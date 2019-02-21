@@ -1,9 +1,8 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "org.elastos.hive"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
@@ -14,6 +13,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    android.libraryVariants.all { variant ->
+        variant.outputs.all {
+            def fileName = "org.elastos.hive" + '-' + variant.buildType.name + '.aar'
+            outputFileName = fileName
         }
     }
 }
