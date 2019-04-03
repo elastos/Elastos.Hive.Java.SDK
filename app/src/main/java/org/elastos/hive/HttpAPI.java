@@ -4,7 +4,11 @@ import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kamranzafar.jtar.TarEntry;
+import org.kamranzafar.jtar.TarInputStream;
+
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -35,8 +39,12 @@ class HttpAPI {
 			int responseCode = conn.getResponseCode();
 			String value = "";
 			if (responseCode == HttpURLConnection.HTTP_OK) {
-				value = streamToString(conn.getInputStream());
-				if (value != null && !value.isEmpty()) {
+				byte[] data = streamToValue(conn.getInputStream());
+				if (data != null) {
+					value = new String(data);
+				}
+
+				if (!value.isEmpty()) {
 					return new JSONObject(value);
 				}
 
@@ -44,7 +52,10 @@ class HttpAPI {
 			}
 			// responseCode: 400
 			else if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST) {
-				value = streamToString(conn.getErrorStream());
+				byte[] data = streamToValue(conn.getErrorStream());
+				if (data != null) {
+					value = new String(data);
+				}
 			}
 			// responseCode: 500
 			else if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR) {
@@ -57,6 +68,7 @@ class HttpAPI {
 			throw new RuntimeException(String.format("Http has error(rc: %d): [%s]" ,responseCode,  value));
 		}
 		catch (ConnectException e) {
+			e.printStackTrace();
 			throw new RuntimeException("Failed to connect to hive daemon at " + url);
 		}
 		catch (JSONException e) {
@@ -67,7 +79,7 @@ class HttpAPI {
 		}
 	}
 
-	static String getString(String url) throws RuntimeException {
+	static byte[] getValue(String url) throws RuntimeException {
 		try {
 			Log.d(TAG, String.format("getString url: %s", url));
 			URL target = new URL(url);
@@ -78,12 +90,19 @@ class HttpAPI {
 			/* 200 represents HTTP OK */
 			int responseCode = conn.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
-				return streamToString(conn.getInputStream());
+				if (url.contains(NodeCmd.FILE_GET)) {
+					return tarStreamToValue(conn.getInputStream());
+				}
+
+				return streamToValue(conn.getInputStream());
 			}
 
 			String value = "";
 			if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST) {
-				value = streamToString(conn.getErrorStream());
+				byte[] data = streamToValue(conn.getErrorStream());
+				if (data != null) {
+					value = new String(data);
+				}
 			}
 			else if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				JSONObject json = streamToJson(conn.getErrorStream());
@@ -236,7 +255,10 @@ class HttpAPI {
 
 			String value = "";
 			if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST) {
-				value = streamToString(urlConn.getErrorStream());
+				byte[] result = streamToValue(urlConn.getErrorStream());
+				if (result != null) {
+					value = new String(result);
+				}
 			}
 			else if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				JSONObject json = streamToJson(urlConn.getErrorStream());
@@ -251,6 +273,7 @@ class HttpAPI {
 			throw new RuntimeException("Json getString failed");
 		}
 		catch (IOException e) {
+			e.printStackTrace();
 			throw new RuntimeException("IOException contacting IPFS");
 		}
 		finally {
@@ -293,19 +316,43 @@ class HttpAPI {
 		return null;
 	}
 
-	private static String streamToString(InputStream is) {
+	private static byte[] streamToValue(InputStream is) {
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-
-			String lines;
-			StringBuilder builder = new StringBuilder();
-			while ((lines = reader.readLine()) != null) {
-				lines = URLDecoder.decode(lines, "utf-8");
-				builder.append(lines);
+			ByteArrayOutputStream bytestream = new ByteArrayOutputStream();
+			int ch;
+			while ((ch = is.read()) != -1) {
+				bytestream.write(ch);
 			}
-			reader.close();
+			byte data[] = bytestream.toByteArray();
+			bytestream.close();
+			return data;
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 
-			return builder.toString();
+		return null;
+	}
+
+	private static byte[] tarStreamToValue(InputStream is) {
+		try {
+			TarInputStream tis = new TarInputStream(is);
+			TarEntry entry;
+
+			ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+			while((entry = tis.getNextEntry()) != null) {
+				int count;
+				byte data[] = new byte[2048];
+				while((count = tis.read(data)) != -1) {
+					byteStream.write(data, 0, count);
+				}
+			}
+
+			byte data[] = byteStream.toByteArray();
+			tis.close();
+			byteStream.close();
+
+			return data;
 		}
 		catch (IOException e) {
 			e.printStackTrace();

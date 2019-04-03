@@ -12,17 +12,13 @@ class NodeCmd {
 	static final String UID_NEW   = "uid/new";
 	static final String UID_RENEW = "uid/renew";
 	static final String UID_INFO  = "uid/info";
+	static final String UID_LOGIN = "uid/login";
 
 	// file
 	static final String FILE_ADD = "file/add";
 	static final String FILE_GET = "file/get";
 	static final String FILE_LS  = "file/ls";
 	static final String FILE_CAT = "file/cat";
-
-	// file/pin
-	static final String PIN_ADD = "pin/add";
-	static final String PIN_LS  = "pin/ls";
-	static final String PIN_RM  = "pin/rm";
 
 	// files
 	static final String FILES_CP     = "files/cp";
@@ -35,11 +31,9 @@ class NodeCmd {
 	static final String FILES_STAT   = "files/stat";
 	static final String FILES_WRITE  = "files/write";
 
-	// name
-	static final String NAME_PUBLISH = "name/publish";
-
 	// version
 	static final String VERSION = "version";
+	static final String PREFIX = "/ipfs/";
 
 	static void initialize(String ip) {
 		HIVE_BASE = String.format(HIVE_BASE_FORMAT, ip);
@@ -63,14 +57,14 @@ class NodeCmd {
 		return HttpAPI.get(url);
 	}
 
-	static String executeEx(String cmd, String extra) {
+	static byte[] executeEx(String cmd, String extra) {
 		String url = HIVE_BASE + HIVE_API + cmd;
 
 		if (extra != null && !extra.isEmpty()) {
 			url += "?" + extra;
 		}
 
-		return HttpAPI.getString(url);
+		return HttpAPI.getValue(url);
 	}
 
 	static JSONObject execute(String cmd, String filePath, byte[] data, Map<String, String> params) {
