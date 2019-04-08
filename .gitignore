@@ -1,12 +1,27 @@
-*.iml
-/gradle
-.gradle
-/gradle.properties
-/local.properties
-.idea
-/.idea/workspace.xml
-/.idea/libraries
-.DS_Store
-/build
-/captures
+# Gradle
+.gradle/
+.project
+.classpath
+.settings/
+bin/
+doc/
+build/
 
+# Maven build output folder
+/target/
+
+# IntelliJ project folder
+intellij/
+.idea/
+*.iml
+gradle.properties
+local.properties
+
+# Output file when rendering ReadMe.md locally.
+/ReadMe.html
+
+# editor temp files
+*~
+
+# macOS
+*.DS_Store
