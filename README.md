@@ -1,1 +1,1 @@
-# HIVE-JAVA-APIs
+# ElastosHiveSDK
