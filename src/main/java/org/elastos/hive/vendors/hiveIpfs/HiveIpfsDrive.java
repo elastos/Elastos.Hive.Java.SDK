@@ -47,6 +47,11 @@ public final class HiveIpfsDrive extends HiveDrive {
 	}
 
 	@Override
+	public void logout() {
+		// TODO
+	}
+
+	@Override
 	@NotNull
 	public HiveFile getRootDir() throws HiveException {
 		// TODO

@@ -54,6 +54,11 @@ public final class OneDrive extends HiveDrive {
 	}
 
 	@Override
+	public void logout() {
+		// TODO
+	}
+
+	@Override
 	public @NotNull HiveFile getRootDir() throws HiveException {
 		return getFile("/");
 	}
@@ -81,5 +86,4 @@ public final class OneDrive extends HiveDrive {
 	String getRootPath() {
 		return GRAPH_API_ROOT;
 	}
-
 }
