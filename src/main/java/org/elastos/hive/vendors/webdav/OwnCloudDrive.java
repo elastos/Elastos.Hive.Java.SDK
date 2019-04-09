@@ -50,6 +50,11 @@ public final class OwnCloudDrive extends HiveDrive {
 	}
 
 	@Override
+	public void logout() {
+		// TODO
+	}
+
+	@Override
 	public @NotNull HiveFile getRootDir() throws HiveException {
 		// TODO
 		return null;

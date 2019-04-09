@@ -11,7 +11,7 @@ public abstract class HiveDrive {
 	/**
 	 * Create an instance with specific options.
 	 *
-	 * @param options TODO
+	 * @param parameters The drive parameters to make authorization and authentication
 	 * @return An new drive instance.
 	 */
 	public static HiveDrive createInstance(@NotNull DriveParameters parameters) {
@@ -36,7 +36,7 @@ public abstract class HiveDrive {
 	/**
 	 * Get an instance of specific drive type.
 	 *
-	 * @param driveType The drive type
+	 * @param driveType The type to specify drive.
 	 * @return An drive instance.
 	 */
 	public static HiveDrive getInstance(DriveType driveType) {
@@ -71,6 +71,8 @@ public abstract class HiveDrive {
 	 */
 
 	public abstract boolean login(Authenticator authenticator) throws HiveException;
+
+	public abstract void logout();
 
 	/**
 	 * Get drive type.
