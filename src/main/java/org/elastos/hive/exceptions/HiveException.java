@@ -6,5 +6,9 @@ public class HiveException extends Exception {
 		// TODO Auto-generated constructor stub
 	}
 
+	public HiveException(final String message) {
+		//TODO;
+	}
+
 	private static final long serialVersionUID = 1486850840770311509L;
 }
