@@ -1,10 +1,13 @@
 package org.elastos.hive.vendors.onedrive;
 
+import java.util.concurrent.Semaphore;
+
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.AuthInfo;
-import org.elastos.hive.AuthResult;
+import org.elastos.hive.AuthServer;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.exceptions.HiveException;
+import org.jetbrains.annotations.NotNull;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -12,7 +15,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 final class OneDriveAuthHelper implements AuthHelper {
-	private final static String REQUEST_URL_PREFIX = "https://login.microsoftonline.com/common/oauth2/v2.0/";
+	private final static String AUTH_URL_PREFIX = "https://login.microsoftonline.com/common/oauth2/v2.0";
 
 	private final String appId;
 	private final String scopes;
@@ -29,22 +32,9 @@ final class OneDriveAuthHelper implements AuthHelper {
 	@Override
 	public synchronized boolean login(Authenticator authenticator) throws HiveException {
 		if (!hasLogin()) {
-			String requestUrl;
-			AuthResult result;
-
-			requestUrl = REQUEST_URL_PREFIX + "authorize?"
-					+ "client_id=" + appId
-					+ "&scope=" + scopes
-					+ "&response_type=code"
-					+ "&redirect_url=" + redirectUrl;
-
-			result = authenticator.requestAuthentication(requestUrl);
-			if (!result.isAuthorized()) {
-				// TODO;
-			}
-
-			requestAccessToken(result.getAuthorCode());
-			result = null;
+			String authCode = getAuthCode(authenticator);
+			requestAccessToken(authCode);
+			authCode = null;
 		}
 
 		if (isExpired()) {
@@ -54,15 +44,39 @@ final class OneDriveAuthHelper implements AuthHelper {
 		return true;
 	}
 
-	private void requestAccessToken(String authorCode) throws HiveException {
-		HttpResponse<JsonNode> response;
-		try {
-			String body = "client_id=" + appId
-					+ "&redirect_url=" + redirectUrl
-					+ "&code=" + authorCode
-					+ "&grant_type=authorization_code";
+	private @NotNull String getAuthCode(Authenticator authenticator) throws HiveException {
+		String url = String
+				.format("%s/authorize?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
+						AUTH_URL_PREFIX, appId, scopes, redirectUrl)
+				.replace(" ", "%20");
 
-			response = Unirest.post(REQUEST_URL_PREFIX + "token")
+		Semaphore semph = new Semaphore(1);
+		AuthServer server = new AuthServer(semph);
+		server.start();
+
+		authenticator.requestAuthentication(url);
+
+		try {
+			semph.acquire();
+		}catch (InterruptedException e) {
+			e.printStackTrace();
+			//TODO
+		}
+
+		String authCode = server.getAuthCode();
+		server.close();
+		semph.release();
+
+		return authCode;
+	}
+
+	private void requestAccessToken(String authCode) throws HiveException {
+		try {
+			String body = String
+					.format("client_id=%s&%redirect_url=%s&code=%s&grant_type=authorization_code",
+							appId, redirectUrl, authCode);
+
+			HttpResponse<JsonNode> response = Unirest.post(AUTH_URL_PREFIX + "/token")
 							.header("Content-Type", "application/x-www-form-urlencoded")
 							.body(body)
 							.asJson();
@@ -81,14 +95,12 @@ final class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	private void refreshAccessToken() throws HiveException {
-		HttpResponse<JsonNode> response;
 		try {
-			String body = "client_id=" + appId
-					+ "&redirect_url=" + redirectUrl
-					+ "&refresh_token=" + authInfo.getRefreshToken()
-					+ "&grant_type=refresh_token";
+			String body = String
+					.format("client_id=%s&%redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
+							appId, redirectUrl, authInfo.getRefreshToken());
 
-			response = Unirest.post(REQUEST_URL_PREFIX + "token")
+			HttpResponse<JsonNode> response = Unirest.post(AUTH_URL_PREFIX + "token")
 					.header("Content-Type", "application/x-www-form-urlencoded")
 					.body(body)
 					.asJson();
