@@ -2,6 +2,11 @@ package org.elastos.hive;
 
 import static org.junit.Assert.assertTrue;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.elastos.hive.exceptions.HiveException;
 import org.junit.Test;
 
@@ -25,20 +30,21 @@ public class HiveDriveTest {
 
 	@Test public void testLogin() {
 		class TestAuthenticator extends Authenticator {
-			TestAuthenticator() {
-				//TODO;
-			}
-
 			@Override
-			public AuthResult requestAuthentication(String requestUrl) {
-				// TODO Auto-generated method stub
-				return null;
+			public void requestAuthentication(String requestUrl) {
+				try {
+					Desktop.getDesktop().browse(new URI(requestUrl));
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
 		DriveParameters parameters = DriveParameters.createForOneDrive("3d0f9362-0f69-4a45-9ead-f653c2712290",
 				"offline_access Files.ReadWrite",
-				"https://login.microsoftonline.com/common/oauth2/nativeclient");
+				"http://localhost:44316");
 
 		try {
 			HiveDrive drive = HiveDrive.createInstance(parameters);
@@ -50,6 +56,7 @@ public class HiveDriveTest {
 			drive.logout();
 		} catch (HiveException e) {
 			e.printStackTrace();
+			assertTrue("Test login errror", false);
 		}
     }
 }

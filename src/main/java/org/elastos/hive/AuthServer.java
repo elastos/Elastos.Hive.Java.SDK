@@ -29,9 +29,10 @@ public final class AuthServer {
 		}
 
 		try {
-			server = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
+			server = HttpServer.create(new InetSocketAddress("localhost", 44316), 0);
 			server.createContext("/", new AuthHandler());
 			server.setExecutor(null);
+
 		}
 		catch (IOException e) {
 			e.printStackTrace();
