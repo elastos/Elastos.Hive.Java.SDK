@@ -39,7 +39,7 @@ final class OneDriveAuthHelper implements AuthHelper {
 		}
 
 		if (isExpired()) {
-			refreshAccessToken();
+			redeemAccessToken();
 		}
 
 		return true;
@@ -79,14 +79,13 @@ final class OneDriveAuthHelper implements AuthHelper {
 							appId, redirectUrl, authCode);
 
 			HttpResponse<JsonNode> response = Unirest.post(AUTH_URL + "/token")
-							.header("Content-Type", "application/x-www-form-urlencoded")
-							.body(body)
-							.asJson();
+					.header("Content-Type", "application/x-www-form-urlencoded")
+					.body(body)
+					.asJson();
 
 			if (response.getStatus() == 200) {
 				JSONObject jsonObj = response.getBody().getObject();
-				AuthInfo authInfo = new AuthInfo();
-
+				authInfo = new AuthInfo();
 				authInfo.withScopes(jsonObj.getString("scope"))
 						.withAccessToken(jsonObj.getString("access_token"))
 						.withRefreshToken(jsonObj.getString("refresh_token"))
@@ -102,14 +101,14 @@ final class OneDriveAuthHelper implements AuthHelper {
 			// TODO
 			e.printStackTrace();
 		}
-
-
 	}
 
-	private void refreshAccessToken() throws HiveException {
+	private void redeemAccessToken() throws HiveException {
 		try {
+			System.out.println("refreshToken: " + authInfo.getAccessToken());
+
 			String body = String
-					.format("client_id=%s&%redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
+					.format("client_id=%s&redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
 							appId, redirectUrl, authInfo.getRefreshToken());
 
 			HttpResponse<JsonNode> response = Unirest.post(AUTH_URL + "token")
@@ -118,7 +117,12 @@ final class OneDriveAuthHelper implements AuthHelper {
 					.asJson();
 
 			if (response.getStatus() == 200) {
-				// TODO;
+				JSONObject jsonObj = response.getBody().getObject();
+
+				authInfo.resetAccessToken(jsonObj.getString("access_token"));
+
+				System.out.println("accessToken: " + authInfo.getAccessToken());
+
 			} else {
 				// TODO;
 			}
@@ -126,10 +130,10 @@ final class OneDriveAuthHelper implements AuthHelper {
 			// TODO
 			e.printStackTrace();
 		}
-		// TODO:
 	}
 
-	private AuthInfo getAuthInfo() {
+	@Override
+	public AuthInfo getAuthInfo() {
 		return authInfo;
 	}
 

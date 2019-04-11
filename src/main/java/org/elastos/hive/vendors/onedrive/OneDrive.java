@@ -9,15 +9,23 @@ import org.elastos.hive.HiveFile;
 import org.elastos.hive.exceptions.HiveException;
 import org.elastos.hive.parameters.OneDriveParameters;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 /**
  * OneDrive class
  */
 public final class OneDrive extends HiveDrive {
-	private final String GRAPH_API_ROOT = "https://graph.microsoft.com/v1.0/me/drive/root";
+	private final String API_URL = "https://graph.microsoft.com/v1.0/me/drive";
 
 	private static OneDrive onedriveInstance;
 	private final AuthHelper authHelper;
+
+	private String driveId;
 
 	private OneDrive(DriveParameters params) {
 		OneDriveParameters parameters = (OneDriveParameters) params;
@@ -50,7 +58,29 @@ public final class OneDrive extends HiveDrive {
 
 	@Override
 	public boolean login(@NotNull Authenticator authenticator) throws HiveException {
-		return authHelper.login(authenticator);
+		authHelper.login(authenticator);
+		validateDrive();
+
+		return true; //TODO
+	}
+
+	private void validateDrive() throws HiveException {
+		try {
+			HttpResponse<JsonNode> response = Unirest.get(API_URL)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.asJson();
+			if (response.getStatus() == 200) {
+				JSONObject jsonObj = response.getBody().getObject();
+				driveId = jsonObj.getString("id");
+				System.out.println("driveId: " + driveId);
+
+			} else {
+				//TODO;
+			}
+		} catch (UnirestException e) {
+			// TODO
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -84,6 +114,6 @@ public final class OneDrive extends HiveDrive {
 	}
 
 	String getRootPath() {
-		return GRAPH_API_ROOT;
+		return API_URL + "/root";
 	}
 }

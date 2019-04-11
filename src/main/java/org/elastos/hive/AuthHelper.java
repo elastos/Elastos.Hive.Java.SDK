@@ -7,4 +7,6 @@ public interface AuthHelper {
 	public boolean login(Authenticator authenticator) throws HiveException;
 
 	public void checkExpired() throws HiveException;
+
+	public AuthInfo getAuthInfo();
 }
