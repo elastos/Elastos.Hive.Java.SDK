@@ -1,19 +1,33 @@
 package org.elastos.hive;
 
-import org.jetbrains.annotations.NotNull;
-
 public class AuthInfo {
 	// private final @NotNull String tokenType;
-	private final @NotNull String scopes;
-	private final @NotNull String refreshToken;
+	private String scopes;
+	private String refreshToken;
 	private String accessToken;
 	private long expiredIn;
 
-	public AuthInfo(String scopes, String accessToken, String refreshToken, long expiredIn) {
+	public AuthInfo() {
+	}
+
+	public AuthInfo withScopes(String scopes) {
 		this.scopes = scopes;
+		return this;
+	}
+
+	public AuthInfo withAccessToken(String accessToken) {
 		this.accessToken = accessToken;
+		return this;
+	}
+
+	public AuthInfo withRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
+		return this;
+	}
+
+	public AuthInfo withExpiredIn(long expiredIn) {
 		this.expiredIn = expiredIn;
+		return this;
 	}
 
 	public void resetAccessToken(String accessToken) {
@@ -22,6 +36,10 @@ public class AuthInfo {
 
 	public String getRefreshToken() {
 		return refreshToken;
+	}
+
+	public String getAccessToken() {
+		return accessToken;
 	}
 
 	public boolean isExpired() {
