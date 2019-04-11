@@ -64,6 +64,7 @@ final class OneDriveAuthHelper implements AuthHelper {
 		}
 
 		String authCode = server.getAuthCode();
+		System.out.println("authCode:" + authCode);
 		server.close();
 		semph.release();
 
