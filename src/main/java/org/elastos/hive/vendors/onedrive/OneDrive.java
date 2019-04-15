@@ -1,5 +1,10 @@
 package org.elastos.hive.vendors.onedrive;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.File;
+import java.io.FileInputStream;
+
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.DriveParameters;
@@ -98,8 +103,26 @@ public final class OneDrive extends HiveDrive {
 	public HiveFile getFile(@NotNull String pathName) throws HiveException {
 		authHelper.checkExpired();
 
-		OneDriveFile file = new OneDriveFile(this, pathName);
-		file.doHttpGet();
+		OneDriveFile file = null;
+//		file.doHttpGet();
+
+		try {
+			String requestUrl = getRootPath() + ":/" + pathName + ":/content";
+			HttpResponse<String> response = Unirest.get(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.asString();
+			
+			System.out.println("getFile body="+response.getBody());
+			if (response.getStatus() == 200) {
+				file = new OneDriveFile(this, pathName);
+			} 
+			else {
+				throw new UnirestException("Using Unirest.get has error: " + response.getStatus());
+			}
+		} catch (UnirestException e) {
+			// TODO
+			e.printStackTrace();
+		}
 
 		return file;
 	}
@@ -109,8 +132,39 @@ public final class OneDrive extends HiveDrive {
 	protected HiveFile createFile(@NotNull String pathName) throws HiveException {
 		authHelper.checkExpired();
 
-		// TODO
-		return null;
+		int pos = pathName.lastIndexOf("/");
+		String fileName = pathName.substring(pos);
+		String requestUrl = getRootPath() + ":" + fileName + ":/content";
+		
+		OneDriveFile oneDriveFile = null;
+		HttpResponse<JsonNode> response;
+
+		try {
+			File file = new File(pathName);
+			@SuppressWarnings("resource")
+			InputStream input = new FileInputStream(file);
+			byte[] data = new byte[input.available()];
+			input.read(data);
+			
+			response = Unirest.put(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.body(data)
+					.asJson();
+			if (response.getStatus() == 200) {
+				oneDriveFile = new OneDriveFile(this, pathName);
+			} 
+			else {
+				throw new UnirestException("Using Unirest.get has error: " + response.getStatus());
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
+
+		return oneDriveFile;
 	}
 
 	String getRootPath() {

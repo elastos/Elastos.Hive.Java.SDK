@@ -42,7 +42,7 @@ public class HiveDriveTest {
 			}
 		}
 
-		DriveParameters parameters = DriveParameters.createForOneDrive("3d0f9362-0f69-4a45-9ead-f653c2712290",
+		DriveParameters parameters = DriveParameters.createForOneDrive("9021f9b8-3afc-4770-b5e2-7a92ddac3abb",
 				"offline_access Files.ReadWrite",
 				"http://localhost:44316");
 
@@ -53,6 +53,13 @@ public class HiveDriveTest {
 			TestAuthenticator testAuth = new TestAuthenticator();
 
 			drive.login(testAuth);
+		
+			//Test Create file
+			String pathName = "/home/path/testCreateFile.txt";
+			drive.createFile(pathName);
+			
+			HiveFile oneDriveFile = drive.getFile("testCreateFile.txt");
+			
 			drive.logout();
 		} catch (HiveException e) {
 			e.printStackTrace();
