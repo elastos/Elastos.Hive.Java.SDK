@@ -14,7 +14,7 @@ public abstract class DriveParameters {
 	 */
 	abstract protected DriveType getDriveType();
 
-	public static DriveParameters createForOneDrive(String applicationId, String scopes, String redirectUrl) {
-		return new OneDriveParameters(applicationId, scopes, redirectUrl);
+	public static DriveParameters createForOneDrive(String clientId, String scopes, String redirectUrl) {
+		return new OneDriveParameters(clientId, scopes, redirectUrl);
 	}
 }

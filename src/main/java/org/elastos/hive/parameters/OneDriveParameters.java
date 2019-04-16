@@ -5,7 +5,7 @@ import org.elastos.hive.DriveType;
 import org.jetbrains.annotations.NotNull;
 
 public final class OneDriveParameters extends DriveParameters {
-	private @NotNull String appId;
+	private @NotNull String clientId;
 	private @NotNull String scopes;
 	private @NotNull String redirectUrl;
 
@@ -13,12 +13,12 @@ public final class OneDriveParameters extends DriveParameters {
 	 * Class constructor
 	 *
 	 * @param applicationId The registered application Id.
-	 * @param scopes        TODO
+	 * @param scopes        The all permissions.
 	 * @param redirectUrl   The built-in redirect URL
 	 */
-	public OneDriveParameters(String appId, String scopes, String redirectUrl) {
+	public OneDriveParameters(String clientId, String scopes, String redirectUrl) {
 		this.scopes = scopes;
-		this.appId = appId;
+		this.clientId = clientId;
 		this.redirectUrl = redirectUrl;
 	}
 
@@ -27,8 +27,8 @@ public final class OneDriveParameters extends DriveParameters {
 		return DriveType.oneDrive;
 	}
 
-	public @NotNull String getAppId() {
-		return this.appId;
+	public @NotNull String getClientId() {
+		return this.clientId;
 	}
 
 	public @NotNull String getScopes() {

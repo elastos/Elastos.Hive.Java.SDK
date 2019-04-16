@@ -29,7 +29,7 @@ public final class OneDrive extends HiveDrive {
 
 	private OneDrive(DriveParameters params) {
 		OneDriveParameters parameters = (OneDriveParameters) params;
-		authHelper = new OneDriveAuthHelper(parameters.getAppId(),
+		authHelper = new OneDriveAuthHelper(parameters.getClientId(),
 				parameters.getScopes(),
 				parameters.getRedirectUrl());
 	}

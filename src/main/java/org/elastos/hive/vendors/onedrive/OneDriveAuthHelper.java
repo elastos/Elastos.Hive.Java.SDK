@@ -18,15 +18,15 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 final class OneDriveAuthHelper implements AuthHelper {
 	private final static String AUTH_URL = "https://login.microsoftonline.com/common/oauth2/v2.0";
 
-	private final String appId;
+	private final String clientId;
 	private final String scopes;
 	private final String redirectUrl;
 
 	private AuthInfo authInfo;
 
-	OneDriveAuthHelper(String appId, String scopes, String redirectUrl) {
-		this.appId = appId;
+	OneDriveAuthHelper(String clientId, String scopes, String redirectUrl) {
 		this.scopes = scopes;
+		this.clientId = clientId;
 		this.redirectUrl = redirectUrl;
 	}
 
@@ -48,7 +48,7 @@ final class OneDriveAuthHelper implements AuthHelper {
 	private @NotNull String getAuthCode(Authenticator authenticator) throws HiveException {
 		String url = String
 				.format("%s/authorize?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-						AUTH_URL, appId, scopes, redirectUrl)
+						AUTH_URL, clientId, scopes, redirectUrl)
 				.replace(" ", "%20");
 
 		Semaphore semph = new Semaphore(1);
@@ -76,7 +76,7 @@ final class OneDriveAuthHelper implements AuthHelper {
 		try {
 			String body = String
 					.format("client_id=%s&redirect_url=%s&code=%s&grant_type=authorization_code",
-							appId, redirectUrl, authCode);
+							clientId, redirectUrl, authCode);
 
 			HttpResponse<JsonNode> response = Unirest.post(AUTH_URL + "/token")
 					.header("Content-Type", "application/x-www-form-urlencoded")
@@ -109,7 +109,7 @@ final class OneDriveAuthHelper implements AuthHelper {
 
 			String body = String
 					.format("client_id=%s&redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
-							appId, redirectUrl, authInfo.getRefreshToken());
+							clientId, redirectUrl, authInfo.getRefreshToken());
 
 			HttpResponse<JsonNode> response = Unirest.post(AUTH_URL + "token")
 					.header("Content-Type", "application/x-www-form-urlencoded")
