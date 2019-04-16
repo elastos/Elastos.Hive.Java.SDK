@@ -90,7 +90,11 @@ public final class OneDrive extends HiveDrive {
 
 	@Override
 	public void logout() {
-		// TODO
+		try {
+			authHelper.logout();
+		} catch (HiveException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -103,11 +107,19 @@ public final class OneDrive extends HiveDrive {
 	public HiveFile getFile(@NotNull String pathName) throws HiveException {
 		authHelper.checkExpired();
 
+		if (authHelper.getAuthInfo() == null) {
+			System.out.println("Please login first");
+			return null;
+		}
+		
 		OneDriveFile file = null;
 //		file.doHttpGet();
 
 		try {
 			String requestUrl = getRootPath() + ":/" + pathName + ":/content";
+			if (pathName.equals("/")) {
+				requestUrl = getRootPath();
+			}
 			HttpResponse<String> response = Unirest.get(requestUrl)
 					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
 					.asString();

@@ -45,6 +45,25 @@ final class OneDriveAuthHelper implements AuthHelper {
 		return true;
 	}
 
+	@Override
+	public void logout() throws HiveException {
+		try {
+			String requestUrl = AUTH_URL + "/logout?post_logout_redirect_uri=" + redirectUrl;
+			HttpResponse<String> response = Unirest.get(requestUrl)
+					.asString();
+			if (response.getStatus() == 200) {
+				System.out.println("logout response.getBody(): " + response.getBody());
+				authInfo = null;
+			} 
+			else {
+				throw new HiveException("logout has error");
+			}
+		} 
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private @NotNull String getAuthCode(Authenticator authenticator) throws HiveException {
 		String url = String
 				.format("%s/authorize?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
