@@ -4,6 +4,8 @@ import org.elastos.hive.AuthHelper;
 import org.elastos.hive.HiveFile;
 import org.elastos.hive.exceptions.HiveException;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -64,11 +66,40 @@ final class OneDriveFile extends HiveFile {
 
 	@Override
 	public boolean isFile() {
-		return isFile;
+//		return isFile;
+		return !isDirectory();
 	}
 
 	@Override
 	public boolean isDirectory() {
+		HttpResponse<JsonNode> response;
+
+		try {
+			String requestUrl = oneDrive.getRootPath() + ":/" + pathName;
+			response = Unirest.get(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.asJson();
+			if (response.getStatus() == 200) {
+				System.out.println("isDirectory response: " + response.getBody());
+				JsonNode node = response.getBody();
+				System.out.println("isDirectory node: " + node.toString());
+				JSONObject object = node.getObject();
+				try {
+					object.get("folder");
+					isDirectory = true;
+				} catch (JSONException e) {
+//					e.printStackTrace();
+					isDirectory = false;
+				}
+			} 
+			else {
+				System.out.println("Invoking isDirectory has error: status=" + response.getStatus());
+			}
+		} catch (UnirestException e) {
+			// TODO
+			e.printStackTrace();
+		}
+		
 		return isDirectory;
 	}
 

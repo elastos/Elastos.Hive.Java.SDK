@@ -59,8 +59,15 @@ public class HiveDriveTest {
 			drive.createFile(pathName);
 			
 			HiveFile oneDriveFile = drive.getFile("testCreateFile.txt");
-			
-			drive.logout();
+
+			boolean isDir = oneDriveFile.isFile();
+			System.out.println("==========================isFile="+isDir);
+//			drive.getFile("test");
+			oneDriveFile = drive.getFile("test");
+			isDir = oneDriveFile.isDirectory();
+			System.out.println("==========================isDir="+isDir);
+//			drive.getRootDir();
+//			drive.logout();
 		} catch (HiveException e) {
 			e.printStackTrace();
 			assertTrue("Test login errror", false);

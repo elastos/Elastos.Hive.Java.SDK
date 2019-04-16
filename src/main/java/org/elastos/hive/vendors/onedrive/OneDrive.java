@@ -118,8 +118,12 @@ public final class OneDrive extends HiveDrive {
 		try {
 			String requestUrl = getRootPath() + ":/" + pathName + ":/content";
 			if (pathName.equals("/")) {
-				requestUrl = getRootPath();
+				requestUrl = getRootPath() + "/children";
 			}
+			else if (!pathName.contains(".")) {
+				requestUrl = getRootPath() + ":/" + pathName;
+			}
+			
 			HttpResponse<String> response = Unirest.get(requestUrl)
 					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
 					.asString();
