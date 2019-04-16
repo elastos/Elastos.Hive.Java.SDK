@@ -1,7 +1,6 @@
 package org.elastos.hive;
 
 public class AuthInfo {
-	// private final @NotNull String tokenType;
 	private String scopes;
 	private String refreshToken;
 	private String accessToken;

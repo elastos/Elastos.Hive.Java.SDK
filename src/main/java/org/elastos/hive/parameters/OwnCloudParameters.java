@@ -4,7 +4,6 @@ import org.elastos.hive.DriveParameters;
 import org.elastos.hive.DriveType;
 
 public final class OwnCloudParameters extends DriveParameters {
-
 	@Override
 	protected DriveType getDriveType() {
 		return DriveType.ownCloud;
