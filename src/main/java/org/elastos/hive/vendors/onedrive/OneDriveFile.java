@@ -4,6 +4,7 @@ import org.elastos.hive.AuthHelper;
 import org.elastos.hive.HiveFile;
 import org.elastos.hive.exceptions.HiveException;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -77,8 +78,8 @@ final class OneDriveFile extends HiveFile {
 					.asJson();
 			if (response.getStatus() == 200) {
 				try {
-					JSONObject rootJson = response.getBody().getObject();
-					JSONObject fileSystemInfo = (JSONObject)rootJson.get("fileSystemInfo");
+					JSONObject baseJson = response.getBody().getObject();
+					JSONObject fileSystemInfo = (JSONObject)baseJson.get("fileSystemInfo");
 					lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -144,8 +145,55 @@ final class OneDriveFile extends HiveFile {
 	@Override
 	public @NotNull HiveFile[] list() throws HiveException {
 		authHelper.checkExpired();
-		// TODO
-		return null;
+		if (!isDirectory()) {
+			return null;
+		}
+
+		HiveFile[] files = null;
+		try {
+			String requestUrl = String.format("%s/items/%s/children", OneDrive.API_URL, this.id);
+
+			System.out.println("Invoking [list] requestUrl=" + requestUrl);
+			HttpResponse<JsonNode> response = Unirest.get(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.asJson();
+
+			System.out.println("Invoking [list] body=" + response.getBody());
+			System.out.println("Invoking [list] getStatus=" + response.getStatus());
+			if (response.getStatus() == 200) {
+				JSONObject baseJson = response.getBody().getObject();
+				JSONArray values = baseJson.getJSONArray("value"); 
+				int len = values.length();
+				System.out.println("valuse len=="+len);
+				if (len > 0) {
+					files = new HiveFile[len];
+					for (int i = 0; i < len; i++) {
+						JSONObject itemJson = values.getJSONObject(i);
+						String name = itemJson.getString("name");
+						OneDriveFile file = new OneDriveFile(oneDrive, name);
+
+						String id = itemJson.getString("id");
+						JSONObject fileSystemInfo = (JSONObject)itemJson.get("fileSystemInfo");
+						String createdDateTime = fileSystemInfo.getString("createdDateTime");
+						String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
+						boolean isDir = itemJson.has("folder");
+						System.out.println("id: " + id + ", isDir=="+isDir);
+						file.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
+						files[i] = file;
+					}
+				}
+			}
+
+			throw new HiveException("Invoking the list has error.");
+		} 
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		return files;
 	}
 
 	@Override
@@ -173,21 +221,21 @@ final class OneDriveFile extends HiveFile {
 
 			System.out.println("Invoking [mkdir] body=" + response.getBody());
 			System.out.println("Invoking [mkdir] StatusText=" + response.getStatusText());
-			JSONObject rootJson = response.getBody().getObject();
+			JSONObject baseJson = response.getBody().getObject();
 			if (response.getStatus() != 200 && response.getStatus() != 201) {
 				System.out.println("Invoking [mkdir] has error: status=" + response.getStatus());
-				JSONObject errorJson = (JSONObject)rootJson.get("error");
+				JSONObject errorJson = (JSONObject)baseJson.get("error");
 				String errorMsg = errorJson.getString("message");
 				System.out.println("Invoking [mkdir] error message: " + errorMsg);
 				throw new HiveException(errorMsg);
 			}
 
 			file = new OneDriveFile(oneDrive, pathName);
-			String id = rootJson.getString("id"); 
-			JSONObject fileSystemInfo = (JSONObject)rootJson.get("fileSystemInfo");
+			String id = baseJson.getString("id"); 
+			JSONObject fileSystemInfo = (JSONObject)baseJson.get("fileSystemInfo");
 			String createdDateTime = fileSystemInfo.getString("createdDateTime");
 			String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
-			boolean isDir = rootJson.has("folder");
+			boolean isDir = baseJson.has("folder");
 			System.out.println("id: " + id + ", isDir=="+isDir);
 			file.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
 		} 
