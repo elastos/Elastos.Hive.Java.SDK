@@ -132,12 +132,13 @@ public final class OneDrive extends HiveDrive {
 				file = new OneDriveFile(this, pathName);
 				try {
 					JSONObject rootJson = response.getBody().getObject();
+					String id = rootJson.getString("id"); 
 					JSONObject fileSystemInfo = (JSONObject)rootJson.get("fileSystemInfo");
 					String createdDateTime = fileSystemInfo.getString("createdDateTime");
 					String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
 					boolean isDir = rootJson.has("folder");
-					System.out.println("isDir=="+isDir);
-					file.initialize(isDir, createdDateTime, lastModifiedDateTime);
+					System.out.println("id: " + id + ", isDir=="+isDir);
+					file.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
 				}
 				catch (JSONException e) {
 					e.printStackTrace();

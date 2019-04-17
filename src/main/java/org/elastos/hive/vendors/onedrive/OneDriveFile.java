@@ -19,6 +19,7 @@ final class OneDriveFile extends HiveFile {
 	private OneDrive oneDrive;
 	private String createdDateTime;
 	private String lastModifiedDateTime;
+	private String id;
 	private boolean isFile;
 	private boolean isDirectory;
 
@@ -29,7 +30,8 @@ final class OneDriveFile extends HiveFile {
 		this.oneDrive = oneDrive;
 	}
 	
-	public void initialize(boolean isDir, String createdDateTime, String lastModifiedDateTime) {
+	public void initialize(String id, boolean isDir, String createdDateTime, String lastModifiedDateTime) {
+		this.id = id;
 		this.isDirectory = isDir;
 		this.isFile = !isDir;
 		this.createdDateTime = createdDateTime;
