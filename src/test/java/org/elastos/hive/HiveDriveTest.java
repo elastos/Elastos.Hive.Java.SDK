@@ -101,6 +101,9 @@ public class HiveDriveTest {
 			} catch (HiveException e) {
 				e.printStackTrace();
 			}
+			
+			//5. list the root.
+			root.list();
 
 			//Last; logout
 			drive.logout();

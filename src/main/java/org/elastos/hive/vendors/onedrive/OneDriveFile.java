@@ -177,14 +177,15 @@ final class OneDriveFile extends HiveFile {
 						String createdDateTime = fileSystemInfo.getString("createdDateTime");
 						String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
 						boolean isDir = itemJson.has("folder");
-						System.out.println("id: " + id + ", isDir=="+isDir);
+						System.out.println("name: " + name + ", isDir=="+isDir);
 						file.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
 						files[i] = file;
 					}
 				}
 			}
-
-			throw new HiveException("Invoking the list has error.");
+			else {
+				throw new HiveException("Invoking the list has error.");	
+			}
 		} 
 		catch (UnirestException e) {
 			e.printStackTrace();
