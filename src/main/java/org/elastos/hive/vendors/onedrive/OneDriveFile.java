@@ -223,7 +223,7 @@ final class OneDriveFile extends HiveFile {
 			System.out.println("Invoking [mkdir] body=" + response.getBody());
 			System.out.println("Invoking [mkdir] StatusText=" + response.getStatusText());
 			JSONObject baseJson = response.getBody().getObject();
-			if (response.getStatus() != 200 && response.getStatus() != 201) {
+			if (response.getStatus() != 201) {
 				System.out.println("Invoking [mkdir] has error: status=" + response.getStatus());
 				JSONObject errorJson = (JSONObject)baseJson.get("error");
 				String errorMsg = errorJson.getString("message");
