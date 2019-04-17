@@ -54,20 +54,56 @@ public class HiveDriveTest {
 
 			drive.login(testAuth);
 		
-			//Test Create file
-			String pathName = "/home/path/testCreateFile.txt";
-			drive.createFile(pathName);
-			
-			HiveFile oneDriveFile = drive.getFile("testCreateFile.txt");
+			//1. Create file at the root, the pathName is an existing file at your Desktop.
+			String pathName = "/home/wanli/workspace/Hive/testCreateFile.txt";
+			try {
+				drive.createFile(pathName);	
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 
-			boolean isDir = oneDriveFile.isFile();
-			System.out.println("==========================isFile="+isDir);
-//			drive.getFile("test");
-			oneDriveFile = drive.getFile("test");
-			isDir = oneDriveFile.isDirectory();
+			//2. Get the created file at the root
+			HiveFile testFile = drive.getFile("testCreateFile.txt");
+			
+			//3. Check the HiveFile: file or directory
+			//3.1 file
+			boolean isFile = testFile.isFile();
+			System.out.println("==========================isFile="+isFile);
+			
+			//3.2 directory: the "test" is an exist directory at yourself oneDrive.
+			drive.getFile("test");
+			testFile = drive.getFile("test");
+			boolean isDir = testFile.isDirectory();
 			System.out.println("==========================isDir="+isDir);
-//			drive.getRootDir();
-//			drive.logout();
+			
+			//4. make a directory
+			//4.1 make a directory at the root
+			HiveFile root = drive.getRootDir();
+			String newDirnameString = "testMkdir004";
+			root.mkdir(newDirnameString);
+			try {
+				//Error, if re-create the directory.
+				root.mkdir(newDirnameString);
+			} catch (HiveException e) {
+				e.printStackTrace();
+			}
+
+			HiveFile firstLevel = drive.getFile(newDirnameString);
+			isDir = firstLevel.isDirectory();
+			System.out.println("====================mkdir=firstLevel, isdir="+firstLevel.isDirectory());
+			String secondDir = "testMkdirChild";
+			//4.2 make a directory at the sub directory.
+			firstLevel.mkdir(secondDir);
+
+			try {
+				//Error, if re-create the directory.
+				firstLevel.mkdir(secondDir);
+			} catch (HiveException e) {
+				e.printStackTrace();
+			}
+
+			//Last; logout
+			drive.logout();
 		} catch (HiveException e) {
 			e.printStackTrace();
 			assertTrue("Test login errror", false);

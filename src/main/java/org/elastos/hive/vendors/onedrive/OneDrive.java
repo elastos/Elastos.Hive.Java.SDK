@@ -14,6 +14,7 @@ import org.elastos.hive.HiveFile;
 import org.elastos.hive.exceptions.HiveException;
 import org.elastos.hive.parameters.OneDriveParameters;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -116,21 +117,31 @@ public final class OneDrive extends HiveDrive {
 //		file.doHttpGet();
 
 		try {
-			String requestUrl = getRootPath() + ":/" + pathName + ":/content";
+			String requestUrl = getRootPath() + ":/" + pathName;
 			if (pathName.equals("/")) {
-				requestUrl = getRootPath() + "/children";
+				//Root
+				requestUrl = getRootPath();
 			}
-			else if (!pathName.contains(".")) {
-				requestUrl = getRootPath() + ":/" + pathName;
-			}
-			
-			HttpResponse<String> response = Unirest.get(requestUrl)
+
+			HttpResponse<JsonNode> response = Unirest.get(requestUrl)
 					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
-					.asString();
+					.asJson();
 			
 			System.out.println("getFile body="+response.getBody());
 			if (response.getStatus() == 200) {
 				file = new OneDriveFile(this, pathName);
+				try {
+					JSONObject rootJson = response.getBody().getObject();
+					JSONObject fileSystemInfo = (JSONObject)rootJson.get("fileSystemInfo");
+					String createdDateTime = fileSystemInfo.getString("createdDateTime");
+					String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
+					boolean isDir = rootJson.has("folder");
+					System.out.println("isDir=="+isDir);
+					file.initialize(isDir, createdDateTime, lastModifiedDateTime);
+				}
+				catch (JSONException e) {
+					e.printStackTrace();
+				}
 			} 
 			else {
 				throw new UnirestException("Using Unirest.get has error: " + response.getStatus());

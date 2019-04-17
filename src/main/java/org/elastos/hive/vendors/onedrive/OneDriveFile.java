@@ -28,6 +28,13 @@ final class OneDriveFile extends HiveFile {
 		this.pathName = pathName;
 		this.oneDrive = oneDrive;
 	}
+	
+	public void initialize(boolean isDir, String createdDateTime, String lastModifiedDateTime) {
+		this.isDirectory = isDir;
+		this.isFile = !isDir;
+		this.createdDateTime = createdDateTime;
+		this.lastModifiedDateTime = lastModifiedDateTime;
+	}
 
 	@Override
 	public @NotNull String getPath() {
@@ -37,6 +44,10 @@ final class OneDriveFile extends HiveFile {
 	@Override
 	@NotNull
 	public String getParentPath() {
+		if (pathName.equals("/")) {
+			return pathName;
+		}
+
 		return pathName.substring(0, pathName.lastIndexOf("/") + 1);
 	}
 
@@ -55,6 +66,30 @@ final class OneDriveFile extends HiveFile {
 	@Override
 	@NotNull
 	public String getLastModifiedDateTime() {
+		HttpResponse<JsonNode> response;
+
+		try {
+			String requestUrl = oneDrive.getRootPath() + ":/" + pathName;
+			response = Unirest.get(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.asJson();
+			if (response.getStatus() == 200) {
+				try {
+					JSONObject rootJson = response.getBody().getObject();
+					JSONObject fileSystemInfo = (JSONObject)rootJson.get("fileSystemInfo");
+					lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} 
+			else {
+				System.out.println("Invoking [getLastModifiedDateTime] has error: status=" + response.getStatus());
+			}
+		} 
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
+		
 		return lastModifiedDateTime;
 	}
 
@@ -66,40 +101,11 @@ final class OneDriveFile extends HiveFile {
 
 	@Override
 	public boolean isFile() {
-//		return isFile;
-		return !isDirectory();
+		return isFile;
 	}
 
 	@Override
 	public boolean isDirectory() {
-		HttpResponse<JsonNode> response;
-
-		try {
-			String requestUrl = oneDrive.getRootPath() + ":/" + pathName;
-			response = Unirest.get(requestUrl)
-					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
-					.asJson();
-			if (response.getStatus() == 200) {
-				System.out.println("isDirectory response: " + response.getBody());
-				JsonNode node = response.getBody();
-				System.out.println("isDirectory node: " + node.toString());
-				JSONObject object = node.getObject();
-				try {
-					object.get("folder");
-					isDirectory = true;
-				} catch (JSONException e) {
-//					e.printStackTrace();
-					isDirectory = false;
-				}
-			} 
-			else {
-				System.out.println("Invoking isDirectory has error: status=" + response.getStatus());
-			}
-		} catch (UnirestException e) {
-			// TODO
-			e.printStackTrace();
-		}
-		
 		return isDirectory;
 	}
 
@@ -143,7 +149,44 @@ final class OneDriveFile extends HiveFile {
 	@Override
 	public void mkdir(@NotNull String pathName) throws HiveException {
 		authHelper.checkExpired();
-		// TODO
+		
+		if (!isDirectory()) {
+			throw new HiveException("This is a file, can't create a child folder.");
+		}
+
+		try {
+			String requestUrl = oneDrive.getRootPath() + ":/" + this.pathName + ":/children";
+			
+			//Check: root directory
+			if (this.pathName.equals("/")) {
+				requestUrl = oneDrive.getRootPath() + "/children";
+			}
+
+			System.out.println("Invoking [mkdir] requestUrl=" + requestUrl);
+			//conflictBehavior' value : fail, replace, or rename
+			String body = "{\"name\": \"" + pathName + "\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}";
+
+			System.out.println("Invoking [mkdir] before body=" + body);
+			HttpResponse<JsonNode> response = Unirest.post(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.header("Content-Type", "application/json")
+					.body(body)
+					.asJson();
+
+			System.out.println("Invoking [mkdir] body=" + response.getBody());
+			System.out.println("Invoking [mkdir] StatusText=" + response.getStatusText());
+			if (response.getStatus() != 200 && response.getStatus() != 201) {
+				System.out.println("Invoking [mkdir] has error: status=" + response.getStatus());
+				JSONObject json = response.getBody().getObject();
+				JSONObject errorJson = (JSONObject)json.get("error");
+				String errorMsg = errorJson.getString("message");
+				System.out.println("Invoking [mkdir] error message: " + errorMsg);
+				throw new HiveException(errorMsg);
+			} 
+		} 
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
