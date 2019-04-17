@@ -80,7 +80,10 @@ public class HiveDriveTest {
 			//4.1 make a directory at the root
 			HiveFile root = drive.getRootDir();
 			String newDirnameString = "testMkdir004";
-			root.mkdir(newDirnameString);
+			HiveFile firstLevel = root.mkdir(newDirnameString);
+			isDir = firstLevel.isDirectory();
+			System.out.println("====================mkdir=firstLevel, isdir="+firstLevel.isDirectory());
+			
 			try {
 				//Error, if re-create the directory.
 				root.mkdir(newDirnameString);
@@ -88,9 +91,6 @@ public class HiveDriveTest {
 				e.printStackTrace();
 			}
 
-			HiveFile firstLevel = drive.getFile(newDirnameString);
-			isDir = firstLevel.isDirectory();
-			System.out.println("====================mkdir=firstLevel, isdir="+firstLevel.isDirectory());
 			String secondDir = "testMkdirChild";
 			//4.2 make a directory at the sub directory.
 			firstLevel.mkdir(secondDir);

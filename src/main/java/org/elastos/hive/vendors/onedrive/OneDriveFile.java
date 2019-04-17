@@ -149,13 +149,14 @@ final class OneDriveFile extends HiveFile {
 	}
 
 	@Override
-	public void mkdir(@NotNull String pathName) throws HiveException {
+	public HiveFile mkdir(@NotNull String pathName) throws HiveException {
 		authHelper.checkExpired();
-		
+
 		if (!isDirectory()) {
 			throw new HiveException("This is a file, can't create a child folder.");
 		}
 
+		OneDriveFile file = null;
 		try {
 			String requestUrl = String.format("%s/items/%s/children", OneDrive.API_URL, this.id);
 
@@ -172,18 +173,32 @@ final class OneDriveFile extends HiveFile {
 
 			System.out.println("Invoking [mkdir] body=" + response.getBody());
 			System.out.println("Invoking [mkdir] StatusText=" + response.getStatusText());
+			JSONObject rootJson = response.getBody().getObject();
 			if (response.getStatus() != 200 && response.getStatus() != 201) {
 				System.out.println("Invoking [mkdir] has error: status=" + response.getStatus());
-				JSONObject json = response.getBody().getObject();
-				JSONObject errorJson = (JSONObject)json.get("error");
+				JSONObject errorJson = (JSONObject)rootJson.get("error");
 				String errorMsg = errorJson.getString("message");
 				System.out.println("Invoking [mkdir] error message: " + errorMsg);
 				throw new HiveException(errorMsg);
-			} 
+			}
+
+			file = new OneDriveFile(oneDrive, pathName);
+			String id = rootJson.getString("id"); 
+			JSONObject fileSystemInfo = (JSONObject)rootJson.get("fileSystemInfo");
+			String createdDateTime = fileSystemInfo.getString("createdDateTime");
+			String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
+			boolean isDir = rootJson.has("folder");
+			System.out.println("id: " + id + ", isDir=="+isDir);
+			file.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
 		} 
 		catch (UnirestException e) {
 			e.printStackTrace();
 		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return file;
 	}
 
 	@Override
