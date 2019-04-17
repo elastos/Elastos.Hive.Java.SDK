@@ -26,7 +26,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
  * OneDrive class
  */
 public final class OneDrive extends HiveDrive {
-	private final String API_URL = "https://graph.microsoft.com/v1.0/me/drive";
+	static final String API_URL = "https://graph.microsoft.com/v1.0/me/drive";
 
 	private static OneDrive onedriveInstance;
 	private final AuthHelper authHelper;

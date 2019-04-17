@@ -157,12 +157,7 @@ final class OneDriveFile extends HiveFile {
 		}
 
 		try {
-			String requestUrl = oneDrive.getRootPath() + ":/" + this.pathName + ":/children";
-			
-			//Check: root directory
-			if (this.pathName.equals("/")) {
-				requestUrl = oneDrive.getRootPath() + "/children";
-			}
+			String requestUrl = String.format("%s/items/%s/children", OneDrive.API_URL, this.id);
 
 			System.out.println("Invoking [mkdir] requestUrl=" + requestUrl);
 			//conflictBehavior' value : fail, replace, or rename
