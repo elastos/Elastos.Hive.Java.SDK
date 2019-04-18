@@ -54,13 +54,13 @@ public class HiveDriveTest {
 
 			drive.login(testAuth);
 		
-			//1. Create file at the root, the pathName is an existing file at your Desktop.
-			String pathName = "/home/wanli/workspace/Hive/testCreateFile.txt";
-			try {
-				drive.createFile(pathName);	
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
+			//1.1 Create file at the root
+			String pathName = "testCreateFile3.txt";
+			drive.createFile(pathName);	
+
+			//1.1 Create file at the root/test
+			pathName = "/test/testCreateFile3.txt";
+			drive.createFile(pathName);
 
 			//2. Get the created file at the root
 			HiveFile testFile = drive.getFile("testCreateFile.txt");
@@ -71,7 +71,6 @@ public class HiveDriveTest {
 			System.out.println("==========================isFile="+isFile);
 			
 			//3.2 directory: the "test" is an exist directory at yourself oneDrive.
-			drive.getFile("test");
 			testFile = drive.getFile("test");
 			boolean isDir = testFile.isDirectory();
 			System.out.println("==========================isDir="+isDir);
@@ -79,11 +78,11 @@ public class HiveDriveTest {
 			//4. make a directory
 			//4.1 make a directory at the root
 			HiveFile root = drive.getRootDir();
-			String newDirnameString = "testMkdir004";
+			String newDirnameString = "testMkdir008";
 			HiveFile firstLevel = root.mkdir(newDirnameString);
 			isDir = firstLevel.isDirectory();
 			System.out.println("====================mkdir=firstLevel, isdir="+firstLevel.isDirectory());
-			
+
 			try {
 				//Error, if re-create the directory.
 				root.mkdir(newDirnameString);
@@ -93,7 +92,7 @@ public class HiveDriveTest {
 
 			String secondDir = "testMkdirChild";
 			//4.2 make a directory at the sub directory.
-			firstLevel.mkdir(secondDir);
+			HiveFile secondLevel = firstLevel.mkdir(secondDir);
 
 			try {
 				//Error, if re-create the directory.
@@ -101,9 +100,16 @@ public class HiveDriveTest {
 			} catch (HiveException e) {
 				e.printStackTrace();
 			}
-			
-			//5. list the root.
+
+			//5. list the folder.
+			testFile.list();
 			root.list();
+
+			//6. copy the sub directory to root
+			secondLevel.copyTo(root);
+
+			//7. delete the folder
+			firstLevel.delete();
 
 			//Last; logout
 			drive.logout();

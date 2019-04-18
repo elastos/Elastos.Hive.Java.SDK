@@ -115,13 +115,97 @@ final class OneDriveFile extends HiveFile {
 	@Override
 	public void copyTo(@NotNull String newPath) throws HiveException {
 		authHelper.checkExpired();
-		// TODO
+
+		try {
+			if (newPath == null || newPath.isEmpty()) {
+				throw new IllegalArgumentException("Illegal Argument: " + newPath);
+			}
+
+			if (pathName.equals("/")) {
+				throw new HiveException("This is root file");
+			}
+
+			if (newPath.equals(getParentPath())) {
+				throw new HiveException("This file has been existed at the folder: " + newPath);
+			}
+
+			String requestUrl = String.format("%s:/%s:/copy", oneDrive.getRootPath(), newPath);
+			if (newPath.equals("/")) {
+				requestUrl = String.format("%s/copy", oneDrive.getRootPath());
+			}
+
+			int LastPos = pathName.lastIndexOf("/"); 
+			String name = pathName.substring(LastPos + 1);
+
+			String body = "{\"parentReference\": {\"driveId\": \"" + oneDrive.getDeviceId() + 
+					"\",\"id\": \"" + id + "\"},\"name\": \"" + name + "\"}";
+
+			System.out.println("Invoking [copyTo] pathName=" + pathName);
+			System.out.println("Invoking [copyTo] requestUrl=" + requestUrl);
+			System.out.println("Invoking [copyTo] body=" + body);
+			HttpResponse<JsonNode> response = Unirest.post(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.header("Content-Type", "application/json")
+					.body(body)
+					.asJson();
+
+			System.out.println("Invoking [copyTo] body=" + response.getBody());
+			System.out.println("Invoking [copyTo] getStatus=" + response.getStatus());
+			if (response.getStatus() != 202) {
+				throw new HiveException("Invoking the copyTo has error.");	
+			}
+		} 
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public void copyTo(@NotNull HiveFile newFile) throws HiveException {
+	public void copyTo(@NotNull HiveFile newPath) throws HiveException {
 		authHelper.checkExpired();
-		// TODO
+
+		try {
+			if (newPath == null) {
+				throw new IllegalArgumentException("Illegal Argument");
+			}
+
+			if (pathName.equals("/")) {
+				throw new HiveException("This is root file");
+			}
+
+			if (newPath.equals(getParentPath())) {
+				throw new HiveException("This file has been existed at the folder: " + newPath);
+			}
+
+			String requestUrl = String.format("%s/items/%s/copy", OneDrive.API_URL, id);
+			if (newPath.equals("/")) {
+				requestUrl = String.format("%s/copy", oneDrive.getRootPath());
+			}
+
+			int LastPos = pathName.lastIndexOf("/"); 
+			String name = pathName.substring(LastPos + 1);
+
+			String body = "{\"parentReference\": {\"driveId\": \"" + oneDrive.getDeviceId() + 
+					"\",\"id\": \"" + ((OneDriveFile)newPath).getId() + "\"},\"name\": \"" + name + "\"}";
+
+			System.out.println("Invoking [copyTo] pathName=" + pathName);
+			System.out.println("Invoking [copyTo] requestUrl=" + requestUrl);
+			System.out.println("Invoking [copyTo] body=" + body);
+			HttpResponse<JsonNode> response = Unirest.post(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.header("Content-Type", "application/json")
+					.body(body)
+					.asJson();
+
+			System.out.println("Invoking [copyTo] body=" + response.getBody());
+			System.out.println("Invoking [copyTo] getStatus=" + response.getStatus());
+			if (response.getStatus() != 202) {
+				throw new HiveException("Invoking the copyTo has error.");	
+			}
+		} 
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -139,7 +223,23 @@ final class OneDriveFile extends HiveFile {
 	@Override
 	public void delete() throws HiveException {
 		authHelper.checkExpired();
-		doHttpDelete();
+		try {
+			String requestUrl = String.format("%s/items/%s", OneDrive.API_URL, this.id);
+
+			System.out.println("Invoking [delete] requestUrl=" + requestUrl);
+			HttpResponse<JsonNode> response = Unirest.delete(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.asJson();
+
+			System.out.println("Invoking [delete] body=" + response.getBody());
+			System.out.println("Invoking [delete] getStatus=" + response.getStatus());
+			if (response.getStatus() != 204) {
+				throw new HiveException("Invoking the delete has error.");	
+			}
+		} 
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -169,7 +269,11 @@ final class OneDriveFile extends HiveFile {
 					files = new HiveFile[len];
 					for (int i = 0; i < len; i++) {
 						JSONObject itemJson = values.getJSONObject(i);
-						String name = itemJson.getString("name");
+						String name = this.pathName + "/" + itemJson.getString("name");
+						if (this.pathName.equals("/")) {
+							name = this.pathName + itemJson.getString("name");
+						}
+
 						OneDriveFile file = new OneDriveFile(oneDrive, name);
 
 						String id = itemJson.getString("id");
@@ -177,7 +281,7 @@ final class OneDriveFile extends HiveFile {
 						String createdDateTime = fileSystemInfo.getString("createdDateTime");
 						String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
 						boolean isDir = itemJson.has("folder");
-						System.out.println("name: " + name + ", isDir=="+isDir);
+						System.out.println("pathName: " + name + ", isDir=="+isDir);
 						file.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
 						files[i] = file;
 					}
@@ -231,13 +335,21 @@ final class OneDriveFile extends HiveFile {
 				throw new HiveException(errorMsg);
 			}
 
+			System.out.println("Invoking [mkdir] pathName=" + pathName + ", this.pathName="+this.pathName);
+			if (this.pathName.equals("/")) {
+				pathName = this.pathName + pathName;
+			}
+			else {
+				pathName = this.pathName + "/" + pathName;
+			}
+
 			file = new OneDriveFile(oneDrive, pathName);
 			String id = baseJson.getString("id"); 
 			JSONObject fileSystemInfo = (JSONObject)baseJson.get("fileSystemInfo");
 			String createdDateTime = fileSystemInfo.getString("createdDateTime");
 			String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
 			boolean isDir = baseJson.has("folder");
-			System.out.println("id: " + id + ", isDir=="+isDir);
+			System.out.println("pathName: " + pathName + ", id: " + id + ", isDir=="+isDir);
 			file.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
 		} 
 		catch (UnirestException e) {
@@ -305,5 +417,9 @@ final class OneDriveFile extends HiveFile {
 			// TODO
 			e.printStackTrace();
 		}
+	}
+	
+	String getId() {
+		return this.id;
 	}
 }

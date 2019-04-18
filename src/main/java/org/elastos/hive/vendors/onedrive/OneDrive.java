@@ -1,10 +1,5 @@
 package org.elastos.hive.vendors.onedrive;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.File;
-import java.io.FileInputStream;
-
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.DriveParameters;
@@ -160,33 +155,23 @@ public final class OneDrive extends HiveDrive {
 	protected HiveFile createFile(@NotNull String pathName) throws HiveException {
 		authHelper.checkExpired();
 
-		int pos = pathName.lastIndexOf("/");
-		String fileName = pathName.substring(pos);
-		String requestUrl = getRootPath() + ":" + fileName + ":/content";
-		
+		if (pathName == null || pathName.equals("/")) {
+			return null;
+		}
+
+		String requestUrl = getRootPath() + ":/" + pathName + ":/content";
 		OneDriveFile oneDriveFile = null;
-		HttpResponse<JsonNode> response;
 
 		try {
-			File file = new File(pathName);
-			@SuppressWarnings("resource")
-			InputStream input = new FileInputStream(file);
-			byte[] data = new byte[input.available()];
-			input.read(data);
-			
-			response = Unirest.put(requestUrl)
+			HttpResponse<JsonNode> response = Unirest.put(requestUrl)
 					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
-					.body(data)
 					.asJson();
-			if (response.getStatus() == 200) {
+			if (response.getStatus() == 200 || response.getStatus() == 201) {
 				oneDriveFile = new OneDriveFile(this, pathName);
 			} 
 			else {
 				throw new UnirestException("Using Unirest.get has error: " + response.getStatus());
 			}
-		}
-		catch (IOException e) {
-			e.printStackTrace();
 		}
 		catch (UnirestException e) {
 			e.printStackTrace();
@@ -197,5 +182,9 @@ public final class OneDrive extends HiveDrive {
 
 	String getRootPath() {
 		return API_URL + "/root";
+	}
+	
+	String getDeviceId() {
+		return driveId;
 	}
 }
