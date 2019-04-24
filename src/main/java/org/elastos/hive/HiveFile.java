@@ -189,7 +189,7 @@ public abstract class HiveFile {
 	 * @param pathname The new pathname to create
 	 * @throws Exception TODO.
 	 */
-	public abstract void mkdir(@NotNull String pathname) throws HiveException;
+	public abstract HiveFile mkdir(@NotNull String pathname) throws HiveException;
 
 	/**
 	 * Create a directory along with all necessary parent directories.
