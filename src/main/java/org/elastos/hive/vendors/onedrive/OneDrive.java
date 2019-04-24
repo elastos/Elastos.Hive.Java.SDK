@@ -9,6 +9,7 @@ import org.elastos.hive.HiveFile;
 import org.elastos.hive.exceptions.HiveException;
 import org.elastos.hive.parameters.OneDriveParameters;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -20,7 +21,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
  * OneDrive class
  */
 public final class OneDrive extends HiveDrive {
-	private final String API_URL = "https://graph.microsoft.com/v1.0/me/drive";
+	static final String API_URL = "https://graph.microsoft.com/v1.0/me/drive";
 
 	private static OneDrive onedriveInstance;
 	private final AuthHelper authHelper;
@@ -85,7 +86,11 @@ public final class OneDrive extends HiveDrive {
 
 	@Override
 	public void logout() {
-		// TODO
+		try {
+			authHelper.logout();
+		} catch (HiveException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -98,8 +103,49 @@ public final class OneDrive extends HiveDrive {
 	public HiveFile getFile(@NotNull String pathName) throws HiveException {
 		authHelper.checkExpired();
 
-		OneDriveFile file = new OneDriveFile(this, pathName);
-		file.doHttpGet();
+		if (authHelper.getAuthInfo() == null) {
+			System.out.println("Please login first");
+			return null;
+		}
+		
+		OneDriveFile file = null;
+//		file.doHttpGet();
+
+		try {
+			String requestUrl = getRootPath() + ":/" + pathName;
+			if (pathName.equals("/")) {
+				//Root
+				requestUrl = getRootPath();
+			}
+
+			HttpResponse<JsonNode> response = Unirest.get(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.asJson();
+			
+			System.out.println("getFile body="+response.getBody());
+			if (response.getStatus() == 200) {
+				file = new OneDriveFile(this, pathName);
+				try {
+					JSONObject baseJson = response.getBody().getObject();
+					String id = baseJson.getString("id"); 
+					JSONObject fileSystemInfo = (JSONObject)baseJson.get("fileSystemInfo");
+					String createdDateTime = fileSystemInfo.getString("createdDateTime");
+					String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
+					boolean isDir = baseJson.has("folder");
+					System.out.println("id: " + id + ", isDir=="+isDir);
+					file.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
+				}
+				catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} 
+			else {
+				throw new UnirestException("Using Unirest.get has error: " + response.getStatus());
+			}
+		} catch (UnirestException e) {
+			// TODO
+			e.printStackTrace();
+		}
 
 		return file;
 	}
@@ -109,11 +155,36 @@ public final class OneDrive extends HiveDrive {
 	protected HiveFile createFile(@NotNull String pathName) throws HiveException {
 		authHelper.checkExpired();
 
-		// TODO
-		return null;
+		if (pathName == null || pathName.equals("/")) {
+			return null;
+		}
+
+		String requestUrl = getRootPath() + ":/" + pathName + ":/content";
+		OneDriveFile oneDriveFile = null;
+
+		try {
+			HttpResponse<JsonNode> response = Unirest.put(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.asJson();
+			if (response.getStatus() == 200 || response.getStatus() == 201) {
+				oneDriveFile = new OneDriveFile(this, pathName);
+			} 
+			else {
+				throw new UnirestException("Using Unirest.get has error: " + response.getStatus());
+			}
+		}
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
+
+		return oneDriveFile;
 	}
 
 	String getRootPath() {
 		return API_URL + "/root";
+	}
+
+	String getDeviceId() {
+		return driveId;
 	}
 }

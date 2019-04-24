@@ -42,7 +42,7 @@ public class HiveDriveTest {
 			}
 		}
 
-		DriveParameters parameters = DriveParameters.createForOneDrive("3d0f9362-0f69-4a45-9ead-f653c2712290",
+		DriveParameters parameters = DriveParameters.createForOneDrive("f0f8fdc1-294e-4d5c-b3d8-774147075480",
 				"offline_access Files.ReadWrite",
 				"http://localhost:44316");
 
@@ -53,6 +53,66 @@ public class HiveDriveTest {
 			TestAuthenticator testAuth = new TestAuthenticator();
 
 			drive.login(testAuth);
+		
+			//1.1 Create file at the root
+			String pathName = "testCreateFile3.txt";
+			drive.createFile(pathName);	
+
+			//1.1 Create file at the root/test
+			pathName = "/test/testCreateFile3.txt";
+			drive.createFile(pathName);
+
+			//2. Get the created file at the root
+			HiveFile testFile = drive.getFile("testCreateFile.txt");
+			
+			//3. Check the HiveFile: file or directory
+			//3.1 file
+			boolean isFile = testFile.isFile();
+			System.out.println("==========================isFile="+isFile);
+			
+			//3.2 directory: the "test" is an exist directory at yourself oneDrive.
+			testFile = drive.getFile("test");
+			boolean isDir = testFile.isDirectory();
+			System.out.println("==========================isDir="+isDir);
+			
+			//4. make a directory
+			//4.1 make a directory at the root
+			HiveFile root = drive.getRootDir();
+			String newDirnameString = "testMkdir008";
+			HiveFile firstLevel = root.mkdir(newDirnameString);
+			isDir = firstLevel.isDirectory();
+			System.out.println("====================mkdir=firstLevel, isdir="+firstLevel.isDirectory());
+
+			try {
+				//Error, if re-create the directory.
+				root.mkdir(newDirnameString);
+			} catch (HiveException e) {
+				e.printStackTrace();
+			}
+
+			String secondDir = "testMkdirChild";
+			//4.2 make a directory at the sub directory.
+			HiveFile secondLevel = firstLevel.mkdir(secondDir);
+
+			try {
+				//Error, if re-create the directory.
+				firstLevel.mkdir(secondDir);
+			} catch (HiveException e) {
+				e.printStackTrace();
+			}
+
+			//5. list the folder.
+			testFile.list();
+			root.list();
+
+			//6. copy the sub directory to root
+//			secondLevel.copyTo(root);
+			secondLevel.copyTo("/");
+
+			//7. delete the folder
+			firstLevel.delete();
+
+			//Last; logout
 			drive.logout();
 		} catch (HiveException e) {
 			e.printStackTrace();

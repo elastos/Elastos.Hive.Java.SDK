@@ -7,7 +7,7 @@ public class HiveException extends Exception {
 	}
 
 	public HiveException(final String message) {
-		//TODO;
+		super(message);
 	}
 
 	private static final long serialVersionUID = 1486850840770311509L;

@@ -5,6 +5,8 @@ import org.elastos.hive.exceptions.HiveException;
 public interface AuthHelper {
 
 	public boolean login(Authenticator authenticator) throws HiveException;
+	
+	public void logout() throws HiveException;
 
 	public void checkExpired() throws HiveException;
 
