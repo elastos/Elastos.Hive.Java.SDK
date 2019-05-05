@@ -99,7 +99,27 @@ final class OneDriveFile extends HiveFile {
 	@Override
 	public void updateDatetime(@NotNull String newDateTime) throws HiveException {
 		authHelper.checkExpired();
-		// TODO
+		try {
+			String requestUrl = String.format("%s/items/%s", OneDrive.API_URL, this.id);
+
+			String body = "{\"lastModifiedDateTime\": \"" + newDateTime + "\"}";
+			
+			System.out.println("Invoking [renameTo] requestUrl=" + requestUrl);
+			HttpResponse<JsonNode> response = Unirest.patch(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.header("Content-Type", "application/json")
+					.body(body)
+					.asJson();
+
+			System.out.println("Invoking [updateDatetime] body=" + response.getBody());
+			System.out.println("Invoking [updateDatetime] getStatus=" + response.getStatus());
+			if (response.getStatus() != 200) {
+				throw new HiveException("Invoking the updateDatetime has error.");	
+			}
+		} 
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -113,17 +133,17 @@ final class OneDriveFile extends HiveFile {
 	}
 
 	@Override
-	public void copyTo(@NotNull String newPath) throws HiveException {
+	public void copyTo(@NotNull String newFile) throws HiveException {
 		authHelper.checkExpired();
 
 		try {
-			if (newPath == null || newPath.isEmpty()) {
-				throw new IllegalArgumentException("Illegal Argument: " + newPath);
+			if (newFile == null || newFile.isEmpty()) {
+				throw new IllegalArgumentException("Illegal Argument: " + newFile);
 			}
 
-			HiveFile parentFile = oneDrive.getFile(newPath);
+			HiveFile parentFile = oneDrive.getFile(newFile);
 			if (parentFile == null || !parentFile.isDirectory()) {
-				throw new IllegalArgumentException("Illegal Argument: " + newPath);
+				throw new IllegalArgumentException("Illegal Argument: " + newFile);
 			}
 
 			copyTo(parentFile);
@@ -134,11 +154,11 @@ final class OneDriveFile extends HiveFile {
 	}
 
 	@Override
-	public void copyTo(@NotNull HiveFile newPath) throws HiveException {
+	public void copyTo(@NotNull HiveFile newFile) throws HiveException {
 		authHelper.checkExpired();
 
 		try {
-			if (newPath == null) {
+			if (newFile == null) {
 				throw new IllegalArgumentException("Illegal Argument");
 			}
 
@@ -146,20 +166,27 @@ final class OneDriveFile extends HiveFile {
 				throw new HiveException("This is root file");
 			}
 
-			if (newPath.getPath().equals(getParentPath())) {
-				throw new HiveException("This file has been existed at the folder: " + newPath.getPath());
+			//If the file path is same, return an exception.
+			if (newFile.getPath().equals(getPath())) {
+				throw new HiveException("This file has been existed at the folder: " + newFile.getPath());
 			}
 
 			String requestUrl = String.format("%s/items/%s/copy", OneDrive.API_URL, id);
-			if (newPath.getPath().equals("/")) {
-				requestUrl = String.format("%s/copy", oneDrive.getRootPath());
-			}
 
 			int LastPos = pathName.lastIndexOf("/"); 
 			String name = pathName.substring(LastPos + 1);
 
 			String body = "{\"parentReference\": {\"driveId\": \"" + oneDrive.getDeviceId() + 
-					"\",\"id\": \"" + ((OneDriveFile)newPath).getId() + "\"},\"name\": \"" + name + "\"}";
+					"\",\"id\": \"" + ((OneDriveFile)newFile).getId() + "\"},\"name\": \"" + name + "\"}";
+			
+			if (!pathName.equals("/")) {
+				LastPos = newFile.getPath().lastIndexOf("/");
+				String newName = newFile.getPath().substring(LastPos + 1);
+				if (newName != null && !newName.isEmpty()) {
+					body = "{\"parentReference\": {\"driveId\": \"" + oneDrive.getDeviceId() + 
+							"\",\"id\": \"" + ((OneDriveFile)newFile).getId() + "\"}}";
+				}
+			}
 
 			System.out.println("Invoking [copyTo] pathName=" + pathName);
 			System.out.println("Invoking [copyTo] requestUrl=" + requestUrl);
@@ -182,9 +209,29 @@ final class OneDriveFile extends HiveFile {
 	}
 
 	@Override
-	public void renameTo(@NotNull String newPath) throws HiveException {
+	public void renameTo(@NotNull String name) throws HiveException {
 		authHelper.checkExpired();
-		// TODO
+		try {
+			String requestUrl = String.format("%s/items/%s", OneDrive.API_URL, this.id);
+
+			String body = "{\"name\": \"" + name + "\"}";
+			
+			System.out.println("Invoking [renameTo] requestUrl=" + requestUrl);
+			HttpResponse<JsonNode> response = Unirest.patch(requestUrl)
+					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
+					.header("Content-Type", "application/json")
+					.body(body)
+					.asJson();
+
+			System.out.println("Invoking [renameTo] body=" + response.getBody());
+			System.out.println("Invoking [renameTo] getStatus=" + response.getStatus());
+			if (response.getStatus() != 200) {
+				throw new HiveException("Invoking the renameTo has error.");	
+			}
+		} 
+		catch (UnirestException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
