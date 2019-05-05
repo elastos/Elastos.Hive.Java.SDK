@@ -168,6 +168,20 @@ public final class OneDrive extends HiveDrive {
 					.asJson();
 			if (response.getStatus() == 200 || response.getStatus() == 201) {
 				oneDriveFile = new OneDriveFile(this, pathName);
+
+				try {
+					JSONObject baseJson = response.getBody().getObject();
+					String id = baseJson.getString("id"); 
+					JSONObject fileSystemInfo = (JSONObject)baseJson.get("fileSystemInfo");
+					String createdDateTime = fileSystemInfo.getString("createdDateTime");
+					String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
+					boolean isDir = baseJson.has("folder");
+					System.out.println("id: " + id + ", isDir=="+isDir);
+					oneDriveFile.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
+				}
+				catch (JSONException e) {
+					e.printStackTrace();
+				}
 			} 
 			else {
 				throw new UnirestException("Using Unirest.get has error: " + response.getStatus());

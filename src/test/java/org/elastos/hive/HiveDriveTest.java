@@ -63,7 +63,7 @@ public class HiveDriveTest {
 			drive.createFile(pathName);
 
 			//2. Get the created file at the root
-			HiveFile testFile = drive.getFile("testCreateFile.txt");
+			HiveFile testFile = drive.getFile(pathName);
 			
 			//3. Check the HiveFile: file or directory
 			//3.1 file
@@ -78,7 +78,7 @@ public class HiveDriveTest {
 			//4. make a directory
 			//4.1 make a directory at the root
 			HiveFile root = drive.getRootDir();
-			String newDirnameString = "testMkdir008";
+			String newDirnameString = "testMkdir01";
 			HiveFile firstLevel = root.mkdir(newDirnameString);
 			isDir = firstLevel.isDirectory();
 			System.out.println("====================mkdir=firstLevel, isdir="+firstLevel.isDirectory());
@@ -108,6 +108,29 @@ public class HiveDriveTest {
 			//6. copy the sub directory to root
 //			secondLevel.copyTo(root);
 			secondLevel.copyTo("/");
+
+			HiveFile file = drive.createFile(pathName);
+			try {
+				file.renameTo("renamefile.txt");				
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
+			try {
+				secondLevel.copyTo(file);				
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+
+			secondLevel.copyTo(file.getParent());
+			secondLevel.renameTo("ElastosTest");
+
+			pathName = "/test/testfile.txt";
+			testFile = drive.getFile(pathName);
+
+			testFile.copyTo(root);
+			testFile.copyTo("/");
+			testFile.copyTo(secondLevel);
 
 			//7. delete the folder
 			firstLevel.delete();
