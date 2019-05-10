@@ -20,7 +20,7 @@ public enum DriveType {
 	ownCloud,
 
 	/**
-	 * Elastos Hive Cluster.
+	 * Hive Cluster.
 	 */
 	hiveIpfs
 }
