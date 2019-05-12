@@ -1,5 +1,5 @@
 package org.elastos.hive;
 
-public abstract class Authenticator {
-	public abstract void requestAuthentication(String requestUrl);
+public interface Authenticator {
+	public void requestAuthentication(String requestUrl);
 }

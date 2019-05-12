@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.elastos.hive.exceptions.HiveException;
 import org.junit.Test;
 
 public class HiveDriveTest {

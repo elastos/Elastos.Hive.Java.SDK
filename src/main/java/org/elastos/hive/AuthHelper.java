@@ -1,14 +1,15 @@
 package org.elastos.hive;
 
-import org.elastos.hive.exceptions.HiveException;
+import java.util.concurrent.CompletableFuture;
 
 public interface AuthHelper {
+	public AuthToken getAuthToken();
 
-	public boolean login(Authenticator authenticator) throws HiveException;
-	
-	public void logout() throws HiveException;
+	public CompletableFuture<HiveResult<AuthToken>> loginAsync(Authenticator authenticator);
+	public CompletableFuture<HiveResult<AuthToken>> loginAsync(Authenticator authenticator, HiveCallback<AuthToken, HiveException> callback);
 
-	public void checkExpired() throws HiveException;
+	public CompletableFuture<HiveResult<Status>>    logoutAsync(HiveCallback<Status, HiveException> callback);
+	public CompletableFuture<HiveResult<Status>>    logoutAsync();
 
-	public AuthInfo getAuthInfo();
+	public CompletableFuture<HiveResult<AuthToken>> checkExpired(HiveCallback<AuthToken, HiveException> callback);
 }
