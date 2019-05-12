@@ -2,18 +2,18 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
-interface FileItem <T extends FileItem<?>>{
+interface FileItem <T extends HiveItem>{
 	public String getPath();
 	public String getParentPath();
 
-	public CompletableFuture<HiveResult<T>> moveTo(String pathName);
-	public CompletableFuture<HiveResult<T>> moveTo(String pathName, HiveCallback<T, HiveException> callback);
+	public CompletableFuture<Result<T>> moveTo(String pathName);
+	public CompletableFuture<Result<T>> moveTo(String pathName, Callback<T> callback);
 
-	public CompletableFuture<HiveResult<T>> copyTo(String pathName);
-	public CompletableFuture<HiveResult<T>> copyTo(String pathName, HiveCallback<T, HiveException> callback);
+	public CompletableFuture<Result<T>> copyTo(String pathName);
+	public CompletableFuture<Result<T>> copyTo(String pathName, Callback<T> callback);
 
-	public CompletableFuture<HiveResult<Status>> deleteItem();
-	public CompletableFuture<HiveResult<Status>> deleteItem(HiveCallback<Status, HiveException> callback);
+	public CompletableFuture<Result<Status>> deleteItem();
+	public CompletableFuture<Result<Status>> deleteItem(Callback<Status> callback);
 
 	public void close();
 }

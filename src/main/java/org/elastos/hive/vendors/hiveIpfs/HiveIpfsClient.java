@@ -3,29 +3,29 @@ package org.elastos.hive.vendors.hiveIpfs;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.Authenticator;
+import org.elastos.hive.Callback;
 import org.elastos.hive.ClientInfo;
 import org.elastos.hive.DriveType;
-import org.elastos.hive.HiveCallback;
-import org.elastos.hive.HiveClient;
-import org.elastos.hive.HiveDrive;
+import org.elastos.hive.Client;
+import org.elastos.hive.Drive;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.HiveResult;
+import org.elastos.hive.Result;
 
-public final class HiveIpfsClient extends HiveClient {
-	private static HiveClient clientInstance;
+public final class HiveIpfsClient extends Client {
+	private static Client clientInstance;
 
 	private HiveIpfsClient(HiveIpfsParameter parameter) {
 		// TODO;
 	}
 
-	public static HiveClient createInstance(HiveIpfsParameter parameter) {
+	public static Client createInstance(HiveIpfsParameter parameter) {
 		if (clientInstance == null) {
 			clientInstance = new HiveIpfsClient(parameter);
 		}
 		return clientInstance;
 	}
 
-	public static HiveClient getInstance() {
+	public static Client getInstance() {
 		return clientInstance;
 	}
 
@@ -56,25 +56,25 @@ public final class HiveIpfsClient extends HiveClient {
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<ClientInfo>> getInfo() {
+	public CompletableFuture<Result<ClientInfo>> getInfo() {
 		// TODO
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<ClientInfo>> getInfo(HiveCallback<ClientInfo, HiveException> callback) {
+	public CompletableFuture<Result<ClientInfo>> getInfo(Callback<ClientInfo> callback) {
 		// TODO
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDrive>> getDefaultDrive() {
+	public CompletableFuture<Result<Drive>> getDefaultDrive() {
 		// TODO
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDrive>> getDefaultDrive(HiveCallback<HiveDrive, HiveException> callback) {
+	public CompletableFuture<Result<Drive>> getDefaultDrive(Callback<Drive> callback) {
 		// TODO
 		return null;
 	}

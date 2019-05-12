@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-public class ClientInfo {
+public class ClientInfo implements HiveItem {
 	private final String userId;
 	private String displayName;
 	private String email;
@@ -11,8 +11,9 @@ public class ClientInfo {
 		this.userId = userId;
 	}
 
-	public String getUserId() {
-		return userId;
+	@Override
+	public String getId() {
+		return  userId;
 	}
 
 	public String getDisplayName() {

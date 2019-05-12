@@ -7,10 +7,10 @@ import org.elastos.hive.AuthHelper;
 import org.elastos.hive.AuthServer;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
-import org.elastos.hive.HiveCallback;
+import org.elastos.hive.Callback;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.HiveResult;
 import org.elastos.hive.OAuthEntry;
+import org.elastos.hive.Result;
 import org.elastos.hive.Status;
 
 class OneDriveAuthHelper implements AuthHelper {
@@ -27,8 +27,8 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<AuthToken>> loginAsync(Authenticator authenticator,
-			HiveCallback<AuthToken, HiveException> callback) {
+	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator,
+			Callback<AuthToken, HiveException> callback) {
 
 		if (!hasLogin())
 			return null;
@@ -38,13 +38,13 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<Status>> logoutAsync(HiveCallback<Status, HiveException> callback) {
+	public CompletableFuture<Result<Status>> logoutAsync(Callback<Status, HiveException> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<AuthToken>> checkExpired(HiveCallback<AuthToken, HiveException> callback) {
+	public CompletableFuture<Result<AuthToken>> checkExpired(Callback<AuthToken, HiveException> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -85,18 +85,18 @@ class OneDriveAuthHelper implements AuthHelper {
 		}
 	}
 
-	private CompletableFuture<HiveResult<AuthToken>> redeemAccessToken(HiveCallback<AuthToken, HiveException> callback) {
+	private CompletableFuture<Result<AuthToken>> redeemAccessToken(Callback<AuthToken, HiveException> callback) {
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<AuthToken>> loginAsync(Authenticator authenticator) {
+	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<Status>> logoutAsync() {
+	public CompletableFuture<Result<Status>> logoutAsync() {
 		// TODO Auto-generated method stub
 		return null;
 	}

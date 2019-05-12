@@ -5,11 +5,11 @@ import java.util.concurrent.CompletableFuture;
 public interface AuthHelper {
 	public AuthToken getAuthToken();
 
-	public CompletableFuture<HiveResult<AuthToken>> loginAsync(Authenticator authenticator);
-	public CompletableFuture<HiveResult<AuthToken>> loginAsync(Authenticator authenticator, HiveCallback<AuthToken, HiveException> callback);
+	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator);
+	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator, Callback<AuthToken> callback);
 
-	public CompletableFuture<HiveResult<Status>>    logoutAsync(HiveCallback<Status, HiveException> callback);
-	public CompletableFuture<HiveResult<Status>>    logoutAsync();
+	public CompletableFuture<Result<Status>>    logoutAsync(Callback<Status> callback);
+	public CompletableFuture<Result<Status>>    logoutAsync();
 
-	public CompletableFuture<HiveResult<AuthToken>> checkExpired(HiveCallback<AuthToken, HiveException> callback);
+	public CompletableFuture<Result<AuthToken>> checkExpired(Callback<AuthToken> callback);
 }

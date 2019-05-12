@@ -3,30 +3,29 @@ package org.elastos.hive.vendors.onedrive;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.AuthHelper;
+import org.elastos.hive.Callback;
 import org.elastos.hive.DriveInfo;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.FileInfo;
-import org.elastos.hive.HiveCallback;
-import org.elastos.hive.HiveDirectory;
-import org.elastos.hive.HiveDrive;
+import org.elastos.hive.Directory;
+import org.elastos.hive.Drive;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.HiveFile;
-import org.elastos.hive.HiveResult;
+import org.elastos.hive.File;
+import org.elastos.hive.Result;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-final class OneDriveDrive implements HiveDrive {
+final class OneDriveDrive implements Drive {
 	private final String driveId;
 	private final AuthHelper authHelper;
 	private DriveInfo driveInfo;
 
 	OneDriveDrive(DriveInfo driveInfo, AuthHelper authHelper) {
-		this.driveId = driveInfo.getDriveId();
+		this.driveId = driveInfo.getId();
 		this.authHelper = authHelper;
 	}
 
@@ -41,13 +40,18 @@ final class OneDriveDrive implements HiveDrive {
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<DriveInfo>> getInfo() {
+	public DriveInfo getLastInfo() {
+		return driveInfo;
+	}
+
+	@Override
+	public CompletableFuture<Result<DriveInfo>> getInfo() {
 		return getInfo(null);
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<DriveInfo>> getInfo(HiveCallback<DriveInfo, HiveException> callback) {
-		CompletableFuture<HiveResult<DriveInfo>> future = new CompletableFuture<HiveResult<DriveInfo>>();
+	public CompletableFuture<Result<DriveInfo>> getInfo(Callback<DriveInfo> callback) {
+		CompletableFuture<Result<DriveInfo>> future = new CompletableFuture<Result<DriveInfo>>();
 
 		Unirest.get(OneDriveURL.API)
 			.header("Authorization",  "bearer " + authHelper.getAuthToken().getAccessToken())
@@ -57,52 +61,49 @@ final class OneDriveDrive implements HiveDrive {
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> getRootDir() {
+	public CompletableFuture<Result<Directory>> getRootDir() {
 		return getRootDir(null);
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> getRootDir(HiveCallback<HiveDirectory, HiveException> callback) {
+	public CompletableFuture<Result<Directory>> getRootDir(Callback<Directory> callback) {
 		return getDirectory("/", callback);
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> createDirectory(String pathName) {
+	public CompletableFuture<Result<Directory>> createDirectory(String pathName) {
 		return createDirectory(pathName, null);
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> createDirectory(String pathName,
-			HiveCallback<HiveDirectory, HiveException> callback) {
+	public CompletableFuture<Result<Directory>> createDirectory(String pathName, Callback<Directory> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> getDirectory(String pathName) {
+	public CompletableFuture<Result<Directory>> getDirectory(String pathName) {
 		return getDirectory(pathName);
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> getDirectory(String pathName,
-			HiveCallback<HiveDirectory, HiveException> callback) {
+	public CompletableFuture<Result<Directory>> getDirectory(String pathName, Callback<Directory> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveFile>> createFile(String pathName) {
+	public CompletableFuture<Result<File>> createFile(String pathName) {
 		return createFile(pathName, null);
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveFile>> createFile(String pathName,
-			HiveCallback<HiveFile, HiveException> callback) {
-		CompletableFuture<HiveResult<HiveFile>> future = new CompletableFuture<HiveResult<HiveFile>>();
+	public CompletableFuture<Result<File>> createFile(String pathName, Callback<File> callback) {
+		CompletableFuture<Result<File>> future = new CompletableFuture<Result<File>>();
 
 		if (!pathName.startsWith("/")) {
 			HiveException e = new HiveException("Not absolute PathName:  " + pathName);
-			HiveResult<HiveFile> value = new HiveResult<HiveFile>(e);
+			Result<File> value = new Result<File>(e);
 
 			if (callback != null)
 				callback.onFailed(e);
@@ -122,18 +123,17 @@ final class OneDriveDrive implements HiveDrive {
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveFile>> getFile(String pathName) {
+	public CompletableFuture<Result<File>> getFile(String pathName) {
 		return getFile(pathName, null);
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveFile>> getFile(String pathName,
-			HiveCallback<HiveFile, HiveException> callback) {
-		CompletableFuture<HiveResult<HiveFile>> future = new CompletableFuture<HiveResult<HiveFile>>();
+	public CompletableFuture<Result<File>> getFile(String pathName, Callback<File> callback) {
+		CompletableFuture<Result<File>> future = new CompletableFuture<Result<File>>();
 
 		if (!pathName.startsWith("/")) {
 			HiveException e = new HiveException("Not absolute PathName:  " + pathName);
-			HiveResult<HiveFile> value = new HiveResult<HiveFile>(e);
+			Result<File> value = new Result<File>(e);
 
 			if (callback != null)
 				callback.onFailed(e);
@@ -152,11 +152,11 @@ final class OneDriveDrive implements HiveDrive {
 		return future;
 	}
 
-	private class GetDriveInfoCallback implements Callback<JsonNode> {
-		private final CompletableFuture<HiveResult<DriveInfo>> future;
-		private final HiveCallback<DriveInfo, HiveException> callback;
+	private class GetDriveInfoCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
+		private final CompletableFuture<Result<DriveInfo>> future;
+		private final Callback<DriveInfo> callback;
 
-		private GetDriveInfoCallback(CompletableFuture<HiveResult<DriveInfo>> future, HiveCallback<DriveInfo, HiveException> callback) {
+		private GetDriveInfoCallback(CompletableFuture<Result<DriveInfo>> future, Callback<DriveInfo> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -171,7 +171,7 @@ final class OneDriveDrive implements HiveDrive {
 
 			if (response.getStatus() != 200) {
 				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				HiveResult<DriveInfo> value = new HiveResult<DriveInfo>(e);
+				Result<DriveInfo> value = new Result<DriveInfo>(e);
 				this.callback.onFailed(e);
 				future.complete(value);
 				return;
@@ -179,7 +179,7 @@ final class OneDriveDrive implements HiveDrive {
 
 			JSONObject jsonObject = response.getBody().getObject();
 			driveInfo = new DriveInfo(jsonObject.getString("id"));
-			HiveResult<DriveInfo> value = new HiveResult<DriveInfo>(driveInfo);
+			Result<DriveInfo> value = new Result<DriveInfo>(driveInfo);
 			this.callback.onSuccess(driveInfo);
 			future.complete(value);
 		}
@@ -190,17 +190,17 @@ final class OneDriveDrive implements HiveDrive {
 				return;
 
 			HiveException e = new HiveException(exception.getMessage());
-			HiveResult<DriveInfo> value = new HiveResult<DriveInfo>(e);
+			Result<DriveInfo> value = new Result<DriveInfo>(e);
 			this.callback.onFailed(e);
 			future.complete(value);
 		}
 	}
 
-	private class CreateFileObjectCallback implements Callback<JsonNode> {
-		private final CompletableFuture<HiveResult<HiveFile>> future;
-		private final HiveCallback<HiveFile, HiveException> callback;
+	private class CreateFileObjectCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
+		private final CompletableFuture<Result<File>> future;
+		private final Callback<File> callback;
 
-		private CreateFileObjectCallback(CompletableFuture<HiveResult<HiveFile>> future, HiveCallback<HiveFile, HiveException> callback) {
+		private CreateFileObjectCallback(CompletableFuture<Result<File>> future, Callback<File> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -215,7 +215,7 @@ final class OneDriveDrive implements HiveDrive {
 
 			if (response.getStatus() != 200) {
 				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				HiveResult<HiveFile> value = new HiveResult<HiveFile>(e);
+				Result<File> value = new Result<File>(e);
 				this.callback.onFailed(e);
 				future.complete(value);
 				return;
@@ -226,7 +226,7 @@ final class OneDriveDrive implements HiveDrive {
 
 			if (!isFile) {
 				HiveException e = new HiveException("This is not a file");
-				HiveResult<HiveFile> value = new HiveResult<HiveFile>(e);
+				Result<File> value = new Result<File>(e);
 				this.callback.onFailed(e);
 				future.complete(value);
 				return;
@@ -237,7 +237,7 @@ final class OneDriveDrive implements HiveDrive {
 			// TODO;
 
 			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
-			HiveResult<HiveFile> value = new HiveResult<HiveFile>(file);
+			Result<File> value = new Result<File>(file);
 			this.callback.onSuccess(file);
 			future.complete(value);
 		}
@@ -248,17 +248,17 @@ final class OneDriveDrive implements HiveDrive {
 				return;
 
 			HiveException e = new HiveException(exception.getMessage());
-			HiveResult<HiveFile> value = new HiveResult<HiveFile>(e);
+			Result<File> value = new Result<File>(e);
 			this.callback.onFailed(e);
 			future.complete(value);
 		}
 	}
 
-	private class GetFileObjectCallback implements Callback<JsonNode> {
-		private final CompletableFuture<HiveResult<HiveFile>> future;
-		private final HiveCallback<HiveFile, HiveException> callback;
+	private class GetFileObjectCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
+		private final CompletableFuture<Result<File>> future;
+		private final Callback<File> callback;
 
-		private GetFileObjectCallback(CompletableFuture<HiveResult<HiveFile>> future, HiveCallback<HiveFile, HiveException> callback) {
+		private GetFileObjectCallback(CompletableFuture<Result<File>> future, Callback<File> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -273,7 +273,7 @@ final class OneDriveDrive implements HiveDrive {
 
 			if (response.getStatus() != 200 && response.getStatus() != 201) {
 				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				HiveResult<HiveFile> value = new HiveResult<HiveFile>(e);
+				Result<File> value = new Result<File>(e);
 				this.callback.onFailed(e);
 				future.complete(value);
 				return;
@@ -284,7 +284,7 @@ final class OneDriveDrive implements HiveDrive {
 
 			if (!isFile) {
 				HiveException e = new HiveException("This is not a file");
-				HiveResult<HiveFile> value = new HiveResult<HiveFile>(e);
+				Result<File> value = new Result<File>(e);
 				this.callback.onFailed(e);
 				future.complete(value);
 				return;
@@ -294,8 +294,8 @@ final class OneDriveDrive implements HiveDrive {
 
 			// TODO;
 
-			OneDriveFile file = new OneDriveFile(fileInfo);
-			HiveResult<HiveFile> value = new HiveResult<HiveFile>(file);
+			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
+			Result<File> value = new Result<File>(file);
 			this.callback.onSuccess(file);
 			future.complete(value);
 		}
@@ -306,7 +306,7 @@ final class OneDriveDrive implements HiveDrive {
 				return;
 
 			HiveException e = new HiveException(exception.getMessage());
-			HiveResult<HiveFile> value = new HiveResult<HiveFile>(e);
+			Result<File> value = new Result<File>(e);
 			this.callback.onFailed(e);
 			future.complete(value);
 		}

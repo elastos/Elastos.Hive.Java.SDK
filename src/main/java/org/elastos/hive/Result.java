@@ -1,15 +1,15 @@
 package org.elastos.hive;
 
-public class HiveResult<T> {
+public class Result<T extends HiveItem> {
 	private final HiveException exception;
 	private final T object;
 
-	public HiveResult(T object) {
+	public Result(T object) {
 		this.object = object;
 		this.exception = null;
 	}
 
-	public HiveResult(HiveException e) {
+	public Result(HiveException e) {
 		this.object = null;
 		this.exception = e;
 	}

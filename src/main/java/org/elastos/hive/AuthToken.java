@@ -1,6 +1,8 @@
 package org.elastos.hive;
 
-public class AuthToken {
+public class AuthToken implements HiveItem {
+	private final String ID = "AuthToken";
+
 	@SuppressWarnings("unused")
 	private final String scope;
 	private final String refreshToken;
@@ -26,5 +28,10 @@ public class AuthToken {
 	public boolean isExpired() {
 		// TODO;
 		return false;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 }

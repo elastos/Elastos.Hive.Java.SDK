@@ -9,21 +9,20 @@ import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.ClientInfo;
 import org.elastos.hive.DriveType;
-import org.elastos.hive.HiveCallback;
-import org.elastos.hive.HiveClient;
-import org.elastos.hive.HiveDrive;
+import org.elastos.hive.Callback;
+import org.elastos.hive.Client;
+import org.elastos.hive.Drive;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.HiveResult;
+import org.elastos.hive.Result;
 import org.elastos.hive.Status;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-public final class OneDriveClient extends HiveClient {
-	private static HiveClient clientInstance;
+public final class OneDriveClient extends Client {
+	private static Client clientInstance;
 
 	private final AuthHelper authHelper;
 	private ClientInfo clientInfo;
@@ -34,14 +33,14 @@ public final class OneDriveClient extends HiveClient {
 		authHelper = new OneDriveAuthHelper(parameter.getAuthEntry());
 	}
 
-	public static HiveClient createInstance(OneDriveParameter parameter) {
+	public static Client createInstance(OneDriveParameter parameter) {
 		if (clientInstance == null) {
 			clientInstance = new OneDriveClient(parameter);
 		}
 		return clientInstance;
 	}
 
-	public static HiveClient getInstance() {
+	public static Client getInstance() {
 		return clientInstance;
 	}
 
@@ -57,8 +56,8 @@ public final class OneDriveClient extends HiveClient {
 
 	@Override
 	public synchronized void login(Authenticator authenticator) throws HiveException {
-		Future<HiveResult<AuthToken>> future = authHelper.loginAsync(authenticator);
-		HiveResult<AuthToken> result;
+		Future<Result<AuthToken>> future = authHelper.loginAsync(authenticator);
+		Result<AuthToken> result;
 
 		try {
 			result = future.get();
@@ -75,8 +74,8 @@ public final class OneDriveClient extends HiveClient {
 
 	@Override
 	public synchronized void logout() throws HiveException {
-		Future<HiveResult<Status>> future = authHelper.logoutAsync();
-		HiveResult<Status> result;
+		Future<Result<Status>> future = authHelper.logoutAsync();
+		Result<Status> result;
 
 		try {
 			result = future.get();
@@ -97,13 +96,13 @@ public final class OneDriveClient extends HiveClient {
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<ClientInfo>> getInfo() {
+	public CompletableFuture<Result<ClientInfo>> getInfo() {
 		return getInfo(null);
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<ClientInfo>> getInfo(HiveCallback<ClientInfo, HiveException> callback) {
-		CompletableFuture<HiveResult<ClientInfo>> future = new CompletableFuture<HiveResult<ClientInfo>>();
+	public CompletableFuture<Result<ClientInfo>> getInfo(Callback<ClientInfo> callback) {
+		CompletableFuture<Result<ClientInfo>> future = new CompletableFuture<Result<ClientInfo>>();
 
 		Unirest.get(OneDriveURL.API)
 			.header("Authorization",  "bearer " + authToken.getAccessToken())
@@ -113,13 +112,13 @@ public final class OneDriveClient extends HiveClient {
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDrive>> getDefaultDrive() {
+	public CompletableFuture<Result<Drive>> getDefaultDrive() {
 		return getDefaultDrive(null);
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDrive>> getDefaultDrive(HiveCallback<HiveDrive, HiveException> callback) {
-		CompletableFuture<HiveResult<HiveDrive>> future = new CompletableFuture<HiveResult<HiveDrive>>();
+	public CompletableFuture<Result<Drive>> getDefaultDrive(Callback<Drive> callback) {
+		CompletableFuture<Result<Drive>> future = new CompletableFuture<Result<Drive>>();
 
 		Unirest.get(OneDriveURL.API)
 			.header("Authorization",  "bearer " + authToken.getAccessToken())
@@ -128,11 +127,11 @@ public final class OneDriveClient extends HiveClient {
 		return future;
 	}
 
-	private class GetClientInfoCallback implements Callback<JsonNode> {
-		private final CompletableFuture<HiveResult<ClientInfo>> future;
-		private final HiveCallback<ClientInfo, HiveException> callback;
+	private class GetClientInfoCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
+		private final CompletableFuture<Result<ClientInfo>> future;
+		private final Callback<ClientInfo> callback;
 
-		GetClientInfoCallback(CompletableFuture<HiveResult<ClientInfo>> future, HiveCallback<ClientInfo, HiveException> callback) {
+		GetClientInfoCallback(CompletableFuture<Result<ClientInfo>> future, Callback<ClientInfo> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -147,17 +146,17 @@ public final class OneDriveClient extends HiveClient {
 		@Override
 		public void failed(UnirestException arg0) {
 			HiveException e = new HiveException(arg0.getMessage());
-			HiveResult<ClientInfo> value = new HiveResult<ClientInfo>(e);
+			Result<ClientInfo> value = new Result<ClientInfo>(e);
 			this.callback.onFailed(e);
 			future.complete(value);
 		}
 	}
 
-	private class GetDriveCallback implements Callback<JsonNode> {
-		private final CompletableFuture<HiveResult<HiveDrive>> future;
-		private final HiveCallback<HiveDrive, HiveException> callback;
+	private class GetDriveCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
+		private final CompletableFuture<Result<Drive>> future;
+		private final Callback<Drive> callback;
 
-		GetDriveCallback(CompletableFuture<HiveResult<HiveDrive>> future, HiveCallback<HiveDrive, HiveException> callback) {
+		GetDriveCallback(CompletableFuture<Result<Drive>> future, Callback<Drive> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -172,7 +171,7 @@ public final class OneDriveClient extends HiveClient {
 		@Override
 		public void failed(UnirestException arg0) {
 			HiveException e = new HiveException(arg0.getMessage());
-			HiveResult<HiveDrive> value = new HiveResult<HiveDrive>(e);
+			Result<Drive> value = new Result<Drive>(e);
 			this.callback.onFailed(e);
 			future.complete(value);
 		}

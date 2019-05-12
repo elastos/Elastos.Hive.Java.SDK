@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
-public class Status {
+public class Status implements HiveItem {
+	private final String ID = "Status";
 	private final int status;
 
 	public Status(int status) {
@@ -9,5 +10,10 @@ public class Status {
 
 	public int getStatus() {
 		return status;
+	}
+
+	@Override
+	public String getId() {
+		return ID;
 	}
 }
