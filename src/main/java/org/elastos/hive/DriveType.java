@@ -1,26 +1,16 @@
 package org.elastos.hive;
 
-/**
- * The enumeration of back-end storage drive type.
- */
 public enum DriveType {
-	/**
-	 * OneDrive
-	 */
-	oneDrive,
+	localDrive("Local Drive"), oneDrive("OneDrive"), dropbox("Dropbox"), hiveIpfs("Hive IPFS"), ownCloud("ownCloud");
 
-	/**
-	 * DropBox
-	 */
-	dropBox,
+	private final String name;
 
-	/**
-	 * OwnCloud
-	 */
-	ownCloud,
-
-	/**
-	 * Hive Cluster.
-	 */
-	hiveIpfs
+	private DriveType(final String name) {
+		this.name = name;
+	}
+  
+	@Override
+	public String toString() {
+		return name;
+	}
 }

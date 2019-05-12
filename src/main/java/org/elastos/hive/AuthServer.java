@@ -6,9 +6,6 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Semaphore;
 
-import org.elastos.hive.exceptions.HiveException;
-import org.jetbrains.annotations.Nullable;
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -23,45 +20,35 @@ public final class AuthServer {
 
 		try {
 			semph.acquire();
-		}
-		catch (InterruptedException e) {
-			throw new HiveException(e);
-		}
 
-		try {
 			server = HttpServer.create(new InetSocketAddress("localhost", 44316), 0);
 			server.createContext("/", new AuthHandler());
 			server.setExecutor(null);
 
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			// FIXME: custom exception
+		} catch (InterruptedException e) {
+			throw new HiveException(e.getMessage());
+		} catch (IOException e) {
+			throw new HiveException(e.getMessage());
 		}
 	}
 
 	public void start() {
-		if (server != null) server.start();
+		server.start();
 	}
 
-	@Nullable
 	public String getAuthCode() {
 		return authCode;
 	}
 
-	@Nullable
 	public void close() {
-		if (server != null) {
-			server.stop(0);
-			return;
-		}
+		server.stop(0);
 	}
 
 	private class AuthHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange httpExchange) throws IOException {
-			byte[] response =
-					"<script type='text/javascript'>window.close()</script>".getBytes(StandardCharsets.UTF_8);
+			byte[] response = "<script type='text/javascript'>window.close()</script>"
+					.getBytes(StandardCharsets.UTF_8);
 			httpExchange.sendResponseHeaders(200, response.length);
 			OutputStream os = httpExchange.getResponseBody();
 			os.write(response);
@@ -74,11 +61,9 @@ public final class AuthServer {
 					authCode = query[1];
 					break;
 				case "error":
-					// FIXME
-					throw new IOException("Wrong login info");
+					throw new IOException("Login error");
 				default:
-					// FIXME
-					throw new IOException("Unrecognized OneDrive Server Error");
+					throw new IOException("Unrecognized Server");
 			}
 			authLock.release();
 		}

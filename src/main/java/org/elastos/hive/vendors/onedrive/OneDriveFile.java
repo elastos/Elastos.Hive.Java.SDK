@@ -1,445 +1,197 @@
 package org.elastos.hive.vendors.onedrive;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.elastos.hive.AuthHelper;
+import org.elastos.hive.FileInfo;
+import org.elastos.hive.HiveCallback;
+import org.elastos.hive.HiveException;
 import org.elastos.hive.HiveFile;
-import org.elastos.hive.exceptions.HiveException;
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
+import org.elastos.hive.HiveResult;
+import org.elastos.hive.Status;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-final class OneDriveFile extends HiveFile {
+final class OneDriveFile implements HiveFile {
 	private final AuthHelper authHelper;
+	private final String fileId;
+	private FileInfo fileInfo;
 
-	private String pathName;
-	private OneDrive oneDrive;
-	private String createdDateTime;
-	private String lastModifiedDateTime;
-	private String id;
-	private boolean isFile;
-	private boolean isDirectory;
-
-	public OneDriveFile(OneDrive oneDrive, String pathName) {
-		super(oneDrive);
-		authHelper = oneDrive.getAuthHelper();
-		this.pathName = pathName;
-		this.oneDrive = oneDrive;
-	}
-	
-	public void initialize(String id, boolean isDir, String createdDateTime, String lastModifiedDateTime) {
-		this.id = id;
-		this.isDirectory = isDir;
-		this.isFile = !isDir;
-		this.createdDateTime = createdDateTime;
-		this.lastModifiedDateTime = lastModifiedDateTime;
+	OneDriveFile(FileInfo fileInfo, AuthHelper authHelper) {
+		this.fileId = fileInfo.getId();
+		this.fileInfo = fileInfo;
+		this.authHelper = authHelper;
 	}
 
 	@Override
-	public @NotNull String getPath() {
-		return pathName;
+	public String getId() {
+		return fileId;
 	}
 
 	@Override
-	@NotNull
-	public String getParentPath() {
-		if (pathName.equals("/")) {
-			return pathName;
-		}
-
-		return pathName.substring(0, pathName.lastIndexOf("/") + 1);
-	}
-
-	@Override
-	@NotNull
-	public HiveFile getParent() throws HiveException {
-		return super.getDrive().getFile(getParentPath());
-	}
-
-	@Override
-	@NotNull
-	public String getCreatedTimeDate() {
-		return createdDateTime;
-	}
-
-	@Override
-	@NotNull
-	public String getLastModifiedDateTime() {
-		HttpResponse<JsonNode> response;
-
-		try {
-			String requestUrl = oneDrive.getRootPath() + ":/" + pathName;
-			response = Unirest.get(requestUrl)
-					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
-					.asJson();
-			if (response.getStatus() == 200) {
-				try {
-					JSONObject baseJson = response.getBody().getObject();
-					JSONObject fileSystemInfo = (JSONObject)baseJson.get("fileSystemInfo");
-					lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			} 
-			else {
-				System.out.println("Invoking [getLastModifiedDateTime] has error: status=" + response.getStatus());
-			}
-		} 
-		catch (UnirestException e) {
-			e.printStackTrace();
-		}
-		
-		return lastModifiedDateTime;
-	}
-
-	@Override
-	public void updateDatetime(@NotNull String newDateTime) throws HiveException {
-		authHelper.checkExpired();
-		try {
-			String requestUrl = String.format("%s/items/%s", OneDrive.API_URL, this.id);
-
-			String body = "{\"lastModifiedDateTime\": \"" + newDateTime + "\"}";
-			
-			System.out.println("Invoking [renameTo] requestUrl=" + requestUrl);
-			HttpResponse<JsonNode> response = Unirest.patch(requestUrl)
-					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
-					.header("Content-Type", "application/json")
-					.body(body)
-					.asJson();
-
-			System.out.println("Invoking [updateDatetime] body=" + response.getBody());
-			System.out.println("Invoking [updateDatetime] getStatus=" + response.getStatus());
-			if (response.getStatus() != 200) {
-				throw new HiveException("Invoking the updateDatetime has error.");	
-			}
-		} 
-		catch (UnirestException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public boolean isFile() {
-		return isFile;
-	}
-
-	@Override
-	public boolean isDirectory() {
-		return isDirectory;
-	}
-
-	@Override
-	public void copyTo(@NotNull String newFile) throws HiveException {
-		authHelper.checkExpired();
-
-		try {
-			if (newFile == null || newFile.isEmpty()) {
-				throw new IllegalArgumentException("Illegal Argument: " + newFile);
-			}
-
-			HiveFile parentFile = oneDrive.getFile(newFile);
-			if (parentFile == null || !parentFile.isDirectory()) {
-				throw new IllegalArgumentException("Illegal Argument: " + newFile);
-			}
-
-			copyTo(parentFile);
-		} 
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void copyTo(@NotNull HiveFile newFile) throws HiveException {
-		authHelper.checkExpired();
-
-		try {
-			if (newFile == null) {
-				throw new IllegalArgumentException("Illegal Argument");
-			}
-
-			if (pathName.equals("/")) {
-				throw new HiveException("This is root file");
-			}
-
-			//If the file path is same, return an exception.
-			if (newFile.getPath().equals(getPath())) {
-				throw new HiveException("This file has been existed at the folder: " + newFile.getPath());
-			}
-
-			String requestUrl = String.format("%s/items/%s/copy", OneDrive.API_URL, id);
-
-			int LastPos = pathName.lastIndexOf("/"); 
-			String name = pathName.substring(LastPos + 1);
-
-			String body = "{\"parentReference\": {\"driveId\": \"" + oneDrive.getDeviceId() + 
-					"\",\"id\": \"" + ((OneDriveFile)newFile).getId() + "\"},\"name\": \"" + name + "\"}";
-			
-			if (!pathName.equals("/")) {
-				LastPos = newFile.getPath().lastIndexOf("/");
-				String newName = newFile.getPath().substring(LastPos + 1);
-				if (newName != null && !newName.isEmpty()) {
-					body = "{\"parentReference\": {\"driveId\": \"" + oneDrive.getDeviceId() + 
-							"\",\"id\": \"" + ((OneDriveFile)newFile).getId() + "\"}}";
-				}
-			}
-
-			System.out.println("Invoking [copyTo] pathName=" + pathName);
-			System.out.println("Invoking [copyTo] requestUrl=" + requestUrl);
-			System.out.println("Invoking [copyTo] body=" + body);
-			HttpResponse<JsonNode> response = Unirest.post(requestUrl)
-					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
-					.header("Content-Type", "application/json")
-					.body(body)
-					.asJson();
-
-			System.out.println("Invoking [copyTo] body=" + response.getBody());
-			System.out.println("Invoking [copyTo] getStatus=" + response.getStatus());
-			if (response.getStatus() != 202) {
-				throw new HiveException("Invoking the copyTo has error.");	
-			}
-		} 
-		catch (UnirestException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void renameTo(@NotNull String name) throws HiveException {
-		authHelper.checkExpired();
-		try {
-			String requestUrl = String.format("%s/items/%s", OneDrive.API_URL, this.id);
-
-			String body = "{\"name\": \"" + name + "\"}";
-			
-			System.out.println("Invoking [renameTo] requestUrl=" + requestUrl);
-			HttpResponse<JsonNode> response = Unirest.patch(requestUrl)
-					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
-					.header("Content-Type", "application/json")
-					.body(body)
-					.asJson();
-
-			System.out.println("Invoking [renameTo] body=" + response.getBody());
-			System.out.println("Invoking [renameTo] getStatus=" + response.getStatus());
-			if (response.getStatus() != 200) {
-				throw new HiveException("Invoking the renameTo has error.");	
-			}
-		} 
-		catch (UnirestException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void renameTo(@NotNull HiveFile newFile) throws HiveException {
-		authHelper.checkExpired();
-		// TODO
-	}
-
-	@Override
-	public void delete() throws HiveException {
-		authHelper.checkExpired();
-		try {
-			String requestUrl = String.format("%s/items/%s", OneDrive.API_URL, this.id);
-
-			System.out.println("Invoking [delete] requestUrl=" + requestUrl);
-			HttpResponse<JsonNode> response = Unirest.delete(requestUrl)
-					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
-					.asJson();
-
-			System.out.println("Invoking [delete] body=" + response.getBody());
-			System.out.println("Invoking [delete] getStatus=" + response.getStatus());
-			if (response.getStatus() != 204) {
-				throw new HiveException("Invoking the delete has error.");	
-			}
-		} 
-		catch (UnirestException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public @NotNull HiveFile[] list() throws HiveException {
-		authHelper.checkExpired();
-		if (!isDirectory()) {
-			return null;
-		}
-
-		HiveFile[] files = null;
-		try {
-			String requestUrl = String.format("%s/items/%s/children", OneDrive.API_URL, this.id);
-
-			System.out.println("Invoking [list] requestUrl=" + requestUrl);
-			HttpResponse<JsonNode> response = Unirest.get(requestUrl)
-					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
-					.asJson();
-
-			System.out.println("Invoking [list] body=" + response.getBody());
-			System.out.println("Invoking [list] getStatus=" + response.getStatus());
-			if (response.getStatus() == 200) {
-				JSONObject baseJson = response.getBody().getObject();
-				JSONArray values = baseJson.getJSONArray("value"); 
-				int len = values.length();
-				System.out.println("valuse len=="+len);
-				if (len > 0) {
-					files = new HiveFile[len];
-					for (int i = 0; i < len; i++) {
-						JSONObject itemJson = values.getJSONObject(i);
-						String name = this.pathName + "/" + itemJson.getString("name");
-						if (this.pathName.equals("/")) {
-							name = this.pathName + itemJson.getString("name");
-						}
-
-						OneDriveFile file = new OneDriveFile(oneDrive, name);
-
-						String id = itemJson.getString("id");
-						JSONObject fileSystemInfo = (JSONObject)itemJson.get("fileSystemInfo");
-						String createdDateTime = fileSystemInfo.getString("createdDateTime");
-						String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
-						boolean isDir = itemJson.has("folder");
-						System.out.println("pathName: " + name + ", isDir=="+isDir);
-						file.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
-						files[i] = file;
-					}
-				}
-			}
-			else {
-				throw new HiveException("Invoking the list has error.");	
-			}
-		} 
-		catch (UnirestException e) {
-			e.printStackTrace();
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
-		return files;
-	}
-
-	@Override
-	public HiveFile mkdir(@NotNull String pathName) throws HiveException {
-		authHelper.checkExpired();
-
-		if (!isDirectory()) {
-			throw new HiveException("This is a file, can't create a child folder.");
-		}
-
-		OneDriveFile file = null;
-		try {
-			String requestUrl = String.format("%s/items/%s/children", OneDrive.API_URL, this.id);
-
-			System.out.println("Invoking [mkdir] requestUrl=" + requestUrl);
-			//conflictBehavior' value : fail, replace, or rename
-			String body = "{\"name\": \"" + pathName + "\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}";
-
-			System.out.println("Invoking [mkdir] before body=" + body);
-			HttpResponse<JsonNode> response = Unirest.post(requestUrl)
-					.header("Authorization", "bearer " + authHelper.getAuthInfo().getAccessToken())
-					.header("Content-Type", "application/json")
-					.body(body)
-					.asJson();
-
-			System.out.println("Invoking [mkdir] body=" + response.getBody());
-			System.out.println("Invoking [mkdir] StatusText=" + response.getStatusText());
-			JSONObject baseJson = response.getBody().getObject();
-			if (response.getStatus() != 201) {
-				System.out.println("Invoking [mkdir] has error: status=" + response.getStatus());
-				JSONObject errorJson = (JSONObject)baseJson.get("error");
-				String errorMsg = errorJson.getString("message");
-				System.out.println("Invoking [mkdir] error message: " + errorMsg);
-				throw new HiveException(errorMsg);
-			}
-
-			System.out.println("Invoking [mkdir] pathName=" + pathName + ", this.pathName="+this.pathName);
-			if (this.pathName.equals("/")) {
-				pathName = this.pathName + pathName;
-			}
-			else {
-				pathName = this.pathName + "/" + pathName;
-			}
-
-			file = new OneDriveFile(oneDrive, pathName);
-			String id = baseJson.getString("id"); 
-			JSONObject fileSystemInfo = (JSONObject)baseJson.get("fileSystemInfo");
-			String createdDateTime = fileSystemInfo.getString("createdDateTime");
-			String lastModifiedDateTime = fileSystemInfo.getString("lastModifiedDateTime");
-			boolean isDir = baseJson.has("folder");
-			System.out.println("pathName: " + pathName + ", id: " + id + ", isDir=="+isDir);
-			file.initialize(id, isDir, createdDateTime, lastModifiedDateTime);
-		} 
-		catch (UnirestException e) {
-			e.printStackTrace();
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		return file;
-	}
-
-	@Override
-	public void mkdirs(@NotNull String pathName) throws HiveException {
-		authHelper.checkExpired();
-		// TODO
-	}
-
-	@Override
-	public void close() throws HiveException {
-		authHelper.checkExpired();
-		// TODO
-	}
-
-	@Override
-	public String toString() {
-		// TODO
+	public String getPath() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	void doHttpGet() throws HiveException {
-		HttpResponse<JsonNode> response;
-
-		try {
-			response = Unirest.get(oneDrive.getRootPath() + pathName)
-					.header("accept", "application/json")
-					.header("Authorization", "bearer ") // TODO:
-					.asJson();
-			if (response.getStatus() == 200) {
-				// TODO;
-			} else {
-				// TODO;
-			}
-		} catch (UnirestException e) {
-			// TODO
-			e.printStackTrace();
-		}
-
-		// TOOD: response;
+	@Override
+	public String getParentPath() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	void doHttpDelete() throws HiveException {
-		HttpResponse<JsonNode> response;
+	@Override
+	public CompletableFuture<HiveResult<FileInfo>> getInfo() {
+		return getInfo(null);
+	}
 
-		try {
-			response = Unirest.delete(oneDrive.getRootPath() + ":/" + pathName)
-					.header("Authorization", "bearer") //TODO
-					.asJson();
-			if (response.getStatus() == 200) {
-				// TODO;
-			} else {
-				// TODO;
+	@Override
+	public CompletableFuture<HiveResult<FileInfo>> getInfo(HiveCallback<FileInfo, HiveException> callback) {
+		CompletableFuture<HiveResult<FileInfo>> future = new CompletableFuture<HiveResult<FileInfo>>();
+
+		Unirest.get(OneDriveURL.API)
+			.header("Authorization",  "bearer " + authHelper.getAuthToken().getAccessToken())
+			.asJsonAsync(new GetFileInfoCallback(future, callback));
+
+		return future;
+	}
+
+	@Override
+	public CompletableFuture<HiveResult<HiveFile>> moveTo(String pathName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<HiveResult<HiveFile>> moveTo(String pathName, HiveCallback<HiveFile, HiveException> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<HiveResult<HiveFile>> copyTo(String pathName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<HiveResult<HiveFile>> copyTo(String pathName, HiveCallback<HiveFile, HiveException> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<HiveResult<Status>> deleteItem() {
+		return deleteItem(null);
+	}
+
+	@Override
+	public CompletableFuture<HiveResult<Status>> deleteItem(HiveCallback<Status, HiveException> callback) {
+		CompletableFuture<HiveResult<Status>> future = new CompletableFuture<HiveResult<Status>>();
+		String url = String.format("%s/items/%s",  OneDriveURL.API, this.fileId)
+				.replace(" ", "%20");
+
+		Unirest.delete(url)
+			.header("Authorization",  "bearer " + authHelper.getAuthToken().getAccessToken())
+			.asJsonAsync(new DeleteItemCallback(future, callback));
+
+		return future;
+	}
+
+	@Override
+	public void close() {
+		// TODO
+	}
+
+	private class GetFileInfoCallback implements Callback<JsonNode> {
+		private final CompletableFuture<HiveResult<FileInfo>> future;
+		private final HiveCallback<FileInfo, HiveException> callback;
+
+		private GetFileInfoCallback(CompletableFuture<HiveResult<FileInfo>> future, HiveCallback<FileInfo, HiveException> callback) {
+			this.future = future;
+			this.callback = callback;
+		}
+		@Override
+		public void cancelled() {
+		}
+
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			if (callback == null)
+				return;
+
+			if (response.getStatus() != 200) {
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				HiveResult<FileInfo> value = new HiveResult<FileInfo>(e);
+				this.callback.onFailed(e);
+				future.complete(value);
+				return;
 			}
-		} catch (UnirestException e) {
-			// TODO
-			e.printStackTrace();
+
+			JSONObject jsonObject = response.getBody().getObject();
+			fileInfo = new FileInfo(jsonObject.getString("id"));
+			HiveResult<FileInfo> value = new HiveResult<FileInfo>(fileInfo);
+			this.callback.onSuccess(fileInfo);
+			future.complete(value);
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			if (callback == null)
+				return;
+
+			HiveException e = new HiveException(exception.getMessage());
+			HiveResult<FileInfo> value = new HiveResult<FileInfo>(e);
+			this.callback.onFailed(e);
+			future.complete(value);
 		}
 	}
-	
-	String getId() {
-		return this.id;
+
+	private class DeleteItemCallback implements Callback<JsonNode> {
+		private final CompletableFuture<HiveResult<Status>> future;
+		private final HiveCallback<Status, HiveException> callback;
+
+		private DeleteItemCallback(CompletableFuture<HiveResult<Status>> future, HiveCallback<Status, HiveException> callback) {
+			this.future = future;
+			this.callback = callback;
+		}
+		@Override
+		public void cancelled() {
+		}
+
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			if (callback == null)
+				return;
+
+			if (response.getStatus() != 204) {
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				HiveResult<Status> value = new HiveResult<Status>(e);
+				this.callback.onFailed(e);
+				future.complete(value);
+				return;
+			}
+
+			Status status = new Status(1);
+			HiveResult<Status> value = new HiveResult<Status>(status);
+			this.callback.onSuccess(status);
+			future.complete(value);
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			if (callback == null)
+				return;
+
+			HiveException e = new HiveException(exception.getMessage());
+			HiveResult<Status> value = new HiveResult<Status>(e);
+			this.callback.onFailed(e);
+			future.complete(value);
+		}
 	}
 }

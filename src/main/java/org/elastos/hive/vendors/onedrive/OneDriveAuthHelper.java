@@ -1,167 +1,287 @@
 package org.elastos.hive.vendors.onedrive;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 
 import org.elastos.hive.AuthHelper;
-import org.elastos.hive.AuthInfo;
 import org.elastos.hive.AuthServer;
+import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
-import org.elastos.hive.exceptions.HiveException;
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
+import org.elastos.hive.HiveCallback;
+import org.elastos.hive.HiveException;
+import org.elastos.hive.HiveResult;
+import org.elastos.hive.OAuthEntry;
+import org.elastos.hive.Status;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+class OneDriveAuthHelper implements AuthHelper {
+	private final OAuthEntry authEntry;
+	private AuthToken authToken;
 
-final class OneDriveAuthHelper implements AuthHelper {
-	private final static String AUTH_URL = "https://login.microsoftonline.com/common/oauth2/v2.0";
-
-	private final String clientId;
-	private final String scopes;
-	private final String redirectUrl;
-
-	private AuthInfo authInfo;
-
-	OneDriveAuthHelper(String clientId, String scopes, String redirectUrl) {
-		this.scopes = scopes;
-		this.clientId = clientId;
-		this.redirectUrl = redirectUrl;
+	OneDriveAuthHelper(OAuthEntry authEntry) {
+		this.authEntry = authEntry;
 	}
 
 	@Override
-	public synchronized boolean login(Authenticator authenticator) throws HiveException {
-		if (!hasLogin()) {
-			String authCode = getAuthCode(authenticator);
-			requestAccessToken(authCode);
-			authCode = null;
-		}
-
-		if (isExpired()) {
-			redeemAccessToken();
-		}
-
-		return true;
+	public AuthToken getAuthToken() {
+		return authToken;
 	}
 
 	@Override
-	public void logout() throws HiveException {
-		try {
-			String requestUrl = AUTH_URL + "/logout?post_logout_redirect_uri=" + redirectUrl;
-			HttpResponse<String> response = Unirest.get(requestUrl)
-					.asString();
-			if (response.getStatus() == 200) {
-				System.out.println("logout response.getBody(): " + response.getBody());
-				authInfo = null;
-			} 
-			else {
-				throw new HiveException("logout has error");
-			}
-		} 
-		catch (UnirestException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private @NotNull String getAuthCode(Authenticator authenticator) throws HiveException {
-		String url = String
-				.format("%s/authorize?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-						AUTH_URL, clientId, scopes, redirectUrl)
-				.replace(" ", "%20");
+	public CompletableFuture<HiveResult<AuthToken>> loginAsync(Authenticator authenticator,
+			HiveCallback<AuthToken, HiveException> callback) {
 
+		if (!hasLogin())
+			return null;
+
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<HiveResult<Status>> logoutAsync(HiveCallback<Status, HiveException> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<HiveResult<AuthToken>> checkExpired(HiveCallback<AuthToken, HiveException> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private boolean hasLogin() {
+		return (authToken != null);
+	}
+
+	private boolean isExpired() {
+		return authToken.isExpired();
+	}
+
+	private String getAuthCode(Authenticator authenticator) throws HiveException {
 		Semaphore semph = new Semaphore(1);
 		AuthServer server = new AuthServer(semph);
 		server.start();
 
-		authenticator.requestAuthentication(url);
-
 		try {
+			String url1 = String
+					.format("%s/%?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
+							OneDriveURL.AUTH,
+							OneDriveMethod.AUTHORIZE,
+							authEntry.getClientId(),
+							authEntry.getScope(),
+							authEntry.getRedirectURL())
+					.replace(" ", "%20");
+
+			authenticator.requestAuthentication(url1);
+
 			semph.acquire();
+			String authCode = server.getAuthCode();
+			server.close();
+			semph.release();
+
+			return authCode;
 		}catch (InterruptedException e) {
-			e.printStackTrace();
-			//TODO
+			throw new HiveException(e.getMessage());
 		}
-
-		String authCode = server.getAuthCode();
-		System.out.println("authCode:" + authCode);
-		server.close();
-		semph.release();
-
-		return authCode;
 	}
 
-	private void requestAccessToken(String authCode) throws HiveException {
-		try {
-			String body = String
-					.format("client_id=%s&redirect_url=%s&code=%s&grant_type=authorization_code",
-							clientId, redirectUrl, authCode);
+	private CompletableFuture<HiveResult<AuthToken>> redeemAccessToken(HiveCallback<AuthToken, HiveException> callback) {
+		return null;
+	}
 
-			HttpResponse<JsonNode> response = Unirest.post(AUTH_URL + "/token")
+	@Override
+	public CompletableFuture<HiveResult<AuthToken>> loginAsync(Authenticator authenticator) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<HiveResult<Status>> logoutAsync() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	private void redeemAccessToken() throws HiveException {
+		try {
+			String url 	= String
+					.format("%s/%s",
+							OneDriveURL.AUTH,
+							OneDriveMethod.TOKEN)
+					.replace(" ", "%20");
+
+			String body = String
+					.format("client_id=%s&redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
+							authEntry.getClientId(),
+							authEntry.getRedirectURL(),
+							authToken.getRefreshToken());
+
+			HttpResponse<JsonNode> response = Unirest.post(url)
 					.header("Content-Type", "application/x-www-form-urlencoded")
 					.body(body)
 					.asJson();
 
 			if (response.getStatus() == 200) {
-				JSONObject jsonObj = response.getBody().getObject();
-				authInfo = new AuthInfo();
-				authInfo.withScopes(jsonObj.getString("scope"))
-						.withAccessToken(jsonObj.getString("access_token"))
-						.withRefreshToken(jsonObj.getString("refresh_token"))
-						.withExpiredIn(jsonObj.getLong("expires_in"));
-
-				System.out.println("accessToken: " + authInfo.getAccessToken());
-				System.out.println("refreshToken: " + authInfo.getRefreshToken());
-
+				JSONObject jsonObject = response.getBody().getObject();
+				authToken = new AuthToken(jsonObject.getString("scope"),
+						  jsonObject.getString("access_token"),
+						  jsonObject.getString("refresh_token"),
+						  jsonObject.getLong("expires_in"));
+				jsonObject = null;
 			} else {
-				// TODO;
+				throw new HiveException(response.getStatusText());
 			}
 		} catch (UnirestException e) {
-			// TODO
-			e.printStackTrace();
+			throw new HiveException(e.getMessage());
+		}
+	}*/
+}
+
+/*
+final class OneDriveAuthHelper implements AuthHelper {
+	private final OAuthEntry authEntry;
+	private AuthToken authToken;
+
+	OneDriveAuthHelper(OAuthEntry authEntry) {
+		this.authEntry = authEntry;
+	}
+
+	@Override
+	public synchronized void login(Authenticator authenticator) throws HiveException {
+		if (!hasLogin())
+			requestAccessToken(getAuthCode(authenticator));
+
+		if (isExpired())
+			redeemAccessToken();
+	}
+
+	@Override
+	public synchronized void logout() throws HiveException {
+		try {
+			String url = String
+					.format("%s/%s?%s=%",
+							OneDriveURL.AUTH,
+							OneDriveMethod.LOGOUT,
+							authEntry.getRedirectURL())
+					.replace(" ", "%20");
+
+			HttpResponse<String> response = Unirest.get(url).asString();
+			if (response.getStatus() == 200) {
+				authToken = null;
+			} else {
+				throw new HiveException("logout has error");
+			}
+		} catch (UnirestException e) {
+			throw new HiveException(e.getMessage());
+		}
+	}
+
+	private String getAuthCode(Authenticator authenticator) throws HiveException {
+		Semaphore semph = new Semaphore(1);
+		AuthServer server = new AuthServer(semph);
+		server.start();
+
+		try {
+			String url1 = String
+					.format("%s/%?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
+							OneDriveURL.AUTH,
+							OneDriveMethod.AUTHORIZE,
+							authEntry.getClientId(),
+							authEntry.getScope(),
+							authEntry.getRedirectURL())
+					.replace(" ", "%20");
+
+			authenticator.requestAuthentication(url1);
+
+			semph.acquire();
+			String authCode = server.getAuthCode();
+			server.close();
+			semph.release();
+
+			return authCode;
+		}catch (InterruptedException e) {
+			throw new HiveException(e.getMessage());
+		}
+	}
+
+	private void requestAccessToken(String authCode) throws HiveException {
+		try {
+			String url  = String
+					.format("%s/%s",
+							OneDriveURL.AUTH,
+							OneDriveMethod.TOKEN)
+					.replace(" ", "%20");
+
+			String body = String
+					.format("client_id=%&redirect_url=%s&code=%s&grant_type=authorization_code",
+							authEntry.getClientId(),
+							authEntry.getRedirectURL(), authCode);
+
+			HttpResponse<JsonNode> response = Unirest.post(url)
+					.header("Content-Type", "application/x-www-form-urlencoded")
+					.body(body)
+					.asJson();
+
+			if (response.getStatus() == 200) {
+				JSONObject jsonObject = response.getBody().getObject();
+				authToken = new AuthToken(jsonObject.getString("scope"),
+										  jsonObject.getString("access_token"),
+										  jsonObject.getString("refresh_token"),
+										  jsonObject.getLong("expires_in"));
+				jsonObject = null;
+			} else {
+				throw new HiveException(response.getStatusText());
+			}
+		} catch (UnirestException e) {
+			throw new HiveException(e.getMessage());
 		}
 	}
 
 	private void redeemAccessToken() throws HiveException {
 		try {
-			System.out.println("refreshToken: " + authInfo.getAccessToken());
+			String url 	= String
+					.format("%s/%s",
+							OneDriveURL.AUTH,
+							OneDriveMethod.TOKEN)
+					.replace(" ", "%20");
 
 			String body = String
 					.format("client_id=%s&redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
-							clientId, redirectUrl, authInfo.getRefreshToken());
+							authEntry.getClientId(),
+							authEntry.getRedirectURL(),
+							authToken.getRefreshToken());
 
-			HttpResponse<JsonNode> response = Unirest.post(AUTH_URL + "token")
+			HttpResponse<JsonNode> response = Unirest.post(url)
 					.header("Content-Type", "application/x-www-form-urlencoded")
 					.body(body)
 					.asJson();
 
 			if (response.getStatus() == 200) {
-				JSONObject jsonObj = response.getBody().getObject();
-
-				authInfo.resetAccessToken(jsonObj.getString("access_token"));
-
-				System.out.println("accessToken: " + authInfo.getAccessToken());
-
+				JSONObject jsonObject = response.getBody().getObject();
+				authToken = new AuthToken(jsonObject.getString("scope"),
+						  jsonObject.getString("access_token"),
+						  jsonObject.getString("refresh_token"),
+						  jsonObject.getLong("expires_in"));
+				jsonObject = null;
 			} else {
-				// TODO;
+				throw new HiveException(response.getStatusText());
 			}
 		} catch (UnirestException e) {
-			// TODO
-			e.printStackTrace();
+			throw new HiveException(e.getMessage());
 		}
 	}
 
 	@Override
-	public AuthInfo getAuthInfo() {
-		return authInfo;
+	public AuthToken getAuthToken() {
+		return authToken;
 	}
 
 	private boolean hasLogin() {
-		return authInfo != null;
+		return authToken != null;
 	}
 
 	private boolean isExpired() {
-		return true;
+		return authToken.isExpired();
 	}
 
 	@Override
@@ -169,3 +289,4 @@ final class OneDriveAuthHelper implements AuthHelper {
 		// TODO
 	}
 }
+*/
