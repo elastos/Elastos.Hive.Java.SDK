@@ -4,14 +4,13 @@ import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.DirectoryInfo;
-import org.elastos.hive.HiveCallback;
-import org.elastos.hive.HiveDirectory;
-import org.elastos.hive.HiveException;
-import org.elastos.hive.HiveFile;
-import org.elastos.hive.HiveResult;
+import org.elastos.hive.Callback;
+import org.elastos.hive.Directory;
+import org.elastos.hive.File;
+import org.elastos.hive.Result;
 import org.elastos.hive.Status;
 
-class OneDriveDirectory implements HiveDirectory {
+class OneDriveDirectory implements Directory {
 	private final AuthHelper authHelper;
 	private final String dirId;
 	private DirectoryInfo dirInfo;
@@ -40,51 +39,54 @@ class OneDriveDirectory implements HiveDirectory {
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<DirectoryInfo>> getInfo() {
+	public DirectoryInfo getLastInfo() {
+		return dirInfo;
+	}
+
+	@Override
+	public CompletableFuture<Result<DirectoryInfo>> getInfo() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<DirectoryInfo>> getInfo(HiveCallback<DirectoryInfo, HiveException> callback) {
+	public CompletableFuture<Result<DirectoryInfo>> getInfo(Callback<DirectoryInfo> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> moveTo(String pathName) {
+	public CompletableFuture<Result<Directory>> moveTo(String pathName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> moveTo(String pathName,
-			HiveCallback<HiveDirectory, HiveException> callback) {
+	public CompletableFuture<Result<Directory>> moveTo(String pathName, Callback<Directory> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> copyTo(String pathName) {
+	public CompletableFuture<Result<Directory>> copyTo(String pathName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> copyTo(String pathName,
-			HiveCallback<HiveDirectory, HiveException> callback) {
+	public CompletableFuture<Result<Directory>> copyTo(String pathName, Callback<Directory> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<Status>> deleteItem() {
+	public CompletableFuture<Result<Status>> deleteItem() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<Status>> deleteItem(HiveCallback<Status, HiveException> callback) {
+	public CompletableFuture<Result<Status>> deleteItem(Callback<Status> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -96,53 +98,50 @@ class OneDriveDirectory implements HiveDirectory {
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> createDirectory(String pathName) {
+	public CompletableFuture<Result<Directory>> createDirectory(String pathName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> createDirectory(String pathName,
-			HiveCallback<HiveDirectory, HiveException> callback) {
+	public CompletableFuture<Result<Directory>> createDirectory(String pathName,
+			Callback<Directory> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> getDirectory(String pathName) {
+	public CompletableFuture<Result<Directory>> getDirectory(String pathName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveDirectory>> getDirectory(String pathName,
-			HiveCallback<HiveDirectory, HiveException> callback) {
+	public CompletableFuture<Result<Directory>> getDirectory(String pathName, Callback<Directory> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveFile>> createFile(String pathName) {
+	public CompletableFuture<Result<File>> createFile(String pathName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveFile>> createFile(String pathName,
-			HiveCallback<HiveFile, HiveException> callback) {
+	public CompletableFuture<Result<File>> createFile(String pathName, Callback<File> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveFile>> getFile(String pathName) {
+	public CompletableFuture<Result<File>> getFile(String pathName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<HiveResult<HiveFile>> getFile(String pathName,
-			HiveCallback<HiveFile, HiveException> callback) {
+	public CompletableFuture<Result<File>> getFile(String pathName, Callback<File> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}

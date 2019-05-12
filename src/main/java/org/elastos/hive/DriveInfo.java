@@ -1,13 +1,14 @@
 package org.elastos.hive;
 
-public class DriveInfo {
+public class DriveInfo implements HiveItem {
 	private final String driveId;
 
-	DriveInfo(String driveId) {
+	public DriveInfo(String driveId) {
 		this.driveId = driveId;
 	}
 
-	public String getDriveId() {
+	@Override
+	public String getId() {
 		return driveId;
 	}
 }

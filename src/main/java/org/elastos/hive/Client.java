@@ -7,8 +7,8 @@ import org.elastos.hive.vendors.hiveIpfs.HiveIpfsClient;
 import org.elastos.hive.vendors.onedrive.OneDriveClient;
 import org.elastos.hive.vendors.webdav.OwnCloudClient;
 
-public abstract class HiveClient implements HiveItem {
-	public static <T> HiveClient createInstance(Parameter<T> parameter) {
+public abstract class Client implements HiveItem {
+	public static <T> Client createInstance(Parameter<T> parameter) {
 		if (parameter == null)
 			return null;
 
@@ -31,7 +31,7 @@ public abstract class HiveClient implements HiveItem {
 		return null;
 	}
 
-	public static HiveClient getInstance(DriveType driveType) {
+	public static Client getInstance(DriveType driveType) {
 
 		switch (driveType) {
 		case oneDrive:
@@ -59,9 +59,9 @@ public abstract class HiveClient implements HiveItem {
 
 	public abstract ClientInfo getLastInfo();
 
-	public abstract CompletableFuture<HiveResult<ClientInfo>> getInfo();
-	public abstract CompletableFuture<HiveResult<ClientInfo>> getInfo(HiveCallback<ClientInfo, HiveException> callback);
+	public abstract CompletableFuture<Result<ClientInfo>> getInfo();
+	public abstract CompletableFuture<Result<ClientInfo>> getInfo(Callback<ClientInfo> callback);
 
-	public abstract CompletableFuture<HiveResult<HiveDrive>> getDefaultDrive();
-	public abstract CompletableFuture<HiveResult<HiveDrive>> getDefaultDrive(HiveCallback<HiveDrive, HiveException> callback);
+	public abstract CompletableFuture<Result<Drive>> getDefaultDrive();
+	public abstract CompletableFuture<Result<Drive>> getDefaultDrive(Callback<Drive> callback);
 }
