@@ -7,7 +7,7 @@ import org.elastos.hive.vendors.hiveIpfs.HiveIpfsClient;
 import org.elastos.hive.vendors.onedrive.OneDriveClient;
 import org.elastos.hive.vendors.webdav.OwnCloudClient;
 
-public abstract class Client implements HiveItem {
+public abstract class Client implements BaseItem {
 	public static <T> Client createInstance(Parameter<T> parameter) {
 		if (parameter == null)
 			return null;

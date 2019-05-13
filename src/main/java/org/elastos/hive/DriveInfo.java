@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-public class DriveInfo implements HiveItem {
+public class DriveInfo implements BaseItem {
 	private final String driveId;
 
 	public DriveInfo(String driveId) {

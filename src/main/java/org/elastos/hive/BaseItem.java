@@ -1,5 +1,5 @@
 package org.elastos.hive;
 
-public interface HiveItem {
+public interface BaseItem {
 	public String getId();
 }

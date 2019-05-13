@@ -2,7 +2,7 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface Drive extends HiveItem, DirectoryItem {
+public interface Drive extends BaseItem, DirectoryItem {
 	public DriveType getType();
 
 	public DriveInfo getLastInfo();

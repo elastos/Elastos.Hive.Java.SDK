@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-public class AuthToken implements HiveItem {
+public class AuthToken implements BaseItem {
 	private final String ID = "AuthToken";
 
 	@SuppressWarnings("unused")
