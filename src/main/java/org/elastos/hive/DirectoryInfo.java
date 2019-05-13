@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-public class DirectoryInfo implements HiveItem {
+public class DirectoryInfo implements BaseItem {
 	private final String dirId;
 
 	public DirectoryInfo(final String dirId) {

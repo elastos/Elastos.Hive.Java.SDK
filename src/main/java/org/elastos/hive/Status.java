@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-public class Status implements HiveItem {
+public class Status implements BaseItem {
 	private final String ID = "Status";
 	private final int status;
 

@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-public class FileInfo implements HiveItem {
+public class FileInfo implements BaseItem {
 	private final String fileId;
 
 	public FileInfo(String fileId) {

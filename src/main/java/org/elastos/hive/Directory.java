@@ -2,7 +2,7 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface Directory extends HiveItem, FileItem<Directory>, DirectoryItem {
+public interface Directory extends BaseItem, FileItem<Directory>, DirectoryItem {
 	public DirectoryInfo getLastInfo();
 
 	public CompletableFuture<Result<DirectoryInfo>> getInfo();

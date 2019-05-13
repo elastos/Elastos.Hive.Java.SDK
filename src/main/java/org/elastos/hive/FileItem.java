@@ -2,7 +2,7 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
-interface FileItem <T extends HiveItem>{
+interface FileItem <T extends BaseItem>{
 	public String getPath();
 	public String getParentPath();
 

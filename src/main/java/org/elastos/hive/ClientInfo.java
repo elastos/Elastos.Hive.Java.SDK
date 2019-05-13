@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-public class ClientInfo implements HiveItem {
+public class ClientInfo implements BaseItem {
 	private final String userId;
 	private String displayName;
 	private String email;
