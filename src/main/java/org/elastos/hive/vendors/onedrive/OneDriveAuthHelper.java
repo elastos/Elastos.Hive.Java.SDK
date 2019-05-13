@@ -22,29 +22,28 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	@Override
-	public AuthToken getAuthToken() {
+	public AuthToken getToken() {
 		return authToken;
 	}
 
 	@Override
 	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator, Callback<AuthToken> callback) {
-
 		if (!hasLogin())
 			return null;
 
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<Result<Status>> logoutAsync(Callback<Status> callback) {
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<Result<AuthToken>> checkExpired(Callback<AuthToken> callback) {
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 

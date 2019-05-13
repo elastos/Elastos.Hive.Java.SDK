@@ -3,7 +3,7 @@ package org.elastos.hive;
 import java.util.concurrent.CompletableFuture;
 
 public interface AuthHelper {
-	public AuthToken getAuthToken();
+	public AuthToken getToken();
 
 	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator);
 	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator, Callback<AuthToken> callback);

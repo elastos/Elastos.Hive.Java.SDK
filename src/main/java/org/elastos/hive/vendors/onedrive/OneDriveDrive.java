@@ -4,13 +4,14 @@ import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Callback;
-import org.elastos.hive.DriveInfo;
-import org.elastos.hive.DriveType;
-import org.elastos.hive.FileInfo;
 import org.elastos.hive.Directory;
 import org.elastos.hive.Drive;
-import org.elastos.hive.HiveException;
+import org.elastos.hive.DriveInfo;
+import org.elastos.hive.DriveType;
 import org.elastos.hive.File;
+import org.elastos.hive.FileInfo;
+import org.elastos.hive.HiveException;
+import org.elastos.hive.NullCallback;
 import org.elastos.hive.Result;
 import org.json.JSONObject;
 
@@ -54,7 +55,7 @@ final class OneDriveDrive implements Drive {
 		CompletableFuture<Result<DriveInfo>> future = new CompletableFuture<Result<DriveInfo>>();
 
 		Unirest.get(OneDriveURL.API)
-			.header("Authorization",  "bearer " + authHelper.getAuthToken().getAccessToken())
+			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
 			.asJsonAsync(new GetDriveInfoCallback(future, callback));
 
 		return future;
@@ -62,7 +63,7 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<Result<Directory>> getRootDir() {
-		return getRootDir(null);
+		return getRootDir(new NullCallback<Directory>());
 	}
 
 	@Override
@@ -72,7 +73,7 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<Result<Directory>> createDirectory(String pathName) {
-		return createDirectory(pathName, null);
+		return createDirectory(pathName, new NullCallback<Directory>());
 	}
 
 	@Override
@@ -83,7 +84,7 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<Result<Directory>> getDirectory(String pathName) {
-		return getDirectory(pathName);
+		return getDirectory(pathName, new NullCallback<Directory>());
 	}
 
 	@Override
@@ -94,7 +95,7 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<Result<File>> createFile(String pathName) {
-		return createFile(pathName, null);
+		return createFile(pathName, new NullCallback<File>());
 	}
 
 	@Override
@@ -116,7 +117,7 @@ final class OneDriveDrive implements Drive {
 				.replace(" ", "%20");
 
 		Unirest.get(url)
-			.header("Authorization",  "bearer " + authHelper.getAuthToken().getAccessToken())
+			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
 			.asJsonAsync(new GetFileObjectCallback(future, callback));
 
 		return future;
@@ -146,7 +147,7 @@ final class OneDriveDrive implements Drive {
 				.replace(" ", "%20");
 
 		Unirest.get(url)
-			.header("Authorization",  "bearer " + authHelper.getAuthToken().getAccessToken())
+			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
 			.asJsonAsync(new CreateFileObjectCallback(future, callback));
 
 		return future;
