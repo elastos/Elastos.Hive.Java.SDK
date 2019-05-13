@@ -4,9 +4,10 @@ import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Callback;
+import org.elastos.hive.File;
 import org.elastos.hive.FileInfo;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.File;
+import org.elastos.hive.NullCallback;
 import org.elastos.hive.Result;
 import org.elastos.hive.Status;
 import org.json.JSONObject;
@@ -51,7 +52,7 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<Result<FileInfo>> getInfo() {
-		return getInfo(null);
+		return getInfo(new NullCallback<FileInfo>());
 	}
 
 	@Override
@@ -59,7 +60,7 @@ final class OneDriveFile implements File {
 		CompletableFuture<Result<FileInfo>> future = new CompletableFuture<Result<FileInfo>>();
 
 		Unirest.get(OneDriveURL.API)
-			.header("Authorization",  "bearer " + authHelper.getAuthToken().getAccessToken())
+			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
 			.asJsonAsync(new GetFileInfoCallback(future, callback));
 
 		return future;
@@ -91,7 +92,7 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<Result<Status>> deleteItem() {
-		return deleteItem(null);
+		return deleteItem(new NullCallback<Status>());
 	}
 
 	@Override
@@ -101,7 +102,7 @@ final class OneDriveFile implements File {
 				.replace(" ", "%20");
 
 		Unirest.delete(url)
-			.header("Authorization",  "bearer " + authHelper.getAuthToken().getAccessToken())
+			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
 			.asJsonAsync(new DeleteItemCallback(future, callback));
 
 		return future;

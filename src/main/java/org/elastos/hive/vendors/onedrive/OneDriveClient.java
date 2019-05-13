@@ -7,12 +7,13 @@ import java.util.concurrent.Future;
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
-import org.elastos.hive.ClientInfo;
-import org.elastos.hive.DriveType;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
+import org.elastos.hive.ClientInfo;
 import org.elastos.hive.Drive;
+import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
+import org.elastos.hive.NullCallback;
 import org.elastos.hive.Result;
 import org.elastos.hive.Status;
 
@@ -26,7 +27,6 @@ public final class OneDriveClient extends Client {
 
 	private final AuthHelper authHelper;
 	private ClientInfo clientInfo;
-	private AuthToken authToken;
 	private String clientId;
 
 	private OneDriveClient(OneDriveParameter parameter) {
@@ -61,7 +61,6 @@ public final class OneDriveClient extends Client {
 
 		try {
 			result = future.get();
-			authToken = result.getObject();
 		} catch (InterruptedException e) {
 			throw new HiveException(e.getMessage());
 		} catch (ExecutionException e) {
@@ -79,7 +78,6 @@ public final class OneDriveClient extends Client {
 
 		try {
 			result = future.get();
-			authToken = null;
 		} catch (InterruptedException e) {
 			throw new HiveException(e.getMessage());
 		} catch (ExecutionException e) {
@@ -97,7 +95,7 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public CompletableFuture<Result<ClientInfo>> getInfo() {
-		return getInfo(null);
+		return getInfo(new NullCallback<ClientInfo>());
 	}
 
 	@Override
@@ -105,7 +103,7 @@ public final class OneDriveClient extends Client {
 		CompletableFuture<Result<ClientInfo>> future = new CompletableFuture<Result<ClientInfo>>();
 
 		Unirest.get(OneDriveURL.API)
-			.header("Authorization",  "bearer " + authToken.getAccessToken())
+			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
 			.asJsonAsync(new GetClientInfoCallback(future, callback));
 
 		return future;
@@ -113,7 +111,7 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public CompletableFuture<Result<Drive>> getDefaultDrive() {
-		return getDefaultDrive(null);
+		return getDefaultDrive(new NullCallback<Drive>());
 	}
 
 	@Override
@@ -121,7 +119,7 @@ public final class OneDriveClient extends Client {
 		CompletableFuture<Result<Drive>> future = new CompletableFuture<Result<Drive>>();
 
 		Unirest.get(OneDriveURL.API)
-			.header("Authorization",  "bearer " + authToken.getAccessToken())
+			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
 			.asJsonAsync(new GetDriveCallback(future, callback));
 
 		return future;
