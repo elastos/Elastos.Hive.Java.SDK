@@ -3,9 +3,10 @@ package org.elastos.hive.vendors.onedrive;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.AuthHelper;
-import org.elastos.hive.DirectoryInfo;
 import org.elastos.hive.Callback;
+import org.elastos.hive.Children;
 import org.elastos.hive.Directory;
+import org.elastos.hive.DirectoryInfo;
 import org.elastos.hive.File;
 import org.elastos.hive.Result;
 import org.elastos.hive.Status;
@@ -142,6 +143,18 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public CompletableFuture<Result<File>> getFile(String pathName, Callback<File> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Result<Children>> getChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Result<Children>> getChildren(Callback<Children> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
