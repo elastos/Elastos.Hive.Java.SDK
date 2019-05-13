@@ -7,4 +7,7 @@ public interface Directory extends BaseItem, FileItem<Directory>, DirectoryItem 
 
 	public CompletableFuture<Result<DirectoryInfo>> getInfo();
 	public CompletableFuture<Result<DirectoryInfo>> getInfo(Callback<DirectoryInfo> callback);
+
+	public CompletableFuture<Result<Children>> getChildren();
+	public CompletableFuture<Result<Children>> getChildren(Callback<Children> callback);
 }

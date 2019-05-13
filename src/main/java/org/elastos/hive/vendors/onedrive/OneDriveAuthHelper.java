@@ -27,8 +27,7 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	@Override
-	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator,
-			Callback<AuthToken, HiveException> callback) {
+	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator, Callback<AuthToken> callback) {
 
 		if (!hasLogin())
 			return null;
@@ -38,13 +37,13 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	@Override
-	public CompletableFuture<Result<Status>> logoutAsync(Callback<Status, HiveException> callback) {
+	public CompletableFuture<Result<Status>> logoutAsync(Callback<Status> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<Result<AuthToken>> checkExpired(Callback<AuthToken, HiveException> callback) {
+	public CompletableFuture<Result<AuthToken>> checkExpired(Callback<AuthToken> callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -85,7 +84,7 @@ class OneDriveAuthHelper implements AuthHelper {
 		}
 	}
 
-	private CompletableFuture<Result<AuthToken>> redeemAccessToken(Callback<AuthToken, HiveException> callback) {
+	private CompletableFuture<Result<AuthToken>> redeemAccessToken(Callback<AuthToken> callback) {
 		return null;
 	}
 
