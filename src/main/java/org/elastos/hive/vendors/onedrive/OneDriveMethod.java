@@ -1,7 +1,7 @@
 package org.elastos.hive.vendors.onedrive;
 
-public class OneDriveMethod {
-    public static final String AUTHORIZE 	= "authorize";
-    public static final String LOGOUT 		= "logout";
-    public static final String TOKEN		= "token";
+class OneDriveMethod {
+    static final String AUTHORIZE	= "authorize";
+    static final String LOGOUT		= "logout";
+    static final String TOKEN		= "token";
 }

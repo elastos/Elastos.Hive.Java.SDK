@@ -30,7 +30,7 @@ public final class OneDriveClient extends Client {
 	private String clientId;
 
 	private OneDriveClient(OneDriveParameter parameter) {
-		authHelper = new OneDriveAuthHelper(parameter.getAuthEntry());
+		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry());
 	}
 
 	public static Client createInstance(OneDriveParameter parameter) {
@@ -103,7 +103,7 @@ public final class OneDriveClient extends Client {
 		CompletableFuture<Result<ClientInfo>> future = new CompletableFuture<Result<ClientInfo>>();
 
 		Unirest.get(OneDriveURL.API)
-			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
+			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetClientInfoCallback(future, callback));
 
 		return future;
@@ -119,7 +119,7 @@ public final class OneDriveClient extends Client {
 		CompletableFuture<Result<Drive>> future = new CompletableFuture<Result<Drive>>();
 
 		Unirest.get(OneDriveURL.API)
-			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
+			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetDriveCallback(future, callback));
 
 		return future;
@@ -139,13 +139,14 @@ public final class OneDriveClient extends Client {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> arg0) {
+			// TODO
 		}
 
 		@Override
 		public void failed(UnirestException arg0) {
 			HiveException e = new HiveException(arg0.getMessage());
 			this.callback.onError(e);
-			future.complete(Result<ClientInfo>(e));
+			future.complete(new Result<ClientInfo>(e));
 		}
 	}
 
@@ -163,13 +164,14 @@ public final class OneDriveClient extends Client {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> arg0) {
+			// TODO;
 		}
 
 		@Override
 		public void failed(UnirestException arg0) {
 			HiveException e = new HiveException(arg0.getMessage());
 			this.callback.onError(e);
-			future.complete(Result<Drive>(e));
+			future.complete(new Result<Drive>(e));
 		}
 	}
 }

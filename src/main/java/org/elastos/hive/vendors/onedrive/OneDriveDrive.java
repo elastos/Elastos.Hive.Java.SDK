@@ -55,7 +55,7 @@ final class OneDriveDrive implements Drive {
 		CompletableFuture<Result<DriveInfo>> future = new CompletableFuture<Result<DriveInfo>>();
 
 		Unirest.get(OneDriveURL.API)
-			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
+			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetDriveInfoCallback(future, callback));
 
 		return future;
@@ -139,7 +139,7 @@ final class OneDriveDrive implements Drive {
 				.replace(" ", "%20");
 
 		Unirest.get(url)
-			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
+			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new CreateFileObjectCallback(future, callback));
 
 		return future;

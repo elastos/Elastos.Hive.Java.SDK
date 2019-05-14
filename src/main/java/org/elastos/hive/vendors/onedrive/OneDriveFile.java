@@ -60,7 +60,7 @@ final class OneDriveFile implements File {
 		CompletableFuture<Result<FileInfo>> future = new CompletableFuture<Result<FileInfo>>();
 
 		Unirest.get(OneDriveURL.API)
-			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
+			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetFileInfoCallback(future, callback));
 
 		return future;
@@ -102,7 +102,7 @@ final class OneDriveFile implements File {
 				.replace(" ", "%20");
 
 		Unirest.delete(url)
-			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
+			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new DeleteItemCallback(future, callback));
 
 		return future;

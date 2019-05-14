@@ -6,10 +6,16 @@ import org.elastos.hive.AuthHelper;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
+import org.elastos.hive.OAuthEntry;
 import org.elastos.hive.Result;
 import org.elastos.hive.Status;
 
 class OneDriveAuthHelper implements AuthHelper {
+	private final OAuthEntry authEntry;
+
+	OneDriveAuthHelper(OAuthEntry authEntry) {
+		this.authEntry = authEntry;
+	}
 
 	@Override
 	public AuthToken getToken() {
