@@ -144,9 +144,8 @@ public final class OneDriveClient extends Client {
 		@Override
 		public void failed(UnirestException arg0) {
 			HiveException e = new HiveException(arg0.getMessage());
-			Result<ClientInfo> value = new Result<ClientInfo>(e);
-			this.callback.onFailed(e);
-			future.complete(value);
+			this.callback.onError(e);
+			future.complete(Result<ClientInfo>(e));
 		}
 	}
 
@@ -169,9 +168,8 @@ public final class OneDriveClient extends Client {
 		@Override
 		public void failed(UnirestException arg0) {
 			HiveException e = new HiveException(arg0.getMessage());
-			Result<Drive> value = new Result<Drive>(e);
-			this.callback.onFailed(e);
-			future.complete(value);
+			this.callback.onError(e);
+			future.complete(Result<Drive>(e));
 		}
 	}
 }

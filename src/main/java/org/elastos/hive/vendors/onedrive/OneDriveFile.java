@@ -35,13 +35,13 @@ final class OneDriveFile implements File {
 
 	@Override
 	public String getPath() {
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 
 	@Override
 	public String getParentPath() {
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 
@@ -68,25 +68,25 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<Result<File>> moveTo(String pathName) {
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<Result<File>> moveTo(String pathName, Callback<File> callback) {
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<Result<File>> copyTo(String pathName) {
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<Result<File>> copyTo(String pathName, Callback<File> callback) {
-		// TODO Auto-generated method stub
+		// TODO
 		return null;
 	}
 
@@ -127,33 +127,24 @@ final class OneDriveFile implements File {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
-			if (callback == null)
-				return;
-
 			if (response.getStatus() != 200) {
 				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				Result<FileInfo> value = new Result<FileInfo>(e);
-				this.callback.onFailed(e);
-				future.complete(value);
+				this.callback.onError(e);
+				future.complete(new Result<FileInfo>(e));
 				return;
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
 			fileInfo = new FileInfo(jsonObject.getString("id"));
-			Result<FileInfo> value = new Result<FileInfo>(fileInfo);
 			this.callback.onSuccess(fileInfo);
-			future.complete(value);
+			future.complete(new Result<FileInfo>(fileInfo));
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
-			if (callback == null)
-				return;
-
 			HiveException e = new HiveException(exception.getMessage());
-			Result<FileInfo> value = new Result<FileInfo>(e);
-			this.callback.onFailed(e);
-			future.complete(value);
+			this.callback.onError(e);
+			future.complete(new Result<FileInfo>(e));
 		}
 	}
 
@@ -171,32 +162,23 @@ final class OneDriveFile implements File {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
-			if (callback == null)
-				return;
-
 			if (response.getStatus() != 204) {
 				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				Result<Status> value = new Result<Status>(e);
-				this.callback.onFailed(e);
-				future.complete(value);
+				this.callback.onError(e);
+				future.complete(new Result<Status>(e));
 				return;
 			}
 
 			Status status = new Status(1);
-			Result<Status> value = new Result<Status>(status);
 			this.callback.onSuccess(status);
-			future.complete(value);
+			future.complete(new Result<Status>(status));
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
-			if (callback == null)
-				return;
-
 			HiveException e = new HiveException(exception.getMessage());
-			Result<Status> value = new Result<Status>(e);
-			this.callback.onFailed(e);
-			future.complete(value);
+			this.callback.onError(e);
+			future.complete(new Result<Status>(e));
 		}
 	}
 }

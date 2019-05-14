@@ -1,89 +1,19 @@
 package org.elastos.hive.vendors.onedrive;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Semaphore;
 
 import org.elastos.hive.AuthHelper;
-import org.elastos.hive.AuthServer;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
-import org.elastos.hive.HiveException;
-import org.elastos.hive.OAuthEntry;
 import org.elastos.hive.Result;
 import org.elastos.hive.Status;
 
 class OneDriveAuthHelper implements AuthHelper {
-	private final OAuthEntry authEntry;
-	private AuthToken authToken;
-
-	OneDriveAuthHelper(OAuthEntry authEntry) {
-		this.authEntry = authEntry;
-	}
 
 	@Override
 	public AuthToken getToken() {
-		return authToken;
-	}
-
-	@Override
-	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator, Callback<AuthToken> callback) {
-		if (!hasLogin())
-			return null;
-
-		// TODO
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Result<Status>> logoutAsync(Callback<Status> callback) {
-		// TODO
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Result<AuthToken>> checkExpired(Callback<AuthToken> callback) {
-		// TODO
-		return null;
-	}
-
-	private boolean hasLogin() {
-		return (authToken != null);
-	}
-
-	private boolean isExpired() {
-		return authToken.isExpired();
-	}
-
-	private String getAuthCode(Authenticator authenticator) throws HiveException {
-		Semaphore semph = new Semaphore(1);
-		AuthServer server = new AuthServer(semph);
-		server.start();
-
-		try {
-			String url1 = String
-					.format("%s/%?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-							OneDriveURL.AUTH,
-							OneDriveMethod.AUTHORIZE,
-							authEntry.getClientId(),
-							authEntry.getScope(),
-							authEntry.getRedirectURL())
-					.replace(" ", "%20");
-
-			authenticator.requestAuthentication(url1);
-
-			semph.acquire();
-			String authCode = server.getAuthCode();
-			server.close();
-			semph.release();
-
-			return authCode;
-		}catch (InterruptedException e) {
-			throw new HiveException(e.getMessage());
-		}
-	}
-
-	private CompletableFuture<Result<AuthToken>> redeemAccessToken(Callback<AuthToken> callback) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -94,45 +24,28 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	@Override
+	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator, Callback<AuthToken> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Result<Status>> logoutAsync(Callback<Status> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public CompletableFuture<Result<Status>> logoutAsync() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/*
-	private void redeemAccessToken() throws HiveException {
-		try {
-			String url 	= String
-					.format("%s/%s",
-							OneDriveURL.AUTH,
-							OneDriveMethod.TOKEN)
-					.replace(" ", "%20");
-
-			String body = String
-					.format("client_id=%s&redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
-							authEntry.getClientId(),
-							authEntry.getRedirectURL(),
-							authToken.getRefreshToken());
-
-			HttpResponse<JsonNode> response = Unirest.post(url)
-					.header("Content-Type", "application/x-www-form-urlencoded")
-					.body(body)
-					.asJson();
-
-			if (response.getStatus() == 200) {
-				JSONObject jsonObject = response.getBody().getObject();
-				authToken = new AuthToken(jsonObject.getString("scope"),
-						  jsonObject.getString("access_token"),
-						  jsonObject.getString("refresh_token"),
-						  jsonObject.getLong("expires_in"));
-				jsonObject = null;
-			} else {
-				throw new HiveException(response.getStatusText());
-			}
-		} catch (UnirestException e) {
-			throw new HiveException(e.getMessage());
-		}
-	}*/
+	@Override
+	public CompletableFuture<Result<AuthToken>> checkExpired(Callback<AuthToken> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
 
 /*
