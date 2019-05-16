@@ -154,8 +154,7 @@ final class OneDriveDrive implements Drive {
 			this.callback = callback;
 		}
 		@Override
-		public void cancelled() {
-		}
+		public void cancelled() {}
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
@@ -189,8 +188,7 @@ final class OneDriveDrive implements Drive {
 			this.callback = callback;
 		}
 		@Override
-		public void cancelled() {
-		}
+		public void cancelled() {}
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
@@ -237,8 +235,7 @@ final class OneDriveDrive implements Drive {
 			this.callback = callback;
 		}
 		@Override
-		public void cancelled() {
-		}
+		public void cancelled() {}
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {

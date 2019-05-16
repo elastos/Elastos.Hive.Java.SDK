@@ -73,8 +73,13 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<Result<File>> moveTo(String pathName, Callback<File> callback) {
-		// TODO
-		return null;
+		CompletableFuture<Result<File>> future = new CompletableFuture<Result<File>>();
+
+		Unirest.get(OneDriveURL.API)
+			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+			.asJsonAsync(new MoveToCallback(future, callback));
+
+		return future;
 	}
 
 	@Override
@@ -84,8 +89,13 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<Result<File>> copyTo(String pathName, Callback<File> callback) {
-		// TODO
-		return null;
+		CompletableFuture<Result<File>> future = new CompletableFuture<Result<File>>();
+
+		Unirest.get(OneDriveURL.API)
+			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+			.asJsonAsync(new CopyToCallback(future, callback));
+
+		return future;
 	}
 
 	@Override
@@ -120,8 +130,7 @@ final class OneDriveFile implements File {
 			this.callback = callback;
 		}
 		@Override
-		public void cancelled() {
-		}
+		public void cancelled() {}
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
@@ -146,6 +155,48 @@ final class OneDriveFile implements File {
 		}
 	}
 
+	private class MoveToCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
+		private final CompletableFuture<Result<File>> future;
+		private final Callback<File> callback;
+
+		MoveToCallback(CompletableFuture<Result<File>> future, Callback<File> callback) {
+			this.future = future;
+			this.callback = callback;
+		}
+		@Override
+		public void cancelled() {}
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			// TODO
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			// TODO
+		}
+	}
+
+	private class CopyToCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
+		private final CompletableFuture<Result<File>> future;
+		private final Callback<File> callback;
+
+		CopyToCallback(CompletableFuture<Result<File>> future, Callback<File> callback) {
+			this.future = future;
+			this.callback = callback;
+		}
+		@Override
+		public void cancelled() {}
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			// TODO
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			// TODO
+		}
+	}
+
 	private class DeleteItemCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
 		private final CompletableFuture<Result<Status>> future;
 		private final Callback<Status> callback;
@@ -155,8 +206,7 @@ final class OneDriveFile implements File {
 			this.callback = callback;
 		}
 		@Override
-		public void cancelled() {
-		}
+		public void cancelled() {}
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
