@@ -3,8 +3,7 @@ package org.elastos.hive;
 import java.util.ArrayList;
 
 public class Children implements BaseItem {
-	private final String ID = "DirectoryList";
-
+	private final String ID = "ChildrenList";
 	private ArrayList<Object> children;
 
 	public Children(ArrayList<Object> children) {
