@@ -13,6 +13,7 @@ import org.elastos.hive.Result;
 
 public final class OwnCloudClient extends Client {
 	private static Client clientInstance;
+	private ClientInfo clientInfo;
 
 	private OwnCloudClient(OwnCloudParameter parameter) {
 		// TODO;
@@ -51,14 +52,12 @@ public final class OwnCloudClient extends Client {
 
 	@Override
 	public ClientInfo getLastInfo() {
-		// TODO
-		return null;
+		return clientInfo;
 	}
 
 	@Override
 	public CompletableFuture<Result<ClientInfo>> getInfo() {
-		// TODO
-		return null;
+		return getInfo(new NullCallback<ClientInfo>());
 	}
 
 	@Override
@@ -69,8 +68,7 @@ public final class OwnCloudClient extends Client {
 
 	@Override
 	public CompletableFuture<Result<Drive>> getDefaultDrive() {
-		// TODO
-		return null;
+		return getDefaultDrive(new NullCallback<Drive>());
 	}
 
 	@Override

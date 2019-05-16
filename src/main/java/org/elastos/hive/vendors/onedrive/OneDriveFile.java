@@ -21,6 +21,7 @@ final class OneDriveFile implements File {
 	private final AuthHelper authHelper;
 	private final String fileId;
 	private FileInfo fileInfo;
+	private String pathName;
 
 	OneDriveFile(FileInfo fileInfo, AuthHelper authHelper) {
 		this.fileId = fileInfo.getId();
@@ -35,8 +36,7 @@ final class OneDriveFile implements File {
 
 	@Override
 	public String getPath() {
-		// TODO
-		return null;
+		return pathName;
 	}
 
 	@Override
@@ -68,8 +68,7 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<Result<File>> moveTo(String pathName) {
-		// TODO
-		return null;
+		return moveTo(pathName, new NullCallback<File>());
 	}
 
 	@Override
@@ -80,8 +79,7 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<Result<File>> copyTo(String pathName) {
-		// TODO
-		return null;
+		return copyTo(pathName, new NullCallback<File>());
 	}
 
 	@Override
@@ -99,7 +97,7 @@ final class OneDriveFile implements File {
 	public CompletableFuture<Result<Status>> deleteItem(Callback<Status> callback) {
 		CompletableFuture<Result<Status>> future = new CompletableFuture<Result<Status>>();
 		String url = String.format("%s/items/%s",  OneDriveURL.API, this.fileId)
-				.replace(" ", "%20");
+			.replace(" ", "%20");
 
 		Unirest.delete(url)
 			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
