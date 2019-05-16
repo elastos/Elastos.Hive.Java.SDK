@@ -134,8 +134,7 @@ public final class OneDriveClient extends Client {
 			this.callback = callback;
 		}
 		@Override
-		public void cancelled() {
-		}
+		public void cancelled() {}
 
 		@Override
 		public void completed(HttpResponse<JsonNode> arg0) {
@@ -159,8 +158,7 @@ public final class OneDriveClient extends Client {
 			this.callback = callback;
 		}
 		@Override
-		public void cancelled() {
-		}
+		public void cancelled() {}
 
 		@Override
 		public void completed(HttpResponse<JsonNode> arg0) {
