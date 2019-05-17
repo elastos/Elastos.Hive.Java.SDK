@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-public class Result<T extends BaseItem> {
+public class Result<T extends ResultItem> {
 	private final HiveException exception;
 	private final T object;
 

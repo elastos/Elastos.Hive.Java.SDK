@@ -7,7 +7,7 @@ import org.elastos.hive.vendors.hiveIpfs.HiveIpfsClient;
 import org.elastos.hive.vendors.onedrive.OneDriveClient;
 import org.elastos.hive.vendors.webdav.OwnCloudClient;
 
-public abstract class Client implements BaseItem {
+public abstract class Client implements ResourceItem<ClientInfo> {
 	public static <T> Client createInstance(Parameter<T> parameter) {
 		if (parameter == null)
 			return null;
@@ -57,9 +57,12 @@ public abstract class Client implements BaseItem {
 	public abstract void login(Authenticator authenticator) throws HiveException;
 	public abstract void logout() throws HiveException;
 
+	@Override
 	public abstract ClientInfo getLastInfo();
 
+	@Override
 	public abstract CompletableFuture<Result<ClientInfo>> getInfo();
+	@Override
 	public abstract CompletableFuture<Result<ClientInfo>> getInfo(Callback<ClientInfo> callback);
 
 	public abstract CompletableFuture<Result<Drive>> getDefaultDrive();

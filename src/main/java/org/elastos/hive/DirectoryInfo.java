@@ -1,14 +1,13 @@
 package org.elastos.hive;
 
-public class DirectoryInfo implements BaseItem {
-	private final String dirId;
+public class DirectoryInfo implements ResultItem {
+	private final String itemId;
 
-	public DirectoryInfo(final String dirId) {
-		this.dirId = dirId;
+	DirectoryInfo(String itemId) {
+		this.itemId = itemId;
 	}
 
-	@Override
 	public String getId() {
-		return dirId;
+		return itemId;
 	}
 }
