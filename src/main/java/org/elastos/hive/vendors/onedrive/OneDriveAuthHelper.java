@@ -2,16 +2,27 @@ package org.elastos.hive.vendors.onedrive;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.hive.AuthCode;
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
+import org.elastos.hive.HiveException;
+import org.elastos.hive.NullCallback;
 import org.elastos.hive.OAuthEntry;
 import org.elastos.hive.Result;
 import org.elastos.hive.Status;
+import org.json.JSONObject;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 class OneDriveAuthHelper implements AuthHelper {
 	private final OAuthEntry authEntry;
+	private AuthCode  code;
+	private AuthToken token;
 
 	OneDriveAuthHelper(OAuthEntry authEntry) {
 		this.authEntry = authEntry;
@@ -19,191 +30,160 @@ class OneDriveAuthHelper implements AuthHelper {
 
 	@Override
 	public AuthToken getToken() {
-		// TODO Auto-generated method stub
-		return null;
+		return token;
 	}
 
 	@Override
 	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator) {
-		// TODO Auto-generated method stub
-		return null;
+		return loginAsync(authenticator, new NullCallback<AuthToken>());
 	}
 
 	@Override
-	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator, Callback<AuthToken> callback) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Result<Status>> logoutAsync(Callback<Status> callback) {
-		// TODO Auto-generated method stub
+	public CompletableFuture<Result<AuthToken>> loginAsync(Authenticator authenticator,
+		Callback<AuthToken> callback) {
+		// TODO
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<Result<Status>> logoutAsync() {
-		// TODO Auto-generated method stub
-		return null;
+		return logoutAsync(new NullCallback<Status>());
+	}
+
+	@Override
+	public CompletableFuture<Result<Status>> logoutAsync(Callback<Status> callback) {
+		CompletableFuture<Result<Status>> future = new CompletableFuture<Result<Status>>();
+		String url = String.format("%s/%s?redirect_url=%s",
+								   OneDriveURL.AUTH,
+								   OneDriveMethod.LOGOUT,
+								   authEntry.getRedirectURL())
+							.replace(" ", "%20");
+		Unirest.get(url).asJsonAsync(new LogoutCallback(future, callback));
+		return future;
 	}
 
 	@Override
 	public CompletableFuture<Result<AuthToken>> checkExpired(Callback<AuthToken> callback) {
-		// TODO Auto-generated method stub
+		if (token.isExpired())
+			return redeemToken(callback);
+
+		CompletableFuture<Result<AuthToken>> future = new CompletableFuture<Result<AuthToken>>();
+		callback.onSuccess(token);
+		future.complete(new Result<AuthToken>(token));
+		return future;
+	}
+
+	private CompletableFuture<Result<AuthCode>> getAuthCode(Authenticator authenticator,
+			Callback<AuthCode> callback) {
+		// TODO;
 		return null;
 	}
-}
 
-/*
-final class OneDriveAuthHelper implements AuthHelper {
-	private final OAuthEntry authEntry;
-	private AuthToken authToken;
+	private CompletableFuture<Result<AuthToken>> getToken(String authCode, Callback<AuthToken> callback) {
+		CompletableFuture<Result<AuthToken>> future = new CompletableFuture<Result<AuthToken>>();
+		String url 	= String.format("%s/%s",
+									OneDriveURL.AUTH,
+									OneDriveMethod.TOKEN);
+		String body	= String.format("client_id=%&redirect_url=%s&code=%s&grant_type=authorization_code",
+									authEntry.getClientId(),
+									authEntry.getRedirectURL(),
+									authCode);
 
-	OneDriveAuthHelper(OAuthEntry authEntry) {
-		this.authEntry = authEntry;
+		Unirest.post(url)
+			.header(OneDriveHttpHeader.ContentType, "application/x-www-form-urlencoded")
+			.body(body)
+			.asJsonAsync(new GetTokenCallback(future, callback));
+
+		return future;
 	}
 
-	@Override
-	public synchronized void login(Authenticator authenticator) throws HiveException {
-		if (!hasLogin())
-			requestAccessToken(getAuthCode(authenticator));
+	private CompletableFuture<Result<AuthToken>> redeemToken(Callback<AuthToken> callback) {
+		CompletableFuture<Result<AuthToken>> future = new CompletableFuture<Result<AuthToken>>();
+		String url 	= String.format("%s/%s",
+									OneDriveURL.AUTH,
+									OneDriveMethod.TOKEN);
+		String body	= String.format("client_id=%&redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
+									authEntry.getClientId(),
+									authEntry.getRedirectURL(),
+									token.getRefreshToken());
 
-		if (isExpired())
-			redeemAccessToken();
+		Unirest.post(url)
+			.header(OneDriveHttpHeader.ContentType, "application/x-www-form-urlencoded")
+			.body(body)
+			.asJsonAsync(new GetTokenCallback(future, callback));
+
+		return future;
 	}
 
-	@Override
-	public synchronized void logout() throws HiveException {
-		try {
-			String url = String
-					.format("%s/%s?%s=%",
-							OneDriveURL.AUTH,
-							OneDriveMethod.LOGOUT,
-							authEntry.getRedirectURL())
-					.replace(" ", "%20");
+	private class GetTokenCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
+		private final CompletableFuture<Result<AuthToken>> future;
+		private final Callback<AuthToken> callback;
 
-			HttpResponse<String> response = Unirest.get(url).asString();
-			if (response.getStatus() == 200) {
-				authToken = null;
-			} else {
-				throw new HiveException("logout has error");
+		GetTokenCallback(CompletableFuture<Result<AuthToken>> future, Callback<AuthToken> callback) {
+			this.future = future;
+			this.callback = callback;
+		}
+		@Override
+		public void cancelled() {}
+
+		@Override
+		public void completed(HttpResponse<JsonNode> arg0) {
+			if (arg0.getStatus() != 200) {
+				HiveException e = new HiveException(arg0.getStatusText());
+				this.callback.onError(e);
+				future.complete(new Result<AuthToken>(e));
+				return;
 			}
-		} catch (UnirestException e) {
-			throw new HiveException(e.getMessage());
+
+			JSONObject jsonObject = arg0.getBody().getObject();
+			AuthToken token = new AuthToken(jsonObject.getString("scope"),
+											jsonObject.getString("access_token"),
+											jsonObject.getString("refresh_token"),
+											jsonObject.getLong("expires_in"));
+
+			OneDriveAuthHelper.this.token = token;
+			this.callback.onSuccess(token);
+			future.complete(new Result<AuthToken>(token));
+		}
+
+		@Override
+		public void failed(UnirestException arg0) {
+			HiveException e = new HiveException(arg0.getMessage());
+			this.callback.onError(e);
+			future.complete(new Result<AuthToken>(e));
 		}
 	}
 
-	private String getAuthCode(Authenticator authenticator) throws HiveException {
-		Semaphore semph = new Semaphore(1);
-		AuthServer server = new AuthServer(semph);
-		server.start();
+	private class LogoutCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
+		private final CompletableFuture<Result<Status>> future;
+		private final Callback<Status> callback;
 
-		try {
-			String url1 = String
-					.format("%s/%?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-							OneDriveURL.AUTH,
-							OneDriveMethod.AUTHORIZE,
-							authEntry.getClientId(),
-							authEntry.getScope(),
-							authEntry.getRedirectURL())
-					.replace(" ", "%20");
-
-			authenticator.requestAuthentication(url1);
-
-			semph.acquire();
-			String authCode = server.getAuthCode();
-			server.close();
-			semph.release();
-
-			return authCode;
-		}catch (InterruptedException e) {
-			throw new HiveException(e.getMessage());
+		LogoutCallback(CompletableFuture<Result<Status>> future, Callback<Status> callback) {
+			this.future = future;
+			this.callback = callback;
 		}
-	}
+		@Override
+		public void cancelled() {}
 
-	private void requestAccessToken(String authCode) throws HiveException {
-		try {
-			String url  = String
-					.format("%s/%s",
-							OneDriveURL.AUTH,
-							OneDriveMethod.TOKEN)
-					.replace(" ", "%20");
-
-			String body = String
-					.format("client_id=%&redirect_url=%s&code=%s&grant_type=authorization_code",
-							authEntry.getClientId(),
-							authEntry.getRedirectURL(), authCode);
-
-			HttpResponse<JsonNode> response = Unirest.post(url)
-					.header("Content-Type", "application/x-www-form-urlencoded")
-					.body(body)
-					.asJson();
-
-			if (response.getStatus() == 200) {
-				JSONObject jsonObject = response.getBody().getObject();
-				authToken = new AuthToken(jsonObject.getString("scope"),
-										  jsonObject.getString("access_token"),
-										  jsonObject.getString("refresh_token"),
-										  jsonObject.getLong("expires_in"));
-				jsonObject = null;
-			} else {
-				throw new HiveException(response.getStatusText());
+		@Override
+		public void completed(HttpResponse<JsonNode> arg0) {
+			if (arg0.getStatus() != 200) {
+				HiveException e = new HiveException(arg0.getStatusText());
+				this.callback.onError(e);
+				future.complete(new Result<Status>(e));
+				return;
 			}
-		} catch (UnirestException e) {
-			throw new HiveException(e.getMessage());
+
+			Status status = new Status(1);
+			this.callback.onSuccess(status);
+			future.complete(new Result<Status>(status));
 		}
-	}
 
-	private void redeemAccessToken() throws HiveException {
-		try {
-			String url 	= String
-					.format("%s/%s",
-							OneDriveURL.AUTH,
-							OneDriveMethod.TOKEN)
-					.replace(" ", "%20");
-
-			String body = String
-					.format("client_id=%s&redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
-							authEntry.getClientId(),
-							authEntry.getRedirectURL(),
-							authToken.getRefreshToken());
-
-			HttpResponse<JsonNode> response = Unirest.post(url)
-					.header("Content-Type", "application/x-www-form-urlencoded")
-					.body(body)
-					.asJson();
-
-			if (response.getStatus() == 200) {
-				JSONObject jsonObject = response.getBody().getObject();
-				authToken = new AuthToken(jsonObject.getString("scope"),
-						  jsonObject.getString("access_token"),
-						  jsonObject.getString("refresh_token"),
-						  jsonObject.getLong("expires_in"));
-				jsonObject = null;
-			} else {
-				throw new HiveException(response.getStatusText());
-			}
-		} catch (UnirestException e) {
-			throw new HiveException(e.getMessage());
+		@Override
+		public void failed(UnirestException arg0) {
+			HiveException e = new HiveException(arg0.getMessage());
+			this.callback.onError(e);
+			future.complete(new Result<Status>(e));
 		}
-	}
-
-	@Override
-	public AuthToken getAuthToken() {
-		return authToken;
-	}
-
-	private boolean hasLogin() {
-		return authToken != null;
-	}
-
-	private boolean isExpired() {
-		return authToken.isExpired();
-	}
-
-	@Override
-	public void checkExpired() throws HiveException {
-		// TODO
 	}
 }
-*/
