@@ -2,7 +2,6 @@ package org.elastos.hive.vendors.onedrive;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.AuthToken;
@@ -56,7 +55,7 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public synchronized void login(Authenticator authenticator) throws HiveException {
-		Future<AuthToken> future = authHelper.loginAsync(authenticator);
+		CompletableFuture<AuthToken> future = authHelper.loginAsync(authenticator);
 
 		try {
 			future.get();
@@ -69,7 +68,7 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public synchronized void logout() throws HiveException {
-		Future<Status> future = authHelper.logoutAsync();
+		CompletableFuture<Status> future = authHelper.logoutAsync();
 
 		try {
 			future.get();
