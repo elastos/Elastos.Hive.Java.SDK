@@ -1,9 +1,10 @@
 package org.elastos.hive.vendors.onedrive;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Semaphore;
 
-import org.elastos.hive.AuthCode;
 import org.elastos.hive.AuthHelper;
+import org.elastos.hive.AuthServer;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
@@ -11,6 +12,7 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.OAuthEntry;
 import org.elastos.hive.Status;
+import org.elastos.hive.UnirestAsyncCallback;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -20,7 +22,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 class OneDriveAuthHelper implements AuthHelper {
 	private final OAuthEntry authEntry;
-	private AuthCode  code;
 	private AuthToken token;
 
 	OneDriveAuthHelper(OAuthEntry authEntry) {
@@ -40,8 +41,9 @@ class OneDriveAuthHelper implements AuthHelper {
 	@Override
 	public CompletableFuture<AuthToken> loginAsync(Authenticator authenticator,
 		Callback<AuthToken> callback) {
-		// TODO
-		return null;
+
+		return getAuthCode(authenticator)
+				.thenCompose(code -> getToken(code, callback));
 	}
 
 	@Override
@@ -72,10 +74,42 @@ class OneDriveAuthHelper implements AuthHelper {
 		return future;
 	}
 
-	private CompletableFuture<AuthCode> getAuthCode(Authenticator authenticator,
-			Callback<AuthCode> callback) {
-		// TODO;
-		return null;
+	private CompletableFuture<String> getAuthCode(Authenticator authenticator) {
+		CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+			Semaphore semph = new Semaphore(1);
+			AuthServer server = null;
+			String url;
+
+			try {
+				server = new AuthServer(semph);
+			} catch (HiveException e1) {
+				e1.printStackTrace();
+			}
+			server.start();
+
+			url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
+								OneDriveURL.AUTH,
+								OneDriveMethod.AUTHORIZE,
+								authEntry.getClientId(),
+								authEntry.getScope(),
+								authEntry.getRedirectURL())
+						.replace(" ", "%20");
+
+			authenticator.requestAuthentication(url);
+			try {
+				semph.acquire();
+			}catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			String authCode = server.getAuthCode();
+			server.close();
+			semph.release();
+
+			return authCode;
+		});
+
+		return future;
 	}
 
 	private CompletableFuture<AuthToken> getToken(String authCode, Callback<AuthToken> callback) {
@@ -104,7 +138,8 @@ class OneDriveAuthHelper implements AuthHelper {
 		String body	= String.format("client_id=%&redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
 									authEntry.getClientId(),
 									authEntry.getRedirectURL(),
-									token.getRefreshToken());
+									token.getRefreshToken())
+							.replace(" ", "%20");
 
 		Unirest.post(url)
 			.header(OneDriveHttpHeader.ContentType, "application/x-www-form-urlencoded")
