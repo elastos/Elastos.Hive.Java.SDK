@@ -8,8 +8,8 @@ import org.elastos.hive.File;
 import org.elastos.hive.FileInfo;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.Result;
 import org.elastos.hive.Status;
+import org.elastos.hive.UnirestAsyncCallback;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -51,13 +51,13 @@ final class OneDriveFile implements File {
 	}
 
 	@Override
-	public CompletableFuture<Result<FileInfo>> getInfo() {
+	public CompletableFuture<FileInfo> getInfo() {
 		return getInfo(new NullCallback<FileInfo>());
 	}
 
 	@Override
-	public CompletableFuture<Result<FileInfo>> getInfo(Callback<FileInfo> callback) {
-		CompletableFuture<Result<FileInfo>> future = new CompletableFuture<Result<FileInfo>>();
+	public CompletableFuture<FileInfo> getInfo(Callback<FileInfo> callback) {
+		CompletableFuture<FileInfo> future = new CompletableFuture<FileInfo>();
 
 		Unirest.get(OneDriveURL.API)
 			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
@@ -67,50 +67,53 @@ final class OneDriveFile implements File {
 	}
 
 	@Override
-	public CompletableFuture<Result<File>> moveTo(String pathName) {
+	public CompletableFuture<File> moveTo(String pathName) {
 		return moveTo(pathName, new NullCallback<File>());
 	}
 
 	@Override
-	public CompletableFuture<Result<File>> moveTo(String pathName, Callback<File> callback) {
-		CompletableFuture<Result<File>> future = new CompletableFuture<Result<File>>();
+	public CompletableFuture<File> moveTo(String pathName, Callback<File> callback) {
+		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		Unirest.get(OneDriveURL.API)
-			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+			.header(OneDriveHttpHeader.Authorization,
+					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new MoveToCallback(future, callback));
 
 		return future;
 	}
 
 	@Override
-	public CompletableFuture<Result<File>> copyTo(String pathName) {
+	public CompletableFuture<File> copyTo(String pathName) {
 		return copyTo(pathName, new NullCallback<File>());
 	}
 
 	@Override
-	public CompletableFuture<Result<File>> copyTo(String pathName, Callback<File> callback) {
-		CompletableFuture<Result<File>> future = new CompletableFuture<Result<File>>();
+	public CompletableFuture<File> copyTo(String pathName, Callback<File> callback) {
+		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		Unirest.get(OneDriveURL.API)
-			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+			.header(OneDriveHttpHeader.Authorization,
+					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new CopyToCallback(future, callback));
 
 		return future;
 	}
 
 	@Override
-	public CompletableFuture<Result<Status>> deleteItem() {
+	public CompletableFuture<Status> deleteItem() {
 		return deleteItem(new NullCallback<Status>());
 	}
 
 	@Override
-	public CompletableFuture<Result<Status>> deleteItem(Callback<Status> callback) {
-		CompletableFuture<Result<Status>> future = new CompletableFuture<Result<Status>>();
+	public CompletableFuture<Status> deleteItem(Callback<Status> callback) {
+		CompletableFuture<Status> future = new CompletableFuture<Status>();
 		String url = String.format("%s/items/%s",  OneDriveURL.API, this.fileId)
 			.replace(" ", "%20");
 
 		Unirest.delete(url)
-			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+			.header(OneDriveHttpHeader.Authorization,
+					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new DeleteItemCallback(future, callback));
 
 		return future;
@@ -121,11 +124,11 @@ final class OneDriveFile implements File {
 		// TODO
 	}
 
-	private class GetFileInfoCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
-		private final CompletableFuture<Result<FileInfo>> future;
+	private class GetFileInfoCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<FileInfo> future;
 		private final Callback<FileInfo> callback;
 
-		private GetFileInfoCallback(CompletableFuture<Result<FileInfo>> future, Callback<FileInfo> callback) {
+		private GetFileInfoCallback(CompletableFuture<FileInfo> future, Callback<FileInfo> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -135,31 +138,31 @@ final class OneDriveFile implements File {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.complete(new Result<FileInfo>(e));
+				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(ex);
+				future.completeExceptionally(ex);
 				return;
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
 			fileInfo = new FileInfo(jsonObject.getString("id"));
 			this.callback.onSuccess(fileInfo);
-			future.complete(new Result<FileInfo>(fileInfo));
+			future.complete(fileInfo);
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.complete(new Result<FileInfo>(e));
+			HiveException ex = new HiveException(exception.getMessage());
+			this.callback.onError(ex);
+			future.completeExceptionally(ex);
 		}
 	}
 
-	private class MoveToCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
-		private final CompletableFuture<Result<File>> future;
+	private class MoveToCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<File> future;
 		private final Callback<File> callback;
 
-		MoveToCallback(CompletableFuture<Result<File>> future, Callback<File> callback) {
+		MoveToCallback(CompletableFuture<File> future, Callback<File> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -176,11 +179,11 @@ final class OneDriveFile implements File {
 		}
 	}
 
-	private class CopyToCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
-		private final CompletableFuture<Result<File>> future;
+	private class CopyToCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<File> future;
 		private final Callback<File> callback;
 
-		CopyToCallback(CompletableFuture<Result<File>> future, Callback<File> callback) {
+		CopyToCallback(CompletableFuture<File> future, Callback<File> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -197,11 +200,11 @@ final class OneDriveFile implements File {
 		}
 	}
 
-	private class DeleteItemCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
-		private final CompletableFuture<Result<Status>> future;
+	private class DeleteItemCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<Status> future;
 		private final Callback<Status> callback;
 
-		private DeleteItemCallback(CompletableFuture<Result<Status>> future, Callback<Status> callback) {
+		private DeleteItemCallback(CompletableFuture<Status> future, Callback<Status> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -211,22 +214,22 @@ final class OneDriveFile implements File {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 204) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.complete(new Result<Status>(e));
+				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(ex);
+				future.completeExceptionally(ex);
 				return;
 			}
 
 			Status status = new Status(1);
 			this.callback.onSuccess(status);
-			future.complete(new Result<Status>(status));
+			future.complete(status);
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.complete(new Result<Status>(e));
+			HiveException ex = new HiveException(exception.getMessage());
+			this.callback.onError(ex);
+			future.completeExceptionally(ex);
 		}
 	}
 }

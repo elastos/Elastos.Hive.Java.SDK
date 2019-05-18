@@ -14,8 +14,8 @@ import org.elastos.hive.Drive;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.Result;
 import org.elastos.hive.Status;
+import org.elastos.hive.UnirestAsyncCallback;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -56,36 +56,28 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public synchronized void login(Authenticator authenticator) throws HiveException {
-		Future<Result<AuthToken>> future = authHelper.loginAsync(authenticator);
-		Result<AuthToken> result;
+		Future<AuthToken> future = authHelper.loginAsync(authenticator);
 
 		try {
-			result = future.get();
+			future.get();
 		} catch (InterruptedException e) {
 			throw new HiveException(e.getMessage());
 		} catch (ExecutionException e) {
 			throw new HiveException(e.getMessage());
 		}
-
-		if (result.isFailed())
-			throw result.getException();
 	}
 
 	@Override
 	public synchronized void logout() throws HiveException {
-		Future<Result<Status>> future = authHelper.logoutAsync();
-		Result<Status> result;
+		Future<Status> future = authHelper.logoutAsync();
 
 		try {
-			result = future.get();
+			future.get();
 		} catch (InterruptedException e) {
 			throw new HiveException(e.getMessage());
 		} catch (ExecutionException e) {
 			throw new HiveException(e.getMessage());
 		}
-
-		if (result.isFailed())
-			throw result.getException();
 	}
 
 	@Override
@@ -94,42 +86,45 @@ public final class OneDriveClient extends Client {
 	}
 
 	@Override
-	public CompletableFuture<Result<ClientInfo>> getInfo() {
+	public CompletableFuture<ClientInfo> getInfo() {
 		return getInfo(new NullCallback<ClientInfo>());
 	}
 
 	@Override
-	public CompletableFuture<Result<ClientInfo>> getInfo(Callback<ClientInfo> callback) {
-		CompletableFuture<Result<ClientInfo>> future = new CompletableFuture<Result<ClientInfo>>();
+	public CompletableFuture<ClientInfo> getInfo(Callback<ClientInfo> callback) {
+		CompletableFuture<ClientInfo> future = new CompletableFuture<ClientInfo>();
 
 		Unirest.get(OneDriveURL.API)
-			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+			.header(OneDriveHttpHeader.Authorization,
+					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetClientInfoCallback(future, callback));
 
 		return future;
 	}
 
 	@Override
-	public CompletableFuture<Result<Drive>> getDefaultDrive() {
+	public CompletableFuture<Drive> getDefaultDrive() {
 		return getDefaultDrive(new NullCallback<Drive>());
 	}
 
 	@Override
-	public CompletableFuture<Result<Drive>> getDefaultDrive(Callback<Drive> callback) {
-		CompletableFuture<Result<Drive>> future = new CompletableFuture<Result<Drive>>();
+	public CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback) {
+		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
 
 		Unirest.get(OneDriveURL.API)
-			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+			.header(OneDriveHttpHeader.Authorization,
+					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetDriveCallback(future, callback));
 
 		return future;
 	}
 
-	private class GetClientInfoCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
-		private final CompletableFuture<Result<ClientInfo>> future;
+	private class GetClientInfoCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<ClientInfo> future;
 		private final Callback<ClientInfo> callback;
 
-		GetClientInfoCallback(CompletableFuture<Result<ClientInfo>> future, Callback<ClientInfo> callback) {
+		GetClientInfoCallback(CompletableFuture<ClientInfo> future,
+			Callback<ClientInfo> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -137,23 +132,23 @@ public final class OneDriveClient extends Client {
 		public void cancelled() {}
 
 		@Override
-		public void completed(HttpResponse<JsonNode> arg0) {
+		public void completed(HttpResponse<JsonNode> response) {
 			// TODO
 		}
 
 		@Override
-		public void failed(UnirestException arg0) {
-			HiveException e = new HiveException(arg0.getMessage());
+		public void failed(UnirestException exception) {
+			HiveException e = new HiveException(exception.getMessage());
 			this.callback.onError(e);
-			future.complete(new Result<ClientInfo>(e));
+			future.completeExceptionally(e);
 		}
 	}
 
-	private class GetDriveCallback implements com.mashape.unirest.http.async.Callback<JsonNode> {
-		private final CompletableFuture<Result<Drive>> future;
+	private class GetDriveCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<Drive> future;
 		private final Callback<Drive> callback;
 
-		GetDriveCallback(CompletableFuture<Result<Drive>> future, Callback<Drive> callback) {
+		GetDriveCallback(CompletableFuture<Drive> future, Callback<Drive> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -169,7 +164,7 @@ public final class OneDriveClient extends Client {
 		public void failed(UnirestException arg0) {
 			HiveException e = new HiveException(arg0.getMessage());
 			this.callback.onError(e);
-			future.complete(new Result<Drive>(e));
+			future.completeExceptionally(e);
 		}
 	}
 }

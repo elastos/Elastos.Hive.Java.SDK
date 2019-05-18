@@ -5,6 +5,6 @@ import java.util.concurrent.CompletableFuture;
 public interface Drive extends ResourceItem<DriveInfo>, DirectoryItem {
 	public DriveType getType();
 
-	public CompletableFuture<Result<Directory>> getRootDir();
-	public CompletableFuture<Result<Directory>> getRootDir(Callback<Directory> callback);
+	public CompletableFuture<Directory> getRootDir();
+	public CompletableFuture<Directory> getRootDir(Callback<Directory> callback);
 }
