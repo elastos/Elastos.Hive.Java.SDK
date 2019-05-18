@@ -61,10 +61,10 @@ public abstract class Client implements ResourceItem<ClientInfo> {
 	public abstract ClientInfo getLastInfo();
 
 	@Override
-	public abstract CompletableFuture<Result<ClientInfo>> getInfo();
+	public abstract CompletableFuture<ClientInfo> getInfo();
 	@Override
-	public abstract CompletableFuture<Result<ClientInfo>> getInfo(Callback<ClientInfo> callback);
+	public abstract CompletableFuture<ClientInfo> getInfo(Callback<ClientInfo> callback);
 
-	public abstract CompletableFuture<Result<Drive>> getDefaultDrive();
-	public abstract CompletableFuture<Result<Drive>> getDefaultDrive(Callback<Drive> callback);
+	public abstract CompletableFuture<Drive> getDefaultDrive();
+	public abstract CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback);
 }

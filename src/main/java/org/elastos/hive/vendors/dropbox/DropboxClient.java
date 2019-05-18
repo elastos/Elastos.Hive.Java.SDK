@@ -4,12 +4,12 @@ import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
-import org.elastos.hive.ClientInfo;
-import org.elastos.hive.DriveType;
 import org.elastos.hive.Client;
+import org.elastos.hive.ClientInfo;
 import org.elastos.hive.Drive;
+import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.Result;
+import org.elastos.hive.NullCallback;
 
 public final class DropboxClient extends Client {
 	private static Client clientInstance;
@@ -56,23 +56,23 @@ public final class DropboxClient extends Client {
 	}
 
 	@Override
-	public CompletableFuture<Result<ClientInfo>> getInfo() {
+	public CompletableFuture<ClientInfo> getInfo() {
 		return getInfo(new NullCallback<ClientInfo>());
 	}
 
 	@Override
-	public CompletableFuture<Result<ClientInfo>> getInfo(Callback<ClientInfo> callback) {
+	public CompletableFuture<ClientInfo> getInfo(Callback<ClientInfo> callback) {
 		// TODO
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<Result<Drive>> getDefaultDrive() {
+	public CompletableFuture<Drive> getDefaultDrive() {
 		return  getDefaultDrive(new NullCallback<Drive>());
 	}
 
 	@Override
-	public CompletableFuture<Result<Drive>> getDefaultDrive(Callback<Drive> callback) {
+	public CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback) {
 		// TODO
 		return null;
 	}
