@@ -117,7 +117,7 @@ class OneDriveAuthHelper implements AuthHelper {
 		String url 	= String.format("%s/%s",
 									OneDriveURL.AUTH,
 									OneDriveMethod.TOKEN);
-		String body	= String.format("client_id=%&redirect_url=%s&code=%s&grant_type=authorization_code",
+		String body	= String.format("client_id=%s&redirect_url=%s&code=%s&grant_type=authorization_code",
 									authEntry.getClientId(),
 									authEntry.getRedirectURL(),
 									authCode);
