@@ -10,11 +10,13 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.ClientInfo;
 import org.elastos.hive.Drive;
+import org.elastos.hive.DriveInfo;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
+import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -59,6 +61,7 @@ public final class OneDriveClient extends Client {
 
 		try {
 			future.get();
+                        authHelper.checkExpired(null);
 		} catch (InterruptedException e) {
 			throw new HiveException(e.getMessage());
 		} catch (ExecutionException e) {
@@ -156,7 +159,10 @@ public final class OneDriveClient extends Client {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> arg0) {
-			// TODO;
+			JSONObject jsonObject = arg0.getBody().getObject();
+			DriveInfo info = new DriveInfo(jsonObject.getString("id"));
+			OneDriveDrive drive = new OneDriveDrive(info, authHelper);
+			future.complete(drive);
 		}
 
 		@Override

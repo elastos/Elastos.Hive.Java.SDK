@@ -25,6 +25,6 @@ public class AuthToken implements ResultItem {
 
 	public boolean isExpired() {
 		// TODO;
-		return false;
+		return true;
 	}
 }
