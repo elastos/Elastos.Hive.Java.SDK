@@ -20,7 +20,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-final class OneDriveDrive implements Drive {
+public final class OneDriveDrive implements Drive {
 	private final String driveId;
 	private final AuthHelper authHelper;
 	private DriveInfo driveInfo;
@@ -110,10 +110,10 @@ final class OneDriveDrive implements Drive {
 			return future;
 		}
 
-		String url = String.format("%s/root:%s", OneDriveURL.API, pathName)
+		String url = String.format("%s/root:%s:/content", OneDriveURL.API, pathName)
 				.replace(" ", "%20");
 
-		Unirest.get(url)
+		Unirest.put(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
 			.asJsonAsync(new CreateFileCallback(future, callback));
 
@@ -194,7 +194,7 @@ final class OneDriveDrive implements Drive {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
+			if (response.getStatus() != 201 && response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
 				this.callback.onError(ex);
 				future.completeExceptionally(ex);
@@ -202,7 +202,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			boolean isFile = jsonObject.has("folder");
+			boolean isFile = !jsonObject.has("folder");
 
 			if (!isFile) {
 				HiveException ex = new HiveException("This is not a file");

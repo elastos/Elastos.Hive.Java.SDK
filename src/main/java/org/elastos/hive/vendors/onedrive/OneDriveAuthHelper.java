@@ -65,11 +65,15 @@ class OneDriveAuthHelper implements AuthHelper {
 
 	@Override
 	public CompletableFuture<AuthToken> checkExpired(Callback<AuthToken> callback) {
-		if (token.isExpired())
+		if (token.isExpired()) {
 			return redeemToken(callback);
+		}
 
 		CompletableFuture<AuthToken> future = new CompletableFuture<AuthToken>();
-		callback.onSuccess(token);
+		if (callback != null) {
+		    callback.onSuccess(token);			
+		}
+
 		future.complete(token);
 		return future;
 	}
@@ -135,7 +139,7 @@ class OneDriveAuthHelper implements AuthHelper {
 		String url 	= String.format("%s/%s",
 									OneDriveURL.AUTH,
 									OneDriveMethod.TOKEN);
-		String body	= String.format("client_id=%&redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
+		String body	= String.format("client_id=%s&redirect_url=%s&refresh_token=%s&grant_type=refresh_token",
 									authEntry.getClientId(),
 									authEntry.getRedirectURL(),
 									token.getRefreshToken())
@@ -164,15 +168,18 @@ class OneDriveAuthHelper implements AuthHelper {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException(response.getStatusText());
-				this.callback.onError(ex);
+				if (this.callback != null) {
+					this.callback.onError(ex);					
+				}
+				
 				future.completeExceptionally(ex);
 				return;
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
 			AuthToken token = new AuthToken(jsonObject.getString("scope"),
-											jsonObject.getString("access_token"),
 											jsonObject.getString("refresh_token"),
+											jsonObject.getString("access_token"),
 											jsonObject.getLong("expires_in"));
 
 			OneDriveAuthHelper.this.token = token;
