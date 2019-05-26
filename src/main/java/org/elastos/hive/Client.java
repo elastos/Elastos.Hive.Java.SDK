@@ -3,9 +3,13 @@ package org.elastos.hive;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.vendors.dropbox.DropboxClient;
+import org.elastos.hive.vendors.dropbox.DropboxParameter;
 import org.elastos.hive.vendors.hiveIpfs.HiveIpfsClient;
+import org.elastos.hive.vendors.hiveIpfs.HiveIpfsParameter;
 import org.elastos.hive.vendors.onedrive.OneDriveClient;
+import org.elastos.hive.vendors.onedrive.OneDriveParameter;
 import org.elastos.hive.vendors.webdav.OwnCloudClient;
+import org.elastos.hive.vendors.webdav.OwnCloudParameter;
 
 public abstract class Client implements ResourceItem<ClientInfo> {
 	public static <T> Client createInstance(Parameter<T> parameter) {
@@ -14,16 +18,16 @@ public abstract class Client implements ResourceItem<ClientInfo> {
 
 		switch (parameter.getDriveType()) {
 		case oneDrive:
-			return OneDriveClient.createInstance(parameter);
+			return OneDriveClient.createInstance((OneDriveParameter)parameter);
 
 		case dropbox:
-			return DropboxClient.createInstance(parameter);
+			return DropboxClient.createInstance((DropboxParameter)parameter);
 
 		case hiveIpfs:
-			return HiveIpfsClient.createInstance(parameter);
+			return HiveIpfsClient.createInstance((HiveIpfsParameter)parameter);
 
 		case ownCloud:
-			return OwnCloudClient.createInstance(parameter);
+			return OwnCloudClient.createInstance((OwnCloudParameter)parameter);
 
 		default:
 			break;
