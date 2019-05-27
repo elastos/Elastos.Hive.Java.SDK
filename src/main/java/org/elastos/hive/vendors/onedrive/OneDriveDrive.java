@@ -1,7 +1,6 @@
 package org.elastos.hive.vendors.onedrive;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Callback;
@@ -26,7 +25,6 @@ final class OneDriveDrive implements Drive {
 	private final String driveId;
 	private final AuthHelper authHelper;
 	private DriveInfo driveInfo;
-	private static Directory rootDir;
 
 	OneDriveDrive(DriveInfo driveInfo, AuthHelper authHelper) {
 		this.driveId = driveInfo.getId();
@@ -91,16 +89,14 @@ final class OneDriveDrive implements Drive {
 			return future;
 		}
 
-		if (rootDir == null) {
-			try {
-				rootDir = getRootDir().get();
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-			}
+		String url = String.format("%s/root/children", OneDriveURL.API).replace(" ", "%20");
+		int pos = pathName.lastIndexOf("/");
+		if (pos > 0) {
+			//Has parent.
+			String parentPath = pathName.substring(0, pos);		
+			url = String.format("%s/root:/%s/:/children", OneDriveURL.API, parentPath).replace(" ", "%20");
+			pathName = pathName.substring(pos + 1);
 		}
-
-		String url = String.format("%s/items/%s/children", OneDriveURL.API, rootDir.getId())
-				.replace(" ", "%20");
 
 		//conflictBehavior' value : fail, replace, or rename
 		String body = "{\"name\": \"" + pathName + "\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}";
@@ -124,10 +120,7 @@ final class OneDriveDrive implements Drive {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (!pathName.startsWith("/")) {
-			HiveException ex = new HiveException("Inavalid pathname: " + pathName);
-			callback.onError(ex);
-			future.completeExceptionally(ex);
-			return future;
+			pathName = "/" + pathName;
 		}
 
 		String url = String.format("%s/root:%s", OneDriveURL.API, pathName)
@@ -155,10 +148,7 @@ final class OneDriveDrive implements Drive {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (!pathName.startsWith("/")) {
-			HiveException e = new HiveException("Not absolute PathName:  " + pathName);
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
+			pathName = "/" + pathName;
 		}
 
 		String url = String.format("%s/root:%s:/content", OneDriveURL.API, pathName)
@@ -181,13 +171,7 @@ final class OneDriveDrive implements Drive {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (!pathName.startsWith("/")) {
-			HiveException ex = new HiveException("Inavalid pathname: " + pathName);
-			if (callback != null) {
-				callback.onError(ex);				
-			}
-
-			future.completeExceptionally(ex);
-			return future;
+			pathName = "/" + pathName;
 		}
 
 		String url = String.format("%s/root:%s", OneDriveURL.API, pathName)
@@ -392,7 +376,10 @@ final class OneDriveDrive implements Drive {
 		@Override
 		public void failed(UnirestException exception) {
 			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
+			if (this.callback != null) {
+				this.callback.onError(ex);				
+			}
+			
 			future.completeExceptionally(ex);
 		}
 	}
@@ -445,7 +432,10 @@ final class OneDriveDrive implements Drive {
 		@Override
 		public void failed(UnirestException exception) {
 			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
+			if (this.callback != null) {
+				this.callback.onError(ex);				
+			}
+			
 			future.completeExceptionally(ex);
 		}
 	}

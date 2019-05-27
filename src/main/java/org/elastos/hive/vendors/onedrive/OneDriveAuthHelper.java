@@ -65,9 +65,8 @@ class OneDriveAuthHelper implements AuthHelper {
 
 	@Override
 	public CompletableFuture<AuthToken> checkExpired(Callback<AuthToken> callback) {
-		if (token.isExpired()) {
+		if (token.isExpired())
 			return redeemToken(callback);
-		}
 
 		CompletableFuture<AuthToken> future = new CompletableFuture<AuthToken>();
 		if (callback != null) {
@@ -183,14 +182,20 @@ class OneDriveAuthHelper implements AuthHelper {
 											jsonObject.getLong("expires_in"));
 
 			OneDriveAuthHelper.this.token = token;
-			this.callback.onSuccess(token);
+			if (this.callback != null) {
+				this.callback.onSuccess(token);				
+			}
+			
 			future.complete(token);
 		}
 
 		@Override
 		public void failed(UnirestException arg0) {
 			HiveException ex = new HiveException(arg0.getMessage());
-			this.callback.onError(ex);
+			if (this.callback != null) {
+				this.callback.onError(ex);				
+			}
+			
 			future.completeExceptionally(ex);
 		}
 	}
@@ -210,20 +215,29 @@ class OneDriveAuthHelper implements AuthHelper {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException(response.getStatusText());
-				this.callback.onError(ex);
+				if (this.callback != null) {
+					this.callback.onError(ex);					
+				}
+				
 				future.completeExceptionally(ex);
 				return;
 			}
 
 			Status status = new Status(1);
-			this.callback.onSuccess(status);
+			if (this.callback != null) {
+				this.callback.onSuccess(status);				
+			}
+			
 			future.complete(status);
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
 			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
+			if (this.callback != null) {
+				this.callback.onError(ex);				
+			}
+			
 			future.completeExceptionally(ex);
 		}
 	}

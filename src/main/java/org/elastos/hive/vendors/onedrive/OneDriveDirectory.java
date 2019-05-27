@@ -12,7 +12,6 @@ import org.elastos.hive.File;
 import org.elastos.hive.FileInfo;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.ResourceItem;
 import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.json.JSONArray;
@@ -87,12 +86,11 @@ class OneDriveDirectory implements Directory {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		try {
-			OneDriveDirectory parentDirectory = (OneDriveDirectory)OneDriveClient.getInstance().getDefaultDrive().get().getDirectory(pathName).get();
-			int LastPos = pathName.lastIndexOf("/"); 
-			String name = pathName.substring(LastPos + 1);
+			int LastPos = this.pathName.lastIndexOf("/"); 
+			String name = this.pathName.substring(LastPos + 1);
 
 			String url = String.format("%s/items/%s", OneDriveURL.API, this.dirId);
-			String body = "{\"parentReference\": \"id\": \"" + parentDirectory.getId() + "\"},\"name\": \"" + name + "\"}";
+			String body = "{\"parentReference\": \"path\": \"" + pathName + "\"},\"name\": \"" + name + "\"}";
 
 			Unirest.patch(url)
 				.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
@@ -119,14 +117,12 @@ class OneDriveDirectory implements Directory {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		try {
-			OneDriveDrive drive = (OneDriveDrive) OneDriveClient.getInstance().getDefaultDrive().get();
-			OneDriveDirectory directory = (OneDriveDirectory)drive.getDirectory(pathName).get();
-			int LastPos = pathName.lastIndexOf("/"); 
-			String name = pathName.substring(LastPos + 1);
+			int LastPos = this.pathName.lastIndexOf("/"); 
+			String name = this.pathName.substring(LastPos + 1);
 
 			String url = String.format("%s/items/%s/copy", OneDriveURL.API, this.dirId);
-			String body = "{\"parentReference\": {\"driveId\": \"" + drive.getId() + 
-					"\",\"id\": \"" + directory.getId() + "\"},\"name\": \"" + name + "\"}";
+			String body = "{\"parentReference\": {\"path\":\"" 
+					 + pathName + "\"},\"name\": \"" + name + "\"}";
 
 			Unirest.post(url)
 				.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
@@ -210,10 +206,7 @@ class OneDriveDirectory implements Directory {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (!name.startsWith("/")) {
-			HiveException ex = new HiveException("Inavalid name: " + name);
-			callback.onError(ex);
-			future.completeExceptionally(ex);
-			return future;
+			name = "/" + name;
 		}
 
 		String url = String.format("%s/root:%s", OneDriveURL.API, pathName + name)
@@ -237,10 +230,7 @@ class OneDriveDirectory implements Directory {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (!name.startsWith("/")) {
-			HiveException e = new HiveException("Not absolute name:  " + name);
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
+			name = "/" + name;
 		}
 
 		String url = String.format("%s/root:%s:/content", OneDriveURL.API, pathName + name)
@@ -263,13 +253,7 @@ class OneDriveDirectory implements Directory {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (!name.startsWith("/")) {
-			HiveException ex = new HiveException("Inavalid name: " + name);
-			if (callback != null) {
-				callback.onError(ex);				
-			}
-
-			future.completeExceptionally(ex);
-			return future;
+			name = "/" + name;
 		}
 
 		String url = String.format("%s/root:%s", OneDriveURL.API, pathName + name)
@@ -717,9 +701,9 @@ class OneDriveDirectory implements Directory {
 			JSONArray values = baseJson.getJSONArray("value"); 
 			int len = values.length();
 			System.out.println("valuse len=="+len);
+			ArrayList<Object> childList = null;
 			if (len > 0) {
-				@SuppressWarnings("rawtypes")
-				ArrayList<ResourceItem> childList = new ArrayList<>();
+				childList = new ArrayList<Object>();
 				for (int i = 0; i < len; i++) {
 					JSONObject itemJson = values.getJSONObject(i);
 					String name = OneDriveDirectory.this.pathName + "/" + itemJson.getString("name");
@@ -744,6 +728,13 @@ class OneDriveDirectory implements Directory {
 					
 				}
 			}
+			
+			Children children = new Children(childList);
+			if (this.callback != null) {
+				this.callback.onSuccess(children);	
+			}
+
+			future.complete(children);
 		}
 
 		@Override
