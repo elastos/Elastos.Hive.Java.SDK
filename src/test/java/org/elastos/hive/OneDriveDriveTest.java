@@ -6,38 +6,18 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
-import org.elastos.hive.vendors.onedrive.OneDriveClient;
 import org.elastos.hive.vendors.onedrive.OneDriveParameter;
 import org.junit.Before;
-import org.junit.Test;
 
-public class OneDriveTest {
+public class OneDriveDriveTest {
 	private static Drive drive;
-	
-	@Test public void testCreateFile() {
-		checkLogin();
+	private static boolean isLogin = false;
 
-		String fileName = "/newOneDriveForder/newfilename2.txt";
-		CompletableFuture<File> file = drive.createFile(fileName);
-		try {
-			file.get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Test public void testCreateDirectory() {
-		checkLogin();
-
-		String path = "newOneDriveForder";
-		CompletableFuture<Directory> directory = drive.createDirectory(path);
-		try {
-			directory.get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+	@Before
+	public void setUp() throws Exception {
+		if (!isLogin) {
+			testLogin();
 		}
 	}
 
@@ -74,14 +54,6 @@ public class OneDriveTest {
 			assertTrue("Test login errror", false);
 		}
     }
-
-	private static boolean isLogin = false;
-	@Before
-	public void setUp() throws Exception {
-		if (!isLogin) {
-			testLogin();
-		}
-	}
 
 	void checkLogin() {
 		if (!isLogin) {

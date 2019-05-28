@@ -54,12 +54,12 @@ class OneDriveAuthHelper implements AuthHelper {
 	@Override
 	public CompletableFuture<Status> logoutAsync(Callback<Status> callback) {
 		CompletableFuture<Status> future = new CompletableFuture<Status>();
-		String url = String.format("%s/%s?redirect_url=%s",
+		String url = String.format("%s/%s?post_logout_redirect_uri=%s",
 								   OneDriveURL.AUTH,
 								   OneDriveMethod.LOGOUT,
 								   authEntry.getRedirectURL())
 							.replace(" ", "%20");
-		Unirest.get(url).asJsonAsync(new LogoutCallback(future, callback));
+		Unirest.get(url).asStringAsync(new LogoutCallback(future, callback));
 		return future;
 	}
 
@@ -200,7 +200,7 @@ class OneDriveAuthHelper implements AuthHelper {
 		}
 	}
 
-	private class LogoutCallback implements UnirestAsyncCallback<JsonNode> {
+	private class LogoutCallback implements com.mashape.unirest.http.async.Callback<String> {
 		private final CompletableFuture<Status> future;
 		private final Callback<Status> callback;
 
@@ -212,7 +212,7 @@ class OneDriveAuthHelper implements AuthHelper {
 		public void cancelled() {}
 
 		@Override
-		public void completed(HttpResponse<JsonNode> response) {
+		public void completed(HttpResponse<String> response) {
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException(response.getStatusText());
 				if (this.callback != null) {
@@ -227,8 +227,9 @@ class OneDriveAuthHelper implements AuthHelper {
 			if (this.callback != null) {
 				this.callback.onSuccess(status);				
 			}
-			
+
 			future.complete(status);
+			OneDriveAuthHelper.this.token = null;
 		}
 
 		@Override
