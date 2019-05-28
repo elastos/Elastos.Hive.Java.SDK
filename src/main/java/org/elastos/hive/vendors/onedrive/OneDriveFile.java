@@ -41,9 +41,8 @@ final class OneDriveFile implements File {
 
 	@Override
 	public String getParentPath() {
-		if (pathName.equals("/")) {
+		if (pathName.equals("/"))
 			return pathName;
-		}
 
 		return pathName.substring(0, pathName.lastIndexOf("/") + 1);
 	}
@@ -60,16 +59,13 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<FileInfo> getInfo(Callback<FileInfo> callback) {
-		if (callback == null) {
-			callback = new NullCallback<FileInfo>();
-		}
-
-		authHelper.checkExpired(null);
-
 		CompletableFuture<FileInfo> future = new CompletableFuture<FileInfo>();
 
+		if (callback == null)
+			callback = new NullCallback<FileInfo>();
+
 		String url = String.format("%s/root:/%s", OneDriveURL.API, pathName)
-				.replace(" ", "%20");
+						   .replace(" ", "%20");
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetFileInfoCallback(future, callback));
@@ -84,17 +80,14 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<File> moveTo(String pathName, Callback<File> callback) {
-		if (callback == null) {
-			callback = new NullCallback<File>();
-		}
-
-		authHelper.checkExpired(null);
-
 		CompletableFuture<File> future = new CompletableFuture<File>();
+
+		if (callback == null)
+			callback = new NullCallback<File>();
 
 		try {
 			OneDriveDirectory parentDirectory = (OneDriveDirectory)OneDriveClient.getInstance().getDefaultDrive().get().getDirectory(pathName).get();
-			int LastPos = pathName.lastIndexOf("/"); 
+			int LastPos = pathName.lastIndexOf("/");
 			String name = pathName.substring(LastPos + 1);
 
 			String url = String.format("%s/items/%s", OneDriveURL.API, this.fileId);
@@ -120,32 +113,31 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<File> copyTo(String pathName, Callback<File> callback) {
-		if (callback == null) {
-			callback = new NullCallback<File>();
-		}
-
-		authHelper.checkExpired(null);
-
 		CompletableFuture<File> future = new CompletableFuture<File>();
+
+		if (callback == null)
+			callback = new NullCallback<File>();
 
 		try {
 			OneDriveDrive drive = (OneDriveDrive) OneDriveClient.getInstance().getDefaultDrive().get();
 			OneDriveDirectory directory = (OneDriveDirectory)drive.getDirectory(pathName).get();
-			int LastPos = pathName.lastIndexOf("/"); 
+			int LastPos = pathName.lastIndexOf("/");
 			String name = pathName.substring(LastPos + 1);
 
-			String url = String.format("%s/items/%s/copy", OneDriveURL.API, this.fileId);
-			String body = "{\"parentReference\": {\"driveId\": \"" + drive.getId() + 
+			String url  = String.format("%s/items/%s/copy", OneDriveURL.API, fileId)
+							    .replace(" ", "%20");
+			String body = "{\"parentReference\": {\"driveId\": \"" + drive.getId() +
 					"\",\"id\": \"" + directory.getId() + "\"},\"name\": \"" + name + "\"}";
 
 			Unirest.post(url)
-				.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+				.header(OneDriveHttpHeader.Authorization,
+						OneDriveHttpHeader.bearerValue(authHelper))
 				.header("Content-Type", "application/json")
 				.body(body)
 				.asJsonAsync(new CopyToCallback(future, callback));
 		} catch (Exception e) {
-			HiveException hiveException = new HiveException(String.format("Copy the file %s to %s failed.", this.pathName, pathName));
-			callback.onError(hiveException);
+			HiveException ex = new HiveException("UNIrest error:" + e.getMessage());
+			callback.onError(ex);
 		}
 
 		return future;
@@ -158,15 +150,13 @@ final class OneDriveFile implements File {
 
 	@Override
 	public CompletableFuture<Status> deleteItem(Callback<Status> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Status>();
-		}
-
-		authHelper.checkExpired(null);
-
 		CompletableFuture<Status> future = new CompletableFuture<Status>();
+
+		if (callback == null)
+			callback = new NullCallback<Status>();
+
 		String url = String.format("%s/items/%s",  OneDriveURL.API, this.fileId)
-			.replace(" ", "%20");
+						   .replace(" ", "%20");
 
 		Unirest.delete(url)
 			.header(OneDriveHttpHeader.Authorization,
@@ -229,7 +219,7 @@ final class OneDriveFile implements File {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);				
+				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}

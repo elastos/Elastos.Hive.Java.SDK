@@ -35,7 +35,7 @@ public final class OneDriveClient extends Client {
 	}
 
 	public static Client createInstance(OneDriveParameter parameter) {
-		if (clientInstance == null && parameter != null) {
+		if (clientInstance == null) {
 			clientInstance = new OneDriveClient(parameter);
 		}
 		return clientInstance;
@@ -93,11 +93,10 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public CompletableFuture<ClientInfo> getInfo(Callback<ClientInfo> callback) {
-		if (callback == null) {
-			callback = new NullCallback<ClientInfo>();
-		}
-
 		CompletableFuture<ClientInfo> future = new CompletableFuture<ClientInfo>();
+
+		if (callback == null)
+			callback = new NullCallback<ClientInfo>();
 
 		Unirest.get(OneDriveURL.API)
 			.header(OneDriveHttpHeader.Authorization,
@@ -114,11 +113,10 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Drive>();
-		}
-
 		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
+
+		if (callback == null)
+			callback = new NullCallback<Drive>();
 
 		Unirest.get(OneDriveURL.API)
 			.header(OneDriveHttpHeader.Authorization,

@@ -46,9 +46,8 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public String getParentPath() {
-		if (pathName.equals("/")) {
+		if (pathName.equals("/"))
 			return pathName;
-		}
 
 		return pathName.substring(0, pathName.lastIndexOf("/") + 1);
 	}
@@ -65,14 +64,13 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public CompletableFuture<DirectoryInfo> getInfo(Callback<DirectoryInfo> callback) {
-		if (callback == null) {
-			callback = new NullCallback<DirectoryInfo>();
-		}
-
 		CompletableFuture<DirectoryInfo> future = new CompletableFuture<DirectoryInfo>();
 
+		if (callback == null)
+			callback = new NullCallback<DirectoryInfo>();
+
 		String url = String.format("%s/root:/%s", OneDriveURL.API, pathName)
-				.replace(" ", "%20");
+						   .replace(" ", "%20");
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetDirInfoCallback(future, callback));
@@ -87,27 +85,30 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public CompletableFuture<Directory> moveTo(String pathName, Callback<Directory> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Directory>();
-		}
-
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
+
+		if (callback == null)
+			callback = new NullCallback<Directory>();
 
 		try {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
 
-			String url = String.format("%s/items/%s", OneDriveURL.API, this.dirId);
-			String body = "{\"parentReference\": \"path\": \"" + pathName + "\"},\"name\": \"" + name + "\"}";
+			String url  = String.format("%s/items/%s", OneDriveURL.API, dirId)
+								.replace(" ", "%20");
+			String body = String.format("{\"parentReference\": \"path\": \"%s\"name\":\"%s\"}",
+										pathName, name);
 
 			Unirest.patch(url)
-				.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+				.header(OneDriveHttpHeader.Authorization,
+						OneDriveHttpHeader.bearerValue(authHelper))
 				.header("Content-Type", "application/json")
 				.body(body)
 				.asJsonAsync(new MoveToCallback(future, callback));
 		} catch (Exception e) {
-			HiveException hiveException = new HiveException(String.format("Move the folder %s to %s failed.", this.pathName, pathName));
-			callback.onError(hiveException);
+			HiveException ex = new HiveException(e.getMessage());
+			callback.onError(ex);
+			future.completeExceptionally(ex);
 		}
 
 		return future;
@@ -120,28 +121,30 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public CompletableFuture<Directory> copyTo(String pathName, Callback<Directory> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Directory>();
-		}
-
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
+
+		if (callback == null)
+			callback = new NullCallback<Directory>();
 
 		try {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
 
-			String url = String.format("%s/items/%s/copy", OneDriveURL.API, this.dirId);
+			String url  = String.format("%s/items/%s/copy", OneDriveURL.API, dirId)
+							    .replace(" ", "%20");
 			String body = "{\"parentReference\": {\"path\":\""
 					 + pathName + "\"},\"name\": \"" + name + "\"}";
 
 			Unirest.post(url)
-				.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+				.header(OneDriveHttpHeader.Authorization,
+						OneDriveHttpHeader.bearerValue(authHelper))
 				.header("Content-Type", "application/json")
 				.body(body)
 				.asJsonAsync(new CopyToCallback(future, callback));
 		} catch (Exception e) {
-			HiveException hiveException = new HiveException(String.format("Copy the folder %s to %s failed.", this.pathName, pathName));
-			callback.onError(hiveException);
+			HiveException ex = new HiveException(e.getMessage());
+			callback.onError(ex);
+			future.completeExceptionally(ex);
 		}
 
 		return future;
@@ -154,14 +157,13 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public CompletableFuture<Status> deleteItem(Callback<Status> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Status>();
-		}
-
 		CompletableFuture<Status> future = new CompletableFuture<Status>();
 
-		String url = String.format("%s/items/%s",  OneDriveURL.API, this.dirId)
-			.replace(" ", "%20");
+		if (callback == null)
+			callback = new NullCallback<Status>();
+
+		String url = String.format("%s/items/%s", OneDriveURL.API, dirId)
+						   .replace(" ", "%20");
 
 		Unirest.delete(url)
 			.header(OneDriveHttpHeader.Authorization,
@@ -183,21 +185,20 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public CompletableFuture<Directory> createDirectory(String name, Callback<Directory> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Directory>();
-		}
-
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
+		if (callback == null)
+			callback = new NullCallback<Directory>();
+
 		if (name.equals("/")) {
-			HiveException e = new HiveException("This is root.");
+			HiveException e = new HiveException("Can't create root dirctory");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		String url = String.format("%s/items/%s/children", OneDriveURL.API, dirId)
-				.replace(" ", "%20");
+						   .replace(" ", "%20");
 
 		//conflictBehavior' value : fail, replace, or rename
 		String body = "{\"name\": \"" + name + "\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}";
@@ -218,18 +219,16 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public CompletableFuture<Directory> getDirectory(String name, Callback<Directory> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Directory>();
-		}
-
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
-		if (!name.startsWith("/")) {
+		if (callback == null)
+			callback = new NullCallback<Directory>();
+
+		if (!name.startsWith("/"))
 			name = "/" + name;
-		}
 
 		String url = String.format("%s/root:%s", OneDriveURL.API, pathName + name)
-				.replace(" ", "%20");
+						   .replace(" ", "%20");
 
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization,
@@ -246,18 +245,16 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public CompletableFuture<File> createFile(String name, Callback<File> callback) {
-		if (callback == null) {
-			callback = new NullCallback<File>();
-		}
-
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
-		if (!name.startsWith("/")) {
+		if (callback == null)
+			callback = new NullCallback<File>();
+
+		if (!name.startsWith("/"))
 			name = "/" + name;
-		}
 
 		String url = String.format("%s/root:%s:/content", OneDriveURL.API, pathName + name)
-				.replace(" ", "%20");
+						   .replace(" ", "%20");
 
 		Unirest.put(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
@@ -273,18 +270,16 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public CompletableFuture<File> getFile(String name, Callback<File> callback) {
-		if (callback == null) {
-			callback = new NullCallback<File>();
-		}
-
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
-		if (!name.startsWith("/")) {
+		if (callback == null)
+			callback = new NullCallback<File>();
+
+		if (!name.startsWith("/"))
 			name = "/" + name;
-		}
 
 		String url = String.format("%s/root:%s", OneDriveURL.API, pathName + name)
-				.replace(" ", "%20");
+						   .replace(" ", "%20");
 
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization,
@@ -301,14 +296,13 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public CompletableFuture<Children> getChildren(Callback<Children> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Children>();
-		}
-
 		CompletableFuture<Children> future = new CompletableFuture<Children>();
 
+		if (callback == null)
+			callback = new NullCallback<Children>();
+
 		String url = String.format("%s/items/%s/children", OneDriveURL.API, dirId)
-				.replace(" ", "%20");
+						   .replace(" ", "%20");
 
 		Unirest.get(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
