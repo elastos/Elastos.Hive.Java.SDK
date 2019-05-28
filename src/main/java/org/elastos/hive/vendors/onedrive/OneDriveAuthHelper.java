@@ -1,6 +1,7 @@
 package org.elastos.hive.vendors.onedrive;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 
 import org.elastos.hive.AuthHelper;
@@ -53,10 +54,6 @@ class OneDriveAuthHelper implements AuthHelper {
 
 	@Override
 	public CompletableFuture<Status> logoutAsync(Callback<Status> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Status>();
-		}
-		
 		CompletableFuture<Status> future = new CompletableFuture<Status>();
 		String url = String.format("%s/%s?post_logout_redirect_uri=%s",
 								   OneDriveURL.AUTH,
@@ -69,16 +66,11 @@ class OneDriveAuthHelper implements AuthHelper {
 
 	@Override
 	public CompletableFuture<AuthToken> checkExpired(Callback<AuthToken> callback) {
-		if (callback == null) {
-			callback = new NullCallback<AuthToken>();
-		}
-
 		if (token.isExpired())
 			return redeemToken(callback);
 
 		CompletableFuture<AuthToken> future = new CompletableFuture<AuthToken>();
 	    callback.onSuccess(token);
-
 		future.complete(token);
 		return future;
 	}
@@ -91,8 +83,8 @@ class OneDriveAuthHelper implements AuthHelper {
 
 			try {
 				server = new AuthServer(semph);
-			} catch (HiveException e1) {
-				e1.printStackTrace();
+			} catch (HiveException ex) {
+				ex.printStackTrace();
 			}
 			server.start();
 
@@ -122,10 +114,6 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	private CompletableFuture<AuthToken> getToken(String authCode, Callback<AuthToken> callback) {
-		if (callback == null) {
-			callback = new NullCallback<AuthToken>();
-		}
-
 		CompletableFuture<AuthToken> future = new CompletableFuture<AuthToken>();
 		String url 	= String.format("%s/%s",
 									OneDriveURL.AUTH,
@@ -144,10 +132,6 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	private CompletableFuture<AuthToken> redeemToken(Callback<AuthToken> callback) {
-		if (callback == null) {
-			callback = new NullCallback<AuthToken>();
-		}
-
 		CompletableFuture<AuthToken> future = new CompletableFuture<AuthToken>();
 		String url 	= String.format("%s/%s",
 									OneDriveURL.AUTH,

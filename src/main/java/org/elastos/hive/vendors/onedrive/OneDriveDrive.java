@@ -53,11 +53,10 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<DriveInfo> getInfo(Callback<DriveInfo> callback) {
-		if (callback == null) {
-			callback = new NullCallback<DriveInfo>();
-		}
-
 		CompletableFuture<DriveInfo> future = new CompletableFuture<DriveInfo>();
+
+		if (callback == null)
+			callback = new NullCallback<DriveInfo>();
 
 		Unirest.get(OneDriveURL.API)
 			.header(OneDriveHttpHeader.Authorization,
@@ -74,9 +73,8 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<Directory> getRootDir(Callback<Directory> callback) {
-		if (callback == null) {
+		if (callback == null)
 			callback = new NullCallback<Directory>();
-		}
 
 		return getDirectory("/", callback);
 	}
@@ -88,24 +86,24 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<Directory> createDirectory(String pathName, Callback<Directory> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Directory>();
-		}
-
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
+		if (callback == null)
+			callback = new NullCallback<Directory>();
+
 		if (pathName.equals("/")) {
-			HiveException e = new HiveException("This is root.");
+			HiveException e = new HiveException("Can't create root directory");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
-		String url = String.format("%s/root/children", OneDriveURL.API).replace(" ", "%20");
+		String url = String.format("%s/root/children", OneDriveURL.API)
+						   .replace(" ", "%20");
 		int pos = pathName.lastIndexOf("/");
 		if (pos > 0) {
 			//Has parent.
-			String parentPath = pathName.substring(0, pos);		
+			String parentPath = pathName.substring(0, pos);
 			url = String.format("%s/root:/%s/:/children", OneDriveURL.API, parentPath).replace(" ", "%20");
 			pathName = pathName.substring(pos + 1);
 		}
@@ -129,22 +127,19 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<Directory> getDirectory(String pathName, Callback<Directory> callback) {
-		if (callback == null) {
-			callback = new NullCallback<Directory>();
-		}
-
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
-		if (!pathName.startsWith("/")) {
+		if (callback == null)
+			callback = new NullCallback<Directory>();
+
+		if (!pathName.startsWith("/"))
 			pathName = "/" + pathName;
-		}
 
 		String url = String.format("%s/root:%s", OneDriveURL.API, pathName)
-				.replace(" ", "%20");
+						   .replace(" ", "%20");
 
-		if (pathName.equals("/")) {
+		if (pathName.equals("/"))
 			url = String.format("%s/root", OneDriveURL.API);
-		}
 
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization,
@@ -161,18 +156,16 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<File> createFile(String pathName, Callback<File> callback) {
-		if (callback == null) {
-			callback = new NullCallback<File>();
-		}
-
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
-		if (!pathName.startsWith("/")) {
+		if (callback == null)
+			callback = new NullCallback<File>();
+
+		if (!pathName.startsWith("/"))
 			pathName = "/" + pathName;
-		}
 
 		String url = String.format("%s/root:%s:/content", OneDriveURL.API, pathName)
-				.replace(" ", "%20");
+						   .replace(" ", "%20");
 
 		Unirest.put(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
@@ -188,18 +181,16 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<File> getFile(String pathName, Callback<File> callback) {
-		if (callback == null) {
-			callback = new NullCallback<File>();
-		}
-
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
-		if (!pathName.startsWith("/")) {
+		if (callback == null)
+			callback = new NullCallback<File>();
+
+		if (!pathName.startsWith("/"))
 			pathName = "/" + pathName;
-		}
 
 		String url = String.format("%s/root:%s", OneDriveURL.API, pathName)
-				.replace(" ", "%20");
+						   .replace(" ", "%20");
 
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization,
@@ -258,7 +249,7 @@ final class OneDriveDrive implements Drive {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 201 && response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);				
+				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
