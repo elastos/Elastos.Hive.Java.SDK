@@ -93,9 +93,12 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public CompletableFuture<ClientInfo> getInfo(Callback<ClientInfo> callback) {
+		if (callback == null) {
+			callback = new NullCallback<ClientInfo>();
+		}
+
 		CompletableFuture<ClientInfo> future = new CompletableFuture<ClientInfo>();
 
-		//TODO
 		Unirest.get(OneDriveURL.API)
 			.header(OneDriveHttpHeader.Authorization,
 					OneDriveHttpHeader.bearerValue(authHelper))
@@ -111,6 +114,10 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback) {
+		if (callback == null) {
+			callback = new NullCallback<Drive>();
+		}
+
 		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
 
 		Unirest.get(OneDriveURL.API)
@@ -137,36 +144,24 @@ public final class OneDriveClient extends Client {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				if (this.callback != null) {
-					this.callback.onError(ex);	
-				}
-
+				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
 
 			//TODO
-			ClientInfo info = new ClientInfo(null);
-			JSONObject jsonObject = response.getBody().getObject();
-			JSONObject ownerObject = (JSONObject) jsonObject.get("owner");
+			JSONObject ownerObject = (JSONObject) response.getBody().getObject().get("owner");
 			JSONObject userObject = (JSONObject) ownerObject.get("user");
-			
+			ClientInfo info = new ClientInfo(userObject.getString("id"));
 			info.setDisplayName(userObject.getString("displayName"));
-			System.out.println("displayName="+info.getDisplayName());
-			System.out.println("jsonObject="+jsonObject.toString());
-			if (this.callback != null) {
-				this.callback.onSuccess(info);
-			}
+			this.callback.onSuccess(info);
 			future.complete(info);
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
 			HiveException e = new HiveException(exception.getMessage());
-			if (this.callback != null) {
-				this.callback.onError(e);				
-			}
-			
+			this.callback.onError(e);
 			future.completeExceptionally(e);
 		}
 	}
@@ -186,10 +181,7 @@ public final class OneDriveClient extends Client {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				if (this.callback != null) {
-					this.callback.onError(ex);	
-				}
-
+				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
@@ -197,19 +189,14 @@ public final class OneDriveClient extends Client {
 			JSONObject jsonObject = response.getBody().getObject();
 			DriveInfo info = new DriveInfo(jsonObject.getString("id"));
 			OneDriveDrive drive = new OneDriveDrive(info, authHelper);
-			if (this.callback != null) {
-				this.callback.onSuccess(drive);
-			}
+			this.callback.onSuccess(drive);
 			future.complete(drive);
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
 			HiveException e = new HiveException(exception.getMessage());
-			if (this.callback != null) {
-				this.callback.onError(e);				
-			}
-			
+			this.callback.onError(e);
 			future.completeExceptionally(e);
 		}
 	}

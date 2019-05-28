@@ -53,6 +53,10 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<DriveInfo> getInfo(Callback<DriveInfo> callback) {
+		if (callback == null) {
+			callback = new NullCallback<DriveInfo>();
+		}
+
 		CompletableFuture<DriveInfo> future = new CompletableFuture<DriveInfo>();
 
 		Unirest.get(OneDriveURL.API)
@@ -70,6 +74,10 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<Directory> getRootDir(Callback<Directory> callback) {
+		if (callback == null) {
+			callback = new NullCallback<Directory>();
+		}
+
 		return getDirectory("/", callback);
 	}
 
@@ -80,6 +88,10 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<Directory> createDirectory(String pathName, Callback<Directory> callback) {
+		if (callback == null) {
+			callback = new NullCallback<Directory>();
+		}
+
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (pathName.equals("/")) {
@@ -117,6 +129,10 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<Directory> getDirectory(String pathName, Callback<Directory> callback) {
+		if (callback == null) {
+			callback = new NullCallback<Directory>();
+		}
+
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (!pathName.startsWith("/")) {
@@ -145,6 +161,10 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<File> createFile(String pathName, Callback<File> callback) {
+		if (callback == null) {
+			callback = new NullCallback<File>();
+		}
+
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (!pathName.startsWith("/")) {
@@ -168,6 +188,10 @@ final class OneDriveDrive implements Drive {
 
 	@Override
 	public CompletableFuture<File> getFile(String pathName, Callback<File> callback) {
+		if (callback == null) {
+			callback = new NullCallback<File>();
+		}
+
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (!pathName.startsWith("/")) {
@@ -200,32 +224,21 @@ final class OneDriveDrive implements Drive {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				if (this.callback != null) {
-					this.callback.onError(ex);					
-				}
-				
+				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
 			driveInfo = new DriveInfo(jsonObject.getString("id"));
-			
-			if (this.callback != null) {
-				this.callback.onSuccess(driveInfo);
-			}
-
+			this.callback.onSuccess(driveInfo);
 			future.complete(driveInfo);
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
 			HiveException ex = new HiveException(exception.getMessage());
-			
-			if (this.callback != null) {
-				this.callback.onError(ex);
-			}
-
+			this.callback.onError(ex);
 			future.completeExceptionally(ex);
 		}
 	}
@@ -245,10 +258,7 @@ final class OneDriveDrive implements Drive {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 201 && response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				if (this.callback != null) {
-					this.callback.onError(ex);	
-				}
-				
+				this.callback.onError(ex);				
 				future.completeExceptionally(ex);
 				return;
 			}
@@ -258,20 +268,14 @@ final class OneDriveDrive implements Drive {
 
 			if (!isFile) {
 				HiveException ex = new HiveException("This is not a file");
-				if (this.callback != null) {
-					this.callback.onError(ex);	
-				}
-				
+				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
 
 			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
 			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
-			if (this.callback != null) {
-				this.callback.onSuccess(file);
-			}
-			
+			this.callback.onSuccess(file);
 			future.complete(file);
 		}
 
@@ -343,10 +347,7 @@ final class OneDriveDrive implements Drive {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200 && response.getStatus() != 201) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				if (this.callback != null) {
-					this.callback.onError(ex);
-				}
-
+				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
@@ -356,30 +357,21 @@ final class OneDriveDrive implements Drive {
 
 			if (!isFile) {
 				HiveException ex = new HiveException("This is not a file");
-				if (this.callback != null) {
-					this.callback.onError(ex);
-				}
-				
+				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
 
 			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
 			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
-			if (this.callback != null) {
-				this.callback.onSuccess(file);
-			}
-			
+			this.callback.onSuccess(file);
 			future.complete(file);
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
 			HiveException ex = new HiveException(exception.getMessage());
-			if (this.callback != null) {
-				this.callback.onError(ex);				
-			}
-			
+			this.callback.onError(ex);
 			future.completeExceptionally(ex);
 		}
 	}
@@ -399,10 +391,7 @@ final class OneDriveDrive implements Drive {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				if (this.callback != null) {
-					this.callback.onError(ex);	
-				}
-				
+				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
@@ -411,31 +400,21 @@ final class OneDriveDrive implements Drive {
 			boolean isDir = jsonObject.has("folder");
 			if (!isDir) {
 				HiveException ex = new HiveException("This is not a folder");
-				if (this.callback != null) {
-					this.callback.onError(ex);	
-				}
-				
+				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
 
 			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
-
 			OneDriveDirectory directory = new OneDriveDirectory(dirInfo, authHelper);
-			if (this.callback != null) {
-				this.callback.onSuccess(directory);	
-			}
-
+			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
 			HiveException ex = new HiveException(exception.getMessage());
-			if (this.callback != null) {
-				this.callback.onError(ex);				
-			}
-			
+			this.callback.onError(ex);
 			future.completeExceptionally(ex);
 		}
 	}
