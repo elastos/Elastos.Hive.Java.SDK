@@ -7,6 +7,9 @@ class OneDriveHttpHeader {
 	static final String ContentType		= "Content-Type";
 
 	static String bearerValue(AuthHelper authHelper) {
-		return "bearer " + authHelper.getToken().getAccessToken();
+		if (authHelper.getToken() != null) {
+			return "bearer " + authHelper.getToken().getAccessToken();			
+		}
+		return "";
 	}
 }

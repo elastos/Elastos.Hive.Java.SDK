@@ -35,7 +35,7 @@ public final class OneDriveClient extends Client {
 	}
 
 	public static Client createInstance(OneDriveParameter parameter) {
-		if (clientInstance == null) {
+		if (clientInstance == null && parameter != null) {
 			clientInstance = new OneDriveClient(parameter);
 		}
 		return clientInstance;
@@ -60,7 +60,7 @@ public final class OneDriveClient extends Client {
 		CompletableFuture<AuthToken> future = authHelper.loginAsync(authenticator);
 
 		try {
-            future.get();
+			future.get();
 		} catch (InterruptedException e) {
 			throw new HiveException(e.getMessage());
 		} catch (ExecutionException e) {
@@ -135,13 +135,38 @@ public final class OneDriveClient extends Client {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
-			// TODO
+			if (response.getStatus() != 200) {
+				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
+				if (this.callback != null) {
+					this.callback.onError(ex);	
+				}
+
+				future.completeExceptionally(ex);
+				return;
+			}
+
+			//TODO
+			ClientInfo info = new ClientInfo(null);
+			JSONObject jsonObject = response.getBody().getObject();
+			JSONObject ownerObject = (JSONObject) jsonObject.get("owner");
+			JSONObject userObject = (JSONObject) ownerObject.get("user");
+			
+			info.setDisplayName(userObject.getString("displayName"));
+			System.out.println("displayName="+info.getDisplayName());
+			System.out.println("jsonObject="+jsonObject.toString());
+			if (this.callback != null) {
+				this.callback.onSuccess(info);
+			}
+			future.complete(info);
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
 			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
+			if (this.callback != null) {
+				this.callback.onError(e);				
+			}
+			
 			future.completeExceptionally(e);
 		}
 	}
@@ -179,8 +204,8 @@ public final class OneDriveClient extends Client {
 		}
 
 		@Override
-		public void failed(UnirestException arg0) {
-			HiveException e = new HiveException(arg0.getMessage());
+		public void failed(UnirestException exception) {
+			HiveException e = new HiveException(exception.getMessage());
 			if (this.callback != null) {
 				this.callback.onError(e);				
 			}
