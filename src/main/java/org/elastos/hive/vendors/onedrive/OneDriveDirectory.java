@@ -90,6 +90,19 @@ class OneDriveDirectory implements Directory {
 		if (callback == null)
 			callback = new NullCallback<Status>();
 
+		if (!pathName.startsWith("/")) {
+			HiveException e = new HiveException("Need a absolute path to moveTo");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+		else if (this.pathName.equals("/")) {
+			HiveException e = new HiveException("Can't move the root.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;			
+		}
+		
 		try {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
@@ -126,14 +139,26 @@ class OneDriveDirectory implements Directory {
 		if (callback == null)
 			callback = new NullCallback<Status>();
 
+		if (!pathName.startsWith("/")) {
+			HiveException e = new HiveException("Need a absolute path to copyTo");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+		else if (this.pathName.equals("/")) {
+			HiveException e = new HiveException("Can't copy the root.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;			
+		}
+
 		try {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
 
 			String url  = String.format("%s/items/%s/copy", OneDriveURL.API, dirId)
 							    .replace(" ", "%20");
-			String body = "{\"parentReference\": {\"path\":\""
-					 + pathName + "\"},\"name\": \"" + name + "\"}";
+			String body = String.format("{\"parentReference\": {\"path\":\"%s\"},\"name\": \"%s\"}", pathName, name);
 
 			Unirest.post(url)
 				.header(OneDriveHttpHeader.Authorization,
@@ -161,6 +186,13 @@ class OneDriveDirectory implements Directory {
 
 		if (callback == null)
 			callback = new NullCallback<Status>();
+
+		if (this.pathName.equals("/")) {
+			HiveException e = new HiveException("Can't delete the root.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;			
+		}
 
 		String url = String.format("%s/items/%s", OneDriveURL.API, dirId)
 						   .replace(" ", "%20");
@@ -190,18 +222,18 @@ class OneDriveDirectory implements Directory {
 		if (callback == null)
 			callback = new NullCallback<Directory>();
 
-		if (name.equals("/")) {
-			HiveException e = new HiveException("Can't create root dirctory");
+		if (name.contains("/")) {
+			HiveException e = new HiveException("Only need the name of a new directory.");
 			callback.onError(e);
 			future.completeExceptionally(e);
-			return future;
+			return future;			
 		}
 
 		String url = String.format("%s/items/%s/children", OneDriveURL.API, dirId)
 						   .replace(" ", "%20");
 
 		//conflictBehavior' value : fail, replace, or rename
-		String body = "{\"name\": \"" + name + "\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}";
+		String body = String.format("{\"name\": \"%s\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}", name);
 
 		Unirest.post(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
@@ -224,10 +256,14 @@ class OneDriveDirectory implements Directory {
 		if (callback == null)
 			callback = new NullCallback<Directory>();
 
-		if (!name.startsWith("/"))
-			name = "/" + name;
+		if (name.contains("/")) {
+			HiveException e = new HiveException("Only need the name of a directory.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;			
+		}
 
-		String url = String.format("%s/root:%s", OneDriveURL.API, pathName + name)
+		String url = String.format("%s/root:%s/%s", OneDriveURL.API, pathName, name)
 						   .replace(" ", "%20");
 
 		Unirest.get(url)
@@ -250,10 +286,14 @@ class OneDriveDirectory implements Directory {
 		if (callback == null)
 			callback = new NullCallback<File>();
 
-		if (!name.startsWith("/"))
-			name = "/" + name;
+		if (name.contains("/")) {
+			HiveException e = new HiveException("Only need the name of a file.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;			
+		}
 
-		String url = String.format("%s/root:%s:/content", OneDriveURL.API, pathName + name)
+		String url = String.format("%s/root:%s/%s:/content", OneDriveURL.API, pathName, name)
 						   .replace(" ", "%20");
 
 		Unirest.put(url)
@@ -275,10 +315,14 @@ class OneDriveDirectory implements Directory {
 		if (callback == null)
 			callback = new NullCallback<File>();
 
-		if (!name.startsWith("/"))
-			name = "/" + name;
+		if (name.contains("/")) {
+			HiveException e = new HiveException("Only need the name of a file.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;			
+		}
 
-		String url = String.format("%s/root:%s", OneDriveURL.API, pathName + name)
+		String url = String.format("%s/root:%s/%s", OneDriveURL.API, pathName, name)
 				   .replace(" ", "%20");
 
 		Unirest.get(url)

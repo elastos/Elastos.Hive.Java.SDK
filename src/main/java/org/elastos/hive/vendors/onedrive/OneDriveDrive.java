@@ -90,8 +90,14 @@ final class OneDriveDrive implements Drive {
 
 		if (callback == null)
 			callback = new NullCallback<Directory>();
-
-		if (pathName.equals("/")) {
+		
+		if (!pathName.startsWith("/")) {
+			HiveException e = new HiveException("Need a absolute path to create a directory.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+		else if (pathName.equals("/")) {
 			HiveException e = new HiveException("Can't create root directory");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -101,7 +107,10 @@ final class OneDriveDrive implements Drive {
 		String url = String.format("%s/root/children", OneDriveURL.API)
 						   .replace(" ", "%20");
 		int pos = pathName.lastIndexOf("/");
-		if (pos > 0) {
+		if (pos == 0) {
+			pathName = pathName.replace("/", "");
+		}
+		else if (pos > 0) {
 			//Has parent.
 			String parentPath = pathName.substring(0, pos);
 			url = String.format("%s/root:/%s/:/children", OneDriveURL.API, parentPath).replace(" ", "%20");
@@ -109,7 +118,7 @@ final class OneDriveDrive implements Drive {
 		}
 
 		//conflictBehavior' value : fail, replace, or rename
-		String body = "{\"name\": \"" + pathName + "\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}";
+		String body = String.format("{\"name\": \"%s\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}", pathName);
 
 		Unirest.post(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
@@ -132,9 +141,13 @@ final class OneDriveDrive implements Drive {
 		if (callback == null)
 			callback = new NullCallback<Directory>();
 
-		if (!pathName.startsWith("/"))
-			pathName = "/" + pathName;
-
+		if (!pathName.startsWith("/")) {
+			HiveException e = new HiveException("Need a absolute path to get a directory.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+		
 		String url = String.format("%s/root:%s", OneDriveURL.API, pathName)
 						   .replace(" ", "%20");
 
@@ -161,8 +174,12 @@ final class OneDriveDrive implements Drive {
 		if (callback == null)
 			callback = new NullCallback<File>();
 
-		if (!pathName.startsWith("/"))
-			pathName = "/" + pathName;
+		if (!pathName.startsWith("/")) {
+			HiveException e = new HiveException("Need a absolute path to create a file.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
 
 		String url = String.format("%s/root:%s:/content", OneDriveURL.API, pathName)
 						   .replace(" ", "%20");
@@ -186,8 +203,12 @@ final class OneDriveDrive implements Drive {
 		if (callback == null)
 			callback = new NullCallback<File>();
 
-		if (!pathName.startsWith("/"))
-			pathName = "/" + pathName;
+		if (!pathName.startsWith("/")) {
+			HiveException e = new HiveException("Need a absolute path to get a file.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
 
 		String url = String.format("%s/root:%s", OneDriveURL.API, pathName)
 						   .replace(" ", "%20");
@@ -344,8 +365,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			boolean isFile = jsonObject.has("folder");
-
+			boolean isFile = !jsonObject.has("folder");
 			if (!isFile) {
 				HiveException ex = new HiveException("This is not a file");
 				this.callback.onError(ex);

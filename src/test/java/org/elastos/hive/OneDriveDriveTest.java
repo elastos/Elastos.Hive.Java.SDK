@@ -1,63 +1,139 @@
 package org.elastos.hive;
 
-import static org.junit.Assert.assertTrue;
-
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.elastos.hive.vendors.onedrive.OneDriveParameter;
-import org.junit.Before;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import java.util.concurrent.ExecutionException;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class OneDriveDriveTest {
 	private static Drive drive;
-	private static boolean isLogin = false;
+	private static Client client;
 
-	@Before
-	public void setUp() throws Exception {
-		if (!isLogin) {
-			testLogin();
-		}
-	}
-
-	void testLogin() {
-		class TestAuthenticator implements Authenticator {
-			@Override
-			public void requestAuthentication(String requestUrl) {
-				try {
-					Desktop.getDesktop().browse(new URI(requestUrl));
-				} catch (URISyntaxException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
+	@Test public void testGetInfo() {
 		try {
-			OAuthEntry entry = new OAuthEntry(OneDriveTestBase.APPID,
-					OneDriveTestBase.SCOPE, OneDriveTestBase.REDIRECTURL);
-			OneDriveParameter parameter = new OneDriveParameter(entry);
-
-			Client client = Client.createInstance(parameter);
-
-			TestAuthenticator authenticator = new TestAuthenticator();
-			client.login(authenticator);
-
-			drive = client.getDefaultDrive().get();
-			assertTrue(drive != null);
-
-			isLogin = true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			assertTrue("Test login errror", false);
+			DriveInfo info = drive.getInfo().get();
+			assertNotNull(info);
+		} catch (InterruptedException | ExecutionException e) {
+			fail("getInfo failed");
+		}
+    }
+	
+	@Test public void testGetRootDir() {
+		try {
+			Directory root = drive.getRootDir().get();
+			assertNotNull(root);
+		} catch (InterruptedException | ExecutionException e) {
+			fail("getRootDir failed");
+		}
+    }
+	
+	@Test public void testCreateDirectory() {
+		try {
+			String pathName = "/newOneDriveDir" + System.currentTimeMillis();
+			Directory directory = drive.createDirectory(pathName).get();
+			assertNotNull(directory);
+			
+			pathName += "/" + System.currentTimeMillis();
+			Directory secondLevelDir = drive.createDirectory(pathName).get();
+			assertNotNull(secondLevelDir);
+		} catch (InterruptedException | ExecutionException e) {
+			fail("createDirectory failed");
+		}
+    }
+	
+	@Test public void testCreateDirectoryWithInvalidArg() {
+		try {
+			//Must include "/"
+			String pathName = "InvalidDirectoryPath";
+			drive.createDirectory(pathName).get();
+			fail();
+		} catch (InterruptedException | ExecutionException e) {
+//			e.printStackTrace();
 		}
     }
 
-	void checkLogin() {
-		if (!isLogin) {
-			assertTrue("Please login first", false);
+	@Test public void testGetDirectory() {
+		try {
+			String pathName = "/newOneDriveDir" + System.currentTimeMillis();
+			Directory directory = drive.createDirectory(pathName).get();
+			assertNotNull(directory);
+
+			directory = drive.getDirectory(pathName).get();
+			assertNotNull(directory);
+		} catch (InterruptedException | ExecutionException e) {
+			fail("getDirectory failed");
+		}
+    }
+	
+	@Test public void testGetDirectoryWithInvalidArg() {
+		try {
+			//Must include "/"
+			String pathName = "InvalidDirectoryPath";
+			drive.getDirectory(pathName).get();
+			fail();
+		} catch (InterruptedException | ExecutionException e) {
+//			e.printStackTrace();
+		}
+    }
+	
+	@Test public void testCreateFile() {
+		try {
+			String pathName = "/newOneDriveFile";
+			File file = drive.createFile(pathName).get();
+			assertNotNull(file);
+		} catch (InterruptedException | ExecutionException e) {
+			fail("createFile failed");
+		}
+    }
+
+	@Test public void testCreateFileWithInvalidArg() {
+		try {
+			//Must include "/"
+			String pathName = "InvalidFilePath";
+			drive.createFile(pathName).get();
+			fail();
+		} catch (InterruptedException | ExecutionException e) {
+//			e.printStackTrace();
+		}
+    }
+	
+	@Test public void testGetFile() {
+		try {
+			String pathName = "/newOneDriveFile";
+			File file = drive.getFile(pathName).get();
+			assertNotNull(file);
+		} catch (InterruptedException | ExecutionException e) {
+			fail("getFile failed");
+		}
+    }
+
+	@Test public void testGetFileWithInvalidArg() {
+		try {
+			//Must include "/"
+			String pathName = "InvalidFilePath";
+			drive.getFile(pathName).get();
+			fail();
+		} catch (InterruptedException | ExecutionException e) {
+//			e.printStackTrace();
+		}
+    }
+	
+	@BeforeClass
+	static public void setUp() throws Exception {
+		if (client == null) {
+			client = OneDriveTestBase.login();
+			assertNotNull(client);
+			drive = client.getDefaultDrive().get();
+			assertNotNull(drive);
 		}
 	}
+
+    @AfterClass
+    static public void tearDown() throws Exception {
+    	if (client != null) {
+    		client.logout();
+    	}
+    }
 }

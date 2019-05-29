@@ -85,13 +85,20 @@ final class OneDriveFile implements File {
 		if (callback == null)
 			callback = new NullCallback<Status>();
 
+		if (!pathName.startsWith("/")) {
+			HiveException e = new HiveException("Neet a absolute path.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;			
+		}
+
 		try {
 			OneDriveDirectory parentDirectory = (OneDriveDirectory)OneDriveClient.getInstance().getDefaultDrive().get().getDirectory(pathName).get();
 			int LastPos = pathName.lastIndexOf("/");
 			String name = pathName.substring(LastPos + 1);
 
 			String url = String.format("%s/items/%s", OneDriveURL.API, this.fileId);
-			String body = "{\"parentReference\": \"id\": \"" + parentDirectory.getId() + "\"},\"name\": \"" + name + "\"}";
+			String body = String.format("{\"parentReference\": \"id\": \"%s\"},\"name\": \"%s\"}", parentDirectory.getId(), name);
 
 			Unirest.patch(url)
 				.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
@@ -118,6 +125,13 @@ final class OneDriveFile implements File {
 		if (callback == null)
 			callback = new NullCallback<Status>();
 
+		if (!pathName.startsWith("/")) {
+			HiveException e = new HiveException("Neet a absolute path.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;			
+		}
+
 		try {
 			OneDriveDrive drive = (OneDriveDrive) OneDriveClient.getInstance().getDefaultDrive().get();
 			OneDriveDirectory directory = (OneDriveDirectory)drive.getDirectory(pathName).get();
@@ -126,8 +140,8 @@ final class OneDriveFile implements File {
 
 			String url  = String.format("%s/items/%s/copy", OneDriveURL.API, fileId)
 							    .replace(" ", "%20");
-			String body = "{\"parentReference\": {\"driveId\": \"" + drive.getId() +
-					"\",\"id\": \"" + directory.getId() + "\"},\"name\": \"" + name + "\"}";
+			String body = String.format("{\"parentReference\": {\"driveId\": \"%s\",\"id\": \"%s\"},\"name\": \"%s\"}"
+					, drive.getId(), directory.getId(), name);
 
 			Unirest.post(url)
 				.header(OneDriveHttpHeader.Authorization,
