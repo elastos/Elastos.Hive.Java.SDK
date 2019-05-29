@@ -24,19 +24,17 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 class OneDriveDirectory implements Directory {
 	private final AuthHelper authHelper;
-	private final String dirId;
-	private DirectoryInfo dirInfo;
+	private volatile DirectoryInfo dirInfo;
 	private String pathName;
 
 	OneDriveDirectory(DirectoryInfo dirInfo, AuthHelper authHelper) {
 		this.authHelper = authHelper;
-		this.dirId = dirInfo.getId();
 		this.dirInfo = dirInfo;
 	}
 
 	@Override
 	public String getId() {
-		return dirId;
+		return dirInfo.getId();
 	}
 
 	@Override
@@ -72,7 +70,8 @@ class OneDriveDirectory implements Directory {
 		String url = String.format("%s/root:/%s", OneDriveURL.API, pathName)
 						   .replace(" ", "%20");
 		Unirest.get(url)
-			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+			.header(OneDriveHttpHeader.Authorization,
+					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetDirInfoCallback(future, callback));
 
 		return future;
@@ -90,27 +89,36 @@ class OneDriveDirectory implements Directory {
 		if (callback == null)
 			callback = new NullCallback<Status>();
 
+		// the pathname must be a absolute path name
 		if (!pathName.startsWith("/")) {
 			HiveException e = new HiveException("Need a absolute path to moveTo");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
-		else if (this.pathName.equals("/")) {
+
+		if (this.pathName.equals("/")) {
 			HiveException e = new HiveException("Can't move the root.");
 			callback.onError(e);
 			future.completeExceptionally(e);
-			return future;			
+			return future;
 		}
-		
+
+		if (this.pathName.equals(pathName)) {
+			HiveException e = new HiveException("Can't move to same path name");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
 		try {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
 
 			String url  = String.format("%s/items/%s", OneDriveURL.API, dirId)
 								.replace(" ", "%20");
-			String body = String.format("{\"parentReference\": \"path\": \"%s\"name\":\"%s\"}",
-										pathName, name);
+			String body = String.format("{\"parentReference\": \"path\": \"%s\"name\":\"%s\"}", pathName, name)
+								.replace(" ", "%20");
 
 			Unirest.patch(url)
 				.header(OneDriveHttpHeader.Authorization,
@@ -118,10 +126,10 @@ class OneDriveDirectory implements Directory {
 				.header("Content-Type", "application/json")
 				.body(body)
 				.asJsonAsync(new MoveToCallback(future, callback));
-		} catch (Exception e) {
-			HiveException ex = new HiveException(e.getMessage());
-			callback.onError(ex);
-			future.completeExceptionally(ex);
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -145,11 +153,19 @@ class OneDriveDirectory implements Directory {
 			future.completeExceptionally(e);
 			return future;
 		}
-		else if (this.pathName.equals("/")) {
-			HiveException e = new HiveException("Can't copy the root.");
+
+		if (this.pathName.equals("/")) {
+			HiveException e = new HiveException("Can't copy the root");
 			callback.onError(e);
 			future.completeExceptionally(e);
-			return future;			
+			return future;
+		}
+
+		if (this.pathName.equals(pathName)) {
+			HiveException e = new HiveException("Can't copy to same path name");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
 		}
 
 		try {
@@ -158,7 +174,8 @@ class OneDriveDirectory implements Directory {
 
 			String url  = String.format("%s/items/%s/copy", OneDriveURL.API, dirId)
 							    .replace(" ", "%20");
-			String body = String.format("{\"parentReference\": {\"path\":\"%s\"},\"name\": \"%s\"}", pathName, name);
+			String body = String.format("{\"parentReference\": {\"path\":\"%s\"},\"name\": \"%s\"}", pathName, name)
+								.replace(" ", "%20");
 
 			Unirest.post(url)
 				.header(OneDriveHttpHeader.Authorization,
@@ -166,10 +183,10 @@ class OneDriveDirectory implements Directory {
 				.header("Content-Type", "application/json")
 				.body(body)
 				.asJsonAsync(new CopyToCallback(future, callback));
-		} catch (Exception e) {
-			HiveException ex = new HiveException(e.getMessage());
-			callback.onError(ex);
-			future.completeExceptionally(ex);
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -191,7 +208,7 @@ class OneDriveDirectory implements Directory {
 			HiveException e = new HiveException("Can't delete the root.");
 			callback.onError(e);
 			future.completeExceptionally(e);
-			return future;			
+			return future;
 		}
 
 		String url = String.format("%s/items/%s", OneDriveURL.API, dirId)
@@ -223,17 +240,18 @@ class OneDriveDirectory implements Directory {
 			callback = new NullCallback<Directory>();
 
 		if (name.contains("/")) {
-			HiveException e = new HiveException("Only need the name of a new directory.");
+			HiveException e = new HiveException("Cant't create root directory");
 			callback.onError(e);
 			future.completeExceptionally(e);
-			return future;			
+			return future;
 		}
 
-		String url = String.format("%s/items/%s/children", OneDriveURL.API, dirId)
-						   .replace(" ", "%20");
+		String url  = String.format("%s/items/%s/children", OneDriveURL.API, dirId)
+						    .replace(" ", "%20");
 
 		//conflictBehavior' value : fail, replace, or rename
-		String body = String.format("{\"name\": \"%s\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}", name);
+		String body = String.format("{\"name\": \"%s\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}", name)
+							.replace(" ", "%20");
 
 		Unirest.post(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
@@ -260,7 +278,7 @@ class OneDriveDirectory implements Directory {
 			HiveException e = new HiveException("Only need the name of a directory.");
 			callback.onError(e);
 			future.completeExceptionally(e);
-			return future;			
+			return future;
 		}
 
 		String url = String.format("%s/root:%s/%s", OneDriveURL.API, pathName, name)
@@ -290,7 +308,7 @@ class OneDriveDirectory implements Directory {
 			HiveException e = new HiveException("Only need the name of a file.");
 			callback.onError(e);
 			future.completeExceptionally(e);
-			return future;			
+			return future;
 		}
 
 		String url = String.format("%s/root:%s/%s:/content", OneDriveURL.API, pathName, name)
@@ -319,7 +337,7 @@ class OneDriveDirectory implements Directory {
 			HiveException e = new HiveException("Only need the name of a file.");
 			callback.onError(e);
 			future.completeExceptionally(e);
-			return future;			
+			return future;
 		}
 
 		String url = String.format("%s/root:%s/%s", OneDriveURL.API, pathName, name)
