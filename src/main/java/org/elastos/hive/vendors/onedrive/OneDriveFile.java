@@ -74,16 +74,16 @@ final class OneDriveFile implements File {
 	}
 
 	@Override
-	public CompletableFuture<File> moveTo(String pathName) {
-		return moveTo(pathName, new NullCallback<File>());
+	public CompletableFuture<Status> moveTo(String pathName) {
+		return moveTo(pathName, new NullCallback<Status>());
 	}
 
 	@Override
-	public CompletableFuture<File> moveTo(String pathName, Callback<File> callback) {
-		CompletableFuture<File> future = new CompletableFuture<File>();
+	public CompletableFuture<Status> moveTo(String pathName, Callback<Status> callback) {
+		CompletableFuture<Status> future = new CompletableFuture<Status>();
 
 		if (callback == null)
-			callback = new NullCallback<File>();
+			callback = new NullCallback<Status>();
 
 		try {
 			OneDriveDirectory parentDirectory = (OneDriveDirectory)OneDriveClient.getInstance().getDefaultDrive().get().getDirectory(pathName).get();
@@ -99,24 +99,24 @@ final class OneDriveFile implements File {
 				.body(body)
 				.asJsonAsync(new MoveToCallback(future, callback));
 		} catch (Exception e) {
-			HiveException hiveException = new HiveException(String.format("Move the file %s to %s failed.", this.pathName, pathName));
-			callback.onError(hiveException);
+			HiveException ex = new HiveException("Unirest exception: " + e.getMessage());
+			callback.onError(ex);
 		}
 
 		return future;
 	}
 
 	@Override
-	public CompletableFuture<File> copyTo(String pathName) {
-		return copyTo(pathName, new NullCallback<File>());
+	public CompletableFuture<Status> copyTo(String pathName) {
+		return copyTo(pathName, new NullCallback<Status>());
 	}
 
 	@Override
-	public CompletableFuture<File> copyTo(String pathName, Callback<File> callback) {
-		CompletableFuture<File> future = new CompletableFuture<File>();
+	public CompletableFuture<Status> copyTo(String pathName, Callback<Status> callback) {
+		CompletableFuture<Status> future = new CompletableFuture<Status>();
 
 		if (callback == null)
-			callback = new NullCallback<File>();
+			callback = new NullCallback<Status>();
 
 		try {
 			OneDriveDrive drive = (OneDriveDrive) OneDriveClient.getInstance().getDefaultDrive().get();
@@ -136,7 +136,7 @@ final class OneDriveFile implements File {
 				.body(body)
 				.asJsonAsync(new CopyToCallback(future, callback));
 		} catch (Exception e) {
-			HiveException ex = new HiveException("UNIrest error:" + e.getMessage());
+			HiveException ex = new HiveException("Unirest exception: " + e.getMessage());
 			callback.onError(ex);
 		}
 
@@ -206,15 +206,17 @@ final class OneDriveFile implements File {
 	}
 
 	private class MoveToCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<File> future;
-		private final Callback<File> callback;
+		private final CompletableFuture<Status> future;
+		private final Callback<Status> callback;
 
-		MoveToCallback(CompletableFuture<File> future, Callback<File> callback) {
+		MoveToCallback(CompletableFuture<Status> future, Callback<Status> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
+
 		@Override
 		public void cancelled() {}
+
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
@@ -224,11 +226,9 @@ final class OneDriveFile implements File {
 				return;
 			}
 
-			JSONObject jsonObject = response.getBody().getObject();
-			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
-			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
-			this.callback.onSuccess(file);
-			future.complete(file);
+			Status status = new Status(1);
+			this.callback.onSuccess(status);
+			future.complete(status);
 		}
 
 		@Override
@@ -240,15 +240,16 @@ final class OneDriveFile implements File {
 	}
 
 	private class CopyToCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<File> future;
-		private final Callback<File> callback;
+		private final CompletableFuture<Status> future;
+		private final Callback<Status> callback;
 
-		CopyToCallback(CompletableFuture<File> future, Callback<File> callback) {
+		CopyToCallback(CompletableFuture<Status> future, Callback<Status> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
 		@Override
 		public void cancelled() {}
+
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 202) {
@@ -258,11 +259,9 @@ final class OneDriveFile implements File {
 				return;
 			}
 
-			JSONObject jsonObject = response.getBody().getObject();
-			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
-			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
-			this.callback.onSuccess(file);
-			future.complete(file);
+			Status status = new Status(1);
+			this.callback.onSuccess(status);
+			future.complete(status);
 		}
 
 		@Override
