@@ -9,7 +9,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class OneDriveClientTest {
+class OneDriveClientTest {
 	private static Client client;
 	@Test public void testGetInstance() {
 		assertNotNull(Client.getInstance(DriveType.oneDrive));
@@ -39,16 +39,12 @@ public class OneDriveClientTest {
 
 	@BeforeClass
 	static public void setUp() throws Exception {
-		if (client == null) {
-			client = OneDriveTestBase.login();
-			assertNotNull(client);
-		}
+		client = OneDriveTestBase.login();
+		assertNotNull(client);
 	}
 
     @AfterClass
     static public void tearDown() throws Exception {
-    	if (client != null) {
-    		client.logout();
-    	}
+    	client.logout();
     }
 }

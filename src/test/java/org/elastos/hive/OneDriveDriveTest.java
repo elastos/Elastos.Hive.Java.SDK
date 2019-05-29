@@ -2,12 +2,14 @@ package org.elastos.hive;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+
 import java.util.concurrent.ExecutionException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class OneDriveDriveTest {
+class OneDriveDriveTest {
 	private static Drive drive;
 	private static Client client;
 
@@ -16,33 +18,36 @@ public class OneDriveDriveTest {
 			DriveInfo info = drive.getInfo().get();
 			assertNotNull(info);
 		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
 			fail("getInfo failed");
 		}
     }
-	
+
 	@Test public void testGetRootDir() {
 		try {
 			Directory root = drive.getRootDir().get();
 			assertNotNull(root);
 		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
 			fail("getRootDir failed");
 		}
     }
-	
+
 	@Test public void testCreateDirectory() {
 		try {
 			String pathName = "/newOneDriveDir" + System.currentTimeMillis();
 			Directory directory = drive.createDirectory(pathName).get();
 			assertNotNull(directory);
-			
+
 			pathName += "/" + System.currentTimeMillis();
 			Directory secondLevelDir = drive.createDirectory(pathName).get();
 			assertNotNull(secondLevelDir);
 		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
 			fail("createDirectory failed");
 		}
     }
-	
+
 	@Test public void testCreateDirectoryWithInvalidArg() {
 		try {
 			//Must include "/"
@@ -50,7 +55,7 @@ public class OneDriveDriveTest {
 			drive.createDirectory(pathName).get();
 			fail();
 		} catch (InterruptedException | ExecutionException e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
     }
 
@@ -66,7 +71,7 @@ public class OneDriveDriveTest {
 			fail("getDirectory failed");
 		}
     }
-	
+
 	@Test public void testGetDirectoryWithInvalidArg() {
 		try {
 			//Must include "/"
@@ -74,16 +79,17 @@ public class OneDriveDriveTest {
 			drive.getDirectory(pathName).get();
 			fail();
 		} catch (InterruptedException | ExecutionException e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
     }
-	
+
 	@Test public void testCreateFile() {
 		try {
 			String pathName = "/newOneDriveFile";
 			File file = drive.createFile(pathName).get();
 			assertNotNull(file);
 		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
 			fail("createFile failed");
 		}
     }
@@ -95,10 +101,10 @@ public class OneDriveDriveTest {
 			drive.createFile(pathName).get();
 			fail();
 		} catch (InterruptedException | ExecutionException e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
     }
-	
+
 	@Test public void testGetFile() {
 		try {
 			String pathName = "/newOneDriveFile";
@@ -116,10 +122,10 @@ public class OneDriveDriveTest {
 			drive.getFile(pathName).get();
 			fail();
 		} catch (InterruptedException | ExecutionException e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
     }
-	
+
 	@BeforeClass
 	static public void setUp() throws Exception {
 		if (client == null) {
