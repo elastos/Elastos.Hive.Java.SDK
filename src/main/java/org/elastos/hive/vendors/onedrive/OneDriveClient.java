@@ -27,8 +27,7 @@ public final class OneDriveClient extends Client {
 	private static Client clientInstance;
 
 	private final AuthHelper authHelper;
-	private ClientInfo clientInfo;
-	private String clientId;
+	private volatile ClientInfo clientInfo;
 
 	private OneDriveClient(OneDriveParameter parameter) {
 		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry());
@@ -47,7 +46,10 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public String getId() {
-		return clientId;
+		if (clientInfo == null)
+			return null;
+
+		return clientInfo.getUserId();
 	}
 
 	@Override
@@ -150,10 +152,15 @@ public final class OneDriveClient extends Client {
 			//TODO
 			JSONObject ownerObject = (JSONObject) response.getBody().getObject().get("owner");
 			JSONObject userObject = (JSONObject) ownerObject.get("user");
-			ClientInfo info = new ClientInfo(userObject.getString("id"));
+			ClientInfo info;
+
+			info = new ClientInfo(userObject.getString("id"));
 			info.setDisplayName(userObject.getString("displayName"));
+
+			clientInfo = info;
+
 			this.callback.onSuccess(info);
-			future.complete(info);
+			future.complete(clientInfo);
 		}
 
 		@Override
@@ -183,7 +190,7 @@ public final class OneDriveClient extends Client {
 				future.completeExceptionally(ex);
 				return;
 			}
-			
+
 			JSONObject jsonObject = response.getBody().getObject();
 			DriveInfo info = new DriveInfo(jsonObject.getString("id"));
 			OneDriveDrive drive = new OneDriveDrive(info, authHelper);

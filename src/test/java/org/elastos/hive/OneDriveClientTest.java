@@ -1,79 +1,50 @@
 package org.elastos.hive;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.awt.Desktop;
-import java.net.URI;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-import org.elastos.hive.vendors.onedrive.OneDriveParameter;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class OneDriveClientTest {
-	@Test public void testNotLogin() {
-		Client client = Client.getInstance(DriveType.oneDrive);
-		assertTrue(client == null);
-		
-		OAuthEntry entry = new OAuthEntry(OneDriveTestBase.APPID,
-				OneDriveTestBase.SCOPE, OneDriveTestBase.REDIRECTURL);
-		OneDriveParameter parameter = new OneDriveParameter(entry);
-		assertEquals(DriveType.oneDrive, parameter.getDriveType());
-
-		client = Client.createInstance(parameter);
-		assertNotNull(client);
+class OneDriveClientTest {
+	private static Client client;
+	@Test public void testGetInstance() {
+		assertNotNull(Client.getInstance(DriveType.oneDrive));
 	}
-	
-	@Test public void testLoginAndLogout() {
-		class TestAuthenticator implements Authenticator {
-			@Override
-			public void requestAuthentication(String requestUrl) {
-				try {
-					Desktop.getDesktop().browse(new URI(requestUrl));
-				} 
-				catch (Exception e) {
-					e.printStackTrace();
-					fail("Authenticator failed");
-				}
-			}
-		}
 
+	@Test public void testGetInfo() {
 		try {
-			OAuthEntry entry = new OAuthEntry("f0f8fdc1-294e-4d5c-b3d8-774147075480",
-					"offline_access Files.ReadWrite",
-					"http://localhost:44316");
-			OneDriveParameter parameter = new OneDriveParameter(entry);
+			ClientInfo info = client.getInfo().get();
+			assertNotNull(info);
+			assertNotNull(info.getUserId());
+			assertNotNull(info.getDisplayName());
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("getInfo failed");
+		}
+	}
 
-			Client client = Client.createInstance(parameter);
-			assertNotNull(client);
-
-			TestAuthenticator authenticator = new TestAuthenticator();
-			client.login(authenticator);
-
-			CompletableFuture<ClientInfo> clientInfo = client.getInfo();
-			assertNotNull(clientInfo);
-			assertNotNull(clientInfo.get().getDisplayName());
-			
+	@Test public void testGetDefaultDrive() {
+		try {
 			Drive drive = client.getDefaultDrive().get();
 			assertNotNull(drive);
-
-			System.out.println("testLogin=================1");
-			client.logout();
-			System.out.println("testLogin=================2");
-			
-			try {
-				drive = client.getDefaultDrive().get();
-				fail("Can't get the default drive.");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			System.out.println("testLogin=================3");
-			
-		} catch (Exception e) {
+		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
-			fail("Test login errror");
+			fail("getInfo failed");
 		}
+	}
+
+	@BeforeClass
+	static public void setUp() throws Exception {
+		client = OneDriveTestBase.login();
+		assertNotNull(client);
+	}
+
+    @AfterClass
+    static public void tearDown() throws Exception {
+    	client.logout();
     }
 }
