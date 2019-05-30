@@ -19,10 +19,12 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 final class OneDriveFile implements File {
 	private final AuthHelper authHelper;
+	private final String pathName;
 	private volatile FileInfo fileInfo;
 
-	OneDriveFile(FileInfo fileInfo, AuthHelper authHelper) {
+	OneDriveFile(String pathName, FileInfo fileInfo, AuthHelper authHelper) {
 		this.fileInfo = fileInfo;
+		this.pathName = pathName;
 		this.authHelper = authHelper;
 	}
 
@@ -33,12 +35,11 @@ final class OneDriveFile implements File {
 
 	@Override
 	public String getPath() {
-		return fileInfo.getPathName();
+		return pathName;
 	}
 
 	@Override
 	public String getParentPath() {
-		String pathName = fileInfo.getPathName();
 		if (pathName.equals("/"))
 			return pathName;
 
@@ -62,11 +63,11 @@ final class OneDriveFile implements File {
 		if (callback == null)
 			callback = new NullCallback<FileInfo>();
 
-		String url = String.format("%s/root:/%s", OneDriveURL.API, fileInfo.getPathName())
+		String url = String.format("%s/root:/%s", OneDriveURL.API, pathName)
 						   .replace(" ", "%20");
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetFileInfoCallback(fileInfo.getPathName(), future, callback));
+			.asJsonAsync(new GetFileInfoCallback(future, callback));
 
 		return future;
 	}
@@ -94,16 +95,15 @@ final class OneDriveFile implements File {
 			int LastPos = pathName.lastIndexOf("/");
 			String name = pathName.substring(LastPos + 1);
 
-			String url = String.format("%s/items/%s", OneDriveURL.API, getId());
+			String url  = String.format("%s/items/%s", OneDriveURL.API, getId());
 			String body = String.format("{\"parentReference\": \"path\": \"%s\"name\":\"%s\"}", pathName, name)
 								.replace(" ", "%20");
 
-			String newPathName = String.format("%s/%s", pathName, name);
 			Unirest.patch(url)
 				.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
 				.header("Content-Type", "application/json")
 				.body(body)
-				.asJsonAsync(new MoveToCallback(newPathName, future, callback));
+				.asJsonAsync(new MoveToCallback(future, callback));
 		} catch (Exception ex) {
 			HiveException e = new HiveException("Unirest exception: " + ex.getMessage());
 			callback.onError(e);
@@ -188,12 +188,10 @@ final class OneDriveFile implements File {
 	}
 
 	private class GetFileInfoCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
 		private final CompletableFuture<FileInfo> future;
 		private final Callback<FileInfo> callback;
 
-		private GetFileInfoCallback(String pathName, CompletableFuture<FileInfo> future, Callback<FileInfo> callback) {
-			this.pathName = pathName;
+		private GetFileInfoCallback(CompletableFuture<FileInfo> future, Callback<FileInfo> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -211,7 +209,6 @@ final class OneDriveFile implements File {
 
 			JSONObject jsonObject = response.getBody().getObject();
 			fileInfo = new FileInfo(jsonObject.getString("id"));
-			fileInfo.setPathName(pathName);
 			this.callback.onSuccess(fileInfo);
 			future.complete(fileInfo);
 		}
@@ -225,12 +222,10 @@ final class OneDriveFile implements File {
 	}
 
 	private class MoveToCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
 		private final CompletableFuture<Status> future;
 		private final Callback<Status> callback;
 
-		MoveToCallback(String pathName, CompletableFuture<Status> future, Callback<Status> callback) {
-			this.pathName = pathName;
+		MoveToCallback(CompletableFuture<Status> future, Callback<Status> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -247,7 +242,6 @@ final class OneDriveFile implements File {
 				return;
 			}
 
-			fileInfo.setPathName(pathName);
 			Status status = new Status(1);
 			this.callback.onSuccess(status);
 			future.complete(status);

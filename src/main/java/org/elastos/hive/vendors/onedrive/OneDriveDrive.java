@@ -292,8 +292,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
-			fileInfo.setPathName(pathName);
-			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
+			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
 		}
@@ -340,9 +339,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
-			dirInfo.setPathName(pathName);
-
-			OneDriveDirectory directory = new OneDriveDirectory(dirInfo, authHelper);
+			OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}
@@ -387,8 +384,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
-			fileInfo.setPathName(pathName);
-			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
+			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
 		}
@@ -433,8 +429,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
-			dirInfo.setPathName(pathName);
-			OneDriveDirectory directory = new OneDriveDirectory(dirInfo, authHelper);
+			OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}

@@ -24,10 +24,12 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 class OneDriveDirectory implements Directory {
 	private final AuthHelper authHelper;
+	private final String pathName;
 	private volatile DirectoryInfo dirInfo;
 
-	OneDriveDirectory(DirectoryInfo dirInfo, AuthHelper authHelper) {
+	OneDriveDirectory(String pathName, DirectoryInfo dirInfo, AuthHelper authHelper) {
 		this.authHelper = authHelper;
+		this.pathName = pathName;
 		this.dirInfo = dirInfo;
 	}
 
@@ -38,12 +40,11 @@ class OneDriveDirectory implements Directory {
 
 	@Override
 	public String getPath() {
-		return dirInfo.getPathName();
+		return pathName;
 	}
 
 	@Override
 	public String getParentPath() {
-		String pathName = dirInfo.getPathName();
 		if (pathName.equals("/"))
 			return pathName;
 
@@ -67,7 +68,7 @@ class OneDriveDirectory implements Directory {
 		if (callback == null)
 			callback = new NullCallback<DirectoryInfo>();
 
-		String url = String.format("%s/root:/%s", OneDriveURL.API, dirInfo.getPathName())
+		String url = String.format("%s/root:/%s", OneDriveURL.API, pathName)
 						   .replace(" ", "%20");
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization,
@@ -97,15 +98,14 @@ class OneDriveDirectory implements Directory {
 			return future;
 		}
 
-		String selfPathName = dirInfo.getPathName();
-		if (selfPathName.equals("/")) {
+		if (this.pathName.equals("/")) {
 			HiveException e = new HiveException("Can't move the root.");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
-		if (selfPathName.equals(pathName)) {
+		if (this.pathName.equals(pathName)) {
 			HiveException e = new HiveException("Can't move to same path name");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -113,21 +113,20 @@ class OneDriveDirectory implements Directory {
 		}
 
 		try {
-			int LastPos = selfPathName.lastIndexOf("/");
-			String name = selfPathName.substring(LastPos + 1);
+			int LastPos = this.pathName.lastIndexOf("/");
+			String name = this.pathName.substring(LastPos + 1);
 
 			String url  = String.format("%s/items/%s", OneDriveURL.API, dirInfo.getId())
 								.replace(" ", "%20");
 			String body = String.format("{\"parentReference\": \"path\": \"%s\"name\":\"%s\"}", pathName, name)
 								.replace(" ", "%20");
 
-			String newPathName = String.format("%s/%s", pathName, name);
 			Unirest.patch(url)
 				.header(OneDriveHttpHeader.Authorization,
 						OneDriveHttpHeader.bearerValue(authHelper))
 				.header("Content-Type", "application/json")
 				.body(body)
-				.asJsonAsync(new MoveToCallback(newPathName, future, callback));
+				.asJsonAsync(new MoveToCallback(future, callback));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -156,15 +155,14 @@ class OneDriveDirectory implements Directory {
 			return future;
 		}
 
-		String selfPathName = dirInfo.getPathName();
-		if (selfPathName.equals("/")) {
+		if (this.pathName.equals("/")) {
 			HiveException e = new HiveException("Can't copy the root");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
-		if (selfPathName.equals(pathName)) {
+		if (this.pathName.equals(pathName)) {
 			HiveException e = new HiveException("Can't copy to same path name");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -172,8 +170,8 @@ class OneDriveDirectory implements Directory {
 		}
 
 		try {
-			int LastPos = selfPathName.lastIndexOf("/");
-			String name = selfPathName.substring(LastPos + 1);
+			int LastPos = this.pathName.lastIndexOf("/");
+			String name = this.pathName.substring(LastPos + 1);
 
 			String url  = String.format("%s/items/%s/copy", OneDriveURL.API, dirInfo.getId())
 							    .replace(" ", "%20");
@@ -207,7 +205,7 @@ class OneDriveDirectory implements Directory {
 		if (callback == null)
 			callback = new NullCallback<Status>();
 
-		if (dirInfo.getPathName().equals("/")) {
+		if (pathName.equals("/")) {
 			HiveException e = new HiveException("Can't delete the root.");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -254,13 +252,12 @@ class OneDriveDirectory implements Directory {
 
 		//conflictBehavior' value : fail, replace, or rename
 		String body = String.format("{\"name\": \"%s\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}", name);
-
-		String childPathName = String.format("%s/%s", dirInfo.getPathName(), name);
+		String path = String.format("%s/%s", this.pathName, name);
 		Unirest.post(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
 			.header("Content-Type", "application/json")
 			.body(body)
-			.asJsonAsync(new CreateDirCallback(childPathName, future, callback));
+			.asJsonAsync(new CreateDirCallback(path, future, callback));
 
 		return future;
 	}
@@ -284,14 +281,13 @@ class OneDriveDirectory implements Directory {
 			return future;
 		}
 
-		String url = String.format("%s/root:%s/%s", OneDriveURL.API, dirInfo.getPathName(), name)
-						   .replace(" ", "%20");
-
-		String childPathName = String.format("%s/%s", dirInfo.getPathName(), name);
+		String url  = String.format("%s/root:%s/%s", OneDriveURL.API, pathName, name)
+						    .replace(" ", "%20");
+		String path = String.format("%s/%s", this.pathName, name);
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization,
 					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetDirCallback(childPathName, future, callback));
+			.asJsonAsync(new GetDirCallback(path, future, callback));
 
 		return future;
 	}
@@ -315,13 +311,13 @@ class OneDriveDirectory implements Directory {
 			return future;
 		}
 
-		String pathName = String.format("%s/%s", dirInfo.getPathName(), name);
-		String url = String.format("%s/root:%s:/content", OneDriveURL.API, pathName)
-						   .replace(" ", "%20");
+		String url  = String.format("%s/root:%s:/content", OneDriveURL.API, pathName)
+						    .replace(" ", "%20");
+		String path = String.format("%s/%s", this.pathName, name);
 
 		Unirest.put(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
-			.asJsonAsync(new CreateFileCallback(pathName, future, callback));
+			.asJsonAsync(new CreateFileCallback(path, future, callback));
 
 		return future;
 	}
@@ -345,14 +341,14 @@ class OneDriveDirectory implements Directory {
 			return future;
 		}
 
-		String pathName = String.format("%s/%s", dirInfo.getPathName(), name);
-		String url = String.format("%s/root:%s", OneDriveURL.API, pathName)
-				   .replace(" ", "%20");
+		String url  = String.format("%s/root:%s", OneDriveURL.API, pathName)
+				   		    .replace(" ", "%20");
+		String path = String.format("%s/%s", this.pathName, name);
 
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization,
 				OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetFileCallback(pathName, future, callback));
+			.asJsonAsync(new GetFileCallback(path, future, callback));
 
 		return future;
 	}
@@ -402,9 +398,7 @@ class OneDriveDirectory implements Directory {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			String pathName = dirInfo.getPathName();
 			dirInfo = new DirectoryInfo(jsonObject.getString("id"));
-			dirInfo.setPathName(pathName);
 			this.callback.onSuccess(dirInfo);
 			future.complete(dirInfo);
 		}
@@ -418,12 +412,10 @@ class OneDriveDirectory implements Directory {
 	}
 
 	private class MoveToCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
 		private final CompletableFuture<Status> future;
 		private final Callback<Status> callback;
 
-		MoveToCallback(String pathName, CompletableFuture<Status> future, Callback<Status> callback) {
-			this.pathName = pathName;
+		MoveToCallback(CompletableFuture<Status> future, Callback<Status> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -440,7 +432,6 @@ class OneDriveDirectory implements Directory {
 				return;
 			}
 
-			dirInfo.setPathName(pathName);
 			Status status = new Status(1);
 			this.callback.onSuccess(status);
 			future.complete(status);
@@ -554,8 +545,7 @@ class OneDriveDirectory implements Directory {
 			}
 
 			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
-			dirInfo.setPathName(pathName);
-			OneDriveDirectory directory = new OneDriveDirectory(dirInfo, authHelper);
+			OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}
@@ -599,8 +589,7 @@ class OneDriveDirectory implements Directory {
 			}
 
 			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
-			dirInfo.setPathName(pathName);
-			OneDriveDirectory directory = new OneDriveDirectory(dirInfo, authHelper);
+			OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}
@@ -645,8 +634,7 @@ class OneDriveDirectory implements Directory {
 			}
 
 			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
-			fileInfo.setPathName(pathName);
-			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
+			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
 		}
@@ -691,8 +679,7 @@ class OneDriveDirectory implements Directory {
 			}
 
 			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
-			fileInfo.setPathName(pathName);
-			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
+			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
 		}
@@ -735,16 +722,15 @@ class OneDriveDirectory implements Directory {
 					JSONObject itemJson = values.getJSONObject(i);
 					String id = itemJson.getString("id");
 					String name = itemJson.getString("name");
+					String path = OneDriveDirectory.this.pathName + name;
 
 					if (itemJson.has("folder")) {
 						DirectoryInfo dirInfo = new DirectoryInfo(id);
-						dirInfo.setPathName(String.format("%s/%s", dirInfo.getPathName(), name));
-						OneDriveDirectory directory = new OneDriveDirectory(dirInfo, authHelper);
+						OneDriveDirectory directory = new OneDriveDirectory(path, dirInfo, authHelper);
 						childList.add(directory);
 					} else {
 						FileInfo fileInfo = new FileInfo(id);
-						fileInfo.setPathName(String.format("%s/%s", dirInfo.getPathName(), name));
-						OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
+						OneDriveFile file = new OneDriveFile(path, fileInfo, authHelper);
 						childList.add(file);
 					}
 				}
