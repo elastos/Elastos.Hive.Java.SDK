@@ -90,14 +90,15 @@ final class OneDriveDrive implements Drive {
 		if (callback == null)
 			callback = new NullCallback<Directory>();
 
-		if (!pathName.startsWith("/")) {
+		String name = pathName;
+		if (!name.startsWith("/")) {
 			HiveException e = new HiveException("Path name must be a abosulte path");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
-		if (pathName.equals("/")) {
+		if (name.equals("/")) {
 			HiveException e = new HiveException("Can't create root directory");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -106,27 +107,25 @@ final class OneDriveDrive implements Drive {
 
 		String url;
 
-		int pos = pathName.lastIndexOf("/");
+		int pos = name.lastIndexOf("/");
 		if (pos == 0) {
-			pathName = pathName.replace("/", "");
+			name = name.replace("/", "");
 			url = String.format("%s/root/children", OneDriveURL.API)
 						.replace(" ", "%20");
 		} else {
-			String parentPath = pathName.substring(0, pos);
-			pathName = pathName.substring(pos + 1);
+			String parentPath = name.substring(0, pos);
+			name = name.substring(pos + 1);
 			url = String.format("%s/root:/%s/:/children", OneDriveURL.API, parentPath)
 						.replace(" ", "%20");
 		}
 
 		//conflictBehavior' value : fail, replace, or rename
-		String body = String.format("{\"name\": \"%s\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}", pathName)
-							.replace(" ", "%20");
-
+		String body = String.format("{\"name\": \"%s\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}", name);
 		Unirest.post(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
 			.header("Content-Type", "application/json")
 			.body(body)
-			.asJsonAsync(new CreateDirectoryCallback(future, callback));
+			.asJsonAsync(new CreateDirectoryCallback(pathName, future, callback));
 
 		return future;
 	}
@@ -162,7 +161,7 @@ final class OneDriveDrive implements Drive {
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization,
 					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetDirectoryCallback(future, callback));
+			.asJsonAsync(new GetDirectoryCallback(pathName, future, callback));
 
 		return future;
 	}
@@ -191,7 +190,7 @@ final class OneDriveDrive implements Drive {
 
 		Unirest.put(url)
 			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
-			.asJsonAsync(new CreateFileCallback(future, callback));
+			.asJsonAsync(new CreateFileCallback(pathName, future, callback));
 
 		return future;
 	}
@@ -221,7 +220,7 @@ final class OneDriveDrive implements Drive {
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization,
 					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetFileCallback(future, callback));
+			.asJsonAsync(new GetFileCallback(pathName, future, callback));
 
 		return future;
 	}
@@ -261,10 +260,12 @@ final class OneDriveDrive implements Drive {
 	}
 
 	private class CreateFileCallback implements UnirestAsyncCallback<JsonNode> {
+		private final String pathName;
 		private final CompletableFuture<File> future;
 		private final Callback<File> callback;
 
-		private CreateFileCallback(CompletableFuture<File> future, Callback<File> callback) {
+		private CreateFileCallback(String pathName, CompletableFuture<File> future, Callback<File> callback) {
+			this.pathName = pathName;
 			this.future = future;
 			this.callback = callback;
 		}
@@ -291,6 +292,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
+			fileInfo.setPathName(pathName);
 			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
@@ -305,13 +307,16 @@ final class OneDriveDrive implements Drive {
 	}
 
 	private class CreateDirectoryCallback implements UnirestAsyncCallback<JsonNode> {
+		private final String pathName;
 		private final CompletableFuture<Directory> future;
 		private final Callback<Directory> callback;
 
-		private CreateDirectoryCallback(CompletableFuture<Directory> future, Callback<Directory> callback) {
+		private CreateDirectoryCallback(String pathName, CompletableFuture<Directory> future, Callback<Directory> callback) {
+			this.pathName = pathName;
 			this.future = future;
 			this.callback = callback;
 		}
+
 		@Override
 		public void cancelled() {}
 
@@ -335,6 +340,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
+			dirInfo.setPathName(pathName);
 
 			OneDriveDirectory directory = new OneDriveDirectory(dirInfo, authHelper);
 			this.callback.onSuccess(directory);
@@ -350,10 +356,12 @@ final class OneDriveDrive implements Drive {
 	}
 
 	private class GetFileCallback implements UnirestAsyncCallback<JsonNode> {
+		private final String pathName;
 		private final CompletableFuture<File> future;
 		private final Callback<File> callback;
 
-		private GetFileCallback(CompletableFuture<File> future, Callback<File> callback) {
+		private GetFileCallback(String pathName, CompletableFuture<File> future, Callback<File> callback) {
+			this.pathName = pathName;
 			this.future = future;
 			this.callback = callback;
 		}
@@ -379,6 +387,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
+			fileInfo.setPathName(pathName);
 			OneDriveFile file = new OneDriveFile(fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
@@ -393,10 +402,12 @@ final class OneDriveDrive implements Drive {
 	}
 
 	private class GetDirectoryCallback implements UnirestAsyncCallback<JsonNode> {
+		private final String pathName;
 		private final CompletableFuture<Directory> future;
 		private final Callback<Directory> callback;
 
-		private GetDirectoryCallback(CompletableFuture<Directory> future, Callback<Directory> callback) {
+		private GetDirectoryCallback(String pathName, CompletableFuture<Directory> future, Callback<Directory> callback) {
+			this.pathName = pathName;
 			this.future = future;
 			this.callback = callback;
 		}
@@ -422,6 +433,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
+			dirInfo.setPathName(pathName);
 			OneDriveDirectory directory = new OneDriveDirectory(dirInfo, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);

@@ -9,7 +9,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-class OneDriveDriveTest {
+public class OneDriveDriveTest {
 	private static Drive drive;
 	private static Client client;
 
