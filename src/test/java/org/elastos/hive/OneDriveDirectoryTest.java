@@ -10,33 +10,33 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class OneDriveDirectoryTest {
+class OneDriveDirectoryTest {
 	private static Drive drive;
 	private static Client client;
 	private static Directory testDirectory;
-	
+
 	@Test public void testRootDirectory() {
 		try {
 			Directory root = drive.getRootDir().get();
-			assertNotNull(root);			
+			assertNotNull(root);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testRootDirectory failed");
 		}
 	}
-	
+
 	@Test public void testGetId() {
 		assertNotNull(testDirectory.getId());
 	}
-	
+
 	@Test public void testGetPath() {
 		assertNotNull(testDirectory.getPath());
 	}
-	
+
 	@Test public void testGetParentPath() {
 		assertNotNull(testDirectory.getParentPath());
 	}
-	
+
 	@Test public void testGetLastInfo() {
 		assertNotNull(testDirectory.getLastInfo());
 	}
@@ -44,13 +44,13 @@ public class OneDriveDirectoryTest {
 	@Test public void testGetInfo() {
 		try {
 			DirectoryInfo info = testDirectory.getInfo().get();
-			assertNotNull(info);			
+			assertNotNull(info);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("getInfo failed");
 		}
 	}
-	
+
 	@Test public void testCreateDirectory() {
 		try {
 			String childName = "testCreateDirectory" + System.currentTimeMillis();
@@ -61,7 +61,7 @@ public class OneDriveDirectoryTest {
 			fail("testCreateDirectory failed");
 		}
 	}
-	
+
 	@Test public void testCreateDirectoryWithInvalidArg() {
 		try {
 			String childName = "/testCreateDirectory" + System.currentTimeMillis();
@@ -71,7 +71,7 @@ public class OneDriveDirectoryTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Test public void testGetDirectory() {
 		try {
 			String childName = "testGetDirectory" + System.currentTimeMillis();
@@ -86,7 +86,7 @@ public class OneDriveDirectoryTest {
 			fail("testGetDirectory failed");
 		}
 	}
-	
+
 	@Test public void testCreateFile() {
 		try {
 			String childName = "testCreateFile" + System.currentTimeMillis();
@@ -131,13 +131,13 @@ public class OneDriveDirectoryTest {
 			fail("testGetChildren failed");
 		}
 	}
-	
+
 	@Test public void testGetChildrenCount() {
 		try {
 			Children children = testDirectory.getChildren().get();
 			assertNotNull(children);
 			final int count = children.getContent().size();
-			
+
 			//Create several files and check the count.
 			final int newCount = 5;
 			for (int i = 0; i < newCount; i++) {
@@ -152,7 +152,7 @@ public class OneDriveDirectoryTest {
 			fail("testGetChildrenCount failed");
 		}
 	}
-	
+
 	@BeforeClass
 	static public void setUp() throws Exception {
 		try {
