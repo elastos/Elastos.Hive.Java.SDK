@@ -19,11 +19,12 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 final class OneDriveFile implements File {
 	private final AuthHelper authHelper;
+	private final String pathName;
 	private volatile FileInfo fileInfo;
-	private String pathName;
 
-	OneDriveFile(FileInfo fileInfo, AuthHelper authHelper) {
+	OneDriveFile(String pathName, FileInfo fileInfo, AuthHelper authHelper) {
 		this.fileInfo = fileInfo;
+		this.pathName = pathName;
 		this.authHelper = authHelper;
 	}
 
@@ -91,12 +92,12 @@ final class OneDriveFile implements File {
 		}
 
 		try {
-			OneDriveDirectory parentDirectory = (OneDriveDirectory)OneDriveClient.getInstance().getDefaultDrive().get().getDirectory(pathName).get();
 			int LastPos = pathName.lastIndexOf("/");
 			String name = pathName.substring(LastPos + 1);
 
-			String url = String.format("%s/items/%s", OneDriveURL.API, getId());
-			String body = String.format("{\"parentReference\": \"id\": \"%s\"},\"name\": \"%s\"}", parentDirectory.getId(), name);
+			String url  = String.format("%s/items/%s", OneDriveURL.API, getId());
+			String body = String.format("{\"parentReference\": \"path\": \"%s\"name\":\"%s\"}", pathName, name)
+								.replace(" ", "%20");
 
 			Unirest.patch(url)
 				.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
