@@ -5,7 +5,6 @@ import java.util.concurrent.CompletableFuture;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
-import org.elastos.hive.ClientInfo;
 import org.elastos.hive.Drive;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
@@ -13,7 +12,7 @@ import org.elastos.hive.NullCallback;
 
 public final class DropboxClient extends Client {
 	private static Client clientInstance;
-	private ClientInfo clientInfo;
+	private Client.Info clientInfo;
 
 	private DropboxClient(DropboxParameter parameter) {
 		// TODO;
@@ -51,17 +50,17 @@ public final class DropboxClient extends Client {
 	}
 
 	@Override
-	public ClientInfo getLastInfo() {
+	public Client.Info getLastInfo() {
 		return clientInfo;
 	}
 
 	@Override
-	public CompletableFuture<ClientInfo> getInfo() {
-		return getInfo(new NullCallback<ClientInfo>());
+	public CompletableFuture<Client.Info> getInfo() {
+		return getInfo(new NullCallback<Client.Info>());
 	}
 
 	@Override
-	public CompletableFuture<ClientInfo> getInfo(Callback<ClientInfo> callback) {
+	public CompletableFuture<Client.Info> getInfo(Callback<Client.Info> callback) {
 		// TODO
 		return null;
 	}

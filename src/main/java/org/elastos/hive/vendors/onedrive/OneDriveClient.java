@@ -8,9 +8,7 @@ import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
-import org.elastos.hive.ClientInfo;
 import org.elastos.hive.Drive;
-import org.elastos.hive.DriveInfo;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
@@ -27,7 +25,7 @@ public final class OneDriveClient extends Client {
 	private static Client clientInstance;
 
 	private final AuthHelper authHelper;
-	private volatile ClientInfo clientInfo;
+	private volatile Client.Info clientInfo;
 
 	private OneDriveClient(OneDriveParameter parameter) {
 		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry());
@@ -84,21 +82,21 @@ public final class OneDriveClient extends Client {
 	}
 
 	@Override
-	public ClientInfo getLastInfo() {
+	public Client.Info getLastInfo() {
 		return clientInfo;
 	}
 
 	@Override
-	public CompletableFuture<ClientInfo> getInfo() {
-		return getInfo(new NullCallback<ClientInfo>());
+	public CompletableFuture<Client.Info> getInfo() {
+		return getInfo(new NullCallback<Client.Info>());
 	}
 
 	@Override
-	public CompletableFuture<ClientInfo> getInfo(Callback<ClientInfo> callback) {
-		CompletableFuture<ClientInfo> future = new CompletableFuture<ClientInfo>();
+	public CompletableFuture<Client.Info> getInfo(Callback<Client.Info> callback) {
+		CompletableFuture<Client.Info> future = new CompletableFuture<Client.Info>();
 
 		if (callback == null)
-			callback = new NullCallback<ClientInfo>();
+			callback = new NullCallback<Client.Info>();
 
 		Unirest.get(OneDriveURL.API)
 			.header(OneDriveHttpHeader.Authorization,
@@ -129,11 +127,11 @@ public final class OneDriveClient extends Client {
 	}
 
 	private class GetClientInfoCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<ClientInfo> future;
-		private final Callback<ClientInfo> callback;
+		private final CompletableFuture<Client.Info> future;
+		private final Callback<Client.Info> callback;
 
-		GetClientInfoCallback(CompletableFuture<ClientInfo> future,
-			Callback<ClientInfo> callback) {
+		GetClientInfoCallback(CompletableFuture<Client.Info> future,
+			Callback<Client.Info> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -152,9 +150,9 @@ public final class OneDriveClient extends Client {
 			//TODO
 			JSONObject ownerObject = (JSONObject) response.getBody().getObject().get("owner");
 			JSONObject userObject = (JSONObject) ownerObject.get("user");
-			ClientInfo info;
+			Client.Info info;
 
-			info = new ClientInfo(userObject.getString("id"));
+			info = new Client.Info(userObject.getString("id"));
 			info.setDisplayName(userObject.getString("displayName"));
 
 			clientInfo = info;
@@ -192,7 +190,7 @@ public final class OneDriveClient extends Client {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			DriveInfo info = new DriveInfo(jsonObject.getString("id"));
+			Drive.Info info = new Drive.Info(jsonObject.getString("id"));
 			OneDriveDrive drive = new OneDriveDrive(info, authHelper);
 			this.callback.onSuccess(drive);
 			future.complete(drive);

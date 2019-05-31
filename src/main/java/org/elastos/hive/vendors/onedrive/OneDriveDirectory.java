@@ -7,9 +7,7 @@ import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Children;
 import org.elastos.hive.Directory;
-import org.elastos.hive.DirectoryInfo;
 import org.elastos.hive.File;
-import org.elastos.hive.FileInfo;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Status;
@@ -22,12 +20,12 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-class OneDriveDirectory implements Directory {
+class OneDriveDirectory extends Directory {
 	private final AuthHelper authHelper;
 	private final String pathName;
-	private volatile DirectoryInfo dirInfo;
+	private volatile Directory.Info dirInfo;
 
-	OneDriveDirectory(String pathName, DirectoryInfo dirInfo, AuthHelper authHelper) {
+	OneDriveDirectory(String pathName, Directory.Info dirInfo, AuthHelper authHelper) {
 		this.authHelper = authHelper;
 		this.pathName = pathName;
 		this.dirInfo = dirInfo;
@@ -52,21 +50,21 @@ class OneDriveDirectory implements Directory {
 	}
 
 	@Override
-	public DirectoryInfo getLastInfo() {
+	public Directory.Info getLastInfo() {
 		return dirInfo;
 	}
 
 	@Override
-	public CompletableFuture<DirectoryInfo> getInfo() {
-		return getInfo(new NullCallback<DirectoryInfo>());
+	public CompletableFuture<Directory.Info> getInfo() {
+		return getInfo(new NullCallback<Directory.Info>());
 	}
 
 	@Override
-	public CompletableFuture<DirectoryInfo> getInfo(Callback<DirectoryInfo> callback) {
-		CompletableFuture<DirectoryInfo> future = new CompletableFuture<DirectoryInfo>();
+	public CompletableFuture<Directory.Info> getInfo(Callback<Directory.Info> callback) {
+		CompletableFuture<Directory.Info> future = new CompletableFuture<Directory.Info>();
 
 		if (callback == null)
-			callback = new NullCallback<DirectoryInfo>();
+			callback = new NullCallback<Directory.Info>();
 
 		String url = String.format("%s/root:/%s", OneDriveURL.API, pathName)
 						   .replace(" ", "%20");
@@ -376,11 +374,11 @@ class OneDriveDirectory implements Directory {
 	}
 
 	private class GetDirInfoCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<DirectoryInfo> future;
-		private final Callback<DirectoryInfo> callback;
+		private final CompletableFuture<Directory.Info> future;
+		private final Callback<Directory.Info> callback;
 
-		GetDirInfoCallback(CompletableFuture<DirectoryInfo> future,
-				   Callback<DirectoryInfo> callback) {
+		GetDirInfoCallback(CompletableFuture<Directory.Info> future,
+				   Callback<Directory.Info> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -398,7 +396,7 @@ class OneDriveDirectory implements Directory {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			dirInfo = new DirectoryInfo(jsonObject.getString("id"));
+			dirInfo = new Directory.Info(jsonObject.getString("id"));
 			this.callback.onSuccess(dirInfo);
 			future.complete(dirInfo);
 		}
@@ -544,7 +542,7 @@ class OneDriveDirectory implements Directory {
 				return;
 			}
 
-			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
+			Directory.Info dirInfo = new Directory.Info(jsonObject.getString("id"));
 			OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
@@ -588,7 +586,7 @@ class OneDriveDirectory implements Directory {
 				return;
 			}
 
-			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
+			Directory.Info dirInfo = new Directory.Info(jsonObject.getString("id"));
 			OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
@@ -633,7 +631,7 @@ class OneDriveDirectory implements Directory {
 				return;
 			}
 
-			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
+			File.Info fileInfo = new File.Info(jsonObject.getString("id"));
 			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
@@ -678,7 +676,7 @@ class OneDriveDirectory implements Directory {
 				return;
 			}
 
-			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
+			File.Info fileInfo = new File.Info(jsonObject.getString("id"));
 			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
@@ -725,11 +723,11 @@ class OneDriveDirectory implements Directory {
 					String path = OneDriveDirectory.this.pathName + name;
 
 					if (itemJson.has("folder")) {
-						DirectoryInfo dirInfo = new DirectoryInfo(id);
+						Directory.Info dirInfo = new Directory.Info(id);
 						OneDriveDirectory directory = new OneDriveDirectory(path, dirInfo, authHelper);
 						childList.add(directory);
 					} else {
-						FileInfo fileInfo = new FileInfo(id);
+						File.Info fileInfo = new File.Info(id);
 						OneDriveFile file = new OneDriveFile(path, fileInfo, authHelper);
 						childList.add(file);
 					}

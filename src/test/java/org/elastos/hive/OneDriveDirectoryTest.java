@@ -10,7 +10,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-class OneDriveDirectoryTest {
+public class OneDriveDirectoryTest {
 	private static Drive drive;
 	private static Client client;
 	private static Directory testDirectory;
@@ -43,7 +43,7 @@ class OneDriveDirectoryTest {
 
 	@Test public void testGetInfo() {
 		try {
-			DirectoryInfo info = testDirectory.getInfo().get();
+			Directory.Info info = testDirectory.getInfo().get();
 			assertNotNull(info);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();

@@ -9,7 +9,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-class OneDriveClientTest {
+public class OneDriveClientTest {
 	private static Client client;
 	@Test public void testGetInstance() {
 		assertNotNull(Client.getInstance(DriveType.oneDrive));
@@ -17,7 +17,7 @@ class OneDriveClientTest {
 
 	@Test public void testGetInfo() {
 		try {
-			ClientInfo info = client.getInfo().get();
+			Client.Info info = client.getInfo().get();
 			assertNotNull(info);
 			assertNotNull(info.getUserId());
 			assertNotNull(info.getDisplayName());

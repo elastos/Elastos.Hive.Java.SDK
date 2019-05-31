@@ -5,12 +5,9 @@ import java.util.concurrent.CompletableFuture;
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Directory;
-import org.elastos.hive.DirectoryInfo;
 import org.elastos.hive.Drive;
-import org.elastos.hive.DriveInfo;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.File;
-import org.elastos.hive.FileInfo;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.UnirestAsyncCallback;
@@ -21,11 +18,11 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-final class OneDriveDrive implements Drive {
+final class OneDriveDrive extends Drive {
 	private final AuthHelper authHelper;
-	private volatile DriveInfo driveInfo;
+	private volatile Drive.Info driveInfo;
 
-	OneDriveDrive(DriveInfo driveInfo, AuthHelper authHelper) {
+	OneDriveDrive(Drive.Info driveInfo, AuthHelper authHelper) {
 		this.driveInfo = driveInfo;
 		this.authHelper = authHelper;
 	}
@@ -41,21 +38,21 @@ final class OneDriveDrive implements Drive {
 	}
 
 	@Override
-	public DriveInfo getLastInfo() {
+	public Drive.Info getLastInfo() {
 		return driveInfo;
 	}
 
 	@Override
-	public CompletableFuture<DriveInfo> getInfo() {
-		return getInfo(new NullCallback<DriveInfo>());
+	public CompletableFuture<Drive.Info> getInfo() {
+		return getInfo(new NullCallback<Drive.Info>());
 	}
 
 	@Override
-	public CompletableFuture<DriveInfo> getInfo(Callback<DriveInfo> callback) {
-		CompletableFuture<DriveInfo> future = new CompletableFuture<DriveInfo>();
+	public CompletableFuture<Drive.Info> getInfo(Callback<Drive.Info> callback) {
+		CompletableFuture<Drive.Info> future = new CompletableFuture<Drive.Info>();
 
 		if (callback == null)
-			callback = new NullCallback<DriveInfo>();
+			callback = new NullCallback<Drive.Info>();
 
 		Unirest.get(OneDriveURL.API)
 			.header(OneDriveHttpHeader.Authorization,
@@ -226,10 +223,10 @@ final class OneDriveDrive implements Drive {
 	}
 
 	private class GetDriveInfoCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<DriveInfo> future;
-		private final Callback<DriveInfo> callback;
+		private final CompletableFuture<Drive.Info> future;
+		private final Callback<Drive.Info> callback;
 
-		private GetDriveInfoCallback(CompletableFuture<DriveInfo> future, Callback<DriveInfo> callback) {
+		private GetDriveInfoCallback(CompletableFuture<Drive.Info> future, Callback<Drive.Info> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -246,7 +243,7 @@ final class OneDriveDrive implements Drive {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			driveInfo = new DriveInfo(jsonObject.getString("id"));
+			driveInfo = new Drive.Info(jsonObject.getString("id"));
 			this.callback.onSuccess(driveInfo);
 			future.complete(driveInfo);
 		}
@@ -291,7 +288,7 @@ final class OneDriveDrive implements Drive {
 				return;
 			}
 
-			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
+			File.Info fileInfo = new File.Info(jsonObject.getString("id"));
 			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
@@ -338,7 +335,7 @@ final class OneDriveDrive implements Drive {
 				return;
 			}
 
-			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
+			Directory.Info dirInfo = new Directory.Info(jsonObject.getString("id"));
 			OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
@@ -383,7 +380,7 @@ final class OneDriveDrive implements Drive {
 				return;
 			}
 
-			FileInfo fileInfo = new FileInfo(jsonObject.getString("id"));
+			File.Info fileInfo = new File.Info(jsonObject.getString("id"));
 			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
@@ -428,7 +425,7 @@ final class OneDriveDrive implements Drive {
 				return;
 			}
 
-			DirectoryInfo dirInfo = new DirectoryInfo(jsonObject.getString("id"));
+			Directory.Info dirInfo = new Directory.Info(jsonObject.getString("id"));
 			OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
