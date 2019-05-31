@@ -34,9 +34,10 @@ public class OneDriveDriveTest {
     }
 
 	@Test public void testCreateDirectory() {
+		Directory directory = null;
 		try {
 			String pathName = "/newOneDriveDir" + System.currentTimeMillis();
-			Directory directory = drive.createDirectory(pathName).get();
+			directory = drive.createDirectory(pathName).get();
 			assertNotNull(directory);
 
 			pathName += "/" + System.currentTimeMillis();
@@ -45,6 +46,14 @@ public class OneDriveDriveTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("createDirectory failed");
+		}
+		finally {
+			try {
+				directory.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
 		}
     }
 
@@ -60,15 +69,24 @@ public class OneDriveDriveTest {
     }
 
 	@Test public void testGetDirectory() {
+		Directory directory = null;
 		try {
 			String pathName = "/newOneDriveDir" + System.currentTimeMillis();
-			Directory directory = drive.createDirectory(pathName).get();
+			directory = drive.createDirectory(pathName).get();
 			assertNotNull(directory);
 
 			directory = drive.getDirectory(pathName).get();
 			assertNotNull(directory);
 		} catch (InterruptedException | ExecutionException e) {
 			fail("getDirectory failed");
+		}		
+		finally {
+			try {
+				directory.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
 		}
     }
 
@@ -84,13 +102,22 @@ public class OneDriveDriveTest {
     }
 
 	@Test public void testCreateFile() {
+		File file = null;
 		try {
 			String pathName = "/newOneDriveFile";
-			File file = drive.createFile(pathName).get();
+			file = drive.createFile(pathName).get();
 			assertNotNull(file);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("createFile failed");
+		}
+		finally {
+			try {
+				file.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
 		}
     }
 
@@ -106,12 +133,24 @@ public class OneDriveDriveTest {
     }
 
 	@Test public void testGetFile() {
+		File file = null;
 		try {
-			String pathName = "/newOneDriveFile";
-			File file = drive.getFile(pathName).get();
+			String pathName = "/newOneDriveFile" + System.currentTimeMillis();
+			file = drive.createFile(pathName).get();
+			assertNotNull(file);
+			file = drive.getFile(pathName).get();
 			assertNotNull(file);
 		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
 			fail("getFile failed");
+		}
+		finally {
+			try {
+				file.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
 		}
     }
 
