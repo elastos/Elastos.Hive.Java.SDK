@@ -5,7 +5,6 @@ import java.util.concurrent.CompletableFuture;
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Callback;
 import org.elastos.hive.File;
-import org.elastos.hive.FileInfo;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Status;
@@ -17,12 +16,12 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-final class OneDriveFile implements File {
+final class OneDriveFile extends File {
 	private final AuthHelper authHelper;
 	private final String pathName;
-	private volatile FileInfo fileInfo;
+	private volatile File.Info fileInfo;
 
-	OneDriveFile(String pathName, FileInfo fileInfo, AuthHelper authHelper) {
+	OneDriveFile(String pathName, File.Info fileInfo, AuthHelper authHelper) {
 		this.fileInfo = fileInfo;
 		this.pathName = pathName;
 		this.authHelper = authHelper;
@@ -47,21 +46,21 @@ final class OneDriveFile implements File {
 	}
 
 	@Override
-	public FileInfo getLastInfo() {
+	public File.Info getLastInfo() {
 		return fileInfo;
 	}
 
 	@Override
-	public CompletableFuture<FileInfo> getInfo() {
-		return getInfo(new NullCallback<FileInfo>());
+	public CompletableFuture<File.Info> getInfo() {
+		return getInfo(new NullCallback<File.Info>());
 	}
 
 	@Override
-	public CompletableFuture<FileInfo> getInfo(Callback<FileInfo> callback) {
-		CompletableFuture<FileInfo> future = new CompletableFuture<FileInfo>();
+	public CompletableFuture<File.Info> getInfo(Callback<File.Info> callback) {
+		CompletableFuture<File.Info> future = new CompletableFuture<File.Info>();
 
 		if (callback == null)
-			callback = new NullCallback<FileInfo>();
+			callback = new NullCallback<File.Info>();
 
 		String url = String.format("%s/root:/%s", OneDriveURL.API, pathName)
 						   .replace(" ", "%20");
@@ -188,10 +187,10 @@ final class OneDriveFile implements File {
 	}
 
 	private class GetFileInfoCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<FileInfo> future;
-		private final Callback<FileInfo> callback;
+		private final CompletableFuture<File.Info> future;
+		private final Callback<File.Info> callback;
 
-		private GetFileInfoCallback(CompletableFuture<FileInfo> future, Callback<FileInfo> callback) {
+		private GetFileInfoCallback(CompletableFuture<File.Info> future, Callback<File.Info> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -208,7 +207,7 @@ final class OneDriveFile implements File {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			fileInfo = new FileInfo(jsonObject.getString("id"));
+			fileInfo = new File.Info(jsonObject.getString("id"));
 			this.callback.onSuccess(fileInfo);
 			future.complete(fileInfo);
 		}

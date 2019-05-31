@@ -9,13 +9,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-class OneDriveDriveTest {
+public class OneDriveDriveTest {
 	private static Drive drive;
 	private static Client client;
 
 	@Test public void testGetInfo() {
 		try {
-			DriveInfo info = drive.getInfo().get();
+			Drive.Info info = drive.getInfo().get();
 			assertNotNull(info);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();

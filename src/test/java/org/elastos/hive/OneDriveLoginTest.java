@@ -5,7 +5,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-class OneDriveLoginTest {
+public class OneDriveLoginTest {
 	@Test public void testLogin() {
 		try {
 			Client client = OneDriveTestBase.login();
