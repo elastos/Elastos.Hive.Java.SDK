@@ -1,7 +1,6 @@
 package org.elastos.hive.vendors.hiveIpfs;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import org.elastos.hive.Callback;
 import org.elastos.hive.Children;
@@ -144,14 +143,32 @@ class HiveIpfsDirectory extends Directory  {
 
 	@Override
 	public CompletableFuture<Status> deleteItem() {
-		// TODO Auto-generated method stub
-		return null;
+		return deleteItem(new NullCallback<Status>());
 	}
 
 	@Override
 	public CompletableFuture<Status> deleteItem(Callback<Status> callback) {
-		// TODO Auto-generated method stub
-		return null;
+		CompletableFuture<Status> future = new CompletableFuture<Status>();
+
+		if (callback == null)
+			callback = new NullCallback<Status>();
+
+		if (pathName.equals("/")) {
+			HiveException e = new HiveException("Can't delete the root.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/rm");
+		Unirest.get(url)
+			.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
+			.queryString(HiveIpfsUtils.UID, getId())
+			.queryString(HiveIpfsUtils.PATH, pathName)
+			.queryString("recursive", "true")
+			.asJsonAsync(new DeleteItemCallback(future, callback));
+
+		return future;
 	}
 
 	@Override
@@ -198,6 +215,40 @@ class HiveIpfsDirectory extends Directory  {
 			dirInfo = new Directory.Info(jsonObject.getString("Hash"));
 			this.callback.onSuccess(dirInfo);
 			future.complete(dirInfo);
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			HiveException ex = new HiveException(exception.getMessage());
+			this.callback.onError(ex);
+			future.completeExceptionally(ex);
+		}
+	}
+	
+	private class DeleteItemCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<Status> future;
+		private final Callback<Status> callback;
+
+		DeleteItemCallback(CompletableFuture<Status> future, Callback<Status> callback) {
+			this.future = future;
+			this.callback = callback;
+		}
+
+		@Override
+		public void cancelled() {}
+
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() != 200) {
+				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(ex);
+				future.completeExceptionally(ex);
+				return;
+			}
+
+			Status status = new Status(1);
+			this.callback.onSuccess(status);
+			future.complete(status);
 		}
 
 		@Override

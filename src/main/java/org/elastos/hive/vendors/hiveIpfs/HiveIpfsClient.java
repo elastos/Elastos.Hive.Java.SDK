@@ -255,7 +255,8 @@ public final class HiveIpfsClient extends Client {
 				return;
 			}
 
-			HiveIpfsDrive drive = new HiveIpfsDrive(parameter.getUid());
+			Drive.Info info = new Drive.Info(parameter.getUid());
+			HiveIpfsDrive drive = new HiveIpfsDrive(info);
 			this.callback.onSuccess(drive);
 			future.complete(drive);
 		}
