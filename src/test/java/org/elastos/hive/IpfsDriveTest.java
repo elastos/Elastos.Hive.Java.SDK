@@ -101,6 +101,70 @@ public class IpfsDriveTest {
 		}
     }
 
+	@Test public void testCreateFile() {
+		File file = null;
+		try {
+			String pathName = "/newOneDriveFile";
+			file = drive.createFile(pathName).get();
+			assertNotNull(file);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("createFile failed");
+		}
+		finally {
+			try {
+				file.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
+		}
+    }
+
+	@Test public void testCreateFileWithInvalidArg() {
+		try {
+			//Must include "/"
+			String pathName = "InvalidFilePath";
+			drive.createFile(pathName).get();
+			fail();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+    }
+
+	@Test public void testGetFile() {
+		File file = null;
+		try {
+			String pathName = "/newOneDriveFile" + System.currentTimeMillis();
+			file = drive.createFile(pathName).get();
+			assertNotNull(file);
+			file = drive.getFile(pathName).get();
+			assertNotNull(file);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("getFile failed");
+		}
+		finally {
+			try {
+				file.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
+		}
+    }
+
+	@Test public void testGetFileWithInvalidArg() {
+		try {
+			//Must include "/"
+			String pathName = "InvalidFilePath";
+			drive.getFile(pathName).get();
+			fail();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+    }
+	
 	@BeforeClass
 	static public void setUp() throws Exception {
 		if (client == null) {
