@@ -240,7 +240,7 @@ class OneDriveDirectory extends Directory {
 			callback = new NullCallback<Directory>();
 
 		if (name.contains("/")) {
-			HiveException e = new HiveException("Cant't create root directory");
+			HiveException e = new HiveException("Only need the path name");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;

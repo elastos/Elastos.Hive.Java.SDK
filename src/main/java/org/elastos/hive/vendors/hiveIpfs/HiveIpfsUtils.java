@@ -1,5 +1,7 @@
 package org.elastos.hive.vendors.hiveIpfs;
 
+import java.util.UUID;
+
 import org.elastos.hive.HiveException;
 import org.elastos.hive.Status;
 import com.mashape.unirest.http.HttpResponse;
@@ -24,7 +26,7 @@ class HiveIpfsUtils {
 				.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
 				.queryString(HiveIpfsUtils.UID, uid)
 				.queryString(HiveIpfsUtils.PATH, path)
-				.queryString("parents", "true")
+				.queryString("parents", "false")
 				.asJson();
 
 			if (response.getStatus() == 200) {
@@ -35,7 +37,46 @@ class HiveIpfsUtils {
 
 		return new Status(0);
 	}
-	
+
+	static Status rm(String uid, String path) {
+		try {
+			String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/rm");
+			HttpResponse<JsonNode> response = Unirest.get(url)
+				.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
+				.queryString(HiveIpfsUtils.UID, uid)
+				.queryString(HiveIpfsUtils.PATH, path)
+				.queryString("recursive", "true")
+				.asJson();
+
+			if (response.getStatus() == 200) {
+				return new Status(1);
+			}
+		} catch (Exception e) {
+		}
+
+		return new Status(0);
+	}
+
+	static Status createEmptyFile(String uid, String path) {
+		try {
+			String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/write");
+			String type = String.format("multipart/form-data; boundary=%s", UUID.randomUUID().toString());
+			HttpResponse<JsonNode> response = Unirest.post(url)
+				.header(HiveIpfsUtils.CONTENTTYPE, type)
+				.queryString(HiveIpfsUtils.UID, uid)
+				.queryString(HiveIpfsUtils.PATH, path)
+				.queryString("create", "true")
+				.asJson();
+
+			if (response.getStatus() == 200) {
+				return new Status(1);
+			}
+		} catch (Exception e) {
+		}
+
+		return new Status(0);
+	}
+
 	static String stat(String uid, String path) {
 		try {
 			String url = String.format("%s%s", BASEURL, "files/stat");
@@ -69,12 +110,12 @@ class HiveIpfsUtils {
 
 		return new Status(0);
 	}
-	
+
 	static String getHomeHash() throws HiveException {
 		String url = BASEURL + "name/resolve";
 		try {
 			HttpResponse<JsonNode> json = Unirest.get(url).header(CONTENTTYPE, TYPE_Json).asJson();
-			return json.getBody().getObject().getString("Path"); 
+			return json.getBody().getObject().getString("Path");
 		} catch (UnirestException e) {
 			e.printStackTrace();
 			throw new HiveException("Get home hash failed.");
@@ -85,10 +126,18 @@ class HiveIpfsUtils {
 		String url = BASEURL + "uid/new";
 		try {
 			HttpResponse<JsonNode> json = Unirest.get(url).header(CONTENTTYPE, TYPE_Json).asJson();
-			return json.getBody().getObject().getString("UID"); 
+			return json.getBody().getObject().getString("UID");
 		} catch (UnirestException e) {
 			e.printStackTrace();
 			throw new HiveException("Get the new uid failed.");
 		}
+	}
+
+	static boolean isFile(String type) {
+		return type != null && type.equals("file");
+	}
+
+	static boolean isFolder(String type) {
+		return type != null && type.equals("directory");
 	}
 }
