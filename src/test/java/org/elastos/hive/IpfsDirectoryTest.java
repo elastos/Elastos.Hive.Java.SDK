@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class IpfsDirectoryTest {
@@ -54,7 +53,7 @@ public class IpfsDirectoryTest {
 		}
 	}
 
-	@Ignore public void testCreateDirectory() {
+	@Test public void testCreateDirectory() {
 		try {
 			String childName = "testCreateDirectory" + System.currentTimeMillis();
 			Directory child = testDirectory.createDirectory(childName).get();
@@ -75,7 +74,7 @@ public class IpfsDirectoryTest {
 		}
 	}
 
-	@Ignore public void testGetDirectory() {
+	@Test public void testGetDirectory() {
 		try {
 			String childName = "testGetDirectory" + System.currentTimeMillis();
 			Directory child = testDirectory.createDirectory(childName).get();
@@ -90,7 +89,7 @@ public class IpfsDirectoryTest {
 		}
 	}
 
-	@Ignore public void testCreateFile() {
+	@Test public void testCreateFile() {
 		try {
 			String childName = "testCreateFile" + System.currentTimeMillis();
 			File child = testDirectory.createFile(childName).get();
@@ -125,7 +124,7 @@ public class IpfsDirectoryTest {
 		}
 	}
 
-	@Ignore public void testGetChildren() {
+	@Test public void testGetChildren() {
 		try {
 			Children children = testDirectory.getChildren().get();
 			assertNotNull(children);
@@ -135,7 +134,7 @@ public class IpfsDirectoryTest {
 		}
 	}
 
-	@Ignore public void testGetChildrenCount() {
+	@Test public void testGetChildrenCount() {
 		try {
 			Children children = testDirectory.getChildren().get();
 			assertNotNull(children);
@@ -156,7 +155,7 @@ public class IpfsDirectoryTest {
 		}
 	}
 
-	@Ignore public void testMoveTo() {
+	@Test public void testMoveTo() {
 		try {
 			String originPath = testDirectory.getPath();
 			testDirectory.moveTo(parentDirForMoveTo.getPath()).get();
@@ -182,7 +181,7 @@ public class IpfsDirectoryTest {
 		}
 	}
 
-	@Ignore public void testCopyTo() {
+	@Test public void testCopyTo() {
 		Directory parentDir = null;
 		try {
 			String parentPath = "/parentDir" + System.currentTimeMillis();
@@ -191,7 +190,6 @@ public class IpfsDirectoryTest {
 			Status status = testDirectory.copyTo(parentPath).get();
 			assertEquals(1, status.getStatus());
 
-			Thread.sleep(5000);
 			Children children = parentDir.getChildren().get();
 			assertNotNull(children);
 			assertEquals(1, children.getContent().size());
@@ -209,7 +207,7 @@ public class IpfsDirectoryTest {
 		}
 	}
 
-	@Ignore public void testCopyToInvalid() {
+	@Test public void testCopyToInvalid() {
 		Directory parentDir = null;
 		try {
 			String parentPath = "/parentDir" + System.currentTimeMillis();
@@ -220,7 +218,6 @@ public class IpfsDirectoryTest {
 			assertEquals(1, status.getStatus());
 
 			//1. Check the parent has a new child.
-			Thread.sleep(2000);
 			Children children = parentDir.getChildren().get();
 			assertNotNull(children);
 			assertEquals(1, children.getContent().size());
@@ -263,6 +260,7 @@ public class IpfsDirectoryTest {
 			assertNotNull(parentDirForMoveTo);
 		} catch (Exception e) {
 			e.printStackTrace();
+			fail();
 		}
 	}
 

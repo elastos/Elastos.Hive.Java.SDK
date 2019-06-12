@@ -8,7 +8,6 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
-import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -46,7 +45,8 @@ final class IPFSFile extends File {
 		if (callback == null)
 			callback = new NullCallback<Info>();
 
-		Unirest.get(IPFSUtils.BASEURL)
+		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
+		Unirest.get(url)
 			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
 			.queryString(IPFSUtils.UID, getId())
 			.queryString(IPFSUtils.PATH, pathName)
@@ -70,26 +70,149 @@ final class IPFSFile extends File {
 
 	@Override
 	public CompletableFuture<Status> moveTo(String path) {
-		// TODO Auto-generated method stub
-		return null;
+		return moveTo(path, new NullCallback<Status>());
 	}
 
 	@Override
 	public CompletableFuture<Status> moveTo(String path, Callback<Status> callback) {
-		// TODO Auto-generated method stub
-		return null;
+		CompletableFuture<Status> future = new CompletableFuture<Status>();
+		if (callback == null)
+			callback = new NullCallback<Status>();
+
+		if (!path.startsWith("/")) {
+			HiveException e = new HiveException("Path name must be a abosulte path");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		if (path.equals(this.pathName)) {
+			HiveException e = new HiveException("Can't move to the oneself");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		//1. move to the path: using this.pathName, not a hash
+		int LastPos = this.pathName.lastIndexOf("/");
+		String name = this.pathName.substring(LastPos + 1);
+		final String newPath = String.format("%s/%s", path, name);
+		CompletableFuture<Status> moveFuture = CompletableFuture.supplyAsync(() -> {
+			return IPFSUtils.moveTo(getId(), this.pathName, newPath);
+		});
+		
+		//2. using stat to get the new path's hash
+		CompletableFuture<String> newStatFuture = moveFuture.thenCompose(status -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("moveTo failed"));
+					return null;
+				}
+
+				return IPFSUtils.stat(getId(), newPath);
+			});
+		});
+
+		final Callback<Status> callbackForPublish = callback;
+		//3. using name/publish to publish the hash
+		newStatFuture.thenCompose(hash -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (hash == null) {
+					future.completeExceptionally(new HiveException("The stat hash is invalid"));
+					return future;
+				}
+
+				String url = String.format("%s%s", IPFSUtils.BASEURL, "name/publish");
+				Unirest.get(url)
+					.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+					.queryString(IPFSUtils.UID, getId())
+					.queryString(IPFSUtils.PATH, hash)
+					.asJsonAsync(new MoveToCallback(newPath, future, callbackForPublish));
+
+				return future;
+			});
+		});
+
+		return future;
 	}
 
 	@Override
 	public CompletableFuture<Status> copyTo(String path) {
-		// TODO Auto-generated method stub
-		return null;
+		return copyTo(path, new NullCallback<Status>());
 	}
 
 	@Override
 	public CompletableFuture<Status> copyTo(String path, Callback<Status> callback) {
-		// TODO Auto-generated method stub
-		return null;
+		CompletableFuture<Status> future = new CompletableFuture<Status>();
+		if (callback == null)
+			callback = new NullCallback<Status>();
+
+		if (!path.startsWith("/")) {
+			HiveException e = new HiveException("Path name must be a abosulte path");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		if (path.equals(this.pathName)) {
+			HiveException e = new HiveException("Can't copy to the oneself");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		//1. using stat to get myself hash
+		CompletableFuture<String> hashFuture = CompletableFuture.supplyAsync(() -> {
+			return IPFSUtils.stat(getId(), this.pathName);
+		});
+
+		//2. copy to the path
+		int LastPos = this.pathName.lastIndexOf("/");
+		String name = this.pathName.substring(LastPos + 1);
+		final String newPath = String.format("%s/%s", path, name);
+		CompletableFuture<Status> copyFuture = hashFuture.thenCompose(hash -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (hash == null || hash.isEmpty()) {
+					return new Status(0);
+				}
+
+				return IPFSUtils.copyTo(getId(), hash, newPath);
+			});
+		});
+
+		//3. using stat to get the new path's hash
+		CompletableFuture<String> newStatFuture = copyFuture.thenCompose(status -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("copy failed."));
+					return null;
+				}
+
+				return IPFSUtils.stat(getId(), newPath);
+			});
+		});
+
+		final Callback<Status> callbackForPublish = callback;
+		//4. using name/publish to publish the hash
+		newStatFuture.thenCompose(hash -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (hash == null) {
+					future.completeExceptionally(new HiveException("The stat hash is invalid"));
+					return future;
+				}
+
+				String url = String.format("%s%s", IPFSUtils.BASEURL, "name/publish");
+				Unirest.get(url)
+					.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+					.queryString(IPFSUtils.UID, getId())
+					.queryString(IPFSUtils.PATH, hash)
+					.asJsonAsync(new CopyToCallback(future, callbackForPublish));
+
+				return future;
+			});
+		});
+
+		return future;
 	}
 
 	@Override
@@ -177,10 +300,80 @@ final class IPFSFile extends File {
 				return;
 			}
 
-			JSONObject jsonObject = response.getBody().getObject();
-			fileInfo = new Info(jsonObject.getString("Hash"));
+			fileInfo = new Info(getId());
 			this.callback.onSuccess(fileInfo);
 			future.complete(fileInfo);
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			HiveException ex = new HiveException(exception.getMessage());
+			this.callback.onError(ex);
+			future.completeExceptionally(ex);
+		}
+	}
+	
+	private class MoveToCallback implements UnirestAsyncCallback<JsonNode> {
+		private final String pathName;
+		private final CompletableFuture<Status> future;
+		private final Callback<Status> callback;
+
+		MoveToCallback(String pathName, CompletableFuture<Status> future, Callback<Status> callback) {
+			this.pathName = pathName;
+			this.future = future;
+			this.callback = callback;
+		}
+
+		@Override
+		public void cancelled() {}
+
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() != 200) {
+				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(ex);
+				future.completeExceptionally(ex);
+				return;
+			}
+
+			IPFSFile.this.pathName = pathName;
+			Status status = new Status(1);
+			this.callback.onSuccess(status);
+			future.complete(status);
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			HiveException ex = new HiveException(exception.getMessage());
+			this.callback.onError(ex);
+			future.completeExceptionally(ex);
+		}
+	}
+	
+	private class CopyToCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<Status> future;
+		private final Callback<Status> callback;
+
+		CopyToCallback(CompletableFuture<Status> future, Callback<Status> callback) {
+			this.future = future;
+			this.callback = callback;
+		}
+
+		@Override
+		public void cancelled() {}
+
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() != 200) {
+				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(ex);
+				future.completeExceptionally(ex);
+				return;
+			}
+
+			Status status = new Status(1);
+			this.callback.onSuccess(status);
+			future.complete(status);
 		}
 
 		@Override

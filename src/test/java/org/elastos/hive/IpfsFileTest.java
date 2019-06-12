@@ -11,7 +11,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class OneDriveFileTest {
+public class IpfsFileTest {
 	private static Drive drive;
 	private static Client client;
 	private static File testFile;
@@ -137,7 +137,7 @@ public class OneDriveFileTest {
 	@BeforeClass
 	static public void setUp() throws Exception {
 		try {
-			client = OneDriveTestBase.login();
+			client = IpfsTestBase.login();
 			assertNotNull(client);
 			drive = client.getDefaultDrive().get();
 			assertNotNull(drive);
