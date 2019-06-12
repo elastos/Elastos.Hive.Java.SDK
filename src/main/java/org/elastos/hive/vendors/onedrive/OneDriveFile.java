@@ -42,7 +42,7 @@ final class OneDriveFile extends File {
 		if (pathName.equals("/"))
 			return pathName;
 
-		return pathName.substring(0, pathName.lastIndexOf("/") + 1);
+		return pathName.substring(0, pathName.lastIndexOf("/"));
 	}
 
 	@Override
@@ -65,7 +65,8 @@ final class OneDriveFile extends File {
 		String url = String.format("%s/root:/%s", OneDriveURL.API, pathName)
 						   .replace(" ", "%20");
 		Unirest.get(url)
-			.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
+			.header(OneDriveHttpHeader.Authorization,
+					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetFileInfoCallback(future, callback));
 
 		return future;
@@ -90,6 +91,20 @@ final class OneDriveFile extends File {
 			return future;
 		}
 
+		if (this.pathName.equals("/")) {
+			HiveException e = new HiveException("Can't move the root.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		if (this.pathName.equals(pathName)) {
+			HiveException e = new HiveException("Can't move to same path name");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
 		try {
 			int LastPos = pathName.lastIndexOf("/");
 			String name = pathName.substring(LastPos + 1);
@@ -99,10 +114,10 @@ final class OneDriveFile extends File {
 			String body = String.format("{\"parentReference\":{\"path\":\"/drive/root:%s\"},\"name\":\"%s\"}", pathName, name)
 								.replace(" ", "%20");
 			String newPathName = String.format("%s/%s", pathName, name);
-			
+
 			Unirest.patch(url)
-				.header(OneDriveHttpHeader.Authorization, OneDriveHttpHeader.bearerValue(authHelper))
-				.header("Content-Type", "application/json")
+				.header(OneDriveHttpHeader.Authorization,
+						OneDriveHttpHeader.bearerValue(authHelper))
 				.body(body)
 				.asJsonAsync(new MoveToCallback(newPathName, future, callback));
 		} catch (Exception ex) {
@@ -133,6 +148,20 @@ final class OneDriveFile extends File {
 			return future;
 		}
 
+		if (this.pathName.equals("/")) {
+			HiveException e = new HiveException("Can't copy the root");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		if (this.pathName.equals(pathName)) {
+			HiveException e = new HiveException("Can't copy to same path name");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
 		try {
 			int LastPos = pathName.lastIndexOf("/");
 			String name = pathName.substring(LastPos + 1);
@@ -145,7 +174,6 @@ final class OneDriveFile extends File {
 			Unirest.post(url)
 				.header(OneDriveHttpHeader.Authorization,
 						OneDriveHttpHeader.bearerValue(authHelper))
-				.header("Content-Type", "application/json")
 				.body(body)
 				.asJsonAsync(new CopyToCallback(future, callback));
 		} catch (Exception ex) {
@@ -199,9 +227,9 @@ final class OneDriveFile extends File {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -213,9 +241,9 @@ final class OneDriveFile extends File {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 
@@ -236,9 +264,9 @@ final class OneDriveFile extends File {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -250,9 +278,9 @@ final class OneDriveFile extends File {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 

@@ -32,9 +32,9 @@ public final class OneDriveClient extends Client {
 	}
 
 	public static Client createInstance(OneDriveParameter parameter) {
-		if (clientInstance == null) {
+		if (clientInstance == null)
 			clientInstance = new OneDriveClient(parameter);
-		}
+
 		return clientInstance;
 	}
 
@@ -44,10 +44,7 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public String getId() {
-		if (clientInfo == null)
-			return null;
-
-		return clientInfo.getUserId();
+		return clientInfo != null ? clientInfo.getUserId() : null;
 	}
 
 	@Override
@@ -121,7 +118,7 @@ public final class OneDriveClient extends Client {
 		Unirest.get(OneDriveURL.API)
 			.header(OneDriveHttpHeader.Authorization,
 					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetDriveCallback(future, callback));
+			.asJsonAsync(new GetDefaultDriveCallback(future, callback));
 
 		return future;
 	}
@@ -147,9 +144,8 @@ public final class OneDriveClient extends Client {
 				return;
 			}
 
-			//TODO
-			JSONObject ownerObject = (JSONObject) response.getBody().getObject().get("owner");
-			JSONObject userObject = (JSONObject) ownerObject.get("user");
+			JSONObject jsonObject = response.getBody().getObject();
+			JSONObject userObject = jsonObject.getJSONObject("owner").getJSONObject("user");
 			Client.Info info;
 
 			info = new Client.Info(userObject.getString("id"));
@@ -158,7 +154,7 @@ public final class OneDriveClient extends Client {
 			clientInfo = info;
 
 			this.callback.onSuccess(info);
-			future.complete(clientInfo);
+			future.complete(info);
 		}
 
 		@Override
@@ -169,11 +165,11 @@ public final class OneDriveClient extends Client {
 		}
 	}
 
-	private class GetDriveCallback implements UnirestAsyncCallback<JsonNode> {
+	private class GetDefaultDriveCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<Drive> future;
 		private final Callback<Drive> callback;
 
-		GetDriveCallback(CompletableFuture<Drive> future, Callback<Drive> callback) {
+		GetDefaultDriveCallback(CompletableFuture<Drive> future, Callback<Drive> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
