@@ -56,7 +56,12 @@ final class OneDriveFile extends File {
 	}
 
 	@Override
-	public CompletableFuture<File.Info> getInfo(Callback<File.Info> callback) {
+	public CompletableFuture<File.Info> getInfo(Callback<File.Info> callback)  {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getInfo(status, callback));
+	}
+
+	private CompletableFuture<File.Info> getInfo(Status status, Callback<File.Info> callback) {
 		CompletableFuture<File.Info> future = new CompletableFuture<File.Info>();
 
 		if (callback == null)
@@ -79,6 +84,11 @@ final class OneDriveFile extends File {
 
 	@Override
 	public CompletableFuture<Status> moveTo(String pathName, Callback<Status> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> moveTo(status, pathName, callback));
+	}
+
+	private CompletableFuture<Status> moveTo(Status status, String pathName, Callback<Status> callback) {
 		CompletableFuture<Status> future = new CompletableFuture<Status>();
 
 		if (callback == null)
@@ -136,6 +146,11 @@ final class OneDriveFile extends File {
 
 	@Override
 	public CompletableFuture<Status> copyTo(String pathName, Callback<Status> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> copyTo(status, pathName, callback));
+	}
+
+	private CompletableFuture<Status> copyTo(Status status, String pathName, Callback<Status> callback) {
 		CompletableFuture<Status> future = new CompletableFuture<Status>();
 
 		if (callback == null)
@@ -192,6 +207,11 @@ final class OneDriveFile extends File {
 
 	@Override
 	public CompletableFuture<Status> deleteItem(Callback<Status> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> deleteItem(status, callback));
+	}
+
+	private CompletableFuture<Status> deleteItem(Status status, Callback<Status> callback) {
 		CompletableFuture<Status> future = new CompletableFuture<Status>();
 
 		if (callback == null)
