@@ -85,6 +85,7 @@ final class IPFSDrive extends Drive{
 		CompletableFuture<String> hashFuture = mkdirStatus.thenCompose(status -> {
 			return CompletableFuture.supplyAsync(() -> {
 				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("createDirectory failed"));
 					return null;
 				}
 

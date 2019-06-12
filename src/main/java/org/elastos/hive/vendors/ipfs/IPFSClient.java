@@ -43,9 +43,9 @@ public final class IPFSClient extends Client {
 	}
 
 	public static Client createInstance(IPFSParameter parameter) {
-		if (clientInstance == null) {
+		if (clientInstance == null) 
 			clientInstance = new IPFSClient(parameter);
-		}
+
 		return clientInstance;
 	}
 
@@ -68,21 +68,17 @@ public final class IPFSClient extends Client {
 		try {
 			String uid = parameter.getUid();
 			if (uid == null) {
-				uid = IPFSUtils.getNewUid();
+				uid = IPFSUtils.initialize(uid);
 				parameter.setUid(uid);
 				storeUid(uid);
 			}
 
-			String homeHash = IPFSUtils.getHomeHash();
-			Unirest.get(IPFSUtils.BASEURL + "uid/login")
-				.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
-				.queryString(IPFSUtils.UID, uid)
-				.queryString(IPFSUtils.HASH, homeHash)
-				.asJson();
+			IPFSUtils.initialize(uid);
+			IPFSUtils.login(uid);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			throw new HiveException("Login failed");
+			throw new HiveException(e.getMessage());
 		}
 	}
 
@@ -215,9 +211,9 @@ public final class IPFSClient extends Client {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -249,9 +245,9 @@ public final class IPFSClient extends Client {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
