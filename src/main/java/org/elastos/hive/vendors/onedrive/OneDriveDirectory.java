@@ -46,7 +46,7 @@ class OneDriveDirectory extends Directory {
 		if (pathName.equals("/"))
 			return pathName;
 
-		return pathName.substring(0, pathName.lastIndexOf("/") + 1);
+		return pathName.substring(0, pathName.lastIndexOf("/"));
 	}
 
 	@Override
@@ -117,7 +117,7 @@ class OneDriveDirectory extends Directory {
 			String url  = String.format("%s/root:%s", OneDriveURL.API, this.pathName)
 								.replace(" ", "%20");
 			String body = String.format("{\"parentReference\":{\"path\":\"/drive/root:%s\"},\"name\":\"%s\"}", pathName, name)
-					.replace(" ", "%20");
+								.replace(" ", "%20");
 			String newPathName = String.format("%s/%s", pathName, name);
 
 			Unirest.patch(url)
@@ -240,7 +240,7 @@ class OneDriveDirectory extends Directory {
 			callback = new NullCallback<Directory>();
 
 		if (name.contains("/")) {
-			HiveException e = new HiveException("Only need the path name");
+			HiveException e = new HiveException("Only need the last part of directory name");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
@@ -274,7 +274,7 @@ class OneDriveDirectory extends Directory {
 			callback = new NullCallback<Directory>();
 
 		if (name.contains("/")) {
-			HiveException e = new HiveException("Only need the name of a directory.");
+			HiveException e = new HiveException("Only need the the last part of directory name");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
@@ -315,7 +315,8 @@ class OneDriveDirectory extends Directory {
 						    .replace(" ", "%20");
 
 		Unirest.put(url)
-			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
+			.header(OneDriveHttpHeader.Authorization,
+					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new CreateFileCallback(path, future, callback));
 
 		return future;
@@ -346,7 +347,7 @@ class OneDriveDirectory extends Directory {
 
 		Unirest.get(url)
 			.header(OneDriveHttpHeader.Authorization,
-				OneDriveHttpHeader.bearerValue(authHelper))
+					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetFileCallback(path, future, callback));
 
 		return future;
@@ -368,7 +369,8 @@ class OneDriveDirectory extends Directory {
 						   .replace(" ", "%20");
 
 		Unirest.get(url)
-			.header("Authorization",  "bearer " + authHelper.getToken().getAccessToken())
+			.header(OneDriveHttpHeader.Authorization,
+					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetChildrenCallback(future, callback));
 
 		return future;
@@ -390,9 +392,9 @@ class OneDriveDirectory extends Directory {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -404,9 +406,9 @@ class OneDriveDirectory extends Directory {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 
@@ -427,9 +429,9 @@ class OneDriveDirectory extends Directory {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -441,9 +443,9 @@ class OneDriveDirectory extends Directory {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 
@@ -462,9 +464,9 @@ class OneDriveDirectory extends Directory {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 202) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -475,9 +477,9 @@ class OneDriveDirectory extends Directory {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 
@@ -496,9 +498,9 @@ class OneDriveDirectory extends Directory {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 204) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -509,9 +511,9 @@ class OneDriveDirectory extends Directory {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 
@@ -532,17 +534,17 @@ class OneDriveDirectory extends Directory {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 201) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
 			if (!jsonObject.has("folder")) {
-				HiveException ex = new HiveException("Impossible: Create a file instead of directory");
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Impossible: Create a file instead of directory");
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -554,9 +556,9 @@ class OneDriveDirectory extends Directory {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 
@@ -576,17 +578,17 @@ class OneDriveDirectory extends Directory {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
 			if (!jsonObject.has("folder")) {
-				HiveException ex = new HiveException("This is not a folder");
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("This is not a folder");
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -598,9 +600,9 @@ class OneDriveDirectory extends Directory {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 
@@ -621,17 +623,17 @@ class OneDriveDirectory extends Directory {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 201 && response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
 			if (!jsonObject.has("file")) {
-				HiveException ex = new HiveException("Impossible: Create a directory instead of file");
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Impossible: Create a directory instead of file");
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -643,9 +645,9 @@ class OneDriveDirectory extends Directory {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 
@@ -666,17 +668,17 @@ class OneDriveDirectory extends Directory {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200 && response.getStatus() != 201) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
 			if (jsonObject.has("folder")) {
-				HiveException ex = new HiveException("This is not a file");
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("This is not a file");
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -688,9 +690,9 @@ class OneDriveDirectory extends Directory {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 
@@ -709,9 +711,9 @@ class OneDriveDirectory extends Directory {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
@@ -745,9 +747,9 @@ class OneDriveDirectory extends Directory {
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 }

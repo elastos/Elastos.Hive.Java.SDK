@@ -41,12 +41,12 @@ public final class DropboxClient extends Client {
 
 	@Override
 	public synchronized void login(Authenticator authenticator) throws HiveException {
-		// TODO;
+		throw new HiveException("Not implemented yet");
 	}
 
 	@Override
 	public synchronized void logout() throws HiveException {
-		// TODO;
+		throw new HiveException("Not implemented yet");
 	}
 
 	@Override
@@ -61,8 +61,14 @@ public final class DropboxClient extends Client {
 
 	@Override
 	public CompletableFuture<Client.Info> getInfo(Callback<Client.Info> callback) {
-		// TODO
-		return null;
+		if (callback == null)
+			callback = new NullCallback<Client.Info>();
+
+		CompletableFuture<Client.Info> future = new CompletableFuture<Client.Info>();
+		HiveException e = new HiveException("Not implemented yet");
+		callback.onError(e);
+		future.completeExceptionally(e);
+		return future;
 	}
 
 	@Override
@@ -72,7 +78,13 @@ public final class DropboxClient extends Client {
 
 	@Override
 	public CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback) {
-		// TODO
-		return null;
+		if (callback == null)
+			callback = new NullCallback<Drive>();
+
+		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
+		HiveException e = new HiveException("Not implemented yet");
+		callback.onError(e);
+		future.completeExceptionally(e);
+		return future;
 	}
 }
