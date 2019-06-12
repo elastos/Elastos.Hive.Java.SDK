@@ -4,8 +4,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.vendors.dropbox.DropboxClient;
 import org.elastos.hive.vendors.dropbox.DropboxParameter;
-import org.elastos.hive.vendors.hiveIpfs.HiveIpfsClient;
-import org.elastos.hive.vendors.hiveIpfs.HiveIpfsParameter;
+import org.elastos.hive.vendors.ipfs.IPFSClient;
+import org.elastos.hive.vendors.ipfs.IPFSParameter;
 import org.elastos.hive.vendors.onedrive.OneDriveClient;
 import org.elastos.hive.vendors.onedrive.OneDriveParameter;
 import org.elastos.hive.vendors.webdav.OwnCloudClient;
@@ -76,7 +76,7 @@ public abstract class Client implements ResourceItem<Client.Info> {
 			return DropboxClient.createInstance((DropboxParameter)parameter);
 
 		case hiveIpfs:
-			return HiveIpfsClient.createInstance((HiveIpfsParameter)parameter);
+			return IPFSClient.createInstance((IPFSParameter)parameter);
 
 		case ownCloud:
 			return OwnCloudClient.createInstance((OwnCloudParameter)parameter);
@@ -97,7 +97,7 @@ public abstract class Client implements ResourceItem<Client.Info> {
 			return DropboxClient.getInstance();
 
 		case hiveIpfs:
-			return HiveIpfsClient.getInstance();
+			return IPFSClient.getInstance();
 
 		case ownCloud:
 			return OwnCloudClient.getInstance();

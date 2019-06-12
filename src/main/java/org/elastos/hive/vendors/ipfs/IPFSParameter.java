@@ -1,12 +1,12 @@
-package org.elastos.hive.vendors.hiveIpfs;
+package org.elastos.hive.vendors.ipfs;
 
 import org.elastos.hive.DriveType;
 import org.elastos.hive.NullEntry;
 import org.elastos.hive.Parameter;
 
-public class HiveIpfsParameter implements Parameter<NullEntry> {
+public class IPFSParameter implements Parameter<NullEntry> {
 	private String uid;
-	public HiveIpfsParameter(String uid) {
+	public IPFSParameter(String uid) {
 		this.uid = uid;
 	}
 	

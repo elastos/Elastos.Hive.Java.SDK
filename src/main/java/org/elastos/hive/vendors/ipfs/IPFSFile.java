@@ -1,4 +1,4 @@
-package org.elastos.hive.vendors.hiveIpfs;
+package org.elastos.hive.vendors.ipfs;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -15,11 +15,11 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-final class HiveIpfsFile extends File {
+final class IPFSFile extends File {
 	private String pathName;
 	private volatile File.Info fileInfo;
 
-	HiveIpfsFile(String pathName, File.Info fileInfo) {
+	IPFSFile(String pathName, File.Info fileInfo) {
 		this.fileInfo = fileInfo;
 		this.pathName = pathName;
 	}
@@ -46,10 +46,10 @@ final class HiveIpfsFile extends File {
 		if (callback == null)
 			callback = new NullCallback<Info>();
 
-		Unirest.get(HiveIpfsUtils.BASEURL)
-			.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-			.queryString(HiveIpfsUtils.UID, getId())
-			.queryString(HiveIpfsUtils.PATH, pathName)
+		Unirest.get(IPFSUtils.BASEURL)
+			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+			.queryString(IPFSUtils.UID, getId())
+			.queryString(IPFSUtils.PATH, pathName)
 			.asJsonAsync(new GetFileInfoCallback(future, callback));
 
 		return future;
@@ -113,7 +113,7 @@ final class HiveIpfsFile extends File {
 
 		//rm
 		CompletableFuture<Status> mkdirStatus = CompletableFuture.supplyAsync(() -> {
-			return HiveIpfsUtils.rm(getId(), pathName);
+			return IPFSUtils.rm(getId(), pathName);
 		});
 		
 		//using stat to get the path's hash
@@ -123,7 +123,7 @@ final class HiveIpfsFile extends File {
 					return null;
 				}
 
-				return HiveIpfsUtils.stat(getId(), "/");
+				return IPFSUtils.stat(getId(), "/");
 			});
 		});
 
@@ -136,11 +136,11 @@ final class HiveIpfsFile extends File {
 					return future;
 				}
 
-				String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "name/publish");
+				String url = String.format("%s%s", IPFSUtils.BASEURL, "name/publish");
 				Unirest.get(url)
-					.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-					.queryString(HiveIpfsUtils.UID, getId())
-					.queryString(HiveIpfsUtils.PATH, hash)
+					.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+					.queryString(IPFSUtils.UID, getId())
+					.queryString(IPFSUtils.PATH, hash)
 					.asJsonAsync(new DeleteItemCallback(future, callbackForPublish));
 
 				return future;

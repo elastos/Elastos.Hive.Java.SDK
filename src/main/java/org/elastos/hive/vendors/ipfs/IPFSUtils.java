@@ -1,4 +1,4 @@
-package org.elastos.hive.vendors.hiveIpfs;
+package org.elastos.hive.vendors.ipfs;
 
 import java.util.UUID;
 
@@ -9,7 +9,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-class HiveIpfsUtils {
+class IPFSUtils {
 	static final String CONFIG      = "/ipfsConfig.properties";
 	static final String BASEURL     = "http://52.83.159.189:9095/api/v0/";
 	static final String PREFIX      = "/ipfs/";
@@ -21,11 +21,11 @@ class HiveIpfsUtils {
 
 	static Status mkdir(String uid, String path) {
 		try {
-			String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/mkdir");
+			String url = String.format("%s%s", IPFSUtils.BASEURL, "files/mkdir");
 			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-				.queryString(HiveIpfsUtils.UID, uid)
-				.queryString(HiveIpfsUtils.PATH, path)
+				.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+				.queryString(IPFSUtils.UID, uid)
+				.queryString(IPFSUtils.PATH, path)
 				.queryString("parents", "false")
 				.asJson();
 
@@ -40,11 +40,11 @@ class HiveIpfsUtils {
 
 	static Status rm(String uid, String path) {
 		try {
-			String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/rm");
+			String url = String.format("%s%s", IPFSUtils.BASEURL, "files/rm");
 			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-				.queryString(HiveIpfsUtils.UID, uid)
-				.queryString(HiveIpfsUtils.PATH, path)
+				.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+				.queryString(IPFSUtils.UID, uid)
+				.queryString(IPFSUtils.PATH, path)
 				.queryString("recursive", "true")
 				.asJson();
 
@@ -59,12 +59,12 @@ class HiveIpfsUtils {
 
 	static Status createEmptyFile(String uid, String path) {
 		try {
-			String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/write");
+			String url = String.format("%s%s", IPFSUtils.BASEURL, "files/write");
 			String type = String.format("multipart/form-data; boundary=%s", UUID.randomUUID().toString());
 			HttpResponse<JsonNode> response = Unirest.post(url)
-				.header(HiveIpfsUtils.CONTENTTYPE, type)
-				.queryString(HiveIpfsUtils.UID, uid)
-				.queryString(HiveIpfsUtils.PATH, path)
+				.header(IPFSUtils.CONTENTTYPE, type)
+				.queryString(IPFSUtils.UID, uid)
+				.queryString(IPFSUtils.PATH, path)
 				.queryString("create", "true")
 				.asJson();
 
@@ -81,9 +81,9 @@ class HiveIpfsUtils {
 		try {
 			String url = String.format("%s%s", BASEURL, "files/stat");
 			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-				.queryString(HiveIpfsUtils.UID, uid)
-				.queryString(HiveIpfsUtils.PATH, path)
+				.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+				.queryString(IPFSUtils.UID, uid)
+				.queryString(IPFSUtils.PATH, path)
 				.asJson();
 			if (response.getStatus() == 200) {
 				return response.getBody().getObject().getString("Hash");
@@ -98,9 +98,9 @@ class HiveIpfsUtils {
 		try {
 			String url = String.format("%s%s", BASEURL, "name/publish");
 			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-				.queryString(HiveIpfsUtils.UID, uid)
-				.queryString(HiveIpfsUtils.PATH, hash)
+				.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+				.queryString(IPFSUtils.UID, uid)
+				.queryString(IPFSUtils.PATH, hash)
 				.asJson();
 			if (response.getStatus() == 200) {
 				return new Status(1);

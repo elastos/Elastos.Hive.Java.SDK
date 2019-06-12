@@ -2,13 +2,14 @@ package org.elastos.hive;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import org.elastos.hive.vendors.hiveIpfs.HiveIpfsParameter;
+
+import org.elastos.hive.vendors.ipfs.IPFSParameter;
 
 public class IpfsTestBase {
 	static public Client login() {
 		try {
 			String uid = null;
-			HiveIpfsParameter parameter = new HiveIpfsParameter(uid);
+			IPFSParameter parameter = new IPFSParameter(uid);
 			Client client = Client.createInstance(parameter);
 
 			assertNotNull(client);

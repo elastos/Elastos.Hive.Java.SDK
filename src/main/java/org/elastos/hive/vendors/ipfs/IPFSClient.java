@@ -1,4 +1,4 @@
-package org.elastos.hive.vendors.hiveIpfs;
+package org.elastos.hive.vendors.ipfs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,12 +22,12 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-public final class HiveIpfsClient extends Client {
+public final class IPFSClient extends Client {
 	private static Client clientInstance;
 	private Client.Info clientInfo;
-	private final HiveIpfsParameter parameter;
+	private final IPFSParameter parameter;
 
-	private HiveIpfsClient(HiveIpfsParameter parameter) {
+	private IPFSClient(IPFSParameter parameter) {
 		this.parameter = parameter;
 		
 		if (parameter.getUid() != null) {
@@ -42,9 +42,9 @@ public final class HiveIpfsClient extends Client {
 		}
 	}
 
-	public static Client createInstance(HiveIpfsParameter parameter) {
+	public static Client createInstance(IPFSParameter parameter) {
 		if (clientInstance == null) {
-			clientInstance = new HiveIpfsClient(parameter);
+			clientInstance = new IPFSClient(parameter);
 		}
 		return clientInstance;
 	}
@@ -68,16 +68,16 @@ public final class HiveIpfsClient extends Client {
 		try {
 			String uid = parameter.getUid();
 			if (uid == null) {
-				uid = HiveIpfsUtils.getNewUid();
+				uid = IPFSUtils.getNewUid();
 				parameter.setUid(uid);
 				storeUid(uid);
 			}
 
-			String homeHash = HiveIpfsUtils.getHomeHash();
-			Unirest.get(HiveIpfsUtils.BASEURL + "uid/login")
-				.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-				.queryString(HiveIpfsUtils.UID, uid)
-				.queryString(HiveIpfsUtils.HASH, homeHash)
+			String homeHash = IPFSUtils.getHomeHash();
+			Unirest.get(IPFSUtils.BASEURL + "uid/login")
+				.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+				.queryString(IPFSUtils.UID, uid)
+				.queryString(IPFSUtils.HASH, homeHash)
 				.asJson();
 		}
 		catch (Exception e) {
@@ -109,11 +109,11 @@ public final class HiveIpfsClient extends Client {
 		if (callback == null)
 			callback = new NullCallback<Client.Info>();
 
-		String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/stat");
+		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
 		Unirest.get(url)
-			.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-			.queryString(HiveIpfsUtils.UID, parameter.getUid())
-			.queryString(HiveIpfsUtils.PATH, "/")
+			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+			.queryString(IPFSUtils.UID, parameter.getUid())
+			.queryString(IPFSUtils.PATH, "/")
 			.asJsonAsync(new GetClientInfoCallback(future, callback));
 
 		return future;
@@ -131,11 +131,11 @@ public final class HiveIpfsClient extends Client {
 		if (callback == null)
 			callback = new NullCallback<Drive>();
 
-		String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/stat");
+		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
 		Unirest.get(url)
-			.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-			.queryString(HiveIpfsUtils.UID, parameter.getUid())
-			.queryString(HiveIpfsUtils.PATH, "/")
+			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+			.queryString(IPFSUtils.UID, parameter.getUid())
+			.queryString(IPFSUtils.PATH, "/")
 			.asJsonAsync(new GetDriveCallback(future, callback));
 
 		return future;
@@ -145,14 +145,14 @@ public final class HiveIpfsClient extends Client {
 		Properties properties = new Properties(); 
 		FileOutputStream out = null;
 		try {
-			String configPath = HiveIpfsClient.class.getResource("/").getPath() + HiveIpfsUtils.CONFIG;
+			String configPath = IPFSClient.class.getResource("/").getPath() + IPFSUtils.CONFIG;
 			//Create the property file.
 			File prop = new File(configPath);
 			if (!prop.exists()) {
 				prop.createNewFile();
 			}
 
-			properties.setProperty(HiveIpfsUtils.UID, uid);
+			properties.setProperty(IPFSUtils.UID, uid);
 			out = new FileOutputStream(prop);
 			properties.store(out, "store the user's uid");
 		} catch (IOException e) {
@@ -174,7 +174,7 @@ public final class HiveIpfsClient extends Client {
 		InputStream inputStream = null;
 
 		try {
-			String configPath = HiveIpfsClient.class.getResource("/").getPath() + HiveIpfsUtils.CONFIG;
+			String configPath = IPFSClient.class.getResource("/").getPath() + IPFSUtils.CONFIG;
 			//Create the property file.
 			File prop = new File(configPath);
 			if (!prop.exists()) {
@@ -183,7 +183,7 @@ public final class HiveIpfsClient extends Client {
 
 			inputStream = new FileInputStream(prop);
 			properties.load(inputStream);
-			return properties.getProperty(HiveIpfsUtils.UID);
+			return properties.getProperty(IPFSUtils.UID);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -256,7 +256,7 @@ public final class HiveIpfsClient extends Client {
 			}
 
 			Drive.Info info = new Drive.Info(parameter.getUid());
-			HiveIpfsDrive drive = new HiveIpfsDrive(info);
+			IPFSDrive drive = new IPFSDrive(info);
 			this.callback.onSuccess(drive);
 			future.complete(drive);
 		}

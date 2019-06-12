@@ -1,4 +1,4 @@
-package org.elastos.hive.vendors.hiveIpfs;
+package org.elastos.hive.vendors.ipfs;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -17,11 +17,11 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-class HiveIpfsDirectory extends Directory  {
+class IPFSDirectory extends Directory  {
 	private String pathName;
 	private volatile Directory.Info dirInfo;
 
-	HiveIpfsDirectory(String pathName, Directory.Info dirInfo) {
+	IPFSDirectory(String pathName, Directory.Info dirInfo) {
 		this.pathName = pathName;
 		this.dirInfo = dirInfo;
 	}
@@ -48,11 +48,11 @@ class HiveIpfsDirectory extends Directory  {
 		if (callback == null)
 			callback = new NullCallback<Directory.Info>();
 
-		String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/stat");
+		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
 		Unirest.get(url)
-			.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-			.queryString(HiveIpfsUtils.UID, getId())
-			.queryString(HiveIpfsUtils.PATH, pathName)
+			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+			.queryString(IPFSUtils.UID, getId())
+			.queryString(IPFSUtils.PATH, pathName)
 			.asJsonAsync(new GetDirInfoCallback(future, callback));
 
 		return future;
@@ -80,7 +80,7 @@ class HiveIpfsDirectory extends Directory  {
 		String pathName = String.format("%s/%s", this.pathName, path);
 		//mkdir
 		CompletableFuture<Status> mkdirStatus = CompletableFuture.supplyAsync(() -> {
-			return HiveIpfsUtils.mkdir(getId(), pathName);
+			return IPFSUtils.mkdir(getId(), pathName);
 		});
 
 		//using stat to get the path's hash
@@ -90,7 +90,7 @@ class HiveIpfsDirectory extends Directory  {
 					return null;
 				}
 
-				return HiveIpfsUtils.stat(getId(), pathName);
+				return IPFSUtils.stat(getId(), pathName);
 			});
 		});
 
@@ -103,11 +103,11 @@ class HiveIpfsDirectory extends Directory  {
 					return future;
 				}
 
-				String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "name/publish");
+				String url = String.format("%s%s", IPFSUtils.BASEURL, "name/publish");
 				Unirest.get(url)
-					.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-					.queryString(HiveIpfsUtils.UID, getId())
-					.queryString(HiveIpfsUtils.PATH, hash)
+					.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+					.queryString(IPFSUtils.UID, getId())
+					.queryString(IPFSUtils.PATH, hash)
 					.asJsonAsync(new CreateDirectoryCallback(pathName, future, callbackForPublish));
 
 				return future;
@@ -138,11 +138,11 @@ class HiveIpfsDirectory extends Directory  {
 
 		String pathName = String.format("%s/%s", this.pathName, path);
 		//stat
-		String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/stat");
+		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
 		Unirest.get(url)
-			.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-			.queryString(HiveIpfsUtils.UID, getId())
-			.queryString(HiveIpfsUtils.PATH, pathName)
+			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+			.queryString(IPFSUtils.UID, getId())
+			.queryString(IPFSUtils.PATH, pathName)
 			.asJsonAsync(new GetDirectoryCallback(pathName, future, callback));
 
 		return future;
@@ -170,7 +170,7 @@ class HiveIpfsDirectory extends Directory  {
 		String pathName = String.format("%s/%s", this.pathName, path);
 		//create file
 		CompletableFuture<Status> createStatus = CompletableFuture.supplyAsync(() -> {
-			return HiveIpfsUtils.createEmptyFile(getId(), pathName);
+			return IPFSUtils.createEmptyFile(getId(), pathName);
 		});
 
 		//using stat to get the path's hash
@@ -180,7 +180,7 @@ class HiveIpfsDirectory extends Directory  {
 					return null;
 				}
 
-				return HiveIpfsUtils.stat(getId(), pathName);
+				return IPFSUtils.stat(getId(), pathName);
 			});
 		});
 
@@ -193,11 +193,11 @@ class HiveIpfsDirectory extends Directory  {
 					return future;
 				}
 
-				String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "name/publish");
+				String url = String.format("%s%s", IPFSUtils.BASEURL, "name/publish");
 				Unirest.get(url)
-					.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-					.queryString(HiveIpfsUtils.UID, getId())
-					.queryString(HiveIpfsUtils.PATH, hash)
+					.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+					.queryString(IPFSUtils.UID, getId())
+					.queryString(IPFSUtils.PATH, hash)
 					.asJsonAsync(new CreateFileCallback(pathName, future, callbackForPublish));
 
 				return future;
@@ -227,11 +227,11 @@ class HiveIpfsDirectory extends Directory  {
 		}
 
 		String pathName = String.format("%s/%s", this.pathName, path);
-		String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "files/stat");
+		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
 		Unirest.get(url)
-			.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-			.queryString(HiveIpfsUtils.UID, getId())
-			.queryString(HiveIpfsUtils.PATH, pathName)
+			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+			.queryString(IPFSUtils.UID, getId())
+			.queryString(IPFSUtils.PATH, pathName)
 			.asJsonAsync(new GetFileCallback(pathName, future, callback));
 
 		return future;
@@ -293,7 +293,7 @@ class HiveIpfsDirectory extends Directory  {
 
 		//rm
 		CompletableFuture<Status> mkdirStatus = CompletableFuture.supplyAsync(() -> {
-			return HiveIpfsUtils.rm(getId(), pathName);
+			return IPFSUtils.rm(getId(), pathName);
 		});
 
 		//using stat to get the path's hash
@@ -303,7 +303,7 @@ class HiveIpfsDirectory extends Directory  {
 					return null;
 				}
 
-				return HiveIpfsUtils.stat(getId(), "/");
+				return IPFSUtils.stat(getId(), "/");
 			});
 		});
 
@@ -316,11 +316,11 @@ class HiveIpfsDirectory extends Directory  {
 					return future;
 				}
 
-				String url = String.format("%s%s", HiveIpfsUtils.BASEURL, "name/publish");
+				String url = String.format("%s%s", IPFSUtils.BASEURL, "name/publish");
 				Unirest.get(url)
-					.header(HiveIpfsUtils.CONTENTTYPE, HiveIpfsUtils.TYPE_Json)
-					.queryString(HiveIpfsUtils.UID, getId())
-					.queryString(HiveIpfsUtils.PATH, hash)
+					.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+					.queryString(IPFSUtils.UID, getId())
+					.queryString(IPFSUtils.PATH, hash)
 					.asJsonAsync(new DeleteItemCallback(future, callbackForPublish));
 
 				return future;
@@ -407,7 +407,7 @@ class HiveIpfsDirectory extends Directory  {
 			}
 
 			Directory.Info dirInfo = new Directory.Info(getId());
-			HiveIpfsDirectory directory = new HiveIpfsDirectory(pathName, dirInfo);
+			IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}
@@ -444,7 +444,7 @@ class HiveIpfsDirectory extends Directory  {
 
 			JSONObject jsonObject = response.getBody().getObject();
 			String type = jsonObject.getString("Type");
-			if (!HiveIpfsUtils.isFolder(type)) {
+			if (!IPFSUtils.isFolder(type)) {
 				HiveException ex = new HiveException("This is not a directory");
 				this.callback.onError(ex);
 				future.completeExceptionally(ex);
@@ -452,7 +452,7 @@ class HiveIpfsDirectory extends Directory  {
 			}
 
 			Directory.Info dirInfo = new Directory.Info(getId());
-			HiveIpfsDirectory directory = new HiveIpfsDirectory(pathName, dirInfo);
+			IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}
@@ -488,7 +488,7 @@ class HiveIpfsDirectory extends Directory  {
 			}
 
 			File.Info fileInfo = new File.Info(getId());
-			HiveIpfsFile file = new HiveIpfsFile(pathName, fileInfo);
+			IPFSFile file = new IPFSFile(pathName, fileInfo);
 			this.callback.onSuccess(file);
 			future.complete(file);
 		}
@@ -526,7 +526,7 @@ class HiveIpfsDirectory extends Directory  {
 
 			JSONObject jsonObject = response.getBody().getObject();
 			String type = jsonObject.getString("Type");
-			if (!HiveIpfsUtils.isFile(type)) {
+			if (!IPFSUtils.isFile(type)) {
 				HiveException ex = new HiveException("This is not a file");
 				this.callback.onError(ex);
 				future.completeExceptionally(ex);
@@ -534,7 +534,7 @@ class HiveIpfsDirectory extends Directory  {
 			}
 
 			File.Info fileInfo = new File.Info(getId());
-			HiveIpfsFile file = new HiveIpfsFile(pathName, fileInfo);
+			IPFSFile file = new IPFSFile(pathName, fileInfo);
 			this.callback.onSuccess(file);
 			future.complete(file);
 		}
