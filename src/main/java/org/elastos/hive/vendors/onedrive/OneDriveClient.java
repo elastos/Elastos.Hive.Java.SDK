@@ -4,7 +4,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import org.elastos.hive.AuthHelper;
-import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
@@ -54,7 +53,7 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public synchronized void login(Authenticator authenticator) throws HiveException {
-		CompletableFuture<AuthToken> future = authHelper.loginAsync(authenticator);
+		CompletableFuture<Status> future = authHelper.loginAsync(authenticator);
 
 		try {
 			future.get();
@@ -90,6 +89,11 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public CompletableFuture<Client.Info> getInfo(Callback<Client.Info> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getInfo(status, callback));
+	}
+
+	private CompletableFuture<Client.Info> getInfo(Status status, Callback<Client.Info> callback) {
 		CompletableFuture<Client.Info> future = new CompletableFuture<Client.Info>();
 
 		if (callback == null)
@@ -110,6 +114,11 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getDefaultDrive(status, callback));
+	}
+
+	private CompletableFuture<Drive> getDefaultDrive(Status status, Callback<Drive> callback) {
 		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
 
 		if (callback == null)

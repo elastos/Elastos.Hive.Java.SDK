@@ -61,6 +61,11 @@ class OneDriveDirectory extends Directory {
 
 	@Override
 	public CompletableFuture<Directory.Info> getInfo(Callback<Directory.Info> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getInfo(status, callback));
+	}
+
+	private CompletableFuture<Directory.Info> getInfo(Status status,  Callback<Directory.Info> callback) {
 		CompletableFuture<Directory.Info> future = new CompletableFuture<Directory.Info>();
 
 		if (callback == null)
@@ -83,6 +88,11 @@ class OneDriveDirectory extends Directory {
 
 	@Override
 	public CompletableFuture<Status> moveTo(String pathName, Callback<Status> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> moveTo(status, pathName, callback));
+	}
+
+	private CompletableFuture<Status> moveTo(Status status, String pathName, Callback<Status> callback) {
 		CompletableFuture<Status> future = new CompletableFuture<Status>();
 
 		if (callback == null)
@@ -142,6 +152,11 @@ class OneDriveDirectory extends Directory {
 
 	@Override
 	public CompletableFuture<Status> copyTo(String pathName, Callback<Status> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> copyTo(status, pathName, callback));
+	}
+
+	private CompletableFuture<Status> copyTo(Status status, String pathName, Callback<Status> callback) {
 		CompletableFuture<Status> future = new CompletableFuture<Status>();
 
 		if (callback == null)
@@ -199,6 +214,11 @@ class OneDriveDirectory extends Directory {
 
 	@Override
 	public CompletableFuture<Status> deleteItem(Callback<Status> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> deleteItem(status, callback));
+	}
+
+	private CompletableFuture<Status> deleteItem(Status status, Callback<Status> callback) {
 		CompletableFuture<Status> future = new CompletableFuture<Status>();
 
 		if (callback == null)
@@ -234,6 +254,11 @@ class OneDriveDirectory extends Directory {
 
 	@Override
 	public CompletableFuture<Directory> createDirectory(String name, Callback<Directory> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> createDirectory(status, name, callback));
+	}
+
+	private CompletableFuture<Directory> createDirectory(Status status, String name, Callback<Directory> callback) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (callback == null)
@@ -268,6 +293,11 @@ class OneDriveDirectory extends Directory {
 
 	@Override
 	public CompletableFuture<Directory> getDirectory(String name, Callback<Directory> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getDirectory(status, name, callback));
+	}
+
+	private CompletableFuture<Directory> getDirectory(Status status, String name, Callback<Directory> callback) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (callback == null)
@@ -298,6 +328,11 @@ class OneDriveDirectory extends Directory {
 
 	@Override
 	public CompletableFuture<File> createFile(String name, Callback<File> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> createFile(status, name, callback));
+	}
+
+	private CompletableFuture<File> createFile(Status status, String name, Callback<File> callback) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (callback == null)
@@ -329,6 +364,11 @@ class OneDriveDirectory extends Directory {
 
 	@Override
 	public CompletableFuture<File> getFile(String name, Callback<File> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getFile(status, name, callback));
+	}
+
+	private CompletableFuture<File> getFile(Status status, String name, Callback<File> callback) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (callback == null)
@@ -360,6 +400,11 @@ class OneDriveDirectory extends Directory {
 
 	@Override
 	public CompletableFuture<Children> getChildren(Callback<Children> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getChildren(status,callback));
+	}
+
+	private CompletableFuture<Children> getChildren(Status status, Callback<Children> callback) {
 		CompletableFuture<Children> future = new CompletableFuture<Children>();
 
 		if (callback == null)

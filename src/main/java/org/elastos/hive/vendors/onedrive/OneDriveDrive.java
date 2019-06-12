@@ -10,6 +10,7 @@ import org.elastos.hive.DriveType;
 import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
+import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.json.JSONObject;
 
@@ -49,6 +50,11 @@ final class OneDriveDrive extends Drive {
 
 	@Override
 	public CompletableFuture<Drive.Info> getInfo(Callback<Drive.Info> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getInfo(status, callback));
+	}
+
+	private CompletableFuture<Drive.Info> getInfo(Status status, Callback<Drive.Info> callback) {
 		CompletableFuture<Drive.Info> future = new CompletableFuture<Drive.Info>();
 
 		if (callback == null)
@@ -69,6 +75,11 @@ final class OneDriveDrive extends Drive {
 
 	@Override
 	public CompletableFuture<Directory> getRootDir(Callback<Directory> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getRootDir(status, callback));
+	}
+
+	private CompletableFuture<Directory> getRootDir(Status status, Callback<Directory> callback) {
 		if (callback == null)
 			callback = new NullCallback<Directory>();
 
@@ -82,6 +93,11 @@ final class OneDriveDrive extends Drive {
 
 	@Override
 	public CompletableFuture<Directory> createDirectory(String pathName, Callback<Directory> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> createDirectory(status, pathName, callback));
+	}
+
+	private CompletableFuture<Directory> createDirectory(Status status, String pathName, Callback<Directory> callback) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (callback == null)
@@ -134,6 +150,11 @@ final class OneDriveDrive extends Drive {
 
 	@Override
 	public CompletableFuture<Directory> getDirectory(String pathName, Callback<Directory> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getDirectory(status, pathName, callback));
+	}
+
+	private CompletableFuture<Directory> getDirectory(Status status, String pathName, Callback<Directory> callback) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (callback == null)
@@ -170,6 +191,11 @@ final class OneDriveDrive extends Drive {
 
 	@Override
 	public CompletableFuture<File> createFile(String pathName, Callback<File> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> createFile(status, pathName, callback));
+	}
+
+	private CompletableFuture<File> createFile(Status status, String pathName, Callback<File> callback) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (callback == null)
@@ -207,6 +233,11 @@ final class OneDriveDrive extends Drive {
 
 	@Override
 	public CompletableFuture<File> getFile(String pathName, Callback<File> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(status -> getFile(status, pathName, callback));
+	}
+
+	private CompletableFuture<File> getFile(Status status, String pathName, Callback<File> callback) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (callback == null)
