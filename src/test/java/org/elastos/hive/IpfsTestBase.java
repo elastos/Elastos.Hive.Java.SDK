@@ -9,7 +9,7 @@ public class IpfsTestBase {
 	static public Client login() {
 		try {
 			String uid = null;
-			IPFSParameter parameter = new IPFSParameter(uid);
+			IPFSParameter parameter = new IPFSParameter(System.getProperty("user.dir"), uid);
 			Client client = Client.createInstance(parameter);
 
 			assertNotNull(client);
