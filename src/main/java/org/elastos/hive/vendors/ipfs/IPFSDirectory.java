@@ -92,7 +92,7 @@ class IPFSDirectory extends Directory  {
 					return null;
 				}
 
-				return IPFSUtils.stat(getId(), pathName);
+				return IPFSUtils.stat(getId(), "/");
 			});
 		});
 
@@ -179,10 +179,11 @@ class IPFSDirectory extends Directory  {
 		CompletableFuture<String> hashFuture = createStatus.thenCompose(status -> {
 			return CompletableFuture.supplyAsync(() -> {
 				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("Create File failed."));
 					return null;
 				}
 
-				return IPFSUtils.stat(getId(), pathName);
+				return IPFSUtils.stat(getId(), "/");
 			});
 		});
 
@@ -293,7 +294,7 @@ class IPFSDirectory extends Directory  {
 					return null;
 				}
 
-				return IPFSUtils.stat(getId(), newPath);
+				return IPFSUtils.stat(getId(), "/");
 			});
 		});
 
@@ -372,7 +373,7 @@ class IPFSDirectory extends Directory  {
 					return null;
 				}
 
-				return IPFSUtils.stat(getId(), newPath);
+				return IPFSUtils.stat(getId(), "/");
 			});
 		});
 
@@ -419,14 +420,15 @@ class IPFSDirectory extends Directory  {
 		}
 
 		//rm
-		CompletableFuture<Status> mkdirStatus = CompletableFuture.supplyAsync(() -> {
+		CompletableFuture<Status> deleteStatus = CompletableFuture.supplyAsync(() -> {
 			return IPFSUtils.rm(getId(), pathName);
 		});
 
 		//using stat to get the path's hash
-		CompletableFuture<String> hashFuture = mkdirStatus.thenCompose(status -> {
+		CompletableFuture<String> hashFuture = deleteStatus.thenCompose(status -> {
 			return CompletableFuture.supplyAsync(() -> {
 				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("Delete directory failed."));
 					return null;
 				}
 

@@ -194,24 +194,6 @@ class IPFSUtils {
 
 		return new Status(0);
 	}
-	
-	static Status publish(String uid, String hash) {
-		try {
-			String url = String.format("%s%s", BASEURL, "name/publish");
-			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(CONTENTTYPE, TYPE_Json)
-				.queryString(UID, uid)
-				.queryString(PATH, hash)
-				.asJson();
-			if (response.getStatus() == 200) {
-				return new Status(1);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return new Status(0);
-	}
 
 	static String getHomeHash() throws HiveException {
 		String url = BASEURL + "name/resolve";

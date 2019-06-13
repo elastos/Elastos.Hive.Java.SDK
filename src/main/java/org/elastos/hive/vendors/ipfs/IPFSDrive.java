@@ -77,19 +77,19 @@ final class IPFSDrive extends Drive{
 		}
 
 		//mkdir
-		CompletableFuture<Status> mkdirStatus = CompletableFuture.supplyAsync(() -> {
+		CompletableFuture<Status> createStatus = CompletableFuture.supplyAsync(() -> {
 			return IPFSUtils.mkdir(getId(), path);
 		});
 
 		//using stat to get the path's hash
-		CompletableFuture<String> hashFuture = mkdirStatus.thenCompose(status -> {
+		CompletableFuture<String> hashFuture = createStatus.thenCompose(status -> {
 			return CompletableFuture.supplyAsync(() -> {
 				if (status.getStatus() == 0) {
 					future.completeExceptionally(new HiveException("createDirectory failed"));
 					return null;
 				}
 
-				return IPFSUtils.stat(getId(), path);
+				return IPFSUtils.stat(getId(), "/");
 			});
 		});
 
@@ -174,10 +174,11 @@ final class IPFSDrive extends Drive{
 		CompletableFuture<String> hashFuture = createStatus.thenCompose(status -> {
 			return CompletableFuture.supplyAsync(() -> {
 				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("Create file failed."));
 					return null;
 				}
 
-				return IPFSUtils.stat(getId(), path);
+				return IPFSUtils.stat(getId(), "/");
 			});
 		});
 
