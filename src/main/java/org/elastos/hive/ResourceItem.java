@@ -3,9 +3,9 @@ package org.elastos.hive;
 import java.util.concurrent.CompletableFuture;
 
 public interface ResourceItem<R extends ResultItem> extends ResultItem {
-	public String getId();
-	public R getLastInfo();
+	String getId();
+	R getLastInfo();
 
-	public CompletableFuture<R> getInfo();
-	public CompletableFuture<R> getInfo(Callback<R> callback);
+	CompletableFuture<R> getInfo();
+	CompletableFuture<R> getInfo(Callback<R> callback);
 }
