@@ -5,11 +5,12 @@ import java.util.concurrent.CompletableFuture;
 public interface AuthHelper {
 	AuthToken getToken();
 
-	CompletableFuture<AuthToken> loginAsync(Authenticator authenticator);
-	CompletableFuture<AuthToken> loginAsync(Authenticator authenticator, Callback<AuthToken> callback);
+	CompletableFuture<Status> 	loginAsync(Authenticator authenticator);
+	CompletableFuture<Status> 	loginAsync(Authenticator authenticator, Callback<Status> callback);
 
-    CompletableFuture<Status>    logoutAsync();
+	CompletableFuture<Status>	logoutAsync();
 	CompletableFuture<Status>    logoutAsync(Callback<Status> callback);
 
-	CompletableFuture<AuthToken> checkExpired(Callback<AuthToken> callback);
+	CompletableFuture<Status> 	checkExpired();
+	CompletableFuture<Status> 	checkExpired(Callback<Status> callback);
 }
