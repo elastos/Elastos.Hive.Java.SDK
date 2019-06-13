@@ -15,7 +15,9 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 class IPFSUtils {
 	static String BASEURL           = null;
-	static final String CONFIG      = "/ipfsConfig.properties";
+	static final String CONFIG      = "ipfs.json";
+	static final String LASTUID     = "last_uid";
+	static final String UIDS        = "uids";
 	static final String URLFORMAT   = "http://%s:9095/api/v0/";
 	static final String PREFIX      = "/ipfs/";
 	static final String CONTENTTYPE = "Content-Type";

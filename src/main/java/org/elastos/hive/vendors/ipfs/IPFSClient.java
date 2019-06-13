@@ -1,11 +1,13 @@
 package org.elastos.hive.vendors.ipfs;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.io.InputStreamReader;
+import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.Authenticator;
@@ -16,6 +18,8 @@ import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.UnirestAsyncCallback;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -26,25 +30,49 @@ public final class IPFSClient extends Client {
 	private static Client clientInstance;
 	private Client.Info clientInfo;
 	private final IPFSParameter parameter;
+	private File ipfsConfig;
 
-	private IPFSClient(IPFSParameter parameter) {
+	private IPFSClient(IPFSParameter parameter) throws HiveException {
 		this.parameter = parameter;
-		
-		if (parameter.getUid() != null) {
-			//Store the uid
-			storeUid(parameter.getUid());
-		}
-		else {
-			String uid = getUid();
-			if (uid != null) {
-				parameter.setUid(uid);
+
+		try {
+			String dataPath = parameter.getDataPath();
+			if (dataPath == null)
+				throw new HiveException("Please input an invalid path to store the IPFS data.");
+
+			File dataFile = new File(dataPath);
+			if (!dataFile.exists()) {
+				dataFile.mkdirs();
 			}
+
+			ipfsConfig = new File(dataFile, IPFSUtils.CONFIG);
+			if (!ipfsConfig.exists()) {
+				ipfsConfig.createNewFile();
+			}
+
+			if (parameter.getUid() != null) {
+				//Store the uid
+				storeUid(parameter.getUid());
+			}
+			else {
+				String uid = getUid();
+				if (uid != null) {
+					parameter.setUid(uid);
+				}
+			}
+		} catch (Exception e) {
+			throw new HiveException(e.getMessage());
 		}
+
 	}
 
 	public static Client createInstance(IPFSParameter parameter) {
-		if (clientInstance == null) 
-			clientInstance = new IPFSClient(parameter);
+		try {
+			if (clientInstance == null) 
+				clientInstance = new IPFSClient(parameter);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return clientInstance;
 	}
@@ -84,7 +112,7 @@ public final class IPFSClient extends Client {
 
 	@Override
 	public synchronized void logout() throws HiveException {
-		//TODO
+		clientInstance = null;
 		parameter.setUid(null);
 	}
 
@@ -138,26 +166,74 @@ public final class IPFSClient extends Client {
 	}
 
 	private void storeUid(final String uid) {
-		Properties properties = new Properties(); 
-		FileOutputStream out = null;
+		BufferedReader bufferedReader = null;
+		BufferedWriter writer = null;
 		try {
-			String configPath = IPFSClient.class.getResource("/").getPath() + IPFSUtils.CONFIG;
-			//Create the property file.
-			File prop = new File(configPath);
-			if (!prop.exists()) {
-				prop.createNewFile();
+			InputStreamReader reader = new InputStreamReader(new FileInputStream(ipfsConfig));
+			bufferedReader = new BufferedReader(reader);
+			String line;
+			String content = "";
+			while ((line = bufferedReader.readLine()) != null) {
+				content += line;
 			}
 
-			properties.setProperty(IPFSUtils.UID, uid);
-			out = new FileOutputStream(prop);
-			properties.store(out, "store the user's uid");
+			JSONObject config;
+			if (!content.isEmpty()) {
+				config = new JSONObject(content);
+			}
+			else {
+				config = new JSONObject();
+			}
+
+			//save at "last_uid"
+			config.put(IPFSUtils.LASTUID, uid);
+
+			//and save in the uid array.
+			String uids = IPFSUtils.UIDS;
+			JSONArray uidArray = null;
+			if (!config.has(uids)) {
+				uidArray = new JSONArray();
+				JSONObject newUid = new JSONObject();
+				newUid.put(IPFSUtils.UID, uid);
+				uidArray.put(newUid);
+				config.put(uids, uidArray);
+			}
+			else {
+				uidArray = config.getJSONArray(uids);
+				Iterator<Object> values = uidArray.iterator();
+				boolean has = false;
+				while (values.hasNext()) {
+					if (uid.equals((String) values.next())) {
+						has = true;
+						break;
+					}
+				}
+
+				if (!has) {
+					JSONObject newUid = new JSONObject();
+					newUid.put(IPFSUtils.UID, uid);
+					uidArray.put(newUid);
+					config.put(uids, uidArray);
+				}
+			}
+			
+			writer = new BufferedWriter(new FileWriter(ipfsConfig));
+			writer.write(config.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		finally {
-			if (out != null) {
+			if (bufferedReader != null) {
 				try {
-					out.close();
+					bufferedReader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (writer != null) {
+				try {
+					writer.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -166,27 +242,32 @@ public final class IPFSClient extends Client {
 	}
 	
 	private String getUid() {
-		Properties properties = new Properties(); 
-		InputStream inputStream = null;
-
+		BufferedReader bufferedReader = null;
 		try {
-			String configPath = IPFSClient.class.getResource("/").getPath() + IPFSUtils.CONFIG;
-			//Create the property file.
-			File prop = new File(configPath);
-			if (!prop.exists()) {
-				prop.createNewFile();
+			InputStreamReader reader = new InputStreamReader(new FileInputStream(ipfsConfig));
+			bufferedReader = new BufferedReader(reader);
+			String line;
+			String content = "";
+			while ((line = bufferedReader.readLine()) != null) {
+				content += line;
 			}
 
-			inputStream = new FileInputStream(prop);
-			properties.load(inputStream);
-			return properties.getProperty(IPFSUtils.UID);
-		} catch (IOException e) {
+			if (content.isEmpty()) {
+				return null;
+			}
+
+			JSONObject config = new JSONObject(content);
+			if (!config.has(IPFSUtils.LASTUID)) {
+				return null;
+			}
+			return config.getString(IPFSUtils.LASTUID);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		finally {
-			if (inputStream != null) {
+			if (bufferedReader != null) {
 				try {
-					inputStream.close();
+					bufferedReader.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
