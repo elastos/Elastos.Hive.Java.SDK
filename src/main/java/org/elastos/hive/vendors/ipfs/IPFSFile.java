@@ -109,7 +109,7 @@ final class IPFSFile extends File {
 					return null;
 				}
 
-				return IPFSUtils.stat(getId(), newPath);
+				return IPFSUtils.stat(getId(), "/");
 			});
 		});
 
@@ -188,7 +188,7 @@ final class IPFSFile extends File {
 					return null;
 				}
 
-				return IPFSUtils.stat(getId(), newPath);
+				return IPFSUtils.stat(getId(), "/");
 			});
 		});
 
@@ -235,14 +235,15 @@ final class IPFSFile extends File {
 		}
 
 		//rm
-		CompletableFuture<Status> mkdirStatus = CompletableFuture.supplyAsync(() -> {
+		CompletableFuture<Status> deleteStatus = CompletableFuture.supplyAsync(() -> {
 			return IPFSUtils.rm(getId(), pathName);
 		});
 		
 		//using stat to get the path's hash
-		CompletableFuture<String> hashFuture = mkdirStatus.thenCompose(status -> {
+		CompletableFuture<String> hashFuture = deleteStatus.thenCompose(status -> {
 			return CompletableFuture.supplyAsync(() -> {
 				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("Delete failed."));
 					return null;
 				}
 
