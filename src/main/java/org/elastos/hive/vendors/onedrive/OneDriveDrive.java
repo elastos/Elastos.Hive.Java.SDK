@@ -137,6 +137,7 @@ final class OneDriveDrive extends Drive {
 		Unirest.post(url)
 			.header(OneDriveHttpHeader.Authorization,
 					OneDriveHttpHeader.bearerValue(authHelper))
+			.header("Content-Type", "application/json")
 			.body(body)
 			.asJsonAsync(new CreateDirectoryCallback(pathName, future, callback));
 

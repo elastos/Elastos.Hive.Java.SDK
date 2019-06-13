@@ -128,6 +128,7 @@ final class OneDriveFile extends File {
 			Unirest.patch(url)
 				.header(OneDriveHttpHeader.Authorization,
 						OneDriveHttpHeader.bearerValue(authHelper))
+				.header("Content-Type", "application/json")
 				.body(body)
 				.asJsonAsync(new MoveToCallback(newPathName, future, callback));
 		} catch (Exception ex) {
@@ -189,6 +190,7 @@ final class OneDriveFile extends File {
 			Unirest.post(url)
 				.header(OneDriveHttpHeader.Authorization,
 						OneDriveHttpHeader.bearerValue(authHelper))
+				.header("Content-Type", "application/json")
 				.body(body)
 				.asJsonAsync(new CopyToCallback(future, callback));
 		} catch (Exception ex) {
