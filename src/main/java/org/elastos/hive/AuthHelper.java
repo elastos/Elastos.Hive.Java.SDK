@@ -3,14 +3,14 @@ package org.elastos.hive;
 import java.util.concurrent.CompletableFuture;
 
 public interface AuthHelper {
-	public AuthToken getToken();
+	AuthToken getToken();
 
-	public CompletableFuture<Status> 	loginAsync(Authenticator authenticator);
-	public CompletableFuture<Status> 	loginAsync(Authenticator authenticator, Callback<Status> callback);
+	CompletableFuture<Status> 	loginAsync(Authenticator authenticator);
+	CompletableFuture<Status> 	loginAsync(Authenticator authenticator, Callback<Status> callback);
 
-	public CompletableFuture<Status>	logoutAsync();
-	public CompletableFuture<Status>    logoutAsync(Callback<Status> callback);
+	CompletableFuture<Status>	logoutAsync();
+	CompletableFuture<Status>    logoutAsync(Callback<Status> callback);
 
-	public CompletableFuture<Status> 	checkExpired();
-	public CompletableFuture<Status> 	checkExpired(Callback<Status> callback);
+	CompletableFuture<Status> 	checkExpired();
+	CompletableFuture<Status> 	checkExpired(Callback<Status> callback);
 }
