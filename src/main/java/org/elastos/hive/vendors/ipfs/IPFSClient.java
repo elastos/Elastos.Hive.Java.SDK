@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
@@ -17,6 +18,7 @@ import org.elastos.hive.Drive;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
+import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,50 +30,50 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 public final class IPFSClient extends Client {
 	private static Client clientInstance;
+	private static IPFSHelper ipfsHelper;
 	private Client.Info clientInfo;
-	private final IPFSParameter parameter;
-	private File ipfsConfig;
 
 	private IPFSClient(IPFSParameter parameter) throws HiveException {
-		this.parameter = parameter;
+		ipfsHelper = new IPFSHelper(parameter.getIpfsEntry());
+	}
 
+	public static Client createInstance(IPFSParameter parameter) throws HiveException {
 		try {
-			String dataPath = parameter.getDataPath();
-			if (dataPath == null)
-				throw new HiveException("Please input an invalid path to store the IPFS data.");
+			if (clientInstance == null) {
+				clientInstance = new IPFSClient(parameter);
 
-			File dataFile = new File(dataPath);
-			if (!dataFile.exists()) {
-				dataFile.mkdirs();
-			}
+				try {
+					IPFSEntry entry = parameter.getIpfsEntry();
+					String dataPath = entry.getDataPath();
+					if (dataPath == null)
+						throw new HiveException("Please input an invalid path to store the IPFS data.");
 
-			ipfsConfig = new File(dataFile, IPFSUtils.CONFIG);
-			if (!ipfsConfig.exists()) {
-				ipfsConfig.createNewFile();
-			}
+					File dataFile = new File(dataPath);
+					if (!dataFile.exists()) {
+						dataFile.mkdirs();
+					}
 
-			if (parameter.getUid() != null) {
-				//Store the uid
-				storeUid(parameter.getUid());
-			}
-			else {
-				String uid = getUid();
-				if (uid != null) {
-					parameter.setUid(uid);
+					File ipfsConfig = new File(dataFile, IPFSUtils.CONFIG);
+					if (!ipfsConfig.exists()) {
+						ipfsConfig.createNewFile();
+					}
+
+					if (entry.getUid() != null) {
+						//Store the uid
+						storeUid(entry.getUid());
+					}
+					else {
+						String uid = getUid();
+						if (uid != null) {
+							entry.setUid(uid);
+						}
+					}
+				} catch (Exception e) {
+					throw new HiveException(e.getMessage());
 				}
 			}
 		} catch (Exception e) {
 			throw new HiveException(e.getMessage());
-		}
-
-	}
-
-	public static Client createInstance(IPFSParameter parameter) {
-		try {
-			if (clientInstance == null) 
-				clientInstance = new IPFSClient(parameter);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 
 		return clientInstance;
@@ -83,7 +85,7 @@ public final class IPFSClient extends Client {
 
 	@Override
 	public String getId() {
-		return parameter.getUid();
+		return ipfsHelper.getIpfsEntry().getUid();
 	}
 
 	@Override
@@ -93,19 +95,13 @@ public final class IPFSClient extends Client {
 
 	@Override
 	public synchronized void login(Authenticator authenticator) throws HiveException {
-		try {
-			String uid = parameter.getUid();
-			if (uid == null) {
-				uid = IPFSUtils.initialize(uid);
-				parameter.setUid(uid);
-				storeUid(uid);
-			}
+		CompletableFuture<Status> future = ipfsHelper.loginAsync();
 
-			IPFSUtils.initialize(uid);
-			IPFSUtils.login(uid);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+		try {
+			future.get();
+		} catch (InterruptedException e) {
+			throw new HiveException(e.getMessage());
+		} catch (ExecutionException e) {
 			throw new HiveException(e.getMessage());
 		}
 	}
@@ -113,7 +109,7 @@ public final class IPFSClient extends Client {
 	@Override
 	public synchronized void logout() throws HiveException {
 		clientInstance = null;
-		parameter.setUid(null);
+		ipfsHelper.logout();
 	}
 
 	@Override
@@ -133,12 +129,24 @@ public final class IPFSClient extends Client {
 		if (callback == null)
 			callback = new NullCallback<Client.Info>();
 
-		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
-		Unirest.get(url)
-			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
-			.queryString(IPFSUtils.UID, parameter.getUid())
-			.queryString(IPFSUtils.PATH, "/")
-			.asJsonAsync(new GetClientInfoCallback(future, callback));
+		Callback<Client.Info> finalCallback = callback;
+		ipfsHelper.checkValid().thenCompose(status -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("createDirectory failed"));
+					return null;
+				}
+
+				String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
+				Unirest.get(url)
+					.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
+					.queryString(IPFSUtils.UID, ipfsHelper.getIpfsEntry().getUid())
+					.queryString(IPFSUtils.PATH, "/")
+					.asJsonAsync(new GetClientInfoCallback(future, finalCallback));
+
+				return future;
+			});
+		});
 
 		return future;
 	}
@@ -158,17 +166,18 @@ public final class IPFSClient extends Client {
 		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
 		Unirest.get(url)
 			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
-			.queryString(IPFSUtils.UID, parameter.getUid())
+			.queryString(IPFSUtils.UID, ipfsHelper.getIpfsEntry().getUid())
 			.queryString(IPFSUtils.PATH, "/")
 			.asJsonAsync(new GetDriveCallback(future, callback));
 
 		return future;
 	}
 
-	private void storeUid(final String uid) {
+	private static void storeUid(final String uid) {
 		BufferedReader bufferedReader = null;
 		BufferedWriter writer = null;
 		try {
+			File ipfsConfig = new File(ipfsHelper.getIpfsEntry().getDataPath(), IPFSUtils.CONFIG);
 			InputStreamReader reader = new InputStreamReader(new FileInputStream(ipfsConfig));
 			bufferedReader = new BufferedReader(reader);
 			String line;
@@ -241,9 +250,10 @@ public final class IPFSClient extends Client {
 		}
 	}
 	
-	private String getUid() {
+	private static String getUid() {
 		BufferedReader bufferedReader = null;
 		try {
+			File ipfsConfig = new File(ipfsHelper.getIpfsEntry().getDataPath(), IPFSUtils.CONFIG);
 			InputStreamReader reader = new InputStreamReader(new FileInputStream(ipfsConfig));
 			bufferedReader = new BufferedReader(reader);
 			String line;
@@ -298,7 +308,7 @@ public final class IPFSClient extends Client {
 				return;
 			}
 
-			clientInfo = new Client.Info(parameter.getUid());
+			clientInfo = new Client.Info(ipfsHelper.getIpfsEntry().getUid());
 			this.callback.onSuccess(clientInfo);
 			future.complete(clientInfo);
 		}
@@ -332,7 +342,7 @@ public final class IPFSClient extends Client {
 				return;
 			}
 
-			Drive.Info info = new Drive.Info(parameter.getUid());
+			Drive.Info info = new Drive.Info(ipfsHelper.getIpfsEntry().getUid());
 			IPFSDrive drive = new IPFSDrive(info);
 			this.callback.onSuccess(drive);
 			future.complete(drive);

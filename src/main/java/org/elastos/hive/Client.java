@@ -64,7 +64,7 @@ public abstract class Client implements ResourceItem<Client.Info> {
 		}
 	}
 
-	public static <T> Client createInstance(Parameter<T> parameter) {
+	public static <T> Client createInstance(Parameter<T> parameter) throws HiveException {
 		if (parameter == null)
 			return null;
 

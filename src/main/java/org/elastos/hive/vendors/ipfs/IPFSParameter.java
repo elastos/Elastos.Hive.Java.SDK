@@ -5,23 +5,13 @@ import org.elastos.hive.NullEntry;
 import org.elastos.hive.Parameter;
 
 public class IPFSParameter implements Parameter<NullEntry> {
-	private String uid;
-	private final String dataPath;
-	public IPFSParameter(String dataPath, String uid) {
-		this.dataPath = dataPath;
-		this.uid = uid;
+	private final IPFSEntry ipfsEntry;
+	public IPFSParameter(String uid, String[] rpcAddrs, String dataPath) {
+		ipfsEntry = new IPFSEntry(uid, rpcAddrs, dataPath);
 	}
 
-	String getUid() {
-		return uid;
-	}
-	
-	void setUid(String uid) {
-		this.uid = uid;
-	}
-
-	String getDataPath() {
-		return this.dataPath;
+	IPFSEntry getIpfsEntry() {
+		return ipfsEntry;
 	}
 
 	@Override
