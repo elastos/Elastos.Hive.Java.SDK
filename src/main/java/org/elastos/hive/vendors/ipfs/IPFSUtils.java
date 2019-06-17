@@ -1,98 +1,28 @@
 package org.elastos.hive.vendors.ipfs;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import org.elastos.hive.HiveException;
 import org.elastos.hive.Status;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 class IPFSUtils {
-	static String BASEURL           = null;
 	static final String CONFIG      = "ipfs.json";
 	static final String LASTUID     = "last_uid";
 	static final String UIDS        = "uids";
 	static final String URLFORMAT   = "http://%s:9095/api/v0/";
-	static final String PREFIX      = "/ipfs/";
-	static final String CONTENTTYPE = "Content-Type";
-	static final String TYPE_Json   = "application/json";
-	static final String UID         = "uid";
-	static final String HASH        = "hash";
-	static final String PATH        = "path";
-	static final String SOURCE      = "source";
-	static final String DEST        = "dest";
 
-	private static final String[] IPFSIPS = {
-			"52.83.159.189",
-			"52.83.119.110",
-			"3.16.202.140",
-			"18.217.147.205",
-			"18.219.53.133"
-	};
-
-	//if uid = null, use "uid/new" to get a new one and check, otherwise use stat to check. 
-	static String initialize(String uid) throws HiveException {
+	static Status mkdir(IPFSHelper ipfsHelper, String path) {
 		try {
-			boolean valid = false;
-			if (uid == null) {
-				for (int i = 0; i < IPFSIPS.length; i++) {
-					BASEURL = String.format(URLFORMAT, IPFSIPS[i]);
-					uid = getNewUid(IPFSIPS[i]);
-					if (uid != null) {
-						valid = true;
-						break;
-					}
-				}
-			}
-			else {
-				for (int i = 0; i < IPFSIPS.length; i++) {
-					BASEURL = String.format(URLFORMAT, IPFSIPS[i]);
-					if (stat(uid, "/") != null) {
-						valid = true;
-						break;
-					}
-				}
-			}
-
-			if (!valid) {
-				throw new HiveException("The ipfs' server are invalid.");
-			}
-
-			return uid;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new HiveException("Login failed");
-		}
-	}
-	
-	static void login(String uid) throws HiveException {
-		try {
-			String homeHash = getHomeHash();
-			Unirest.get(BASEURL + "uid/login")
-				.header(CONTENTTYPE, TYPE_Json)
-				.queryString(UID, uid)
-				.queryString(HASH, homeHash)
-				.asJson();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			throw new HiveException("Login failed");
-		}
-	}
-
-	static Status mkdir(String uid, String path) {
-		try {
-			String url = String.format("%s%s", BASEURL, "files/mkdir");
+			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.MKDIR);
 			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(CONTENTTYPE, TYPE_Json)
-				.queryString(UID, uid)
-				.queryString(PATH, path)
+				.header(IPFSURL.ContentType, IPFSURL.Json)
+				.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
+				.queryString(IPFSURL.PATH, path)
 				.queryString("parents", "false")
 				.asJson();
 
@@ -106,13 +36,13 @@ class IPFSUtils {
 		return new Status(0);
 	}
 
-	static Status rm(String uid, String path) {
+	static Status rm(IPFSHelper ipfsHelper, String path) {
 		try {
-			String url = String.format("%s%s", BASEURL, "files/rm");
+			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.RM);
 			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(CONTENTTYPE, TYPE_Json)
-				.queryString(UID, uid)
-				.queryString(PATH, path)
+				.header(IPFSURL.ContentType, IPFSURL.Json)
+				.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
+				.queryString(IPFSURL.PATH, path)
 				.queryString("recursive", "true")
 				.asJson();
 
@@ -126,14 +56,14 @@ class IPFSUtils {
 		return new Status(0);
 	}
 
-	static Status createEmptyFile(String uid, String path) {
+	static Status createEmptyFile(IPFSHelper ipfsHelper, String path) {
 		try {
-			String url = String.format("%s%s", BASEURL, "files/write");
+			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.WRITE);
 			String type = String.format("multipart/form-data; boundary=%s", UUID.randomUUID().toString());
 			HttpResponse<JsonNode> response = Unirest.post(url)
-				.header(CONTENTTYPE, type)
-				.queryString(UID, uid)
-				.queryString(PATH, path)
+				.header(IPFSURL.ContentType, type)
+				.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
+				.queryString(IPFSURL.PATH, path)
 				.queryString("create", "true")
 				.asJson();
 
@@ -147,13 +77,13 @@ class IPFSUtils {
 		return new Status(0);
 	}
 
-	static String stat(String uid, String path) {
+	static String stat(IPFSHelper ipfsHelper, String path) {
 		try {
-			String url = String.format("%s%s", BASEURL, "files/stat");
+			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.STAT);
 			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(CONTENTTYPE, TYPE_Json)
-				.queryString(UID, uid)
-				.queryString(PATH, path)
+				.header(IPFSURL.ContentType, IPFSURL.Json)
+				.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
+				.queryString(IPFSURL.PATH, path)
 				.asJson();
 			if (response.getStatus() == 200) {
 				return response.getBody().getObject().getString("Hash");
@@ -165,26 +95,26 @@ class IPFSUtils {
 		return null;
 	}
 
-	static Status copyTo(String uid, String hash, String newPath) {
-		return copyAndMove(uid, hash, newPath, "files/cp");
+	static Status copyTo(IPFSHelper ipfsHelper, String hash, String newPath) {
+		return copyAndMove(ipfsHelper, hash, newPath, IPFSMethod.CP);
 	}
 
-	static Status moveTo(String uid, String hash, String newPath) {
-		return copyAndMove(uid, hash, newPath, "files/mv");
+	static Status moveTo(IPFSHelper ipfsHelper, String hash, String newPath) {
+		return copyAndMove(ipfsHelper, hash, newPath, IPFSMethod.MV);
 	}
 
-	private static Status copyAndMove(String uid, String hash, String newPath, String operator) {
+	private static Status copyAndMove(IPFSHelper ipfsHelper, String hash, String newPath, String operator) {
 		try {
-			String url = String.format("%s%s", BASEURL, operator);
-			String finalHash = PREFIX + hash;
-			if (operator.equals("files/mv")) {
+			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), operator);
+			String finalHash = IPFSURL.PREFIX + hash;
+			if (operator.equals(IPFSMethod.MV)) {
 				finalHash = hash;
 			}
 			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(CONTENTTYPE, TYPE_Json)
-				.queryString(UID, uid)
-				.queryString(SOURCE, finalHash)
-				.queryString(DEST, newPath)
+				.header(IPFSURL.ContentType, IPFSURL.Json)
+				.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
+				.queryString(IPFSURL.SOURCE, finalHash)
+				.queryString(IPFSURL.DEST, newPath)
 				.asJson();
 
 			if (response.getStatus() == 200) {
@@ -197,61 +127,13 @@ class IPFSUtils {
 		return new Status(0);
 	}
 
-	static String getHomeHash() throws HiveException {
-		String url = BASEURL + "name/resolve";
+	static boolean isFolder(IPFSHelper ipfsHelper, String path) throws HiveException {
 		try {
-			HttpResponse<JsonNode> json = Unirest.get(url).header(CONTENTTYPE, TYPE_Json).asJson();
-			return json.getBody().getObject().getString("Path");
-		} catch (UnirestException e) {
-			e.printStackTrace();
-			throw new HiveException("Get home hash failed.");
-		}
-	}
-
-	private static String getNewUid(String ip) {
-		String url = BASEURL + "uid/new";
-		try {
-			HttpResponse<JsonNode> json = Unirest.get(url).header(CONTENTTYPE, TYPE_Json).asJson();
-			return json.getBody().getObject().getString("UID");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	static ArrayList<String> getNameList(String parentPath, JSONObject baseJson) {
-		JSONArray entries = null;
-		try {
-			entries = baseJson.getJSONArray("Entries");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		int len = 0;
-		if (entries != null) {
-			len = entries.length();
-		}
-
-		ArrayList<String> nameList = new ArrayList<String>(len);
-		if (len > 0) {
-			for (int i = 0; i < len; i++) {
-				JSONObject itemJson = entries.getJSONObject(i);
-				String name = itemJson.getString("Name");
-				nameList.add(String.format("%s/%s", parentPath, name));
-			}
-		}
-
-		return nameList;
-	}
-	
-	static boolean isFolder(String uid, String path) throws HiveException {
-		try {
-			String url = String.format("%s%s", BASEURL, "files/stat");
+			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.STAT);
 			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(CONTENTTYPE, TYPE_Json)
-				.queryString(UID, uid)
-				.queryString(PATH, path)
+				.header(IPFSURL.ContentType, IPFSURL.Json)
+				.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
+				.queryString(IPFSURL.PATH, path)
 				.asJson();
 			if (response.getStatus() == 200) {
 				JSONObject jsonObject = response.getBody().getObject();

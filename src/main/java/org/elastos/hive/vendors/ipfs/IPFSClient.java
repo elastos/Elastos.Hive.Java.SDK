@@ -64,8 +64,15 @@ public final class IPFSClient extends Client {
 					}
 					else {
 						String uid = getUid();
+						if (uid == null) {
+							//uid/new a new uid.
+							uid = getNewUid();
+						}
+
 						if (uid != null) {
 							entry.setUid(uid);
+							//Store the new uid
+							storeUid(entry.getUid());
 						}
 					}
 				} catch (Exception e) {
@@ -133,15 +140,15 @@ public final class IPFSClient extends Client {
 		ipfsHelper.checkValid().thenCompose(status -> {
 			return CompletableFuture.supplyAsync(() -> {
 				if (status.getStatus() == 0) {
-					future.completeExceptionally(new HiveException("createDirectory failed"));
+					future.completeExceptionally(new HiveException("getInfo failed"));
 					return null;
 				}
 
-				String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
+				String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.STAT);
 				Unirest.get(url)
-					.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
-					.queryString(IPFSUtils.UID, ipfsHelper.getIpfsEntry().getUid())
-					.queryString(IPFSUtils.PATH, "/")
+					.header(IPFSURL.ContentType, IPFSURL.Json)
+					.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
+					.queryString(IPFSURL.PATH, "/")
 					.asJsonAsync(new GetClientInfoCallback(future, finalCallback));
 
 				return future;
@@ -163,14 +170,48 @@ public final class IPFSClient extends Client {
 		if (callback == null)
 			callback = new NullCallback<Drive>();
 
-		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
-		Unirest.get(url)
-			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
-			.queryString(IPFSUtils.UID, ipfsHelper.getIpfsEntry().getUid())
-			.queryString(IPFSUtils.PATH, "/")
-			.asJsonAsync(new GetDriveCallback(future, callback));
+		Callback<Drive> finalCallback = callback;
+		ipfsHelper.checkValid().thenCompose(status -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("getDefaultDrive failed"));
+					return null;
+				}
+
+				String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.STAT);
+				Unirest.get(url)
+					.header(IPFSURL.ContentType, IPFSURL.Json)
+					.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
+					.queryString(IPFSURL.PATH, "/")
+					.asJsonAsync(new GetDriveCallback(future, finalCallback));
+
+				return future;
+			});
+		});
 
 		return future;
+	}
+
+	private static String getNewUid() throws HiveException {
+		String[] addrs = ipfsHelper.getIpfsEntry().getRpcIPAddrs();
+		if (addrs != null) {
+			for (int i = 0; i < addrs.length; i++) {
+				String url = String.format(IPFSURL.URLFORMAT, addrs[i]) + IPFSMethod.NEW;
+				try {
+					HttpResponse<JsonNode> json = Unirest.get(url)
+							.header(IPFSURL.ContentType, IPFSURL.Json)
+							.asJson();
+					if (json.getStatus() == 200) {
+						ipfsHelper.setValidAddress(addrs[i]);
+						return json.getBody().getObject().getString("UID");
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		throw new HiveException("The input addresses are all invalid.");
 	}
 
 	private static void storeUid(final String uid) {
@@ -203,7 +244,7 @@ public final class IPFSClient extends Client {
 			if (!config.has(uids)) {
 				uidArray = new JSONArray();
 				JSONObject newUid = new JSONObject();
-				newUid.put(IPFSUtils.UID, uid);
+				newUid.put(IPFSURL.UID, uid);
 				uidArray.put(newUid);
 				config.put(uids, uidArray);
 			}
@@ -212,7 +253,8 @@ public final class IPFSClient extends Client {
 				Iterator<Object> values = uidArray.iterator();
 				boolean has = false;
 				while (values.hasNext()) {
-					if (uid.equals((String) values.next())) {
+					JSONObject json = (JSONObject) values.next();
+					if (uid.equals((String) json.getString(IPFSURL.UID))) {
 						has = true;
 						break;
 					}
@@ -220,12 +262,12 @@ public final class IPFSClient extends Client {
 
 				if (!has) {
 					JSONObject newUid = new JSONObject();
-					newUid.put(IPFSUtils.UID, uid);
+					newUid.put(IPFSURL.UID, uid);
 					uidArray.put(newUid);
 					config.put(uids, uidArray);
 				}
 			}
-			
+
 			writer = new BufferedWriter(new FileWriter(ipfsConfig));
 			writer.write(config.toString());
 		} catch (IOException e) {
@@ -249,7 +291,7 @@ public final class IPFSClient extends Client {
 			}
 		}
 	}
-	
+
 	private static String getUid() {
 		BufferedReader bufferedReader = null;
 		try {
@@ -283,10 +325,10 @@ public final class IPFSClient extends Client {
 				}
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	private class GetClientInfoCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<Client.Info> future;
 		private final Callback<Client.Info> callback;
@@ -320,7 +362,7 @@ public final class IPFSClient extends Client {
 			future.completeExceptionally(e);
 		}
 	}
-	
+
 	private class GetDriveCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<Drive> future;
 		private final Callback<Drive> callback;
@@ -343,7 +385,7 @@ public final class IPFSClient extends Client {
 			}
 
 			Drive.Info info = new Drive.Info(ipfsHelper.getIpfsEntry().getUid());
-			IPFSDrive drive = new IPFSDrive(info);
+			IPFSDrive drive = new IPFSDrive(info, ipfsHelper);
 			this.callback.onSuccess(drive);
 			future.complete(drive);
 		}

@@ -15,6 +15,7 @@ class IPFSHelper {
 	private final IPFSEntry ipfsEntry;
 	private boolean isValid = false;
 	private String BASEURL  = null;
+	private String validAddress;
 
 	IPFSHelper(IPFSEntry ipfsEntry) {
 		this.ipfsEntry = ipfsEntry;
@@ -23,7 +24,7 @@ class IPFSHelper {
 	IPFSEntry getIpfsEntry() {
 		return ipfsEntry;
 	}
-	
+
 	CompletableFuture<Status> loginAsync() {
 		return loginAsync(new NullCallback<Status>());
 	}
@@ -31,13 +32,21 @@ class IPFSHelper {
 	CompletableFuture<Status> loginAsync(Callback<Status> callback) {
 		return checkValid(callback);
 	}
-	
+
 	void logout() {
 		isValid = false;
 	}
-	
+
 	String getBaseUrl() {
 		return BASEURL;
+	}
+
+	void setStatus(boolean invalid) {
+		isValid = invalid;
+	}
+
+	void setValidAddress(String validAddress) {
+		this.validAddress = validAddress;
 	}
 
 	CompletableFuture<Status> checkValid() {
@@ -50,27 +59,34 @@ class IPFSHelper {
 			Status status = new Status(1);
 		    callback.onSuccess(status);
 		    future.complete(status);
-			return future;			
+			return future;
 		}
 
 		//get home hash and login
 		CompletableFuture<Status> future = CompletableFuture.supplyAsync(() -> {
 			Status status = null;
-			if (isValid) {
-				status = new Status(1);
-			    callback.onSuccess(status);
-				return status;			
-			}
-			
 			try {
 				String homeHash = null;
-				String[] addrs = ipfsEntry.getRpcIPAddrs();
-				for (int i = 0; i < addrs.length; i++) {
-					String url = String.format(IPFSURL.URLFORMAT, addrs[i]);
+				//Using the older validAddress try to get the home hash.
+				if (validAddress != null && !validAddress.isEmpty()) {
+					String url = String.format(IPFSURL.URLFORMAT, validAddress);
 					homeHash = getHomeHash(url);
-					if (homeHash != null && !homeHash.isEmpty()) {
-						BASEURL = url;
-						break;
+					BASEURL = url;
+					if (homeHash == null) {
+						validAddress = null;
+					}
+				}
+
+				if (homeHash == null) {
+					String[] addrs = ipfsEntry.getRpcIPAddrs();
+					for (int i = 0; i < addrs.length; i++) {
+						String url = String.format(IPFSURL.URLFORMAT, addrs[i]);
+						homeHash = getHomeHash(url);
+						if (homeHash != null && !homeHash.isEmpty()) {
+							BASEURL = url;
+							validAddress = addrs[i];
+							break;
+						}
 					}
 				}
 
@@ -79,7 +95,7 @@ class IPFSHelper {
 				    callback.onSuccess(status);
 					return status;
 				}
-				
+
 				Unirest.get(BASEURL + IPFSMethod.LOGIN)
 					.header(IPFSURL.ContentType, IPFSURL.Json)
 					.queryString(IPFSURL.UID, ipfsEntry.getUid())
@@ -93,14 +109,14 @@ class IPFSHelper {
 
 			status = new Status(0);
 		    callback.onSuccess(status);
-			return status;	
+			return status;
 		});
 
 		return future;
 	}
-	
+
 	private String getHomeHash(String baseUrl) {
-		String url = baseUrl + "name/resolve";
+		String url = baseUrl + IPFSMethod.NAMERESOLVE;
 		try {
 			HttpResponse<JsonNode> json = Unirest.get(url)
 					.header(IPFSURL.ContentType, IPFSURL.Json)
@@ -109,7 +125,7 @@ class IPFSHelper {
 		} catch (UnirestException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 }

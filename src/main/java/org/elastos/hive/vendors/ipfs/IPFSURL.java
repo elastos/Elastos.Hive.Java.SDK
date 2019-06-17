@@ -4,6 +4,7 @@ class IPFSURL {
 	static final String URLFORMAT       = "http://%s:9095/api/v0/";
 	static final String ContentType		= "Content-Type";
 	static final String Json			= "application/json";
+	static final String PREFIX          = "/ipfs/";
 	static final String UID         	= "uid";
 	static final String HASH        	= "hash";
 	static final String PATH        	= "path";

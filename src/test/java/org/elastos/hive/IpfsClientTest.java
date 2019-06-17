@@ -31,7 +31,7 @@ public class IpfsClientTest {
 			assertNotNull(drive);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
-			fail("getInfo failed");
+			fail("testGetDefaultDrive failed");
 		}
 	}
 

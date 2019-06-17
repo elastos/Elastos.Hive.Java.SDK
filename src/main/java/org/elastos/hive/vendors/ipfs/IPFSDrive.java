@@ -20,9 +20,11 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 final class IPFSDrive extends Drive{
 	private volatile Drive.Info driveInfo;
+	private IPFSHelper ipfsHelper;
 
-	IPFSDrive(Drive.Info driveInfo) {
+	IPFSDrive(Drive.Info driveInfo, IPFSHelper ipfsHelper) {
 		this.driveInfo = driveInfo;
+		this.ipfsHelper = ipfsHelper;
 	}
 
 	@Override
@@ -47,12 +49,24 @@ final class IPFSDrive extends Drive{
 		if (callback == null)
 			callback = new NullCallback<Info>();
 
-		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
-		Unirest.get(url)
-			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
-			.queryString(IPFSUtils.UID, getId())
-			.queryString(IPFSUtils.PATH, "/")
-			.asJsonAsync(new GetInfoCallback(future, callback));
+		Callback<Info> finalCallback = callback;
+		ipfsHelper.checkValid().thenCompose(status -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("getInfo failed"));
+					return null;
+				}
+
+				String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.STAT);
+				Unirest.get(url)
+					.header(IPFSURL.ContentType, IPFSURL.Json)
+					.queryString(IPFSURL.UID, getId())
+					.queryString(IPFSURL.PATH, "/")
+					.asJsonAsync(new GetInfoCallback(future, finalCallback));
+
+				return future;
+			});
+		});
 
 		return future;
 	}
@@ -76,37 +90,35 @@ final class IPFSDrive extends Drive{
 			return future;
 		}
 
-		//mkdir
-		CompletableFuture<Status> createStatus = CompletableFuture.supplyAsync(() -> {
-			return IPFSUtils.mkdir(getId(), path);
-		});
-
-		//using stat to get the path's hash
-		CompletableFuture<String> hashFuture = createStatus.thenCompose(status -> {
+		final Callback<Directory> callbackForPublish = callback;
+		ipfsHelper.checkValid().thenCompose(checkStatus -> {
 			return CompletableFuture.supplyAsync(() -> {
+				if (checkStatus.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("createDirectory failed"));
+					return null;
+				}
+
+				//1. mkdir
+				Status status = IPFSUtils.mkdir(ipfsHelper, path);
 				if (status.getStatus() == 0) {
 					future.completeExceptionally(new HiveException("createDirectory failed"));
 					return null;
 				}
 
-				return IPFSUtils.stat(getId(), "/");
-			});
-		});
+				//2. using stat to get the home hash
+				String homeHash = IPFSUtils.stat(ipfsHelper, "/");
 
-		final Callback<Directory> callbackForPublish = callback;
-		//using name/publish to publish the hash
-		hashFuture.thenCompose(hash -> {
-			return CompletableFuture.supplyAsync(() -> {
-				if (hash == null) {
+				if (homeHash == null) {
 					future.completeExceptionally(new HiveException("The stat hash is invalid"));
 					return future;
 				}
 
-				String url = String.format("%s%s", IPFSUtils.BASEURL, "name/publish");
+				//3. using name/publish to publish the hash
+				String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.PUBLISH);
 				Unirest.get(url)
-					.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
-					.queryString(IPFSUtils.UID, getId())
-					.queryString(IPFSUtils.PATH, hash)
+					.header(IPFSURL.ContentType, IPFSURL.Json)
+					.queryString(IPFSURL.UID, getId())
+					.queryString(IPFSURL.PATH, homeHash)
 					.asJsonAsync(new CreateDirectoryCallback(path, future, callbackForPublish));
 
 				return future;
@@ -135,13 +147,25 @@ final class IPFSDrive extends Drive{
 			return future;
 		}
 
-		//stat
-		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
-		Unirest.get(url)
-			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
-			.queryString(IPFSUtils.UID, getId())
-			.queryString(IPFSUtils.PATH, path)
-			.asJsonAsync(new GetDirectoryCallback(path, future, callback));
+		Callback<Directory> finalCallback = callback;
+		ipfsHelper.checkValid().thenCompose(status -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("getDirectory failed"));
+					return null;
+				}
+
+				//stat
+				String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.STAT);
+				Unirest.get(url)
+					.header(IPFSURL.ContentType, IPFSURL.Json)
+					.queryString(IPFSURL.UID, getId())
+					.queryString(IPFSURL.PATH, path)
+					.asJsonAsync(new GetDirectoryCallback(path, future, finalCallback));
+
+				return future;
+			});
+		});
 
 		return future;
 	}
@@ -165,38 +189,36 @@ final class IPFSDrive extends Drive{
 			return future;
 		}
 
-		//create file
-		CompletableFuture<Status> createStatus = CompletableFuture.supplyAsync(() -> {
-			return IPFSUtils.createEmptyFile(getId(), path);
-		});
-
-		//using stat to get the path's hash
-		CompletableFuture<String> hashFuture = createStatus.thenCompose(status -> {
+		Callback<File> finalCallback = callback;
+		ipfsHelper.checkValid().thenCompose(checkStatus -> {
 			return CompletableFuture.supplyAsync(() -> {
+				if (checkStatus.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("createFile failed"));
+					return null;
+				}
+
+				//1. create file
+				Status status = IPFSUtils.createEmptyFile(ipfsHelper, path);
 				if (status.getStatus() == 0) {
 					future.completeExceptionally(new HiveException("Create file failed."));
 					return null;
 				}
 
-				return IPFSUtils.stat(getId(), "/");
-			});
-		});
+				//2. using stat to get the home hash
+				String homeHash = IPFSUtils.stat(ipfsHelper, "/");
 
-		final Callback<File> callbackForPublish = callback;
-		//using name/publish to publish the hash
-		hashFuture.thenCompose(hash -> {
-			return CompletableFuture.supplyAsync(() -> {
-				if (hash == null) {
+				if (homeHash == null) {
 					future.completeExceptionally(new HiveException("The stat hash is invalid"));
 					return future;
 				}
 
-				String url = String.format("%s%s", IPFSUtils.BASEURL, "name/publish");
+				//3. using name/publish to publish the hash
+				String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.PUBLISH);
 				Unirest.get(url)
-					.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
-					.queryString(IPFSUtils.UID, getId())
-					.queryString(IPFSUtils.PATH, hash)
-					.asJsonAsync(new CreateFileCallback(path, future, callbackForPublish));
+					.header(IPFSURL.ContentType, IPFSURL.Json)
+					.queryString(IPFSURL.UID, getId())
+					.queryString(IPFSURL.PATH, homeHash)
+					.asJsonAsync(new CreateFileCallback(path, future, finalCallback));
 
 				return future;
 			});
@@ -224,12 +246,24 @@ final class IPFSDrive extends Drive{
 			return future;
 		}
 
-		String url = String.format("%s%s", IPFSUtils.BASEURL, "files/stat");
-		Unirest.get(url)
-			.header(IPFSUtils.CONTENTTYPE, IPFSUtils.TYPE_Json)
-			.queryString(IPFSUtils.UID, getId())
-			.queryString(IPFSUtils.PATH, path)
-			.asJsonAsync(new GetFileCallback(path, future, callback));
+		Callback<File> finalCallback = callback;
+		ipfsHelper.checkValid().thenCompose(status -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("getFile failed"));
+					return null;
+				}
+
+				String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.STAT);
+				Unirest.get(url)
+					.header(IPFSURL.ContentType, IPFSURL.Json)
+					.queryString(IPFSURL.UID, getId())
+					.queryString(IPFSURL.PATH, path)
+					.asJsonAsync(new GetFileCallback(path, future, finalCallback));
+
+				return future;
+			});
+		});
 
 		return future;
 	}
@@ -310,7 +344,7 @@ final class IPFSDrive extends Drive{
 			}
 
 			Directory.Info dirInfo = new Directory.Info(getId());
-			IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo);
+			IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, ipfsHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}
@@ -355,7 +389,7 @@ final class IPFSDrive extends Drive{
 			}
 
 			Directory.Info dirInfo = new Directory.Info(getId());
-			IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo);
+			IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, ipfsHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}
@@ -391,7 +425,7 @@ final class IPFSDrive extends Drive{
 			}
 
 			File.Info fileInfo = new File.Info(getId());
-			IPFSFile file = new IPFSFile(pathName, fileInfo);
+			IPFSFile file = new IPFSFile(pathName, fileInfo, ipfsHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
 		}
@@ -436,7 +470,7 @@ final class IPFSDrive extends Drive{
 			}
 
 			File.Info fileInfo = new File.Info(getId());
-			IPFSFile file = new IPFSFile(pathName, fileInfo);
+			IPFSFile file = new IPFSFile(pathName, fileInfo, ipfsHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
 		}
