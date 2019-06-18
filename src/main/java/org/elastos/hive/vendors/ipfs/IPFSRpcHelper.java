@@ -2,22 +2,101 @@ package org.elastos.hive.vendors.ipfs;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.hive.AuthHelper;
+import org.elastos.hive.AuthToken;
+import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
-import org.elastos.hive.NullCallback;
+import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.Status;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+class IPFSRpcHelper implements AuthHelper {
+	private final IPFSEntry entry;
 
-class IPFSHelper {
+	IPFSRpcHelper(IPFSEntry entry) {
+		this.entry = entry;
+	}
+
+	@Override
+	public AuthToken getToken() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Status> loginAsync(Authenticator authenticator) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Status> loginAsync(Authenticator authenticator, Callback<Status> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Status> logoutAsync() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Status> logoutAsync(Callback<Status> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Status> checkExpired() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Status> checkExpired(Callback<Status> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	String getBaseUrl() {
+		return null;
+	}
+
+/*
+   String getHomeHash(String baseUrl) {
+
+		String url = baseUrl + IPFSMethod.NAMERESOLVE;
+		try {
+			HttpResponse<JsonNode> json = Unirest.get(url)
+					.header(IPFSURL.ContentType, IPFSURL.Json)
+					.asJson();
+			return json.getBody().getObject().getString("Path");
+		} catch (UnirestException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	private String getBaseUrl() {
+		return null;
+	}
+
+	private String getRootHash() {
+		String url = getBaseUrl() + IPFSMethod.NAMERESOLVE;
+		return null;
+	}
+*/
+}
+
+/*
+class IPFSRpcHelper implements AuthHelper {
 	private final IPFSEntry ipfsEntry;
 	private boolean isValid = false;
 	private String BASEURL  = null;
 	private String validAddress;
 
-	IPFSHelper(IPFSEntry ipfsEntry) {
+	IPFSRpcHelper(IPFSEntry ipfsEntry) {
 		this.ipfsEntry = ipfsEntry;
 	}
 
@@ -129,3 +208,4 @@ class IPFSHelper {
 		return null;
 	}
 }
+*/

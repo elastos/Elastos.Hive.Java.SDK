@@ -20,4 +20,10 @@ public class OneDriveParameter implements Parameter<OAuthEntry> {
 	public OAuthEntry getAuthEntry() {
 		return authEntry;
 	}
+
+	@Override
+	public String getKeyStorePath() {
+		// TODO
+		return null;
+	}
 }
