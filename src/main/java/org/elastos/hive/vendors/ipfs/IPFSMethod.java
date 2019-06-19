@@ -8,8 +8,9 @@ class IPFSMethod {
 	static final String CP  		= "files/cp";
 	static final String MV  		= "files/mv";
 	static final String LS  		= "files/ls";
+	static final String READ                = "files/read";
 	static final String WRITE  		= "files/write";
 	static final String STAT		= "files/stat";
 	static final String PUBLISH		= "name/publish";
-	static final String NAMERESOLVE = "name/resolve";
+	static final String NAMERESOLVE         = "name/resolve";
 }

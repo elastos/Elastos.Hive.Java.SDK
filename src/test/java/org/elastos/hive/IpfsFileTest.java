@@ -5,6 +5,9 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.AfterClass;
@@ -128,6 +131,42 @@ public class IpfsFileTest {
 		finally {
 			try {
 				parentDir.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	@Test public void testFileWriteAndRead() {
+		File file = null;
+		try {
+			Directory root = drive.getRootDir().get();
+			assertNotNull(root);
+			
+			//1. create a file
+			String filePath = "testFileWriteAndRead" + System.currentTimeMillis();
+			file = root.createFile(filePath).get();
+			assertNotNull(file);
+			
+			//2. write data
+			String data = filePath;
+			InputStream input = new ByteArrayInputStream(data.getBytes());
+			Status status = file.write(input).get();
+			assertEquals(1, status.getStatus());
+			
+			//3. read the file and check
+			ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+			status = file.read(arrayOutputStream).get();
+			assertEquals(1, status.getStatus());
+			assertEquals(data, new String(arrayOutputStream.toByteArray()));
+			arrayOutputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("testFileWriteAndRead failed");
+		}
+		finally {
+			try {
+				file.deleteItem().get();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

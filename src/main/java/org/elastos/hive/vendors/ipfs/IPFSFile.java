@@ -1,5 +1,7 @@
 package org.elastos.hive.vendors.ipfs;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.Callback;
@@ -287,6 +289,74 @@ final class IPFSFile extends File {
 		// TODO Auto-generated method stub
 
 	}
+	
+	@Override
+	public CompletableFuture<Status> read(OutputStream outputStream) {
+		return read(outputStream, new NullCallback<Status>());
+	}
+
+	@Override
+	public CompletableFuture<Status> read(OutputStream outputStream, Callback<Status> callback) {
+		CompletableFuture<Status> future = new CompletableFuture<Status>();
+
+		if (callback == null)
+			callback = new NullCallback<Status>();
+
+		Callback<Status> finalCallback = callback;
+		ipfsHelper.checkValid().thenCompose(status -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("read-stat failed"));
+					return null;
+				}
+
+				String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.READ);
+				Unirest.get(url)
+					.header(IPFSURL.ContentType, IPFSURL.Json)
+					.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
+					.queryString(IPFSURL.PATH, this.pathName)
+					.asStringAsync(new ReadCallback(outputStream, future, finalCallback));
+
+				return future;
+			});
+		});
+
+		return future;
+	}
+
+	@Override
+	public CompletableFuture<Status> write(InputStream inputStream) {
+		return write(inputStream, new NullCallback<Status>());
+	}
+
+	@Override
+	public CompletableFuture<Status> write(InputStream inputStream, Callback<Status> callback) {
+		CompletableFuture<Status> future = new CompletableFuture<Status>();
+
+		if (callback == null)
+			callback = new NullCallback<Status>();
+
+		Callback<Status> finalCallback = callback;
+		ipfsHelper.checkValid().thenCompose(status -> {
+			return CompletableFuture.supplyAsync(() -> {
+				if (status.getStatus() == 0) {
+					future.completeExceptionally(new HiveException("write-stat failed"));
+					return null;
+				}
+
+				String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.WRITE);
+				Unirest.post(url)
+					.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
+					.queryString(IPFSURL.PATH, this.pathName)
+					.field("upload", inputStream, this.pathName)
+					.asJsonAsync(new WriteCallback(future, finalCallback));
+
+				return future;
+			});
+		});
+
+		return future;
+	}
 
 	private class GetFileInfoCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<Info> future;
@@ -409,6 +479,90 @@ final class IPFSFile extends File {
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(ex);
+				future.completeExceptionally(ex);
+				return;
+			}
+
+			Status status = new Status(1);
+			this.callback.onSuccess(status);
+			future.complete(status);
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			HiveException ex = new HiveException(exception.getMessage());
+			this.callback.onError(ex);
+			future.completeExceptionally(ex);
+		}
+	}
+	
+	private class ReadCallback implements com.mashape.unirest.http.async.Callback<String> {
+		private final CompletableFuture<Status> future;
+		private final Callback<Status> callback;
+		private OutputStream outputStream;
+
+		ReadCallback(OutputStream outputStream, CompletableFuture<Status> future, Callback<Status> callback) {
+			this.outputStream = outputStream;
+			this.future = future;
+			this.callback = callback;
+		}
+
+		@Override
+		public void cancelled() {}
+
+		@Override
+		public void completed(HttpResponse<String> response) {
+			if (response.getStatus() != 200) {
+				HiveException e = new HiveException("[Read] Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
+				return;
+			}
+
+			InputStream inputStream = response.getRawBody();
+			int value = 0;
+			try {
+				while ((value = inputStream.read()) != -1) {
+					outputStream.write(value);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				HiveException ex = new HiveException(e.getMessage());
+				this.callback.onError(ex);
+				future.completeExceptionally(ex);
+				return;
+			}
+
+			Status status = new Status(1);
+			this.callback.onSuccess(status);
+			future.complete(status);
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			HiveException ex = new HiveException(exception.getMessage());
+			this.callback.onError(ex);
+			future.completeExceptionally(ex);
+		}
+	}
+	
+	private class WriteCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<Status> future;
+		private final Callback<Status> callback;
+
+		WriteCallback(CompletableFuture<Status> future, Callback<Status> callback) {
+			this.future = future;
+			this.callback = callback;
+		}
+
+		@Override
+		public void cancelled() {}
+
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() != 200) {
+				HiveException ex = new HiveException("[Write] Server Error: " + response.getStatusText());
 				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;

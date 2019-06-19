@@ -64,7 +64,7 @@ class IPFSUtils {
 				.header(IPFSURL.ContentType, type)
 				.queryString(IPFSURL.UID, ipfsHelper.getIpfsEntry().getUid())
 				.queryString(IPFSURL.PATH, path)
-				.queryString("create", "true")
+				.queryString(IPFSURL.CREATE, "true")
 				.asJson();
 
 			if (response.getStatus() == 200) {

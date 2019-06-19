@@ -1,5 +1,7 @@
 package org.elastos.hive.vendors.onedrive;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.AuthHelper;
@@ -370,5 +372,29 @@ final class OneDriveFile extends File {
 			this.callback.onError(e);
 			future.completeExceptionally(e);
 		}
+	}
+
+	@Override
+	public CompletableFuture<Status> read(OutputStream outputStream) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Status> read(OutputStream outputStream, Callback<Status> callback) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Status> write(InputStream inputStream) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Status> write(InputStream inputStream, Callback<Status> callback) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
