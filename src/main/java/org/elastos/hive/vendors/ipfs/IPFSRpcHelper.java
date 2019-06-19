@@ -7,132 +7,65 @@ import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
 import org.elastos.hive.IPFSEntry;
+import org.elastos.hive.NullCallback;
 import org.elastos.hive.Status;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 class IPFSRpcHelper implements AuthHelper {
 	private final IPFSEntry entry;
+	private boolean isValid = false;
+	private String BASEURL  = null;
+	private String validAddress;
 
 	IPFSRpcHelper(IPFSEntry entry) {
 		this.entry = entry;
 	}
+	
+	IPFSEntry getIpfsEntry() {
+		return entry;
+	}
 
 	@Override
 	public AuthToken getToken() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<Status> loginAsync(Authenticator authenticator) {
-		// TODO Auto-generated method stub
-		return null;
+		return loginAsync(authenticator, new NullCallback<Status>());
 	}
 
 	@Override
 	public CompletableFuture<Status> loginAsync(Authenticator authenticator, Callback<Status> callback) {
-		// TODO Auto-generated method stub
-		return null;
+		return checkExpired(callback);
 	}
 
 	@Override
 	public CompletableFuture<Status> logoutAsync() {
-		// TODO Auto-generated method stub
-		return null;
+		return logoutAsync(new NullCallback<Status>());
 	}
 
 	@Override
 	public CompletableFuture<Status> logoutAsync(Callback<Status> callback) {
-		// TODO Auto-generated method stub
-		return null;
+		isValid = false;
+		CompletableFuture<Status> future = new CompletableFuture<Status>();
+		Status status = new Status(1);
+	    callback.onSuccess(status);
+	    future.complete(status);
+		return future;
 	}
 
 	@Override
 	public CompletableFuture<Status> checkExpired() {
-		// TODO Auto-generated method stub
-		return null;
+		return checkExpired(new NullCallback<Status>());
 	}
 
 	@Override
 	public CompletableFuture<Status> checkExpired(Callback<Status> callback) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	String getBaseUrl() {
-		return null;
-	}
-
-/*
-   String getHomeHash(String baseUrl) {
-
-		String url = baseUrl + IPFSMethod.NAMERESOLVE;
-		try {
-			HttpResponse<JsonNode> json = Unirest.get(url)
-					.header(IPFSURL.ContentType, IPFSURL.Json)
-					.asJson();
-			return json.getBody().getObject().getString("Path");
-		} catch (UnirestException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	private String getBaseUrl() {
-		return null;
-	}
-
-	private String getRootHash() {
-		String url = getBaseUrl() + IPFSMethod.NAMERESOLVE;
-		return null;
-	}
-*/
-}
-
-/*
-class IPFSRpcHelper implements AuthHelper {
-	private final IPFSEntry ipfsEntry;
-	private boolean isValid = false;
-	private String BASEURL  = null;
-	private String validAddress;
-
-	IPFSRpcHelper(IPFSEntry ipfsEntry) {
-		this.ipfsEntry = ipfsEntry;
-	}
-
-	IPFSEntry getIpfsEntry() {
-		return ipfsEntry;
-	}
-
-	CompletableFuture<Status> loginAsync() {
-		return loginAsync(new NullCallback<Status>());
-	}
-
-	CompletableFuture<Status> loginAsync(Callback<Status> callback) {
-		return checkValid(callback);
-	}
-
-	void logout() {
-		isValid = false;
-	}
-
-	String getBaseUrl() {
-		return BASEURL;
-	}
-
-	void setStatus(boolean invalid) {
-		isValid = invalid;
-	}
-
-	void setValidAddress(String validAddress) {
-		this.validAddress = validAddress;
-	}
-
-	CompletableFuture<Status> checkValid() {
-		return checkValid(new NullCallback<Status>());
-	}
-
-	CompletableFuture<Status> checkValid(Callback<Status> callback) {
 		if (isValid) {
 			CompletableFuture<Status> future = new CompletableFuture<Status>();
 			Status status = new Status(1);
@@ -157,7 +90,7 @@ class IPFSRpcHelper implements AuthHelper {
 				}
 
 				if (homeHash == null) {
-					String[] addrs = ipfsEntry.getRpcIPAddrs();
+					String[] addrs = entry.getRcpAddrs();
 					for (int i = 0; i < addrs.length; i++) {
 						String url = String.format(IPFSURL.URLFORMAT, addrs[i]);
 						homeHash = getHomeHash(url);
@@ -177,7 +110,7 @@ class IPFSRpcHelper implements AuthHelper {
 
 				Unirest.get(BASEURL + IPFSMethod.LOGIN)
 					.header(IPFSURL.ContentType, IPFSURL.Json)
-					.queryString(IPFSURL.UID, ipfsEntry.getUid())
+					.queryString(IPFSURL.UID, entry.getUid())
 					.queryString(IPFSURL.HASH, homeHash)
 					.asJson();
 
@@ -194,7 +127,19 @@ class IPFSRpcHelper implements AuthHelper {
 		return future;
 	}
 
-	private String getHomeHash(String baseUrl) {
+	String getBaseUrl() {
+		return BASEURL;
+	}
+
+	void setStatus(boolean invalid) {
+		isValid = invalid;
+	}
+
+	void setValidAddress(String validAddress) {
+		this.validAddress = validAddress;
+	}
+	
+   String getHomeHash(String baseUrl) {
 		String url = baseUrl + IPFSMethod.NAMERESOLVE;
 		try {
 			HttpResponse<JsonNode> json = Unirest.get(url)
@@ -208,4 +153,3 @@ class IPFSRpcHelper implements AuthHelper {
 		return null;
 	}
 }
-*/

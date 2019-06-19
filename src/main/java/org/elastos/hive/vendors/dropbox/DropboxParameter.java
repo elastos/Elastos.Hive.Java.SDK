@@ -20,4 +20,10 @@ public class DropboxParameter implements Parameter<OAuthEntry> {
 	public OAuthEntry getAuthEntry() {
 		return authEntry;
 	}
+
+	@Override
+	public String getKeyStorePath() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

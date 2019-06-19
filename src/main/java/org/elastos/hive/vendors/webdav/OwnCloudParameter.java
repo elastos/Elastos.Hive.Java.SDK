@@ -14,4 +14,10 @@ public final class OwnCloudParameter implements Parameter<NullEntry> {
 	public NullEntry getAuthEntry() {
 		return new NullEntry();
 	}
+
+	@Override
+	public String getKeyStorePath() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

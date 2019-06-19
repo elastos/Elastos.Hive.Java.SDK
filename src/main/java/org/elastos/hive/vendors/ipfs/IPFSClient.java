@@ -17,6 +17,7 @@ import org.elastos.hive.Client;
 import org.elastos.hive.Drive;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
+import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
@@ -32,10 +33,11 @@ public final class IPFSClient extends Client {
 	private static Client clientInstance;
 	private static IPFSRpcHelper rpcHelper;
 	private Client.Info clientInfo;
+	private static String keystorePath;
 
 	private IPFSClient(IPFSParameter parameter) {
 		rpcHelper = new IPFSRpcHelper(parameter.getAuthEntry());
-		//TODO: keystorePath
+		keystorePath = parameter.getKeyStorePath();
 	}
 
 	public static Client createInstance(IPFSParameter parameter) throws HiveException {
@@ -43,14 +45,12 @@ public final class IPFSClient extends Client {
 			if (clientInstance == null) {
 				clientInstance = new IPFSClient(parameter);
 
-				/*
 				try {
-					IPFSEntry entry = parameter.getIpfsEntry();
-					String dataPath = entry.getDataPath();
-					if (dataPath == null)
+					IPFSEntry entry = parameter.getAuthEntry();
+					if (keystorePath == null)
 						throw new HiveException("Please input an invalid path to store the IPFS data.");
 
-					File dataFile = new File(dataPath);
+					File dataFile = new File(keystorePath);
 					if (!dataFile.exists()) {
 						dataFile.mkdirs();
 					}
@@ -80,7 +80,6 @@ public final class IPFSClient extends Client {
 				} catch (Exception e) {
 					throw new HiveException(e.getMessage());
 				}
-				*/
 			}
 		} catch (Exception e) {
 			throw new HiveException(e.getMessage());
@@ -95,7 +94,7 @@ public final class IPFSClient extends Client {
 
 	@Override
 	public String getId() {
-		return clientInfo.getUserId();
+		return rpcHelper.getIpfsEntry().getUid();
 	}
 
 	@Override
@@ -191,7 +190,7 @@ public final class IPFSClient extends Client {
 	}
 
 	private static String getNewUid() throws HiveException {
-		String[] addrs = ipfsHelper.getIpfsEntry().getRpcIPAddrs();
+		String[] addrs = rpcHelper.getIpfsEntry().getRcpAddrs();
 		if (addrs != null) {
 			for (int i = 0; i < addrs.length; i++) {
 				String url = String.format(IPFSURL.URLFORMAT, addrs[i]) + IPFSMethod.NEW;
@@ -200,7 +199,7 @@ public final class IPFSClient extends Client {
 							.header(IPFSURL.ContentType, IPFSURL.Json)
 							.asJson();
 					if (json.getStatus() == 200) {
-						ipfsHelper.setValidAddress(addrs[i]);
+						rpcHelper.setValidAddress(addrs[i]);
 						return json.getBody().getObject().getString("UID");
 					}
 				} catch (Exception e) {
@@ -216,7 +215,7 @@ public final class IPFSClient extends Client {
 		BufferedReader bufferedReader = null;
 		BufferedWriter writer = null;
 		try {
-			File ipfsConfig = new File(ipfsHelper.getIpfsEntry().getDataPath(), IPFSUtils.CONFIG);
+			File ipfsConfig = new File(keystorePath, IPFSUtils.CONFIG);
 			InputStreamReader reader = new InputStreamReader(new FileInputStream(ipfsConfig));
 			bufferedReader = new BufferedReader(reader);
 			String line;
@@ -293,7 +292,7 @@ public final class IPFSClient extends Client {
 	private static String getUid() {
 		BufferedReader bufferedReader = null;
 		try {
-			File ipfsConfig = new File(ipfsHelper.getIpfsEntry().getDataPath(), IPFSUtils.CONFIG);
+			File ipfsConfig = new File(keystorePath, IPFSUtils.CONFIG);
 			InputStreamReader reader = new InputStreamReader(new FileInputStream(ipfsConfig));
 			bufferedReader = new BufferedReader(reader);
 			String line;
@@ -348,7 +347,7 @@ public final class IPFSClient extends Client {
 				return;
 			}
 
-			clientInfo = new Client.Info(ipfsHelper.getIpfsEntry().getUid());
+			clientInfo = new Client.Info(rpcHelper.getIpfsEntry().getUid());
 			this.callback.onSuccess(clientInfo);
 			future.complete(clientInfo);
 		}
@@ -382,8 +381,8 @@ public final class IPFSClient extends Client {
 				return;
 			}
 
-			Drive.Info info = new Drive.Info(ipfsHelper.getIpfsEntry().getUid());
-			IPFSDrive drive = new IPFSDrive(info, ipfsHelper);
+			Drive.Info info = new Drive.Info(rpcHelper.getIpfsEntry().getUid());
+			IPFSDrive drive = new IPFSDrive(info, rpcHelper);
 			this.callback.onSuccess(drive);
 			future.complete(drive);
 		}

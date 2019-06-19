@@ -16,7 +16,7 @@ class IPFSUtils {
 	static final String UIDS        = "uids";
 	static final String URLFORMAT   = "http://%s:9095/api/v0/";
 
-	static Status mkdir(IPFSHelper ipfsHelper, String path) {
+	static Status mkdir(IPFSRpcHelper ipfsHelper, String path) {
 		try {
 			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.MKDIR);
 			HttpResponse<JsonNode> response = Unirest.get(url)
@@ -36,7 +36,7 @@ class IPFSUtils {
 		return new Status(0);
 	}
 
-	static Status rm(IPFSHelper ipfsHelper, String path) {
+	static Status rm(IPFSRpcHelper ipfsHelper, String path) {
 		try {
 			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.RM);
 			HttpResponse<JsonNode> response = Unirest.get(url)
@@ -56,7 +56,7 @@ class IPFSUtils {
 		return new Status(0);
 	}
 
-	static Status createEmptyFile(IPFSHelper ipfsHelper, String path) {
+	static Status createEmptyFile(IPFSRpcHelper ipfsHelper, String path) {
 		try {
 			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.WRITE);
 			String type = String.format("multipart/form-data; boundary=%s", UUID.randomUUID().toString());
@@ -77,7 +77,7 @@ class IPFSUtils {
 		return new Status(0);
 	}
 
-	static String stat(IPFSHelper ipfsHelper, String path) {
+	static String stat(IPFSRpcHelper ipfsHelper, String path) {
 		try {
 			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.STAT);
 			HttpResponse<JsonNode> response = Unirest.get(url)
@@ -95,15 +95,15 @@ class IPFSUtils {
 		return null;
 	}
 
-	static Status copyTo(IPFSHelper ipfsHelper, String hash, String newPath) {
+	static Status copyTo(IPFSRpcHelper ipfsHelper, String hash, String newPath) {
 		return copyAndMove(ipfsHelper, hash, newPath, IPFSMethod.CP);
 	}
 
-	static Status moveTo(IPFSHelper ipfsHelper, String hash, String newPath) {
+	static Status moveTo(IPFSRpcHelper ipfsHelper, String hash, String newPath) {
 		return copyAndMove(ipfsHelper, hash, newPath, IPFSMethod.MV);
 	}
 
-	private static Status copyAndMove(IPFSHelper ipfsHelper, String hash, String newPath, String operator) {
+	private static Status copyAndMove(IPFSRpcHelper ipfsHelper, String hash, String newPath, String operator) {
 		try {
 			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), operator);
 			String finalHash = IPFSURL.PREFIX + hash;
@@ -127,7 +127,7 @@ class IPFSUtils {
 		return new Status(0);
 	}
 
-	static boolean isFolder(IPFSHelper ipfsHelper, String path) throws HiveException {
+	static boolean isFolder(IPFSRpcHelper ipfsHelper, String path) throws HiveException {
 		try {
 			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.STAT);
 			HttpResponse<JsonNode> response = Unirest.get(url)
