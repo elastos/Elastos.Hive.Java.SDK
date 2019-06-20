@@ -1,17 +1,16 @@
 package org.elastos.hive.vendors.ipfs;
 
 import org.elastos.hive.DriveType;
-import org.elastos.hive.NullEntry;
+import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.Parameter;
 
-public class IPFSParameter implements Parameter<NullEntry> {
-	private final IPFSEntry ipfsEntry;
-	public IPFSParameter(String uid, String[] rpcAddrs, String dataPath) {
-		ipfsEntry = new IPFSEntry(uid, rpcAddrs, dataPath);
-	}
+public class IPFSParameter implements Parameter<IPFSEntry> {
+	private final IPFSEntry entry;
+	private final String keyStorePath;
 
-	IPFSEntry getIpfsEntry() {
-		return ipfsEntry;
+	public IPFSParameter(IPFSEntry entry, String storePath)  {
+		this.entry = entry;
+		this.keyStorePath = storePath;
 	}
 
 	@Override
@@ -20,7 +19,12 @@ public class IPFSParameter implements Parameter<NullEntry> {
 	}
 
 	@Override
-	public NullEntry getAuthEntry() {
-		return null;
+	public IPFSEntry getAuthEntry() {
+		return this.entry;
+	}
+
+	@Override
+	public String getKeyStorePath() {
+		return keyStorePath;
 	}
 }

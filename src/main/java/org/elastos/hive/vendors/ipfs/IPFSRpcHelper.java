@@ -2,7 +2,11 @@ package org.elastos.hive.vendors.ipfs;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.hive.AuthHelper;
+import org.elastos.hive.AuthToken;
+import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
+import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Status;
 
@@ -11,49 +15,57 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-class IPFSHelper {
-	private final IPFSEntry ipfsEntry;
+class IPFSRpcHelper implements AuthHelper {
+	private final IPFSEntry entry;
 	private boolean isValid = false;
 	private String BASEURL  = null;
 	private String validAddress;
 
-	IPFSHelper(IPFSEntry ipfsEntry) {
-		this.ipfsEntry = ipfsEntry;
+	IPFSRpcHelper(IPFSEntry entry) {
+		this.entry = entry;
 	}
-
+	
 	IPFSEntry getIpfsEntry() {
-		return ipfsEntry;
+		return entry;
 	}
 
-	CompletableFuture<Status> loginAsync() {
-		return loginAsync(new NullCallback<Status>());
+	@Override
+	public AuthToken getToken() {
+		return null;
 	}
 
-	CompletableFuture<Status> loginAsync(Callback<Status> callback) {
-		return checkValid(callback);
+	@Override
+	public CompletableFuture<Status> loginAsync(Authenticator authenticator) {
+		return loginAsync(authenticator, new NullCallback<Status>());
 	}
 
-	void logout() {
+	@Override
+	public CompletableFuture<Status> loginAsync(Authenticator authenticator, Callback<Status> callback) {
+		return checkExpired(callback);
+	}
+
+	@Override
+	public CompletableFuture<Status> logoutAsync() {
+		return logoutAsync(new NullCallback<Status>());
+	}
+
+	@Override
+	public CompletableFuture<Status> logoutAsync(Callback<Status> callback) {
 		isValid = false;
+		CompletableFuture<Status> future = new CompletableFuture<Status>();
+		Status status = new Status(1);
+	    callback.onSuccess(status);
+	    future.complete(status);
+		return future;
 	}
 
-	String getBaseUrl() {
-		return BASEURL;
+	@Override
+	public CompletableFuture<Status> checkExpired() {
+		return checkExpired(new NullCallback<Status>());
 	}
 
-	void setStatus(boolean invalid) {
-		isValid = invalid;
-	}
-
-	void setValidAddress(String validAddress) {
-		this.validAddress = validAddress;
-	}
-
-	CompletableFuture<Status> checkValid() {
-		return checkValid(new NullCallback<Status>());
-	}
-
-	CompletableFuture<Status> checkValid(Callback<Status> callback) {
+	@Override
+	public CompletableFuture<Status> checkExpired(Callback<Status> callback) {
 		if (isValid) {
 			CompletableFuture<Status> future = new CompletableFuture<Status>();
 			Status status = new Status(1);
@@ -78,7 +90,7 @@ class IPFSHelper {
 				}
 
 				if (homeHash == null) {
-					String[] addrs = ipfsEntry.getRpcIPAddrs();
+					String[] addrs = entry.getRcpAddrs();
 					for (int i = 0; i < addrs.length; i++) {
 						String url = String.format(IPFSURL.URLFORMAT, addrs[i]);
 						homeHash = getHomeHash(url);
@@ -98,7 +110,7 @@ class IPFSHelper {
 
 				Unirest.get(BASEURL + IPFSMethod.LOGIN)
 					.header(IPFSURL.ContentType, IPFSURL.Json)
-					.queryString(IPFSURL.UID, ipfsEntry.getUid())
+					.queryString(IPFSURL.UID, entry.getUid())
 					.queryString(IPFSURL.HASH, homeHash)
 					.asJson();
 
@@ -115,7 +127,19 @@ class IPFSHelper {
 		return future;
 	}
 
-	private String getHomeHash(String baseUrl) {
+	String getBaseUrl() {
+		return BASEURL;
+	}
+
+	void setStatus(boolean invalid) {
+		isValid = invalid;
+	}
+
+	void setValidAddress(String validAddress) {
+		this.validAddress = validAddress;
+	}
+	
+   String getHomeHash(String baseUrl) {
 		String url = baseUrl + IPFSMethod.NAMERESOLVE;
 		try {
 			HttpResponse<JsonNode> json = Unirest.get(url)
