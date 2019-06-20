@@ -23,7 +23,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 public final class OneDriveClient extends Client {
 	private static Client clientInstance;
 
-	private final AuthHelper authHelper;
+	private final OneDriveAuthHelper authHelper;
 	private volatile Client.Info clientInfo;
 
 	private OneDriveClient(OneDriveParameter parameter) {
@@ -146,6 +146,14 @@ public final class OneDriveClient extends Client {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() == 401) {
+				authHelper.getToken().expired();
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
+				return;
+			}
+			
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
 				this.callback.onError(ex);
@@ -187,6 +195,14 @@ public final class OneDriveClient extends Client {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() == 401) {
+				authHelper.getToken().expired();
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
+				return;
+			}
+
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
 				this.callback.onError(ex);
