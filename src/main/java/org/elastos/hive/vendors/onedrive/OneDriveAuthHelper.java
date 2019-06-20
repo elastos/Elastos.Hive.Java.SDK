@@ -129,7 +129,7 @@ class OneDriveAuthHelper implements AuthHelper {
 									authCode);
 
 		Unirest.post(url)
-			.header(OneDriveHttpHeader.ContentType, "application/x-www-form-urlencoded")
+			.header(OneDriveHttpHeader.ContentType, OneDriveHttpHeader.Urlencoded)
 			.body(body)
 			.asJsonAsync(new GetTokenCallback(future, callback));
 
@@ -148,7 +148,7 @@ class OneDriveAuthHelper implements AuthHelper {
 							.replace(" ", "%20");
 
 		Unirest.post(url)
-			.header(OneDriveHttpHeader.ContentType, "application/x-www-form-urlencoded")
+			.header(OneDriveHttpHeader.ContentType, OneDriveHttpHeader.Urlencoded)
 			.body(body)
 			.asJsonAsync(new GetTokenCallback(future, callback));
 

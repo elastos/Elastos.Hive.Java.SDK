@@ -128,7 +128,7 @@ final class OneDriveFile extends File {
 			Unirest.patch(url)
 				.header(OneDriveHttpHeader.Authorization,
 						OneDriveHttpHeader.bearerValue(authHelper))
-				.header("Content-Type", "application/json")
+				.header(OneDriveHttpHeader.ContentType, OneDriveHttpHeader.Json)
 				.body(body)
 				.asJsonAsync(new MoveToCallback(newPathName, future, callback));
 		} catch (Exception ex) {
@@ -190,7 +190,7 @@ final class OneDriveFile extends File {
 			Unirest.post(url)
 				.header(OneDriveHttpHeader.Authorization,
 						OneDriveHttpHeader.bearerValue(authHelper))
-				.header("Content-Type", "application/json")
+				.header(OneDriveHttpHeader.ContentType, OneDriveHttpHeader.Json)
 				.body(body)
 				.asJsonAsync(new CopyToCallback(future, callback));
 		} catch (Exception ex) {
@@ -248,6 +248,14 @@ final class OneDriveFile extends File {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() == 401) {
+				authHelper.getToken().expired();
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
+				return;
+			}
+
 			if (response.getStatus() != 200) {
 				HiveException e = new HiveException("Server Error: " + response.getStatusText());
 				this.callback.onError(e);
@@ -285,6 +293,14 @@ final class OneDriveFile extends File {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() == 401) {
+				authHelper.getToken().expired();
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
+				return;
+			}
+
 			if (response.getStatus() != 200) {
 				HiveException e = new HiveException("Server Error: " + response.getStatusText());
 				this.callback.onError(e);
@@ -319,6 +335,14 @@ final class OneDriveFile extends File {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() == 401) {
+				authHelper.getToken().expired();
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
+				return;
+			}
+
 			if (response.getStatus() != 202) {
 				HiveException e = new HiveException("Server Error: " + response.getStatusText());
 				this.callback.onError(e);
@@ -352,6 +376,14 @@ final class OneDriveFile extends File {
 
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() == 401) {
+				authHelper.getToken().expired();
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
+				return;
+			}
+
 			if (response.getStatus() != 204) {
 				HiveException e = new HiveException("Server Error: " + response.getStatusText());
 				this.callback.onError(e);

@@ -5,14 +5,14 @@ public class AuthToken implements ResultItem {
 	private final String scope;
 	private final String refreshToken;
 	private final String accessToken;
-	private final long expiresIn;
+	private long experitime;
 	private final long createdTime;
 
-	public AuthToken(String scope, String refreshToken, String accessToken, long expiresIn) {
+	public AuthToken(String scope, String refreshToken, String accessToken, long experitime) {
 		this.scope = scope;
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
-		this.expiresIn = expiresIn;
+		this.experitime = experitime;
 		this.createdTime = System.currentTimeMillis() / 1000;
 	}
 
@@ -26,10 +26,14 @@ public class AuthToken implements ResultItem {
 
 	public boolean isExpired() {
 		long currentSeconds = System.currentTimeMillis() / 1000;
-		if (currentSeconds >= (createdTime + expiresIn)) {
+		if (currentSeconds >= (createdTime + experitime)) {
 			return true;
 		}
 
 		return false;
+	}
+	
+	public void expired() {
+		this.experitime = 0;
 	}
 }
