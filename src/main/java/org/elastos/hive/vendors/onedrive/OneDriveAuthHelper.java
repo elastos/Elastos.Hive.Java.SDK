@@ -1,5 +1,12 @@
 package org.elastos.hive.vendors.onedrive;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 
@@ -23,14 +30,20 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 class OneDriveAuthHelper implements AuthHelper {
 	private final OAuthEntry authEntry;
 	private AuthToken token;
+	private final String keystorePath;
 
-	OneDriveAuthHelper(OAuthEntry authEntry) {
+	OneDriveAuthHelper(OAuthEntry authEntry, String keystorePath) {
 		this.authEntry = authEntry;
+		this.keystorePath = keystorePath;
 	}
 
 	@Override
 	public AuthToken getToken() {
 		return token;
+	}
+
+	OAuthEntry getAuthEntry() {
+		return authEntry;
 	}
 
 	@Override
@@ -78,6 +91,10 @@ class OneDriveAuthHelper implements AuthHelper {
 	    callback.onSuccess(status);
 		future.complete(status);
 		return future;
+	}
+
+	void updateAuthToken(String refreshToken, String accessToken, long experitime) {
+		this.token = new AuthToken(refreshToken, accessToken, experitime);
 	}
 
 	private CompletableFuture<String> getAuthCode(Authenticator authenticator) {
@@ -155,6 +172,59 @@ class OneDriveAuthHelper implements AuthHelper {
 		return future;
 	}
 
+	private void storeLocalData() {
+		BufferedReader bufferedReader = null;
+		BufferedWriter writer = null;
+		try {
+			File ipfsConfig = new File(keystorePath, OneDriveUtils.CONFIG);
+			InputStreamReader reader = new InputStreamReader(new FileInputStream(ipfsConfig));
+			bufferedReader = new BufferedReader(reader);
+			String line;
+			String content = "";
+			while ((line = bufferedReader.readLine()) != null) {
+				content += line;
+			}
+
+			JSONObject config;
+			if (!content.isEmpty()) {
+				config = new JSONObject(content);
+			}
+			else {
+				config = new JSONObject();
+			}
+
+			//store the info.
+			config.put(OneDriveUtils.ClientId, getAuthEntry().getClientId());
+			config.put(OneDriveUtils.Scope, getAuthEntry().getScope());
+			config.put(OneDriveUtils.RedirectUrl, getAuthEntry().getRedirectURL());
+			config.put(OneDriveUtils.RefreshToken, getToken().getRefreshToken());
+			config.put(OneDriveUtils.AccessToken, getToken().getAccessToken());
+			config.put(OneDriveUtils.ExpiresAt, getToken().getExpiredTime());
+
+			writer = new BufferedWriter(new FileWriter(ipfsConfig));
+			writer.write(config.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally {
+			if (bufferedReader != null) {
+				try {
+					bufferedReader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	private class GetTokenCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<Status> future;
 		private final Callback<Status> callback;
@@ -176,12 +246,15 @@ class OneDriveAuthHelper implements AuthHelper {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			AuthToken token = new AuthToken(jsonObject.getString("scope"),
-											jsonObject.getString("refresh_token"),
+			long experitime = System.currentTimeMillis() / 1000 + jsonObject.getLong("expires_in");
+			AuthToken token = new AuthToken(jsonObject.getString("refresh_token"),
 											jsonObject.getString("access_token"),
-											jsonObject.getLong("expires_in"));
+											experitime);
 
 			OneDriveAuthHelper.this.token = token;
+
+			//Store the local data.
+			storeLocalData();
 
 			Status status = new Status(1);
 			this.callback.onSuccess(status);
