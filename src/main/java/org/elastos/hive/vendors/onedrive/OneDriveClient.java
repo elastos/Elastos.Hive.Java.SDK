@@ -1,25 +1,23 @@
 package org.elastos.hive.vendors.onedrive;
 
-import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.Drive;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.JsonPersistent;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
-import org.json.JSONObject;
+import org.elastos.hive.vendors.onedrive.Model.DriveResponse;
+import org.elastos.hive.vendors.onedrive.network.Api;
+import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 public final class OneDriveClient extends Client {
 	private static Client clientInstance;
@@ -101,10 +99,14 @@ public final class OneDriveClient extends Client {
 		if (callback == null)
 			callback = new NullCallback<Client.Info>();
 
-		Unirest.get(OneDriveURL.USER)
-			.header(OneDriveHttpHeader.Authorization,
-					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetClientInfoCallback(future, callback));
+		try {
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
+					true ,true , authHelper.getToken());
+			Call call = api.getInfo();
+			call.enqueue(new DriveClientCallback(future , callback , Type.GET_INFO));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return future;
 	}
@@ -126,129 +128,89 @@ public final class OneDriveClient extends Client {
 		if (callback == null)
 			callback = new NullCallback<Drive>();
 
-		Unirest.get(OneDriveURL.API)
-			.header(OneDriveHttpHeader.Authorization,
-					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetDefaultDriveCallback(future, callback));
+		try {
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
+					true ,true , authHelper.getToken());
+			Call call = api.getDrive();
+			call.enqueue(new DriveClientCallback(future , callback , Type.GET_DEFAULT_DRIVE));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return future;
 	}
 
-	private class GetClientInfoCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Client.Info> future;
-		private final Callback<Client.Info> callback;
+	private class DriveClientCallback implements retrofit2.Callback{
+		CompletableFuture future ;
+		Callback callback ;
+		Type type ;
 
-		GetClientInfoCallback(CompletableFuture<Client.Info> future,
-			Callback<Client.Info> callback) {
-			this.future = future;
-			this.callback = callback;
+		public DriveClientCallback(CompletableFuture future , Callback callback , Type type) {
+			this.future = future ;
+			this.callback = callback ;
+			this.type = type ;
 		}
-		@Override
-		public void cancelled() {}
 
 		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
+		public void onResponse(Call call, Response response) {
+			if (response.code() == 401) {
 				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				HiveException e = new HiveException("Server Error: " + response.message());
 				this.callback.onError(e);
 				future.completeExceptionally(e);
 				return;
 			}
-
-			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
+			if (response.code() != 200) {
+				HiveException ex = new HiveException("Server Error: " + response.message());
 				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
 
-			JSONObject jsonObject = response.getBody().getObject();
-			JSONObject userObject = jsonObject.getJSONObject("owner").getJSONObject("user");
-			Client.Info info;
+			switch (type){
+				case GET_INFO:
+					//if @call https://graph.microsoft.com/v1.0/me/
+//					ClientResponse clientInfoResponse = (ClientResponse) response.body();
+//					Client.Info info = new Client.Info(clientInfoResponse.getId());
+//					info.setDisplayName(clientInfoResponse.getDisplayName());
 
-			HashMap<String, String> attrs = new HashMap<String, String>();
-			attrs.put(Client.Info.userId, userObject.getString("id"));
-			attrs.put(Client.Info.name, userObject.getString("DisplayName"));
-			// TODO;
+					DriveResponse driveResponseForClient= (DriveResponse) response.body();
+					HashMap<String, String> attrs = new HashMap<String, String>();
+					attrs.put(Client.Info.userId, driveResponseForClient.getOwner().getUser().getId());
+					attrs.put(Client.Info.name, driveResponseForClient.getOwner().getUser().getDisplayName());
 
-			info = new Client.Info(attrs);
+					Client.Info info = new Client.Info(attrs);
 
-			clientInfo = info;
-			userId = clientInfo.get(Client.Info.userId);
+					clientInfo = info;
+					this.callback.onSuccess(info);
+					future.complete(info);
+					break ;
+				case GET_DEFAULT_DRIVE:
+					DriveResponse driveResponse= (DriveResponse) response.body();
 
-			this.callback.onSuccess(info);
-			future.complete(info);
+					HashMap<String, String> driveAttrs = new HashMap<String, String>();
+					driveAttrs.put(Client.Info.userId, driveResponse.getOwner().getUser().getId());
+					driveAttrs.put(Client.Info.name, driveResponse.getOwner().getUser().getDisplayName());
+
+					Drive.Info driveInfo = new Drive.Info(driveAttrs);
+					OneDriveDrive drive = new OneDriveDrive(driveInfo , authHelper);
+
+					this.callback.onSuccess(drive);
+					future.complete(drive);
+
+					break ;
+			}
 		}
 
 		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
+		public void onFailure(Call call, Throwable t) {
+			HiveException e = new HiveException(t.getMessage());
 			this.callback.onError(e);
 			future.completeExceptionally(e);
 		}
 	}
 
-	private class GetDefaultDriveCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Drive> future;
-		private final Callback<Drive> callback;
-
-		GetDefaultDriveCallback(CompletableFuture<Drive> future, Callback<Drive> callback) {
-			this.future = future;
-			this.callback = callback;
-		}
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
-				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
-				return;
-			}
-
-			JSONObject jsonObject = response.getBody().getObject();
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Drive.Info.driveId, jsonObject.getString("id"));
-			// TODO;
-
-			Drive.Info info = new Drive.Info(attrs);
-			OneDriveDrive drive = new OneDriveDrive(info, authHelper);
-			this.callback.onSuccess(drive);
-			future.complete(drive);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	class KeyStore implements JsonPersistent {
-		//private String storePath;
-
-		@Override
-		public JSONObject parseFrom() throws HiveException {
-			// TODO
-			return null;
-		}
-
-		@Override
-		public void upateContent(JSONObject conetnt) throws HiveException {
-			// TODO
-
-		}
+	private enum Type{
+		GET_INFO, GET_DEFAULT_DRIVE
 	}
 }
