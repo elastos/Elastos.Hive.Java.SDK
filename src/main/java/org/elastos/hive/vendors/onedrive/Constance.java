@@ -7,13 +7,16 @@ package org.elastos.hive.vendors.onedrive;
  */
 public class Constance {
     public static final String ONE_DRIVE_AUTH_BASE_URL = OneDriveURL.AUTH+"/" ;
-    public static final String ONE_DRIVE_API_BASE_URL = OneDriveURL.API+"/";
+    public static final String ONE_DRIVE_API_BASE_URL = "https://graph.microsoft.com/v1.0/me/" ;
 
     public static final String AUTHORIZE = "authorize" ;
     public static final String TOKEN = "token";
     public static final String LOGOUT = "logout";
 
+    public static final String DRIVE = "drive" ;
+
     public static final String AUTHORIZATION = "Authorization";
+    public static final String CONTENT_TYPE = "Content-Type";
 
     public static final String CLIENT_ID = "client_id" ;
     public static final String REDIRECT_URL = "redirect_url" ;
@@ -28,5 +31,7 @@ public class Constance {
 
     public static final String GRANT_TYPE_GET_TOKEN = "authorization_code" ;
     public static final String GRANT_TYPE_REFRESH_TOKEN = "refresh_token";
+
+    public static final String ROOT = "root" ;
 
 }
