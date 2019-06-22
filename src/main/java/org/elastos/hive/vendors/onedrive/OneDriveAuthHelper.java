@@ -39,7 +39,8 @@ public class OneDriveAuthHelper implements AuthHelper {
 		this.authEntry = authEntry;
 		this.persistent = persistent;
 		try {
-			authApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL , true);
+			authApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL ,
+					true , false , null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -90,7 +91,8 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 		AuthApi logoutApi = null;
 		try {
-			logoutApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL , false);
+			logoutApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL ,
+					false , false ,null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
