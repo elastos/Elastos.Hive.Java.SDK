@@ -1,11 +1,13 @@
 package org.elastos.hive.vendors.ipfs;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.Callback;
 import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
+import org.elastos.hive.Length;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
@@ -399,5 +401,53 @@ final class IPFSFile extends File {
 			this.callback.onError(ex);
 			future.completeExceptionally(ex);
 		}
+	}
+
+	@Override
+	public CompletableFuture<Length> read(ByteBuffer dest) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Length> read(ByteBuffer dest, long position) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Length> read(ByteBuffer dest, long position, Callback<Length> callback) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Length> write(ByteBuffer dest) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Length> write(ByteBuffer dest, long position) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Length> write(ByteBuffer dest, long position, Callback<Length> callback) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Void> commit() {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public void discard() {
+		// TODO
+
 	}
 }

@@ -1,5 +1,6 @@
 package org.elastos.hive.vendors.onedrive;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -7,6 +8,7 @@ import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Callback;
 import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
+import org.elastos.hive.Length;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
@@ -407,5 +409,52 @@ final class OneDriveFile extends File {
 			this.callback.onError(e);
 			future.completeExceptionally(e);
 		}
+	}
+
+	@Override
+	public CompletableFuture<Length> read(ByteBuffer dest) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Length> read(ByteBuffer dest, long position) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Length> read(ByteBuffer dest, long position, Callback<Length> callback) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Length> write(ByteBuffer dest) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Length> write(ByteBuffer dest, long position) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Length> write(ByteBuffer dest, long position, Callback<Length> callback) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Void> commit() {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public void discard() {
+		// TODO
 	}
 }
