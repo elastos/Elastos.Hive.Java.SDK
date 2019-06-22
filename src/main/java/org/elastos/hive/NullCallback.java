@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-public class NullCallback<T extends ResultItem> implements Callback<T> {
+public class NullCallback<T extends Result> implements Callback<T> {
 	@Override
 	public void onError(HiveException e) {
 	}

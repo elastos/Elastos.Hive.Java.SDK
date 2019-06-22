@@ -2,14 +2,14 @@ package org.elastos.hive;
 
 import java.util.ArrayList;
 
-public class Children implements ResultItem {
-	private final ArrayList<Object> children;
+public class Children extends Result {
+	private final ArrayList<ItemInfo> children;
 
-	public Children(ArrayList<Object> children) {
+	public Children(ArrayList<ItemInfo> children) {
 		this.children = children;
 	}
 
-	public ArrayList<Object> getContent() {
+	public ArrayList<ItemInfo> getContent() {
 		return children;
 	}
 }

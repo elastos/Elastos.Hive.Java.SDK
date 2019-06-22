@@ -6,14 +6,14 @@ interface FileItem {
 	String getPath();
 	String getParentPath();
 
-	CompletableFuture<Status> moveTo(String path);
-	CompletableFuture<Status> moveTo(String path, Callback<Status> callback);
+	CompletableFuture<Void> moveTo(String path);
+	CompletableFuture<Void> moveTo(String path, Callback<Void> callback);
 
-	CompletableFuture<Status> copyTo(String path);
-	CompletableFuture<Status> copyTo(String path, Callback<Status> callback);
+	CompletableFuture<Void> copyTo(String path);
+	CompletableFuture<Void> copyTo(String path, Callback<Void> callback);
 
-	CompletableFuture<Status> deleteItem();
-	CompletableFuture<Status> deleteItem(Callback<Status> callback);
+	CompletableFuture<Void> deleteItem();
+	CompletableFuture<Void> deleteItem(Callback<Void> callback);
 
 	void close();
 }

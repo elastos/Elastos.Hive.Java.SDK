@@ -11,8 +11,8 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.OAuthEntry;
-import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
+import org.elastos.hive.Void;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -34,26 +34,26 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	@Override
-	public CompletableFuture<Status> loginAsync(Authenticator authenticator) {
-		return loginAsync(authenticator, new NullCallback<Status>());
+	public CompletableFuture<Void> loginAsync(Authenticator authenticator) {
+		return loginAsync(authenticator, new NullCallback<Void>());
 	}
 
 	@Override
-	public CompletableFuture<Status> loginAsync(Authenticator authenticator,
-		Callback<Status> callback) {
+	public CompletableFuture<Void> loginAsync(Authenticator authenticator,
+		Callback<Void> callback) {
 
 		return getAuthCode(authenticator)
 				.thenCompose(code -> getToken(code, callback));
 	}
 
 	@Override
-	public CompletableFuture<Status> logoutAsync() {
-		return logoutAsync(new NullCallback<Status>());
+	public CompletableFuture<Void> logoutAsync() {
+		return logoutAsync(new NullCallback<Void>());
 	}
 
 	@Override
-	public CompletableFuture<Status> logoutAsync(Callback<Status> callback) {
-		CompletableFuture<Status> future = new CompletableFuture<Status>();
+	public CompletableFuture<Void> logoutAsync(Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
 		String url = String.format("%s/%s?post_logout_redirect_uri=%s",
 								   OneDriveURL.AUTH,
 								   OneDriveMethod.LOGOUT,
@@ -64,19 +64,19 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	@Override
-	public CompletableFuture<Status> checkExpired() {
-		return checkExpired(new NullCallback<Status>());
+	public CompletableFuture<Void> checkExpired() {
+		return checkExpired(new NullCallback<Void>());
 	}
 
 	@Override
-	public CompletableFuture<Status> checkExpired(Callback<Status> callback) {
+	public CompletableFuture<Void> checkExpired(Callback<Void> callback) {
 		if (token.isExpired())
 			return redeemToken(callback);
 
-		CompletableFuture<Status> future = new CompletableFuture<Status>();
-		Status status = new Status(1);
-	    callback.onSuccess(status);
-		future.complete(status);
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
+		Void placeHolder = new Void();
+	    callback.onSuccess(placeHolder);
+		future.complete(placeHolder);
 		return future;
 	}
 
@@ -118,8 +118,8 @@ class OneDriveAuthHelper implements AuthHelper {
 		return future;
 	}
 
-	private CompletableFuture<Status> getToken(String authCode, Callback<Status> callback) {
-		CompletableFuture<Status> future = new CompletableFuture<Status>();
+	private CompletableFuture<Void> getToken(String authCode, Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
 		String url 	= String.format("%s/%s",
 									OneDriveURL.AUTH,
 									OneDriveMethod.TOKEN);
@@ -136,8 +136,8 @@ class OneDriveAuthHelper implements AuthHelper {
 		return future;
 	}
 
-	private CompletableFuture<Status> redeemToken(Callback<Status> callback) {
-		CompletableFuture<Status> future = new CompletableFuture<Status>();
+	private CompletableFuture<Void> redeemToken(Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
 		String url 	= String.format("%s/%s",
 									OneDriveURL.AUTH,
 									OneDriveMethod.TOKEN);
@@ -156,10 +156,10 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	private class GetTokenCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Status> future;
-		private final Callback<Status> callback;
+		private final CompletableFuture<Void> future;
+		private final Callback<Void> callback;
 
-		GetTokenCallback(CompletableFuture<Status> future, Callback<Status> callback) {
+		GetTokenCallback(CompletableFuture<Void> future, Callback<Void> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -183,9 +183,9 @@ class OneDriveAuthHelper implements AuthHelper {
 
 			OneDriveAuthHelper.this.token = token;
 
-			Status status = new Status(1);
-			this.callback.onSuccess(status);
-			this.future.complete(status);
+			Void placeHolder = new Void();
+		    callback.onSuccess(placeHolder);
+			future.complete(placeHolder);
 		}
 
 		@Override
@@ -197,10 +197,10 @@ class OneDriveAuthHelper implements AuthHelper {
 	}
 
 	private class LogoutCallback implements com.mashape.unirest.http.async.Callback<String> {
-		private final CompletableFuture<Status> future;
-		private final Callback<Status> callback;
+		private final CompletableFuture<Void> future;
+		private final Callback<Void> callback;
 
-		LogoutCallback(CompletableFuture<Status> future, Callback<Status> callback) {
+		LogoutCallback(CompletableFuture<Void> future, Callback<Void> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -216,9 +216,9 @@ class OneDriveAuthHelper implements AuthHelper {
 				return;
 			}
 
-			Status status = new Status(1);
-			this.callback.onSuccess(status);
-			future.complete(status);
+			Void placeHolder = new Void();
+		    callback.onSuccess(placeHolder);
+			future.complete(placeHolder);
 			OneDriveAuthHelper.this.token = null;
 		}
 

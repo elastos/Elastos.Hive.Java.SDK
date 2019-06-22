@@ -3,7 +3,7 @@ package org.elastos.hive.vendors.ipfs;
 import java.util.UUID;
 
 import org.elastos.hive.HiveException;
-import org.elastos.hive.Status;
+import org.elastos.hive.Void;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -16,7 +16,7 @@ class IPFSUtils {
 	static final String UIDS        = "uids";
 	static final String URLFORMAT   = "http://%s:9095/api/v0/";
 
-	static Status mkdir(IPFSRpcHelper ipfsHelper, String path) {
+	static Void mkdir(IPFSRpcHelper ipfsHelper, String path) {
 		try {
 			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.MKDIR);
 			HttpResponse<JsonNode> response = Unirest.get(url)
@@ -27,16 +27,16 @@ class IPFSUtils {
 				.asJson();
 
 			if (response.getStatus() == 200) {
-				return new Status(1);
+				return new Void();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return new Status(0);
+		return new Void();
 	}
 
-	static Status rm(IPFSRpcHelper ipfsHelper, String path) {
+	static Void rm(IPFSRpcHelper ipfsHelper, String path) {
 		try {
 			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.RM);
 			HttpResponse<JsonNode> response = Unirest.get(url)
@@ -47,16 +47,16 @@ class IPFSUtils {
 				.asJson();
 
 			if (response.getStatus() == 200) {
-				return new Status(1);
+				return new Void();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return new Status(0);
+		return new Void();
 	}
 
-	static Status createEmptyFile(IPFSRpcHelper ipfsHelper, String path) {
+	static Void createEmptyFile(IPFSRpcHelper ipfsHelper, String path) {
 		try {
 			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), IPFSMethod.WRITE);
 			String type = String.format("multipart/form-data; boundary=%s", UUID.randomUUID().toString());
@@ -68,13 +68,13 @@ class IPFSUtils {
 				.asJson();
 
 			if (response.getStatus() == 200) {
-				return new Status(1);
+				return new Void();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return new Status(0);
+		return new Void();
 	}
 
 	static String stat(IPFSRpcHelper ipfsHelper, String path) {
@@ -95,15 +95,15 @@ class IPFSUtils {
 		return null;
 	}
 
-	static Status copyTo(IPFSRpcHelper ipfsHelper, String hash, String newPath) {
+	static Void copyTo(IPFSRpcHelper ipfsHelper, String hash, String newPath) {
 		return copyAndMove(ipfsHelper, hash, newPath, IPFSMethod.CP);
 	}
 
-	static Status moveTo(IPFSRpcHelper ipfsHelper, String hash, String newPath) {
+	static Void moveTo(IPFSRpcHelper ipfsHelper, String hash, String newPath) {
 		return copyAndMove(ipfsHelper, hash, newPath, IPFSMethod.MV);
 	}
 
-	private static Status copyAndMove(IPFSRpcHelper ipfsHelper, String hash, String newPath, String operator) {
+	private static Void copyAndMove(IPFSRpcHelper ipfsHelper, String hash, String newPath, String operator) {
 		try {
 			String url = String.format("%s%s", ipfsHelper.getBaseUrl(), operator);
 			String finalHash = IPFSURL.PREFIX + hash;
@@ -118,13 +118,13 @@ class IPFSUtils {
 				.asJson();
 
 			if (response.getStatus() == 200) {
-				return new Status(1);
+				return new Void();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return new Status(0);
+		return new Void();
 	}
 
 	static boolean isFolder(IPFSRpcHelper ipfsHelper, String path) throws HiveException {

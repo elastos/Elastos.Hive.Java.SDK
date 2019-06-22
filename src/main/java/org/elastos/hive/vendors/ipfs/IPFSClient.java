@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -19,8 +20,8 @@ import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
+import org.elastos.hive.Void;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -104,7 +105,7 @@ public final class IPFSClient extends Client {
 
 	@Override
 	public synchronized void login(Authenticator authenticator) throws HiveException {
-		CompletableFuture<Status> future = rpcHelper.loginAsync(authenticator);
+		CompletableFuture<Void> future = rpcHelper.loginAsync(authenticator);
 
 		try {
 			future.get();
@@ -117,7 +118,7 @@ public final class IPFSClient extends Client {
 
 	@Override
 	public synchronized void logout() throws HiveException {
-		CompletableFuture<Status> future = rpcHelper.logoutAsync();
+		CompletableFuture<Void> future = rpcHelper.logoutAsync();
 
 		try {
 			future.get();
@@ -144,7 +145,7 @@ public final class IPFSClient extends Client {
 				.thenCompose(status -> getInfo(status, callback));
 	}
 
-	private CompletableFuture<Client.Info> getInfo(Status status, Callback<Client.Info> callback) {
+	private CompletableFuture<Client.Info> getInfo(Void status, Callback<Client.Info> callback) {
 		CompletableFuture<Client.Info> future = new CompletableFuture<Client.Info>();
 
 		if (callback == null)
@@ -172,7 +173,7 @@ public final class IPFSClient extends Client {
 				.thenCompose(status -> getDefaultDrive(status, callback));
 	}
 
-	private CompletableFuture<Drive> getDefaultDrive(Status status, Callback<Drive> callback) {
+	private CompletableFuture<Drive> getDefaultDrive(Void status, Callback<Drive> callback) {
 		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
 
 		if (callback == null)
@@ -347,7 +348,11 @@ public final class IPFSClient extends Client {
 				return;
 			}
 
-			clientInfo = new Client.Info(rpcHelper.getIpfsEntry().getUid());
+			HashMap<String, String> attrs = new HashMap<>();
+			attrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid()); // TODO;
+			// TODO;
+
+			clientInfo = new Client.Info(attrs);
 			this.callback.onSuccess(clientInfo);
 			future.complete(clientInfo);
 		}
@@ -381,7 +386,11 @@ public final class IPFSClient extends Client {
 				return;
 			}
 
-			Drive.Info info = new Drive.Info(rpcHelper.getIpfsEntry().getUid());
+			HashMap<String, String> attrs = new HashMap<>();
+			attrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid()); // TODO;
+			// TODO;
+
+			Drive.Info info = new Drive.Info(attrs);
 			IPFSDrive drive = new IPFSDrive(info, rpcHelper);
 			this.callback.onSuccess(drive);
 			future.complete(drive);

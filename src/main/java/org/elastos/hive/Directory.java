@@ -1,17 +1,14 @@
 package org.elastos.hive;
 
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class Directory implements ResourceItem<Directory.Info>, DirectoryItem,  FileItem {
-	public static class Info implements ResultItem {
-		private final String itemId;
+public abstract class Directory extends Result implements ResourceItem<Directory.Info>, DirectoryItem,  FileItem {
+	public static class Info extends AttributeMap {
+		public static final String itemId = "ItemId";
 
-		public Info(String itemId) {
-			this.itemId = itemId;
-		}
-
-		public String getId() {
-			return itemId;
+		public Info(HashMap<String, String> hash) {
+			super(hash);
 		}
 	}
 

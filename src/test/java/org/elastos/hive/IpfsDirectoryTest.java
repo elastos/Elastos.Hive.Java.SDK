@@ -187,8 +187,7 @@ public class IpfsDirectoryTest {
 			String parentPath = "/parentDir" + System.currentTimeMillis();
 			parentDir = drive.createDirectory(parentPath).get();
 			assertNotNull(parentDir);
-			Status status = testDirectory.copyTo(parentPath).get();
-			assertEquals(1, status.getStatus());
+			testDirectory.copyTo(parentPath).get();
 
 			Children children = parentDir.getChildren().get();
 			assertNotNull(children);
@@ -214,8 +213,7 @@ public class IpfsDirectoryTest {
 			parentDir = drive.createDirectory(parentPath).get();
 			assertNotNull(parentDir);
 			String originPath = testDirectory.getPath();
-			Status status = testDirectory.copyTo(parentPath).get();
-			assertEquals(1, status.getStatus());
+			Void placeHolder = testDirectory.copyTo(parentPath).get();
 
 			//1. Check the parent has a new child.
 			Children children = parentDir.getChildren().get();
