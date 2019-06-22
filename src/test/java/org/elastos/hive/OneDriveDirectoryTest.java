@@ -164,7 +164,7 @@ public class OneDriveDirectoryTest {
 			Children children = parentDirForMoveTo.getChildren().get();
 			assertNotNull(children);
 			assertEquals(1, children.getContent().size());
-			
+
 			//2. Check: the origin and the new path is different
 			assertNotEquals(originPath, testDirectory.getPath());
 
@@ -180,15 +180,14 @@ public class OneDriveDirectoryTest {
 			fail("testMoveToInvalid failed");
 		}
 	}
-	
+
 	@Test public void testCopyTo() {
 		Directory parentDir = null;
 		try {
 			String parentPath = "/parentDir" + System.currentTimeMillis();
 			parentDir = drive.createDirectory(parentPath).get();
 			assertNotNull(parentDir);
-			Status status = testDirectory.copyTo(parentPath).get();
-			assertEquals(1, status.getStatus());
+			testDirectory.copyTo(parentPath).get();
 
 			Thread.sleep(5000);
 			Children children = parentDir.getChildren().get();
@@ -215,8 +214,7 @@ public class OneDriveDirectoryTest {
 			parentDir = drive.createDirectory(parentPath).get();
 			assertNotNull(parentDir);
 			String originPath = testDirectory.getPath();
-			Status status = testDirectory.copyTo(parentPath).get();
-			assertEquals(1, status.getStatus());
+			testDirectory.copyTo(parentPath).get();
 
 			//1. Check the parent has a new child.
 			Thread.sleep(2000);
@@ -278,7 +276,7 @@ public class OneDriveDirectoryTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    	
+
     	client.logout();
     }
 }

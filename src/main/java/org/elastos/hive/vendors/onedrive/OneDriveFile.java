@@ -1,5 +1,6 @@
 package org.elastos.hive.vendors.onedrive;
 
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.AuthHelper;
@@ -7,8 +8,8 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
+import org.elastos.hive.Void;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -29,7 +30,7 @@ final class OneDriveFile extends File {
 
 	@Override
 	public String getId() {
-		return fileInfo.getId();
+		return fileInfo.get(File.Info.itemId);
 	}
 
 	@Override
@@ -58,10 +59,10 @@ final class OneDriveFile extends File {
 	@Override
 	public CompletableFuture<File.Info> getInfo(Callback<File.Info> callback)  {
 		return authHelper.checkExpired()
-				.thenCompose(status -> getInfo(status, callback));
+				.thenCompose(placeHolder -> getInfo(placeHolder, callback));
 	}
 
-	private CompletableFuture<File.Info> getInfo(Status status, Callback<File.Info> callback) {
+	private CompletableFuture<File.Info> getInfo(Void placeHolder, Callback<File.Info> callback) {
 		CompletableFuture<File.Info> future = new CompletableFuture<File.Info>();
 
 		if (callback == null)
@@ -78,21 +79,21 @@ final class OneDriveFile extends File {
 	}
 
 	@Override
-	public CompletableFuture<Status> moveTo(String pathName) {
-		return moveTo(pathName, new NullCallback<Status>());
+	public CompletableFuture<Void> moveTo(String pathName) {
+		return moveTo(pathName, new NullCallback<Void>());
 	}
 
 	@Override
-	public CompletableFuture<Status> moveTo(String pathName, Callback<Status> callback) {
+	public CompletableFuture<Void> moveTo(String pathName, Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> moveTo(status, pathName, callback));
+				.thenCompose(placeHolder -> moveTo(placeHolder, pathName, callback));
 	}
 
-	private CompletableFuture<Status> moveTo(Status status, String pathName, Callback<Status> callback) {
-		CompletableFuture<Status> future = new CompletableFuture<Status>();
+	private CompletableFuture<Void> moveTo(Void placeHolder, String pathName, Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
-			callback = new NullCallback<Status>();
+			callback = new NullCallback<Void>();
 
 		if (!pathName.startsWith("/")) {
 			HiveException e = new HiveException("Neet a absolute path.");
@@ -141,21 +142,21 @@ final class OneDriveFile extends File {
 	}
 
 	@Override
-	public CompletableFuture<Status> copyTo(String pathName) {
-		return copyTo(pathName, new NullCallback<Status>());
+	public CompletableFuture<Void> copyTo(String pathName) {
+		return copyTo(pathName, new NullCallback<Void>());
 	}
 
 	@Override
-	public CompletableFuture<Status> copyTo(String pathName, Callback<Status> callback) {
+	public CompletableFuture<Void> copyTo(String pathName, Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> copyTo(status, pathName, callback));
+				.thenCompose(placeHolder -> copyTo(placeHolder, pathName, callback));
 	}
 
-	private CompletableFuture<Status> copyTo(Status status, String pathName, Callback<Status> callback) {
-		CompletableFuture<Status> future = new CompletableFuture<Status>();
+	private CompletableFuture<Void> copyTo(Void placeHolder, String pathName, Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
-			callback = new NullCallback<Status>();
+			callback = new NullCallback<Void>();
 
 		if (!pathName.startsWith("/")) {
 			HiveException e = new HiveException("Neet a absolute path.");
@@ -203,21 +204,21 @@ final class OneDriveFile extends File {
 	}
 
 	@Override
-	public CompletableFuture<Status> deleteItem() {
-		return deleteItem(new NullCallback<Status>());
+	public CompletableFuture<Void> deleteItem() {
+		return deleteItem(new NullCallback<Void>());
 	}
 
 	@Override
-	public CompletableFuture<Status> deleteItem(Callback<Status> callback) {
+	public CompletableFuture<Void> deleteItem(Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> deleteItem(status, callback));
+				.thenCompose(placeHolder -> deleteItem(placeHolder, callback));
 	}
 
-	private CompletableFuture<Status> deleteItem(Status status, Callback<Status> callback) {
-		CompletableFuture<Status> future = new CompletableFuture<Status>();
+	private CompletableFuture<Void> deleteItem(Void placeHolder, Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
-			callback = new NullCallback<Status>();
+			callback = new NullCallback<Void>();
 
 		String url = String.format("%s/root:%s", OneDriveURL.API, this.pathName)
 						   .replace(" ", "%20");
@@ -264,8 +265,12 @@ final class OneDriveFile extends File {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			fileInfo = new File.Info(jsonObject.getString("id"));
-			this.callback.onSuccess(fileInfo);
+			HashMap<String, String> attrs = new HashMap<>();
+			attrs.put(File.Info.itemId, jsonObject.getString("id"));
+			// TODO;
+
+			File.Info info = new File.Info(attrs);
+			this.callback.onSuccess(info);
 			future.complete(fileInfo);
 		}
 
@@ -279,10 +284,10 @@ final class OneDriveFile extends File {
 
 	private class MoveToCallback implements UnirestAsyncCallback<JsonNode> {
 		private final String pathName;
-		private final CompletableFuture<Status> future;
-		private final Callback<Status> callback;
+		private final CompletableFuture<Void> future;
+		private final Callback<Void> callback;
 
-		MoveToCallback(String pathName, CompletableFuture<Status> future, Callback<Status> callback) {
+		MoveToCallback(String pathName, CompletableFuture<Void> future, Callback<Void> callback) {
 			this.pathName = pathName;
 			this.future = future;
 			this.callback = callback;
@@ -309,9 +314,9 @@ final class OneDriveFile extends File {
 			}
 
 			OneDriveFile.this.pathName = pathName;
-			Status status = new Status(1);
-			this.callback.onSuccess(status);
-			future.complete(status);
+			Void placeHolder = new Void();
+			this.callback.onSuccess(placeHolder);
+			future.complete(placeHolder);
 		}
 
 		@Override
@@ -323,10 +328,10 @@ final class OneDriveFile extends File {
 	}
 
 	private class CopyToCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Status> future;
-		private final Callback<Status> callback;
+		private final CompletableFuture<Void> future;
+		private final Callback<Void> callback;
 
-		CopyToCallback(CompletableFuture<Status> future, Callback<Status> callback) {
+		CopyToCallback(CompletableFuture<Void> future, Callback<Void> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -350,9 +355,9 @@ final class OneDriveFile extends File {
 				return;
 			}
 
-			Status status = new Status(1);
-			this.callback.onSuccess(status);
-			future.complete(status);
+			Void placeHolder = new Void();
+			this.callback.onSuccess(placeHolder);
+			future.complete(placeHolder);
 		}
 
 		@Override
@@ -364,10 +369,10 @@ final class OneDriveFile extends File {
 	}
 
 	private class DeleteItemCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Status> future;
-		private final Callback<Status> callback;
+		private final CompletableFuture<Void> future;
+		private final Callback<Void> callback;
 
-		private DeleteItemCallback(CompletableFuture<Status> future, Callback<Status> callback) {
+		private DeleteItemCallback(CompletableFuture<Void> future, Callback<Void> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -391,9 +396,9 @@ final class OneDriveFile extends File {
 				return;
 			}
 
-			Status status = new Status(1);
-			this.callback.onSuccess(status);
-			future.complete(status);
+			Void placeHolder = new Void();
+			this.callback.onSuccess(placeHolder);
+			future.complete(placeHolder);
 		}
 
 		@Override

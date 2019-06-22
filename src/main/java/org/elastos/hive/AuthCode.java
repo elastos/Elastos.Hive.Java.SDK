@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-class AuthCode implements ResultItem {
+class AuthCode extends Result {
 	private final String authCode;
 
 	AuthCode(String authCode) {

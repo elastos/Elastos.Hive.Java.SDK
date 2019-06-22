@@ -1,9 +1,9 @@
 package org.elastos.hive.vendors.onedrive;
 
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
@@ -11,8 +11,8 @@ import org.elastos.hive.Drive;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
+import org.elastos.hive.Void;
 import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -24,7 +24,8 @@ public final class OneDriveClient extends Client {
 	private static Client clientInstance;
 
 	private final OneDriveAuthHelper authHelper;
-	private volatile Client.Info clientInfo;
+	private Client.Info clientInfo;
+	private String userId;
 
 	private OneDriveClient(OneDriveParameter parameter) {
 		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry());
@@ -43,7 +44,7 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public String getId() {
-		return clientInfo != null ? clientInfo.getUserId() : null;
+		return userId;
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public synchronized void login(Authenticator authenticator) throws HiveException {
-		CompletableFuture<Status> future = authHelper.loginAsync(authenticator);
+		CompletableFuture<Void> future = authHelper.loginAsync(authenticator);
 
 		try {
 			future.get();
@@ -66,7 +67,7 @@ public final class OneDriveClient extends Client {
 
 	@Override
 	public synchronized void logout() throws HiveException {
-		CompletableFuture<Status> future = authHelper.logoutAsync();
+		CompletableFuture<Void> future = authHelper.logoutAsync();
 
 		try {
 			future.get();
@@ -93,13 +94,13 @@ public final class OneDriveClient extends Client {
 				.thenCompose(status -> getInfo(status, callback));
 	}
 
-	private CompletableFuture<Client.Info> getInfo(Status status, Callback<Client.Info> callback) {
+	private CompletableFuture<Client.Info> getInfo(Void status, Callback<Client.Info> callback) {
 		CompletableFuture<Client.Info> future = new CompletableFuture<Client.Info>();
 
 		if (callback == null)
 			callback = new NullCallback<Client.Info>();
 
-		Unirest.get(OneDriveURL.API)
+		Unirest.get(OneDriveURL.USER)
 			.header(OneDriveHttpHeader.Authorization,
 					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetClientInfoCallback(future, callback));
@@ -118,7 +119,7 @@ public final class OneDriveClient extends Client {
 				.thenCompose(status -> getDefaultDrive(status, callback));
 	}
 
-	private CompletableFuture<Drive> getDefaultDrive(Status status, Callback<Drive> callback) {
+	private CompletableFuture<Drive> getDefaultDrive(Void status, Callback<Drive> callback) {
 		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
 
 		if (callback == null)
@@ -153,7 +154,7 @@ public final class OneDriveClient extends Client {
 				future.completeExceptionally(e);
 				return;
 			}
-			
+
 			if (response.getStatus() != 200) {
 				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
 				this.callback.onError(ex);
@@ -165,10 +166,15 @@ public final class OneDriveClient extends Client {
 			JSONObject userObject = jsonObject.getJSONObject("owner").getJSONObject("user");
 			Client.Info info;
 
-			info = new Client.Info(userObject.getString("id"));
-			info.setDisplayName(userObject.getString("displayName"));
+			HashMap<String, String> attrs = new HashMap<String, String>();
+			attrs.put(Client.Info.userId, userObject.getString("id"));
+			attrs.put(Client.Info.name, userObject.getString("DisplayName"));
+			// TODO;
+
+			info = new Client.Info(attrs);
 
 			clientInfo = info;
+			userId = clientInfo.get(Client.Info.userId);
 
 			this.callback.onSuccess(info);
 			future.complete(info);
@@ -211,7 +217,11 @@ public final class OneDriveClient extends Client {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			Drive.Info info = new Drive.Info(jsonObject.getString("id"));
+			HashMap<String, String> attrs = new HashMap<>();
+			attrs.put(Drive.Info.driveId, jsonObject.getString("id"));
+			// TODO;
+
+			Drive.Info info = new Drive.Info(attrs);
 			OneDriveDrive drive = new OneDriveDrive(info, authHelper);
 			this.callback.onSuccess(drive);
 			future.complete(drive);

@@ -2,7 +2,9 @@ package org.elastos.hive;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+
 import java.util.concurrent.ExecutionException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -18,7 +20,7 @@ public class IpfsClientTest {
 		try {
 			Client.Info info = client.getInfo().get();
 			assertNotNull(info);
-			assertNotNull(info.getUserId());
+			assertNotNull(info.get(Client.Info.userId));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("getInfo failed");

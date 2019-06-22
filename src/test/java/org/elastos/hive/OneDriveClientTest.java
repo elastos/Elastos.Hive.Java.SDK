@@ -19,8 +19,8 @@ public class OneDriveClientTest {
 		try {
 			Client.Info info = client.getInfo().get();
 			assertNotNull(info);
-			assertNotNull(info.getUserId());
-			assertNotNull(info.getDisplayName());
+			assertNotNull(info.get(Client.Info.userId));
+			assertNotNull(info.get(Client.Info.name));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("getInfo failed");

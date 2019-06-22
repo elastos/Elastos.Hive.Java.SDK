@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.vendors.dropbox.DropboxClient;
@@ -11,56 +12,16 @@ import org.elastos.hive.vendors.onedrive.OneDriveParameter;
 import org.elastos.hive.vendors.webdav.OwnCloudClient;
 import org.elastos.hive.vendors.webdav.OwnCloudParameter;
 
-public abstract class Client implements ResourceItem<Client.Info> {
-	public static class Info implements ResultItem{
-		private final String userId;
-		private String displayName;
-		private String email;
-		private String phoneNo;
-		private String region;
+public abstract class Client extends Result implements ResourceItem<Client.Info> {
+	public static class Info extends AttributeMap {
+		public static final String userId = "UserId";
+		public static final String name   = "DisplayName";
+		public static final String email  = "Email";
+		public static final String phoneNo= "PhoneNo";
+		public static final String region = "Region";
 
-		public Info(String userId) {
-			this.userId = userId;
-		}
-
-		public String getUserId() {
-			return userId;
-		}
-
-		public String getDisplayName() {
-			return displayName;
-		}
-
-		public String email() {
-			return email;
-		}
-
-		public String getPhoneNo() {
-			return phoneNo;
-		}
-
-		public String getRegion() {
-			return region;
-		}
-
-		public Info setDisplayName(String displayName) {
-			this.displayName = displayName;
-			return this;
-		}
-
-		public Info setEmail(String email) {
-			this.email = email;
-			return this;
-		}
-
-		public Info setPhoneNo(String phoneNo) {
-			this.phoneNo = phoneNo;
-			return this;
-		}
-
-		public Info setRegion(String region) {
-			this.region = region;
-			return this;
+		public Info(HashMap<String, String> hash) {
+			super(hash);
 		}
 	}
 

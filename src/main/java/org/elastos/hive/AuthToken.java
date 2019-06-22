@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-public class AuthToken implements ResultItem {
+public class AuthToken {
 	@SuppressWarnings("unused")
 	private final String scope;
 	private final String refreshToken;
@@ -32,7 +32,7 @@ public class AuthToken implements ResultItem {
 
 		return false;
 	}
-	
+
 	public void expired() {
 		this.experitime = 0;
 	}

@@ -1,17 +1,13 @@
 package org.elastos.hive;
 
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class Drive implements ResourceItem<Drive.Info>, DirectoryItem {
-	public static class Info implements ResultItem {
-		private final String driveId;
-
-		public Info(String driveId) {
-			this.driveId = driveId;
-		}
-
-		public String getId() {
-			return driveId;
+public abstract class Drive extends Result implements ResourceItem<Drive.Info>, DirectoryItem {
+	public static class Info extends AttributeMap {
+		public static final String driveId = "DriveId";
+		public Info(HashMap<String, String> hash) {
+			super(hash);
 		}
 	}
 

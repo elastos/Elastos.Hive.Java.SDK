@@ -1,6 +1,7 @@
 package org.elastos.hive.vendors.onedrive;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.AuthHelper;
@@ -9,9 +10,10 @@ import org.elastos.hive.Children;
 import org.elastos.hive.Directory;
 import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
+import org.elastos.hive.ItemInfo;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.Status;
 import org.elastos.hive.UnirestAsyncCallback;
+import org.elastos.hive.Void;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -23,7 +25,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 class OneDriveDirectory extends Directory {
 	private final AuthHelper authHelper;
 	private String pathName;
-	private volatile Directory.Info dirInfo;
+	private Directory.Info dirInfo;
 
 	OneDriveDirectory(String pathName, Directory.Info dirInfo, AuthHelper authHelper) {
 		this.authHelper = authHelper;
@@ -33,7 +35,7 @@ class OneDriveDirectory extends Directory {
 
 	@Override
 	public String getId() {
-		return dirInfo.getId();
+		return dirInfo.get(Directory.Info.itemId);
 	}
 
 	@Override
@@ -62,10 +64,10 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<Directory.Info> getInfo(Callback<Directory.Info> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> getInfo(status, callback));
+				.thenCompose(placeHolder -> getInfo(placeHolder, callback));
 	}
 
-	private CompletableFuture<Directory.Info> getInfo(Status status,  Callback<Directory.Info> callback) {
+	private CompletableFuture<Directory.Info> getInfo(Void placeHolder,  Callback<Directory.Info> callback) {
 		CompletableFuture<Directory.Info> future = new CompletableFuture<Directory.Info>();
 
 		if (callback == null)
@@ -82,21 +84,21 @@ class OneDriveDirectory extends Directory {
 	}
 
 	@Override
-	public CompletableFuture<Status> moveTo(String pathName) {
-		return moveTo(pathName, new NullCallback<Status>());
+	public CompletableFuture<Void> moveTo(String pathName) {
+		return moveTo(pathName, new NullCallback<Void>());
 	}
 
 	@Override
-	public CompletableFuture<Status> moveTo(String pathName, Callback<Status> callback) {
+	public CompletableFuture<Void> moveTo(String pathName, Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> moveTo(status, pathName, callback));
+				.thenCompose(placeHolder -> moveTo(placeHolder, pathName, callback));
 	}
 
-	private CompletableFuture<Status> moveTo(Status status, String pathName, Callback<Status> callback) {
-		CompletableFuture<Status> future = new CompletableFuture<Status>();
+	private CompletableFuture<Void> moveTo(Void placeHolder, String pathName, Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
-			callback = new NullCallback<Status>();
+			callback = new NullCallback<Void>();
 
 		// the pathname must be a absolute path name
 		if (!pathName.startsWith("/")) {
@@ -146,21 +148,21 @@ class OneDriveDirectory extends Directory {
 	}
 
 	@Override
-	public CompletableFuture<Status> copyTo(String pathName) {
-		return copyTo(pathName, new NullCallback<Status>());
+	public CompletableFuture<Void> copyTo(String pathName) {
+		return copyTo(pathName, new NullCallback<Void>());
 	}
 
 	@Override
-	public CompletableFuture<Status> copyTo(String pathName, Callback<Status> callback) {
+	public CompletableFuture<Void> copyTo(String pathName, Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> copyTo(status, pathName, callback));
+				.thenCompose(placeHolder -> copyTo(placeHolder, pathName, callback));
 	}
 
-	private CompletableFuture<Status> copyTo(Status status, String pathName, Callback<Status> callback) {
-		CompletableFuture<Status> future = new CompletableFuture<Status>();
+	private CompletableFuture<Void> copyTo(Void placeHolder, String pathName, Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
-			callback = new NullCallback<Status>();
+			callback = new NullCallback<Void>();
 
 		if (!pathName.startsWith("/")) {
 			HiveException e = new HiveException("Need a absolute path to copyTo");
@@ -208,21 +210,21 @@ class OneDriveDirectory extends Directory {
 	}
 
 	@Override
-	public CompletableFuture<Status> deleteItem() {
-		return deleteItem(new NullCallback<Status>());
+	public CompletableFuture<Void> deleteItem() {
+		return deleteItem(new NullCallback<Void>());
 	}
 
 	@Override
-	public CompletableFuture<Status> deleteItem(Callback<Status> callback) {
+	public CompletableFuture<Void> deleteItem(Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> deleteItem(status, callback));
+				.thenCompose(placeHolder -> deleteItem(placeHolder, callback));
 	}
 
-	private CompletableFuture<Status> deleteItem(Status status, Callback<Status> callback) {
-		CompletableFuture<Status> future = new CompletableFuture<Status>();
+	private CompletableFuture<Void> deleteItem(Void placeHolder, Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
-			callback = new NullCallback<Status>();
+			callback = new NullCallback<Void>();
 
 		if (pathName.equals("/")) {
 			HiveException e = new HiveException("Can't delete the root.");
@@ -255,10 +257,10 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<Directory> createDirectory(String name, Callback<Directory> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> createDirectory(status, name, callback));
+				.thenCompose(placeHolder -> createDirectory(placeHolder, name, callback));
 	}
 
-	private CompletableFuture<Directory> createDirectory(Status status, String name, Callback<Directory> callback) {
+	private CompletableFuture<Directory> createDirectory(Void placeHolder, String name, Callback<Directory> callback) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (callback == null)
@@ -297,7 +299,7 @@ class OneDriveDirectory extends Directory {
 				.thenCompose(status -> getDirectory(status, name, callback));
 	}
 
-	private CompletableFuture<Directory> getDirectory(Status status, String name, Callback<Directory> callback) {
+	private CompletableFuture<Directory> getDirectory(Void status, String name, Callback<Directory> callback) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (callback == null)
@@ -332,7 +334,7 @@ class OneDriveDirectory extends Directory {
 				.thenCompose(status -> createFile(status, name, callback));
 	}
 
-	private CompletableFuture<File> createFile(Status status, String name, Callback<File> callback) {
+	private CompletableFuture<File> createFile(Void status, String name, Callback<File> callback) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (callback == null)
@@ -368,7 +370,7 @@ class OneDriveDirectory extends Directory {
 				.thenCompose(status -> getFile(status, name, callback));
 	}
 
-	private CompletableFuture<File> getFile(Status status, String name, Callback<File> callback) {
+	private CompletableFuture<File> getFile(Void status, String name, Callback<File> callback) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (callback == null)
@@ -404,7 +406,7 @@ class OneDriveDirectory extends Directory {
 				.thenCompose(status -> getChildren(status,callback));
 	}
 
-	private CompletableFuture<Children> getChildren(Status status, Callback<Children> callback) {
+	private CompletableFuture<Children> getChildren(Void status, Callback<Children> callback) {
 		CompletableFuture<Children> future = new CompletableFuture<Children>();
 
 		if (callback == null)
@@ -452,8 +454,12 @@ class OneDriveDirectory extends Directory {
 			}
 
 			JSONObject jsonObject = response.getBody().getObject();
-			dirInfo = new Directory.Info(jsonObject.getString("id"));
-			this.callback.onSuccess(dirInfo);
+			HashMap<String, String> attrs = new HashMap<>();
+			attrs.put(Directory.Info.itemId, jsonObject.getString("id"));
+			// TODO;
+
+			Directory.Info info = new Directory.Info(attrs);
+			this.callback.onSuccess(info);
 			future.complete(dirInfo);
 		}
 
@@ -467,10 +473,10 @@ class OneDriveDirectory extends Directory {
 
 	private class MoveToCallback implements UnirestAsyncCallback<JsonNode> {
 		private final String pathName;
-		private final CompletableFuture<Status> future;
-		private final Callback<Status> callback;
+		private final CompletableFuture<Void> future;
+		private final Callback<Void> callback;
 
-		MoveToCallback(String pathName, CompletableFuture<Status> future, Callback<Status> callback) {
+		MoveToCallback(String pathName, CompletableFuture<Void> future, Callback<Void> callback) {
 			this.pathName = pathName;
 			this.future = future;
 			this.callback = callback;
@@ -497,9 +503,9 @@ class OneDriveDirectory extends Directory {
 			}
 
 			OneDriveDirectory.this.pathName = pathName;
-			Status status = new Status(1);
-			this.callback.onSuccess(status);
-			future.complete(status);
+			Void placeHolder = new Void();
+			this.callback.onSuccess(placeHolder);
+			future.complete(placeHolder);
 		}
 
 		@Override
@@ -511,10 +517,10 @@ class OneDriveDirectory extends Directory {
 	}
 
 	private class CopyToCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Status> future;
-		private final Callback<Status> callback;
+		private final CompletableFuture<Void> future;
+		private final Callback<Void> callback;
 
-		CopyToCallback(CompletableFuture<Status> future, Callback<Status> callback) {
+		CopyToCallback(CompletableFuture<Void> future, Callback<Void> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -539,9 +545,9 @@ class OneDriveDirectory extends Directory {
 				return;
 			}
 
-			Status status = new Status(1);
-			this.callback.onSuccess(status);
-			future.complete(status);
+			Void placeHolder = new Void();
+			this.callback.onSuccess(placeHolder);
+			future.complete(placeHolder);
 		}
 
 		@Override
@@ -553,10 +559,10 @@ class OneDriveDirectory extends Directory {
 	}
 
 	private class DeleteItemCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Status> future;
-		private final Callback<Status> callback;
+		private final CompletableFuture<Void> future;
+		private final Callback<Void> callback;
 
-		DeleteItemCallback(CompletableFuture<Status> future, Callback<Status> callback) {
+		DeleteItemCallback(CompletableFuture<Void> future, Callback<Void> callback) {
 			this.future = future;
 			this.callback = callback;
 		}
@@ -581,9 +587,9 @@ class OneDriveDirectory extends Directory {
 				return;
 			}
 
-			Status status = new Status(1);
-			this.callback.onSuccess(status);
-			future.complete(status);
+			Void placeHolder = new Void();
+			this.callback.onSuccess(placeHolder);
+			future.complete(placeHolder);
 		}
 
 		@Override
@@ -633,8 +639,12 @@ class OneDriveDirectory extends Directory {
 				return;
 			}
 
-			Directory.Info dirInfo = new Directory.Info(jsonObject.getString("id"));
-			OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
+			HashMap<String, String> attrs = new HashMap<>();
+			attrs.put(Directory.Info.itemId, jsonObject.getString("id"));
+			// TODO;
+
+			Directory.Info info = new Directory.Info(attrs);
+			OneDriveDirectory directory = new OneDriveDirectory(pathName, info, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}
@@ -685,8 +695,12 @@ class OneDriveDirectory extends Directory {
 				return;
 			}
 
-			Directory.Info dirInfo = new Directory.Info(jsonObject.getString("id"));
-			OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
+			HashMap<String, String> attrs = new HashMap<>();
+			attrs.put(Directory.Info.itemId, jsonObject.getString("id"));
+			// TODO;
+
+			Directory.Info info = new Directory.Info(attrs);
+			OneDriveDirectory directory = new OneDriveDirectory(pathName, info, authHelper);
 			this.callback.onSuccess(directory);
 			future.complete(directory);
 		}
@@ -738,8 +752,12 @@ class OneDriveDirectory extends Directory {
 				return;
 			}
 
-			File.Info fileInfo = new File.Info(jsonObject.getString("id"));
-			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
+			HashMap<String, String> attrs = new HashMap<>();
+			attrs.put(File.Info.itemId, jsonObject.getString("id"));
+			// TODO;
+
+			File.Info info = new File.Info(attrs);
+			OneDriveFile file = new OneDriveFile(pathName, info, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
 		}
@@ -791,7 +809,11 @@ class OneDriveDirectory extends Directory {
 				return;
 			}
 
-			File.Info fileInfo = new File.Info(jsonObject.getString("id"));
+			HashMap<String, String> attrs = new HashMap<>();
+			attrs.put(File.Info.itemId, jsonObject.getString("id"));
+			// TODO;
+
+			File.Info fileInfo = new File.Info(attrs);
 			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
 			this.callback.onSuccess(file);
 			future.complete(file);
@@ -837,27 +859,20 @@ class OneDriveDirectory extends Directory {
 			JSONObject baseJson = response.getBody().getObject();
 			JSONArray values = baseJson.getJSONArray("value");
 			int len = values.length();
-			ArrayList<Object> childList = new ArrayList<Object>(len);
+			ArrayList<ItemInfo> array = new ArrayList<ItemInfo>(len);
 			if (len > 0) {
 				for (int i = 0; i < len; i++) {
 					JSONObject itemJson = values.getJSONObject(i);
-					String id = itemJson.getString("id");
-					String name = itemJson.getString("name");
-					String path = String.format("%s/%s", OneDriveDirectory.this.pathName, name);
 
-					if (itemJson.has("folder")) {
-						Directory.Info dirInfo = new Directory.Info(id);
-						OneDriveDirectory directory = new OneDriveDirectory(path, dirInfo, authHelper);
-						childList.add(directory);
-					} else {
-						File.Info fileInfo = new File.Info(id);
-						OneDriveFile file = new OneDriveFile(path, fileInfo, authHelper);
-						childList.add(file);
-					}
+					HashMap<String, String> attrs = new HashMap<>();
+					attrs.put(ItemInfo.itemId, itemJson.getString("id"));
+					attrs.put(ItemInfo.type, itemJson.has("Folder") ? "Folder": "File");
+
+					array.add(new ItemInfo(attrs));
 				}
 			}
 
-			Children children = new Children(childList);
+			Children children = new Children(array);
 			this.callback.onSuccess(children);
 			future.complete(children);
 		}

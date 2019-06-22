@@ -1,15 +1,12 @@
 package org.elastos.hive;
 
-public abstract class File implements ResourceItem<File.Info>, FileItem {
-	public static class Info implements ResultItem {
-		private final String fileId;
+import java.util.HashMap;
 
-		public Info(String fileId) {
-			this.fileId = fileId;
-		}
-
-		public String getId() {
-			return fileId;
+public abstract class File extends Result implements ResourceItem<File.Info>, FileItem {
+	public static class Info extends AttributeMap {
+		public static final String itemId = "ItemId";
+		public Info(HashMap<String, String> hash) {
+			super(hash);
 		}
 	}
 }

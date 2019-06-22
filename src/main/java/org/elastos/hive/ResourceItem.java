@@ -2,7 +2,7 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface ResourceItem<R extends ResultItem> extends ResultItem {
+public interface ResourceItem<R extends Result> {
 	String getId();
 	R getLastInfo();
 

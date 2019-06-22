@@ -68,15 +68,14 @@ public class OneDriveFileTest {
 			fail("testMoveToInvalid failed");
 		}
 	}
-	
+
 	@Test public void testCopyTo() {
 		Directory parentDir = null;
 		try {
 			String parentPath = "/parentDir" + System.currentTimeMillis();
 			parentDir = drive.createDirectory(parentPath).get();
 			assertNotNull(parentDir);
-			Status status = testFile.copyTo(parentPath).get();
-			assertEquals(1, status.getStatus());
+			testFile.copyTo(parentPath).get();
 
 			Thread.sleep(5000);
 			Children children = parentDir.getChildren().get();
@@ -102,8 +101,7 @@ public class OneDriveFileTest {
 			parentDir = drive.createDirectory(parentPath).get();
 			assertNotNull(parentDir);
 			String originPath = testFile.getPath();
-			Status status = testFile.copyTo(parentPath).get();
-			assertEquals(1, status.getStatus());
+			testFile.copyTo(parentPath).get();
 
 			//1. Check the parent has a new child.
 			Thread.sleep(2000);
@@ -133,7 +131,7 @@ public class OneDriveFileTest {
 			}
 		}
 	}
-	
+
 	@BeforeClass
 	static public void setUp() throws Exception {
 		try {
@@ -157,13 +155,13 @@ public class OneDriveFileTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    	
+
     	try {
     		parentDirForMoveTo.deleteItem().get();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    	
+
     	client.logout();
     }
 }
