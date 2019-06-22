@@ -15,4 +15,7 @@ public abstract class Drive extends Result implements ResourceItem<Drive.Info>, 
 
 	public abstract CompletableFuture<Directory> getRootDir();
 	public abstract CompletableFuture<Directory> getRootDir(Callback<Directory> callback);
+
+	public abstract CompletableFuture<ItemInfo> getItemInfo(String path);
+	public abstract CompletableFuture<ItemInfo> getItemInfo(String path, Callback<ItemInfo> callback);
 }

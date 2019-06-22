@@ -10,6 +10,7 @@ import org.elastos.hive.Drive;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
+import org.elastos.hive.ItemInfo;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
@@ -543,5 +544,17 @@ final class OneDriveDrive extends Drive {
 			this.callback.onError(e);
 			future.completeExceptionally(e);
 		}
+	}
+
+	@Override
+	public CompletableFuture<ItemInfo> getItemInfo(String path) {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<ItemInfo> getItemInfo(String path, Callback<ItemInfo> callback) {
+		// TODO
+		return null;
 	}
 }
