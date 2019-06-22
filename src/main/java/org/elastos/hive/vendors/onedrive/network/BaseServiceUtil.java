@@ -1,6 +1,7 @@
 package org.elastos.hive.vendors.onedrive.network;
 
 
+import org.elastos.hive.AuthToken;
 import org.elastos.hive.utils.CheckTextUtil;
 import org.elastos.hive.utils.LogUtil;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class BaseServiceUtil {
     private static final int DEFAULT_TIMEOUT = 10;
 
-    public static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl , boolean useGsonConverter) throws Exception {
+    public static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl ,
+                                      boolean useGsonConverter , boolean useAuthHeader,
+                                      AuthToken authToken) throws Exception {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
@@ -39,6 +42,12 @@ public class BaseServiceUtil {
         }
 
         clientBuilder.interceptors().clear();
+
+        if (useAuthHeader){
+            HeaderInterceptor headerInterceptor = new HeaderInterceptor(authToken);
+            clientBuilder.interceptors().add(headerInterceptor);
+        }
+
 
         if (LogUtil.debug){
             NetworkLogInterceptor networkLogInterceptor = new NetworkLogInterceptor();

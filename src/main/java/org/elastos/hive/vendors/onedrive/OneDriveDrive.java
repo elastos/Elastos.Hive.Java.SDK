@@ -12,14 +12,15 @@ import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.ItemInfo;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
-import org.json.JSONObject;
+import org.elastos.hive.vendors.onedrive.Model.CreateDirRequest;
+import org.elastos.hive.vendors.onedrive.Model.DriveResponse;
+import org.elastos.hive.vendors.onedrive.Model.FileOrDirPropResponse;
+import org.elastos.hive.vendors.onedrive.network.Api;
+import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import retrofit2.Call;
+import retrofit2.Response;
 
 final class OneDriveDrive extends Drive {
 	private final AuthHelper authHelper;
@@ -58,15 +59,17 @@ final class OneDriveDrive extends Drive {
 
 	private CompletableFuture<Drive.Info> getInfo(Void status, Callback<Drive.Info> callback) {
 		CompletableFuture<Drive.Info> future = new CompletableFuture<Drive.Info>();
-
 		if (callback == null)
 			callback = new NullCallback<Drive.Info>();
 
-		Unirest.get(OneDriveURL.API)
-			.header(OneDriveHttpHeader.Authorization,
-					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetDriveInfoCallback(future, callback));
-
+		try {
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
+					true ,true , authHelper.getToken());
+			Call call = api.getInfo();
+			call.enqueue(new DriveDriveCallback(null, future , callback , Type.GET_INFO));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return future;
 	}
 
@@ -111,30 +114,28 @@ final class OneDriveDrive extends Drive {
 			return future;
 		}
 
-		String url;
+		String urlPath;
 		String name;
 
 		int pos = pathName.lastIndexOf("/");
 		if (pos == 0) {
 			name = pathName.replace("/", "");
-			url = String.format("%s/root/children", OneDriveURL.API)
-						.replace(" ", "%20");
+			urlPath = "/root/children";
 		} else {
 			String parentPath = pathName.substring(0, pos);
 			name = pathName.substring(pos + 1);
-			url = String.format("%s/root:/%s:/children", OneDriveURL.API, parentPath)
-						.replace(" ", "%20");
+			urlPath = "/root:/"+parentPath+":/children";
 		}
 
-		//conflictBehavior' value : fail, replace, or rename
-		String body = String.format("{\"name\": \"%s\", \"folder\": { }, \"@microsoft.graph.conflictBehavior\": \"fail\"}", name);
-		Unirest.post(url)
-			.header(OneDriveHttpHeader.Authorization,
-					OneDriveHttpHeader.bearerValue(authHelper))
-			.header(OneDriveHttpHeader.ContentType, OneDriveHttpHeader.Json)
-			.body(body)
-			.asJsonAsync(new CreateDirectoryCallback(pathName, future, callback));
-
+		CreateDirRequest createDirRequest = new CreateDirRequest(name);
+		try {
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
+					true ,true , authHelper.getToken());
+			Call call = api.createDir(urlPath , createDirRequest);
+			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.CREATE_DIR));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return future;
 	}
 
@@ -162,20 +163,21 @@ final class OneDriveDrive extends Drive {
 			return future;
 		}
 
-		String url;
+		String fullPath;
+		if (pathName.equals("/")){
+			fullPath = Constance.ROOT ;
+		} else {
+			fullPath = Constance.ROOT+":"+pathName;
+		}
 
-		if (pathName.equals("/"))
-			url = String.format("%s/root", OneDriveURL.API)
-					    .replace(" ", "%20");
-		else
-			url = String.format("%s/root:%s", OneDriveURL.API, pathName)
-						.replace(" ", "%20");
-
-		Unirest.get(url)
-			.header(OneDriveHttpHeader.Authorization,
-					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetDirectoryCallback(pathName, future, callback));
-
+		try {
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
+					true ,true , authHelper.getToken());
+			Call call = api.getFileOrDirProp(fullPath);
+			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_DIR));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return future;
 	}
 
@@ -210,13 +212,14 @@ final class OneDriveDrive extends Drive {
 			return future;
 		}
 
-		String url = String.format("%s/root:%s:/content", OneDriveURL.API, pathName)
-						   .replace(" ", "%20");
-
-		Unirest.put(url)
-			.header(OneDriveHttpHeader.Authorization,
-					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new CreateFileCallback(pathName, future, callback));
+		try {
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
+					true ,true , authHelper.getToken());
+			Call call = api.createFile(pathName);
+			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.CREATE_FILE));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return future;
 	}
@@ -252,301 +255,128 @@ final class OneDriveDrive extends Drive {
 			return future;
 		}
 
-		String url = String.format("%s/root:%s", OneDriveURL.API, pathName)
-						   .replace(" ", "%20");
+		String fullPath;
+		if (pathName.equals("/")){
+			fullPath = Constance.ROOT ;
+		} else {
+			fullPath = Constance.ROOT+":"+pathName;
+		}
 
-		Unirest.get(url)
-			.header(OneDriveHttpHeader.Authorization,
-					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetFileCallback(pathName, future, callback));
+		try {
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
+					true ,true , authHelper.getToken());
+			Call call = api.getFileOrDirProp(fullPath);
+			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_FILE));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return future;
 	}
 
-	private class GetDriveInfoCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Drive.Info> future;
-		private final Callback<Drive.Info> callback;
-
-		private GetDriveInfoCallback(CompletableFuture<Drive.Info> future, Callback<Drive.Info> callback) {
-			this.future = future;
-			this.callback = callback;
-		}
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
-				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			JSONObject jsonObject = response.getBody().getObject();
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Drive.Info.driveId,  jsonObject.getString("id"));
-			driveInfo = new Drive.Info(attrs);
-			this.callback.onSuccess(driveInfo);
-			future.complete(driveInfo);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
-		}
-	}
-
-	private class CreateFileCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
-		private final CompletableFuture<File> future;
-		private final Callback<File> callback;
-
-		private CreateFileCallback(String pathName, CompletableFuture<File> future, Callback<File> callback) {
-			this.pathName = pathName;
-			this.future = future;
-			this.callback = callback;
-		}
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
-				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			if (response.getStatus() != 201 && response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			JSONObject jsonObject = response.getBody().getObject();
-			boolean isFile = !jsonObject.has("folder");
-
-			if (!isFile) {
-				HiveException e = new HiveException("This is not a file");
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(File.Info.itemId, jsonObject.getString("id"));
-			//TODO:
-
-			File.Info fileInfo = new File.Info(attrs);
-			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
-			this.callback.onSuccess(file);
-			future.complete(file);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
-		}
-	}
-
-	private class CreateDirectoryCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
-		private final CompletableFuture<Directory> future;
-		private final Callback<Directory> callback;
-
-		private CreateDirectoryCallback(String pathName, CompletableFuture<Directory> future, Callback<Directory> callback) {
-			this.pathName = pathName;
-			this.future = future;
-			this.callback = callback;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
-				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			if (response.getStatus() != 201) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			JSONObject jsonObject = response.getBody().getObject();
-			boolean isFolder = jsonObject.has("folder");
-
-			if (!isFolder) {
-				HiveException e = new HiveException("This is not a folder");
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Directory.Info.itemId, jsonObject.getString("id"));
-			// TODO;
-
-			Directory.Info info = new Directory.Info(attrs);
-			OneDriveDirectory directory = new OneDriveDirectory(pathName, info, authHelper);
-			this.callback.onSuccess(directory);
-			future.complete(directory);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
-		}
-	}
-
-	private class GetFileCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
-		private final CompletableFuture<File> future;
-		private final Callback<File> callback;
-
-		private GetFileCallback(String pathName, CompletableFuture<File> future, Callback<File> callback) {
-			this.pathName = pathName;
-			this.future = future;
-			this.callback = callback;
-		}
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
-				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			if (response.getStatus() != 200 && response.getStatus() != 201) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			JSONObject jsonObject = response.getBody().getObject();
-			boolean isFile = !jsonObject.has("folder");
-			if (!isFile) {
-				HiveException e = new HiveException("This is not a file");
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(File.Info.itemId, jsonObject.getString("id"));
-			//TODO:
-
-			File.Info fileInfo = new File.Info(attrs);
-			OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
-			this.callback.onSuccess(file);
-			future.complete(file);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class GetDirectoryCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
-		private final CompletableFuture<Directory> future;
-		private final Callback<Directory> callback;
-
-		private GetDirectoryCallback(String pathName, CompletableFuture<Directory> future, Callback<Directory> callback) {
-			this.pathName = pathName;
-			this.future = future;
-			this.callback = callback;
-		}
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
-				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			JSONObject jsonObject = response.getBody().getObject();
-			boolean isDir = jsonObject.has("folder");
-			if (!isDir) {
-				HiveException e = new HiveException("This is not a folder");
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Directory.Info.itemId, jsonObject.getString("id"));
-			// TODO;
-
-			Directory.Info info = new Directory.Info(attrs);
-			OneDriveDirectory directory = new OneDriveDirectory(pathName, info, authHelper);
-			this.callback.onSuccess(directory);
-			future.complete(directory);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
-
 	@Override
 	public CompletableFuture<ItemInfo> getItemInfo(String path) {
-		// TODO
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<ItemInfo> getItemInfo(String path, Callback<ItemInfo> callback) {
-		// TODO
 		return null;
+	}
+
+	private class DriveDriveCallback implements retrofit2.Callback{
+		private final String pathName;
+		private final CompletableFuture future;
+		private final Callback callback;
+		private final Type type ;
+
+		public DriveDriveCallback(String pathName, CompletableFuture future, Callback callback , Type type) {
+			this.pathName = pathName;
+			this.future = future;
+			this.callback = callback;
+			this.type = type ;
+		}
+
+		@Override
+		public void onResponse(Call call, Response response) {
+			if (response.code() == 401) {
+				authHelper.getToken().expired();
+				HiveException e = new HiveException("Server Error: " + response.message());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
+				return;
+			}
+
+			if (response.code() != 200 && response.code() != 201) {
+				HiveException ex = new HiveException("Server Error: " + response.message());
+				this.callback.onError(ex);
+				future.completeExceptionally(ex);
+				return;
+			}
+
+			switch (type){
+				case GET_INFO:
+
+					DriveResponse driveResponse= (DriveResponse) response.body();
+
+					HashMap<String, String> attrs = new HashMap<>();
+					attrs.put(Drive.Info.driveId, driveResponse.getId());
+
+					Drive.Info driveInfo = new Drive.Info(attrs);
+					this.callback.onSuccess(driveInfo);
+					future.complete(driveInfo);
+					break;
+				case CREATE_DIR:
+				case GET_DIR:
+					FileOrDirPropResponse dirResponse= (FileOrDirPropResponse) response.body();
+
+					if (dirResponse.getFolder() == null) {
+						HiveException e = new HiveException("This is not a folder");
+						this.callback.onError(e);
+						future.completeExceptionally(e);
+						return;
+					}
+
+					HashMap<String, String> dirAttrs = new HashMap<>();
+					dirAttrs.put(Directory.Info.itemId, dirResponse.getId());
+
+					Directory.Info dirInfo_ = new Directory.Info(dirAttrs);
+					OneDriveDirectory directory = new OneDriveDirectory(pathName,dirInfo_,authHelper);
+					this.callback.onSuccess(directory);
+					future.complete(directory);
+
+					break;
+				case CREATE_FILE:
+				case GET_FILE:
+					FileOrDirPropResponse filePropResponse= (FileOrDirPropResponse) response.body();
+
+					if (filePropResponse.getFolder()!=null) {
+						HiveException e = new HiveException("This is not a file");
+						this.callback.onError(e);
+						future.completeExceptionally(e);
+						return;
+					}
+
+					HashMap<String, String> fileAttrs = new HashMap<>();
+					fileAttrs.put(File.Info.itemId, filePropResponse.getId());
+
+					File.Info fileInfo = new File.Info(fileAttrs);
+					OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
+					this.callback.onSuccess(file);
+					future.complete(file);
+					break;
+			}
+		}
+
+		@Override
+		public void onFailure(Call call, Throwable t) {
+			HiveException e = new HiveException(t.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
+		}
+	}
+
+	private enum Type{
+		GET_INFO, CREATE_DIR , CREATE_FILE , GET_DIR , GET_FILE
 	}
 }
