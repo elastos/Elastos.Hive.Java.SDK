@@ -33,11 +33,9 @@ public final class OneDriveClient extends Client {
 	private Client.Info clientInfo;
 	private String userId;
 	private KeyStore keyStore;
-	private static String keystorePath;
 
 	private OneDriveClient(OneDriveParameter parameter) {
-		keystorePath = parameter.getKeyStorePath();
-		keyStore = new KeyStore(keystorePath);
+		keyStore = new KeyStore(parameter.getKeyStorePath());
 		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry(), keyStore);
 	}
 
