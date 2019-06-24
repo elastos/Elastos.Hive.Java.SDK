@@ -10,6 +10,7 @@ import org.elastos.hive.NullCallback;
 import org.elastos.hive.OAuthEntry;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.UrlUtil;
+import org.elastos.hive.vendors.onedrive.Model.BaseServiceConfig;
 import org.elastos.hive.vendors.onedrive.Model.TokenResponse;
 import org.elastos.hive.vendors.onedrive.network.AuthApi;
 import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
@@ -30,8 +31,8 @@ public class OneDriveAuthHelper implements AuthHelper {
 	protected OneDriveAuthHelper(OAuthEntry authEntry) {
 		this.authEntry = authEntry;
 		try {
-			authApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL ,
-					true , false , null);
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,false,null,false);
+			authApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL ,baseServiceConfig);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -66,8 +67,8 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 		AuthApi logoutApi = null;
 		try {
-			logoutApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL ,
-					false , false ,null);
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(false,false,null,false);
+			logoutApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL ,baseServiceConfig);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -1,9 +1,9 @@
 package org.elastos.hive.vendors.onedrive.network;
 
 
-import org.elastos.hive.AuthToken;
 import org.elastos.hive.utils.CheckTextUtil;
 import org.elastos.hive.utils.LogUtil;
+import org.elastos.hive.vendors.onedrive.Model.BaseServiceConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -21,15 +21,18 @@ public class BaseServiceUtil {
     private static final int DEFAULT_TIMEOUT = 10;
 
     public static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl ,
-                                      boolean useGsonConverter , boolean useAuthHeader,
-                                      AuthToken authToken) throws Exception {
+                                      BaseServiceConfig baseServiceConfig) throws Exception {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
 
-        if (useGsonConverter){
+        if (baseServiceConfig.isNobody()){
+            retrofitBuilder.addConverterFactory(NobodyConverterFactory.create());
+        }
+
+        if (baseServiceConfig.isUseGsonConverter()){
             retrofitBuilder.addConverterFactory(GsonConverterFactory.create());
         }else{
             retrofitBuilder.addConverterFactory(new StringConverterFactory());
@@ -43,11 +46,10 @@ public class BaseServiceUtil {
 
         clientBuilder.interceptors().clear();
 
-        if (useAuthHeader){
-            HeaderInterceptor headerInterceptor = new HeaderInterceptor(authToken);
+        if (baseServiceConfig.isUseAuthHeader()){
+            HeaderInterceptor headerInterceptor = new HeaderInterceptor(baseServiceConfig.getAuthToken());
             clientBuilder.interceptors().add(headerInterceptor);
         }
-
 
         if (LogUtil.debug){
             NetworkLogInterceptor networkLogInterceptor = new NetworkLogInterceptor();
