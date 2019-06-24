@@ -1,8 +1,5 @@
 package org.elastos.hive.vendors.onedrive;
 
-import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
-
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Directory;
@@ -13,11 +10,15 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.ItemInfo;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
+import org.elastos.hive.vendors.onedrive.Model.BaseServiceConfig;
 import org.elastos.hive.vendors.onedrive.Model.CreateDirRequest;
 import org.elastos.hive.vendors.onedrive.Model.DriveResponse;
 import org.elastos.hive.vendors.onedrive.Model.FileOrDirPropResponse;
 import org.elastos.hive.vendors.onedrive.network.Api;
 import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
+
+import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -63,8 +64,8 @@ final class OneDriveDrive extends Drive {
 			callback = new NullCallback<Drive.Info>();
 
 		try {
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
-					true ,true , authHelper.getToken());
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
 			Call call = api.getInfo();
 			call.enqueue(new DriveDriveCallback(null, future , callback , Type.GET_INFO));
 		} catch (Exception e) {
@@ -129,8 +130,8 @@ final class OneDriveDrive extends Drive {
 
 		CreateDirRequest createDirRequest = new CreateDirRequest(name);
 		try {
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
-					true ,true , authHelper.getToken());
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
 			Call call = api.createDir(urlPath , createDirRequest);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.CREATE_DIR));
 		} catch (Exception e) {
@@ -171,8 +172,8 @@ final class OneDriveDrive extends Drive {
 		}
 
 		try {
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
-					true ,true , authHelper.getToken());
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
 			Call call = api.getFileOrDirProp(fullPath);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_DIR));
 		} catch (Exception e) {
@@ -213,8 +214,8 @@ final class OneDriveDrive extends Drive {
 		}
 
 		try {
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
-					true ,true , authHelper.getToken());
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
 			Call call = api.createFile(pathName);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.CREATE_FILE));
 		} catch (Exception e) {
@@ -263,8 +264,8 @@ final class OneDriveDrive extends Drive {
 		}
 
 		try {
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
-					true ,true , authHelper.getToken());
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
 			Call call = api.getFileOrDirProp(fullPath);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_FILE));
 		} catch (Exception e) {
