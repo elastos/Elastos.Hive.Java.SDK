@@ -10,6 +10,7 @@ import org.elastos.hive.Client;
 import org.elastos.hive.Drive;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
+import org.elastos.hive.JsonPersistent;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
@@ -232,6 +233,22 @@ public final class OneDriveClient extends Client {
 			HiveException e = new HiveException(exception.getMessage());
 			this.callback.onError(e);
 			future.completeExceptionally(e);
+		}
+	}
+
+	class KeyStore implements JsonPersistent {
+		//private String storePath;
+
+		@Override
+		public JSONObject parseFrom() throws HiveException {
+			// TODO
+			return null;
+		}
+
+		@Override
+		public void upateContent(JSONObject conetnt) throws HiveException {
+			// TODO
+
 		}
 	}
 }
