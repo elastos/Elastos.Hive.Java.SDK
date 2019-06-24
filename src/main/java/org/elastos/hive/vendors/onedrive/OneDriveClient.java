@@ -8,6 +8,7 @@ import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
+import org.elastos.hive.vendors.onedrive.Model.BaseServiceConfig;
 import org.elastos.hive.vendors.onedrive.Model.DriveResponse;
 import org.elastos.hive.vendors.onedrive.network.Api;
 import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
@@ -100,8 +101,8 @@ public final class OneDriveClient extends Client {
 			callback = new NullCallback<Client.Info>();
 
 		try {
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
-					true ,true , authHelper.getToken());
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
 			Call call = api.getInfo();
 			call.enqueue(new DriveClientCallback(future , callback , Type.GET_INFO));
 		} catch (Exception e) {
@@ -129,8 +130,8 @@ public final class OneDriveClient extends Client {
 			callback = new NullCallback<Drive>();
 
 		try {
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,
-					true ,true , authHelper.getToken());
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
 			Call call = api.getDrive();
 			call.enqueue(new DriveClientCallback(future , callback , Type.GET_DEFAULT_DRIVE));
 		} catch (Exception e) {
