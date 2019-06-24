@@ -1,19 +1,14 @@
 package org.elastos.hive;
 
 public class AuthToken {
-	@SuppressWarnings("unused")
-	private final String scope;
 	private final String refreshToken;
 	private final String accessToken;
 	private long experitime;
-	private final long createdTime;
 
-	public AuthToken(String scope, String refreshToken, String accessToken, long experitime) {
-		this.scope = scope;
-		this.accessToken = accessToken;
+	public AuthToken(String refreshToken, String accessToken, long experitime) {
 		this.refreshToken = refreshToken;
+		this.accessToken = accessToken;
 		this.experitime = experitime;
-		this.createdTime = System.currentTimeMillis() / 1000;
 	}
 
 	public String getRefreshToken() {
@@ -24,9 +19,13 @@ public class AuthToken {
 		return accessToken;
 	}
 
+	public long getExpiredTime() {
+		return experitime;
+	}
+
 	public boolean isExpired() {
 		long currentSeconds = System.currentTimeMillis() / 1000;
-		if (currentSeconds >= (createdTime + experitime)) {
+		if (currentSeconds >= experitime) {
 			return true;
 		}
 

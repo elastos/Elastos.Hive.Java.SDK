@@ -6,9 +6,11 @@ import org.elastos.hive.Parameter;
 
 public class OneDriveParameter implements Parameter<OAuthEntry> {
 	private final OAuthEntry authEntry;
+	private final String keyStorePath;
 
-	public OneDriveParameter(OAuthEntry data) {
+	public OneDriveParameter(OAuthEntry data, String storePath) {
 		this.authEntry = data;
+		this.keyStorePath = storePath;
 	}
 
 	@Override
@@ -23,7 +25,6 @@ public class OneDriveParameter implements Parameter<OAuthEntry> {
 
 	@Override
 	public String getKeyStorePath() {
-		// TODO
-		return null;
+		return keyStorePath;
 	}
 }
