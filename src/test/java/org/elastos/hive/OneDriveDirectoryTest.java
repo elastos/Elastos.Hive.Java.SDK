@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -166,7 +166,7 @@ public class OneDriveDirectoryTest {
 			assertEquals(1, children.getContent().size());
 
 			//2. Check: the origin and the new path is different
-			assertNotEquals(originPath, testDirectory.getPath());
+			assertFalse(originPath.equals(testDirectory.getPath()));
 
 			//3. Check: the origin path is invalid.
 			try {

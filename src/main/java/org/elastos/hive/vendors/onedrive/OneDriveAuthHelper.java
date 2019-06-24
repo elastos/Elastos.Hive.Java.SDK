@@ -13,7 +13,7 @@ import org.elastos.hive.NullCallback;
 import org.elastos.hive.OAuthEntry;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -23,9 +23,11 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 class OneDriveAuthHelper implements AuthHelper {
 	private final OAuthEntry authEntry;
 	private AuthToken token;
+	private final OneDriveClient.KeyStore keyStore;
 
-	OneDriveAuthHelper(OAuthEntry authEntry) {
+	OneDriveAuthHelper(OAuthEntry authEntry, OneDriveClient.KeyStore keyStore) {
 		this.authEntry = authEntry;
+		this.keyStore = keyStore;
 	}
 
 	@Override
@@ -42,12 +44,30 @@ class OneDriveAuthHelper implements AuthHelper {
 	public CompletableFuture<Void> loginAsync(Authenticator authenticator,
 		Callback<Void> callback) {
 
+		//load the local data, if invalid, invoke the http interfaces to login.
+		if (hasLocalData()) {
+			long current = System.currentTimeMillis() / 1000;
+			//Check the expire time
+			if (token.getExpiredTime() > current) {
+				CompletableFuture<Void> future = new CompletableFuture<Void>();
+				Void placeHolder = new Void();
+			    callback.onSuccess(placeHolder);
+				future.complete(placeHolder);
+				return future;
+			}
+
+			return redeemToken(callback);
+		}
+
 		return getAuthCode(authenticator)
 				.thenCompose(code -> getToken(code, callback));
 	}
 
 	@Override
 	public CompletableFuture<Void> logoutAsync() {
+		//clear the access_token, refresh_token and expires_at in the config.
+		clearTokenInfo();
+
 		return logoutAsync(new NullCallback<Void>());
 	}
 
@@ -155,6 +175,57 @@ class OneDriveAuthHelper implements AuthHelper {
 		return future;
 	}
 
+	private boolean hasLocalData() {
+		try {
+			//get the access_token, refresh_token and expires_at from the config.
+			JSONObject config = keyStore.parseFrom();
+			if (config.containsKey(OneDriveUtils.RefreshToken) && config.containsKey(OneDriveUtils.AccessToken)
+					&& config.containsKey(OneDriveUtils.ExpiresAt)) {
+				long experitime = (long)config.get(OneDriveUtils.ExpiresAt);
+				String refreshToken = (String)config.get(OneDriveUtils.RefreshToken);
+				String accessToken = (String)config.get(OneDriveUtils.AccessToken);
+				this.token = new AuthToken(refreshToken, accessToken, experitime);
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+	
+	private void clearTokenInfo() {
+		try {
+			JSONObject config = keyStore.parseFrom();
+			//clear the access_token, refresh_token and expires_at
+			config.remove(OneDriveUtils.RefreshToken);
+			config.remove(OneDriveUtils.AccessToken);
+			config.remove(OneDriveUtils.ExpiresAt);
+
+			keyStore.upateContent(config);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void storeLocalData() {
+		try {
+			JSONObject config = new JSONObject();
+
+			//store the info.
+			config.put(OneDriveUtils.ClientId, authEntry.getClientId());
+			config.put(OneDriveUtils.Scope, authEntry.getScope());
+			config.put(OneDriveUtils.RedirectUrl, authEntry.getRedirectURL());
+			config.put(OneDriveUtils.RefreshToken, token.getRefreshToken());
+			config.put(OneDriveUtils.AccessToken, token.getAccessToken());
+			config.put(OneDriveUtils.ExpiresAt, token.getExpiredTime());
+
+			keyStore.upateContent(config);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private class GetTokenCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<Void> future;
 		private final Callback<Void> callback;
@@ -175,13 +246,16 @@ class OneDriveAuthHelper implements AuthHelper {
 				return;
 			}
 
-			JSONObject jsonObject = response.getBody().getObject();
-			AuthToken token = new AuthToken(jsonObject.getString("scope"),
-											jsonObject.getString("refresh_token"),
+			org.json.JSONObject jsonObject = response.getBody().getObject();
+			long experitime = System.currentTimeMillis() / 1000 + jsonObject.getLong("expires_in");
+			AuthToken token = new AuthToken(jsonObject.getString("refresh_token"),
 											jsonObject.getString("access_token"),
-											jsonObject.getLong("expires_in"));
+											experitime);
 
 			OneDriveAuthHelper.this.token = token;
+
+			//Store the local data.
+			storeLocalData();
 
 			Void placeHolder = new Void();
 		    callback.onSuccess(placeHolder);

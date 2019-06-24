@@ -29,7 +29,7 @@ public class OneDriveTestBase {
 
 		try {
 			OAuthEntry entry = new OAuthEntry(APPID, SCOPE, REDIRECTURL);
-			OneDriveParameter parameter = new OneDriveParameter(entry);
+			OneDriveParameter parameter = new OneDriveParameter(entry, System.getProperty("user.dir"));
 
 			Client client = Client.createInstance(parameter);
 			assertNotNull(client);

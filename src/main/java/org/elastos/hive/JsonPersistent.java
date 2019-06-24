@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 
 public interface JsonPersistent {
 	JSONObject parseFrom() throws HiveException;
