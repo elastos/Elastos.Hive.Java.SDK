@@ -1,8 +1,5 @@
 package org.elastos.hive.vendors.onedrive;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -13,13 +10,11 @@ import org.elastos.hive.Client;
 import org.elastos.hive.Drive;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.JsonPersistent;
 import org.elastos.hive.NullCallback;
+import org.elastos.hive.Persistent;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -32,11 +27,11 @@ public final class OneDriveClient extends Client {
 	private final OneDriveAuthHelper authHelper;
 	private Client.Info clientInfo;
 	private String userId;
-	private KeyStore keyStore;
+	private final Persistent persistent;
 
 	private OneDriveClient(OneDriveParameter parameter) {
-		keyStore = new KeyStore(parameter.getKeyStorePath());
-		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry(), keyStore);
+		persistent = new KeyStore(parameter.getKeyStorePath());
+		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry(), persistent);
 	}
 
 	public static Client createInstance(OneDriveParameter parameter) {
@@ -170,8 +165,8 @@ public final class OneDriveClient extends Client {
 				return;
 			}
 
-			org.json.JSONObject jsonObject = response.getBody().getObject();
-			org.json.JSONObject userObject = jsonObject.getJSONObject("owner").getJSONObject("user");
+			JSONObject jsonObject = response.getBody().getObject();
+			JSONObject userObject = jsonObject.getJSONObject("owner").getJSONObject("user");
 			Client.Info info;
 
 			HashMap<String, String> attrs = new HashMap<String, String>();
@@ -224,7 +219,7 @@ public final class OneDriveClient extends Client {
 				return;
 			}
 
-			org.json.JSONObject jsonObject = response.getBody().getObject();
+			JSONObject jsonObject = response.getBody().getObject();
 			HashMap<String, String> attrs = new HashMap<>();
 			attrs.put(Drive.Info.driveId, jsonObject.getString("id"));
 			// TODO;
@@ -243,7 +238,7 @@ public final class OneDriveClient extends Client {
 		}
 	}
 
-	class KeyStore implements JsonPersistent {
+	class KeyStore implements Persistent {
 		private String storePath;
 
 		KeyStore(String storePath) {
@@ -252,34 +247,13 @@ public final class OneDriveClient extends Client {
 
 		@Override
 		public JSONObject parseFrom() throws HiveException {
-			JSONParser parser = new JSONParser();
-	        try {
-				return (JSONObject) parser.parse(new FileReader(storePath));
-			} catch(Exception e) {
-				throw new HiveException(e.getMessage());
-	        }
+			// TODO:
+			return null;
 		}
 
 		@Override
 		public void upateContent(JSONObject conetnt) throws HiveException {
-			FileWriter fileWriter = null;
-			try {
-				fileWriter = new FileWriter(storePath);
-
-				// Writting the jsonObject into sample.json
-				fileWriter.write(conetnt.toJSONString());
-			} catch (Exception e) {
-				throw new HiveException(e.getMessage());
-			}
-			finally {
-				if (fileWriter != null) {
-					try {
-						fileWriter.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+			// TODO
 		}
 	}
 }
