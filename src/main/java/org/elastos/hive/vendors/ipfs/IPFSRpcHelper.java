@@ -6,8 +6,10 @@ import org.elastos.hive.AuthHelper;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
+import org.elastos.hive.HiveException;
 import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.NullCallback;
+import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -16,6 +18,10 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 class IPFSRpcHelper implements AuthHelper {
+	static final String CONFIG      = "ipfs.json";
+	static final String LASTUID     = "last_uid";
+	static final String UIDS        = "uids";
+	
 	private final IPFSEntry entry;
 	private boolean isValid = false;
 	private String BASEURL  = null;
@@ -125,6 +131,61 @@ class IPFSRpcHelper implements AuthHelper {
 		});
 
 		return future;
+	}
+
+	CompletableFuture<String> stat(String path) {
+		CompletableFuture<String> future = new CompletableFuture<String>();
+
+		String url = String.format("%s%s", getBaseUrl(), IPFSMethod.STAT);
+		Unirest.get(url)
+				.header(IPFSURL.ContentType, IPFSURL.Json)
+				.queryString(IPFSURL.UID, getIpfsEntry().getUid())
+				.queryString(IPFSURL.PATH, path)
+				.asJsonAsync(new StatCallback(future));
+
+		return future;
+	}
+
+	CompletableFuture<Void> publish(String hash) {
+		//
+		return null;
+	}
+
+	boolean isFile(String type) {
+		return type != null && type.equals("file");
+	}
+
+	boolean isFolder(String type) {
+		return type != null && type.equals("directory");
+	}
+	
+	private class StatCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<String> future;
+
+		StatCallback(CompletableFuture<String> future) {
+			this.future = future;
+		}
+
+		@Override
+		public void cancelled() {}
+
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() != 200) {
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				future.completeExceptionally(e);
+				return;
+			}
+
+			String hash = response.getBody().getObject().getString("Hash");
+			future.complete(hash);
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			HiveException e = new HiveException(exception.getMessage());
+			future.completeExceptionally(e);
+		}
 	}
 
 	String getBaseUrl() {

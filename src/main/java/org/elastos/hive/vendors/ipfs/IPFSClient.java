@@ -56,7 +56,7 @@ public final class IPFSClient extends Client {
 						dataFile.mkdirs();
 					}
 
-					File ipfsConfig = new File(dataFile, IPFSUtils.CONFIG);
+					File ipfsConfig = new File(dataFile, IPFSRpcHelper.CONFIG);
 					if (!ipfsConfig.exists()) {
 						ipfsConfig.createNewFile();
 					}
@@ -216,7 +216,7 @@ public final class IPFSClient extends Client {
 		BufferedReader bufferedReader = null;
 		BufferedWriter writer = null;
 		try {
-			File ipfsConfig = new File(keystorePath, IPFSUtils.CONFIG);
+			File ipfsConfig = new File(keystorePath, IPFSRpcHelper.CONFIG);
 			InputStreamReader reader = new InputStreamReader(new FileInputStream(ipfsConfig));
 			bufferedReader = new BufferedReader(reader);
 			String line;
@@ -234,10 +234,10 @@ public final class IPFSClient extends Client {
 			}
 
 			//save at "last_uid"
-			config.put(IPFSUtils.LASTUID, uid);
+			config.put(IPFSRpcHelper.LASTUID, uid);
 
 			//and save in the uid array.
-			String uids = IPFSUtils.UIDS;
+			String uids = IPFSRpcHelper.UIDS;
 			JSONArray uidArray = null;
 			if (!config.has(uids)) {
 				uidArray = new JSONArray();
@@ -293,7 +293,7 @@ public final class IPFSClient extends Client {
 	private static String getUid() {
 		BufferedReader bufferedReader = null;
 		try {
-			File ipfsConfig = new File(keystorePath, IPFSUtils.CONFIG);
+			File ipfsConfig = new File(keystorePath, IPFSRpcHelper.CONFIG);
 			InputStreamReader reader = new InputStreamReader(new FileInputStream(ipfsConfig));
 			bufferedReader = new BufferedReader(reader);
 			String line;
@@ -307,10 +307,10 @@ public final class IPFSClient extends Client {
 			}
 
 			JSONObject config = new JSONObject(content);
-			if (!config.has(IPFSUtils.LASTUID)) {
+			if (!config.has(IPFSRpcHelper.LASTUID)) {
 				return null;
 			}
-			return config.getString(IPFSUtils.LASTUID);
+			return config.getString(IPFSRpcHelper.LASTUID);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -349,7 +349,8 @@ public final class IPFSClient extends Client {
 			}
 
 			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid()); // TODO;
+			attrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid());
+			attrs.put(Client.Info.userId, rpcHelper.getIpfsEntry().getUid());
 			// TODO;
 
 			clientInfo = new Client.Info(attrs);
