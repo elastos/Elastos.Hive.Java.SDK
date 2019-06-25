@@ -4,8 +4,8 @@ package org.elastos.hive.vendors.onedrive.network;
 import org.elastos.hive.vendors.onedrive.Constance;
 import org.elastos.hive.vendors.onedrive.Model.CreateDirRequest;
 import org.elastos.hive.vendors.onedrive.Model.DirChildrenResponse;
-import org.elastos.hive.vendors.onedrive.Model.DirInfoResponse;
-import org.elastos.hive.vendors.onedrive.Model.DirMoveAndCopyReqest;
+import org.elastos.hive.vendors.onedrive.Model.DirOrFileInfoResponse;
+import org.elastos.hive.vendors.onedrive.Model.MoveAndCopyReqest;
 import org.elastos.hive.vendors.onedrive.Model.DriveResponse;
 import org.elastos.hive.vendors.onedrive.Model.FileOrDirPropResponse;
 import org.elastos.hive.vendors.onedrive.Model.NoBodyEntity;
@@ -47,13 +47,13 @@ public interface Api {
     Call<FileOrDirPropResponse> createDir(@Path("path") String path , @Body CreateDirRequest dirRequest);
 
     @GET(Constance.DRIVE+"/root:/{path}")
-    Call<DirInfoResponse> getDirInfo(@Path("path")String path);
+    Call<DirOrFileInfoResponse> getDirAndFileInfo(@Path("path")String path);
 
     @PATCH(Constance.DRIVE+"/root:{path}")
-    Call<NoBodyEntity> moveTo(@Path("path")String path , @Body DirMoveAndCopyReqest dirMoveAndCopyReqest);
+    Call<NoBodyEntity> moveTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
 
     @POST(Constance.DRIVE+"/root:{path}:/copy")
-    Call<NoBodyEntity> copyTo(@Path("path")String path , @Body DirMoveAndCopyReqest dirMoveAndCopyReqest);
+    Call<NoBodyEntity> copyTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
 
     @DELETE(Constance.DRIVE+"/root:{path}")
     Call<NoBodyEntity> deleteItem(@Path("path")String path);
