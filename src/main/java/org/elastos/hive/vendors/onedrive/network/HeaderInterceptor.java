@@ -9,11 +9,6 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.network
- * ClassName: HeaderInterceptor
- * Created by ranwang on 2019/6/20.
- */
 public class HeaderInterceptor implements Interceptor{
     private final AuthToken authToken;
     public HeaderInterceptor(AuthToken authToken) {

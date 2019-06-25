@@ -12,11 +12,6 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.network
- * ClassName: BaseServiceUtil
- * Created by ranwang on 2019/6/17.
- */
 public class BaseServiceUtil {
     private static final int DEFAULT_TIMEOUT = 10;
 

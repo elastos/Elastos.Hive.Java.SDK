@@ -91,22 +91,24 @@ public final class OneDriveClient extends Client {
 	@Override
 	public CompletableFuture<Client.Info> getInfo(Callback<Client.Info> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> getInfo(status, callback));
+				.thenCompose(padding -> getInfo(padding, callback));
 	}
 
-	private CompletableFuture<Client.Info> getInfo(Void status, Callback<Client.Info> callback) {
+	private CompletableFuture<Client.Info> getInfo(Void padding, Callback<Client.Info> callback) {
 		CompletableFuture<Client.Info> future = new CompletableFuture<Client.Info>();
 
 		if (callback == null)
 			callback = new NullCallback<Client.Info>();
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getInfo();
 			call.enqueue(new DriveClientCallback(future , callback , Type.GET_INFO));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -120,36 +122,38 @@ public final class OneDriveClient extends Client {
 	@Override
 	public CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> getDefaultDrive(status, callback));
+				.thenCompose(padding -> getDefaultDrive(padding, callback));
 	}
 
-	private CompletableFuture<Drive> getDefaultDrive(Void status, Callback<Drive> callback) {
+	private CompletableFuture<Drive> getDefaultDrive(Void padding, Callback<Drive> callback) {
 		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
 
 		if (callback == null)
 			callback = new NullCallback<Drive>();
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getDrive();
 			call.enqueue(new DriveClientCallback(future , callback , Type.GET_DEFAULT_DRIVE));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
 	}
 
 	private class DriveClientCallback implements retrofit2.Callback{
-		CompletableFuture future ;
-		Callback callback ;
-		Type type ;
+		CompletableFuture future;
+		Callback callback;
+		Type type;
 
 		public DriveClientCallback(CompletableFuture future , Callback callback , Type type) {
-			this.future = future ;
-			this.callback = callback ;
-			this.type = type ;
+			this.future = future;
+			this.callback = callback;
+			this.type = type;
 		}
 
 		@Override
@@ -170,12 +174,8 @@ public final class OneDriveClient extends Client {
 
 			switch (type){
 				case GET_INFO:
-					//if @call https://graph.microsoft.com/v1.0/me/
-//					ClientResponse clientInfoResponse = (ClientResponse) response.body();
-//					Client.Info info = new Client.Info(clientInfoResponse.getId());
-//					info.setDisplayName(clientInfoResponse.getDisplayName());
-
 					DriveResponse driveResponseForClient= (DriveResponse) response.body();
+
 					HashMap<String, String> attrs = new HashMap<String, String>();
 					attrs.put(Client.Info.userId, driveResponseForClient.getOwner().getUser().getId());
 					attrs.put(Client.Info.name, driveResponseForClient.getOwner().getUser().getDisplayName());
@@ -186,6 +186,7 @@ public final class OneDriveClient extends Client {
 					this.callback.onSuccess(info);
 					future.complete(info);
 					break ;
+
 				case GET_DEFAULT_DRIVE:
 					DriveResponse driveResponse= (DriveResponse) response.body();
 
@@ -198,7 +199,6 @@ public final class OneDriveClient extends Client {
 
 					this.callback.onSuccess(drive);
 					future.complete(drive);
-
 					break ;
 			}
 		}

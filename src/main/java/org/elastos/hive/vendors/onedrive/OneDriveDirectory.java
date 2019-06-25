@@ -69,22 +69,24 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<Directory.Info> getInfo(Callback<Directory.Info> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(placeHolder -> getInfo(placeHolder, callback));
+				.thenCompose(padding -> getInfo(padding, callback));
 	}
 
-	private CompletableFuture<Directory.Info> getInfo(Void placeHolder,  Callback<Directory.Info> callback) {
+	private CompletableFuture<Directory.Info> getInfo(Void padding,  Callback<Directory.Info> callback) {
 		CompletableFuture<Directory.Info> future = new CompletableFuture<Directory.Info>();
 
 		if (callback == null)
 			callback = new NullCallback<Directory.Info>();
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getDirAndFileInfo(pathName);
 			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.GET_INFO));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -98,10 +100,10 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<Void> moveTo(String pathName, Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(placeHolder -> moveTo(placeHolder, pathName, callback));
+				.thenCompose(padding -> moveTo(padding, pathName, callback));
 	}
 
-	private CompletableFuture<Void> moveTo(Void placeHolder, String pathName, Callback<Void> callback) {
+	private CompletableFuture<Void> moveTo(Void padding, String pathName, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
@@ -133,14 +135,10 @@ class OneDriveDirectory extends Directory {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
 
-			try {
-				BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),true);
-				Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
-				Call call = api.moveTo(this.pathName , new MoveAndCopyReqest(pathName,name));
-				call.enqueue(new DirectoryCallback(future , callback ,pathName+"/"+name, Type.MOVE_TO));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = api.moveTo(this.pathName , new MoveAndCopyReqest(pathName,name));
+			call.enqueue(new DirectoryCallback(future , callback ,pathName+"/"+name, Type.MOVE_TO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -158,10 +156,10 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<Void> copyTo(String pathName, Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(placeHolder -> copyTo(placeHolder, pathName, callback));
+				.thenCompose(padding -> copyTo(padding, pathName, callback));
 	}
 
-	private CompletableFuture<Void> copyTo(Void placeHolder, String pathName, Callback<Void> callback) {
+	private CompletableFuture<Void> copyTo(Void padding, String pathName, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
@@ -192,15 +190,10 @@ class OneDriveDirectory extends Directory {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
 
-			try {
-				BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),true);
-				Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
-				Call call = api.copyTo(this.pathName , new MoveAndCopyReqest(pathName,name));
-				call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.COPY_TO));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = api.copyTo(this.pathName , new MoveAndCopyReqest(pathName,name));
+			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.COPY_TO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -218,29 +211,31 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<Void> deleteItem(Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(placeHolder -> deleteItem(placeHolder, callback));
+				.thenCompose(padding -> deleteItem(padding, callback));
 	}
 
-	private CompletableFuture<Void> deleteItem(Void placeHolder, Callback<Void> callback) {
+	private CompletableFuture<Void> deleteItem(Void padding, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
 			callback = new NullCallback<Void>();
 
 		if (pathName.equals("/")) {
-			HiveException e = new HiveException("Can't delete the root.");
+			HiveException e = new HiveException("Can't delete the root directory");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),true);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.deleteItem(this.pathName);
 			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.DELETE_ITEM));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -259,10 +254,10 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<Directory> createDirectory(String name, Callback<Directory> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(placeHolder -> createDirectory(placeHolder, name, callback));
+				.thenCompose(padding -> createDirectory(padding, name, callback));
 	}
 
-	private CompletableFuture<Directory> createDirectory(Void placeHolder, String name, Callback<Directory> callback) {
+	private CompletableFuture<Directory> createDirectory(Void padding, String name, Callback<Directory> callback) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (callback == null)
@@ -276,15 +271,16 @@ class OneDriveDirectory extends Directory {
 		}
 
         try {
-            BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),true);
-            Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+            BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+            CreateDirRequest createDirRequest = new CreateDirRequest(name);
 
-			CreateDirRequest createDirRequest = new CreateDirRequest(name);
+            Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
             Call call = api.createDirFromDir(this.pathName, createDirRequest);
-
             call.enqueue(new DirectoryCallback(future , callback ,this.pathName+"/"+name, Type.CREATE_DIR));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+        	HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
         }
 
 		return future;
@@ -298,10 +294,10 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<Directory> getDirectory(String name, Callback<Directory> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> getDirectory(status, name, callback));
+				.thenCompose(padding -> getDirectory(padding, name, callback));
 	}
 
-	private CompletableFuture<Directory> getDirectory(Void status, String name, Callback<Directory> callback) {
+	private CompletableFuture<Directory> getDirectory(Void padding, String name, Callback<Directory> callback) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (callback == null)
@@ -316,14 +312,14 @@ class OneDriveDirectory extends Directory {
 		String path = this.pathName + "/" +name ;
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),true);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
-
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getDirFromDir(path);
-
 			call.enqueue(new DirectoryCallback(future , callback ,path, Type.GET_DIR));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 		return future;
 	}
@@ -336,10 +332,10 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<File> createFile(String name, Callback<File> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> createFile(status, name, callback));
+				.thenCompose(padding -> createFile(padding, name, callback));
 	}
 
-	private CompletableFuture<File> createFile(Void status, String name, Callback<File> callback) {
+	private CompletableFuture<File> createFile(Void padding, String name, Callback<File> callback) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (callback == null)
@@ -355,12 +351,14 @@ class OneDriveDirectory extends Directory {
 		String path = this.pathName+"/"+name ;
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.createFile(path);
 			call.enqueue(new DirectoryCallback(future , callback , path , Type.CREATE_FILE));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 		return future;
 	}
@@ -373,10 +371,10 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<File> getFile(String name, Callback<File> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> getFile(status, name, callback));
+				.thenCompose(padding -> getFile(padding, name, callback));
 	}
 
-	private CompletableFuture<File> getFile(Void status, String name, Callback<File> callback) {
+	private CompletableFuture<File> getFile(Void padding, String name, Callback<File> callback) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (callback == null)
@@ -392,12 +390,14 @@ class OneDriveDirectory extends Directory {
 		String path = this.pathName+"/"+name;
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,config);
 			Call call = api.getFileFromDir(path);
 			call.enqueue(new DirectoryCallback(future , callback , path , Type.GET_FILE));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -411,22 +411,24 @@ class OneDriveDirectory extends Directory {
 	@Override
 	public CompletableFuture<Children> getChildren(Callback<Children> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> getChildren(status,callback));
+				.thenCompose(padding -> getChildren(padding,callback));
 	}
 
-	private CompletableFuture<Children> getChildren(Void status, Callback<Children> callback) {
+	private CompletableFuture<Children> getChildren(Void padding, Callback<Children> callback) {
 		CompletableFuture<Children> future = new CompletableFuture<Children>();
 
 		if (callback == null)
 			callback = new NullCallback<Children>();
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,config);
 			Call call = api.getChildren(this.pathName);
 			call.enqueue(new DirectoryCallback(future , callback , this.pathName , Type.GET_CHILDREN));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -454,7 +456,10 @@ class OneDriveDirectory extends Directory {
 				future.completeExceptionally(e);
 				return;
 			}
-			if (response.code() != 200 && response.code() != 201 && response.code() != 202 && response.code() != 204) {
+			if (response.code() != 200 &&
+				response.code() != 201 &&
+				response.code() != 202 &&
+				response.code() != 204) {
 				HiveException ex = new HiveException("Server Error: " + response.message());
 				this.callback.onError(ex);
 				future.completeExceptionally(ex);
@@ -467,22 +472,24 @@ class OneDriveDirectory extends Directory {
 					DirOrFileInfoResponse dirInfoResponse = (DirOrFileInfoResponse) response.body();
 					HashMap<String, String> attrs = new HashMap<>();
 					attrs.put(Directory.Info.itemId, dirInfoResponse.getId());
+					// TODO:
 
 					Directory.Info info = new Directory.Info(attrs);
 					this.callback.onSuccess(info);
 					future.complete(dirInfo);
 					break;
+
 				case MOVE_TO:
 					OneDriveDirectory.this.pathName = pathName;
 				case COPY_TO:
 				case DELETE_ITEM:
-					Void placeHolder = new Void();
-					this.callback.onSuccess(placeHolder);
-					future.complete(placeHolder);
+					Void padding = new Void();
+					this.callback.onSuccess(padding);
+					future.complete(padding);
 					break;
+
 				case CREATE_DIR:
 				case GET_DIR:
-
 					FileOrDirPropResponse dirResponse= (FileOrDirPropResponse) response.body();
 
 					if (dirResponse.getFolder() == null) {
@@ -494,15 +501,16 @@ class OneDriveDirectory extends Directory {
 
 					HashMap<String, String> dirAttrs = new HashMap<>();
 					dirAttrs.put(Directory.Info.itemId, dirResponse.getId());
+					// TODO:
 
 					Directory.Info dirInfo_ = new Directory.Info(dirAttrs);
 					OneDriveDirectory directory = new OneDriveDirectory(pathName,dirInfo_,authHelper);
 					this.callback.onSuccess(directory);
 					future.complete(directory);
 					break;
+
 				case CREATE_FILE:
 				case GET_FILE:
-
 					FileOrDirPropResponse filePropResponse= (FileOrDirPropResponse) response.body();
 
 					if (filePropResponse.getFolder()!=null) {
@@ -514,6 +522,7 @@ class OneDriveDirectory extends Directory {
 
 					HashMap<String, String> fileAttrs = new HashMap<>();
 					fileAttrs.put(File.Info.itemId, filePropResponse.getId());
+					// TODO:
 
 					File.Info fileInfo = new File.Info(fileAttrs);
 					OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
@@ -540,11 +549,10 @@ class OneDriveDirectory extends Directory {
 					Children children = new Children(itemInfos);
 					this.callback.onSuccess(children);
 					future.complete(children);
-
 					break;
+
 				default:
 					break;
-
 			}
 		}
 
@@ -560,7 +568,7 @@ class OneDriveDirectory extends Directory {
 	}
 
 	private enum Type{
-		GET_INFO, MOVE_TO , COPY_TO , DELETE_ITEM , CREATE_DIR ,
-		GET_DIR , CREATE_FILE , GET_FILE , GET_CHILDREN
+		GET_INFO, MOVE_TO, COPY_TO, DELETE_ITEM, CREATE_DIR,
+		GET_DIR, CREATE_FILE, GET_FILE, GET_CHILDREN
 	}
 }

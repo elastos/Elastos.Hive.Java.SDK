@@ -2,11 +2,6 @@ package org.elastos.hive.vendors.onedrive.Model;
 
 import org.elastos.hive.AuthToken;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.Model
- * ClassName: BaseServiceConfig
- * Created by ranwang on 2019/6/24.
- */
 public class BaseServiceConfig {
     private boolean useGsonConverter ;
     private boolean useAuthHeader ;
@@ -14,6 +9,10 @@ public class BaseServiceConfig {
     private boolean isNobody ;
 
     public BaseServiceConfig(){
+    }
+
+    public BaseServiceConfig(AuthToken authToken) {
+        this(true, true, authToken, false);
     }
 
     public BaseServiceConfig(boolean useGsonConverter, boolean useAuthHeader, AuthToken authToken, boolean isNobody) {

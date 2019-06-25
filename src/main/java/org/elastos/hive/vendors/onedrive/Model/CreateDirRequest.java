@@ -2,11 +2,6 @@ package org.elastos.hive.vendors.onedrive.Model;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.Model
- * ClassName: CreateDirRequest
- * Created by ranwang on 2019/6/22.
- */
 public class CreateDirRequest {
     private String name ;
 

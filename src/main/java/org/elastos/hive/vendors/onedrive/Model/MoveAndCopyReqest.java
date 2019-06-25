@@ -1,13 +1,8 @@
 package org.elastos.hive.vendors.onedrive.Model;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.Model
- * ClassName: MoveAndCopyReqest
- * Created by ranwang on 2019/6/24.
- */
 public class MoveAndCopyReqest {
-    private ParentReference parentReference ;
-    private String name ;
+    private ParentReference parentReference;
+    private String name;
 
     public MoveAndCopyReqest(String pathName, String name) {
         this.parentReference = new ParentReference("/drive/root:"+pathName);
@@ -45,6 +40,4 @@ public class MoveAndCopyReqest {
             this.path = path;
         }
     }
-
-
 }

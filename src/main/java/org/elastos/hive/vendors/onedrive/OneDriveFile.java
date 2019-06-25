@@ -64,22 +64,24 @@ final class OneDriveFile extends File {
 	@Override
 	public CompletableFuture<File.Info> getInfo(Callback<File.Info> callback)  {
 		return authHelper.checkExpired()
-				.thenCompose(placeHolder -> getInfo(placeHolder, callback));
+				.thenCompose(padding -> getInfo(padding, callback));
 	}
 
-	private CompletableFuture<File.Info> getInfo(Void placeHolder, Callback<File.Info> callback) {
+	private CompletableFuture<File.Info> getInfo(Void padding, Callback<File.Info> callback) {
 		CompletableFuture<File.Info> future = new CompletableFuture<File.Info>();
 
 		if (callback == null)
 			callback = new NullCallback<File.Info>();
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getDirAndFileInfo(pathName);
 			call.enqueue(new FileCallback(future , callback ,pathName, Type.GET_INFO));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -93,10 +95,10 @@ final class OneDriveFile extends File {
 	@Override
 	public CompletableFuture<Void> moveTo(String pathName, Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(placeHolder -> moveTo(placeHolder, pathName, callback));
+				.thenCompose(padding -> moveTo(padding, pathName, callback));
 	}
 
-	private CompletableFuture<Void> moveTo(Void placeHolder, String pathName, Callback<Void> callback) {
+	private CompletableFuture<Void> moveTo(Void padding, String pathName, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
@@ -130,10 +132,10 @@ final class OneDriveFile extends File {
 
 			String newPathName = pathName + "/" +name ;
 
-			MoveAndCopyReqest moveAndCopyReqest = new MoveAndCopyReqest(pathName,name);
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
-			Call call = api.moveTo(this.pathName,moveAndCopyReqest);
+			MoveAndCopyReqest request = new MoveAndCopyReqest(pathName,name);
+			BaseServiceConfig config  = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = api.moveTo(this.pathName, request);
 			call.enqueue(new FileCallback(future , callback ,newPathName, Type.MOVE_TO));
 
 		} catch (Exception ex) {
@@ -153,10 +155,10 @@ final class OneDriveFile extends File {
 	@Override
 	public CompletableFuture<Void> copyTo(String pathName, Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(placeHolder -> copyTo(placeHolder, pathName, callback));
+				.thenCompose(padding -> copyTo(padding, pathName, callback));
 	}
 
-	private CompletableFuture<Void> copyTo(Void placeHolder, String pathName, Callback<Void> callback) {
+	private CompletableFuture<Void> copyTo(Void padding, String pathName, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
@@ -187,11 +189,11 @@ final class OneDriveFile extends File {
 			int LastPos = pathName.lastIndexOf("/");
 			String name = pathName.substring(LastPos + 1);
 
-			MoveAndCopyReqest moveAndCopyReqest = new MoveAndCopyReqest(pathName,name);
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),true);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
-			Call call = api.copyTo(this.pathName , moveAndCopyReqest);
-			call.enqueue(new FileCallback(future , callback ,pathName, Type.COPY_TO));
+			MoveAndCopyReqest request = new MoveAndCopyReqest(pathName,name);
+			BaseServiceConfig config  = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = api.copyTo(this.pathName, request);
+			call.enqueue(new FileCallback(future, callback ,pathName, Type.COPY_TO));
 
 		} catch (Exception ex) {
 			HiveException e = new HiveException("connect exception: " + ex.getMessage());
@@ -210,22 +212,24 @@ final class OneDriveFile extends File {
 	@Override
 	public CompletableFuture<Void> deleteItem(Callback<Void> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(placeHolder -> deleteItem(placeHolder, callback));
+				.thenCompose(padding -> deleteItem(padding, callback));
 	}
 
-	private CompletableFuture<Void> deleteItem(Void placeHolder, Callback<Void> callback) {
+	private CompletableFuture<Void> deleteItem(Void padding, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
 			callback = new NullCallback<Void>();
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.deleteItem(this.pathName);
 			call.enqueue(new FileCallback(future , callback ,pathName, Type.DELETE_ITEM));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -238,14 +242,18 @@ final class OneDriveFile extends File {
 
 	@Override
 	public CompletableFuture<Length> read(ByteBuffer dest) {
+		return read(dest, new NullCallback<Length>());
+	}
+
+	@Override
+	public CompletableFuture<Length> read(ByteBuffer dest, Callback<Length> callback) {
 		// TODO
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<Length> read(ByteBuffer dest, long position) {
-		// TODO
-		return null;
+		return read(dest, position, new NullCallback<Length>());
 	}
 
 	@Override
@@ -256,14 +264,18 @@ final class OneDriveFile extends File {
 
 	@Override
 	public CompletableFuture<Length> write(ByteBuffer dest) {
+		return write(dest, new NullCallback<Length>());
+	}
+
+	@Override
+	public CompletableFuture<Length> write(ByteBuffer dest, Callback<Length> callback) {
 		// TODO
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<Length> write(ByteBuffer dest, long position) {
-		// TODO
-		return null;
+		return write(dest, position, new NullCallback<Length>());
 	}
 
 	@Override
@@ -274,6 +286,11 @@ final class OneDriveFile extends File {
 
 	@Override
 	public CompletableFuture<Void> commit() {
+		return commit(new NullCallback<Void>());
+	}
+
+	@Override
+	public CompletableFuture<Void> commit(Callback<Void> callback) {
 		// TODO
 		return null;
 	}
@@ -306,7 +323,10 @@ final class OneDriveFile extends File {
 				future.completeExceptionally(e);
 				return;
 			}
-			if (response.code() != 200 && response.code() != 201 && response.code() != 202 && response.code() != 204) {
+			if (response.code() != 200 &&
+				response.code() != 201 &&
+				response.code() != 202 &&
+				response.code() != 204) {
 				HiveException ex = new HiveException("Server Error: " + response.message());
 				this.callback.onError(ex);
 				future.completeExceptionally(ex);
@@ -318,19 +338,22 @@ final class OneDriveFile extends File {
 					DirOrFileInfoResponse dirInfoResponse = (DirOrFileInfoResponse) response.body();
 					HashMap<String, String> attrs = new HashMap<>();
 					attrs.put(Directory.Info.itemId, dirInfoResponse.getId());
+					// TODO:
 
 					File.Info info = new File.Info(attrs);
 					this.callback.onSuccess(info);
 					future.complete(info);
 					break;
+
 				case MOVE_TO:
 					OneDriveFile.this.pathName = pathName;
 				case COPY_TO:
 				case DELETE_ITEM:
-					Void placeHolder = new Void();
-					this.callback.onSuccess(placeHolder);
-					future.complete(placeHolder);
+					Void padding = new Void();
+					this.callback.onSuccess(padding);
+					future.complete(padding);
 					break;
+
 				default:
 					break;
 
