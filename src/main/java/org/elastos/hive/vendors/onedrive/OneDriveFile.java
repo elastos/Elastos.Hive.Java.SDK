@@ -1,23 +1,26 @@
 package org.elastos.hive.vendors.onedrive;
 
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
-
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Callback;
+import org.elastos.hive.Directory;
 import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.Length;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
-import org.json.JSONObject;
+import org.elastos.hive.utils.LogUtil;
+import org.elastos.hive.vendors.onedrive.Model.BaseServiceConfig;
+import org.elastos.hive.vendors.onedrive.Model.DirOrFileInfoResponse;
+import org.elastos.hive.vendors.onedrive.Model.MoveAndCopyReqest;
+import org.elastos.hive.vendors.onedrive.network.Api;
+import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 final class OneDriveFile extends File {
 	private final AuthHelper authHelper;
@@ -70,12 +73,14 @@ final class OneDriveFile extends File {
 		if (callback == null)
 			callback = new NullCallback<File.Info>();
 
-		String url = String.format("%s/root:/%s", OneDriveURL.API, pathName)
-						   .replace(" ", "%20");
-		Unirest.get(url)
-			.header(OneDriveHttpHeader.Authorization,
-					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new GetFileInfoCallback(future, callback));
+		try {
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			Call call = api.getDirAndFileInfo(pathName);
+			call.enqueue(new FileCallback(future , callback ,pathName, Type.GET_INFO));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return future;
 	}
@@ -119,23 +124,20 @@ final class OneDriveFile extends File {
 		}
 
 		try {
+
 			int LastPos = pathName.lastIndexOf("/");
 			String name = pathName.substring(LastPos + 1);
 
-			String url  = String.format("%s/root:%s", OneDriveURL.API, this.pathName)
-								.replace(" ", "%20");
-			String body = String.format("{\"parentReference\":{\"path\":\"/drive/root:%s\"},\"name\":\"%s\"}", pathName, name)
-								.replace(" ", "%20");
-			String newPathName = String.format("%s/%s", pathName, name);
+			String newPathName = pathName + "/" +name ;
 
-			Unirest.patch(url)
-				.header(OneDriveHttpHeader.Authorization,
-						OneDriveHttpHeader.bearerValue(authHelper))
-				.header(OneDriveHttpHeader.ContentType, OneDriveHttpHeader.Json)
-				.body(body)
-				.asJsonAsync(new MoveToCallback(newPathName, future, callback));
+			MoveAndCopyReqest moveAndCopyReqest = new MoveAndCopyReqest(pathName,name);
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			Call call = api.moveTo(this.pathName,moveAndCopyReqest);
+			call.enqueue(new FileCallback(future , callback ,newPathName, Type.MOVE_TO));
+
 		} catch (Exception ex) {
-			HiveException e = new HiveException("Unirest exception: " + ex.getMessage());
+			HiveException e = new HiveException("connect exception: " + ex.getMessage());
 			callback.onError(e);
 			future.completeExceptionally(e);
 		}
@@ -185,19 +187,14 @@ final class OneDriveFile extends File {
 			int LastPos = pathName.lastIndexOf("/");
 			String name = pathName.substring(LastPos + 1);
 
-			String url  = String.format("%s/root:%s:/copy", OneDriveURL.API, this.pathName)
-							    .replace(" ", "%20");
-			String body = String.format("{\"parentReference\":{\"path\":\"/drive/root:%s\"},\"name\":\"%s\"}", pathName, name)
-								.replace(" ", "%20");
+			MoveAndCopyReqest moveAndCopyReqest = new MoveAndCopyReqest(pathName,name);
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),true);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			Call call = api.copyTo(this.pathName , moveAndCopyReqest);
+			call.enqueue(new FileCallback(future , callback ,pathName, Type.COPY_TO));
 
-			Unirest.post(url)
-				.header(OneDriveHttpHeader.Authorization,
-						OneDriveHttpHeader.bearerValue(authHelper))
-				.header(OneDriveHttpHeader.ContentType, OneDriveHttpHeader.Json)
-				.body(body)
-				.asJsonAsync(new CopyToCallback(future, callback));
 		} catch (Exception ex) {
-			HiveException e = new HiveException("Unirest exception: " + ex.getMessage());
+			HiveException e = new HiveException("connect exception: " + ex.getMessage());
 			callback.onError(e);
 			future.completeExceptionally(e);
 		}
@@ -222,13 +219,14 @@ final class OneDriveFile extends File {
 		if (callback == null)
 			callback = new NullCallback<Void>();
 
-		String url = String.format("%s/root:%s", OneDriveURL.API, this.pathName)
-						   .replace(" ", "%20");
-
-		Unirest.delete(url)
-			.header(OneDriveHttpHeader.Authorization,
-					OneDriveHttpHeader.bearerValue(authHelper))
-			.asJsonAsync(new DeleteItemCallback(future, callback));
+		try {
+			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			Call call = api.deleteItem(this.pathName);
+			call.enqueue(new FileCallback(future , callback ,pathName, Type.DELETE_ITEM));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return future;
 	}
@@ -236,179 +234,6 @@ final class OneDriveFile extends File {
 	@Override
 	public void close() {
 		// TODO
-	}
-
-	private class GetFileInfoCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<File.Info> future;
-		private final Callback<File.Info> callback;
-
-		private GetFileInfoCallback(CompletableFuture<File.Info> future, Callback<File.Info> callback) {
-			this.future = future;
-			this.callback = callback;
-		}
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
-				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			JSONObject jsonObject = response.getBody().getObject();
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(File.Info.itemId, jsonObject.getString("id"));
-			// TODO;
-
-			File.Info info = new File.Info(attrs);
-			this.callback.onSuccess(info);
-			future.complete(fileInfo);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class MoveToCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
-		private final CompletableFuture<Void> future;
-		private final Callback<Void> callback;
-
-		MoveToCallback(String pathName, CompletableFuture<Void> future, Callback<Void> callback) {
-			this.pathName = pathName;
-			this.future = future;
-			this.callback = callback;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
-				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			OneDriveFile.this.pathName = pathName;
-			Void placeHolder = new Void();
-			this.callback.onSuccess(placeHolder);
-			future.complete(placeHolder);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class CopyToCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Void> future;
-		private final Callback<Void> callback;
-
-		CopyToCallback(CompletableFuture<Void> future, Callback<Void> callback) {
-			this.future = future;
-			this.callback = callback;
-		}
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
-				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			if (response.getStatus() != 202) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			Void placeHolder = new Void();
-			this.callback.onSuccess(placeHolder);
-			future.complete(placeHolder);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class DeleteItemCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Void> future;
-		private final Callback<Void> callback;
-
-		private DeleteItemCallback(CompletableFuture<Void> future, Callback<Void> callback) {
-			this.future = future;
-			this.callback = callback;
-		}
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() == 401) {
-				authHelper.getToken().expired();
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			if (response.getStatus() != 204) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			Void placeHolder = new Void();
-			this.callback.onSuccess(placeHolder);
-			future.complete(placeHolder);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
 	}
 
 	@Override
@@ -456,5 +281,74 @@ final class OneDriveFile extends File {
 	@Override
 	public void discard() {
 		// TODO
+	}
+
+
+	private class FileCallback implements retrofit2.Callback{
+		private final String pathName;
+		private final CompletableFuture future;
+		private final Callback callback;
+		private final Type type ;
+
+		public FileCallback(CompletableFuture future , Callback callback ,String pathName , Type type) {
+			this.future = future ;
+			this.callback = callback ;
+			this.pathName = pathName ;
+			this.type = type ;
+		}
+
+		@Override
+		public void onResponse(Call call, Response response) {
+			if (response.code() == 401) {
+				authHelper.getToken().expired();
+				HiveException e = new HiveException("Server Error: " + response.message());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
+				return;
+			}
+			if (response.code() != 200 && response.code() != 201 && response.code() != 202 && response.code() != 204) {
+				HiveException ex = new HiveException("Server Error: " + response.message());
+				this.callback.onError(ex);
+				future.completeExceptionally(ex);
+				return;
+			}
+
+			switch (type){
+				case GET_INFO:
+					DirOrFileInfoResponse dirInfoResponse = (DirOrFileInfoResponse) response.body();
+					HashMap<String, String> attrs = new HashMap<>();
+					attrs.put(Directory.Info.itemId, dirInfoResponse.getId());
+
+					File.Info info = new File.Info(attrs);
+					this.callback.onSuccess(info);
+					future.complete(info);
+					break;
+				case MOVE_TO:
+					OneDriveFile.this.pathName = pathName;
+				case COPY_TO:
+				case DELETE_ITEM:
+					Void placeHolder = new Void();
+					this.callback.onSuccess(placeHolder);
+					future.complete(placeHolder);
+					break;
+				default:
+					break;
+
+			}
+		}
+
+		@Override
+		public void onFailure(Call call, Throwable t) {
+			LogUtil.d("t = "+t.getMessage());
+			t.printStackTrace();
+
+			HiveException e = new HiveException(t.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
+		}
+	}
+
+	private enum Type{
+		GET_INFO , COPY_TO , MOVE_TO , DELETE_ITEM
 	}
 }

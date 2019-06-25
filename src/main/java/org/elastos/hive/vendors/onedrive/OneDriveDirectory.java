@@ -13,8 +13,8 @@ import org.elastos.hive.utils.LogUtil;
 import org.elastos.hive.vendors.onedrive.Model.BaseServiceConfig;
 import org.elastos.hive.vendors.onedrive.Model.CreateDirRequest;
 import org.elastos.hive.vendors.onedrive.Model.DirChildrenResponse;
-import org.elastos.hive.vendors.onedrive.Model.DirInfoResponse;
-import org.elastos.hive.vendors.onedrive.Model.DirMoveAndCopyReqest;
+import org.elastos.hive.vendors.onedrive.Model.DirOrFileInfoResponse;
+import org.elastos.hive.vendors.onedrive.Model.MoveAndCopyReqest;
 import org.elastos.hive.vendors.onedrive.Model.FileOrDirPropResponse;
 import org.elastos.hive.vendors.onedrive.network.Api;
 import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
@@ -81,7 +81,7 @@ class OneDriveDirectory extends Directory {
 		try {
 			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
-			Call call = api.getDirInfo(pathName);
+			Call call = api.getDirAndFileInfo(pathName);
 			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.GET_INFO));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -136,7 +136,7 @@ class OneDriveDirectory extends Directory {
 			try {
 				BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),true);
 				Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
-				Call call = api.moveTo(this.pathName , new DirMoveAndCopyReqest(pathName,name));
+				Call call = api.moveTo(this.pathName , new MoveAndCopyReqest(pathName,name));
 				call.enqueue(new DirectoryCallback(future , callback ,pathName+"/"+name, Type.MOVE_TO));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -195,7 +195,7 @@ class OneDriveDirectory extends Directory {
 			try {
 				BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),true);
 				Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
-				Call call = api.copyTo(this.pathName , new DirMoveAndCopyReqest(pathName,name));
+				Call call = api.copyTo(this.pathName , new MoveAndCopyReqest(pathName,name));
 				call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.COPY_TO));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -464,7 +464,7 @@ class OneDriveDirectory extends Directory {
 
 			switch (type){
 				case GET_INFO:
-					DirInfoResponse dirInfoResponse = (DirInfoResponse) response.body();
+					DirOrFileInfoResponse dirInfoResponse = (DirOrFileInfoResponse) response.body();
 					HashMap<String, String> attrs = new HashMap<>();
 					attrs.put(Directory.Info.itemId, dirInfoResponse.getId());
 
