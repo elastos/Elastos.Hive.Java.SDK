@@ -10,8 +10,8 @@ import org.elastos.hive.Client;
 import org.elastos.hive.Drive;
 import org.elastos.hive.DriveType;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.JsonPersistent;
 import org.elastos.hive.NullCallback;
+import org.elastos.hive.Persistent;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
 import org.json.JSONObject;
@@ -27,9 +27,11 @@ public final class OneDriveClient extends Client {
 	private final OneDriveAuthHelper authHelper;
 	private Client.Info clientInfo;
 	private String userId;
+	private final Persistent persistent;
 
 	private OneDriveClient(OneDriveParameter parameter) {
-		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry());
+		persistent = new KeyStore(parameter.getKeyStorePath());
+		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry(), persistent);
 	}
 
 	public static Client createInstance(OneDriveParameter parameter) {
@@ -101,7 +103,7 @@ public final class OneDriveClient extends Client {
 		if (callback == null)
 			callback = new NullCallback<Client.Info>();
 
-		Unirest.get(OneDriveURL.USER)
+		Unirest.get(OneDriveURL.API)
 			.header(OneDriveHttpHeader.Authorization,
 					OneDriveHttpHeader.bearerValue(authHelper))
 			.asJsonAsync(new GetClientInfoCallback(future, callback));
@@ -169,7 +171,7 @@ public final class OneDriveClient extends Client {
 
 			HashMap<String, String> attrs = new HashMap<String, String>();
 			attrs.put(Client.Info.userId, userObject.getString("id"));
-			attrs.put(Client.Info.name, userObject.getString("DisplayName"));
+			attrs.put(Client.Info.name, userObject.getString("displayName"));
 			// TODO;
 
 			info = new Client.Info(attrs);
@@ -236,19 +238,22 @@ public final class OneDriveClient extends Client {
 		}
 	}
 
-	class KeyStore implements JsonPersistent {
-		//private String storePath;
+	class KeyStore implements Persistent {
+		private String storePath;
+
+		KeyStore(String storePath) {
+			this.storePath = String.format("%s/%s", storePath, OneDriveUtils.CONFIG);
+		}
 
 		@Override
 		public JSONObject parseFrom() throws HiveException {
-			// TODO
+			// TODO:
 			return null;
 		}
 
 		@Override
 		public void upateContent(JSONObject conetnt) throws HiveException {
 			// TODO
-
 		}
 	}
 }
