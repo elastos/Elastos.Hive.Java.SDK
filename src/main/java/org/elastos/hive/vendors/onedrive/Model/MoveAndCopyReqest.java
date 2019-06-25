@@ -2,14 +2,14 @@ package org.elastos.hive.vendors.onedrive.Model;
 
 /**
  * Package: org.elastos.hive.vendors.onedrive.Model
- * ClassName: DirMoveAndCopyReqest
+ * ClassName: MoveAndCopyReqest
  * Created by ranwang on 2019/6/24.
  */
-public class DirMoveAndCopyReqest {
+public class MoveAndCopyReqest {
     private ParentReference parentReference ;
     private String name ;
 
-    public DirMoveAndCopyReqest(String pathName, String name) {
+    public MoveAndCopyReqest(String pathName, String name) {
         this.parentReference = new ParentReference("/drive/root:"+pathName);
         this.name = name;
     }
