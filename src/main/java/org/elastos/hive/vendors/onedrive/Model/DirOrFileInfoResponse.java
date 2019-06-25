@@ -2,7 +2,7 @@ package org.elastos.hive.vendors.onedrive.Model;
 
 /**
  * Package: org.elastos.hive.vendors.onedrive.Model
- * ClassName: DirInfoResponse
+ * ClassName: DirOrFileInfoResponse
  * Created by ranwang on 2019/6/24.
  */
 /*
@@ -56,10 +56,10 @@ package org.elastos.hive.vendors.onedrive.Model;
 	}
 }
  */
-public class DirInfoResponse {
+public class DirOrFileInfoResponse {
     private String id;
 
-    public DirInfoResponse(String id) {
+    public DirOrFileInfoResponse(String id) {
         this.id = id;
     }
 
