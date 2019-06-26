@@ -520,42 +520,4 @@ final class IPFSDrive extends Drive{
 		// TODO
 		return null;
 	}
-
-	private class publishCreateFileResultCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
-		private final CompletableFuture<File> future;
-		private final Callback<File> callback;
-
-		private publishCreateFileResultCallback(String pathName, CompletableFuture<File> future, Callback<File> callback) {
-			this.pathName = pathName;
-			this.future = future;
-			this.callback = callback;
-		}
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
-				return;
-			}
-
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Directory.Info.itemId, getId());
-			File.Info fileInfo = new File.Info(attrs);
-			IPFSFile file = new IPFSFile(pathName, fileInfo, rpcHelper);
-			this.callback.onSuccess(file);
-			future.complete(file);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
-		}
-	}
 }

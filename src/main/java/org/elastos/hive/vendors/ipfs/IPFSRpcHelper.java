@@ -74,8 +74,60 @@ class IPFSRpcHelper implements AuthHelper {
 	}
 
 	public CompletableFuture<PackValue> checkExpiredNew() {
-		// TODO:
-		return null;
+		if (isValid) {
+			CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
+			PackValue padding = new PackValue();
+		    future.complete(padding);
+			return future;
+		}
+
+		//get home hash and login
+		CompletableFuture<PackValue> future = CompletableFuture.supplyAsync(() -> {
+			PackValue padding = new PackValue();
+			try {
+				String homeHash = null;
+				//Using the older validAddress try to get the home hash.
+				if (validAddress != null && !validAddress.isEmpty()) {
+					String url = String.format(IPFSURL.URLFORMAT, validAddress);
+					homeHash = getHomeHash(url);
+					BASEURL = url;
+					if (homeHash == null) {
+						validAddress = null;
+					}
+				}
+
+				if (homeHash == null) {
+					String[] addrs = entry.getRcpAddrs();
+					for (int i = 0; i < addrs.length; i++) {
+						String url = String.format(IPFSURL.URLFORMAT, addrs[i]);
+						homeHash = getHomeHash(url);
+						if (homeHash != null && !homeHash.isEmpty()) {
+							BASEURL = url;
+							validAddress = addrs[i];
+							break;
+						}
+					}
+				}
+
+				if (homeHash == null) {
+					return padding;
+				}
+
+				Unirest.get(BASEURL + IPFSMethod.LOGIN)
+					.header(IPFSURL.ContentType, IPFSURL.Json)
+					.queryString(IPFSURL.UID, entry.getUid())
+					.queryString(IPFSURL.HASH, homeHash)
+					.asJson();
+
+				isValid = true;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return padding;
+		});
+
+		return future;
 	}
 
 	@Override
@@ -142,6 +194,10 @@ class IPFSRpcHelper implements AuthHelper {
 	}
 
 	CompletableFuture<PackValue> getRootHash(PackValue value) {
+		return getPathHash(value, "/");
+	}
+
+	CompletableFuture<PackValue> getPathHash(PackValue value, String path) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
 		if (value.getException() != null) {
@@ -153,8 +209,8 @@ class IPFSRpcHelper implements AuthHelper {
 		Unirest.get(url)
 				.header(IPFSURL.ContentType, IPFSURL.Json)
 				.queryString(IPFSURL.UID, getIpfsEntry().getUid())
-				.queryString(IPFSURL.PATH, "/")
-				.asJsonAsync(new GetRootHashCallback(value, future));
+				.queryString(IPFSURL.PATH, path)
+				.asJsonAsync(new GetPathHashCallback(value, future));
 
 		return future;
 	}
@@ -211,6 +267,41 @@ class IPFSRpcHelper implements AuthHelper {
 		return future;
 	}
 
+	CompletableFuture<Void> invokeVoidCallback(PackValue value) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
+
+		if (value.getException() != null) {
+			value.getCallback().onError(value.getException());
+			future.completeExceptionally(value.getException());
+			return future;
+		}
+
+		Void object = new Void();
+		@SuppressWarnings("unchecked")
+		Callback<Void> callback = (Callback<Void>)value.getCallback();
+		callback.onSuccess(object);
+		future.complete(object);
+		return future;
+	}
+	
+	CompletableFuture<PackValue> stat(PackValue value) {
+		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
+
+		if (value.getException() != null) {
+			future.completeExceptionally(value.getException());
+			return future;
+		}
+
+		String url = String.format("%s%s", getBaseUrl(), IPFSMethod.PUBLISH);
+		Unirest.get(url)
+			.header(IPFSURL.ContentType, IPFSURL.Json)
+			.queryString(IPFSURL.UID, getIpfsEntry().getUid())
+			.queryString(IPFSURL.PATH, value.getHash().getValue())
+			.asJsonAsync(new PublishRootHashCallback(value, future));
+
+		return future;
+	}
+	
 	CompletableFuture<String> stat(String path) {
 		CompletableFuture<String> future = new CompletableFuture<String>();
 
@@ -222,11 +313,6 @@ class IPFSRpcHelper implements AuthHelper {
 				.asJsonAsync(new StatCallback(future));
 
 		return future;
-	}
-
-	CompletableFuture<Void> publish(String hash) {
-		//
-		return null;
 	}
 
 	boolean isFile(String type) {
@@ -266,11 +352,11 @@ class IPFSRpcHelper implements AuthHelper {
 		}
 	}
 
-	private class GetRootHashCallback implements UnirestAsyncCallback<JsonNode> {
+	private class GetPathHashCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<PackValue> future;
 		private final PackValue value;
 
-		GetRootHashCallback(PackValue value, CompletableFuture<PackValue> future) {
+		GetPathHashCallback(PackValue value, CompletableFuture<PackValue> future) {
 			this.value = value;
 			this.future = future;
 		}
@@ -289,7 +375,7 @@ class IPFSRpcHelper implements AuthHelper {
 
 			JSONObject jsonObject = response.getBody().getObject();
 			IPFSHash hash = new IPFSHash(jsonObject.getString("Hash"));
-			value.setValue(hash);
+			value.setHash(hash);
 			future.complete(value);
 		}
 
