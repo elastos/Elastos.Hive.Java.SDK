@@ -79,7 +79,7 @@ class OneDriveDirectory extends Directory {
 			callback = new NullCallback<Directory.Info>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getDirAndFileInfo(pathName);
 			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.GET_INFO));
@@ -135,7 +135,10 @@ class OneDriveDirectory extends Directory {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
 
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken())
+					.ignoreReturnBody(true)
+					.build();
+
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.moveTo(this.pathName , new MoveAndCopyReqest(pathName,name));
 			call.enqueue(new DirectoryCallback(future , callback ,pathName+"/"+name, Type.MOVE_TO));
@@ -190,7 +193,9 @@ class OneDriveDirectory extends Directory {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
 
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken())
+					.ignoreReturnBody(true)
+					.build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.copyTo(this.pathName , new MoveAndCopyReqest(pathName,name));
 			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.COPY_TO));
@@ -228,7 +233,9 @@ class OneDriveDirectory extends Directory {
 		}
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken())
+					.ignoreReturnBody(true)
+					.build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.deleteItem(this.pathName);
 			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.DELETE_ITEM));
@@ -271,7 +278,9 @@ class OneDriveDirectory extends Directory {
 		}
 
         try {
-            BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken())
+					.ignoreReturnBody(true)
+					.build();
             CreateDirRequest createDirRequest = new CreateDirRequest(name);
 
             Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
@@ -312,7 +321,9 @@ class OneDriveDirectory extends Directory {
 		String path = this.pathName + "/" +name ;
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken())
+					.ignoreReturnBody(true)
+					.build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getDirFromDir(path);
 			call.enqueue(new DirectoryCallback(future , callback ,path, Type.GET_DIR));
@@ -351,7 +362,8 @@ class OneDriveDirectory extends Directory {
 		String path = this.pathName+"/"+name ;
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
+
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.createFile(path);
 			call.enqueue(new DirectoryCallback(future , callback , path , Type.CREATE_FILE));
@@ -390,7 +402,7 @@ class OneDriveDirectory extends Directory {
 		String path = this.pathName+"/"+name;
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,config);
 			Call call = api.getFileFromDir(path);
 			call.enqueue(new DirectoryCallback(future , callback , path , Type.GET_FILE));
@@ -421,7 +433,7 @@ class OneDriveDirectory extends Directory {
 			callback = new NullCallback<Children>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,config);
 			Call call = api.getChildren(this.pathName);
 			call.enqueue(new DirectoryCallback(future , callback , this.pathName , Type.GET_CHILDREN));

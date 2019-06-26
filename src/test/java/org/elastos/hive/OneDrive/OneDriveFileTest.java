@@ -1,15 +1,20 @@
-package org.elastos.hive;
+package org.elastos.hive.OneDrive;
+
+import org.elastos.hive.Children;
+import org.elastos.hive.Client;
+import org.elastos.hive.Directory;
+import org.elastos.hive.Drive;
+import org.elastos.hive.File;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
-import java.util.concurrent.ExecutionException;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class OneDriveFileTest {
 	private static Drive drive;

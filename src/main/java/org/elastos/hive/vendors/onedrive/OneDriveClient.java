@@ -101,7 +101,7 @@ public final class OneDriveClient extends Client {
 			callback = new NullCallback<Client.Info>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getInfo();
 			call.enqueue(new DriveClientCallback(future , callback , Type.GET_INFO));
@@ -132,7 +132,7 @@ public final class OneDriveClient extends Client {
 			callback = new NullCallback<Drive>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getDrive();
 			call.enqueue(new DriveClientCallback(future , callback , Type.GET_DEFAULT_DRIVE));

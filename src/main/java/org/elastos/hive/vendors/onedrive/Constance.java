@@ -1,7 +1,8 @@
 package org.elastos.hive.vendors.onedrive;
 
 public class Constance {
-    public static final String ONE_DRIVE_AUTH_BASE_URL = "https://login.microsoftonline.com/common/oauth2/v2.0/";
+    public static final String ONE_DRIVE_AUTH_URL = "https://login.microsoftonline.com/common/oauth2/v2.0" ;
+    public static final String ONE_DRIVE_AUTH_BASE_URL = ONE_DRIVE_AUTH_URL+"/";
     public static final String ONE_DRIVE_API_BASE_URL  = "https://graph.microsoft.com/v1.0/me/";
 
     public static final String AUTHORIZE = "authorize";

@@ -64,7 +64,7 @@ final class OneDriveDrive extends Drive {
 			callback = new NullCallback<Drive.Info>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getInfo();
 			call.enqueue(new DriveDriveCallback(null, future , callback , Type.GET_INFO));
@@ -140,7 +140,7 @@ final class OneDriveDrive extends Drive {
 
 		CreateDirRequest createDirRequest = new CreateDirRequest(name);
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.createDir(urlPath , createDirRequest);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.CREATE_DIR));
@@ -183,7 +183,7 @@ final class OneDriveDrive extends Drive {
 			fullPath = Constance.ROOT+":"+pathName;
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,config);
 			Call call = api.getFileOrDirProp(fullPath);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_DIR));
@@ -227,7 +227,7 @@ final class OneDriveDrive extends Drive {
 		}
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.createFile(pathName);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.CREATE_FILE));
@@ -278,7 +278,7 @@ final class OneDriveDrive extends Drive {
 			fullPath = Constance.ROOT+":"+pathName;
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getFileOrDirProp(fullPath);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_FILE));
