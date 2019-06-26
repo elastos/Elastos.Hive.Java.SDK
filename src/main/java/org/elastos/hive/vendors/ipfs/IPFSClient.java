@@ -42,48 +42,44 @@ public final class IPFSClient extends Client {
 	}
 
 	public static Client createInstance(IPFSParameter parameter) throws HiveException {
-		try {
-			if (clientInstance == null) {
-				clientInstance = new IPFSClient(parameter);
+		if (clientInstance == null) {
+			clientInstance = new IPFSClient(parameter);
 
-				try {
-					IPFSEntry entry = parameter.getAuthEntry();
-					if (keystorePath == null)
-						throw new HiveException("Please input an invalid path to store the IPFS data.");
+			try {
+				IPFSEntry entry = parameter.getAuthEntry();
+				if (keystorePath == null)
+					throw new HiveException("Please input an invalid path to store the IPFS data.");
 
-					File dataFile = new File(keystorePath);
-					if (!dataFile.exists()) {
-						dataFile.mkdirs();
+				File dataFile = new File(keystorePath);
+				if (!dataFile.exists()) {
+					dataFile.mkdirs();
+				}
+
+				File ipfsConfig = new File(dataFile, IPFSRpcHelper.CONFIG);
+				if (!ipfsConfig.exists()) {
+					ipfsConfig.createNewFile();
+				}
+
+				if (entry.getUid() != null) {
+					//Store the uid
+					storeUid(entry.getUid());
+				}
+				else {
+					String uid = getUid();
+					if (uid == null) {
+						//uid/new a new uid.
+						uid = getNewUid();
 					}
 
-					File ipfsConfig = new File(dataFile, IPFSRpcHelper.CONFIG);
-					if (!ipfsConfig.exists()) {
-						ipfsConfig.createNewFile();
-					}
-
-					if (entry.getUid() != null) {
-						//Store the uid
+					if (uid != null) {
+						entry.setUid(uid);
+						//Store the new uid
 						storeUid(entry.getUid());
 					}
-					else {
-						String uid = getUid();
-						if (uid == null) {
-							//uid/new a new uid.
-							uid = getNewUid();
-						}
-
-						if (uid != null) {
-							entry.setUid(uid);
-							//Store the new uid
-							storeUid(entry.getUid());
-						}
-					}
-				} catch (Exception e) {
-					throw new HiveException(e.getMessage());
 				}
+			} catch (Exception e) {
+				throw new HiveException(e.getMessage());
 			}
-		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
 		}
 
 		return clientInstance;
@@ -142,10 +138,10 @@ public final class IPFSClient extends Client {
 	@Override
 	public CompletableFuture<Client.Info> getInfo(Callback<Client.Info> callback) {
 		return rpcHelper.checkExpired()
-				.thenCompose(status -> getInfo(status, callback));
+				.thenCompose(padding -> getInfo(padding, callback));
 	}
 
-	private CompletableFuture<Client.Info> getInfo(Void status, Callback<Client.Info> callback) {
+	private CompletableFuture<Client.Info> getInfo(Void padding, Callback<Client.Info> callback) {
 		CompletableFuture<Client.Info> future = new CompletableFuture<Client.Info>();
 
 		if (callback == null)
@@ -170,10 +166,10 @@ public final class IPFSClient extends Client {
 	@Override
 	public CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback) {
 		return rpcHelper.checkExpired()
-				.thenCompose(status -> getDefaultDrive(status, callback));
+				.thenCompose(padding -> getDefaultDrive(padding, callback));
 	}
 
-	private CompletableFuture<Drive> getDefaultDrive(Void status, Callback<Drive> callback) {
+	private CompletableFuture<Drive> getDefaultDrive(Void padding, Callback<Drive> callback) {
 		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
 
 		if (callback == null)
@@ -349,7 +345,7 @@ public final class IPFSClient extends Client {
 			}
 
 			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid());
+			//attrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid());
 			attrs.put(Client.Info.userId, rpcHelper.getIpfsEntry().getUid());
 			// TODO;
 

@@ -6,11 +6,14 @@ import org.elastos.hive.AuthHelper;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
+import org.elastos.hive.Directory;
+import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
+import org.json.JSONObject;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -21,7 +24,7 @@ class IPFSRpcHelper implements AuthHelper {
 	static final String CONFIG      = "ipfs.json";
 	static final String LASTUID     = "last_uid";
 	static final String UIDS        = "uids";
-	
+
 	private final IPFSEntry entry;
 	private boolean isValid = false;
 	private String BASEURL  = null;
@@ -68,6 +71,11 @@ class IPFSRpcHelper implements AuthHelper {
 	@Override
 	public CompletableFuture<Void> checkExpired() {
 		return checkExpired(new NullCallback<Void>());
+	}
+
+	public CompletableFuture<PackValue> checkExpiredNew() {
+		// TODO:
+		return null;
 	}
 
 	@Override
@@ -133,6 +141,76 @@ class IPFSRpcHelper implements AuthHelper {
 		return future;
 	}
 
+	CompletableFuture<PackValue> getRootHash(PackValue value) {
+		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
+
+		if (value.getException() != null) {
+			future.completeExceptionally(value.getException());
+			return future;
+		}
+
+		String url = String.format("%s%s", getBaseUrl(), IPFSMethod.STAT);
+		Unirest.get(url)
+				.header(IPFSURL.ContentType, IPFSURL.Json)
+				.queryString(IPFSURL.UID, getIpfsEntry().getUid())
+				.queryString(IPFSURL.PATH, "/")
+				.asJsonAsync(new GetRootHashCallback(value, future));
+
+		return future;
+	}
+
+	CompletableFuture<PackValue> publishHash(PackValue value) {
+		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
+
+		if (value.getException() != null) {
+			future.completeExceptionally(value.getException());
+			return future;
+		}
+
+		String url = String.format("%s%s", getBaseUrl(), IPFSMethod.PUBLISH);
+		Unirest.get(url)
+			.header(IPFSURL.ContentType, IPFSURL.Json)
+			.queryString(IPFSURL.UID, getIpfsEntry().getUid())
+			.queryString(IPFSURL.PATH, value.getHash().getValue())
+			.asJsonAsync(new PublishRootHashCallback(value, future));
+
+		return future;
+	}
+
+	CompletableFuture<Directory> invokeDirectoryCallback(PackValue value) {
+		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
+
+		if (value.getException() != null) {
+			value.getCallback().onError(value.getException());
+			future.completeExceptionally(value.getException());
+			return future;
+		}
+
+		Directory object = (Directory)value.getValue();
+		@SuppressWarnings("unchecked")
+		Callback<Directory> callback = (Callback<Directory>)value.getCallback();
+		callback.onSuccess(object);
+		future.complete(object);
+		return future;
+	}
+
+	CompletableFuture<File> invokeFileCallback(PackValue value) {
+		CompletableFuture<File> future = new CompletableFuture<File>();
+
+		if (value.getException() != null) {
+			value.getCallback().onError(value.getException());
+			future.completeExceptionally(value.getException());
+			return future;
+		}
+
+		File object = (File)value.getValue();
+		@SuppressWarnings("unchecked")
+		Callback<File> callback = (Callback<File>)value.getCallback();
+		callback.onSuccess(object);
+		future.complete(object);
+		return future;
+	}
+
 	CompletableFuture<String> stat(String path) {
 		CompletableFuture<String> future = new CompletableFuture<String>();
 
@@ -158,7 +236,7 @@ class IPFSRpcHelper implements AuthHelper {
 	boolean isFolder(String type) {
 		return type != null && type.equals("directory");
 	}
-	
+
 	private class StatCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<String> future;
 
@@ -184,6 +262,73 @@ class IPFSRpcHelper implements AuthHelper {
 		@Override
 		public void failed(UnirestException exception) {
 			HiveException e = new HiveException(exception.getMessage());
+			future.completeExceptionally(e);
+		}
+	}
+
+	private class GetRootHashCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<PackValue> future;
+		private final PackValue value;
+
+		GetRootHashCallback(PackValue value, CompletableFuture<PackValue> future) {
+			this.value = value;
+			this.future = future;
+		}
+
+		@Override
+		public void cancelled() {}
+
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() != 200) {
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				value.setException(e);
+				future.completeExceptionally(e);
+				return;
+			}
+
+			JSONObject jsonObject = response.getBody().getObject();
+			IPFSHash hash = new IPFSHash(jsonObject.getString("Hash"));
+			value.setValue(hash);
+			future.complete(value);
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			HiveException e = new HiveException(exception.getMessage());
+			value.setException(e);
+			future.completeExceptionally(e);
+		}
+	}
+
+	private class PublishRootHashCallback implements UnirestAsyncCallback<JsonNode> {
+		private final CompletableFuture<PackValue> future;
+		private final PackValue value;
+
+		private PublishRootHashCallback(PackValue value, CompletableFuture<PackValue> future) {
+			this.value = value;
+			this.future = future;
+		}
+
+		@Override
+		public void cancelled() {}
+
+		@Override
+		public void completed(HttpResponse<JsonNode> response) {
+			if (response.getStatus() != 200) {
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				value.setException(e);
+				future.completeExceptionally(e);
+				return;
+			}
+
+			future.complete(value);
+		}
+
+		@Override
+		public void failed(UnirestException exception) {
+			HiveException e = new HiveException(exception.getMessage());
+			value.setException(e);
 			future.completeExceptionally(e);
 		}
 	}
