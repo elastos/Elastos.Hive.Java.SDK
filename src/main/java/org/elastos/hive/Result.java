@@ -1,4 +1,4 @@
 package org.elastos.hive;
 
-class Result {
+public class Result {
 }

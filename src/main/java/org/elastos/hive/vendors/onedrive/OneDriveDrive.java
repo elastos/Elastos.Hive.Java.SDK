@@ -77,14 +77,6 @@ final class OneDriveDrive extends Drive {
 
 	@Override
 	public CompletableFuture<Directory> getRootDir(Callback<Directory> callback) {
-		return authHelper.checkExpired()
-				.thenCompose(status -> getRootDir(status, callback));
-	}
-
-	private CompletableFuture<Directory> getRootDir(Void status, Callback<Directory> callback) {
-		if (callback == null)
-			callback = new NullCallback<Directory>();
-
 		return getDirectory("/", callback);
 	}
 
