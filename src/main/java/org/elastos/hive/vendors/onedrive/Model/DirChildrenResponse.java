@@ -4,11 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.Model
- * ClassName: DirChildrenResponse
- * Created by ranwang on 2019/6/24.
- */
 /*
 {
 	"@odata.count": 2,

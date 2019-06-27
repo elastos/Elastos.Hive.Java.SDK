@@ -1,10 +1,5 @@
 package org.elastos.hive.vendors.onedrive.Model;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.Model
- * ClassName: DirOrFileInfoResponse
- * Created by ranwang on 2019/6/24.
- */
 /*
 {
 	"lastModifiedDateTime": "2019-06-24T02:46:03.52Z",

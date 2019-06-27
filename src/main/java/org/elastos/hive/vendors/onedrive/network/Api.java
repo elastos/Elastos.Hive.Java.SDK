@@ -19,11 +19,6 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.network
- * ClassName: Api
- * Created by ranwang on 2019/6/17.
- */
 public interface Api {
 
     //if @call https://graph.microsoft.com/v1.0/me/

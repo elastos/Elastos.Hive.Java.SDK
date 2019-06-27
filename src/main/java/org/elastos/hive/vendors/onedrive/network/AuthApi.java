@@ -11,11 +11,6 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.network
- * ClassName: AuthApi
- * Created by ranwang on 2019/6/17.
- */
 public interface AuthApi {
     @FormUrlEncoded
     @POST(Constance.TOKEN)

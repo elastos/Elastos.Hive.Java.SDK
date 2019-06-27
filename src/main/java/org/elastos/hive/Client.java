@@ -27,7 +27,7 @@ public abstract class Client extends Result implements ResourceItem<Client.Info>
 
 	public static <T> Client createInstance(Parameter<T> parameter) throws HiveException {
 		if (parameter == null)
-			return null;
+			throw new HiveException("Null Parameter is not allowed");
 
 		switch (parameter.getDriveType()) {
 		case oneDrive:
@@ -43,9 +43,8 @@ public abstract class Client extends Result implements ResourceItem<Client.Info>
 			return OwnCloudClient.createInstance((OwnCloudParameter)parameter);
 
 		default:
-			break;
+			throw new HiveException("Not supported drive type: " + parameter.getDriveType());
 		}
-		return null;
 	}
 
 	public static Client getInstance(DriveType driveType) {
