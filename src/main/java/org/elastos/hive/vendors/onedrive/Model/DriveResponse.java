@@ -1,10 +1,5 @@
 package org.elastos.hive.vendors.onedrive.Model;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.Model
- * ClassName: DriveResponse
- * Created by ranwang on 2019/6/20.
- */
 /*
 {
 	"owner": {

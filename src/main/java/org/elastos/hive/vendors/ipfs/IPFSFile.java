@@ -417,6 +417,12 @@ final class IPFSFile extends File {
 	}
 
 	@Override
+	public CompletableFuture<Length> read(ByteBuffer dest, Callback<Length> callback) {
+		// TODO
+		return null;
+	}
+
+	@Override
 	public CompletableFuture<Length> read(ByteBuffer dest, long position) {
 		// TODO
 		return null;
@@ -435,6 +441,12 @@ final class IPFSFile extends File {
 	}
 
 	@Override
+	public CompletableFuture<Length> write(ByteBuffer dest, Callback<Length> callback) {
+		// TODO
+		return null;
+	}
+
+	@Override
 	public CompletableFuture<Length> write(ByteBuffer dest, long position) {
 		// TODO
 		return null;
@@ -448,6 +460,12 @@ final class IPFSFile extends File {
 
 	@Override
 	public CompletableFuture<Void> commit() {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Void> commit(Callback<Void> callback) {
 		// TODO
 		return null;
 	}

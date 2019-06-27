@@ -2,11 +2,6 @@ package org.elastos.hive.vendors.onedrive.Model;
 
 import java.util.Arrays;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.Model
- * ClassName: ClientResponse
- * Created by ranwang on 2019/6/21.
- */
 /*
 {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users/$entity",

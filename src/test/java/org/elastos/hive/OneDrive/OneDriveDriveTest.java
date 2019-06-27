@@ -1,10 +1,14 @@
-package org.elastos.hive;
+package org.elastos.hive.OneDrive;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.concurrent.ExecutionException;
 
+import org.elastos.hive.Client;
+import org.elastos.hive.Directory;
+import org.elastos.hive.Drive;
+import org.elastos.hive.File;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

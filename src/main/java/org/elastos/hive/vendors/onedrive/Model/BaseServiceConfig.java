@@ -2,57 +2,79 @@ package org.elastos.hive.vendors.onedrive.Model;
 
 import org.elastos.hive.AuthToken;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.Model
- * ClassName: BaseServiceConfig
- * Created by ranwang on 2019/6/24.
- */
 public class BaseServiceConfig {
-    private boolean useGsonConverter ;
-    private boolean useAuthHeader ;
-    private AuthToken authToken ;
-    private boolean isNobody ;
 
-    public BaseServiceConfig(){
+    private final boolean useGsonConverter ;
+    private final boolean useAuthHeader ;
+    private final AuthToken authToken ;
+    private final boolean ignoreReturnbody;
+
+    private BaseServiceConfig(){
+        this.useGsonConverter = true;
+        this.useAuthHeader = true;
+        this.ignoreReturnbody = false;
+        this.authToken = null;
     }
 
-    public BaseServiceConfig(boolean useGsonConverter, boolean useAuthHeader, AuthToken authToken, boolean isNobody) {
-        this.useGsonConverter = useGsonConverter;
-        this.useAuthHeader = useAuthHeader;
-        this.authToken = authToken;
-        this.isNobody = isNobody;
+    private BaseServiceConfig(Builder builder){
+        this.useGsonConverter = builder.useGsonConverter;
+        this.useAuthHeader = builder.useAuthHeader;
+        this.ignoreReturnbody = builder.ignoreReturnbody;
+        this.authToken = builder.authToken;
     }
 
     public boolean isUseGsonConverter() {
         return useGsonConverter;
     }
 
-    public void setUseGsonConverter(boolean useGsonConverter) {
-        this.useGsonConverter = useGsonConverter;
-    }
-
     public boolean isUseAuthHeader() {
         return useAuthHeader;
-    }
-
-    public void setUseAuthHeader(boolean useAuthHeader) {
-        this.useAuthHeader = useAuthHeader;
     }
 
     public AuthToken getAuthToken() {
         return authToken;
     }
 
-    public void setAuthToken(AuthToken authToken) {
-        this.authToken = authToken;
+    public boolean isIgnoreReturnbody() {
+        return ignoreReturnbody;
     }
 
-    public boolean isNobody() {
-        return isNobody;
-    }
+    public static final class Builder {
+        boolean useGsonConverter ;
+        boolean useAuthHeader ;
+        AuthToken authToken ;
+        boolean ignoreReturnbody;
 
-    public void setNobody(boolean nobody) {
-        isNobody = nobody;
+        public Builder(AuthToken authToken) {
+            this.useGsonConverter = true ;
+            this.useAuthHeader = true ;
+            this.authToken = authToken;
+            this.ignoreReturnbody = false ;
+        }
+
+        public Builder useGsonConverter(boolean flag){
+            this.useGsonConverter = flag ;
+            return this;
+        }
+
+        public Builder useAuthHeader(boolean flag){
+            this.useAuthHeader = flag ;
+            return this;
+        }
+
+        public Builder authToken(AuthToken authToken){
+            this.authToken = authToken ;
+            return this;
+        }
+
+        public Builder ignoreReturnBody(boolean flag){
+            this.ignoreReturnbody = flag ;
+            return this;
+        }
+
+        public BaseServiceConfig build() {
+            return new BaseServiceConfig(this);
+        }
     }
 
 }

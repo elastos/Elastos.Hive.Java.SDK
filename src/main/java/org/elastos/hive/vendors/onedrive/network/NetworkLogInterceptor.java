@@ -17,11 +17,6 @@ import okhttp3.ResponseBody;
 import okio.Buffer;
 import okio.BufferedSource;
 
-/**
- * Package: org.elastos.hive.elastoshiveandroiddemo
- * ClassName: NetworkLogInterceptor
- * Created by ranwang on 2019/6/17.
- */
 public class NetworkLogInterceptor implements Interceptor{
     @Override
     public Response intercept(Chain chain) throws IOException {
