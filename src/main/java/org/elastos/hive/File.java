@@ -13,13 +13,19 @@ public abstract class File extends Result implements ResourceItem<File.Info>, Fi
 	}
 
 	public abstract CompletableFuture<Length> read(ByteBuffer dest);
+	public abstract CompletableFuture<Length> read(ByteBuffer dest, Callback<Length> callback);
+
 	public abstract CompletableFuture<Length> read(ByteBuffer dest, long position);
 	public abstract CompletableFuture<Length> read(ByteBuffer dest, long position, Callback<Length> callback);
 
 	public abstract CompletableFuture<Length> write(ByteBuffer dest);
+	public abstract CompletableFuture<Length> write(ByteBuffer dest, Callback<Length> callback);
+
 	public abstract CompletableFuture<Length> write(ByteBuffer dest, long position);
 	public abstract CompletableFuture<Length> write(ByteBuffer dest, long position, Callback<Length> callback);
 
 	public abstract CompletableFuture<Void> commit();
+	public abstract CompletableFuture<Void> commit(Callback<Void> callback);
+
 	public abstract void discard();
 }

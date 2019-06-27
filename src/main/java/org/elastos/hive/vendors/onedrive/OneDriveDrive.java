@@ -55,21 +55,23 @@ final class OneDriveDrive extends Drive {
 	@Override
 	public CompletableFuture<Drive.Info> getInfo(Callback<Drive.Info> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> getInfo(status, callback));
+				.thenCompose(padding -> getInfo(padding, callback));
 	}
 
-	private CompletableFuture<Drive.Info> getInfo(Void status, Callback<Drive.Info> callback) {
+	private CompletableFuture<Drive.Info> getInfo(Void padding, Callback<Drive.Info> callback) {
 		CompletableFuture<Drive.Info> future = new CompletableFuture<Drive.Info>();
 		if (callback == null)
 			callback = new NullCallback<Drive.Info>();
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getInfo();
 			call.enqueue(new DriveDriveCallback(null, future , callback , Type.GET_INFO));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 		return future;
 	}
@@ -81,6 +83,14 @@ final class OneDriveDrive extends Drive {
 
 	@Override
 	public CompletableFuture<Directory> getRootDir(Callback<Directory> callback) {
+		return authHelper.checkExpired()
+				.thenCompose(padding -> getRootDir(padding, callback));
+	}
+
+	private CompletableFuture<Directory> getRootDir(Void padding, Callback<Directory> callback) {
+		if (callback == null)
+			callback = new NullCallback<Directory>();
+
 		return getDirectory("/", callback);
 	}
 
@@ -92,24 +102,24 @@ final class OneDriveDrive extends Drive {
 	@Override
 	public CompletableFuture<Directory> createDirectory(String pathName, Callback<Directory> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> createDirectory(status, pathName, callback));
+				.thenCompose(padding -> createDirectory(padding, pathName, callback));
 	}
 
-	private CompletableFuture<Directory> createDirectory(Void status, String pathName, Callback<Directory> callback) {
+	private CompletableFuture<Directory> createDirectory(Void padding, String pathName, Callback<Directory> callback) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (callback == null)
 			callback = new NullCallback<Directory>();
 
 		if (!pathName.startsWith("/")) {
-			HiveException e = new HiveException("Path name must be a abosulte path");
+			HiveException e = new HiveException("Path name must be absulte path");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (pathName.equals("/")) {
-			HiveException e = new HiveException("Can't create root directory");
+			HiveException e = new HiveException("Impossible to create root directory");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
@@ -130,12 +140,14 @@ final class OneDriveDrive extends Drive {
 
 		CreateDirRequest createDirRequest = new CreateDirRequest(name);
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.createDir(urlPath , createDirRequest);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.CREATE_DIR));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 		return future;
 	}
@@ -148,36 +160,37 @@ final class OneDriveDrive extends Drive {
 	@Override
 	public CompletableFuture<Directory> getDirectory(String pathName, Callback<Directory> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> getDirectory(status, pathName, callback));
+				.thenCompose(padding -> getDirectory(padding, pathName, callback));
 	}
 
-	private CompletableFuture<Directory> getDirectory(Void status, String pathName, Callback<Directory> callback) {
+	private CompletableFuture<Directory> getDirectory(Void padding, String pathName, Callback<Directory> callback) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
 		if (callback == null)
 			callback = new NullCallback<Directory>();
 
 		if (!pathName.startsWith("/")) {
-			HiveException e = new HiveException("Need a absolute path to get a directory.");
+			HiveException e = new HiveException("Path name must be absulte path");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		String fullPath;
-		if (pathName.equals("/")){
+		if (pathName.equals("/"))
 			fullPath = Constance.ROOT ;
-		} else {
+		else
 			fullPath = Constance.ROOT+":"+pathName;
-		}
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,config);
 			Call call = api.getFileOrDirProp(fullPath);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_DIR));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 		return future;
 	}
@@ -190,36 +203,38 @@ final class OneDriveDrive extends Drive {
 	@Override
 	public CompletableFuture<File> createFile(String pathName, Callback<File> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> createFile(status, pathName, callback));
+				.thenCompose(padding -> createFile(padding, pathName, callback));
 	}
 
-	private CompletableFuture<File> createFile(Void status, String pathName, Callback<File> callback) {
+	private CompletableFuture<File> createFile(Void padding, String pathName, Callback<File> callback) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (callback == null)
 			callback = new NullCallback<File>();
 
 		if (!pathName.startsWith("/")) {
-			HiveException ex = new HiveException("Need a absolute path to create a file.");
+			HiveException ex = new HiveException("Path name must be absulte path");
 			callback.onError(ex);
 			future.completeExceptionally(ex);
 			return future;
 		}
 
 		if (pathName.equals("/")) {
-			HiveException ex = new HiveException("Can't create file with root path");
+			HiveException ex = new HiveException("Impossible to create root directory as file");
 			callback.onError(ex);
 			future.completeExceptionally(ex);
 			return future;
 		}
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.createFile(pathName);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.CREATE_FILE));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -233,43 +248,44 @@ final class OneDriveDrive extends Drive {
 	@Override
 	public CompletableFuture<File> getFile(String pathName, Callback<File> callback) {
 		return authHelper.checkExpired()
-				.thenCompose(status -> getFile(status, pathName, callback));
+				.thenCompose(padding -> getFile(padding, pathName, callback));
 	}
 
-	private CompletableFuture<File> getFile(Void status, String pathName, Callback<File> callback) {
+	private CompletableFuture<File> getFile(Void padding, String pathName, Callback<File> callback) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
 		if (callback == null)
 			callback = new NullCallback<File>();
 
 		if (!pathName.startsWith("/")) {
-			HiveException e = new HiveException("Need a absolute path to get a file.");
+			HiveException e = new HiveException("Path name must be absulte path");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (pathName.equals("/")) {
-			HiveException ex = new HiveException("Can't get file with root path");
+			HiveException ex = new HiveException("Impossible to open root directory as file");
 			callback.onError(ex);
 			future.completeExceptionally(ex);
 			return future;
 		}
 
 		String fullPath;
-		if (pathName.equals("/")){
+		if (pathName.equals("/"))
 			fullPath = Constance.ROOT ;
-		} else {
+		else
 			fullPath = Constance.ROOT+":"+pathName;
-		}
 
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,true,authHelper.getToken(),false);
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
+			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getFileOrDirProp(fullPath);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_FILE));
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 
 		return future;
@@ -277,11 +293,12 @@ final class OneDriveDrive extends Drive {
 
 	@Override
 	public CompletableFuture<ItemInfo> getItemInfo(String path) {
-		return null;
+		return getItemInfo(path, new NullCallback<ItemInfo>());
 	}
 
 	@Override
 	public CompletableFuture<ItemInfo> getItemInfo(String path, Callback<ItemInfo> callback) {
+		// TODO:
 		return null;
 	}
 
@@ -317,16 +334,17 @@ final class OneDriveDrive extends Drive {
 
 			switch (type){
 				case GET_INFO:
-
 					DriveResponse driveResponse= (DriveResponse) response.body();
 
 					HashMap<String, String> attrs = new HashMap<>();
 					attrs.put(Drive.Info.driveId, driveResponse.getId());
+					// TODO:
 
 					Drive.Info driveInfo = new Drive.Info(attrs);
 					this.callback.onSuccess(driveInfo);
 					future.complete(driveInfo);
 					break;
+
 				case CREATE_DIR:
 				case GET_DIR:
 					FileOrDirPropResponse dirResponse= (FileOrDirPropResponse) response.body();
@@ -340,18 +358,19 @@ final class OneDriveDrive extends Drive {
 
 					HashMap<String, String> dirAttrs = new HashMap<>();
 					dirAttrs.put(Directory.Info.itemId, dirResponse.getId());
+					// TODO:
 
 					Directory.Info dirInfo_ = new Directory.Info(dirAttrs);
 					OneDriveDirectory directory = new OneDriveDirectory(pathName,dirInfo_,authHelper);
 					this.callback.onSuccess(directory);
 					future.complete(directory);
-
 					break;
+
 				case CREATE_FILE:
 				case GET_FILE:
 					FileOrDirPropResponse filePropResponse= (FileOrDirPropResponse) response.body();
 
-					if (filePropResponse.getFolder()!=null) {
+					if (filePropResponse.getFolder() !=null) {
 						HiveException e = new HiveException("This is not a file");
 						this.callback.onError(e);
 						future.completeExceptionally(e);
@@ -360,6 +379,7 @@ final class OneDriveDrive extends Drive {
 
 					HashMap<String, String> fileAttrs = new HashMap<>();
 					fileAttrs.put(File.Info.itemId, filePropResponse.getId());
+					// TODO:
 
 					File.Info fileInfo = new File.Info(fileAttrs);
 					OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);

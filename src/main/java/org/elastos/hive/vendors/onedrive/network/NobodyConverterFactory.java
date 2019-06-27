@@ -11,11 +11,6 @@ import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
-/**
- * Package: org.elastos.hive.vendors.onedrive.network
- * ClassName: NobodyConverterFactory
- * Created by ranwang on 2019/6/24.
- */
 public class NobodyConverterFactory extends Converter.Factory {
     public static final NobodyConverterFactory create() {
         return new NobodyConverterFactory();

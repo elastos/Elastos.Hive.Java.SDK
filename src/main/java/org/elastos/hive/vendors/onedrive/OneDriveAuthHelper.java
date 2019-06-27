@@ -40,10 +40,13 @@ public class OneDriveAuthHelper implements AuthHelper {
 		this.authEntry = authEntry;
 		this.persistent = persistent;
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(true,false,null,false);
-			authApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig.Builder(null).
+					useAuthHeader(false)
+					.build();
+			authApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL, config);
 		} catch (Exception e) {
 			e.printStackTrace();
+			// TODO:
 		}
 	}
 
@@ -92,10 +95,14 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 		AuthApi logoutApi = null;
 		try {
-			BaseServiceConfig baseServiceConfig = new BaseServiceConfig(false,false,null,false);
-			logoutApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL ,baseServiceConfig);
+			BaseServiceConfig config = new BaseServiceConfig.Builder(null)
+					.useAuthHeader(false)
+					.useGsonConverter(false)
+					.build();
+			logoutApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL, config);
 		} catch (Exception e) {
 			e.printStackTrace();
+			// TODO:
 		}
 		Call call = logoutApi.logout(authEntry.getRedirectURL());
 
@@ -115,9 +122,9 @@ public class OneDriveAuthHelper implements AuthHelper {
 			return redeemToken(callback);
 
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
-		Void placeHolder = new Void();
-	    callback.onSuccess(placeHolder);
-		future.complete(placeHolder);
+		Void padding = new Void();
+	    callback.onSuccess(padding);
+		future.complete(padding);
 		return future;
 	}
 
@@ -139,8 +146,8 @@ public class OneDriveAuthHelper implements AuthHelper {
 			}
 
 			String url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-								OneDriveURL.AUTH,
-								OneDriveMethod.AUTHORIZE,
+								Constance.ONE_DRIVE_AUTH_URL,
+								Constance.AUTHORIZE,
 								authEntry.getClientId(),
 								authEntry.getScope(),
 								authEntry.getRedirectURL())
@@ -159,6 +166,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 			try{
 				server.stop();
 			}catch (Exception e){
+				// TODO;
 			}
 
 			semph.release();
@@ -173,10 +181,9 @@ public class OneDriveAuthHelper implements AuthHelper {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		Call call = authApi.getToken(authEntry.getClientId(),authCode,
-				authEntry.getRedirectURL(),Constance.GRANT_TYPE_GET_TOKEN);
+					authEntry.getRedirectURL(),Constance.GRANT_TYPE_GET_TOKEN);
 
 		call.enqueue(new AuthCallback(future,callback,Type.GET_TOKEN));
-
 		return future;
 	}
 
@@ -187,7 +194,6 @@ public class OneDriveAuthHelper implements AuthHelper {
 				token.getRefreshToken(),Constance.GRANT_TYPE_REFRESH_TOKEN);
 
 		call.enqueue(new AuthCallback(future,callback,Type.REDEEM_TOKEN));
-
 		return future;
 	}
 
@@ -280,24 +286,26 @@ public class OneDriveAuthHelper implements AuthHelper {
 					writebackToken();
 
 					break;
+
 				case LOGOUT:
 					OneDriveAuthHelper.this.clearToken();
 					break;
+
 				default:
 					break;
 			}
 
 
-			Void placeHolder = new Void();
-		    callback.onSuccess(placeHolder);
-			future.complete(placeHolder);
+			Void padding = new Void();
+		    callback.onSuccess(padding);
+			future.complete(padding);
 		}
 
 		@Override
 		public void onFailure(Call call, Throwable t) {
-			HiveException ex = new HiveException(t.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(t.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
 
