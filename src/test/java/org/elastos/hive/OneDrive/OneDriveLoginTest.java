@@ -1,9 +1,10 @@
-package org.elastos.hive;
+package org.elastos.hive.OneDrive;
+
+import org.elastos.hive.Client;
+import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
-import org.junit.Test;
 
 public class OneDriveLoginTest {
 	@Test public void testLogin() {

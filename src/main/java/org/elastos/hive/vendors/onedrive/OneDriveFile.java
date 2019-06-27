@@ -74,7 +74,7 @@ final class OneDriveFile extends File {
 			callback = new NullCallback<File.Info>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.getDirAndFileInfo(pathName);
 			call.enqueue(new FileCallback(future , callback ,pathName, Type.GET_INFO));
@@ -133,7 +133,7 @@ final class OneDriveFile extends File {
 			String newPathName = pathName + "/" +name ;
 
 			MoveAndCopyReqest request = new MoveAndCopyReqest(pathName,name);
-			BaseServiceConfig config  = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config  = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.moveTo(this.pathName, request);
 			call.enqueue(new FileCallback(future , callback ,newPathName, Type.MOVE_TO));
@@ -190,7 +190,9 @@ final class OneDriveFile extends File {
 			String name = pathName.substring(LastPos + 1);
 
 			MoveAndCopyReqest request = new MoveAndCopyReqest(pathName,name);
-			BaseServiceConfig config  = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config  = new BaseServiceConfig.Builder(authHelper.getToken())
+					.ignoreReturnBody(true)
+					.build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.copyTo(this.pathName, request);
 			call.enqueue(new FileCallback(future, callback ,pathName, Type.COPY_TO));
@@ -222,7 +224,7 @@ final class OneDriveFile extends File {
 			callback = new NullCallback<Void>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(authHelper.getToken());
+			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 			Call call = api.deleteItem(this.pathName);
 			call.enqueue(new FileCallback(future , callback ,pathName, Type.DELETE_ITEM));

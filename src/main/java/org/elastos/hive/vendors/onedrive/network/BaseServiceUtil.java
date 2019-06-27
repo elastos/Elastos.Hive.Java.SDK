@@ -23,7 +23,7 @@ public class BaseServiceUtil {
 
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
 
-        if (baseServiceConfig.isNobody()){
+        if (baseServiceConfig.isIgnoreReturnbody()){
             retrofitBuilder.addConverterFactory(NobodyConverterFactory.create());
         }
 

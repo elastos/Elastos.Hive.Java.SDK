@@ -1,12 +1,15 @@
-package org.elastos.hive;
+package org.elastos.hive.OneDrive;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import org.elastos.hive.Authenticator;
+import org.elastos.hive.Client;
+import org.elastos.hive.OAuthEntry;
+import org.elastos.hive.vendors.onedrive.OneDriveParameter;
 
 import java.awt.Desktop;
 import java.net.URI;
 
-import org.elastos.hive.vendors.onedrive.OneDriveParameter;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class OneDriveTestBase {
 	static public final String APPID = "f0f8fdc1-294e-4d5c-b3d8-774147075480";

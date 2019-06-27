@@ -31,7 +31,9 @@ public class OneDriveAuthHelper implements AuthHelper {
 	protected OneDriveAuthHelper(OAuthEntry authEntry) {
 		this.authEntry = authEntry;
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(true,false,null,false);
+			BaseServiceConfig config = new BaseServiceConfig.Builder(null).
+					useAuthHeader(false)
+					.build();
 			authApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL, config);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -68,7 +70,10 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 		AuthApi logoutApi = null;
 		try {
-			BaseServiceConfig config = new BaseServiceConfig(false,false,null,false);
+			BaseServiceConfig config = new BaseServiceConfig.Builder(null)
+					.useAuthHeader(false)
+					.useGsonConverter(false)
+					.build();
 			logoutApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL, config);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -116,7 +121,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 			}
 
 			String url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-								Constance.ONE_DRIVE_AUTH_BASE_URL,
+								Constance.ONE_DRIVE_AUTH_URL,
 								Constance.AUTHORIZE,
 								authEntry.getClientId(),
 								authEntry.getScope(),
