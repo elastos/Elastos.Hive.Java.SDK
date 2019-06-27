@@ -197,7 +197,7 @@ class OneDriveAuthHelper implements AuthHelper {
 
 			if (refreshToken != null && accessToken != null && expiresAt > 0)
 				this.token = new AuthToken(refreshToken, accessToken, expiresAt);
-		} catch (HiveException e) {
+		} catch (Exception e) {
 			// TODO: Log output.
 		}
 	}
