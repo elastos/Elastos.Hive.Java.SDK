@@ -45,15 +45,21 @@ final class IPFSFile extends File {
 
 	@Override
 	public CompletableFuture<Info> getInfo(Callback<Info> callback) {
-		return rpcHelper.checkExpired()
-				.thenCompose(status -> getInfo(status, callback));
+		return rpcHelper.checkExpiredNew()
+				.thenCompose(value -> getInfo(value, callback));
 	}
 
-	private CompletableFuture<Info> getInfo(Void status, Callback<Info> callback) {
-		CompletableFuture<Info> future = new CompletableFuture<Info>();
+	private CompletableFuture<Info> getInfo(PackValue value, Callback<Info> callback) {
+		CompletableFuture<File.Info> future = new CompletableFuture<File.Info>();
 
 		if (callback == null)
 			callback = new NullCallback<Info>();
+
+		if (value.getException() != null) {
+			callback.onError(value.getException());
+			future.completeExceptionally(value.getException());
+			return future;
+		}
 
 		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.STAT);
 		Unirest.get(url)
@@ -94,15 +100,16 @@ final class IPFSFile extends File {
 
 	private CompletableFuture<PackValue> moveTo(PackValue value, String path, Callback<Void> callback) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
+
+		if (callback == null)
+			callback = new NullCallback<Void>();
+
+		value.setCallback(callback);
+
 		if (value.getException() != null) {
 			future.completeExceptionally(value.getException());
 			return future;
 		}
-
-		if (callback == null)
-			callback = new NullCallback<Void>();
-		
-		value.setCallback(callback);
 
 		if (path == null || path.isEmpty()) {
 			HiveException e = new HiveException("The path is invalid");
@@ -128,7 +135,7 @@ final class IPFSFile extends File {
 		int LastPos = this.pathName.lastIndexOf("/");
 		String name = this.pathName.substring(LastPos + 1);
 		final String newPath = String.format("%s/%s", path, name);
-		
+
 		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.MV);
 		Unirest.get(url)
 				.header(IPFSURL.ContentType, IPFSURL.Json)
@@ -139,7 +146,7 @@ final class IPFSFile extends File {
 
 		return future;
 	}
-	
+
 	@Override
 	public CompletableFuture<Void> copyTo(String path) {
 		return copyTo(path, new NullCallback<Void>());
@@ -157,15 +164,16 @@ final class IPFSFile extends File {
 
 	private CompletableFuture<PackValue> copyTo(PackValue value, String path, Callback<Void> callback) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
+
+		if (callback == null)
+			callback = new NullCallback<Void>();
+
+		value.setCallback(callback);
+
 		if (value.getException() != null) {
 			future.completeExceptionally(value.getException());
 			return future;
 		}
-
-		if (callback == null)
-			callback = new NullCallback<Void>();
-		
-		value.setCallback(callback);
 
 		if (path == null || path.isEmpty()) {
 			HiveException e = new HiveException("The path is invalid");
@@ -198,7 +206,7 @@ final class IPFSFile extends File {
 		int LastPos = this.pathName.lastIndexOf("/");
 		String name = this.pathName.substring(LastPos + 1);
 		final String newPath = String.format("%s/%s", path, name);
-		
+
 		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.CP);
 		Unirest.get(url)
 				.header(IPFSURL.ContentType, IPFSURL.Json)
@@ -209,7 +217,7 @@ final class IPFSFile extends File {
 
 		return future;
 	}
-	
+
 	@Override
 	public CompletableFuture<Void> deleteItem() {
 		return deleteItem(new NullCallback<Void>());
@@ -225,23 +233,24 @@ final class IPFSFile extends File {
 
 	private CompletableFuture<PackValue> deleteItem(PackValue value, Callback<Void> callback) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
-		if (value.getException() != null) {
-			future.completeExceptionally(value.getException());
-			return future;
-		}
 
 		if (callback == null)
 			callback = new NullCallback<Void>();
 
 		value.setCallback(callback);
-		
+
+		if (value.getException() != null) {
+			future.completeExceptionally(value.getException());
+			return future;
+		}
+
 		if (pathName.equals("/")) {
 			HiveException e = new HiveException("Can't delete the root.");
 			value.setException(e);
 			future.completeExceptionally(e);
 			return future;
 		}
-		
+
 		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.RM);
 		Unirest.get(url)
 			.header(IPFSURL.ContentType, IPFSURL.Json)
@@ -274,26 +283,28 @@ final class IPFSFile extends File {
 		@Override
 		public void completed(HttpResponse<JsonNode> response) {
 			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
+				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 
 			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(File.Info.itemId, getId()); // TODO:
+			attrs.put(File.Info.itemId, getId());
+			// TODO:
+
 			this.callback.onSuccess(fileInfo);
 			future.complete(fileInfo);
 		}
 
 		@Override
 		public void failed(UnirestException exception) {
-			HiveException ex = new HiveException(exception.getMessage());
-			this.callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException(exception.getMessage());
+			this.callback.onError(e);
+			future.completeExceptionally(e);
 		}
 	}
-	
+
 	private class copyToCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<PackValue> future;
 		private final PackValue value;
@@ -315,7 +326,7 @@ final class IPFSFile extends File {
 				return;
 			}
 
-			PackValue padding = new PackValue();
+			Void padding = new Void();
 			value.setValue(padding);
 			future.complete(value);
 		}
@@ -327,7 +338,7 @@ final class IPFSFile extends File {
 			future.completeExceptionally(e);
 		}
 	}
-	
+
 	private class moveToCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<PackValue> future;
 		private final String pathName;
@@ -352,7 +363,7 @@ final class IPFSFile extends File {
 			}
 
 			IPFSFile.this.pathName = pathName;
-			PackValue padding = new PackValue();
+			Void padding = new Void();
 			value.setValue(padding);
 			future.complete(value);
 		}
@@ -364,7 +375,7 @@ final class IPFSFile extends File {
 			future.completeExceptionally(e);
 		}
 	}
-	
+
 	private class deleteItemCallback implements UnirestAsyncCallback<JsonNode> {
 		private final CompletableFuture<PackValue> future;
 		private final PackValue value;
@@ -386,7 +397,7 @@ final class IPFSFile extends File {
 				return;
 			}
 
-			PackValue padding = new PackValue();
+			Void padding = new Void();
 			value.setValue(padding);
 			future.complete(value);
 		}

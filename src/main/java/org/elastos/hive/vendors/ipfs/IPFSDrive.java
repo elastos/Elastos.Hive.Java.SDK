@@ -67,12 +67,6 @@ final class IPFSDrive extends Drive{
 			return future;
 		}
 
-		if (value.getException() != null) {
-			callback.onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
 		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.STAT);
 		Unirest.get(url)
 			.header(IPFSURL.ContentType, IPFSURL.Json)
