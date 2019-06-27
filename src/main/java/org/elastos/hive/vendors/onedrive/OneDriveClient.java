@@ -1,5 +1,9 @@
 package org.elastos.hive.vendors.onedrive;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -247,13 +251,62 @@ public final class OneDriveClient extends Client {
 
 		@Override
 		public JSONObject parseFrom() throws HiveException {
-			// TODO:
+			FileReader reader = null;
+			try {
+				initialize();
+				reader = new FileReader(storePath);
+				char[] buf = new char[128];
+				int len = 0;
+				StringBuilder content = new StringBuilder();
+				while ((len = reader.read(buf)) != -1) {
+					content.append(new String(buf, 0, len));
+				}
+				
+				if (content.length() > 0) {
+					return new JSONObject(content.toString());
+				}
+			} catch (Exception e) {
+				throw new HiveException(e.getMessage());
+			}
+			finally {
+				if (reader != null) {
+					try {
+						reader.close();
+					} catch (IOException e) {
+						throw new HiveException(e.getMessage());
+					}
+				}
+			}
+
 			return null;
 		}
 
 		@Override
 		public void upateContent(JSONObject conetnt) throws HiveException {
-			// TODO
+			FileWriter fileWriter = null;
+			try {
+				initialize();
+				fileWriter = new FileWriter(storePath);
+				fileWriter.write(conetnt.toString());
+			} catch (Exception e) {
+				throw new HiveException(e.getMessage());
+			}
+			finally {
+				if (fileWriter != null) {
+					try {
+						fileWriter.close();
+					} catch (IOException e) {
+						throw new HiveException(e.getMessage());
+					}
+				}
+			}
+		}
+
+		private void initialize() throws IOException {
+			File config = new File(storePath);
+			if (!config.exists()) {
+				config.createNewFile();
+			}
 		}
 	}
 }
