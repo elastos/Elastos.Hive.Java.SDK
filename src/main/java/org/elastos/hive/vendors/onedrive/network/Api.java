@@ -5,11 +5,13 @@ import org.elastos.hive.vendors.onedrive.Constance;
 import org.elastos.hive.vendors.onedrive.Model.CreateDirRequest;
 import org.elastos.hive.vendors.onedrive.Model.DirChildrenResponse;
 import org.elastos.hive.vendors.onedrive.Model.DirOrFileInfoResponse;
-import org.elastos.hive.vendors.onedrive.Model.MoveAndCopyReqest;
 import org.elastos.hive.vendors.onedrive.Model.DriveResponse;
 import org.elastos.hive.vendors.onedrive.Model.FileOrDirPropResponse;
+import org.elastos.hive.vendors.onedrive.Model.MoveAndCopyReqest;
 import org.elastos.hive.vendors.onedrive.Model.NoBodyEntity;
 
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -64,4 +66,10 @@ public interface Api {
 
     @GET(Constance.DRIVE+"/root:{path}:/children")
     Call<DirChildrenResponse> getChildren(@Path("path") String path);
+
+    @GET(Constance.DRIVE+"/root:{path}:/content")
+    Call<ResponseBody> read(@Path("path") String path);
+
+    @PUT(Constance.DRIVE+"/root:{path}:/content")
+    Call<NoBodyEntity> write(@Path("path") String path, @Body RequestBody body);
 }

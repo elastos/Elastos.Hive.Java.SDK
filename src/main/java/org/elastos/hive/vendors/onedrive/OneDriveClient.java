@@ -36,7 +36,7 @@ public final class OneDriveClient extends Client {
 
 	private OneDriveClient(OneDriveParameter parameter) {
 		persistent = new KeyStore(parameter.getKeyStorePath());
-		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry(), persistent);
+		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry(), persistent, parameter.getKeyStorePath());
 	}
 
 	public static Client createInstance(OneDriveParameter parameter) {

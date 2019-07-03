@@ -17,6 +17,7 @@ import org.elastos.hive.vendors.onedrive.network.AuthApi;
 import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
@@ -25,25 +26,32 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 public class OneDriveAuthHelper implements AuthHelper {
-	public static final String clientIdKey 		= "client_id";
-	public static final String accessTokenKey 	= "access_token";
-	public static final String refreshTokenKey 	= "refresh_token";
-	public static final String expireAtKey 		= "expires_at";
+	private static final String clientIdKey 		= "client_id";
+	private static final String accessTokenKey 		= "access_token";
+	private static final String refreshTokenKey 	= "refresh_token";
+	private static final String expireAtKey 		= "expires_at";
 
 	private final OAuthEntry authEntry;
 	private final Persistent persistent;
+	private final String cachePath;
 	private AuthToken token;
 	private AuthApi authApi ;
 
 
-	protected OneDriveAuthHelper(OAuthEntry authEntry, Persistent persistent) {
+	OneDriveAuthHelper(OAuthEntry authEntry, Persistent persistent, String cachePath) {
 		this.authEntry = authEntry;
 		this.persistent = persistent;
+		this.cachePath = String.format("%s/%s", cachePath, OneDriveUtils.TMP);
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder(null).
 					useAuthHeader(false)
 					.build();
 			authApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL, config);
+			
+			File tmpPath = new File(this.cachePath);
+			if (!tmpPath.exists()) {
+				tmpPath.mkdir();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO:
@@ -126,6 +134,10 @@ public class OneDriveAuthHelper implements AuthHelper {
 	    callback.onSuccess(padding);
 		future.complete(padding);
 		return future;
+	}
+
+	protected String getCachePath() {
+		return this.cachePath;
 	}
 
 	protected CompletableFuture<String> getAuthCode(Authenticator authenticator) {
