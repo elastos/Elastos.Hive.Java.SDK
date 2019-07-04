@@ -37,11 +37,13 @@ final class OneDriveFile extends File {
 	private final AuthHelper authHelper;
 	private String pathName;
 	private volatile File.Info fileInfo;
+	private boolean needDeleteCache;
 
 	OneDriveFile(String pathName, File.Info fileInfo, AuthHelper authHelper) {
 		this.fileInfo = fileInfo;
 		this.pathName = pathName;
 		this.authHelper = authHelper;
+		this.needDeleteCache = true;
 	}
 
 	@Override
@@ -251,7 +253,7 @@ final class OneDriveFile extends File {
 
 	@Override
 	public void close() {
-		// TODO
+		deleteCache();
 	}
 
 	private long readCursor = 0;
@@ -294,7 +296,17 @@ final class OneDriveFile extends File {
 			return future;
 		}
 
-		if (!cacheFileIsExist(this.pathName)) {
+		//at the first read, if the cache file exists, delete it, and get a new one from the remote.
+		java.io.File cacheFile = getCacheFile(pathName);
+		if (needDeleteCache) {
+			if (cacheFile.exists()) {
+				cacheFile.delete();
+			}
+
+			needDeleteCache = false;
+		}
+
+		if (!cacheFile.exists()) {
 			//get the file from the remote.
 			try {
 				BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken())
@@ -387,7 +399,9 @@ final class OneDriveFile extends File {
 
 	@Override
 	public CompletableFuture<Length> write(ByteBuffer dest, Callback<Length> callback) {
-		return localWrite(dest, -1, callback);
+		return authHelper.checkExpired()
+				.thenCompose(padding -> checkAndCache(dest))
+				.thenCompose(length -> localWrite(dest, -1, callback));
 	}
 
 	@Override
@@ -405,7 +419,9 @@ final class OneDriveFile extends File {
 			return future;
 		}
 
-		return localWrite(dest, position, callback);
+		return authHelper.checkExpired()
+				.thenCompose(padding -> checkAndCache(dest))
+				.thenCompose(length -> localWrite(dest, position, callback));
 	}
 
 	private long writeCursor = 0;
@@ -416,18 +432,17 @@ final class OneDriveFile extends File {
 				return new Length(0);
 			}
 
-			checkAndBackup(this.pathName);
 			//using writeCursor to write
 			FileChannel outputChannel = null;
 			FileOutputStream outputStream = null;
 			long len = 0;
 			try {
-				java.io.File backupCacheFile = new java.io.File(getCacheFileName(this.pathName, backupPrefix));
-				if (!backupCacheFile.exists()) {
-					backupCacheFile.createNewFile();						
+				java.io.File cacheFile = new java.io.File(getCacheFileName(this.pathName));
+				if (!cacheFile.exists()) {
+					cacheFile.createNewFile();						
 				}
 
-				outputStream = new FileOutputStream(backupCacheFile, true);
+				outputStream = new FileOutputStream(cacheFile, true);
 				outputChannel = outputStream.getChannel();
 
 				if (position == -1) {
@@ -477,8 +492,8 @@ final class OneDriveFile extends File {
 	private CompletableFuture<Void> commit(Void padding, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
-		java.io.File backupCacheFile = new java.io.File(getCacheFileName(this.pathName, backupPrefix));
-		if (backupCacheFile.length() <= 0) {
+		java.io.File cacheFile = new java.io.File(getCacheFileName(this.pathName));
+		if (cacheFile.length() <= 0) {
 			HiveException e = new HiveException("the file to upload is invalid");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -486,7 +501,7 @@ final class OneDriveFile extends File {
 		}
 
 		final long limitSize = 4 * 1024 * 1024; //4M
-		if (backupCacheFile.length() > limitSize) {
+		if (cacheFile.length() > limitSize) {
 			HiveException e = new HiveException("the file size is too large");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -497,7 +512,7 @@ final class OneDriveFile extends File {
 			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
 			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
 
-			RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), backupCacheFile);
+			RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), cacheFile);
 
 			Call call = api.write(pathName, requestBody);
 			call.enqueue(new FileCallback(future , callback , pathName, Type.WRITE));
@@ -513,67 +528,20 @@ final class OneDriveFile extends File {
 	@Override
 	public void discard() {
 		writeCursor = 0;
-		deleteBackup();
-	}
-
-	private static final String backupPrefix = "tmp_";
-	private void checkAndBackup(String path) {
-		FileChannel inputChannel = null;
-		FileChannel outputChannel = null;
-		try {
-			java.io.File backupCacheFile = new java.io.File(getCacheFileName(path, backupPrefix));
-			if (backupCacheFile.exists()) {
-				//if the backup file exists, return.
-				return;
-			}
-
-			//create a new backup file.
-			backupCacheFile.createNewFile();
-
-			String fileName = getCacheFileName(path);
-			java.io.File file = new java.io.File(fileName);
-			if (file.exists()) {
-				//backup the cache file, and delete the backup file if commit successfully
-				inputChannel = new FileInputStream(file).getChannel();
-				outputChannel = new FileOutputStream(backupCacheFile).getChannel();
-				outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
-			try {
-				if (inputChannel != null) {
-					inputChannel.close();
-				}
-
-				if (outputChannel != null) {
-					outputChannel.close();
-				}
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+		deleteCache();
 	}
 
 	//if discard or commit successfully, delete the cache file.
-	private void deleteBackup() {
+	private void deleteCache() {
 		try {
-			java.io.File backupCacheFile = new java.io.File(getCacheFileName(this.pathName, backupPrefix));
-			if (backupCacheFile.exists()) {
-				backupCacheFile.delete();
+			java.io.File cacheFile = new java.io.File(getCacheFileName(this.pathName));
+			if (cacheFile.exists()) {
+				cacheFile.delete();
 			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private boolean cacheFileIsExist(String path) {
-		java.io.File file = getCacheFile(path);
-		return file != null && file.exists();
 	}
 
 	private java.io.File getCacheFile(String path) {
@@ -719,7 +687,7 @@ final class OneDriveFile extends File {
 					Void padding = new Void();
 					this.callback.onSuccess(padding);
 					future.complete(padding);
-					deleteBackup();
+					deleteCache();
 					break;
 				}
 
