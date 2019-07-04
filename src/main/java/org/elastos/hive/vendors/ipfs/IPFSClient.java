@@ -1,5 +1,21 @@
 package org.elastos.hive.vendors.ipfs;
 
+import org.elastos.hive.Authenticator;
+import org.elastos.hive.Callback;
+import org.elastos.hive.Client;
+import org.elastos.hive.Drive;
+import org.elastos.hive.DriveType;
+import org.elastos.hive.HiveException;
+import org.elastos.hive.IPFSEntry;
+import org.elastos.hive.NullCallback;
+import org.elastos.hive.Void;
+import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
+import org.elastos.hive.vendors.ipfs.network.IPFSApi;
+import org.elastos.hive.vendors.connection.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,23 +28,8 @@ import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import org.elastos.hive.Authenticator;
-import org.elastos.hive.Callback;
-import org.elastos.hive.Client;
-import org.elastos.hive.Drive;
-import org.elastos.hive.DriveType;
-import org.elastos.hive.HiveException;
-import org.elastos.hive.IPFSEntry;
-import org.elastos.hive.NullCallback;
-import org.elastos.hive.UnirestAsyncCallback;
-import org.elastos.hive.Void;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public final class IPFSClient extends Client {
 	private static Client clientInstance;
@@ -147,13 +148,8 @@ public final class IPFSClient extends Client {
 		if (callback == null)
 			callback = new NullCallback<Client.Info>();
 
-		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.STAT);
-
-		Unirest.get(url)
-			.header(IPFSHttpHeader.ContentType, "application/json")
-			.queryString("uid", getId())
-			.queryString("path", "/")
-			.asJsonAsync(new GetInfoCallback(future, callback));
+		getStat(future,callback,rpcHelper.getBaseUrl(),
+				getId(),"/" , IPFSConstance.Type.GET_INFO);
 
 		return future;
 	}
@@ -175,13 +171,8 @@ public final class IPFSClient extends Client {
 		if (callback == null)
 			callback = new NullCallback<Drive>();
 
-		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.STAT);
-
-		Unirest.get(url)
-			.header(IPFSHttpHeader.ContentType, "application/json")
-			.queryString("uid", getId())
-			.queryString("path", "/")
-			.asJsonAsync(new GetDriveCallback(future, callback));
+		getStat(future,callback,rpcHelper.getBaseUrl(),
+				getId(),"/" , IPFSConstance.Type.GET_DEFAULT_DRIVE);
 
 		return future;
 	}
@@ -190,21 +181,22 @@ public final class IPFSClient extends Client {
 		String[] addrs = rpcHelper.getIpfsEntry().getRcpAddrs();
 		if (addrs != null) {
 			for (int i = 0; i < addrs.length; i++) {
-				String url = String.format(IPFSURL.URLFORMAT, addrs[i]) + IPFSMethod.NEW;
+
 				try {
-					HttpResponse<JsonNode> json = Unirest.get(url)
-							.header(IPFSURL.ContentType, IPFSURL.Json)
-							.asJson();
-					if (json.getStatus() == 200) {
+					BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+					IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , rpcHelper.getBaseUrl() , config);
+					Call call = ipfsApi.getNewUid();
+					Response response = call.execute();
+					if (response.code() == 200){
 						rpcHelper.setValidAddress(addrs[i]);
-						return json.getBody().getObject().getString("UID");
+						UIDResponse uidResponse = (UIDResponse) response.body();
+						return uidResponse.getUID();
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}
-
 		throw new HiveException("The input addresses are all invalid.");
 	}
 
@@ -238,7 +230,7 @@ public final class IPFSClient extends Client {
 			if (!config.has(uids)) {
 				uidArray = new JSONArray();
 				JSONObject newUid = new JSONObject();
-				newUid.put(IPFSURL.UID, uid);
+				newUid.put(IPFSConstance.UID, uid);
 				uidArray.put(newUid);
 				config.put(uids, uidArray);
 			}
@@ -248,7 +240,7 @@ public final class IPFSClient extends Client {
 				boolean has = false;
 				while (values.hasNext()) {
 					JSONObject json = (JSONObject) values.next();
-					if (uid.equals(json.getString(IPFSURL.UID))) {
+					if (uid.equals(json.getString(IPFSConstance.UID))) {
 						has = true;
 						break;
 					}
@@ -256,7 +248,7 @@ public final class IPFSClient extends Client {
 
 				if (!has) {
 					JSONObject newUid = new JSONObject();
-					newUid.put(IPFSURL.UID, uid);
+					newUid.put(IPFSConstance.UID, uid);
 					uidArray.put(newUid);
 					config.put(uids, uidArray);
 				}
@@ -286,6 +278,20 @@ public final class IPFSClient extends Client {
 		}
 	}
 
+	private void getStat(CompletableFuture future , Callback callback , String url ,
+						 String uid , String path , IPFSConstance.Type type){
+		try {
+			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
+			Call call = ipfsApi.getStat(uid , path);
+			call.enqueue(new IPFSClientCallback(future , callback , type));
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
+		}
+	}
+
 	private static String getUid() {
 		BufferedReader bufferedReader = null;
 		try {
@@ -309,8 +315,7 @@ public final class IPFSClient extends Client {
 			return config.getString(IPFSRpcHelper.LASTUID);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			if (bufferedReader != null) {
 				try {
 					bufferedReader.close();
@@ -319,85 +324,61 @@ public final class IPFSClient extends Client {
 				}
 			}
 		}
-
 		return null;
 	}
 
-	private class GetInfoCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Client.Info> future;
-		private final Callback<Client.Info> callback;
+	private class IPFSClientCallback implements retrofit2.Callback{
+		CompletableFuture future;
+		Callback callback;
+		IPFSConstance.Type type;
 
-		GetInfoCallback(CompletableFuture<Client.Info> future, Callback<Client.Info> callback) {
+		public IPFSClientCallback(CompletableFuture future , Callback callback , IPFSConstance.Type type) {
 			this.future = future;
 			this.callback = callback;
+			this.type = type;
 		}
 
 		@Override
-		public void cancelled() {}
+		public void onResponse(Call call, Response response) {
+			if (response.code() != 200) {
+				HiveException ex = new HiveException("Server Error: " + response.message());
+				if (callback!=null){
+					this.callback.onError(ex);
+				}
 
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
+				if (future!=null){
+					future.completeExceptionally(ex);
+				}
 				return;
 			}
 
-			HashMap<String, String> attrs = new HashMap<>();
-			//attrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid());
-			attrs.put(Client.Info.userId, rpcHelper.getIpfsEntry().getUid());
-			// TODO;
-
-			clientInfo = new Client.Info(attrs);
-			this.callback.onSuccess(clientInfo);
-			future.complete(clientInfo);
+			switch (type){
+				case GET_INFO:
+					HashMap<String, String> attrs = new HashMap<String, String>();
+					attrs.put(Client.Info.userId, rpcHelper.getIpfsEntry().getUid());
+					Client.Info info = new Client.Info(attrs);
+					clientInfo = info;
+					this.callback.onSuccess(info);
+					future.complete(info);
+					break ;
+				case GET_DEFAULT_DRIVE:
+					HashMap<String, String> driveAttrs = new HashMap<>();
+					driveAttrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid()); // TODO;
+					// TODO;
+					Drive.Info driveInfo = new Drive.Info(driveAttrs);
+					IPFSDrive drive = new IPFSDrive(driveInfo, rpcHelper);
+					this.callback.onSuccess(drive);
+					future.complete(drive);
+					break;
+			}
 		}
 
 		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
+		public void onFailure(Call call, Throwable t) {
+			HiveException e = new HiveException(t.getMessage());
 			this.callback.onError(e);
 			future.completeExceptionally(e);
 		}
 	}
 
-	private class GetDriveCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Drive> future;
-		private final Callback<Drive> callback;
-
-		GetDriveCallback(CompletableFuture<Drive> future, Callback<Drive> callback) {
-			this.future = future;
-			this.callback = callback;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid()); // TODO;
-			// TODO;
-
-			Drive.Info info = new Drive.Info(attrs);
-			IPFSDrive drive = new IPFSDrive(info, rpcHelper);
-			this.callback.onSuccess(drive);
-			future.complete(drive);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
 }

@@ -11,10 +11,10 @@ import org.elastos.hive.OAuthEntry;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.UrlUtil;
-import org.elastos.hive.vendors.onedrive.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.onedrive.Model.TokenResponse;
+import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
+import org.elastos.hive.vendors.onedrive.network.Model.TokenResponse;
 import org.elastos.hive.vendors.onedrive.network.AuthApi;
-import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.BaseServiceUtil;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -40,10 +40,8 @@ public class OneDriveAuthHelper implements AuthHelper {
 		this.authEntry = authEntry;
 		this.persistent = persistent;
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(null).
-					useAuthHeader(false)
-					.build();
-			authApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL, config);
+			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+			authApi = BaseServiceUtil.createService(AuthApi.class, OneDriveConstance.ONE_DRIVE_AUTH_BASE_URL, config);
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO:
@@ -95,11 +93,11 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 		AuthApi logoutApi = null;
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(null)
-					.useAuthHeader(false)
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
 					.useGsonConverter(false)
 					.build();
-			logoutApi = BaseServiceUtil.createService(AuthApi.class, Constance.ONE_DRIVE_AUTH_BASE_URL, config);
+			logoutApi = BaseServiceUtil.createService(AuthApi.class,
+					OneDriveConstance.ONE_DRIVE_AUTH_BASE_URL, config);
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO:
@@ -133,7 +131,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 			Semaphore semph = new Semaphore(1);
 
 			String hostUrl = authEntry.getRedirectURL() ;
-			String[] hostAndPort = UrlUtil.decodeHostAndPort(hostUrl , Constance.DEFAULT_REDIRECT_URL , String.valueOf(Constance.DEFAULT_REDIRECT_PORT));
+			String[] hostAndPort = UrlUtil.decodeHostAndPort(hostUrl , OneDriveConstance.DEFAULT_REDIRECT_URL , String.valueOf(OneDriveConstance.DEFAULT_REDIRECT_PORT));
 
 			String host = hostAndPort[0] ;
 			int port = Integer.valueOf(hostAndPort[1]) ;
@@ -146,8 +144,8 @@ public class OneDriveAuthHelper implements AuthHelper {
 			}
 
 			String url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-								Constance.ONE_DRIVE_AUTH_URL,
-								Constance.AUTHORIZE,
+								OneDriveConstance.ONE_DRIVE_AUTH_URL,
+								OneDriveConstance.AUTHORIZE,
 								authEntry.getClientId(),
 								authEntry.getScope(),
 								authEntry.getRedirectURL())
@@ -181,7 +179,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		Call call = authApi.getToken(authEntry.getClientId(),authCode,
-					authEntry.getRedirectURL(),Constance.GRANT_TYPE_GET_TOKEN);
+					authEntry.getRedirectURL(), OneDriveConstance.GRANT_TYPE_GET_TOKEN);
 
 		call.enqueue(new AuthCallback(future,callback,Type.GET_TOKEN));
 		return future;
@@ -191,7 +189,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		Call call = authApi.refreshToken(authEntry.getClientId(),authEntry.getRedirectURL(),
-				token.getRefreshToken(),Constance.GRANT_TYPE_REFRESH_TOKEN);
+				token.getRefreshToken(), OneDriveConstance.GRANT_TYPE_REFRESH_TOKEN);
 
 		call.enqueue(new AuthCallback(future,callback,Type.REDEEM_TOKEN));
 		return future;

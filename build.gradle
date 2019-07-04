@@ -12,10 +12,9 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
-    compile 'com.googlecode.json-simple:json-simple:1.1.1'
 	compile 'org.jetbrains:annotations:17.0.0'
-    compile 'com.mashape.unirest:unirest-java:1.4.9'
 
+    implementation 'org.json:json:20180813'
     implementation 'com.squareup.retrofit2:retrofit:2.6.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
 

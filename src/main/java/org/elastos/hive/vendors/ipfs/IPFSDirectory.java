@@ -1,10 +1,5 @@
 package org.elastos.hive.vendors.ipfs;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
 import org.elastos.hive.Callback;
 import org.elastos.hive.Children;
 import org.elastos.hive.Directory;
@@ -12,15 +7,22 @@ import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.ItemInfo;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.elastos.hive.vendors.connection.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
+import org.elastos.hive.vendors.connection.Model.HeaderConfig;
+import org.elastos.hive.vendors.ipfs.network.IPFSApi;
+import org.elastos.hive.vendors.ipfs.network.model.ListChildResponse;
+import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 class IPFSDirectory extends Directory  {
 	private String pathName;
@@ -66,12 +68,8 @@ class IPFSDirectory extends Directory  {
 			return future;
 		}
 
-		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.STAT);
-		Unirest.get(url)
-			.header(IPFSURL.ContentType, IPFSURL.Json)
-			.queryString(IPFSURL.UID, getId())
-			.queryString(IPFSURL.PATH, pathName)
-			.asJsonAsync(new GetDirInfoCallback(future, callback));
+		createConnection(future,callback,rpcHelper.getBaseUrl(),
+				getId(),pathName,null,IPFSConstance.Type.GET_INFO);
 
 		return future;
 	}
@@ -119,14 +117,8 @@ class IPFSDirectory extends Directory  {
 
 		String newPath = String.format("%s/%s", this.pathName, path);
 
-		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.MKDIR);
-		Unirest.get(url)
-			.header(IPFSURL.ContentType, IPFSURL.Json)
-			.queryString(IPFSURL.UID, rpcHelper.getIpfsEntry().getUid())
-			.queryString(IPFSURL.PATH, newPath)
-			.queryString("parents", "false")
-			.asJsonAsync(new CreateDirectoryCallback(value, newPath, future));
-
+		createConnectionForResult(future,value,rpcHelper.getBaseUrl(),
+				rpcHelper.getIpfsEntry().getUid(),newPath,newPath,IPFSConstance.Type.MKDIR);
 		return future;
 	}
 
@@ -168,14 +160,9 @@ class IPFSDirectory extends Directory  {
 		}
 
 		String pathName = String.format("%s/%s", this.pathName, path);
-		//stat
-		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.STAT);
-		Unirest.get(url)
-			.header(IPFSURL.ContentType, IPFSURL.Json)
-			.queryString(IPFSURL.UID, getId())
-			.queryString(IPFSURL.PATH, pathName)
-			.asJsonAsync(new GetDirectoryCallback(pathName, future, callback));
 
+		createConnection(future,callback,rpcHelper.getBaseUrl(),
+				getId(),pathName,pathName,IPFSConstance.Type.GET_DIR);
 		return future;
 	}
 
@@ -222,14 +209,8 @@ class IPFSDirectory extends Directory  {
 
 		String pathName = String.format("%s/%s", this.pathName, path);
 
-		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.WRITE);
-		String type = String.format("multipart/form-data; boundary=%s", UUID.randomUUID().toString());
-		Unirest.post(url)
-			.header(IPFSURL.ContentType, type)
-			.queryString(IPFSURL.UID, rpcHelper.getIpfsEntry().getUid())
-			.queryString(IPFSURL.PATH, pathName)
-			.queryString("create", "true")
-			.asJsonAsync(new CreateFileCallback(value, pathName, future));
+		createConnectionForResult(future,value,rpcHelper.getBaseUrl(),
+				rpcHelper.getIpfsEntry().getUid(),pathName,pathName,IPFSConstance.Type.CREATE_FILE);
 
 		return future;
 	}
@@ -272,12 +253,9 @@ class IPFSDirectory extends Directory  {
 		}
 
 		String pathName = String.format("%s/%s", this.pathName, path);
-		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.STAT);
-		Unirest.get(url)
-			.header(IPFSURL.ContentType, IPFSURL.Json)
-			.queryString(IPFSURL.UID, getId())
-			.queryString(IPFSURL.PATH, pathName)
-			.asJsonAsync(new GetFileCallback(pathName, future, callback));
+
+		createConnection(future,callback,rpcHelper.getBaseUrl(),
+				getId(),pathName,pathName,IPFSConstance.Type.GET_FILE);
 
 		return future;
 	}
@@ -347,13 +325,14 @@ class IPFSDirectory extends Directory  {
 		String name = this.pathName.substring(LastPos + 1);
 		final String newPath = String.format("%s/%s", path, name);
 
-		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.MV);
-		Unirest.get(url)
-				.header(IPFSURL.ContentType, IPFSURL.Json)
-				.queryString(IPFSURL.UID, rpcHelper.getIpfsEntry().getUid())
-				.queryString(IPFSURL.SOURCE, this.pathName)
-				.queryString(IPFSURL.DEST, newPath)
-				.asJsonAsync(new moveToCallback(value, newPath, future));
+		try {
+			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
+			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
+			Call call = ipfsApi.moveTo(rpcHelper.getIpfsEntry().getUid(), pathName, newPath);
+			call.enqueue(new IPFSDirForResultCallback(future,value,newPath, IPFSConstance.Type.MOVE_TO));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return future;
 	}
@@ -418,13 +397,14 @@ class IPFSDirectory extends Directory  {
 		String name = this.pathName.substring(LastPos + 1);
 		final String newPath = String.format("%s/%s", path, name);
 
-		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.CP);
-		Unirest.get(url)
-				.header(IPFSURL.ContentType, IPFSURL.Json)
-				.queryString(IPFSURL.UID, rpcHelper.getIpfsEntry().getUid())
-				.queryString(IPFSURL.SOURCE, IPFSURL.PREFIX + hash)
-				.queryString(IPFSURL.DEST, newPath)
-				.asJsonAsync(new copyToCallback(value, future));
+		try {
+			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
+			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
+			Call call = ipfsApi.copyTo(rpcHelper.getIpfsEntry().getUid(), IPFSConstance.PREFIX + hash, newPath);
+			call.enqueue(new IPFSDirForResultCallback(future,value,null, IPFSConstance.Type.COPY_TO));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return future;
 	}
@@ -462,13 +442,14 @@ class IPFSDirectory extends Directory  {
 			return future;
 		}
 
-		String url = String.format("%s%s", rpcHelper.getBaseUrl(), IPFSMethod.RM);
-		Unirest.get(url)
-			.header(IPFSURL.ContentType, IPFSURL.Json)
-			.queryString(IPFSURL.UID, rpcHelper.getIpfsEntry().getUid())
-			.queryString(IPFSURL.PATH, pathName)
-			.queryString("recursive", "true")
-			.asJsonAsync(new deleteItemCallback(value, future));
+		try {
+			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
+			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
+			Call call = ipfsApi.deleteItem(rpcHelper.getIpfsEntry().getUid(), pathName, "true");
+			call.enqueue(new IPFSDirForResultCallback(future,value,null, IPFSConstance.Type.DELETE_ITEM));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return future;
 	}
@@ -502,36 +483,22 @@ class IPFSDirectory extends Directory  {
 			return future;
 		}
 
-		//1. Using files/ls to get the nameList.
-		ArrayList<String> nameList = null;
 		try {
-			String url = rpcHelper.getBaseUrl() + IPFSMethod.LS;
+			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
+			Call call = ipfsApi.list(getId(), pathName);
+			Response response = call.execute();
 
-			HttpResponse<JsonNode> response = Unirest.get(url)
-				.header(IPFSURL.ContentType, IPFSURL.Json)
-				.queryString(IPFSURL.UID, getId())
-				.queryString(IPFSURL.PATH, this.pathName)
-				.asJson();
-			if (response.getStatus() == 200)
-				nameList = getNameList(pathName, response.getBody().getObject());
-		} catch (Exception ex) {
-			HiveException e = new HiveException(ex.getMessage());
-			callback.onError(e);
-			future.completeExceptionally(e);
-		}
+			if (response.code() != 200){
+				future.completeExceptionally(new HiveException("GetChildren failed"));
+				return future;
+			}
 
-		//2. Using stat to get the child's type.
-		if (nameList == null) {
-			future.completeExceptionally(new HiveException("GetChildren failed"));
-			return future;
-		}
-
-		try {
-			int len = nameList.size();
-			ArrayList<ItemInfo> childList = new ArrayList<ItemInfo>(len);
-			if (len > 0) {
-				for (int i = 0; i < len; i++) {
-					String childPath = nameList.get(i);
+			ListChildResponse listChildResponse = (ListChildResponse) response.body();
+			List<ListChildResponse.EntriesBean> entriesBeanList = listChildResponse.getEntries() ;
+			ArrayList<ItemInfo> childList = new ArrayList<>();
+			if (entriesBeanList != null){
+				for (ListChildResponse.EntriesBean entriesBean : entriesBeanList){
 					HashMap<String, String> attrs = new HashMap<>();
 					attrs.put(Directory.Info.itemId, rpcHelper.getIpfsEntry().getUid());
 					ItemInfo info = new ItemInfo(attrs);
@@ -539,363 +506,219 @@ class IPFSDirectory extends Directory  {
 					childList.add(info);
 				}
 			}
-
 			Children children = new Children(childList);
 			callback.onSuccess(children);
 			future.complete(children);
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
-		catch (Exception ex) {
-			callback.onSuccess(null);
-			future.completeExceptionally(new HiveException("GetChildren failed [child type]"));
-		}
-
 		return future;
 	}
 
-	private ArrayList<String> getNameList(String parentPath, JSONObject baseJson) {
-		JSONArray entries = null;
+	private void createConnectionForResult(CompletableFuture future , PackValue value , String url ,
+										   String uid , String path , String pathName ,IPFSConstance.Type type){
 		try {
-			entries = baseJson.getJSONArray("Entries");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		int len = 0;
-		if (entries != null) {
-			len = entries.length();
-		}
-
-		ArrayList<String> nameList = new ArrayList<String>(len);
-		if (len > 0) {
-			for (int i = 0; i < len; i++) {
-				JSONObject itemJson = entries.getJSONObject(i);
-				String name = itemJson.getString("Name");
-				nameList.add(String.format("%s/%s", parentPath, name));
+			Call call = null;
+			switch (type) {
+				case CREATE_FILE:
+					String contentType = String.format("multipart/form-data; boundary=%s", UUID.randomUUID().toString());
+					HeaderConfig headerConfig = new HeaderConfig.Builder()
+							.contentType(contentType)
+							.build();
+					BaseServiceConfig config = new BaseServiceConfig.Builder()
+							.headerConfig(headerConfig)
+							.ignoreReturnBody(true)
+							.build();
+					IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, url, config);
+					call = ipfsApi.createFile(uid, path, true);
+					break;
+				case MKDIR:
+					BaseServiceConfig mkdirConfig = new BaseServiceConfig.Builder()
+							.ignoreReturnBody(true)
+							.build();
+					IPFSApi ipfsMkdirApi = BaseServiceUtil.createService(IPFSApi.class, url, mkdirConfig);
+					call = ipfsMkdirApi.mkdir(uid,path,"false");
+					break;
+				case MOVE_TO:
+					break;
+				case COPY_TO:
+					break;
+				case DELETE_ITEM:
+					break;
 			}
+
+			if (call != null) {
+				call.enqueue(new IPFSDirForResultCallback(future, value, pathName, type));
+			}
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			value.setException(e);
+			future.completeExceptionally(e);
 		}
 
-		return nameList;
 	}
 
-	private class GetDirInfoCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<Directory.Info> future;
-		private final Callback<Directory.Info> callback;
-
-		GetDirInfoCallback(CompletableFuture<Directory.Info> future,
-				   Callback<Directory.Info> callback) {
-			this.future = future;
-			this.callback = callback;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
+	private void createConnection(CompletableFuture future , Callback callback ,String url ,
+								  String uid , String path , String pathName , IPFSConstance.Type type){
+		try {
+			Call call = null ;
+			switch (type){
+				case GET_INFO:
+				case GET_DIR:
+				case GET_FILE:
+					BaseServiceConfig ipfsConfig = new BaseServiceConfig.Builder().build();
+					IPFSApi ipfsStatApi = BaseServiceUtil.createService(IPFSApi.class , url , ipfsConfig);
+					call = ipfsStatApi.getStat(uid , path);
+					break;
+				case LIST:
+					break;
 			}
 
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Directory.Info.itemId, getId());  // TODO;
-			Directory.Info dirInfo = new Directory.Info(attrs);
-			this.callback.onSuccess(dirInfo);
-			future.complete(dirInfo);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
+			if (call!=null){
+				call.enqueue(new IPFSDirCallback(future , callback , pathName , type));
+			}
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
 			future.completeExceptionally(e);
 		}
 	}
 
-	private class CreateDirectoryCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<PackValue> future;
-		private final String pathName;
+	private class IPFSDirForResultCallback implements retrofit2.Callback{
+		private final String pathName ;
+		private final CompletableFuture future;
 		private final PackValue value;
+		private final IPFSConstance.Type type ;
 
-		CreateDirectoryCallback(PackValue value, String pathName, CompletableFuture<PackValue> future) {
-			this.pathName = pathName;
-			this.future = future;
-			this.value = value;
+		IPFSDirForResultCallback(CompletableFuture future , PackValue value , String pathName , IPFSConstance.Type type){
+			this.future = future ;
+			this.value = value ;
+			this.pathName = pathName ;
+			this.type = type ;
 		}
 
 		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
+		public void onResponse(Call call, Response response) {
+			if (response.code() != 200) {
+				HiveException e = new HiveException("Server Error: " + response.message());
 				value.setException(e);
 				future.completeExceptionally(e);
 				return;
 			}
 
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Directory.Info.itemId, getId());
-			// TODO:
+			switch (type){
+				case CREATE_FILE:
+					HashMap<String, String> fileAttrs = new HashMap<>();
+					fileAttrs.put(File.Info.itemId, getId());
 
-			Directory.Info dirInfo = new Directory.Info(attrs);
-			IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, rpcHelper);
+					File.Info fileInfo = new File.Info(fileAttrs);
+					IPFSFile file = new IPFSFile(pathName, fileInfo, rpcHelper);
 
-			value.setValue(directory);
-			future.complete(value);
+					value.setValue(file);
+					future.complete(value);
+					break;
+				case MKDIR:
+					HashMap<String, String> dirAttrs = new HashMap<>();
+					dirAttrs.put(Directory.Info.itemId, getId());
+					Directory.Info dirInfo = new Directory.Info(dirAttrs);
+					IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, rpcHelper);
+
+					value.setValue(directory);
+					future.complete(value);
+					break;
+				case MOVE_TO:
+					IPFSDirectory.this.pathName = pathName;
+				case COPY_TO:
+				case DELETE_ITEM:
+					Void padding = new Void();
+					value.setValue(padding);
+					future.complete(value);
+					break;
+			}
 		}
 
 		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
+		public void onFailure(Call call, Throwable t) {
+			HiveException e = new HiveException(t.getMessage());
 			value.setException(e);
 			future.completeExceptionally(e);
 		}
 	}
 
-	private class GetDirectoryCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
-		private final CompletableFuture<Directory> future;
-		private final Callback<Directory> callback;
+	private class IPFSDirCallback implements retrofit2.Callback{
+		private final String pathName ;
+		private final CompletableFuture future;
+		private final Callback callback;
+		private final IPFSConstance.Type type;
 
-		private GetDirectoryCallback(String pathName, CompletableFuture<Directory> future, Callback<Directory> callback) {
-			this.pathName = pathName;
+		IPFSDirCallback(CompletableFuture future , Callback callback , String pathName , IPFSConstance.Type type) {
 			this.future = future;
 			this.callback = callback;
+			this.pathName = pathName ;
+			this.type = type;
 		}
-		@Override
-		public void cancelled() {}
 
 		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
+		public void onResponse(Call call, Response response) {
+			if (response.code() != 200) {
+				HiveException ex = new HiveException("Server Error: " + response.message());
 				this.callback.onError(ex);
 				future.completeExceptionally(ex);
 				return;
 			}
 
-			JSONObject jsonObject = response.getBody().getObject();
-			String type = jsonObject.getString("Type");
-			if (!rpcHelper.isFolder(type)) {
-				HiveException e = new HiveException("This is not a directory");
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
+			switch (type) {
+				case GET_INFO:
+					HashMap<String, String> attrs = new HashMap<>();
+					attrs.put(Directory.Info.itemId, getId());  // TODO;
+					Directory.Info info = new Directory.Info(attrs);
+					this.callback.onSuccess(info);
+					future.complete(info);
+					break;
+				case GET_DIR:
+					StatResponse statResponse = (StatResponse) response.body();
+					if (!rpcHelper.isFolder(statResponse.getType())) {
+						HiveException e = new HiveException("This is not a directory");
+						this.callback.onError(e);
+						future.completeExceptionally(e);
+						return;
+					}
+
+					HashMap<String, String> dirAttrs = new HashMap<>();
+					dirAttrs.put(Directory.Info.itemId, getId());
+					// TODO;
+
+					Directory.Info dirInfo = new Directory.Info(dirAttrs);
+					IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, rpcHelper);
+					this.callback.onSuccess(directory);
+					future.complete(directory);
+					break;
+				case GET_FILE:
+					StatResponse fileStatResponse = (StatResponse) response.body();
+					if (!rpcHelper.isFile(fileStatResponse.getType())) {
+						HiveException e = new HiveException("This is not a file");
+						this.callback.onError(e);
+						future.completeExceptionally(e);
+						return;
+					}
+
+					HashMap<String, String> fileAttrs = new HashMap<>();
+					fileAttrs.put(Directory.Info.itemId, getId());  // TODO;
+					File.Info fileInfo = new File.Info(fileAttrs);
+					IPFSFile file = new IPFSFile(pathName, fileInfo, rpcHelper);
+					this.callback.onSuccess(file);
+					future.complete(file);
+
+					break;
 			}
-
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Directory.Info.itemId, getId());
-			// TODO;
-
-			Directory.Info dirInfo = new Directory.Info(attrs);
-			IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, rpcHelper);
-			this.callback.onSuccess(directory);
-			future.complete(directory);
 		}
 
 		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
+		public void onFailure(Call call, Throwable t) {
+			HiveException e = new HiveException(t.getMessage());
 			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class CreateFileCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<PackValue> future;
-		private final String pathName;
-		private final PackValue value;
-
-		CreateFileCallback(PackValue value, String pathName, CompletableFuture<PackValue> future) {
-			this.pathName = pathName;
-			this.future = future;
-			this.value = value;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				value.setException(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Directory.Info.itemId, getId());
-			// TOOD:
-
-			File.Info fileInfo = new File.Info(attrs);
-			IPFSFile file = new IPFSFile(pathName, fileInfo, rpcHelper);
-
-			value.setValue(file);
-			future.complete(value);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			value.setException(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class GetFileCallback implements UnirestAsyncCallback<JsonNode> {
-		private final String pathName;
-		private final CompletableFuture<File> future;
-		private final Callback<File> callback;
-
-		private GetFileCallback(String pathName, CompletableFuture<File> future, Callback<File> callback) {
-			this.pathName = pathName;
-			this.future = future;
-			this.callback = callback;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.getStatusText());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
-				return;
-			}
-
-			JSONObject jsonObject = response.getBody().getObject();
-			String type = jsonObject.getString("Type");
-			if (!rpcHelper.isFile(type)) {
-				HiveException e = new HiveException("This is not a file");
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			HashMap<String, String> attrs = new HashMap<>();
-			attrs.put(Directory.Info.itemId, getId());  // TODO;
-			File.Info fileInfo = new File.Info(attrs);
-			IPFSFile file = new IPFSFile(pathName, fileInfo, rpcHelper);
-			this.callback.onSuccess(file);
-			future.complete(file);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class moveToCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<PackValue> future;
-		private final String pathName;
-		private final PackValue value;
-
-		moveToCallback(PackValue value, String pathName, CompletableFuture<PackValue> future) {
-			this.pathName = pathName;
-			this.future = future;
-			this.value = value;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				value.setException(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			IPFSDirectory.this.pathName = pathName;
-			Void padding = new Void();
-			value.setValue(padding);
-			future.complete(value);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			value.setException(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class copyToCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<PackValue> future;
-		private final PackValue value;
-
-		copyToCallback(PackValue value, CompletableFuture<PackValue> future) {
-			this.future = future;
-			this.value = value;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				value.setException(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			Void padding = new Void();
-			value.setValue(padding);
-			future.complete(value);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			value.setException(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class deleteItemCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<PackValue> future;
-		private final PackValue value;
-
-		deleteItemCallback(PackValue value, CompletableFuture<PackValue> future) {
-			this.future = future;
-			this.value = value;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				value.setException(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			Void padding = new Void();
-			value.setValue(padding);
-			future.complete(value);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			value.setException(e);
 			future.completeExceptionally(e);
 		}
 	}

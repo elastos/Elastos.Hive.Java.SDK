@@ -1,7 +1,5 @@
 package org.elastos.hive.vendors.ipfs;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
@@ -11,14 +9,18 @@ import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.UnirestAsyncCallback;
 import org.elastos.hive.Void;
-import org.json.JSONObject;
+import org.elastos.hive.vendors.ipfs.network.model.ResolveResponse;
+import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
+import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
+import org.elastos.hive.vendors.ipfs.network.IPFSApi;
+import org.elastos.hive.vendors.connection.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import java.util.concurrent.CompletableFuture;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 class IPFSRpcHelper implements AuthHelper {
 	static final String CONFIG      = "ipfs.json";
@@ -88,8 +90,8 @@ class IPFSRpcHelper implements AuthHelper {
 				String homeHash = null;
 				//Using the older validAddress try to get the home hash.
 				if (validAddress != null && !validAddress.isEmpty()) {
-					String url = String.format(IPFSURL.URLFORMAT, validAddress);
-					homeHash = getHomeHash(url);
+					String url = String.format(IPFSConstance.URLFORMAT, validAddress);
+					homeHash = getHomeHash(url,entry.getUid());
 					BASEURL = url;
 					if (homeHash == null) {
 						validAddress = null;
@@ -99,8 +101,8 @@ class IPFSRpcHelper implements AuthHelper {
 				if (homeHash == null) {
 					String[] addrs = entry.getRcpAddrs();
 					for (int i = 0; i < addrs.length; i++) {
-						String url = String.format(IPFSURL.URLFORMAT, addrs[i]);
-						homeHash = getHomeHash(url);
+						String url = String.format(IPFSConstance.URLFORMAT, addrs[i]);
+						homeHash = getHomeHash(url,entry.getUid());
 						if (homeHash != null && !homeHash.isEmpty()) {
 							BASEURL = url;
 							validAddress = addrs[i];
@@ -113,13 +115,13 @@ class IPFSRpcHelper implements AuthHelper {
 					return padding;
 				}
 
-				Unirest.get(BASEURL + IPFSMethod.LOGIN)
-					.header(IPFSURL.ContentType, IPFSURL.Json)
-					.queryString(IPFSURL.UID, entry.getUid())
-					.queryString(IPFSURL.HASH, homeHash)
-					.asJson();
+				if (login(BASEURL , entry.getUid() , homeHash)){
+					isValid = true;
+				}
 
-				isValid = true;
+				isValid = false ;
+
+				login(BASEURL,entry.getUid() , homeHash);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -147,8 +149,8 @@ class IPFSRpcHelper implements AuthHelper {
 				String homeHash = null;
 				//Using the older validAddress try to get the home hash.
 				if (validAddress != null && !validAddress.isEmpty()) {
-					String url = String.format(IPFSURL.URLFORMAT, validAddress);
-					homeHash = getHomeHash(url);
+					String url = String.format(IPFSConstance.URLFORMAT, validAddress);
+					homeHash = getHomeHash(url,entry.getUid());
 					BASEURL = url;
 					if (homeHash == null) {
 						validAddress = null;
@@ -158,8 +160,8 @@ class IPFSRpcHelper implements AuthHelper {
 				if (homeHash == null) {
 					String[] addrs = entry.getRcpAddrs();
 					for (int i = 0; i < addrs.length; i++) {
-						String url = String.format(IPFSURL.URLFORMAT, addrs[i]);
-						homeHash = getHomeHash(url);
+						String url = String.format(IPFSConstance.URLFORMAT, addrs[i]);
+						homeHash = getHomeHash(url,entry.getUid());
 						if (homeHash != null && !homeHash.isEmpty()) {
 							BASEURL = url;
 							validAddress = addrs[i];
@@ -174,12 +176,7 @@ class IPFSRpcHelper implements AuthHelper {
 					return placeHolder;
 				}
 
-				Unirest.get(BASEURL + IPFSMethod.LOGIN)
-					.header(IPFSURL.ContentType, IPFSURL.Json)
-					.queryString(IPFSURL.UID, entry.getUid())
-					.queryString(IPFSURL.HASH, homeHash)
-					.asJson();
-
+				login(BASEURL , entry.getUid() , homeHash);
 				isValid = true;
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -204,14 +201,7 @@ class IPFSRpcHelper implements AuthHelper {
 			future.completeExceptionally(value.getException());
 			return future;
 		}
-
-		String url = String.format("%s%s", getBaseUrl(), IPFSMethod.STAT);
-		Unirest.get(url)
-				.header(IPFSURL.ContentType, IPFSURL.Json)
-				.queryString(IPFSURL.UID, getIpfsEntry().getUid())
-				.queryString(IPFSURL.PATH, path)
-				.asJsonAsync(new GetPathHashCallback(value, future));
-
+		getStat(future,value,getBaseUrl(),getIpfsEntry().getUid(),path);
 		return future;
 	}
 
@@ -223,12 +213,7 @@ class IPFSRpcHelper implements AuthHelper {
 			return future;
 		}
 
-		String url = String.format("%s%s", getBaseUrl(), IPFSMethod.PUBLISH);
-		Unirest.get(url)
-			.header(IPFSURL.ContentType, IPFSURL.Json)
-			.queryString(IPFSURL.UID, getIpfsEntry().getUid())
-			.queryString(IPFSURL.PATH, value.getHash().getValue())
-			.asJsonAsync(new PublishRootHashCallback(value, future));
+		publish(future,value,getBaseUrl(),getIpfsEntry().getUid(),value.getHash().getValue());
 
 		return future;
 	}
@@ -283,37 +268,6 @@ class IPFSRpcHelper implements AuthHelper {
 		future.complete(object);
 		return future;
 	}
-	
-	CompletableFuture<PackValue> stat(PackValue value) {
-		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
-
-		if (value.getException() != null) {
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		String url = String.format("%s%s", getBaseUrl(), IPFSMethod.PUBLISH);
-		Unirest.get(url)
-			.header(IPFSURL.ContentType, IPFSURL.Json)
-			.queryString(IPFSURL.UID, getIpfsEntry().getUid())
-			.queryString(IPFSURL.PATH, value.getHash().getValue())
-			.asJsonAsync(new PublishRootHashCallback(value, future));
-
-		return future;
-	}
-	
-	CompletableFuture<String> stat(String path) {
-		CompletableFuture<String> future = new CompletableFuture<String>();
-
-		String url = String.format("%s%s", getBaseUrl(), IPFSMethod.STAT);
-		Unirest.get(url)
-				.header(IPFSURL.ContentType, IPFSURL.Json)
-				.queryString(IPFSURL.UID, getIpfsEntry().getUid())
-				.queryString(IPFSURL.PATH, path)
-				.asJsonAsync(new StatCallback(future));
-
-		return future;
-	}
 
 	boolean isFile(String type) {
 		return type != null && type.equals("file");
@@ -321,102 +275,6 @@ class IPFSRpcHelper implements AuthHelper {
 
 	boolean isFolder(String type) {
 		return type != null && type.equals("directory");
-	}
-
-	private class StatCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<String> future;
-
-		StatCallback(CompletableFuture<String> future) {
-			this.future = future;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				future.completeExceptionally(e);
-				return;
-			}
-
-			String hash = response.getBody().getObject().getString("Hash");
-			future.complete(hash);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class GetPathHashCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<PackValue> future;
-		private final PackValue value;
-
-		GetPathHashCallback(PackValue value, CompletableFuture<PackValue> future) {
-			this.value = value;
-			this.future = future;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				value.setException(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			JSONObject jsonObject = response.getBody().getObject();
-			IPFSHash hash = new IPFSHash(jsonObject.getString("Hash"));
-			value.setHash(hash);
-			future.complete(value);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			value.setException(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class PublishRootHashCallback implements UnirestAsyncCallback<JsonNode> {
-		private final CompletableFuture<PackValue> future;
-		private final PackValue value;
-
-		private PublishRootHashCallback(PackValue value, CompletableFuture<PackValue> future) {
-			this.value = value;
-			this.future = future;
-		}
-
-		@Override
-		public void cancelled() {}
-
-		@Override
-		public void completed(HttpResponse<JsonNode> response) {
-			if (response.getStatus() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.getStatusText());
-				value.setException(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			future.complete(value);
-		}
-
-		@Override
-		public void failed(UnirestException exception) {
-			HiveException e = new HiveException(exception.getMessage());
-			value.setException(e);
-			future.completeExceptionally(e);
-		}
 	}
 
 	String getBaseUrl() {
@@ -431,17 +289,138 @@ class IPFSRpcHelper implements AuthHelper {
 		this.validAddress = validAddress;
 	}
 
-   String getHomeHash(String baseUrl) {
-		String url = baseUrl + IPFSMethod.NAMERESOLVE;
+   String getHomeHash(String baseUrl , String uid) {
+	   String peerID = getUidInfo(baseUrl , uid);
+	   return resolve(baseUrl , peerID);
+	}
+
+	private String getUidInfo(String url , String uid){
+		String peerId = null;
 		try {
-			HttpResponse<JsonNode> json = Unirest.get(url)
-					.header(IPFSURL.ContentType, IPFSURL.Json)
-					.asJson();
-			return json.getBody().getObject().getString("Path");
-		} catch (UnirestException e) {
+			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+
+			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
+			Call call = ipfsApi.getUidInfo(uid);
+
+			Response response = call.execute();
+
+			if (response.code() == 200){
+				UIDResponse uidResponse = (UIDResponse) response.body();
+				peerId = uidResponse.getPeerID();
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return null;
+		return peerId ;
+	}
+
+	private boolean login(String url , String uid , String hash){
+		try {
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.ignoreReturnBody(true)
+					.build();
+			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
+			Call call = ipfsApi.login(uid , hash);
+			Response response = call.execute();
+
+			if (response.code()==200){
+				return true ;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false ;
+	}
+
+	private String resolve(String url , String peerId){
+		String path = null;
+		try {
+			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
+			Call call = ipfsApi.resolve();
+			Response response = call.execute();
+
+			if (response.code() == 200){
+				ResolveResponse resolveResponse = (ResolveResponse) response.body();
+				path = resolveResponse.getPath();
+			}else {
+				//TODO callback exception
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return path ;
+	}
+
+	private void getStat(CompletableFuture future , PackValue value ,
+						 String url , String uid , String path){
+		try {
+			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+
+			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
+			Call call = ipfsApi.getStat(uid,path);
+			call.enqueue(new IPFSRpcCallback(future,value,IPFSConstance.Type.GET_STAT));
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			value.setException(e);
+			future.completeExceptionally(e);
+		}
+
+	}
+
+	private void publish(CompletableFuture future , PackValue value ,
+						 String url , String uid , String path){
+		try {
+			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+
+			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
+			Call call = ipfsApi.publish(uid,path);
+			call.enqueue(new IPFSRpcCallback(future,value,IPFSConstance.Type.PUBLISH));
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			value.setException(e);
+			future.completeExceptionally(e);
+		}
+	}
+
+	private class IPFSRpcCallback implements retrofit2.Callback{
+		private final CompletableFuture future;
+		private final PackValue value;
+		private final IPFSConstance.Type type;
+
+		public IPFSRpcCallback(CompletableFuture future , PackValue value , IPFSConstance.Type type) {
+			this.future = future;
+			this.value = value;
+			this.type = type;
+		}
+
+		@Override
+		public void onResponse(Call call, Response response) {
+			if (response.code() != 200) {
+				HiveException e = new HiveException("Server Error: " + response.message());
+				value.setException(e);
+				future.completeExceptionally(e);
+				return;
+			}
+
+			switch (type){
+				case GET_STAT:
+					StatResponse statResponse = (StatResponse) response.body();
+					IPFSHash hash = new IPFSHash(statResponse.getHash());
+					value.setHash(hash);
+				case PUBLISH:
+					future.complete(value);
+					break;
+			}
+		}
+
+		@Override
+		public void onFailure(Call call, Throwable t) {
+			HiveException e = new HiveException(t.getMessage());
+			this.value.setException(e);
+			future.completeExceptionally(e);
+		}
 	}
 }
