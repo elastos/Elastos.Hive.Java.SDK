@@ -598,11 +598,12 @@ final class OneDriveFile extends File {
 			md = MessageDigest.getInstance("MD5");
 			md.update(path.getBytes());
 			String md5Name =  bytes2Hex(md.digest());
+			String cachePath = CacheHelper.getCachePath();
 			if (prefix != null) {
-				cacheFileName = String.format("%s/%s%s", ((OneDriveAuthHelper)authHelper).getCachePath(), prefix, md5Name);
+				cacheFileName = String.format("%s/%s%s", cachePath, prefix, md5Name);
 			}
 			else {
-				cacheFileName = String.format("%s/%s", ((OneDriveAuthHelper)authHelper).getCachePath(), md5Name);				
+				cacheFileName = String.format("%s/%s", cachePath, md5Name);				
 			}
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
