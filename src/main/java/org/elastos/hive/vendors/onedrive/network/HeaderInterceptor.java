@@ -21,7 +21,7 @@ public class HeaderInterceptor implements Interceptor{
         Request request = chain.request();
         Request newRequest = request.newBuilder()
                 .addHeader(Constance.AUTHORIZATION, "bearer "+authToken.getAccessToken())
-//                .addHeader(Constance.CONTENT_TYPE,"application/x-www-form-urlencoded")
+                .addHeader("Accept-Encoding", "identity")
                 .build();
 
         Response response = chain.proceed(newRequest);

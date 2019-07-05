@@ -25,10 +25,10 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 public class OneDriveAuthHelper implements AuthHelper {
-	public static final String clientIdKey 		= "client_id";
-	public static final String accessTokenKey 	= "access_token";
-	public static final String refreshTokenKey 	= "refresh_token";
-	public static final String expireAtKey 		= "expires_at";
+	private static final String clientIdKey 		= "client_id";
+	private static final String accessTokenKey 		= "access_token";
+	private static final String refreshTokenKey 	= "refresh_token";
+	private static final String expireAtKey 		= "expires_at";
 
 	private final OAuthEntry authEntry;
 	private final Persistent persistent;
@@ -36,7 +36,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 	private AuthApi authApi ;
 
 
-	protected OneDriveAuthHelper(OAuthEntry authEntry, Persistent persistent) {
+	OneDriveAuthHelper(OAuthEntry authEntry, Persistent persistent) {
 		this.authEntry = authEntry;
 		this.persistent = persistent;
 		try {
