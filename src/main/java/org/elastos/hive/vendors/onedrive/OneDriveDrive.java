@@ -10,12 +10,13 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.ItemInfo;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
-import org.elastos.hive.vendors.onedrive.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.onedrive.Model.CreateDirRequest;
-import org.elastos.hive.vendors.onedrive.Model.DriveResponse;
-import org.elastos.hive.vendors.onedrive.Model.FileOrDirPropResponse;
-import org.elastos.hive.vendors.onedrive.network.Api;
-import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
+import org.elastos.hive.vendors.connection.Model.HeaderConfig;
+import org.elastos.hive.vendors.onedrive.network.Model.CreateDirRequest;
+import org.elastos.hive.vendors.onedrive.network.Model.DriveResponse;
+import org.elastos.hive.vendors.onedrive.network.Model.FileOrDirPropResponse;
+import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
 
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
@@ -64,9 +65,15 @@ final class OneDriveDrive extends Drive {
 			callback = new NullCallback<Drive.Info>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = api.getInfo();
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.getInfo();
 			call.enqueue(new DriveDriveCallback(null, future , callback , Type.GET_INFO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
@@ -140,9 +147,15 @@ final class OneDriveDrive extends Drive {
 
 		CreateDirRequest createDirRequest = new CreateDirRequest(name);
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = api.createDir(urlPath , createDirRequest);
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.createDir(urlPath , createDirRequest);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.CREATE_DIR));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
@@ -178,14 +191,20 @@ final class OneDriveDrive extends Drive {
 
 		String fullPath;
 		if (pathName.equals("/"))
-			fullPath = Constance.ROOT ;
+			fullPath = OneDriveConstance.ROOT ;
 		else
-			fullPath = Constance.ROOT+":"+pathName;
+			fullPath = OneDriveConstance.ROOT+":"+pathName;
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL ,config);
-			Call call = api.getFileOrDirProp(fullPath);
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL ,config);
+			Call call = oneDriveApi.getFileOrDirProp(fullPath);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_DIR));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
@@ -227,9 +246,15 @@ final class OneDriveDrive extends Drive {
 		}
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = api.createFile(pathName);
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.createFile(pathName);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.CREATE_FILE));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
@@ -273,14 +298,20 @@ final class OneDriveDrive extends Drive {
 
 		String fullPath;
 		if (pathName.equals("/"))
-			fullPath = Constance.ROOT ;
+			fullPath = OneDriveConstance.ROOT ;
 		else
-			fullPath = Constance.ROOT+":"+pathName;
+			fullPath = OneDriveConstance.ROOT+":"+pathName;
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = api.getFileOrDirProp(fullPath);
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.getFileOrDirProp(fullPath);
 			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_FILE));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());

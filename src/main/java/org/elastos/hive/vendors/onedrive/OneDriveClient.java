@@ -9,10 +9,11 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.Void;
-import org.elastos.hive.vendors.onedrive.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.onedrive.Model.DriveResponse;
-import org.elastos.hive.vendors.onedrive.network.Api;
-import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
+import org.elastos.hive.vendors.connection.Model.HeaderConfig;
+import org.elastos.hive.vendors.onedrive.network.Model.DriveResponse;
+import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
+import org.elastos.hive.vendors.connection.BaseServiceUtil;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -110,9 +111,15 @@ public final class OneDriveClient extends Client {
 			callback = new NullCallback<Client.Info>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = api.getInfo();
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.getInfo();
 			call.enqueue(new DriveClientCallback(future , callback , Type.GET_INFO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
@@ -141,9 +148,14 @@ public final class OneDriveClient extends Client {
 			callback = new NullCallback<Drive>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = api.getDrive();
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class, OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.getDrive();
 			call.enqueue(new DriveClientCallback(future , callback , Type.GET_DEFAULT_DRIVE));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());

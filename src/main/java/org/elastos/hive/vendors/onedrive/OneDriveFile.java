@@ -8,12 +8,12 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.Length;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
-import org.elastos.hive.utils.LogUtil;
-import org.elastos.hive.vendors.onedrive.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.onedrive.Model.DirOrFileInfoResponse;
-import org.elastos.hive.vendors.onedrive.Model.MoveAndCopyReqest;
-import org.elastos.hive.vendors.onedrive.network.Api;
-import org.elastos.hive.vendors.onedrive.network.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
+import org.elastos.hive.vendors.connection.Model.HeaderConfig;
+import org.elastos.hive.vendors.onedrive.network.Model.DirOrFileInfoResponse;
+import org.elastos.hive.vendors.onedrive.network.Model.MoveAndCopyReqest;
+import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -87,9 +87,15 @@ final class OneDriveFile extends File {
 			callback = new NullCallback<File.Info>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = api.getDirAndFileInfo(pathName);
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.getDirAndFileInfo(pathName);
 			call.enqueue(new FileCallback(future , callback ,pathName, Type.GET_INFO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
@@ -146,9 +152,15 @@ final class OneDriveFile extends File {
 			String newPathName = pathName + "/" +name ;
 
 			MoveAndCopyReqest request = new MoveAndCopyReqest(pathName,name);
-			BaseServiceConfig config  = new BaseServiceConfig.Builder(authHelper.getToken()).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = api.moveTo(this.pathName, request);
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.moveTo(this.pathName, request);
 			call.enqueue(new FileCallback(future , callback ,newPathName, Type.MOVE_TO));
 
 		} catch (Exception ex) {
@@ -203,11 +215,16 @@ final class OneDriveFile extends File {
 			String name = pathName.substring(LastPos + 1);
 
 			MoveAndCopyReqest request = new MoveAndCopyReqest(pathName,name);
-			BaseServiceConfig config  = new BaseServiceConfig.Builder(authHelper.getToken())
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
 					.ignoreReturnBody(true)
 					.build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = api.copyTo(this.pathName, request);
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.copyTo(this.pathName, request);
 			call.enqueue(new FileCallback(future, callback ,pathName, Type.COPY_TO));
 
 		} catch (Exception ex) {
@@ -237,10 +254,15 @@ final class OneDriveFile extends File {
 			callback = new NullCallback<Void>();
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken())
-					.ignoreReturnBody(true).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = api.deleteItem(this.pathName);
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.deleteItem(this.pathName);
 			call.enqueue(new FileCallback(future , callback ,pathName, Type.DELETE_ITEM));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
@@ -309,9 +331,15 @@ final class OneDriveFile extends File {
 		if (!cacheFile.exists()) {
 			//get the file from the remote.
 			try {
-				BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken())
-						.useGsonConverter(false).build();
-				Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
+                HeaderConfig headerConfig = new HeaderConfig.Builder()
+                        .authToken(authHelper.getToken())
+						.acceptEncoding("identity")
+                        .build();
+                BaseServiceConfig config = new BaseServiceConfig.Builder()
+                        .useGsonConverter(false)
+                        .headerConfig(headerConfig)
+                        .build();
+				OneDriveApi api = BaseServiceUtil.createService(OneDriveApi.class, OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
 				Call call = api.read(pathName);
 				call.enqueue(new FileCallback(future , null, getCacheFileName(pathName), Type.READ));
 			} catch (Exception ex) {
@@ -509,8 +537,13 @@ final class OneDriveFile extends File {
 		}
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder(authHelper.getToken()).build();
-			Api api = BaseServiceUtil.createService(Api.class, Constance.ONE_DRIVE_API_BASE_URL, config);
+            HeaderConfig headerConfig = new HeaderConfig.Builder()
+                    .authToken(authHelper.getToken())
+                    .build();
+            BaseServiceConfig config = new BaseServiceConfig.Builder()
+                    .headerConfig(headerConfig)
+                    .build();
+			OneDriveApi api = BaseServiceUtil.createService(OneDriveApi.class, OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
 
 			RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), cacheFile);
 
@@ -699,7 +732,6 @@ final class OneDriveFile extends File {
 
 		@Override
 		public void onFailure(Call call, Throwable t) {
-			LogUtil.d("t = "+t.getMessage());
 			t.printStackTrace();
 
 			HiveException e = new HiveException(t.getMessage());
