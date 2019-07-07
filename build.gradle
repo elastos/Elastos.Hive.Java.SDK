@@ -14,7 +14,7 @@ targetCompatibility = JavaVersion.VERSION_1_8
 dependencies {
 	compile 'org.jetbrains:annotations:17.0.0'
 
-    implementation 'org.json:json:20180813'
+    implementation 'org.json:json:20160212'
     implementation 'com.squareup.retrofit2:retrofit:2.6.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
 
