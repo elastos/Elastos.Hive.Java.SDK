@@ -3,7 +3,6 @@ package org.elastos.hive.ipfs;
 import org.elastos.hive.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.FileInputStream;
@@ -24,7 +23,7 @@ public class IpfsFileOperatorTest {
 	public void testFileWrite() {
 		File file = null;
 		try {
-			String pathName = "/testFileWrite.txt";
+			String pathName = "/ipfs_testFileWrite.txt";
 			file = drive.createFile(pathName).get();
 			assertNotNull(file);
 
@@ -76,11 +75,11 @@ public class IpfsFileOperatorTest {
 		}
     }
 	
-	@Test 
+	@Test
 	public void testFileWriteWithPosition() {
 		File file = null;
 		try {
-			String pathName = "/testFileWriteWithPosition.txt";
+			String pathName = "/ipfs_testFileWriteWithPosition.txt";
 			file = drive.createFile(pathName).get();
 			assertNotNull(file);
 
@@ -156,11 +155,8 @@ public class IpfsFileOperatorTest {
 		try {
 			fileInputStream = new FileInputStream(path);
 			inChannel = fileInputStream.getChannel();
-			long len = 0;
-			//2. read by inner readCursor or position
-				//read, by-position
 			ByteBuffer buffer = ByteBuffer.allocate(fileInputStream.available());
-			len = inChannel.read(buffer);
+			inChannel.read(buffer);
 			buffer.flip();
 			return buffer;
 		}
