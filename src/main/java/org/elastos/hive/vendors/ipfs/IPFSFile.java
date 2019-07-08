@@ -409,7 +409,8 @@ final class IPFSFile extends File {
 
 				IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
 				Call call = ipfsApi.read(rpcHelper.getIpfsEntry().getUid(), pathName);
-				call.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.READ));
+				call.enqueue(new IPFSFileForResultCallback(future, value, 
+						CacheHelper.getCacheFileName(pathName), IPFSConstance.Type.READ));
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				HiveException e = new HiveException(ex.getMessage());
@@ -694,7 +695,7 @@ final class IPFSFile extends File {
 
 					lengthObj = new Length(total);
 					value.setValue(lengthObj);
-					future.complete(lengthObj);
+					future.complete(value);
 					break;
 				}
 				case WRITE: {
