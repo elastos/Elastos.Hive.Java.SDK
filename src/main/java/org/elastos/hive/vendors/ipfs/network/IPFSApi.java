@@ -28,9 +28,14 @@ import org.elastos.hive.vendors.ipfs.network.model.PublishResponse;
 import org.elastos.hive.vendors.ipfs.network.model.ResolveResponse;
 import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
+
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+
 import org.elastos.hive.vendors.connection.Model.NoBodyEntity;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -89,4 +94,14 @@ public interface IPFSApi {
     @POST(IPFSConstance.LS)
     Call<ListChildResponse> list(@Query(IPFSConstance.UID) String uid ,
                                  @Query(IPFSConstance.PATH) String path);
+
+    @POST(IPFSConstance.READ)
+    Call<ResponseBody> read(@Query(IPFSConstance.UID) String uid ,
+                                  @Query(IPFSConstance.PATH) String path);
+
+    @POST(IPFSConstance.WRITE)
+    Call<NoBodyEntity> write(@Query(IPFSConstance.UID) String uid ,
+                                  @Query(IPFSConstance.PATH) String path ,
+                                  @Query(IPFSConstance.CREATE) boolean create, 
+                                  @Body RequestBody body);
 }

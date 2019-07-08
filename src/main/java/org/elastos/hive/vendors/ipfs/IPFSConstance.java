@@ -45,6 +45,7 @@ public class IPFSConstance {
     public static final String MV  		= "files/mv";
     public static final String LS  		= "files/ls";
     public static final String WRITE  		= "files/write";
+    public static final String READ  		= "files/read";
     public static final String STAT		= "files/stat";
     public static final String PUBLISH		= "name/publish";
     public static final String NAMERESOLVE = "name/resolve";
@@ -56,7 +57,8 @@ public class IPFSConstance {
         CREATE_FILE , MKDIR ,
         GET_STAT , PUBLISH ,
         COPY_TO , DELETE_ITEM,
-        MOVE_TO , LIST
+        MOVE_TO , LIST,
+        READ, WRITE
     }
 
 }

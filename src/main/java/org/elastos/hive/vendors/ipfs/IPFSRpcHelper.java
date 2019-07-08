@@ -8,6 +8,7 @@ import org.elastos.hive.Directory;
 import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.IPFSEntry;
+import org.elastos.hive.Length;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
 import org.elastos.hive.vendors.ipfs.network.model.ResolveResponse;
@@ -269,6 +270,23 @@ class IPFSRpcHelper implements AuthHelper {
 		return future;
 	}
 
+	CompletableFuture<Length> invokeLengthCallback(PackValue value) {
+		CompletableFuture<Length> future = new CompletableFuture<Length>();
+
+		if (value.getException() != null) {
+			value.getCallback().onError(value.getException());
+			future.completeExceptionally(value.getException());
+			return future;
+		}
+
+		Length object = (Length) value.getValue();
+		@SuppressWarnings("unchecked")
+		Callback<Length> callback = (Callback<Length>)value.getCallback();
+		callback.onSuccess(object);
+		future.complete(object);
+		return future;
+	}
+	
 	boolean isFile(String type) {
 		return type != null && type.equals("file");
 	}

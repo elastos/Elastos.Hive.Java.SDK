@@ -8,6 +8,7 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.Length;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
+import org.elastos.hive.utils.CacheHelper;
 import org.elastos.hive.vendors.connection.BaseServiceUtil;
 import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
 import org.elastos.hive.vendors.connection.Model.HeaderConfig;
@@ -22,8 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -275,7 +274,7 @@ final class OneDriveFile extends File {
 
 	@Override
 	public void close() {
-		deleteCache();
+		CacheHelper.deleteCache(this.pathName);
 	}
 
 	private long readCursor = 0;
@@ -319,7 +318,7 @@ final class OneDriveFile extends File {
 		}
 
 		//at the first read, if the cache file exists, delete it, and get a new one from the remote.
-		java.io.File cacheFile = getCacheFile(pathName);
+		java.io.File cacheFile = CacheHelper.getCacheFile(pathName);
 		if (needDeleteCache) {
 			if (cacheFile.exists()) {
 				cacheFile.delete();
@@ -341,7 +340,7 @@ final class OneDriveFile extends File {
                         .build();
 				OneDriveApi api = BaseServiceUtil.createService(OneDriveApi.class, OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
 				Call call = api.read(pathName);
-				call.enqueue(new FileCallback(future , null, getCacheFileName(pathName), Type.READ));
+				call.enqueue(new FileCallback(future , null, CacheHelper.getCacheFileName(pathName), Type.READ));
 			} catch (Exception ex) {
 				HiveException e = new HiveException(ex.getMessage());
 				future.completeExceptionally(e);
@@ -350,7 +349,7 @@ final class OneDriveFile extends File {
 			return future;
 		}
 
-		java.io.File file = getCacheFile(this.pathName);
+		java.io.File file = CacheHelper.getCacheFile(this.pathName);
 		Length length = new Length(file.length());
 		future.complete(length);
 		return future;
@@ -368,11 +367,11 @@ final class OneDriveFile extends File {
 		FileInputStream fileInputStream = null;
 		FileChannel inChannel = null;
 		try {
-			java.io.File cacheFile = new java.io.File(getCacheFileName(pathName));
+			java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(pathName));
 			if (!cacheFile.exists()) {
 				cacheFile.createNewFile();
 			}
-			fileInputStream = new FileInputStream(getCacheFileName(pathName));
+			fileInputStream = new FileInputStream(cacheFile);
 			inChannel = fileInputStream.getChannel();
 			long len = 0;
 			//2. read by inner readCursor or position
@@ -465,7 +464,7 @@ final class OneDriveFile extends File {
 			FileOutputStream outputStream = null;
 			long len = 0;
 			try {
-				java.io.File cacheFile = new java.io.File(getCacheFileName(this.pathName));
+				java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(this.pathName));
 				if (!cacheFile.exists()) {
 					cacheFile.createNewFile();						
 				}
@@ -520,7 +519,7 @@ final class OneDriveFile extends File {
 	private CompletableFuture<Void> commit(Void padding, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
-		java.io.File cacheFile = new java.io.File(getCacheFileName(this.pathName));
+		java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(this.pathName));
 		if (cacheFile.length() <= 0) {
 			HiveException e = new HiveException("the file to upload is invalid");
 			callback.onError(e);
@@ -561,67 +560,8 @@ final class OneDriveFile extends File {
 	@Override
 	public void discard() {
 		writeCursor = 0;
-		deleteCache();
+		CacheHelper.deleteCache(this.pathName);
 	}
-
-	//if discard or commit successfully, delete the cache file.
-	private void deleteCache() {
-		try {
-			java.io.File cacheFile = new java.io.File(getCacheFileName(this.pathName));
-			if (cacheFile.exists()) {
-				cacheFile.delete();
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private java.io.File getCacheFile(String path) {
-		java.io.File file = null;
-		try {
-			file = new java.io.File(getCacheFileName(path));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return file;
-	}
-
-	private String getCacheFileName(String path) {
-		return getCacheFileName(path, null);
-	}
-	
-	private String getCacheFileName(String path, String prefix) {
-		String cacheFileName = null;
-		try {
-			MessageDigest md;
-			md = MessageDigest.getInstance("MD5");
-			md.update(path.getBytes());
-			String md5Name =  bytes2Hex(md.digest());
-			String cachePath = CacheHelper.getCachePath();
-			if (prefix != null) {
-				cacheFileName = String.format("%s/%s%s", cachePath, prefix, md5Name);
-			}
-			else {
-				cacheFileName = String.format("%s/%s", cachePath, md5Name);				
-			}
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-
-		return cacheFileName;
-	}
-	
-	private String bytes2Hex(byte[] content) {
-    	final char[] HEX = "0123456789abcdef".toCharArray();
-        char[] chs = new char[content.length * 2];
-        for(int i = 0, offset = 0; i < content.length; i++) {
-            chs[offset++] = HEX[content[i] >> 4 & 0xf];
-            chs[offset++] = HEX[content[i] & 0xf];
-        }
-        return new String(chs);
-    }
 
 	private class FileCallback implements retrofit2.Callback{
 		private final String pathName;
@@ -720,7 +660,7 @@ final class OneDriveFile extends File {
 					Void padding = new Void();
 					this.callback.onSuccess(padding);
 					future.complete(padding);
-					deleteCache();
+					CacheHelper.deleteCache(OneDriveFile.this.pathName);
 					break;
 				}
 
