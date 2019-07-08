@@ -9,6 +9,7 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
+import org.elastos.hive.utils.CacheHelper;
 import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
 import org.elastos.hive.vendors.ipfs.network.IPFSApi;
 import org.elastos.hive.vendors.connection.BaseServiceUtil;
@@ -40,6 +41,7 @@ public final class IPFSClient extends Client {
 	private IPFSClient(IPFSParameter parameter) {
 		rpcHelper = new IPFSRpcHelper(parameter.getAuthEntry());
 		keystorePath = parameter.getKeyStorePath();
+		CacheHelper.initialize(parameter.getKeyStorePath());
 	}
 
 	public static Client createInstance(IPFSParameter parameter) throws HiveException {
@@ -181,10 +183,10 @@ public final class IPFSClient extends Client {
 		String[] addrs = rpcHelper.getIpfsEntry().getRcpAddrs();
 		if (addrs != null) {
 			for (int i = 0; i < addrs.length; i++) {
-
 				try {
 					BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-					IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , rpcHelper.getBaseUrl() , config);
+					String url = String.format(IPFSConstance.URLFORMAT, addrs[i]);
+					IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url, config);
 					Call call = ipfsApi.getNewUid();
 					Response response = call.execute();
 					if (response.code() == 200){

@@ -9,6 +9,7 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.Void;
+import org.elastos.hive.utils.CacheHelper;
 import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
 import org.elastos.hive.vendors.connection.Model.HeaderConfig;
 import org.elastos.hive.vendors.onedrive.network.Model.DriveResponse;

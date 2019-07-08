@@ -2,7 +2,6 @@ package org.elastos.hive.vendors.onedrive;
 
 class OneDriveUtils {
 	static final String CONFIG  		= "onedrive.json";
-	static final String TMP 	        = ".tmp";
 	static final String ClientId 		= "client_id";
 	static final String Scope 		= "Scope";
 	static final String RedirectUrl 	= "redirect_url";
