@@ -8,16 +8,14 @@ import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.CacheHelper;
 import org.elastos.hive.vendors.ipfs.network.IPFSApi;
-import org.elastos.hive.vendors.onedrive.OneDriveConstance;
-import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
 import org.elastos.hive.vendors.connection.BaseServiceUtil;
 import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.connection.Model.HeaderConfig;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -368,7 +366,7 @@ final class IPFSFile extends File {
 	@Override
 	public CompletableFuture<Void> commit(Callback<Void> callback) {
 		return rpcHelper.checkExpiredNew()
-				.thenCompose(padding -> commit(null, callback));
+				.thenCompose(value -> commit(value, callback));
 	}
 
 	@Override
@@ -573,8 +571,14 @@ final class IPFSFile extends File {
 		return future;
 	}
 	
-	private CompletableFuture<Void> commit(Void padding, Callback<Void> callback) {
+	private CompletableFuture<Void> commit(PackValue value, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
+
+		if (value.getException() != null) {
+			callback.onError(value.getException());
+			future.completeExceptionally(value.getException());
+			return future;
+		}
 
 		java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(this.pathName));
 		if (cacheFile.length() <= 0) {
@@ -597,9 +601,14 @@ final class IPFSFile extends File {
 
 			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
 
-			RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), cacheFile);
+			RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), cacheFile);
+			RequestBody requestBody = new MultipartBody.Builder()
+				.setType(MultipartBody.FORM)
+				.addFormDataPart("file", this.pathName, fileBody)
+				.build();
+			
 			Call call = ipfsApi.write(rpcHelper.getIpfsEntry().getUid(), pathName, true, requestBody);
-			call.enqueue(new IPFSFileForResultCallback(future, null, null, IPFSConstance.Type.WRITE));
+			call.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.WRITE));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			HiveException e = new HiveException(ex.getMessage());
@@ -690,13 +699,13 @@ final class IPFSFile extends File {
 				}
 				case WRITE: {
 					Void padding = new Void();
-					if (value != null) {
-						//TODO
-//						value.getCallback().onSuccess(padding);
+					if (value != null && value.getCallback() != null) {
+						Callback<Void> callback = (Callback<Void>) value.getCallback();
+						callback.onSuccess(padding);
 					}
-					
+
 					future.complete(padding);
-//					CacheHelper.deleteCache(IPFSFile.this.pathName);
+					CacheHelper.deleteCache(IPFSFile.this.pathName);
 					break;
 				}
 			}
