@@ -261,14 +261,45 @@ final class IPFSDrive extends Drive{
 
 	@Override
 	public CompletableFuture<ItemInfo> getItemInfo(String path) {
-		// TODO
-		return null;
+		return getItemInfo(path, new NullCallback<ItemInfo>());
 	}
 
 	@Override
 	public CompletableFuture<ItemInfo> getItemInfo(String path, Callback<ItemInfo> callback) {
-		// TODO
-		return null;
+		return rpcHelper.checkExpiredNew()
+				.thenCompose(value -> getItemInfo(value, path, callback));
+	}
+	
+	private CompletableFuture<ItemInfo> getItemInfo(PackValue value, String path, Callback<ItemInfo> callback) {
+		CompletableFuture<ItemInfo> future = new CompletableFuture<ItemInfo>();
+
+		if (callback == null)
+			callback = new NullCallback<ItemInfo>();
+
+		if (value.getException() != null) {
+			callback.onError(value.getException());
+			future.completeExceptionally(value.getException());
+			return future;
+		}
+
+		if (path == null || path.isEmpty()) {
+			HiveException e = new HiveException("Empty path name");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		if (!path.startsWith("/")) {
+			HiveException e = new HiveException("Need a absolute path to get a file or directory's item info.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		createConnection(future,callback,rpcHelper.getBaseUrl() ,
+				getId() , path , path , IPFSConstance.Type.GET_ITEMINFO);
+
+		return future;
 	}
 
 	private void createConnectionForResult(CompletableFuture future , PackValue value , String url ,
@@ -316,14 +347,15 @@ final class IPFSDrive extends Drive{
 				case GET_INFO:
 				case GET_DIR:
 				case GET_FILE:
+				case GET_ITEMINFO:
 					BaseServiceConfig ipfsConfig = new BaseServiceConfig.Builder().build();
 					IPFSApi ipfsStatApi = BaseServiceUtil.createService(IPFSApi.class , url , ipfsConfig);
 					call = ipfsStatApi.getStat(uid , path);
 					break;
 			}
 
-			if (call!=null){
-				call.enqueue(new IPFSDriveCallback(future , callback , pathName , type));
+			if (call != null){
+				call.enqueue(new IPFSDriveCallback(future, callback, pathName, type));
 			}
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
@@ -414,14 +446,15 @@ final class IPFSDrive extends Drive{
 			}
 
 			switch (type) {
-				case GET_INFO:
+				case GET_INFO: {
 					HashMap<String, String> attrs = new HashMap<>();
-					attrs.put(Drive.Info.driveId, getId());  // TODO:
+					attrs.put(Drive.Info.driveId, getId());
 
 					this.callback.onSuccess(driveInfo);
 					future.complete(driveInfo);
 					break;
-				case GET_FILE:
+				}
+				case GET_FILE: {
 					StatResponse fileStatResponse = (StatResponse) response.body();
 					if (!rpcHelper.isFile(fileStatResponse.getType())) {
 						HiveException e = new HiveException("This is not a file");
@@ -439,8 +472,8 @@ final class IPFSDrive extends Drive{
 					callback.onSuccess(file);
 					future.complete(file);
 					break;
-				case GET_DIR:
-
+				}
+				case GET_DIR: {
 					StatResponse dirStatResponse = (StatResponse) response.body();
 					if (!rpcHelper.isFolder(dirStatResponse.getType())) {
 						HiveException e = new HiveException("This is not a directory");
@@ -458,6 +491,23 @@ final class IPFSDrive extends Drive{
 					callback.onSuccess(directory);
 					future.complete(directory);
 					break;
+				}
+				case GET_ITEMINFO: {
+					StatResponse itemStatResponse = (StatResponse) response.body();
+					HashMap<String, String> itemAttrs = new HashMap<>();
+					itemAttrs.put(ItemInfo.itemId, itemStatResponse.getType());
+					itemAttrs.put(ItemInfo.type, itemStatResponse.getType());
+					itemAttrs.put(ItemInfo.size, Integer.toString(itemStatResponse.getSize()));
+
+					int LastPos = this.pathName.lastIndexOf("/");
+					String name = this.pathName.substring(LastPos + 1);
+					itemAttrs.put(ItemInfo.name, name);
+
+					ItemInfo info = new ItemInfo(itemAttrs);
+					callback.onSuccess(info);
+					future.complete(info);
+					break;
+				}
 
 			}
 		}

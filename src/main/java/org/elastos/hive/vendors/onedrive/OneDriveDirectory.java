@@ -596,9 +596,14 @@ class OneDriveDirectory extends Directory {
 					ArrayList<ItemInfo> itemInfos = new ArrayList<>(list.size());
 					for (DirChildrenResponse.ValueBean value : list){
 						HashMap<String , String> childrenAttrs = new HashMap<>();
-						childrenAttrs.put(ItemInfo.itemId,value.getId());
+						childrenAttrs.put(ItemInfo.itemId, value.getId());
+						childrenAttrs.put(ItemInfo.name, value.getName());
 
-						childrenAttrs.put(ItemInfo.type, value.getFolder()!=null ? "Folder": "File");
+						boolean isFolder = value.getFolder() != null;
+						childrenAttrs.put(ItemInfo.type, isFolder ? "Folder": "File");
+						if (isFolder) {
+							childrenAttrs.put(ItemInfo.size, Integer.toString(value.getSize()));							
+						}
 
 						itemInfos.add(new ItemInfo(childrenAttrs));
 					}

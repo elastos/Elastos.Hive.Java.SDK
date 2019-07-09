@@ -53,7 +53,9 @@ package org.elastos.hive.vendors.onedrive.network.Model;
  */
 public class FileOrDirPropResponse {
     private String id ;
-    private Folder folder ;
+    private String name;
+    private int size;
+    private Folder folder;
 
     public FileOrDirPropResponse(String id) {
         this.id = id;
@@ -70,6 +72,22 @@ public class FileOrDirPropResponse {
 
     public void setId(String id) {
         this.id = id;
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     public Folder getFolder() {

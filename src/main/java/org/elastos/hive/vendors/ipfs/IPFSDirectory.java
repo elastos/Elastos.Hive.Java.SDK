@@ -446,7 +446,7 @@ class IPFSDirectory extends Directory  {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
 			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
 			Call call = ipfsApi.deleteItem(rpcHelper.getIpfsEntry().getUid(), pathName, "true");
-			call.enqueue(new IPFSDirForResultCallback(future,value,null, IPFSConstance.Type.DELETE_ITEM));
+			call.enqueue(new IPFSDirForResultCallback(future, value, null, IPFSConstance.Type.DELETE_ITEM));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -487,28 +487,7 @@ class IPFSDirectory extends Directory  {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
 			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
 			Call call = ipfsApi.list(getId(), pathName);
-			Response response = call.execute();
-
-			if (response.code() != 200){
-				future.completeExceptionally(new HiveException("GetChildren failed"));
-				return future;
-			}
-
-			ListChildResponse listChildResponse = (ListChildResponse) response.body();
-			List<ListChildResponse.EntriesBean> entriesBeanList = listChildResponse.getEntries() ;
-			ArrayList<ItemInfo> childList = new ArrayList<>();
-			if (entriesBeanList != null){
-				for (ListChildResponse.EntriesBean entriesBean : entriesBeanList){
-					HashMap<String, String> attrs = new HashMap<>();
-					attrs.put(Directory.Info.itemId, rpcHelper.getIpfsEntry().getUid());
-					ItemInfo info = new ItemInfo(attrs);
-					// TODO;
-					childList.add(info);
-				}
-			}
-			Children children = new Children(childList);
-			callback.onSuccess(children);
-			future.complete(children);
+			call.enqueue(new IPFSDirForResultCallback(future, value, null, IPFSConstance.Type.GET_CHILDREN));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -636,6 +615,30 @@ class IPFSDirectory extends Directory  {
 					value.setValue(padding);
 					future.complete(value);
 					break;
+				case GET_CHILDREN: {
+					ListChildResponse listChildResponse = (ListChildResponse) response.body();
+					List<ListChildResponse.EntriesBean> entriesBeanList = listChildResponse.getEntries() ;
+					ArrayList<ItemInfo> childList = new ArrayList<>();
+					if (entriesBeanList != null){
+						for (ListChildResponse.EntriesBean entriesBean : entriesBeanList){
+							HashMap<String, String> attrs = new HashMap<>();
+							attrs.put(Directory.Info.itemId, rpcHelper.getIpfsEntry().getUid());
+							ItemInfo info = new ItemInfo(attrs);
+							info.put(ItemInfo.name, entriesBean.getName());
+							childList.add(info);
+						}
+					}
+
+					Children children = new Children(childList);
+					if (value != null && value.getCallback() != null) {
+						Callback<Children> callback = (Callback<Children>) value.getCallback();
+						callback.onSuccess(children);
+					}
+
+					future.complete(children);
+					
+					break;
+				}
 			}
 		}
 
@@ -672,7 +675,7 @@ class IPFSDirectory extends Directory  {
 			switch (type) {
 				case GET_INFO:
 					HashMap<String, String> attrs = new HashMap<>();
-					attrs.put(Directory.Info.itemId, getId());  // TODO;
+					attrs.put(Directory.Info.itemId, getId());
 					Directory.Info info = new Directory.Info(attrs);
 					this.callback.onSuccess(info);
 					future.complete(info);
@@ -688,7 +691,6 @@ class IPFSDirectory extends Directory  {
 
 					HashMap<String, String> dirAttrs = new HashMap<>();
 					dirAttrs.put(Directory.Info.itemId, getId());
-					// TODO;
 
 					Directory.Info dirInfo = new Directory.Info(dirAttrs);
 					IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, rpcHelper);
@@ -705,7 +707,7 @@ class IPFSDirectory extends Directory  {
 					}
 
 					HashMap<String, String> fileAttrs = new HashMap<>();
-					fileAttrs.put(Directory.Info.itemId, getId());  // TODO;
+					fileAttrs.put(Directory.Info.itemId, getId());
 					File.Info fileInfo = new File.Info(fileAttrs);
 					IPFSFile file = new IPFSFile(pathName, fileInfo, rpcHelper);
 					this.callback.onSuccess(file);

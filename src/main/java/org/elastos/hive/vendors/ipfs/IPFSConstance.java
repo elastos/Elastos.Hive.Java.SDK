@@ -58,7 +58,8 @@ public class IPFSConstance {
         GET_STAT , PUBLISH ,
         COPY_TO , DELETE_ITEM,
         MOVE_TO , LIST,
-        READ, WRITE
+        READ, WRITE, 
+        GET_CHILDREN, GET_ITEMINFO
     }
 
 }
