@@ -24,13 +24,25 @@ package org.elastos.hive;
 
 import java.util.ArrayList;
 
+/**
+ * Hive children .
+ * Directory children info in Hive backend.
+ */
 public class Children extends Result {
 	private final ArrayList<ItemInfo> children;
 
+	/**
+	 * Hive children constructor
+	 * @param children Children list
+	 */
 	public Children(ArrayList<ItemInfo> children) {
 		this.children = children;
 	}
 
+	/**
+	 * Get children info list.
+	 * @return Children list.
+	 */
 	public ArrayList<ItemInfo> getContent() {
 		return children;
 	}

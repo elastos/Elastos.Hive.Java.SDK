@@ -24,15 +24,54 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Provides author-related functionality
+ */
 public interface AuthHelper {
+	/**
+	 * get AuthToken
+	 * @return Current drivetype
+	 */
 	AuthToken getToken();
 
+	/**
+	 * Login async with authenticator instance
+	 * @param authenticator authenticator instance
+	 * @return Returns 'Void' if the login succees
+	 */
 	CompletableFuture<Void> loginAsync(Authenticator authenticator);
+
+	/**
+	 * Login async with authenticator instance
+	 * @param authenticator authenticator instance
+	 * @param callback Callback loginAsync result
+	 * @return Returns 'Void' if the login succees
+	 */
 	CompletableFuture<Void> loginAsync(Authenticator authenticator, Callback<Void> callback);
 
+	/**
+	 * Logout account
+	 * @return Returns `Void` if the logout succees
+	 */
 	CompletableFuture<Void>	logoutAsync();
+
+	/**
+	 * Logout account
+	 * @param callback Callback logoutAsync result
+	 * @return Returns `Void` if the logout succees
+	 */
 	CompletableFuture<Void> logoutAsync(Callback<Void> callback);
 
+	/**
+	 * Check access token isExpired
+	 * @return Returns `Void` if expired
+	 */
 	CompletableFuture<Void> checkExpired();
+
+	/**
+	 * Check access token isExpired
+	 * @param callback Callback checkExpired result
+	 * @return Returns `Void` if expired
+	 */
 	CompletableFuture<Void> checkExpired(Callback<Void> callback);
 }

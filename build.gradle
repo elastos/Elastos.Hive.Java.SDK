@@ -30,3 +30,42 @@ jar {
                    'Implementation-Version': project.version)
     }
 }
+
+task createjavadoc(type: Javadoc) {
+    options{
+        encoding("utf-8")
+        links "http://docs.oracle.com/javase/8/docs/api"
+    }
+    include(
+            "**/Client.java",
+            "**/Drive.java",
+            "**/Directory.java",
+            "**/File.java",
+
+            "**/Callback.java",
+            "**/HiveException.java",
+            "**/Authenticator.java",
+
+            "**/Parameter.java",
+            "**/OAuthEntry.java",
+
+            "**/DriveType.java",
+            "**/DirectoryItem.java",
+            "**/FileItem.java",
+//            "**/ResourceItem.java",
+
+            "**/ItemInfo.java",
+            "**/Length.java",
+            "**/Void.java",
+            "**/Children.java",
+            "**/Result.java",
+
+            "**/AttributeMap.java"
+    )
+    source = sourceSets.main.java.srcDirs
+    destinationDir = file("../javadoc/")
+    failOnError false
+}
+
+javadoc.dependsOn(build)
+

@@ -22,8 +22,29 @@
 
 package org.elastos.hive;
 
+/**
+ * Configuration Paramsters for the ElastosHiveSDK.
+ * @param <T> Hive sdk parameter .<br>
+ *           for example :OneDriveParameter
+ */
 public interface Parameter<T> {
+
+	/**
+	 * Get current drive type
+	 * @return Return current drive type
+	 */
 	DriveType getDriveType();
+
+	/**
+	 * Get current AuthEntry<br>
+	 * @see OAuthEntry
+	 * @return Return current AuthEntry
+	 */
 	T getAuthEntry();
+
+	/**
+	 * Get the path specified by the user
+	 * @return return the path specified by the user
+	 */
 	String getKeyStorePath();
 }

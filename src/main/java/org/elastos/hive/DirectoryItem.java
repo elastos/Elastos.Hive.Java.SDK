@@ -24,16 +24,95 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * {@link Directory} Action
+ * {@link Drive} or {@link Directory} implements this interface
+ */
 public interface DirectoryItem {
+	/**
+	 * Create directory in current {@link DriveType}, and return this directory instance.<br>
+	 * <br>
+	 * This function is effective only when state of {@link Client} is "logined".<br>
+	 * <br>
+	 * @param path Directory path
+	 * @return Return {@link Directory} instance
+	 * Sync method
+	 */
 	CompletableFuture<Directory> createDirectory(String path);
+
+	/**
+	 * Create directory in current {@link DriveType}, and return this directory instance.<br>
+	 * <br>
+	 * This function is effective only when state of {@link Client} is "logined".<br>
+	 * <br>
+	 * @param path Directory path
+	 * @param callback callback createDirectory result
+	 * @return Return {@link Directory} instance
+	 */
 	CompletableFuture<Directory> createDirectory(String path, Callback<Directory> callback);
 
+	/**
+	 * Get current directory instance.<br>
+	 * <br>
+	 * This function is effective only when state of {@link Client} is "logined".<br>
+	 * <br>
+	 * If the directory does not exist, an exception is thrown
+	 * @param path Directory path
+	 * @return Return {@link Directory} instance
+	 */
 	CompletableFuture<Directory> getDirectory(String path);
+
+	/**
+	 * Get current directory instance.<br>
+	 * If the directory does not exist, an exception is thrown<br>
+	 * <br>
+	 * This function is effective only when state of {@link Client} is "logined".<br>
+	 * <br>
+	 * @param path Directory path
+	 * @param callback Callback getDirectory result
+	 * @return Return {@link Directory} instance
+	 */
 	CompletableFuture<Directory> getDirectory(String path, Callback<Directory> callback);
 
+	/**
+	 * Create file in current {@link DriveType}, and return this File instance.<br>
+	 * <br>
+	 * This function is effective only when state of {@link Client} is "logined".<br>
+	 * <br>
+	 * @param path File path
+	 * @return Return {@link File} instance
+	 */
 	CompletableFuture<File> createFile(String path);
+
+	/**
+	 * Create file in current {@link DriveType}, and return this File instance.<br>
+	 * <br>
+	 * This function is effective only when state of {@link Client} is "logined".<br>
+	 * <br>
+	 * @param path File path
+	 * @param callback Callback createFile result
+	 * @return Return {@link File} instance
+	 */
 	CompletableFuture<File> createFile(String path, Callback<File> callback);
 
+	/**
+	 * Get current file instance.<br>
+	 * <br>
+	 * This function is effective only when state of {@link Client} is "logined".<br>
+	 * <br>
+	 * @param path File path
+	 * @return Return {@link File} instance
+	 */
 	CompletableFuture<File> getFile(String path);
+
+	/**
+	 * Get current file instance.<br>
+	 * <br>
+	 * This function is effective only when state of {@link Client} is "logined".<br>
+	 * <br>
+	 * @param path File path
+	 * @param callback Callback getFile result
+	 * @return Return {@link File} instance
+	 */
 	CompletableFuture<File> getFile(String path, Callback<File> callback);
 }

@@ -22,6 +22,13 @@
 
 package org.elastos.hive;
 
+/**
+ * Authenticator interface
+ */
 public interface Authenticator {
+	/**
+	 * User defined function to open authentication URL during login process.
+	 * @param requestUrl Authentication URL to be opened
+	 */
 	void requestAuthentication(String requestUrl);
 }

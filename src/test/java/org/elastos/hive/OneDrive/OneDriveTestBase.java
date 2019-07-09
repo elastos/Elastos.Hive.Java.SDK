@@ -37,7 +37,7 @@ public class OneDriveTestBase {
 			Client client = Client.createInstance(parameter);
 			assertNotNull(client);
 
-			TestAuthenticator authenticator = new TestAuthenticator();
+			Authenticator authenticator = new TestAuthenticator();
 			client.login(authenticator);
 			return client;
 		} catch (Exception e) {

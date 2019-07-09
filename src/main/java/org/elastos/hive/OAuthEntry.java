@@ -22,25 +22,47 @@
 
 package org.elastos.hive;
 
+/**
+ * Configuration for the ElastosHiveSDK.<br>
+ * All app information should match the information in your app portal
+ */
 public class OAuthEntry {
 	private final String clientId;
 	private final String scope;
 	private final String redirectURL;
 
+	/**
+	 * OAuthEntry constructor
+	 * @param clientId User client id
+	 * @param scope User scope
+	 * @param redirectURL User redirect url
+	 */
 	public OAuthEntry(String clientId, String scope, String redirectURL) {
 		this.clientId = clientId;
 		this.scope = scope;
 		this.redirectURL = redirectURL;
 	}
 
+	/**
+	 * Get current client id
+	 * @return Return current client id
+	 */
 	public String getClientId() {
 		return clientId;
 	}
 
+	/**
+	 * Get current scope
+	 * @return current scope
+	 */
 	public String getScope() {
 		return scope;
 	}
 
+	/**
+	 * Get current redirect url
+	 * @return current redirect url
+	 */
 	public String getRedirectURL() {
 		return redirectURL;
 	}
