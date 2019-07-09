@@ -1,5 +1,6 @@
 package org.elastos.hive.OneDrive;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -9,6 +10,7 @@ import org.elastos.hive.Client;
 import org.elastos.hive.Directory;
 import org.elastos.hive.Drive;
 import org.elastos.hive.File;
+import org.elastos.hive.ItemInfo;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -166,6 +168,51 @@ public class OneDriveDriveTest {
 			fail();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
+		}
+    }
+
+	@Test public void testGetItemInfo() {
+		File file = null;
+		Directory directory = null;
+		try {
+			//1. file
+			String name = "testGetItemInfo_File.txt";
+			String pathName = "/" + name;
+			file = drive.createFile(pathName).get();
+			assertNotNull(file);
+
+			ItemInfo info = drive.getItemInfo(pathName).get();
+			assertNotNull(info);
+			assertEquals(name, info.get(ItemInfo.name));
+			assertEquals("file", info.get(ItemInfo.type));
+			assertEquals(0, Integer.parseInt(info.get(ItemInfo.size)));
+			assertNotNull(info.get(ItemInfo.itemId));
+
+			//2. directory
+			name = "testGetItemInfo_Dir";
+			pathName = "/" + name;
+			directory = drive.createDirectory(pathName).get();
+			assertNotNull(directory);
+
+			info = drive.getItemInfo(pathName).get();
+			assertNotNull(info);
+			assertEquals(name, info.get(ItemInfo.name));
+			assertEquals("directory", info.get(ItemInfo.type));
+			assertEquals(0, Integer.parseInt(info.get(ItemInfo.size)));
+			assertNotNull(info.get(ItemInfo.itemId));
+
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testGetItemInfo failed");
+		}
+		finally {
+			try {
+				file.deleteItem().get();
+				directory.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
 		}
     }
 

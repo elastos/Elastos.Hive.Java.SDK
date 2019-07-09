@@ -329,10 +329,56 @@ final class OneDriveDrive extends Drive {
 
 	@Override
 	public CompletableFuture<ItemInfo> getItemInfo(String path, Callback<ItemInfo> callback) {
-		// TODO:
-		return null;
+		return authHelper.checkExpired()
+				.thenCompose(padding -> getItemInfo(padding, path, callback));
 	}
 
+	private CompletableFuture<ItemInfo> getItemInfo(Void padding, String pathName, Callback<ItemInfo> callback) {
+		CompletableFuture<ItemInfo> future = new CompletableFuture<ItemInfo>();
+
+		if (callback == null)
+			callback = new NullCallback<ItemInfo>();
+
+		if (pathName == null || pathName.isEmpty()) {
+			HiveException e = new HiveException("Empty path name");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		if (!pathName.startsWith("/")) {
+			HiveException e = new HiveException("Need a absolute path to get a file or directory's item info.");
+			callback.onError(e);
+			future.completeExceptionally(e);
+			return future;
+		}
+
+		try {
+			String fullPath;
+			if (pathName.equals("/"))
+				fullPath = OneDriveConstance.ROOT ;
+			else
+				fullPath = OneDriveConstance.ROOT+":"+pathName;
+			
+			HeaderConfig headerConfig = new HeaderConfig.Builder()
+					.authToken(authHelper.getToken())
+					.build();
+			BaseServiceConfig config = new BaseServiceConfig.Builder()
+					.headerConfig(headerConfig)
+					.build();
+			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
+					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
+			Call call = oneDriveApi.getFileOrDirProp(fullPath);
+			call.enqueue(new DriveDriveCallback(pathName, future , callback , Type.GET_ITEMINFO));
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
+		}
+
+		return future;
+	}
+	
 	private class DriveDriveCallback implements retrofit2.Callback{
 		private final String pathName;
 		private final CompletableFuture future;
@@ -377,7 +423,7 @@ final class OneDriveDrive extends Drive {
 					break;
 
 				case CREATE_DIR:
-				case GET_DIR:
+				case GET_DIR: {
 					FileOrDirPropResponse dirResponse= (FileOrDirPropResponse) response.body();
 
 					if (dirResponse.getFolder() == null) {
@@ -396,9 +442,9 @@ final class OneDriveDrive extends Drive {
 					this.callback.onSuccess(directory);
 					future.complete(directory);
 					break;
-
+				}
 				case CREATE_FILE:
-				case GET_FILE:
+				case GET_FILE: {
 					FileOrDirPropResponse filePropResponse= (FileOrDirPropResponse) response.body();
 
 					if (filePropResponse.getFolder() !=null) {
@@ -417,6 +463,27 @@ final class OneDriveDrive extends Drive {
 					this.callback.onSuccess(file);
 					future.complete(file);
 					break;
+				}
+				case GET_ITEMINFO: {
+					FileOrDirPropResponse itemResponse= (FileOrDirPropResponse) response.body();
+
+					HashMap<String, String> itemAttrs = new HashMap<>();
+					itemAttrs.put(ItemInfo.itemId, itemResponse.getId());
+					if (itemResponse.getFolder() != null) {
+						itemAttrs.put(ItemInfo.type, "directory");
+					}
+					else {
+						itemAttrs.put(ItemInfo.type, "file");
+					}
+
+					itemAttrs.put(ItemInfo.size, Integer.toString(itemResponse.getSize()));
+					itemAttrs.put(ItemInfo.name, itemResponse.getName());
+
+					ItemInfo info = new ItemInfo(itemAttrs);
+					this.callback.onSuccess(info);
+					future.complete(info);
+					break;
+				}
 			}
 		}
 
@@ -429,6 +496,6 @@ final class OneDriveDrive extends Drive {
 	}
 
 	private enum Type{
-		GET_INFO, CREATE_DIR , CREATE_FILE , GET_DIR , GET_FILE
+		GET_INFO, CREATE_DIR , CREATE_FILE , GET_DIR , GET_FILE, GET_ITEMINFO
 	}
 }
