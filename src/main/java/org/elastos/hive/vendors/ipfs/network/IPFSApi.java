@@ -22,6 +22,7 @@
 
 package org.elastos.hive.vendors.ipfs.network;
 
+import org.elastos.hive.vendors.connection.Model.NoBodyEntity;
 import org.elastos.hive.vendors.ipfs.IPFSConstance;
 import org.elastos.hive.vendors.ipfs.network.model.ListChildResponse;
 import org.elastos.hive.vendors.ipfs.network.model.PublishResponse;
@@ -31,9 +32,6 @@ import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-
-import org.elastos.hive.vendors.connection.Model.NoBodyEntity;
-
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
