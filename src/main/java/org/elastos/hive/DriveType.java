@@ -22,11 +22,33 @@
 
 package org.elastos.hive;
 
+/**
+ * Various Hive supporting backends.
+ */
 public enum DriveType {
+	/**
+	 * Native file system.
+	 */
 	localDrive("Local Drive"),
+
+	/**
+	 * OneDrive
+	 */
 	oneDrive("OneDrive"),
+
+	/**
+	 * Dropbox (not implemented).
+	 */
 	dropbox("Dropbox"),
+
+	/**
+	 * IPFS
+	 */
 	hiveIpfs("Hive IPFS"),
+
+	/**
+	 * ownCloud (not implemented).
+	 */
 	ownCloud("ownCloud");
 
 	private final String driveName;

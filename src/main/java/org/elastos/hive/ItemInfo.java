@@ -24,12 +24,34 @@ package org.elastos.hive;
 
 import java.util.HashMap;
 
+/**
+ * The `HiveItemInfo` object is a property bag for ClientInfo information.
+ */
 public class ItemInfo extends AttributeMap {
+	/**
+	 * The unique identifier of the item within the Drive.
+	 */
 	public static final String itemId = "ItemId";
+
+	/**
+	 * The name of the item (filename and extension)
+	 */
 	public static final String name   = "Name";
+
+	/**
+	 * The item type is `file` or `directory`
+	 */
 	public static final String type   = "Type";
+
+	/**
+	 * Size of the item in bytes
+	 */
 	public static final String size   = "Size";
 
+	/**
+	 * ItemInfo constructor
+	 * @param hash The map with the `itemId`, `name`, `type` and `size` key-value
+	 */
 	public ItemInfo(HashMap<String, String> hash) {
 		super(hash);
 	}

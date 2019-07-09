@@ -22,6 +22,9 @@
 
 package org.elastos.hive;
 
+/**
+ * Hive exception
+ */
 public class HiveException extends Exception {
 	private static final long serialVersionUID = 1486850840770311509L;
 
@@ -33,6 +36,10 @@ public class HiveException extends Exception {
 		super(e.getMessage());
 	}
 
+	/**
+	 * Hive exception constructor
+	 * @param message exception message
+	 */
 	public HiveException(final String message) {
 		super(message);
 	}

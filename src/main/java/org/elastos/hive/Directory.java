@@ -25,17 +25,50 @@ package org.elastos.hive;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Hive Directory
+ * First of all , create Hive Client,
+ * Second , build the Hive Drive from the Hive Client
+ * Third , build the Hive Directory from the Hive Drive
+ */
 public abstract class Directory extends Result implements ResourceItem<Directory.Info>, DirectoryItem,  FileItem {
+	/**
+	 * Associated directory's information<br>
+	 * The result is filled into {@link Directory.Info}<br>
+	 */
 	public static class Info extends AttributeMap {
+		/**
+		 * Directory item id
+		 */
 		public static final String itemId = "ItemId";
 		public static final String name   = "Name";
 		public static final String childCount   = "ChildCount";
 
+		/**
+		 * {@link Directory.Info} constructor
+		 * @param hash Directory information hashmap
+		 */
 		public Info(HashMap<String, String> hash) {
 			super(hash);
 		}
 	}
 
+	/**
+	 * List for current directory<br>
+	 * <br>
+	 * This function is effective only when state of {@link Directory} is "logined".<br>
+	 * <br>
+	 * @return Returns list for current directory
+	 */
 	public abstract CompletableFuture<Children> getChildren();
+
+	/**
+	 * List for current directory<br>
+	 * <br>
+	 * This function is effective only when state of {@link Directory} is "logined".<br>
+	 * <br>
+	 * @param callback Callback getChildren result
+	 * @return Returns List for current directory
+	 */
 	public abstract CompletableFuture<Children> getChildren(Callback<Children> callback);
 }

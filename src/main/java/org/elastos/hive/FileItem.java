@@ -24,16 +24,80 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * {@link File} Action.
+ */
 interface FileItem {
+	/**
+	 * Get current file path in backend.
+	 * @return current file path in backend.
+	 */
 	String getPath();
+
+	/**
+	 * Get current file parent path in backend.
+	 * @return current file parent path in backend.
+	 */
 	String getParentPath();
 
+	/**
+	 * Move the file specified by current path to destination path.<br>
+	 * <br>
+	 * This function is effective only when state of client generating is "logined".<br>
+	 * <br>
+	 * @param path The absolute path that a file would move to.
+	 * @return Return {@link Void}
+	 */
 	CompletableFuture<Void> moveTo(String path);
+
+	/**
+	 * Move the file specified by current path to destination path.<br>
+	 * <br>
+	 * This function is effective only when state of client generating is "logined".<br>
+	 * <br>
+	 * @param path The absolute path that a file would move to.
+	 * @param callback Callback moveTo result
+	 * @return Return {@link Void}
+	 */
 	CompletableFuture<Void> moveTo(String path, Callback<Void> callback);
 
+	/**
+	 * Copy the file specified by current path to destination path.<br>
+	 * <br>
+	 * This function is effective only when state of client generating is "logined".<br>
+	 * <br>
+	 * @param path The absolute path that a file would Copy to.
+	 * @return Return {@link Void}
+	 */
 	CompletableFuture<Void> copyTo(String path);
+
+	/**
+	 * Copy the file specified by current path to destination path.<br>
+	 * <br>
+	 * This function is effective only when state of client generating is "logined".<br>
+	 * <br>
+	 * @param path The absolute path that a file would Copy to.
+	 * @param callback Callback copyTo result
+	 * @return Return {@link Void}
+	 */
 	CompletableFuture<Void> copyTo(String path, Callback<Void> callback);
 
+	/**
+	 * Delete the file current file.<br>
+	 * <br>
+	 * This function is effective only when state of client generating is "logined".<br>
+	 * <br>
+	 * @return Return {@link Void}
+	 */
 	CompletableFuture<Void> deleteItem();
+
+	/**
+	 * Delete the file current file.<br>
+	 * <br>
+	 * This function is effective only when state of client generating is "logined".<br>
+	 * <br>
+	 * @param callback Callback deleteItem result
+	 * @return Return {@link Void}
+	 */
 	CompletableFuture<Void> deleteItem(Callback<Void> callback);
 }

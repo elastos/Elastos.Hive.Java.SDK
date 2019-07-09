@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * The `AttributeMap` object is a property bag for itemInfo information.
+ */
 class AttributeMap extends Result implements Map<String, String> {
 	private final HashMap<String, String> attrHash;
 

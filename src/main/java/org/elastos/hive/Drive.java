@@ -25,19 +25,67 @@ package org.elastos.hive;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Hive Drive<br>
+ * First of all , create Hive Client,<br>
+ * Second , build the Hive Drive from the Hive Client<br>
+ */
 public abstract class Drive extends Result implements ResourceItem<Drive.Info>, DirectoryItem {
+	/**
+	 * representing the hive drive information.
+	 */
 	public static class Info extends AttributeMap {
+		/**
+		 * Drive Id.
+		 */
 		public static final String driveId = "DriveId";
+
+		/**
+		 * Hive drive info constructor.
+		 * @param hash The map with the `driveId` key-value.
+		 */
 		public Info(HashMap<String, String> hash) {
 			super(hash);
 		}
 	}
 
+	/**
+	 * Get current backend's drive type
+	 * @return current backend's drive type
+	 */
 	public abstract DriveType getType();
 
+	/**
+	 * Get root directory in current drive.<br>
+	 * <br>
+	 * This function is effective only when state of {@link Client} is "logined".<br>
+	 * <br>
+	 * @return Return {@link Directory} instance of root directory in current drive.
+	 */
 	public abstract CompletableFuture<Directory> getRootDir();
+
+	/**
+	 * Get root directory in current drive<br>
+	 * <br>
+	 * This function is effective only when state of {@link Client} is "logined".<br>
+	 * <br>
+	 * @param callback Callback getRootDir result
+	 * @return Return {@link Directory} instance of root directory in current drive.
+	 */
 	public abstract CompletableFuture<Directory> getRootDir(Callback<Directory> callback);
 
+	/**
+	 * Request itemInfo with a path
+	 * @param path The path
+	 * @return Return the {@link ItemInfo}
+	 */
 	public abstract CompletableFuture<ItemInfo> getItemInfo(String path);
+
+	/**
+	 * Request itemInfo with a path
+	 * @param path The path
+	 * @param callback Callback getItemInfo result
+	 * @return Return the {@link ItemInfo}
+	 */
 	public abstract CompletableFuture<ItemInfo> getItemInfo(String path, Callback<ItemInfo> callback);
 }
