@@ -11,10 +11,7 @@ import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class OneDriveFileTest {
 	private static Drive drive;
@@ -35,13 +32,20 @@ public class OneDriveFileTest {
 	}
 
 	@Test public void testGetLastInfo() {
-		assertNotNull(testFile.getLastInfo());
+		File.Info info = testFile.getLastInfo();
+		assertNotNull(info);
+		assertNotNull(info.get(File.Info.name));
+		assertNotNull(info.get(File.Info.itemId));
+		assertTrue(info.containsKey(File.Info.size));
 	}
 
 	@Test public void testGetInfo() {
 		try {
 			File.Info info = testFile.getInfo().get();
 			assertNotNull(info);
+			assertNotNull(info.get(File.Info.name));
+			assertNotNull(info.get(File.Info.itemId));
+			assertTrue(info.containsKey(File.Info.size));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("getInfo failed");

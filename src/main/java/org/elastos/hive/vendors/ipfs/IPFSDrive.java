@@ -387,9 +387,14 @@ final class IPFSDrive extends Drive{
 			}
 
 			switch (type){
-				case CREATE_FILE:
+				case CREATE_FILE: {
 					HashMap<String, String> fileAttrs = new HashMap<>();
 					fileAttrs.put(File.Info.itemId, getId());
+					fileAttrs.put(File.Info.size, "0");
+
+					int LastPos = pathName.lastIndexOf("/");
+					String name = pathName.substring(LastPos + 1);
+					fileAttrs.put(File.Info.name, name);
 
 					File.Info fileInfo = new File.Info(fileAttrs);
 					IPFSFile file = new IPFSFile(pathName, fileInfo, rpcHelper);
@@ -397,16 +402,23 @@ final class IPFSDrive extends Drive{
 					value.setValue(file);
 					future.complete(value);
 					break;
-				case MKDIR:
+				}
+				case MKDIR: {
 					HashMap<String, String> dirAttrs = new HashMap<>();
 					dirAttrs.put(Directory.Info.itemId, getId());
+					dirAttrs.put(Directory.Info.childCount, "0");
+
+					int LastPos = pathName.lastIndexOf("/");
+					String name = pathName.substring(LastPos + 1);
+					dirAttrs.put(File.Info.name, name);
+
 					Directory.Info dirInfo = new Directory.Info(dirAttrs);
 					IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, rpcHelper);
 
 					value.setValue(directory);
 					future.complete(value);
 					break;
-
+				}
 			}
 		}
 
@@ -464,8 +476,12 @@ final class IPFSDrive extends Drive{
 					}
 
 					HashMap<String, String> fileAttrs = new HashMap<>();
-					fileAttrs.put(Directory.Info.itemId, getId());
-					// TODO:
+					fileAttrs.put(File.Info.itemId, getId());
+					fileAttrs.put(File.Info.size, Integer.toString(fileStatResponse.getSize()));
+
+					int LastPos = pathName.lastIndexOf("/");
+					String name = pathName.substring(LastPos + 1);
+					fileAttrs.put(File.Info.name, name);
 
 					File.Info fileInfo = new File.Info(fileAttrs);
 					IPFSFile file = new IPFSFile(pathName, fileInfo, rpcHelper);
@@ -484,7 +500,17 @@ final class IPFSDrive extends Drive{
 
 					HashMap<String, String> dirAttrs = new HashMap<>();
 					dirAttrs.put(Directory.Info.itemId, getId());
-					// TODO:
+
+					if (pathName.equals("/")) {
+						dirAttrs.put(Directory.Info.name, "/");
+					}
+					else {
+						int LastPos = pathName.lastIndexOf("/");
+						String name = pathName.substring(LastPos + 1);
+						dirAttrs.put(Directory.Info.name, name);
+					}
+
+					dirAttrs.put(Directory.Info.childCount, Integer.toString(dirStatResponse.getBlocks()));
 
 					Directory.Info dirInfo = new Directory.Info(dirAttrs);
 					IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, rpcHelper);
@@ -495,9 +521,15 @@ final class IPFSDrive extends Drive{
 				case GET_ITEMINFO: {
 					StatResponse itemStatResponse = (StatResponse) response.body();
 					HashMap<String, String> itemAttrs = new HashMap<>();
-					itemAttrs.put(ItemInfo.itemId, itemStatResponse.getType());
+					itemAttrs.put(ItemInfo.itemId, getId());
+
 					itemAttrs.put(ItemInfo.type, itemStatResponse.getType());
-					itemAttrs.put(ItemInfo.size, Integer.toString(itemStatResponse.getSize()));
+					if (rpcHelper.isFile(itemStatResponse.getType())) {
+						itemAttrs.put(ItemInfo.size, Integer.toString(itemStatResponse.getSize()));
+					}
+					else {
+						itemAttrs.put(ItemInfo.size, "0");
+					}
 
 					int LastPos = this.pathName.lastIndexOf("/");
 					String name = this.pathName.substring(LastPos + 1);

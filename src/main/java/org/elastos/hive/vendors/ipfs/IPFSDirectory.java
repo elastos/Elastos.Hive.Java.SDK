@@ -209,8 +209,8 @@ class IPFSDirectory extends Directory  {
 
 		String pathName = String.format("%s/%s", this.pathName, path);
 
-		createConnectionForResult(future,value,rpcHelper.getBaseUrl(),
-				rpcHelper.getIpfsEntry().getUid(),pathName,pathName,IPFSConstance.Type.CREATE_FILE);
+		createConnectionForResult(future, value,rpcHelper.getBaseUrl(),
+				rpcHelper.getIpfsEntry().getUid(), pathName, pathName, IPFSConstance.Type.CREATE_FILE);
 
 		return future;
 	}
@@ -588,9 +588,14 @@ class IPFSDirectory extends Directory  {
 			}
 
 			switch (type){
-				case CREATE_FILE:
+				case CREATE_FILE: {
 					HashMap<String, String> fileAttrs = new HashMap<>();
 					fileAttrs.put(File.Info.itemId, getId());
+					fileAttrs.put(File.Info.size, "0");
+
+					int LastPos = pathName.lastIndexOf("/");
+					String name = pathName.substring(LastPos + 1);
+					fileAttrs.put(Info.name, name);
 
 					File.Info fileInfo = new File.Info(fileAttrs);
 					IPFSFile file = new IPFSFile(pathName, fileInfo, rpcHelper);
@@ -598,15 +603,23 @@ class IPFSDirectory extends Directory  {
 					value.setValue(file);
 					future.complete(value);
 					break;
-				case MKDIR:
+				}
+				case MKDIR: {
 					HashMap<String, String> dirAttrs = new HashMap<>();
 					dirAttrs.put(Directory.Info.itemId, getId());
+					dirAttrs.put(Info.childCount, "0");
+
+					int LastPos = pathName.lastIndexOf("/");
+					String name = pathName.substring(LastPos + 1);
+					dirAttrs.put(Info.name, name);
+
 					Directory.Info dirInfo = new Directory.Info(dirAttrs);
 					IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, rpcHelper);
 
 					value.setValue(directory);
 					future.complete(value);
 					break;
+				}
 				case MOVE_TO:
 					IPFSDirectory.this.pathName = pathName;
 				case COPY_TO:
@@ -673,14 +686,28 @@ class IPFSDirectory extends Directory  {
 			}
 
 			switch (type) {
-				case GET_INFO:
+				case GET_INFO: {
+					StatResponse statResponse = (StatResponse) response.body();
 					HashMap<String, String> attrs = new HashMap<>();
-					attrs.put(Directory.Info.itemId, getId());
-					Directory.Info info = new Directory.Info(attrs);
-					this.callback.onSuccess(info);
-					future.complete(info);
+					attrs.put(Info.itemId, getId());
+
+					if (IPFSDirectory.this.pathName.equals("/")) {
+						attrs.put(Info.name, "/");
+					}
+					else {
+						int LastPos = IPFSDirectory.this.pathName.lastIndexOf("/");
+						String name = IPFSDirectory.this.pathName.substring(LastPos + 1);
+						attrs.put(Info.name, name);
+					}
+
+					attrs.put(Info.childCount, Integer.toString(statResponse.getBlocks()));
+
+					dirInfo = new Directory.Info(attrs);
+					this.callback.onSuccess(dirInfo);
+					future.complete(dirInfo);
 					break;
-				case GET_DIR:
+				}
+				case GET_DIR: {
 					StatResponse statResponse = (StatResponse) response.body();
 					if (!rpcHelper.isFolder(statResponse.getType())) {
 						HiveException e = new HiveException("This is not a directory");
@@ -689,15 +716,22 @@ class IPFSDirectory extends Directory  {
 						return;
 					}
 
-					HashMap<String, String> dirAttrs = new HashMap<>();
-					dirAttrs.put(Directory.Info.itemId, getId());
+					HashMap<String, String> attrs = new HashMap<>();
+					attrs.put(Info.itemId, getId());
 
-					Directory.Info dirInfo = new Directory.Info(dirAttrs);
+					int LastPos = pathName.lastIndexOf("/");
+					String name = pathName.substring(LastPos + 1);
+					attrs.put(Info.name, name);
+
+					attrs.put(Info.childCount, Integer.toString(statResponse.getBlocks()));
+
+					Directory.Info dirInfo = new Directory.Info(attrs);
 					IPFSDirectory directory = new IPFSDirectory(pathName, dirInfo, rpcHelper);
 					this.callback.onSuccess(directory);
 					future.complete(directory);
 					break;
-				case GET_FILE:
+				}
+				case GET_FILE: {
 					StatResponse fileStatResponse = (StatResponse) response.body();
 					if (!rpcHelper.isFile(fileStatResponse.getType())) {
 						HiveException e = new HiveException("This is not a file");
@@ -707,13 +741,20 @@ class IPFSDirectory extends Directory  {
 					}
 
 					HashMap<String, String> fileAttrs = new HashMap<>();
-					fileAttrs.put(Directory.Info.itemId, getId());
+					fileAttrs.put(File.Info.itemId, getId());
+					fileAttrs.put(File.Info.size, Integer.toString(fileStatResponse.getSize()));
+
+					int LastPos = pathName.lastIndexOf("/");
+					String name = pathName.substring(LastPos + 1);
+					fileAttrs.put(File.Info.name, name);
+
 					File.Info fileInfo = new File.Info(fileAttrs);
 					IPFSFile file = new IPFSFile(pathName, fileInfo, rpcHelper);
 					this.callback.onSuccess(file);
 					future.complete(file);
 
 					break;
+				}
 			}
 		}
 

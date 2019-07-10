@@ -23,6 +23,7 @@ public class IpfsDriveTest {
 		try {
 			Drive.Info info = drive.getInfo().get();
 			assertNotNull(info);
+			assertNotNull(info.get(Drive.Info.driveId));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("getInfo failed");

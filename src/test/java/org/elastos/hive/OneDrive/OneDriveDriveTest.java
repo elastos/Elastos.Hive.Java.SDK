@@ -23,6 +23,7 @@ public class OneDriveDriveTest {
 		try {
 			Drive.Info info = drive.getInfo().get();
 			assertNotNull(info);
+			assertNotNull(info.get(Drive.Info.driveId));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("getInfo failed");
@@ -189,7 +190,7 @@ public class OneDriveDriveTest {
 			assertNotNull(info.get(ItemInfo.itemId));
 
 			//2. directory
-			name = "testGetItemInfo_Dir";
+			name = "testGetItemInfo_Dir" + System.currentTimeMillis();
 			pathName = "/" + name;
 			directory = drive.createDirectory(pathName).get();
 			assertNotNull(directory);
