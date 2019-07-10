@@ -1,10 +1,5 @@
 package org.elastos.hive.ipfs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 import java.util.concurrent.ExecutionException;
 
 import org.elastos.hive.Children;
@@ -15,6 +10,8 @@ import org.elastos.hive.File;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class IpfsFileTest {
 	private static Drive drive;
@@ -35,13 +32,20 @@ public class IpfsFileTest {
 	}
 
 	@Test public void testGetLastInfo() {
-		assertNotNull(testFile.getLastInfo());
+		File.Info info = testFile.getLastInfo();
+		assertNotNull(info);
+		assertNotNull(info.get(File.Info.name));
+		assertNotNull(info.get(File.Info.itemId));
+		assertTrue(info.containsKey(File.Info.size));
 	}
 
 	@Test public void testGetInfo() {
 		try {
 			File.Info info = testFile.getInfo().get();
 			assertNotNull(info);
+			assertNotNull(info.get(File.Info.name));
+			assertNotNull(info.get(File.Info.itemId));
+			assertTrue(info.containsKey(File.Info.size));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("getInfo failed");

@@ -296,12 +296,7 @@ final class OneDriveDrive extends Drive {
 			return future;
 		}
 
-		String fullPath;
-		if (pathName.equals("/"))
-			fullPath = OneDriveConstance.ROOT ;
-		else
-			fullPath = OneDriveConstance.ROOT+":"+pathName;
-
+		String fullPath = OneDriveConstance.ROOT + ":" + pathName;
 		try {
 			HeaderConfig headerConfig = new HeaderConfig.Builder()
 					.authToken(authHelper.getToken())
@@ -385,7 +380,7 @@ final class OneDriveDrive extends Drive {
 		private final Callback callback;
 		private final Type type ;
 
-		public DriveDriveCallback(String pathName, CompletableFuture future, Callback callback , Type type) {
+		DriveDriveCallback(String pathName, CompletableFuture future, Callback callback , Type type) {
 			this.pathName = pathName;
 			this.future = future;
 			this.callback = callback;
@@ -415,7 +410,6 @@ final class OneDriveDrive extends Drive {
 
 					HashMap<String, String> attrs = new HashMap<>();
 					attrs.put(Drive.Info.driveId, driveResponse.getId());
-					// TODO:
 
 					Drive.Info driveInfo = new Drive.Info(attrs);
 					this.callback.onSuccess(driveInfo);
@@ -426,7 +420,7 @@ final class OneDriveDrive extends Drive {
 				case GET_DIR: {
 					FileOrDirPropResponse dirResponse= (FileOrDirPropResponse) response.body();
 
-					if (dirResponse.getFolder() == null) {
+					if (dirResponse == null || dirResponse.getFolder() == null) {
 						HiveException e = new HiveException("This is not a folder");
 						this.callback.onError(e);
 						future.completeExceptionally(e);
@@ -435,10 +429,17 @@ final class OneDriveDrive extends Drive {
 
 					HashMap<String, String> dirAttrs = new HashMap<>();
 					dirAttrs.put(Directory.Info.itemId, dirResponse.getId());
-					// TODO:
+					dirAttrs.put(Directory.Info.name, dirResponse.getName());
 
-					Directory.Info dirInfo_ = new Directory.Info(dirAttrs);
-					OneDriveDirectory directory = new OneDriveDirectory(pathName,dirInfo_,authHelper);
+					if (type == Type.CREATE_DIR) {
+						dirAttrs.put(Directory.Info.childCount, Integer.toString(dirResponse.getFolder().getChildCount()));
+					}
+					else {
+						dirAttrs.put(Directory.Info.childCount, "0");
+					}
+
+					Directory.Info dirInfo = new Directory.Info(dirAttrs);
+					OneDriveDirectory directory = new OneDriveDirectory(pathName, dirInfo, authHelper);
 					this.callback.onSuccess(directory);
 					future.complete(directory);
 					break;
@@ -447,7 +448,7 @@ final class OneDriveDrive extends Drive {
 				case GET_FILE: {
 					FileOrDirPropResponse filePropResponse= (FileOrDirPropResponse) response.body();
 
-					if (filePropResponse.getFolder() !=null) {
+					if (filePropResponse == null || filePropResponse.getFolder() !=null) {
 						HiveException e = new HiveException("This is not a file");
 						this.callback.onError(e);
 						future.completeExceptionally(e);
@@ -456,7 +457,8 @@ final class OneDriveDrive extends Drive {
 
 					HashMap<String, String> fileAttrs = new HashMap<>();
 					fileAttrs.put(File.Info.itemId, filePropResponse.getId());
-					// TODO:
+					fileAttrs.put(File.Info.name, filePropResponse.getName());
+					fileAttrs.put(File.Info.size, Integer.toString(filePropResponse.getSize()));
 
 					File.Info fileInfo = new File.Info(fileAttrs);
 					OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
@@ -471,12 +473,13 @@ final class OneDriveDrive extends Drive {
 					itemAttrs.put(ItemInfo.itemId, itemResponse.getId());
 					if (itemResponse.getFolder() != null) {
 						itemAttrs.put(ItemInfo.type, "directory");
+						itemAttrs.put(ItemInfo.size, "0");
 					}
 					else {
 						itemAttrs.put(ItemInfo.type, "file");
+						itemAttrs.put(ItemInfo.size, Integer.toString(itemResponse.getSize()));
 					}
 
-					itemAttrs.put(ItemInfo.size, Integer.toString(itemResponse.getSize()));
 					itemAttrs.put(ItemInfo.name, itemResponse.getName());
 
 					ItemInfo info = new ItemInfo(itemAttrs);

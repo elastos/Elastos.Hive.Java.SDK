@@ -7,6 +7,9 @@ import java.util.concurrent.CompletableFuture;
 public abstract class File extends Result implements ResourceItem<File.Info>, FileItem {
 	public static class Info extends AttributeMap {
 		public static final String itemId = "ItemId";
+		public static final String name   = "Name";
+		public static final String size   = "Size";
+
 		public Info(HashMap<String, String> hash) {
 			super(hash);
 		}

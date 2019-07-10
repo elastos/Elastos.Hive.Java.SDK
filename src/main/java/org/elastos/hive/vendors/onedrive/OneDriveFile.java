@@ -2,7 +2,6 @@ package org.elastos.hive.vendors.onedrive;
 
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Callback;
-import org.elastos.hive.Directory;
 import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.Length;
@@ -12,7 +11,7 @@ import org.elastos.hive.utils.CacheHelper;
 import org.elastos.hive.vendors.connection.BaseServiceUtil;
 import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
 import org.elastos.hive.vendors.connection.Model.HeaderConfig;
-import org.elastos.hive.vendors.onedrive.network.Model.DirOrFileInfoResponse;
+import org.elastos.hive.vendors.onedrive.network.Model.FileOrDirPropResponse;
 import org.elastos.hive.vendors.onedrive.network.Model.MoveAndCopyReqest;
 import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
 
@@ -597,12 +596,14 @@ final class OneDriveFile extends File {
 
 			switch (type){
 				case GET_INFO:
-					DirOrFileInfoResponse dirInfoResponse = (DirOrFileInfoResponse) response.body();
+					FileOrDirPropResponse fileInfoResponse = (FileOrDirPropResponse) response.body();
 					HashMap<String, String> attrs = new HashMap<>();
-					attrs.put(Directory.Info.itemId, dirInfoResponse.getId());
-					// TODO:
+					attrs.put(Info.itemId, fileInfoResponse.getId());
+					attrs.put(Info.name, fileInfoResponse.getName());
+					attrs.put(Info.size, Integer.toString(fileInfoResponse.getSize()));
 
 					File.Info info = new File.Info(attrs);
+					fileInfo = info;
 					this.callback.onSuccess(info);
 					future.complete(info);
 					break;

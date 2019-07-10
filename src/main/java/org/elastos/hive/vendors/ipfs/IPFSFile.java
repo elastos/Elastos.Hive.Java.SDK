@@ -27,6 +27,7 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -751,9 +752,16 @@ final class IPFSFile extends File {
 
 			switch (type) {
 				case GET_INFO:
+					StatResponse statResponse = (StatResponse) response.body();
 					HashMap<String, String> attrs = new HashMap<>();
-					attrs.put(File.Info.itemId, getId());
-					// TODO:
+					attrs.put(Info.itemId, getId());
+
+					int LastPos = IPFSFile.this.pathName.lastIndexOf("/");
+					String name = IPFSFile.this.pathName.substring(LastPos + 1);
+					attrs.put(Info.name, name);
+					attrs.put(Info.size, Integer.toString(statResponse.getSize()));
+
+					fileInfo = new File.Info(attrs);
 
 					this.callback.onSuccess(fileInfo);
 					future.complete(fileInfo);

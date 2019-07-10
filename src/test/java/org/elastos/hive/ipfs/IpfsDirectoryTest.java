@@ -1,21 +1,15 @@
 package org.elastos.hive.ipfs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-import org.elastos.hive.Children;
-import org.elastos.hive.Client;
-import org.elastos.hive.Directory;
-import org.elastos.hive.Drive;
-import org.elastos.hive.File;
+import org.elastos.hive.*;
 import org.elastos.hive.Void;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class IpfsDirectoryTest {
 	private static Drive drive;
@@ -46,13 +40,20 @@ public class IpfsDirectoryTest {
 	}
 
 	@Test public void testGetLastInfo() {
-		assertNotNull(testDirectory.getLastInfo());
+		Directory.Info info = testDirectory.getLastInfo();
+		assertNotNull(info);
+		assertNotNull(info.get(Directory.Info.itemId));
+		assertNotNull(info.get(Directory.Info.name));
+		assertTrue(info.containsKey(Directory.Info.childCount));
 	}
 
 	@Test public void testGetInfo() {
 		try {
 			Directory.Info info = testDirectory.getInfo().get();
 			assertNotNull(info);
+			assertNotNull(info.get(Directory.Info.itemId));
+			assertNotNull(info.get(Directory.Info.name));
+			assertTrue(info.containsKey(Directory.Info.childCount));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("getInfo failed");
@@ -158,6 +159,35 @@ public class IpfsDirectoryTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testGetChildrenCount failed");
+		}
+	}
+
+	@Test public void testGetChildrenDetails() {
+		try {
+			Children children = testDirectory.getChildren().get();
+			assertNotNull(children);
+			final int count = children.getContent().size();
+
+			//Create several files and check the count.
+			final int NUM = 5;
+			for (int i = 0; i < NUM; i++) {
+				String childName = "testGetChildrenDetails" + System.currentTimeMillis();
+				assertNotNull(testDirectory.createFile(childName).get());
+			}
+
+			children = testDirectory.getChildren().get();
+			assertEquals(count + NUM, children.getContent().size());
+
+			ArrayList<ItemInfo> items = children.getContent();
+			for (ItemInfo info: items) {
+				assertNotNull(info);
+				assertNotNull(info.get(ItemInfo.itemId));
+				assertNotNull(info.get(ItemInfo.name));
+				//TODO get the item's type using Drive.getItemInfo
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testGetChildrenDetails failed");
 		}
 	}
 

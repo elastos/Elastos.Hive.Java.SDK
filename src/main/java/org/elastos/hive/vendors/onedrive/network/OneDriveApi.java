@@ -44,7 +44,7 @@ public interface OneDriveApi {
     Call<FileOrDirPropResponse> createDir(@Path("path") String path , @Body CreateDirRequest dirRequest);
 
     @GET(OneDriveConstance.DRIVE+"/root:/{path}")
-    Call<DirOrFileInfoResponse> getDirAndFileInfo(@Path("path")String path);
+    Call<FileOrDirPropResponse> getDirAndFileInfo(@Path("path")String path);
 
     @PATCH(OneDriveConstance.DRIVE+"/root:{path}")
     Call<NoBodyEntity> moveTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
