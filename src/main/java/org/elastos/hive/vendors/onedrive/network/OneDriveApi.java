@@ -4,7 +4,6 @@ package org.elastos.hive.vendors.onedrive.network;
 import org.elastos.hive.vendors.onedrive.OneDriveConstance;
 import org.elastos.hive.vendors.onedrive.network.Model.CreateDirRequest;
 import org.elastos.hive.vendors.onedrive.network.Model.DirChildrenResponse;
-import org.elastos.hive.vendors.onedrive.network.Model.DirOrFileInfoResponse;
 import org.elastos.hive.vendors.onedrive.network.Model.MoveAndCopyReqest;
 import org.elastos.hive.vendors.onedrive.network.Model.DriveResponse;
 import org.elastos.hive.vendors.onedrive.network.Model.FileOrDirPropResponse;

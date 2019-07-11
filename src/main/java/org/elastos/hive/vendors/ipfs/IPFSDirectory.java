@@ -455,12 +455,6 @@ class IPFSDirectory extends Directory  {
 	}
 
 	@Override
-	public void close() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public CompletableFuture<Children> getChildren() {
 		return getChildren(new NullCallback<Children>());
 	}

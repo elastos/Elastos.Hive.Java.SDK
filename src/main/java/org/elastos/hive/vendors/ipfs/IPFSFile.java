@@ -285,11 +285,6 @@ final class IPFSFile extends File {
 	}
 
 	@Override
-	public void close() {
-		CacheHelper.deleteCache(this.pathName);
-	}
-
-	@Override
 	public CompletableFuture<Length> read(ByteBuffer dest) {
 		return read(dest, new NullCallback<Length>());
 	}

@@ -271,11 +271,6 @@ final class OneDriveFile extends File {
 		return future;
 	}
 
-	@Override
-	public void close() {
-		CacheHelper.deleteCache(this.pathName);
-	}
-
 	private long readCursor = 0;
 	@Override
 	public CompletableFuture<Length> read(ByteBuffer dest) {

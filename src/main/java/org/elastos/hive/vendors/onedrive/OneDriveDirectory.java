@@ -14,7 +14,6 @@ import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
 import org.elastos.hive.vendors.connection.Model.HeaderConfig;
 import org.elastos.hive.vendors.onedrive.network.Model.CreateDirRequest;
 import org.elastos.hive.vendors.onedrive.network.Model.DirChildrenResponse;
-import org.elastos.hive.vendors.onedrive.network.Model.DirOrFileInfoResponse;
 import org.elastos.hive.vendors.onedrive.network.Model.FileOrDirPropResponse;
 import org.elastos.hive.vendors.onedrive.network.Model.MoveAndCopyReqest;
 import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
@@ -267,11 +266,6 @@ class OneDriveDirectory extends Directory {
 		}
 
 		return future;
-	}
-
-	@Override
-	public void close() {
-		// TODO
 	}
 
 	@Override
