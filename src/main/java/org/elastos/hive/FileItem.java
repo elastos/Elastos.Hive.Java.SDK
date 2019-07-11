@@ -14,6 +14,4 @@ interface FileItem {
 
 	CompletableFuture<Void> deleteItem();
 	CompletableFuture<Void> deleteItem(Callback<Void> callback);
-
-	void close();
 }
