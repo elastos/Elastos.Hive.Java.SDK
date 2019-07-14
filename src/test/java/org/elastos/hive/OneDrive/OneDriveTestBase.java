@@ -3,6 +3,7 @@ package org.elastos.hive.OneDrive;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Client;
 import org.elastos.hive.OAuthEntry;
+import org.elastos.hive.Parameter;
 import org.elastos.hive.vendors.onedrive.OneDriveParameter;
 
 import java.awt.Desktop;
@@ -31,9 +32,13 @@ public class OneDriveTestBase {
 		}
 
 		try {
+			//First create OAuthEntry
 			OAuthEntry entry = new OAuthEntry(APPID, SCOPE, REDIRECTURL);
-			OneDriveParameter parameter = new OneDriveParameter(entry, System.getProperty("user.dir"));
 
+			//Then create parameter
+			Parameter parameter = new OneDriveParameter(entry, System.getProperty("user.dir"));
+
+			//Finally create client instance
 			Client client = Client.createInstance(parameter);
 			assertNotNull(client);
 
