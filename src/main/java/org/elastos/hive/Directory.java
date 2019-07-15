@@ -54,11 +54,11 @@ public abstract class Directory extends Result implements ResourceItem<Directory
 	}
 
 	/**
-	 * List for current directory<br>
+	 * Get children for current directory<br>
 	 * <br>
 	 * This function is effective only when state of {@link Directory} is "logined".<br>
 	 * <br>
-	 * @return Returns list for current directory
+	 * @return Returns A list of directories
 	 */
 	public abstract CompletableFuture<Children> getChildren();
 
