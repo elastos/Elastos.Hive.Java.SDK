@@ -63,7 +63,7 @@ task createjavadoc(type: Javadoc) {
             "**/AttributeMap.java"
     )
     source = sourceSets.main.java.srcDirs
-    destinationDir = file("../javadoc/")
+    destinationDir = file("doc/")
     failOnError false
 }
 

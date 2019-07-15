@@ -1,15 +1,15 @@
 Elastos Hive Java SDK
 =============================
 
-[![Build Status](https://travis-ci.org/elastos/Elastos.NET.Hive.Java.SDK.svg?)](https://travis-ci.org/elastos/Elastos.NET.Hive.Java.SDK)
+[![Build Status](https://travis-ci.com/elastos/Elastos.NET.Hive.Java.SDK.svg?)](https://travis-ci.com/elastos/Elastos.NET.Hive.Java.SDK)
 
 ## Summary
 
-Elastos Hive Java SDK is a set of Java APIs as well as an uniform layer that could be utilized by Elastos dApps  to access  (or store)  their files or datum from (or to) cloud driver backends, which currently includes  the list of following cloud drivers supported:
+Elastos Hive Java SDK is a set of Java APIs as well as an uniform layer that could be utilised by Elastos dApps  to access  (or to store)  their files or datum from (or to) cloud driver backends, which currently includes  the list of following cloud drivers supported:
 
 - OneDriver
-- ownCloud  on WebDav
-- Hive IPFS/Cluster
+- Hive IPFS
+- ownCloud  on WebDav (Not implemented yet)
 
 ## Build from source
 
@@ -21,26 +21,25 @@ $ cd Elastos.NET.Hive.Java.SDK
 $ open -a Elipse .
 ```
 
-Then use the **Eclipse** to run **build** or **tests** tasks.
+Then use the **Eclipse** to run **build** or **tests** tasks, or try to make build and tests with following samples:
 
-or run the command below:
-#### Build without run test
+#### 1. Build
 
-Enter the following command to build project whithout run tests:
+Enter the following command to build project but ignore running tests:
 
-```
+```shell
 $ ./gradlew build -x test
 ```
 
-#### Build & Run test
+#### 2. Build & Run test
 
 Enter the following command to build project and run tests:
 
-```
+```shell
 $ ./gradlew build
 ```
 
-#### Tests
+#### 3. Run tests
 
 Enter the following command to run tests:
 
@@ -48,831 +47,252 @@ Enter the following command to run tests:
 $ ./gradlew test
 ```
 
-#### Build Docs
+#### 3. Build Docs
 
-Enter the following command to build Java doc:
+Enter the following command to build APIs document:
 
 ```
 $ ./gradlew createjavadoc
 ```
 
-## How-to use APIs
+## How to use APIs
 
+In order to get developers involved to have a brief overview of APIs,  here are several examples to show the usage of Hive APIs.
 
-#### Create a Client
+### Client
 
-Steps：
+#### 1. Create a Client
 
-```
-First create OAuthEntry,
-Then create Parameter,
-Finally create Client instance
-```
-For example:
-
-```
-//First create OAuthEntry
-OAuthEntry entry = new OAuthEntry(APPID, SCOPE, REDIRECTURL);
-
-//Then create parameter
-Parameter parameter = new OneDriveParameter(entry, System.getProperty("user.dir"));
-
-//Finally create client instance
-Client client = Client.createInstance(parameter);
-```
-
-&nbsp;
-
-#### Login
-
-Steps:
-
-```
-First create Client instance
-Second create Authenticator
-Then run client.login
-```
-
-For example:
-
-```
-//First create Client instance
-Client client = xxx ;
-
-//Second create Authenticator
-Authenticator authenticator = new TestAuthenticator();
-
-//Then run client.login
-client.login(authenticator);
-```
-
-&nbsp;
-
-#### Get drive
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method
-Finally call getDefaultDrive method
-```
-
-For example
-
-```
-//First create the Client instance by referring to the above
-Client client = xxxxxx ;
-
-//Then call login method
-client.login(xxx);
-
-//Finally call getDefaultDrive method
-Drive drive = client.getDefaultDrive().get();
-```
-
-&nbsp;
-
-#### Get directory
-1.Get root directory from ***Drive***
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Finally call drive.getRootDir method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive instance by referring to the above
-Drive drive = xxx;
-
-//Finally call drive.getRootDir method
-Directory root = drive.getRootDir().get();
-```
-
-2.Get directory with path from ***Drive***
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Finally call drive.getDirectory method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive instance by referring to the above
-Drive drive = xxx;
-
-//Finally call drive.getDirectory method
-Directory directory = drive.getDirectory(path).get();
-```
-
-
-3.Get directory with path from ***Directory***
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get Directory instance by referring to the above
-Finally call directory.getDirectory method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Fourth call drive.getRootDir or drive.getDirectory method
-Directory root = drive.getRootDir().get();
-
-//Finally call directory.getDirectory method
-Directory directory = root.getDirectory(path).get();
-```
-
-&nbsp;
-
-#### Get file
-1.Get file with path from ***Drive***
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Finally call drive.getFile method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive instance by referring to the above
-Drive drive = xxx;
-
-//Finally call drive.getFile method
-File file = drive.getFile(pathName).get();
-
-```
-
-2.Get file with path from ***Directory***
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third create Drive instance by referring to the above
-Fourth create Directory instance by referring to the above
-Finally call directory.getFile method
-```
-
-For example:
-
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Fourth create Directory instance by referring to the above
-Directory directory = xxx;
-
-//Finally call directory.getFile method
-File file = directory.getFile(path).get();
-```
-
-&nbsp;
-#### Create directory 
-1.Create directory with path from ***Drive***
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third create Drive instance by referring to the above
-Finally call drive.createDirectory method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Finally call drive.createDirectory method
-Directory child = drive.createDirectory(path).get();
-```
-
-2.Create directory with path from ***Directory***
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get Directory instance by referring to the above
-Finally call directory.createDirectory method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Fourth create Directory instance by referring to the above
-Directory directory = xxx;
-
-//Finally call directory.createDirectory method
-Directory child = drive.createDirectory(childDirectoryName).get();
-```
-
-&nbsp;
-#### Create file
-
-1.Create file with path from ***Drive***
-
-Step
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Finally call drive.createFile method
-```
-
-For example
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Finally call drive.createFile method
-File file = drive.createFile(pathName).get()
-```
-
-
-2.Create file with path from ***Directory***
+The first API to use Hive SDK is to create a client object to expected cloud storage service. For example,  the following paragraph is to create to a client to OneDrive:
 
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get Directory instance by referring to the above
-Finally call directory.createFile method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Fourth get Directory instance by referring to the above
-Directory directory = xxx;
-
-//Finally call directory.createFile method
-File file = directory.createFile(childDirectoryName).get();
-```
-
-&nbsp;
-
-#### Copy a directory
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get Directory instance by referring to the above
-Finally call directory.copyTo method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Fourth get Directory instance by referring to the above
-Directory directory = xxx;
-
-//Finally call directory.copyTo method
-directory.copyTo(destPath).get();
-
-```
-
-
-&nbsp;
-
-#### Copy a file
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get File instance by referring to the above
-Finally call file.copyTo method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Fourth get File instance by referring to the above
-File file = xxx;
-
-//Finally call file.copyTo method
-file.copyTo(destPath).get();
-```
-
-
-&nbsp;
-
-#### Move a directory
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get Directory instance by referring to the above
-Finally call directory.moveTo method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Fourth get Directory instance by referring to the above
-Directory directory = xxx;
-
-//Finally call directory.moveTo method
-directory.moveTo(destPath).get();
-
-```
-
-
-
-&nbsp;
-
-#### Move a file
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get File instance by referring to the above
-Finally call file.moveTo method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Fourth get File instance by referring to the above
-File file = xxx;
-
-//Finally call file.copyTo method
-file.moveTo(destPath).get();
-```
-
-
-&nbsp;
-
-#### Delete a directory
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get Directory instance by referring to the above
-Finally call directory.deleteItem method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Fourth get Directory instance by referring to the above
-Directory directory = xxx;
-
-//Finally call directory.deleteItem method
-directory.deleteItem().get();
-```
-
-&nbsp;
-
-#### Delete a file
-
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get File instance by referring to the above
-Finally call file.deleteItem method
-```
-
-For example:
-
+```Java
+OAuthEntry entry = new OAuthEntry(YOUR-CLIENT-ID, YOUR-SCOPE, YOUR-REIRECTURL);
+Paramter  params = new OneDriveParameter(entry , YOUR-DATA-DIR);
+Client client = Client.createInstance(params);
 ```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
 
-//Third get Drive by referring to the above
-Drive drive = xxx;
+#### 2. Login 
 
-//Fourth get File instance by referring to the above
-File file = xxx;
+When you get a client object, you need to get login with user's authorisation before calling any other APIs, example for OneDrive.  And remember that an extend class has to be implement based on interface **Authenticator** before calling **login** API.
 
-//Finally call file.copyTo method
-file.deleteItem().get();
+```java
+// Supposed having a client object.
+Authenticator authenticator = new YOUR-OWN-AUTHENTICATOR();
+try {
+   client.login(authenticator);
+} catch (HiveException e) {
+   e.printstack();
+}
 ```
-
-
-&nbsp;
 
-#### List files
+#### 3. Get drive
 
-Steps:
+As long as you get user's authorisation,  then you can follow the example to get a default drive object and to handle it for your own purpose:
 
+```java
+// Supposed having a client object.
+client.getDefaultDrive()
+      .thenAccept(drive ->  {
+        // Here is your code to use drive.
+      });
 ```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get Directory instance by referring to the above
-Finally call directory.getChildren method
-```
-
-For example:
-
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
 
-//Third get Drive by referring to the above
-Drive drive = xxx;
+#### 4. Logout
 
-//Fourth get Directory instance by referring to the above
-Directory directory = xxx;
+When you want to log out of your account after all your backend file operations, follow these instructions:
 
-//Finally call directory.getChildren method
-Children children = directory.getChildren().get();
+```java
+// Supposed having a client object.
+try {
+	client.logout();
+} catch (HiveException e) {
+   e.printstack();
+}
 ```
 
-&nbsp;
+### Drive
 
-#### Read data
+#### 1. Get directory
 
-Steps:
+After you get the drive, if you want to get the folder in the backend, you can refer to the following example:
 
+```java
+// Supposed having a drive object.
+drive.getDirectory(YOUR-DIR-PATH)
+	.thenAccept(directory -> {
+        // Here is your code to use directory.
+	});
 ```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get File instance by referring to the above
-Fifth create ByteBuffer
-finally read data from backend file to ByteBuffer
-```
 
-For example:
+#### 2. Get file
+if you want to get the file in the backend, you can refer to the following example:
 
+```java
+// Supposed having a drive object.
+drive.getFile(YOUR-FILE-PATH)
+	.thenAccept(file -> {
+        // Here is your code to use file.
+	});
 ```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
-
-//Third get Drive by referring to the above
-Drive drive = xxx;
-
-//Fourth get File instance by referring to the above
-File file = xxx;
 
-//Fifth create ByteBuffer
-ByteBuffer readBuf = ByteBuffer.allocate(100);
+#### 3. Create directory 
 
-//finally read data from backend file to ByteBuffer
-Length lenObj = file.read(readBuf).get();
+You can also create a directory directly using drive, just like that:
 
+```java
+// Supposed having a drive object.
+drive.createDirectory(YOUR-DIR-PATH)
+	.thenAccept(directory -> {
+        // Here is your code to use directory.
+	});
 ```
-
-
-&nbsp;
-
-#### Write data
-
-Steps:
 
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get File instance by referring to the above
-Fifth create ByteBuffer
-Sixth call file.write method 
-Finally call file.commit method
-```
+#### 4. Create file
 
-For example:
+Or use drive to create a directory, just like that:
 
+```java
+// Supposed having a drive object.
+drive.createFile(YOUR-FILE-PATH)
+	.thenAccept(file -> {
+		// Here is your code to use file.
+	});
 ```
-//First create the Client instance by referring to the above
-Client client = xxx ;
 
-//Then call login method by referring to the above
-client.login(xxx);
+### Directory
 
-//Third get Drive by referring to the above
-Drive drive = xxx;
+#### 1. Copy a directory
 
-//Fourth get File instance by referring to the above
-File file = xxx;
+After you have an instance of directory, you can copy a directory:
 
-//Fifth create ByteBuffer
-ByteBuffer writeBuffer = xxx
+```java
+// Supposed having a directory object.
+directory.copyTo(YOUR-DIR-PATH)
+	.thenAccept(v ->{
+		//Do another things after copy a directory.
+    });
 
-//Sixth call file.write method 
-file.write(writeBuffer).get();
-
-//Finally call file.commit method
-file.commit().get();
 ```
-
 
+#### 2. Move a directory
 
-&nbsp;
+Or move the directory, as in the following example:
 
-#### Get info
-
-1.Get ***Client*** info
-
-Steps:
-
+```java
+// Supposed having a directory object.
+directory.moveTo(YOUR-DIR-PATH)
+    .thenAccept(v ->{
+		//Do another things after Move a directory.
+    });
 ```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Finally call client.getInfo method
-```
 
-For example:
 
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
+#### 3. Delete a directory
 
-//Then call login method by referring to the above
-client.login(xxx);
+Or refer to the implementation below to delete a directory:
 
-//Finally call client.getInfo method
-Client.Info info = client.getInfo().get();
+```java
+// Supposed having a directory object.
+directory.deleteItem()
+    .thenAccept(v ->{
+        //Do another things after delete a directory.
+    });
 ```
 
+#### 4. List files
 
-2.Get ***Drive*** info
+You can also use directory to list all subdirectories in the current directory:
 
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Finally call drive.getInfo method
-```
-
-For example:
-
+```java
+// Supposed having a directory object.
+directory.getChildren()
+    .thenAccept(children -> {
+        //List children for current directory
+    });
 ```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
 
-//Third get Drive by referring to the above
-Drive drive = xxx;
+### File
 
-//Finally call drive.getInfo method
-Drive.Info info = drive.getInfo().get();
-```
+When you have a file instance, you can do file related operations, such as copying a file:
 
-3.Get ***Directory*** info
+#### 1. Copy a file
 
-Steps:
-
-```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive instance by referring to the above
-Fourth get Directory instance by referring to the above
-Finally call directory.getInfo method
+```java
+// Supposed having a file object.
+file.copyTo(YOUR-FILE-PATH)
+    .thenAccept(v ->{
+		//Do another things after copy a file.
+    });
 ```
 
-For example:
 
-```
-//First create the Client instance by referring to the above
-Client client = xxx ;
-
-//Then call login method by referring to the above
-client.login(xxx);
 
-//Third get Drive by referring to the above
-Drive drive = xxx;
+#### 2. Move a file
 
-//Fourth get Directory instance by referring to the above
-Directory directory = xxx;
+You can also use the following example to move files around:
 
-//Finally call directory.getInfo method
-Directory.Info info = directory.getInfo().get();
+```java
+// Supposed having a file object.
+file.moveTo(YOUR-FILE-PATH)
+    .thenAccept(v ->{
+		//Do another things after Move a file.
+    });
 
 ```
 
-4.Get ***File*** info
+#### 3. Delete a file
 
-Steps:
+If you want to delete files, you can refer to the following example：
 
+```java
+// Supposed having a file object.
+file.deleteItem()
+    .thenAccept(v ->{
+        //Do another things after delete a file.
+    });
 ```
-First create the Client instance by referring to the above
-Then call login method by referring to the above
-Third get Drive by referring to the above
-Fourth get File instance by referring to the above
-Finally call file.getInfo method
-```
-
-For example:
 
-```
 
-//First create the Client instance by referring to the above
-Client client = xxx ;
+#### 4. Read data
 
-//Then call login method by referring to the above
-client.login(xxx);
+When you want to read a file from the background, you can use the following example.
 
-//Third get Drive by referring to the above
-Drive drive = xxx;
+```java
+// Supposed having a file object.
+ByteBuffer readBuf = ByteBuffer.allocate(YOUR-BUFFER-LENGTH);
 
-//Fourth get File instance by referring to the above
-File file = xxx;
+file.read(readBuf)
+        .thenAccept(length -> {
+			//TODO
+        });
 
-//Finally call file.getInfo method
-File.Info info = testFile.getInfo().get();
 ```
-
-&nbsp;
 
-#### Logout
+#### 5. Write data
 
-Steps:
+If you have some data that you want to store in the backend,you need to call the file.write interface to write the data, and then call the file.commit interface to commit the changes,as shown in the following example:
 
-```
-If client is "logined" , can call client.logout method
-```
+```java
+// Supposed having a file object.
+// prepare Bytebuffer
+ByteBuffer writeBuffer = YOUR-DATA-BUFFER ;
 
-For example:
+file.write(writeBuffer)
+		.thenAccept(length -> {
+			// Do somthing after write buffer
+		});
+file.commit()
+		.thenAccept(v ->{
+			// Do another things after commit 	
+		});
 
 ```
-Client client = xxx ;
 
-//If client is "logined" , can call client.logout method
-client.logout();
-```
 
-&nbsp;
 
 ***More guide refer to APIDoc and Sample***
 
 &nbsp;
-
-
-
-
 
 ## Thanks
 
@@ -880,7 +300,7 @@ Sincerely thanks to all teams and projects that we relies on directly or indirec
 
 ## Contributing
 
-We welcome contributions to the Elastos Hive Java Project in many forms.
+We welcome contributions to the Elastos Hive Java Project.
 
 ## License
 
