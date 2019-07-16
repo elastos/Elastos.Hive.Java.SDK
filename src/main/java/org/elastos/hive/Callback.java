@@ -30,7 +30,7 @@ public interface Callback<T extends Result> {
 	 * An exception occurred in the middle of obtaining the result
 	 * @param e {@link HiveException}
 	 */
-	void onError(HiveException e);
+	public void onError(HiveException e);
 
 	/**
 	 * Callback when successful
@@ -38,5 +38,5 @@ public interface Callback<T extends Result> {
 	 *            for example:<br>
 	 *            Drive , Directory , File , Drive.Info ,Directory.Info , File.Info and so on.
 	 */
-	void onSuccess(T body);
+	public void onSuccess(T body);
 }
