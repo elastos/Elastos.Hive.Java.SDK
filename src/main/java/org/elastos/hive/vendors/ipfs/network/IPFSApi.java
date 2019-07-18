@@ -43,11 +43,11 @@ public interface IPFSApi {
     @POST(IPFSConstance.NEW)
     Call<UIDResponse> getNewUid();
 
-//    @GET(IPFSConstance.NAMERESOLVE)
-//    Call<ResolveResponse> resolve(@Query(IPFSConstance.ARG) String peerId);
-
     @GET(IPFSConstance.NAMERESOLVE)
-    Call<ResolveResponse> resolve();
+    Call<ResolveResponse> resolve(@Query(IPFSConstance.ARG) String peerId);
+
+//    @GET(IPFSConstance.NAMERESOLVE)
+//    Call<ResolveResponse> resolve();
 
     @POST(IPFSConstance.UID_INFO)
     Call<UIDResponse> getUidInfo(@Query(IPFSConstance.UID) String uid);

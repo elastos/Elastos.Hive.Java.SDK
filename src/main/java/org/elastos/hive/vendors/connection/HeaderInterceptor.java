@@ -79,7 +79,6 @@ public class HeaderInterceptor implements Interceptor{
                 .addHeader(AUTHORIZATION, "bearer "+headerConfig.getAuthToken().getAccessToken())
                 .build();
         return newRequest ;
-
     }
 
     private Request addContentTypeHeader(Request realRequest){
@@ -101,6 +100,4 @@ public class HeaderInterceptor implements Interceptor{
                 .build();
         return newRequest ;
     }
-
-
 }

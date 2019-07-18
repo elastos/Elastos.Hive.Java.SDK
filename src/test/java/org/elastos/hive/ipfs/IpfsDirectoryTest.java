@@ -169,21 +169,58 @@ public class IpfsDirectoryTest {
 			final int count = children.getContent().size();
 
 			//Create several files and check the count.
-			final int NUM = 5;
-			for (int i = 0; i < NUM; i++) {
-				String childName = "testGetChildrenDetails" + System.currentTimeMillis();
+			final int DIR_NUM = 5;
+			String[] dirNames = new String[DIR_NUM];
+			for (int i = 0; i < DIR_NUM; i++) {
+				String childName = "testGetChildrenDetails_dir" + System.currentTimeMillis();
+				assertNotNull(testDirectory.createDirectory(childName).get());
+				dirNames[i] = childName;
+			}
+
+			final int FILE_NUM = 10;
+			String[] fileNames = new String[FILE_NUM];
+			for (int i = 0; i < FILE_NUM; i++) {
+				String childName = "testGetChildrenDetails_file" + System.currentTimeMillis();
 				assertNotNull(testDirectory.createFile(childName).get());
+				fileNames[i] = childName;
 			}
 
 			children = testDirectory.getChildren().get();
-			assertEquals(count + NUM, children.getContent().size());
+			assertEquals(count + DIR_NUM + FILE_NUM, children.getContent().size());
 
 			ArrayList<ItemInfo> items = children.getContent();
 			for (ItemInfo info: items) {
 				assertNotNull(info);
 				assertNotNull(info.get(ItemInfo.itemId));
-				assertNotNull(info.get(ItemInfo.name));
-				//TODO get the item's type using Drive.getItemInfo
+
+				String name = info.get(ItemInfo.name);
+				assertNotNull(name);
+
+				for (String dirName: dirNames) {
+					if (name.equals(dirName)) {
+						String path = testDirectory.getPath() + "/" + name;
+						ItemInfo dirInfo = drive.getItemInfo(path).get();
+						assertNotNull(dirInfo);
+
+						String type = dirInfo.get(ItemInfo.type);
+						assertNotNull(type);
+						assertEquals("directory", type);
+						assertNotNull(dirInfo.get(ItemInfo.size));
+					}
+				}
+
+				for (String fileName: fileNames) {
+					if (name.equals(fileName)) {
+						String path = testDirectory.getPath() + "/" + name;
+						ItemInfo fileInfo = drive.getItemInfo(path).get();
+						assertNotNull(fileInfo);
+
+						String type = fileInfo.get(ItemInfo.type);
+						assertNotNull(type);
+						assertEquals("file", type);
+						assertNotNull(fileInfo.get(ItemInfo.size));
+					}
+				}
 			}
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
