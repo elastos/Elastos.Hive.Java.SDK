@@ -347,8 +347,6 @@ final class IPFSFile extends File {
 		return rpcHelper.checkExpiredNew()
 				.thenCompose(value -> checkAndCache(value, dest))
 				.thenCompose(value -> localWrite(value, dest, -1, callback))
-				.thenCompose(value -> rpcHelper.getRootHash(value))
-				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeLengthCallback(value));
 	}
 
@@ -370,8 +368,6 @@ final class IPFSFile extends File {
 		return rpcHelper.checkExpiredNew()
 				.thenCompose(value -> checkAndCache(value, dest))
 				.thenCompose(value -> localWrite(value, dest, position, callback))
-				.thenCompose(value -> rpcHelper.getRootHash(value))
-				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeLengthCallback(value));
 	}
 
@@ -383,7 +379,10 @@ final class IPFSFile extends File {
 	@Override
 	public CompletableFuture<Void> commit(Callback<Void> callback) {
 		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> commit(value, callback));
+				.thenCompose(value -> commit(value, callback))
+				.thenCompose(value -> rpcHelper.getRootHash(value))
+				.thenCompose(value -> rpcHelper.publishHash(value))
+				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
 	}
 
 	@Override
@@ -590,8 +589,13 @@ final class IPFSFile extends File {
 		return future;
 	}
 	
-	private CompletableFuture<Void> commit(PackValue value, Callback<Void> callback) {
-		CompletableFuture<Void> future = new CompletableFuture<Void>();
+	private CompletableFuture<PackValue> commit(PackValue value, Callback<Void> callback) {
+		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
+
+		if (callback == null)
+			callback = new NullCallback<Void>();
+
+		value.setCallback(callback);
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -717,18 +721,17 @@ final class IPFSFile extends File {
 					lengthObj = new Length(total);
 					value.setValue(lengthObj);
 					future.complete(value);
-					break;
+					return;
 				}
 				case WRITE: {
-					Void padding = new Void();
 					if (value != null && value.getCallback() != null) {
-						Callback<Void> callback = (Callback<Void>) value.getCallback();
-						callback.onSuccess(padding);
+						Callback<PackValue> callback = (Callback<PackValue>) value.getCallback();
+						callback.onSuccess(value);
 					}
 
-					future.complete(padding);
+					future.complete(value);
 					CacheHelper.deleteCache(IPFSFile.this.pathName);
-					break;
+					return;
 				}
 			}
 

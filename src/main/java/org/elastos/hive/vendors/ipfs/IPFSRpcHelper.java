@@ -141,10 +141,6 @@ class IPFSRpcHelper implements AuthHelper {
 				if (login(BASEURL , entry.getUid() , homeHash)){
 					isValid = true;
 				}
-
-				isValid = false ;
-
-				login(BASEURL,entry.getUid() , homeHash);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -199,8 +195,9 @@ class IPFSRpcHelper implements AuthHelper {
 					return placeHolder;
 				}
 
-				login(BASEURL , entry.getUid() , homeHash);
-				isValid = true;
+				if (login(BASEURL , entry.getUid() , homeHash)) {
+					isValid = true;
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -378,7 +375,7 @@ class IPFSRpcHelper implements AuthHelper {
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
 			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
-			Call call = ipfsApi.resolve();
+			Call call = ipfsApi.resolve(peerId);
 			Response response = call.execute();
 
 			if (response.code() == 200){
@@ -450,6 +447,7 @@ class IPFSRpcHelper implements AuthHelper {
 					StatResponse statResponse = (StatResponse) response.body();
 					IPFSHash hash = new IPFSHash(statResponse.getHash());
 					value.setHash(hash);
+					future.complete(value);
 				case PUBLISH:
 					future.complete(value);
 					break;
