@@ -30,6 +30,7 @@ import org.elastos.hive.Length;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.CacheHelper;
+import org.elastos.hive.utils.HeaderUtil;
 import org.elastos.hive.vendors.connection.BaseServiceUtil;
 import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
 import org.elastos.hive.vendors.connection.Model.HeaderConfig;
@@ -636,8 +637,17 @@ final class OneDriveFile extends File {
 				}
 				case READ: {
 					ResponseBody body = (ResponseBody) response.body();
-					if (body.contentLength() <= 0) {
-						future.complete(new Length(body.contentLength()));
+					Length lengthObj ;
+					if (body == null) {
+						lengthObj = new Length(0);
+						future.complete(lengthObj);
+						return;
+					}
+
+					if (HeaderUtil.getContentLength(response) == -1
+							&& !HeaderUtil.isTrunced(response)){
+						lengthObj = new Length(0);
+						future.complete(lengthObj);
 						break;
 					}
 
@@ -670,7 +680,7 @@ final class OneDriveFile extends File {
 						}
 					}
 
-					Length lengthObj = new Length(total);
+					lengthObj = new Length(total);
 					future.complete(lengthObj);
 					break;
 				}

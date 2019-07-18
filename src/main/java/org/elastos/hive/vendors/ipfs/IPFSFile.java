@@ -29,15 +29,11 @@ import org.elastos.hive.Length;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.CacheHelper;
-import org.elastos.hive.vendors.ipfs.network.IPFSApi;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-
+import org.elastos.hive.utils.HeaderUtil;
 import org.elastos.hive.vendors.connection.BaseServiceUtil;
 import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
+import org.elastos.hive.vendors.ipfs.network.IPFSApi;
+import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,7 +45,10 @@ import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -421,6 +420,7 @@ final class IPFSFile extends File {
 		if (!cacheFile.exists()) {
 			//get the file from the remote.
 			try {
+
 				BaseServiceConfig config = new BaseServiceConfig.Builder()
 						.useGsonConverter(false)
 						.build();
@@ -668,15 +668,17 @@ final class IPFSFile extends File {
 					break;
 				case READ: {
 					ResponseBody body = (ResponseBody) response.body();
-					Length lengthObj = new Length(0);
+					Length lengthObj ;
 					if (body == null) {
+						lengthObj = new Length(0);
 						value.setValue(lengthObj);
 						future.complete(value);
 						return;
 					}
 
-					if (body.contentLength() <= 0) {
-						lengthObj = new Length(body.contentLength());
+					if (HeaderUtil.getContentLength(response) == -1
+							&& !HeaderUtil.isTrunced(response)){
+						lengthObj = new Length(0);
 						value.setValue(lengthObj);
 						future.complete(value);
 						return;
@@ -689,6 +691,7 @@ final class IPFSFile extends File {
 						InputStream data = body.byteStream();
 
 						cacheStream = new FileOutputStream(pathName);
+
 						byte[] b = new byte[1024];
 						int length = 0;
 
