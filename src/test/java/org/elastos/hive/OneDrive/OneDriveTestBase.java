@@ -13,11 +13,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 public class OneDriveTestBase {
-	static public final String APPID = "f0f8fdc1-294e-4d5c-b3d8-774147075480";
-	static public final String SCOPE = "offline_access Files.ReadWrite";
-	static public final String REDIRECTURL = "http://localhost:44316";
+	private static final String APPID = "afd3d647-a8b7-4723-bf9d-1b832f43b881";//f0f8fdc1-294e-4d5c-b3d8-774147075480
+	private static final String SCOPE = "User.Read Files.ReadWrite.All offline_access";//offline_access Files.ReadWrite
+	private static final String REDIRECTURL = "http://localhost:12345";//http://localhost:44316
 
-	static public Client login() {
+	public static Client login() {
 		class TestAuthenticator implements Authenticator {
 			@Override
 			public void requestAuthentication(String requestUrl) {
