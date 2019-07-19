@@ -42,7 +42,7 @@ public class OneDriveConstance {
     public static final String LOGOUT_REDIRECT_URL = "post_logout_redirect_uri";
 
     public static final String DEFAULT_REDIRECT_URL = "localhost";
-    public static final int    DEFAULT_REDIRECT_PORT = 44316;
+    public static final int    DEFAULT_REDIRECT_PORT = 12345;
 
     public static final String GRANT_TYPE_GET_TOKEN = "authorization_code";
     public static final String GRANT_TYPE_REFRESH_TOKEN = "refresh_token";

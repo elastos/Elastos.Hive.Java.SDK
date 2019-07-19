@@ -32,6 +32,7 @@ import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.CacheHelper;
+import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
 import org.elastos.hive.vendors.ipfs.network.IPFSApi;
 import org.elastos.hive.vendors.connection.BaseServiceUtil;
@@ -207,7 +208,8 @@ public final class IPFSClient extends Client {
 			for (int i = 0; i < addrs.length; i++) {
 				try {
 					BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-					String url = String.format(IPFSConstance.URLFORMAT, addrs[i]);
+					String requestUrl = UrlUtil.checkPort(addrs[i],IPFSConstance.DEFAULT_PORT);
+					String url = String.format(IPFSConstance.URLFORMAT, requestUrl);
 					IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url, config);
 					Call call = ipfsApi.getNewUid();
 					Response response = call.execute();

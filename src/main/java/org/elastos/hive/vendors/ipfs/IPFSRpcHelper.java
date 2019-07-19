@@ -33,12 +33,13 @@ import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.Length;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
+import org.elastos.hive.utils.UrlUtil;
+import org.elastos.hive.vendors.connection.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
+import org.elastos.hive.vendors.ipfs.network.IPFSApi;
 import org.elastos.hive.vendors.ipfs.network.model.ResolveResponse;
 import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
-import org.elastos.hive.vendors.ipfs.network.IPFSApi;
-import org.elastos.hive.vendors.connection.BaseServiceUtil;
-import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -113,7 +114,8 @@ class IPFSRpcHelper implements AuthHelper {
 				String homeHash = null;
 				//Using the older validAddress try to get the home hash.
 				if (validAddress != null && !validAddress.isEmpty()) {
-					String url = String.format(IPFSConstance.URLFORMAT, validAddress);
+					String requestUrl = UrlUtil.checkPort(validAddress,IPFSConstance.DEFAULT_PORT);
+					String url = String.format(IPFSConstance.URLFORMAT, requestUrl);
 					homeHash = getHomeHash(url,entry.getUid());
 					BASEURL = url;
 					if (homeHash == null) {
@@ -124,7 +126,8 @@ class IPFSRpcHelper implements AuthHelper {
 				if (homeHash == null) {
 					String[] addrs = entry.getRcpAddrs();
 					for (int i = 0; i < addrs.length; i++) {
-						String url = String.format(IPFSConstance.URLFORMAT, addrs[i]);
+						String requestUrl = UrlUtil.checkPort(addrs[i],IPFSConstance.DEFAULT_PORT);
+						String url = String.format(IPFSConstance.URLFORMAT, requestUrl);
 						homeHash = getHomeHash(url,entry.getUid());
 						if (homeHash != null && !homeHash.isEmpty()) {
 							BASEURL = url;
@@ -168,7 +171,8 @@ class IPFSRpcHelper implements AuthHelper {
 				String homeHash = null;
 				//Using the older validAddress try to get the home hash.
 				if (validAddress != null && !validAddress.isEmpty()) {
-					String url = String.format(IPFSConstance.URLFORMAT, validAddress);
+					String requestUrl = UrlUtil.checkPort(validAddress,IPFSConstance.DEFAULT_PORT);
+					String url = String.format(IPFSConstance.URLFORMAT, requestUrl);
 					homeHash = getHomeHash(url,entry.getUid());
 					BASEURL = url;
 					if (homeHash == null) {
@@ -179,7 +183,8 @@ class IPFSRpcHelper implements AuthHelper {
 				if (homeHash == null) {
 					String[] addrs = entry.getRcpAddrs();
 					for (int i = 0; i < addrs.length; i++) {
-						String url = String.format(IPFSConstance.URLFORMAT, addrs[i]);
+						String requestUrl = UrlUtil.checkPort(addrs[i],IPFSConstance.DEFAULT_PORT);
+						String url = String.format(IPFSConstance.URLFORMAT, requestUrl);
 						homeHash = getHomeHash(url,entry.getUid());
 						if (homeHash != null && !homeHash.isEmpty()) {
 							BASEURL = url;
