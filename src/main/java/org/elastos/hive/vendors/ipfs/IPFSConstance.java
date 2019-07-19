@@ -23,7 +23,8 @@
 package org.elastos.hive.vendors.ipfs;
 
 public class IPFSConstance {
-    public static final String URLFORMAT       = "http://%s:9095/api/v0/";
+    public static final String URLFORMAT       = "http://%s/api/v0/";
+    public static final String DEFAULT_PORT = "9095";
     public static final String JSON			= "application/json";
     public static final String PREFIX          = "/ipfs/";
     public static final String UID         	= "uid";
