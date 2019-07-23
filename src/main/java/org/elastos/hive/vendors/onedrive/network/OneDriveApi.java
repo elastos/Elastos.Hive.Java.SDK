@@ -23,12 +23,12 @@
 package org.elastos.hive.vendors.onedrive.network;
 
 import org.elastos.hive.vendors.onedrive.OneDriveConstance;
-import org.elastos.hive.vendors.onedrive.network.Model.CreateDirRequest;
-import org.elastos.hive.vendors.onedrive.network.Model.DirChildrenResponse;
-import org.elastos.hive.vendors.onedrive.network.Model.MoveAndCopyReqest;
-import org.elastos.hive.vendors.onedrive.network.Model.DriveResponse;
-import org.elastos.hive.vendors.onedrive.network.Model.FileOrDirPropResponse;
-import org.elastos.hive.vendors.connection.Model.NoBodyEntity;
+import org.elastos.hive.vendors.onedrive.network.model.CreateDirRequest;
+import org.elastos.hive.vendors.onedrive.network.model.DirChildrenResponse;
+import org.elastos.hive.vendors.onedrive.network.model.MoveAndCopyReqest;
+import org.elastos.hive.vendors.onedrive.network.model.DriveResponse;
+import org.elastos.hive.vendors.onedrive.network.model.FileOrDirPropResponse;
+import org.elastos.hive.vendors.connection.model.NoBodyEntity;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -36,6 +36,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -88,7 +89,7 @@ public interface OneDriveApi {
     Call<DirChildrenResponse> getChildren(@Path("path") String path);
 
     @GET(OneDriveConstance.DRIVE+"/root:{path}:/content")
-    Call<ResponseBody> read(@Path("path") String path);
+    Call<ResponseBody> read(@Header("Accept-Encoding") String acceptEncoding, @Path("path") String path);
 
     @PUT(OneDriveConstance.DRIVE+"/root:{path}:/content")
     Call<NoBodyEntity> write(@Path("path") String path, @Body RequestBody body);

@@ -31,12 +31,15 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 
 public class StringConverterFactory extends Converter.Factory {
+    public static final StringConverterFactory create() {
+        return new StringConverterFactory();
+    }
     @Override
     public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
         if (type == String.class) {
             return new StringConverter();
         }
-        return null;
+        return super.responseBodyConverter(type, annotations, retrofit);
     }
 
     class StringConverter implements Converter<ResponseBody, String> {

@@ -30,10 +30,7 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.ItemInfo;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
-import org.elastos.hive.vendors.connection.BaseServiceUtil;
-import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.connection.Model.HeaderConfig;
-import org.elastos.hive.vendors.ipfs.network.IPFSApi;
+import org.elastos.hive.vendors.connection.ConnectionManager;
 import org.elastos.hive.vendors.ipfs.network.model.ListChildResponse;
 import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 
@@ -348,10 +345,9 @@ class IPFSDirectory extends Directory  {
 		final String newPath = String.format("%s/%s", path, name);
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
-			Call call = ipfsApi.moveTo(rpcHelper.getIpfsEntry().getUid(), pathName, newPath);
-			call.enqueue(new IPFSDirForResultCallback(future,value,newPath, IPFSConstance.Type.MOVE_TO));
+			ConnectionManager.getIPFSApi()
+					.moveTo(rpcHelper.getIpfsEntry().getUid(), pathName, newPath)
+					.enqueue(new IPFSDirForResultCallback(future,value,newPath, IPFSConstance.Type.MOVE_TO));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -420,10 +416,9 @@ class IPFSDirectory extends Directory  {
 		final String newPath = String.format("%s/%s", path, name);
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
-			Call call = ipfsApi.copyTo(rpcHelper.getIpfsEntry().getUid(), IPFSConstance.PREFIX + hash, newPath);
-			call.enqueue(new IPFSDirForResultCallback(future,value,null, IPFSConstance.Type.COPY_TO));
+			ConnectionManager.getIPFSApi()
+					.copyTo(rpcHelper.getIpfsEntry().getUid(), IPFSConstance.PREFIX + hash, newPath)
+					.enqueue(new IPFSDirForResultCallback(future,value,null, IPFSConstance.Type.COPY_TO));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -465,10 +460,9 @@ class IPFSDirectory extends Directory  {
 		}
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
-			Call call = ipfsApi.deleteItem(rpcHelper.getIpfsEntry().getUid(), pathName, "true");
-			call.enqueue(new IPFSDirForResultCallback(future, value, null, IPFSConstance.Type.DELETE_ITEM));
+			ConnectionManager.getIPFSApi()
+					.deleteItem(rpcHelper.getIpfsEntry().getUid(), pathName, "true")
+					.enqueue(new IPFSDirForResultCallback(future, value, null, IPFSConstance.Type.DELETE_ITEM));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -500,10 +494,9 @@ class IPFSDirectory extends Directory  {
 		}
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
-			Call call = ipfsApi.list(getId(), pathName);
-			call.enqueue(new IPFSDirForResultCallback(future, value, null, IPFSConstance.Type.GET_CHILDREN));
+			ConnectionManager.getIPFSApi()
+					.list(getId(), pathName)
+					.enqueue(new IPFSDirForResultCallback(future, value, null, IPFSConstance.Type.GET_CHILDREN));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -519,28 +512,12 @@ class IPFSDirectory extends Directory  {
 			switch (type) {
 				case CREATE_FILE:
 					String contentType = String.format("multipart/form-data; boundary=%s", UUID.randomUUID().toString());
-					HeaderConfig headerConfig = new HeaderConfig.Builder()
-							.contentType(contentType)
-							.build();
-					BaseServiceConfig config = new BaseServiceConfig.Builder()
-							.headerConfig(headerConfig)
-							.ignoreReturnBody(true)
-							.build();
-					IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, url, config);
-					call = ipfsApi.createFile(uid, path, true);
+					call = ConnectionManager.getIPFSApi()
+							.createFile(contentType , uid, path, true);
 					break;
 				case MKDIR:
-					BaseServiceConfig mkdirConfig = new BaseServiceConfig.Builder()
-							.ignoreReturnBody(true)
-							.build();
-					IPFSApi ipfsMkdirApi = BaseServiceUtil.createService(IPFSApi.class, url, mkdirConfig);
-					call = ipfsMkdirApi.mkdir(uid,path,"false");
-					break;
-				case MOVE_TO:
-					break;
-				case COPY_TO:
-					break;
-				case DELETE_ITEM:
+					call = ConnectionManager.getIPFSApi()
+							.mkdir(uid,path,"false");
 					break;
 			}
 
@@ -563,11 +540,8 @@ class IPFSDirectory extends Directory  {
 				case GET_INFO:
 				case GET_DIR:
 				case GET_FILE:
-					BaseServiceConfig ipfsConfig = new BaseServiceConfig.Builder().build();
-					IPFSApi ipfsStatApi = BaseServiceUtil.createService(IPFSApi.class , url , ipfsConfig);
-					call = ipfsStatApi.getStat(uid , path);
-					break;
-				case LIST:
+					call = ConnectionManager.getIPFSApi()
+							.getStat(uid , path);
 					break;
 			}
 

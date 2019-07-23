@@ -32,11 +32,9 @@ import org.elastos.hive.NullCallback;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.CacheHelper;
-import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.connection.Model.HeaderConfig;
-import org.elastos.hive.vendors.onedrive.network.Model.DriveResponse;
-import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
-import org.elastos.hive.vendors.connection.BaseServiceUtil;
+import org.elastos.hive.vendors.connection.ConnectionManager;
+import org.elastos.hive.vendors.connection.model.BaseServiceConfig;
+import org.elastos.hive.vendors.onedrive.network.model.DriveResponse;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -63,6 +61,13 @@ public final class OneDriveClient extends Client {
 		persistent = new KeyStore(parameter.getKeyStorePath());
 		this.authHelper = new OneDriveAuthHelper(parameter.getAuthEntry(), persistent);
 		CacheHelper.initialize(parameter.getKeyStorePath());
+
+		try {
+			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+			ConnectionManager.resetOneDriveApi(OneDriveConstance.ONE_DRIVE_API_BASE_URL,config);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static Client createInstance(OneDriveParameter parameter) {
@@ -135,16 +140,9 @@ public final class OneDriveClient extends Client {
 			callback = new NullCallback<Client.Info>();
 
 		try {
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.build();
-			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = oneDriveApi.getInfo();
-			call.enqueue(new DriveClientCallback(future , callback , Type.GET_INFO));
+			ConnectionManager.getOnedriveApi()
+					.getInfo()
+					.enqueue(new DriveClientCallback(future , callback , Type.GET_INFO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -172,15 +170,9 @@ public final class OneDriveClient extends Client {
 			callback = new NullCallback<Drive>();
 
 		try {
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.build();
-			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class, OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = oneDriveApi.getDrive();
-			call.enqueue(new DriveClientCallback(future , callback , Type.GET_DEFAULT_DRIVE));
+			ConnectionManager.getOnedriveApi()
+					.getDrive()
+					.enqueue(new DriveClientCallback(future , callback , Type.GET_DEFAULT_DRIVE));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);

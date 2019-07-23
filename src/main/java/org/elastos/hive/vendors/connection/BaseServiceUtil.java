@@ -24,7 +24,7 @@ package org.elastos.hive.vendors.connection;
 
 import org.elastos.hive.utils.CheckTextUtil;
 import org.elastos.hive.utils.LogUtil;
-import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
+import org.elastos.hive.vendors.connection.model.BaseServiceConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -43,26 +43,18 @@ public class BaseServiceUtil {
                 .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
-
-        if (baseServiceConfig.isIgnoreReturnbody()){
-            retrofitBuilder.addConverterFactory(NobodyConverterFactory.create());
-        }
-
-        if (baseServiceConfig.isUseGsonConverter()){
-            retrofitBuilder.addConverterFactory(GsonConverterFactory.create());
-        }else{
-            retrofitBuilder.addConverterFactory(new StringConverterFactory());
-        }
-
         if (!CheckTextUtil.isEmpty(baseUrl)) {
             retrofitBuilder.baseUrl(baseUrl);
         } else{
             throw new Exception("base url must not null , and end of /");
         }
 
-        clientBuilder.interceptors().clear();
+        retrofitBuilder.addConverterFactory(StringConverterFactory.create());
+        retrofitBuilder.addConverterFactory(NobodyConverterFactory.create());
+        retrofitBuilder.addConverterFactory(GsonConverterFactory.create());
 
-        if (baseServiceConfig.getHeaderConfig()!=null){
+        clientBuilder.interceptors().clear();
+        if (baseServiceConfig!=null && baseServiceConfig.getHeaderConfig()!=null){
             HeaderInterceptor headerInterceptor = new HeaderInterceptor(baseServiceConfig.getHeaderConfig());
             clientBuilder.interceptors().add(headerInterceptor);
         }
@@ -74,6 +66,7 @@ public class BaseServiceUtil {
 
         OkHttpClient client = clientBuilder.build();
         Retrofit retrofit = retrofitBuilder.client(client).build();
+
         return retrofit.create(serviceClass);
     }
 }

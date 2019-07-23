@@ -20,32 +20,17 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendors.connection.Model;
+package org.elastos.hive.vendors.connection.model;
 
 public class BaseServiceConfig {
-
-    private final boolean useGsonConverter ;
-    private final boolean ignoreReturnbody;
     private final HeaderConfig headerConfig ;
 
     private BaseServiceConfig(){
-        this.useGsonConverter = true;
-        this.ignoreReturnbody = false;
         this.headerConfig = null ;
     }
 
     private BaseServiceConfig(Builder builder){
-        this.useGsonConverter = builder.useGsonConverter;
-        this.ignoreReturnbody = builder.ignoreReturnbody;
         this.headerConfig = builder.headerConfig ;
-    }
-
-    public boolean isUseGsonConverter() {
-        return useGsonConverter;
-    }
-
-    public boolean isIgnoreReturnbody() {
-        return ignoreReturnbody;
     }
 
     public HeaderConfig getHeaderConfig() {
@@ -53,24 +38,10 @@ public class BaseServiceConfig {
     }
 
     public static final class Builder {
-        boolean useGsonConverter ;
-        boolean ignoreReturnbody;
         HeaderConfig headerConfig ;
 
         public Builder() {
-            this.useGsonConverter = true ;
-            this.ignoreReturnbody = false ;
             this.headerConfig = null ;
-        }
-
-        public Builder useGsonConverter(boolean flag){
-            this.useGsonConverter = flag ;
-            return this;
-        }
-
-        public Builder ignoreReturnBody(boolean flag){
-            this.ignoreReturnbody = flag ;
-            return this;
         }
 
         public Builder headerConfig(HeaderConfig headerConfig){

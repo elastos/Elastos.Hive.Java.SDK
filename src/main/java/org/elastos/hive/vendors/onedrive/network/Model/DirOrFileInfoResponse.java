@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendors.onedrive.network.Model;
+package org.elastos.hive.vendors.onedrive.network.model;
 
 /*
 {

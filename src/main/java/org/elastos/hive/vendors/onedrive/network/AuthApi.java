@@ -23,7 +23,7 @@
 package org.elastos.hive.vendors.onedrive.network;
 
 import org.elastos.hive.vendors.onedrive.OneDriveConstance;
-import org.elastos.hive.vendors.onedrive.network.Model.TokenResponse;
+import org.elastos.hive.vendors.onedrive.network.model.TokenResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Field;

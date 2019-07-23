@@ -34,9 +34,8 @@ import org.elastos.hive.Length;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.UrlUtil;
-import org.elastos.hive.vendors.connection.BaseServiceUtil;
-import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.ipfs.network.IPFSApi;
+import org.elastos.hive.vendors.connection.ConnectionManager;
+import org.elastos.hive.vendors.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendors.ipfs.network.model.ResolveResponse;
 import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
@@ -339,13 +338,7 @@ class IPFSRpcHelper implements AuthHelper {
 	private String getUidInfo(String url , String uid){
 		String peerId = null;
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
-			Call call = ipfsApi.getUidInfo(uid);
-
-			Response response = call.execute();
-
+			Response response = ConnectionManager.getIPFSApi().getUidInfo(uid).execute();
 			if (response.code() == 200){
 				UIDResponse uidResponse = (UIDResponse) response.body();
 				peerId = uidResponse.getPeerID();
@@ -359,13 +352,7 @@ class IPFSRpcHelper implements AuthHelper {
 
 	private boolean login(String url , String uid , String hash){
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.ignoreReturnBody(true)
-					.build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
-			Call call = ipfsApi.login(uid , hash);
-			Response response = call.execute();
-
+			Response response = ConnectionManager.getIPFSApi().login(uid,hash).execute();
 			if (response.code()==200){
 				return true ;
 			}
@@ -379,9 +366,8 @@ class IPFSRpcHelper implements AuthHelper {
 		String path = null;
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
-			Call call = ipfsApi.resolve(peerId);
-			Response response = call.execute();
+			ConnectionManager.resetIPFSApi(url,config);
+			Response response = ConnectionManager.getIPFSApi().resolve(peerId).execute();
 
 			if (response.code() == 200){
 				ResolveResponse resolveResponse = (ResolveResponse) response.body();
@@ -399,11 +385,9 @@ class IPFSRpcHelper implements AuthHelper {
 	private void getStat(CompletableFuture future , PackValue value ,
 						 String url , String uid , String path){
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
-			Call call = ipfsApi.getStat(uid,path);
-			call.enqueue(new IPFSRpcCallback(future,value,IPFSConstance.Type.GET_STAT));
+			ConnectionManager.getIPFSApi()
+					.getStat(uid,path)
+					.enqueue(new IPFSRpcCallback(future,value,IPFSConstance.Type.GET_STAT));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			value.setException(e);
@@ -415,11 +399,9 @@ class IPFSRpcHelper implements AuthHelper {
 	private void publish(CompletableFuture future , PackValue value ,
 						 String url , String uid , String path){
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
-			Call call = ipfsApi.publish(uid,path);
-			call.enqueue(new IPFSRpcCallback(future,value,IPFSConstance.Type.PUBLISH));
+			ConnectionManager.getIPFSApi()
+					.publish(uid,path)
+					.enqueue(new IPFSRpcCallback(future,value,IPFSConstance.Type.PUBLISH));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			value.setException(e);
