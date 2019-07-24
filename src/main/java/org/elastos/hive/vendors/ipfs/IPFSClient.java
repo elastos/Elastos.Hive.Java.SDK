@@ -46,6 +46,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
@@ -162,15 +163,21 @@ public final class IPFSClient extends Client {
 
 	@Override
 	public CompletableFuture<Client.Info> getInfo(Callback<Client.Info> callback) {
-		return rpcHelper.checkExpired()
-				.thenCompose(padding -> getInfo(padding, callback));
+		return rpcHelper.checkExpiredNew()
+				.thenCompose(value -> getInfo(value, callback));
 	}
 
-	private CompletableFuture<Client.Info> getInfo(Void padding, Callback<Client.Info> callback) {
+	private CompletableFuture<Client.Info> getInfo(PackValue value, Callback<Client.Info> callback) {
 		CompletableFuture<Client.Info> future = new CompletableFuture<Client.Info>();
 
 		if (callback == null)
 			callback = new NullCallback<Client.Info>();
+
+		if (value.getException() != null) {
+			callback.onError(value.getException());
+			future.completeExceptionally(value.getException());
+			return future;
+		}
 
 		getStat(future,callback,rpcHelper.getBaseUrl(),
 				getId(),"/" , IPFSConstance.Type.GET_INFO);
@@ -185,15 +192,21 @@ public final class IPFSClient extends Client {
 
 	@Override
 	public CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback) {
-		return rpcHelper.checkExpired()
-				.thenCompose(padding -> getDefaultDrive(padding, callback));
+		return rpcHelper.checkExpiredNew()
+				.thenCompose(value -> getDefaultDrive(value, callback));
 	}
 
-	private CompletableFuture<Drive> getDefaultDrive(Void padding, Callback<Drive> callback) {
+	private CompletableFuture<Drive> getDefaultDrive(PackValue value, Callback<Drive> callback) {
 		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
 
 		if (callback == null)
 			callback = new NullCallback<Drive>();
+
+		if (value.getException() != null) {
+			callback.onError(value.getException());
+			future.completeExceptionally(value.getException());
+			return future;
+		}
 
 		getStat(future,callback,rpcHelper.getBaseUrl(),
 				getId(),"/" , IPFSConstance.Type.GET_DEFAULT_DRIVE);
@@ -206,11 +219,10 @@ public final class IPFSClient extends Client {
 		if (addrs != null) {
 			for (int i = 0; i < addrs.length; i++) {
 				try {
-					BaseServiceConfig config = new BaseServiceConfig.Builder().build();
 					String requestUrl = UrlUtil.checkPort(addrs[i],IPFSConstance.DEFAULT_PORT);
 					String url = String.format(IPFSConstance.URLFORMAT, requestUrl);
 
-					ConnectionManager.resetIPFSApi(url,config);
+					ConnectionManager.resetIPFSApi(url);
 					Response response = ConnectionManager.getIPFSApi().getNewUid().execute();
 					if (response.code() == 200){
 						rpcHelper.setValidAddress(addrs[i]);
@@ -399,10 +411,13 @@ public final class IPFSClient extends Client {
 
 		@Override
 		public void onFailure(Call call, Throwable t) {
+			if (t instanceof SocketTimeoutException) {
+				rpcHelper.setStatus(false);
+			}
+
 			HiveException e = new HiveException(t.getMessage());
 			this.callback.onError(e);
 			future.completeExceptionally(e);
 		}
 	}
-
 }

@@ -35,20 +35,23 @@ import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendors.connection.ConnectionManager;
-import org.elastos.hive.vendors.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendors.ipfs.network.model.ResolveResponse;
 import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
+import org.json.JSONObject;
 
+import java.net.SocketTimeoutException;
 import java.util.concurrent.CompletableFuture;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
 class IPFSRpcHelper implements AuthHelper {
-	static final String CONFIG      = "ipfs.json";
-	static final String LASTUID     = "last_uid";
-	static final String UIDS        = "uids";
+	static final String CONFIG       = "ipfs.json";
+	static final String LASTUID      = "last_uid";
+	static final String UIDS         = "uids";
+	static final String DEF_LIFETIME = "1000h";
+	static final String NOT_PUB      = "routing: not found";
 
 	private final IPFSEntry entry;
 	private boolean isValid = false;
@@ -137,11 +140,15 @@ class IPFSRpcHelper implements AuthHelper {
 				}
 
 				if (homeHash == null) {
+				    padding.setException(new HiveException("The PRC addresses cant be connected now."));
 					return padding;
 				}
 
 				if (login(BASEURL , entry.getUid() , homeHash)){
 					isValid = true;
+				}
+				else {
+					padding.setException(new HiveException("Connect to ipfs failed."));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -184,6 +191,8 @@ class IPFSRpcHelper implements AuthHelper {
 					for (int i = 0; i < addrs.length; i++) {
 						String requestUrl = UrlUtil.checkPort(addrs[i],IPFSConstance.DEFAULT_PORT);
 						String url = String.format(IPFSConstance.URLFORMAT, requestUrl);
+
+						ConnectionManager.resetIPFSApi(url);
 						homeHash = getHomeHash(url,entry.getUid());
 						if (homeHash != null && !homeHash.isEmpty()) {
 							BASEURL = url;
@@ -195,12 +204,17 @@ class IPFSRpcHelper implements AuthHelper {
 
 				if (homeHash == null) {
 					placeHolder = new Void();
-				    callback.onSuccess(placeHolder);
+				    callback.onError(new HiveException("The PRC addresses cant be connected now."));
 					return placeHolder;
 				}
 
 				if (login(BASEURL , entry.getUid() , homeHash)) {
 					isValid = true;
+				}
+				else {
+					placeHolder = new Void();
+				        callback.onError(new HiveException("Login failed."));
+					return placeHolder;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -309,7 +323,7 @@ class IPFSRpcHelper implements AuthHelper {
 		future.complete(object);
 		return future;
 	}
-	
+
 	boolean isFile(String type) {
 		return type != null && type.equals("file");
 	}
@@ -322,17 +336,20 @@ class IPFSRpcHelper implements AuthHelper {
 		return BASEURL;
 	}
 
-	void setStatus(boolean invalid) {
-		isValid = invalid;
+	void setStatus(boolean valid) {
+		isValid = valid;
 	}
 
 	void setValidAddress(String validAddress) {
 		this.validAddress = validAddress;
 	}
 
-   String getHomeHash(String baseUrl , String uid) {
+   String getHomeHash(String baseUrl, String uid) {
 	   String peerID = getUidInfo(baseUrl , uid);
-	   return resolve(baseUrl , peerID);
+	   if (peerID == null)
+		   return null;
+
+	   return resolve(baseUrl, uid, peerID);
 	}
 
 	private String getUidInfo(String url , String uid){
@@ -347,7 +364,7 @@ class IPFSRpcHelper implements AuthHelper {
 			e.printStackTrace();
 		}
 
-		return peerId ;
+		return peerId;
 	}
 
 	private boolean login(String url , String uid , String hash){
@@ -362,24 +379,69 @@ class IPFSRpcHelper implements AuthHelper {
 		return false ;
 	}
 
-	private String resolve(String url , String peerId){
+	private String resolve(String url, String uid, String peerId){
 		String path = null;
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-			ConnectionManager.resetIPFSApi(url,config);
+			ConnectionManager.resetIPFSApi(url);
 			Response response = ConnectionManager.getIPFSApi().resolve(peerId).execute();
 
 			if (response.code() == 200){
 				ResolveResponse resolveResponse = (ResolveResponse) response.body();
 				path = resolveResponse.getPath();
-			}else {
-				//TODO callback exception
+			} else if (response.code() == 500){
+				//json: {"Message":"routing: not found","Code":0,"Type":"error"}
+				//1. get the root hash.
+				String errMsg = new JSONObject(response.errorBody().string()).getString("Message");
+				if (NOT_PUB.equals(errMsg)) {
+					String hash = getHashOnce(url, uid, "/");
+					if (hash != null) {
+						//2. publish the uid.
+						response = ConnectionManager.getIPFSApi().publish(uid, DEF_LIFETIME, hash).execute();
+						if (response.code() == 200) {
+							//3. resolve again.
+							return resolveOnce(url, peerId);
+						}
+					}
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return path ;
+		return path;
+	}
+
+	private String resolveOnce(String url, String peerId){
+		String path = null;
+		try {
+			ConnectionManager.resetIPFSApi(url);
+			Response response = ConnectionManager.getIPFSApi().resolve(peerId).execute();
+			if (response.code() == 200){
+				ResolveResponse resolveResponse = (ResolveResponse) response.body();
+				path = resolveResponse.getPath();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return path;
+	}
+
+	private String getHashOnce(String url, String uid, String path){
+		String hash = null;
+		try {
+			ConnectionManager.resetIPFSApi(url);
+			Response response = ConnectionManager.getIPFSApi().getStat(uid, path).execute();
+
+			if (response.code() == 200){
+				StatResponse statResponse = (StatResponse) response.body();
+				hash = statResponse.getHash();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return hash;
 	}
 
 	private void getStat(CompletableFuture future , PackValue value ,
@@ -393,14 +455,13 @@ class IPFSRpcHelper implements AuthHelper {
 			value.setException(e);
 			future.completeExceptionally(e);
 		}
-
 	}
 
 	private void publish(CompletableFuture future , PackValue value ,
 						 String url , String uid , String path){
 		try {
 			ConnectionManager.getIPFSApi()
-					.publish(uid,path)
+					.publish(uid, DEF_LIFETIME, path)
 					.enqueue(new IPFSRpcCallback(future,value,IPFSConstance.Type.PUBLISH));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
@@ -443,6 +504,10 @@ class IPFSRpcHelper implements AuthHelper {
 
 		@Override
 		public void onFailure(Call call, Throwable t) {
+			if (t instanceof SocketTimeoutException) {
+				setStatus(false);
+			}
+
 			HiveException e = new HiveException(t.getMessage());
 			this.value.setException(e);
 			future.completeExceptionally(e);

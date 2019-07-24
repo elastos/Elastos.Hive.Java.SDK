@@ -101,9 +101,9 @@ public class ConnectionManager {
         updateOneDriveConfig(baseServiceConfig);
     }
 
-    public static void resetIPFSApi(String baseUrl , BaseServiceConfig baseServiceConfig) throws Exception {
+    public static void resetIPFSApi(String baseUrl) throws Exception {
         ipfsApi = null ;
         updateIPFSBaseUrl(baseUrl);
-        updateIPFSConfig(baseServiceConfig);
+        updateIPFSConfig(new BaseServiceConfig.Builder().build());
     }
 }

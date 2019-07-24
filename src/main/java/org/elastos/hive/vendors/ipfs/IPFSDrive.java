@@ -33,6 +33,7 @@ import org.elastos.hive.NullCallback;
 import org.elastos.hive.vendors.connection.ConnectionManager;
 import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -125,6 +126,7 @@ final class IPFSDrive extends Drive{
 		value.setCallback(callback);
 
 		if (value.getException() != null) {
+			callback.onError(value.getException());
 			future.completeExceptionally(value.getException());
 			return future;
 		}
@@ -213,6 +215,7 @@ final class IPFSDrive extends Drive{
 		value.setCallback(callback);
 
 		if (value.getException() != null) {
+			callback.onError(value.getException());
 			future.completeExceptionally(value.getException());
 			return future;
 		}
@@ -432,6 +435,10 @@ final class IPFSDrive extends Drive{
 
 		@Override
 		public void onFailure(Call call, Throwable t) {
+			if (t instanceof SocketTimeoutException) {
+				rpcHelper.setStatus(false);
+			}
+
 			HiveException e = new HiveException(t.getMessage());
 			value.setException(e);
 			future.completeExceptionally(e);
@@ -554,6 +561,10 @@ final class IPFSDrive extends Drive{
 
 		@Override
 		public void onFailure(Call call, Throwable t) {
+			if (t instanceof SocketTimeoutException) {
+				rpcHelper.setStatus(false);
+			}
+			
 			HiveException e = new HiveException(t.getMessage());
 			this.callback.onError(e);
 			future.completeExceptionally(e);
