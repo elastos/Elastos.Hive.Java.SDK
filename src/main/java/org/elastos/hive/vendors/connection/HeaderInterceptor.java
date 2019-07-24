@@ -22,7 +22,7 @@
 
 package org.elastos.hive.vendors.connection;
 
-import org.elastos.hive.vendors.connection.Model.HeaderConfig;
+import org.elastos.hive.vendors.connection.model.HeaderConfig;
 
 import java.io.IOException;
 

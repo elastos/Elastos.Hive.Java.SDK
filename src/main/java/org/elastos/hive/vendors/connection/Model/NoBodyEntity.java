@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendors.connection.Model;
+package org.elastos.hive.vendors.connection.model;
 
 public class NoBodyEntity {
 }

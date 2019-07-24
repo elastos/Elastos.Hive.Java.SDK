@@ -22,7 +22,7 @@
 
 package org.elastos.hive.vendors.connection;
 
-import org.elastos.hive.vendors.connection.Model.NoBodyEntity;
+import org.elastos.hive.vendors.connection.model.NoBodyEntity;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;

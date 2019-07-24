@@ -21,7 +21,7 @@ dependencies {
     api 'org.apache.commons:commons-math3:3.6.1'
     testImplementation 'junit:junit:4.12'
 
-    api files('libs/nanohttpd.jar')
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
 }
 
 jar {

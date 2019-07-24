@@ -31,14 +31,11 @@ import org.elastos.hive.HiveException;
 import org.elastos.hive.ItemInfo;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
-import org.elastos.hive.vendors.connection.BaseServiceUtil;
-import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.connection.Model.HeaderConfig;
-import org.elastos.hive.vendors.onedrive.network.Model.CreateDirRequest;
-import org.elastos.hive.vendors.onedrive.network.Model.DirChildrenResponse;
-import org.elastos.hive.vendors.onedrive.network.Model.FileOrDirPropResponse;
-import org.elastos.hive.vendors.onedrive.network.Model.MoveAndCopyReqest;
-import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
+import org.elastos.hive.vendors.connection.ConnectionManager;
+import org.elastos.hive.vendors.onedrive.network.model.CreateDirRequest;
+import org.elastos.hive.vendors.onedrive.network.model.DirChildrenResponse;
+import org.elastos.hive.vendors.onedrive.network.model.FileOrDirPropResponse;
+import org.elastos.hive.vendors.onedrive.network.model.MoveAndCopyReqest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,16 +97,9 @@ class OneDriveDirectory extends Directory {
 			callback = new NullCallback<Directory.Info>();
 
 		try {
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.build();
-			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = oneDriveApi.getDirAndFileInfo(pathName);
-			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.GET_INFO));
+			ConnectionManager.getOnedriveApi()
+					.getDirAndFileInfo(pathName)
+					.enqueue(new DirectoryCallback(future , callback ,pathName, Type.GET_INFO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -162,17 +152,9 @@ class OneDriveDirectory extends Directory {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
 
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.ignoreReturnBody(true)
-					.build();
-			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = oneDriveApi.moveTo(this.pathName , new MoveAndCopyReqest(pathName,name));
-			call.enqueue(new DirectoryCallback(future , callback ,pathName+"/"+name, Type.MOVE_TO));
+			ConnectionManager.getOnedriveApi()
+					.moveTo(this.pathName , new MoveAndCopyReqest(pathName,name))
+					.enqueue(new DirectoryCallback(future , callback ,pathName+"/"+name, Type.MOVE_TO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -224,17 +206,9 @@ class OneDriveDirectory extends Directory {
 			int LastPos = this.pathName.lastIndexOf("/");
 			String name = this.pathName.substring(LastPos + 1);
 
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.ignoreReturnBody(true)
-					.build();
-			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = oneDriveApi.copyTo(this.pathName , new MoveAndCopyReqest(pathName,name));
-			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.COPY_TO));
+			ConnectionManager.getOnedriveApi()
+					.copyTo(this.pathName , new MoveAndCopyReqest(pathName,name))
+					.enqueue(new DirectoryCallback(future , callback ,pathName, Type.COPY_TO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -269,18 +243,9 @@ class OneDriveDirectory extends Directory {
 		}
 
 		try {
-
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.ignoreReturnBody(true)
-					.build();
-			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = oneDriveApi.deleteItem(this.pathName);
-			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.DELETE_ITEM));
+			ConnectionManager.getOnedriveApi()
+					.deleteItem(this.pathName)
+					.enqueue(new DirectoryCallback(future , callback ,pathName, Type.DELETE_ITEM));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -315,18 +280,10 @@ class OneDriveDirectory extends Directory {
 		}
 
         try {
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.ignoreReturnBody(true)
-					.build();
-            CreateDirRequest createDirRequest = new CreateDirRequest(name);
-            OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
-            Call call = oneDriveApi.createDirFromDir(this.pathName, createDirRequest);
-            call.enqueue(new DirectoryCallback(future , callback ,this.pathName+"/"+name, Type.CREATE_DIR));
+			CreateDirRequest createDirRequest = new CreateDirRequest(name);
+			ConnectionManager.getOnedriveApi()
+					.createDirFromDir(this.pathName, createDirRequest)
+					.enqueue(new DirectoryCallback(future , callback ,this.pathName+"/"+name, Type.CREATE_DIR));
         } catch (Exception ex) {
         	HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -362,17 +319,9 @@ class OneDriveDirectory extends Directory {
 		String path = this.pathName + "/" +name ;
 
 		try {
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.ignoreReturnBody(true)
-					.build();
-			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = oneDriveApi.getDirFromDir(path);
-			call.enqueue(new DirectoryCallback(future , callback ,path, Type.GET_DIR));
+			ConnectionManager.getOnedriveApi()
+					.getDirFromDir(path)
+					.enqueue(new DirectoryCallback(future , callback ,path, Type.GET_DIR));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -408,16 +357,9 @@ class OneDriveDirectory extends Directory {
 		String path = this.pathName+"/"+name ;
 
 		try {
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.build();
-			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-					OneDriveConstance.ONE_DRIVE_API_BASE_URL, config);
-			Call call = oneDriveApi.createFile(path);
-			call.enqueue(new DirectoryCallback(future , callback , path , Type.CREATE_FILE));
+			ConnectionManager.getOnedriveApi()
+					.createFile(path)
+					.enqueue(new DirectoryCallback(future , callback , path , Type.CREATE_FILE));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -453,16 +395,9 @@ class OneDriveDirectory extends Directory {
 		String path = this.pathName+"/"+name;
 
 		try {
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.build();
-			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-					OneDriveConstance.ONE_DRIVE_API_BASE_URL ,config);
-			Call call = oneDriveApi.getFileFromDir(path);
-			call.enqueue(new DirectoryCallback(future , callback , path , Type.GET_FILE));
+			ConnectionManager.getOnedriveApi()
+					.getFileFromDir(path)
+					.enqueue(new DirectoryCallback(future , callback , path , Type.GET_FILE));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -490,16 +425,9 @@ class OneDriveDirectory extends Directory {
 			callback = new NullCallback<Children>();
 
 		try {
-			HeaderConfig headerConfig = new HeaderConfig.Builder()
-					.authToken(authHelper.getToken())
-					.build();
-			BaseServiceConfig config = new BaseServiceConfig.Builder()
-					.headerConfig(headerConfig)
-					.build();
-			OneDriveApi oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-					OneDriveConstance.ONE_DRIVE_API_BASE_URL ,config);
-			Call call = oneDriveApi.getChildren(this.pathName);
-			call.enqueue(new DirectoryCallback(future , callback , this.pathName , Type.GET_CHILDREN));
+			ConnectionManager.getOnedriveApi()
+					.getChildren(this.pathName)
+					.enqueue(new DirectoryCallback(future , callback , this.pathName , Type.GET_CHILDREN));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);

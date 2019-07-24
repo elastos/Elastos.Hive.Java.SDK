@@ -30,11 +30,8 @@ import org.elastos.hive.File;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.ItemInfo;
 import org.elastos.hive.NullCallback;
+import org.elastos.hive.vendors.connection.ConnectionManager;
 import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
-import org.elastos.hive.vendors.ipfs.network.IPFSApi;
-import org.elastos.hive.vendors.connection.BaseServiceUtil;
-import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.connection.Model.HeaderConfig;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -331,22 +328,12 @@ final class IPFSDrive extends Drive{
 			switch (type) {
 				case CREATE_FILE:
 					String contentType = String.format("multipart/form-data; boundary=%s", UUID.randomUUID().toString());
-					HeaderConfig headerConfig = new HeaderConfig.Builder()
-							.contentType(contentType)
-							.build();
-					BaseServiceConfig config = new BaseServiceConfig.Builder()
-							.headerConfig(headerConfig)
-							.ignoreReturnBody(true)
-							.build();
-					IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, url, config);
-					call = ipfsApi.createFile(uid, path, true);
+					call = ConnectionManager.getIPFSApi()
+							.createFile(contentType,uid, path, true);
 					break;
 				case MKDIR:
-					BaseServiceConfig mkdirConfig = new BaseServiceConfig.Builder()
-							.ignoreReturnBody(true)
-							.build();
-					IPFSApi ipfsMkdirApi = BaseServiceUtil.createService(IPFSApi.class, url, mkdirConfig);
-					call = ipfsMkdirApi.mkdir(uid,path,"false");
+					call = ConnectionManager.getIPFSApi()
+							.mkdir(uid,path,"false");
 					break;
 			}
 
@@ -370,9 +357,8 @@ final class IPFSDrive extends Drive{
 				case GET_DIR:
 				case GET_FILE:
 				case GET_ITEMINFO:
-					BaseServiceConfig ipfsConfig = new BaseServiceConfig.Builder().build();
-					IPFSApi ipfsStatApi = BaseServiceUtil.createService(IPFSApi.class , url , ipfsConfig);
-					call = ipfsStatApi.getStat(uid , path);
+					call = ConnectionManager.getIPFSApi()
+							.getStat(uid , path);
 					break;
 			}
 

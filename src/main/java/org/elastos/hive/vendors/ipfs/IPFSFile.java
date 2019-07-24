@@ -30,9 +30,7 @@ import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.CacheHelper;
 import org.elastos.hive.utils.HeaderUtil;
-import org.elastos.hive.vendors.connection.BaseServiceUtil;
-import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
-import org.elastos.hive.vendors.ipfs.network.IPFSApi;
+import org.elastos.hive.vendors.connection.ConnectionManager;
 import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 
 import java.io.FileInputStream;
@@ -99,10 +97,9 @@ final class IPFSFile extends File {
 		}
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
-			Call call = ipfsApi.getStat(getId(), pathName);
-			call.enqueue(new IPFSFileCallback(future, callback, IPFSConstance.Type.GET_INFO));
+			ConnectionManager.getIPFSApi()
+					.getStat(getId(), pathName)
+					.enqueue(new IPFSFileCallback(future, callback, IPFSConstance.Type.GET_INFO));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -176,10 +173,9 @@ final class IPFSFile extends File {
 		final String newPath = String.format("%s/%s", path, name);
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
-			Call call = ipfsApi.moveTo(rpcHelper.getIpfsEntry().getUid(), pathName, newPath);
-			call.enqueue(new IPFSFileForResultCallback(future, value, newPath, IPFSConstance.Type.MOVE_TO));
+			ConnectionManager.getIPFSApi()
+					.moveTo(rpcHelper.getIpfsEntry().getUid(), pathName, newPath)
+					.enqueue(new IPFSFileForResultCallback(future, value, newPath, IPFSConstance.Type.MOVE_TO));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -248,10 +244,9 @@ final class IPFSFile extends File {
 		final String newPath = String.format("%s/%s", path, name);
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
-			Call call = ipfsApi.copyTo(rpcHelper.getIpfsEntry().getUid(), IPFSConstance.PREFIX + hash, newPath);
-			call.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.COPY_TO));
+			ConnectionManager.getIPFSApi()
+					.copyTo(rpcHelper.getIpfsEntry().getUid(), IPFSConstance.PREFIX + hash, newPath)
+					.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.COPY_TO));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -294,10 +289,9 @@ final class IPFSFile extends File {
 		}
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
-			Call call = ipfsApi.deleteItem(rpcHelper.getIpfsEntry().getUid(), pathName, "true");
-			call.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.DELETE_ITEM));
+			ConnectionManager.getIPFSApi()
+					.deleteItem(rpcHelper.getIpfsEntry().getUid(), pathName, "true")
+					.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.DELETE_ITEM));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -419,14 +413,9 @@ final class IPFSFile extends File {
 		if (!cacheFile.exists()) {
 			//get the file from the remote.
 			try {
-
-				BaseServiceConfig config = new BaseServiceConfig.Builder()
-						.useGsonConverter(false)
-						.build();
-
-				IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
-				Call call = ipfsApi.read(rpcHelper.getIpfsEntry().getUid(), pathName);
-				call.enqueue(new IPFSFileForResultCallback(future, value, 
+				ConnectionManager.getIPFSApi()
+						.read(rpcHelper.getIpfsEntry().getUid(), pathName)
+						.enqueue(new IPFSFileForResultCallback(future, value,
 						CacheHelper.getCacheFileName(pathName), IPFSConstance.Type.READ));
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -620,18 +609,15 @@ final class IPFSFile extends File {
 		}
 
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().ignoreReturnBody(true).build();
-
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class, rpcHelper.getBaseUrl(), config);
-
 			RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), cacheFile);
 			RequestBody requestBody = new MultipartBody.Builder()
-				.setType(MultipartBody.FORM)
-				.addFormDataPart("file", this.pathName, fileBody)
-				.build();
-			
-			Call call = ipfsApi.write(rpcHelper.getIpfsEntry().getUid(), pathName, true, requestBody);
-			call.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.WRITE));
+					.setType(MultipartBody.FORM)
+					.addFormDataPart("file", this.pathName, fileBody)
+					.build();
+
+			ConnectionManager.getIPFSApi()
+					.write(rpcHelper.getIpfsEntry().getUid(), pathName, true, requestBody)
+					.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.WRITE));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			HiveException e = new HiveException(ex.getMessage());

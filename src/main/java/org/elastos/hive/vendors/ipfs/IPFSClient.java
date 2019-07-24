@@ -33,10 +33,9 @@ import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
 import org.elastos.hive.utils.CacheHelper;
 import org.elastos.hive.utils.UrlUtil;
+import org.elastos.hive.vendors.connection.ConnectionManager;
+import org.elastos.hive.vendors.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
-import org.elastos.hive.vendors.ipfs.network.IPFSApi;
-import org.elastos.hive.vendors.connection.BaseServiceUtil;
-import org.elastos.hive.vendors.connection.Model.BaseServiceConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -210,9 +209,9 @@ public final class IPFSClient extends Client {
 					BaseServiceConfig config = new BaseServiceConfig.Builder().build();
 					String requestUrl = UrlUtil.checkPort(addrs[i],IPFSConstance.DEFAULT_PORT);
 					String url = String.format(IPFSConstance.URLFORMAT, requestUrl);
-					IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url, config);
-					Call call = ipfsApi.getNewUid();
-					Response response = call.execute();
+
+					ConnectionManager.resetIPFSApi(url,config);
+					Response response = ConnectionManager.getIPFSApi().getNewUid().execute();
 					if (response.code() == 200){
 						rpcHelper.setValidAddress(addrs[i]);
 						UIDResponse uidResponse = (UIDResponse) response.body();
@@ -307,10 +306,9 @@ public final class IPFSClient extends Client {
 	private void getStat(CompletableFuture future , Callback callback , String url ,
 						 String uid , String path , IPFSConstance.Type type){
 		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-			IPFSApi ipfsApi = BaseServiceUtil.createService(IPFSApi.class , url , config);
-			Call call = ipfsApi.getStat(uid , path);
-			call.enqueue(new IPFSClientCallback(future , callback , type));
+			ConnectionManager.getIPFSApi()
+					.getStat(uid,path)
+					.enqueue(new IPFSClientCallback(future , callback , type));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);

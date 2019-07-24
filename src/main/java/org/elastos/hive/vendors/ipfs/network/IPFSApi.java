@@ -22,7 +22,7 @@
 
 package org.elastos.hive.vendors.ipfs.network;
 
-import org.elastos.hive.vendors.connection.Model.NoBodyEntity;
+import org.elastos.hive.vendors.connection.model.NoBodyEntity;
 import org.elastos.hive.vendors.ipfs.IPFSConstance;
 import org.elastos.hive.vendors.ipfs.network.model.ListChildResponse;
 import org.elastos.hive.vendors.ipfs.network.model.PublishResponse;
@@ -35,6 +35,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -70,7 +71,8 @@ public interface IPFSApi {
                              @Query(IPFSConstance.PARENTS) String parents);
 
     @POST(IPFSConstance.WRITE)
-    Call<NoBodyEntity> createFile(@Query(IPFSConstance.UID) String uid ,
+    Call<NoBodyEntity> createFile(@Header("Content-Type") String contentType ,
+                                  @Query(IPFSConstance.UID) String uid ,
                                   @Query(IPFSConstance.PATH) String path ,
                                   @Query(IPFSConstance.CREATE) boolean create);
 
