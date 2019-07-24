@@ -47,9 +47,6 @@ public interface IPFSApi {
     @GET(IPFSConstance.NAMERESOLVE)
     Call<ResolveResponse> resolve(@Query(IPFSConstance.ARG) String peerId);
 
-//    @GET(IPFSConstance.NAMERESOLVE)
-//    Call<ResolveResponse> resolve();
-
     @POST(IPFSConstance.UID_INFO)
     Call<UIDResponse> getUidInfo(@Query(IPFSConstance.UID) String uid);
 
@@ -58,7 +55,8 @@ public interface IPFSApi {
                              @Query(IPFSConstance.HASH) String hash);
 
     @POST(IPFSConstance.PUBLISH)
-    Call<PublishResponse> publish(@Query(IPFSConstance.UID) String uid ,
+    Call<PublishResponse> publish(@Query(IPFSConstance.UID) String uid,
+                                  @Query(IPFSConstance.LIFETIME) String lifetime,
                                   @Query(IPFSConstance.PATH) String path);
 
     @POST(IPFSConstance.STAT)
