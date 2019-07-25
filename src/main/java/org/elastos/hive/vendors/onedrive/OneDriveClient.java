@@ -34,6 +34,7 @@ import org.elastos.hive.Void;
 import org.elastos.hive.utils.CacheHelper;
 import org.elastos.hive.vendors.connection.ConnectionManager;
 import org.elastos.hive.vendors.connection.model.BaseServiceConfig;
+import org.elastos.hive.vendors.onedrive.network.model.ClientResponse;
 import org.elastos.hive.vendors.onedrive.network.model.DriveResponse;
 import org.json.JSONObject;
 
@@ -211,11 +212,14 @@ public final class OneDriveClient extends Client {
 
 			switch (type){
 				case GET_INFO:
-					DriveResponse driveResponseForClient= (DriveResponse) response.body();
+					ClientResponse clientResponse = (ClientResponse) response.body();
 
 					HashMap<String, String> attrs = new HashMap<String, String>();
-					attrs.put(Client.Info.userId, driveResponseForClient.getOwner().getUser().getId());
-					attrs.put(Client.Info.name, driveResponseForClient.getOwner().getUser().getDisplayName());
+					attrs.put(Client.Info.userId, clientResponse.getId());
+					attrs.put(Client.Info.name, clientResponse.getDisplayName());
+					attrs.put(Client.Info.email, clientResponse.getMail());
+					attrs.put(Client.Info.phoneNo, clientResponse.getMobilePhone());
+					attrs.put(Client.Info.region, clientResponse.getOfficeLocation());
 
 					Client.Info info = new Client.Info(attrs);
 

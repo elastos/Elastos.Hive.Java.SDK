@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class OneDriveClientTest {
@@ -25,7 +26,10 @@ public class OneDriveClientTest {
 			Client.Info info = client.getInfo().get();
 			assertNotNull(info);
 			assertNotNull(info.get(Client.Info.userId));
-			assertNotNull(info.get(Client.Info.name));
+			assertTrue(info.containsKey(Client.Info.name));
+			assertTrue(info.containsKey(Client.Info.email));
+			assertTrue(info.containsKey(Client.Info.phoneNo));
+			assertTrue(info.containsKey(Client.Info.region));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("getInfo failed");
