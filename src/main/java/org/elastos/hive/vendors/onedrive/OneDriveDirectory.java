@@ -32,6 +32,7 @@ import org.elastos.hive.ItemInfo;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Void;
 import org.elastos.hive.vendors.connection.ConnectionManager;
+import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
 import org.elastos.hive.vendors.onedrive.network.model.CreateDirRequest;
 import org.elastos.hive.vendors.onedrive.network.model.DirChildrenResponse;
 import org.elastos.hive.vendors.onedrive.network.model.FileOrDirPropResponse;
@@ -425,9 +426,18 @@ class OneDriveDirectory extends Directory {
 			callback = new NullCallback<Children>();
 
 		try {
-			ConnectionManager.getOnedriveApi()
-					.getChildren(this.pathName)
-					.enqueue(new DirectoryCallback(future , callback , this.pathName , Type.GET_CHILDREN));
+			OneDriveApi api = ConnectionManager.getOnedriveApi();
+			Call<DirChildrenResponse> call;
+			if (this.pathName.equals("/")) {
+				//Get the root directory's children
+				call = api.getRootChildren();
+			}
+			else {
+				//Get the other directory's children
+				call = api.getChildren(this.pathName);
+			}
+
+			call.enqueue(new DirectoryCallback(future , callback , this.pathName , Type.GET_CHILDREN));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);

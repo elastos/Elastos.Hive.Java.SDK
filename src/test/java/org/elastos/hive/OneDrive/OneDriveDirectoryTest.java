@@ -140,6 +140,17 @@ public class OneDriveDirectoryTest {
 		}
 	}
 
+	@Test public void testGetRootChildren() {
+		try {
+			Directory root = drive.getRootDir().get();
+			Children children = root.getChildren().get();
+			assertNotNull(children);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testGetChildren failed");
+		}
+	}
+	
 	@Test public void testGetChildrenCount() {
 		try {
 			Children children = testDirectory.getChildren().get();
