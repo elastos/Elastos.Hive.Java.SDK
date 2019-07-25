@@ -129,11 +129,19 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 	@Override
 	public CompletableFuture<Void> checkExpired(Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
+		Void padding = new Void();
+
+		if (token == null) {
+			HiveException e = new HiveException("Please login first");
+			future.completeExceptionally(e);
+			callback.onError(e);;
+			return future;
+		}
+
 		if (token.isExpired())
 			return redeemToken(callback);
 
-		CompletableFuture<Void> future = new CompletableFuture<Void>();
-		Void padding = new Void();
 	    callback.onSuccess(padding);
 		future.complete(padding);
 		return future;
