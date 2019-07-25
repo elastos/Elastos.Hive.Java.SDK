@@ -28,23 +28,6 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Hive File<br>
- * <br>
- * Create Hive File instance,<br>
- * <br>
- * for example:
- * <p>
- *     First of all , create Hive {@link Client},<br>
- *     Second , create the Hive {@link Drive} from the Hive {@link Client},<br>
- *     Third , create the Hive {@link File} from the Hive {@link Drive}.
- * </p>
- * or
- * <p>
- *     First of all , create Hive {@link Client},<br>
- *     Second , create the Hive {@link Drive} from the Hive {@link Client},<br>
- *     Third , create the Hive {@link Directory} from the Hive {@link Drive},<br>
- *     Fourth , create the Hive {@link File} from the Hive {@link Directory}.
- * </p>
- *
  */
 public abstract class File extends Result implements ResourceItem<File.Info>, FileItem {
 	/**
