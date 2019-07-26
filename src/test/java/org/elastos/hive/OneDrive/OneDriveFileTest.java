@@ -1,10 +1,13 @@
 package org.elastos.hive.OneDrive;
 
+import org.elastos.hive.Callback;
 import org.elastos.hive.Children;
 import org.elastos.hive.Client;
 import org.elastos.hive.Directory;
 import org.elastos.hive.Drive;
 import org.elastos.hive.File;
+import org.elastos.hive.HiveException;
+import org.elastos.hive.Void;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -18,6 +21,7 @@ public class OneDriveFileTest {
 	private static Client client;
 	private static File testFile;
 	private static Directory parentDirForMoveTo;
+	private boolean callbackInvoked = false;
 
 	@Test public void testGetId() {
 		assertNotNull(testFile.getId());
@@ -48,19 +52,91 @@ public class OneDriveFileTest {
 			assertTrue(info.containsKey(File.Info.size));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
-			fail("getInfo failed");
+			fail("testGetInfo failed");
+		}
+	}
+	
+	@Test public void testGetInfoAsync() {
+		callbackInvoked = false;
+		Callback<File.Info> callback = new Callback<File.Info>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				fail();
+			}
+
+			@Override
+			public void onSuccess(File.Info info) {
+				callbackInvoked = true;
+				assertNotNull(info);
+				assertNotNull(info.get(File.Info.name));
+				assertNotNull(info.get(File.Info.itemId));
+				assertTrue(info.containsKey(File.Info.size));
+			}
+		};
+		
+		try {
+			testFile.getInfo(callback).get();
+			assertTrue(callbackInvoked);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testGetInfoAsync failed");
 		}
 	}
 
 	@Test public void testMoveTo() {
 		try {
-			String originPath = testFile.getPath();
-			testFile.moveTo(parentDirForMoveTo.getPath()).get();
+			File tempFile = drive.createFile("/testMoveToFile" + System.currentTimeMillis()).get();
+			assertNotNull(tempFile);
+			
+			String originPath = tempFile.getPath();
+			int childCount = parentDirForMoveTo.getChildren().get().getContent().size();
+			tempFile.moveTo(parentDirForMoveTo.getPath()).get();
 
 			//1. Check the parent has a new child.
-			Children children = parentDirForMoveTo.getChildren().get();
-			assertNotNull(children);
-			assertEquals(1, children.getContent().size());
+			int newChildCount = parentDirForMoveTo.getChildren().get().getContent().size();
+			assertEquals(childCount + 1, newChildCount);
+
+			//2. Check: the origin and the new path is different
+			assertFalse(originPath.equals(tempFile.getPath()));
+
+			//3. Check: the origin path is invalid.
+			try {
+				drive.getDirectory(originPath).get();
+				fail(String.format("The file has moved, the origin path is invalid: %s", originPath));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testMoveTo failed");
+		}
+	}
+	
+	@Test public void testMoveToAsync() {
+		callbackInvoked = false;
+		Callback<Void> callback = new Callback<Void>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				fail();
+			}
+
+			@Override
+			public void onSuccess(Void none) {
+				callbackInvoked = true;
+			}
+		};
+		
+		try {
+			String originPath = testFile.getPath();
+			int childCount = parentDirForMoveTo.getChildren().get().getContent().size();
+			testFile.moveTo(parentDirForMoveTo.getPath(), callback).get();
+			assertTrue(callbackInvoked);
+
+			//1. Check the parent has a new child.
+			int newChildCount = parentDirForMoveTo.getChildren().get().getContent().size();
+			assertEquals(childCount + 1, newChildCount);
 
 			//2. Check: the origin and the new path is different
 			assertFalse(originPath.equals(testFile.getPath()));
@@ -74,14 +150,14 @@ public class OneDriveFileTest {
 			}
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
-			fail("testMoveToInvalid failed");
+			fail("testMoveToAsync failed");
 		}
 	}
 
 	@Test public void testCopyTo() {
 		Directory parentDir = null;
 		try {
-			String parentPath = "/parentDir" + System.currentTimeMillis();
+			String parentPath = "/testCopyToParentDir" + System.currentTimeMillis();
 			parentDir = drive.createDirectory(parentPath).get();
 			assertNotNull(parentDir);
 			testFile.copyTo(parentPath).get();
@@ -93,6 +169,46 @@ public class OneDriveFileTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCopyTo failed");
+		}
+		finally {
+			try {
+				parentDir.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	@Test public void testCopyToAsync() {
+		callbackInvoked = false;
+		Callback<Void> callback = new Callback<Void>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				fail();
+			}
+
+			@Override
+			public void onSuccess(Void none) {
+				callbackInvoked = true;
+			}
+		};
+
+		Directory parentDir = null;
+		try {
+			String parentPath = "/testCopyToAsyncParentDir" + System.currentTimeMillis();
+			parentDir = drive.createDirectory(parentPath).get();
+			assertNotNull(parentDir);
+			testFile.copyTo(parentPath, callback).get();
+			assertTrue(callbackInvoked);
+
+			Thread.sleep(5000);
+			Children children = parentDir.getChildren().get();
+			assertNotNull(children);
+			assertEquals(1, children.getContent().size());
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testCopyToAsync failed");
 		}
 		finally {
 			try {

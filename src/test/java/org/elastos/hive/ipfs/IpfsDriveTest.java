@@ -2,14 +2,17 @@ package org.elastos.hive.ipfs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.concurrent.ExecutionException;
 
+import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.Directory;
 import org.elastos.hive.Drive;
 import org.elastos.hive.File;
+import org.elastos.hive.HiveException;
 import org.elastos.hive.ItemInfo;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -18,6 +21,7 @@ import org.junit.Test;
 public class IpfsDriveTest {
 	private static Drive drive;
 	private static Client client;
+	private boolean callbackInvoked = false;
 
 	@Test public void testGetInfo() {
 		try {
@@ -26,7 +30,33 @@ public class IpfsDriveTest {
 			assertNotNull(info.get(Drive.Info.driveId));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
-			fail("getInfo failed");
+			fail("testGetInfo failed");
+		}
+    }
+	
+	@Test public void testGetInfoAsync() {
+		callbackInvoked = false;
+		Callback<Drive.Info> callback = new Callback<Drive.Info>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				fail();
+			}
+
+			@Override
+			public void onSuccess(Drive.Info info) {
+				callbackInvoked = true;
+				assertNotNull(info);
+				assertNotNull(info.get(Drive.Info.driveId));
+			}
+		};
+		
+		try {
+			drive.getInfo(callback).get();
+			assertTrue(callbackInvoked);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testGetInfoAsync failed");
 		}
     }
 
@@ -42,7 +72,32 @@ public class IpfsDriveTest {
 			assertNotNull(root);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
-			fail("getRootDir failed");
+			fail("testGetRootDir failed");
+		}
+    }
+	
+	@Test public void testGetRootDirAsync() {
+		callbackInvoked = false;
+		Callback<Directory> callback = new Callback<Directory>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				fail();
+			}
+
+			@Override
+			public void onSuccess(Directory directory) {
+				callbackInvoked = true;
+				assertNotNull(directory);
+			}
+		};
+		
+		try {
+			drive.getRootDir(callback).get();
+			assertTrue(callbackInvoked);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testGetRootDirAsync failed");
 		}
     }
 
@@ -63,6 +118,46 @@ public class IpfsDriveTest {
 		finally {
 			try {
 				directory.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
+		}
+    }
+	
+	private Directory testDirectory = null;
+	@Test public void testCreateDirectoryAsync() {
+		callbackInvoked = false;
+		Callback<Directory> callback = new Callback<Directory>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				fail();
+			}
+
+			@Override
+			public void onSuccess(Directory directory) {
+				callbackInvoked = true;
+				assertNotNull(directory);
+				testDirectory = directory;
+			}
+		};
+
+		try {
+			String pathName = "/testCreateDirectoryAsync" + System.currentTimeMillis();
+			drive.createDirectory(pathName, callback).get();
+			assertTrue(callbackInvoked);
+
+			pathName += "/" + System.currentTimeMillis();
+			Directory secondLevelDir = drive.createDirectory(pathName).get();
+			assertNotNull(secondLevelDir);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testCreateDirectoryAsync failed");
+		}
+		finally {
+			try {
+				testDirectory.deleteItem().get();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				fail();
@@ -102,6 +197,42 @@ public class IpfsDriveTest {
 			}
 		}
     }
+	
+	@Test public void testGetDirectoryAsync() {
+		callbackInvoked = false;
+		Callback<Directory> callback = new Callback<Directory>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				fail();
+			}
+
+			@Override
+			public void onSuccess(Directory directory) {
+				callbackInvoked = true;
+				assertNotNull(directory);
+				testDirectory = directory;
+			}
+		};
+
+		try {
+			String pathName = "/testGetDirectoryAsync" + System.currentTimeMillis();
+			assertNotNull(drive.createDirectory(pathName).get());
+
+			drive.getDirectory(pathName, callback).get();
+			assertTrue(callbackInvoked);
+		} catch (InterruptedException | ExecutionException e) {
+			fail("testGetDirectoryAsync failed");
+		}		
+		finally {
+			try {
+				testDirectory.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
+		}
+    }
 
 	@Test public void testGetDirectoryWithInvalidArg() {
 		try {
@@ -127,6 +258,42 @@ public class IpfsDriveTest {
 		finally {
 			try {
 				file.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
+		}
+    }
+	
+	private File testFile = null;
+	@Test public void testCreateFileAsync() {
+		callbackInvoked = false;
+		Callback<File> callback = new Callback<File>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				fail();
+			}
+
+			@Override
+			public void onSuccess(File file) {
+				callbackInvoked = true;
+				assertNotNull(file);
+				testFile = file;
+			}
+		};
+
+		try {
+			String pathName = "/testCreateFileAsync";
+			drive.createFile(pathName, callback).get();
+			assertTrue(callbackInvoked);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testCreateFileAsync failed");
+		}
+		finally {
+			try {
+				testFile.deleteItem().get();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				fail();
@@ -160,6 +327,42 @@ public class IpfsDriveTest {
 		finally {
 			try {
 				file.deleteItem().get();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				fail();
+			}
+		}
+    }
+	
+	@Test public void testGetFileAsync() {
+		callbackInvoked = false;
+		Callback<File> callback = new Callback<File>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				fail();
+			}
+
+			@Override
+			public void onSuccess(File file) {
+				callbackInvoked = true;
+				assertNotNull(file);
+				testFile = file;
+			}
+		};
+
+		try {
+			String pathName = "/testGetFileAsync" + System.currentTimeMillis();
+			assertNotNull(drive.createFile(pathName).get());
+			drive.getFile(pathName, callback).get();
+			assertTrue(callbackInvoked);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testGetFileAsync failed");
+		}
+		finally {
+			try {
+				testFile.deleteItem().get();
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				fail();
@@ -218,6 +421,59 @@ public class IpfsDriveTest {
 				directory.deleteItem().get();
 			} catch (Exception ex) {
 				ex.printStackTrace();
+				fail();
+			}
+		}
+    }
+	
+	@Test public void testGetItemInfoAsync() {
+		callbackInvoked = false;
+		Callback<ItemInfo> callback = new Callback<ItemInfo>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				fail();
+			}
+
+			@Override
+			public void onSuccess(ItemInfo info) {
+				callbackInvoked = true;
+				assertNotNull(info);
+				assertTrue(info.containsKey(ItemInfo.name));
+				assertTrue(info.containsKey(ItemInfo.type));
+				assertTrue(info.containsKey(ItemInfo.itemId));
+			}
+		};
+
+		try {
+			//1. file
+			String name = "testGetItemInfoAsync_File.txt";
+			String pathName = "/" + name;
+			testFile = drive.createFile(pathName).get();
+			assertNotNull(testFile);
+
+			drive.getItemInfo(pathName, callback).get();
+			assertTrue(callbackInvoked);
+			
+			//2. directory
+			name = "testGetItemInfoAsync_Dir";
+			pathName = "/" + name;
+			testDirectory = drive.createDirectory(pathName).get();
+			assertNotNull(testDirectory);
+
+			callbackInvoked = false;
+			drive.getItemInfo(pathName, callback).get();
+			assertTrue(callbackInvoked);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testGetItemInfoAsync failed");
+		}
+		finally {
+			try {
+				testFile.deleteItem().get();
+				testDirectory.deleteItem().get();
+			} catch (Exception e) {
+				e.printStackTrace();
 				fail();
 			}
 		}

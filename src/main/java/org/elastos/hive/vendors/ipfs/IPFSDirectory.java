@@ -498,6 +498,8 @@ class IPFSDirectory extends Directory  {
 			future.completeExceptionally(value.getException());
 			return future;
 		}
+		
+		value.setCallback(callback);
 
 		try {
 			ConnectionManager.getIPFSApi()
@@ -565,13 +567,13 @@ class IPFSDirectory extends Directory  {
 		private final String pathName ;
 		private final CompletableFuture future;
 		private final PackValue value;
-		private final IPFSConstance.Type type ;
+		private final IPFSConstance.Type type;
 
-		IPFSDirForResultCallback(CompletableFuture future , PackValue value , String pathName , IPFSConstance.Type type){
-			this.future = future ;
-			this.value = value ;
-			this.pathName = pathName ;
-			this.type = type ;
+		IPFSDirForResultCallback(CompletableFuture future, PackValue value, String pathName, IPFSConstance.Type type){
+			this.future = future;
+			this.value = value;
+			this.pathName = pathName;
+			this.type = type;
 		}
 
 		@Override
@@ -644,6 +646,7 @@ class IPFSDirectory extends Directory  {
 						callback.onSuccess(children);
 					}
 
+					value.setValue(children);
 					future.complete(children);
 					
 					break;

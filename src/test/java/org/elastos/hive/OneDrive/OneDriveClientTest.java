@@ -17,6 +17,8 @@ import static org.junit.Assert.fail;
 
 public class OneDriveClientTest {
 	private static Client client;
+	private boolean callbackInvoked = false;
+
 	@Test public void testGetInstance() {
 		assertNotNull(Client.getInstance(DriveType.oneDrive));
 	}
@@ -38,22 +40,34 @@ public class OneDriveClientTest {
 
 	@Test
 	public void testGetInfoAsync(){
+		callbackInvoked = false;
 		Callback<Client.Info> callback = new Callback<Client.Info>() {
 			@Override
 			public void onError(HiveException e) {
 				e.printStackTrace();
+				fail();
 			}
 
 			@Override
 			public void onSuccess(Client.Info body) {
+				callbackInvoked = true;
 				Client.Info info = body ;
 				assertNotNull(info);
 				assertNotNull(info.get(Client.Info.userId));
-				assertNotNull(info.get(Client.Info.name));
+				assertTrue(info.containsKey(Client.Info.name));
+				assertTrue(info.containsKey(Client.Info.email));
+				assertTrue(info.containsKey(Client.Info.phoneNo));
+				assertTrue(info.containsKey(Client.Info.region));
 			}
 		};
 
-		client.getInfo(callback);
+		try {
+			client.getInfo(callback).get();
+			assertTrue(callbackInvoked);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testGetInfoAsync failed");
+		}
 	}
 
 	@Test public void testGetDefaultDrive() {
@@ -68,19 +82,28 @@ public class OneDriveClientTest {
 
 	@Test
 	public void testGetDefaultDriveAsync(){
+		callbackInvoked = false;
 		Callback<Drive> callback = new Callback<Drive>() {
 			@Override
 			public void onError(HiveException e) {
 				e.printStackTrace();
+				fail();
 			}
 
 			@Override
-			public void onSuccess(Drive body) {
-				Drive drive = body ;
-				assertNotNull(body);
+			public void onSuccess(Drive drive) {
+				callbackInvoked = true;
+				assertNotNull(drive);
 			}
 		};
-		client.getDefaultDrive(callback);
+
+		try {
+			client.getDefaultDrive(callback).get();
+			assertTrue(callbackInvoked);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			fail("testGetDefaultDriveAsync failed");
+		}
 	}
 
 	@BeforeClass
