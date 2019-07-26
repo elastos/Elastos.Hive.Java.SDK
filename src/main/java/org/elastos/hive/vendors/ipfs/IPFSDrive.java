@@ -476,6 +476,7 @@ final class IPFSDrive extends Drive{
 				case GET_INFO: {
 					HashMap<String, String> attrs = new HashMap<>();
 					attrs.put(Drive.Info.driveId, getId());
+					driveInfo = new Drive.Info(attrs);
 
 					this.callback.onSuccess(driveInfo);
 					future.complete(driveInfo);

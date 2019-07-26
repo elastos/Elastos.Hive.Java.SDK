@@ -399,8 +399,7 @@ public final class IPFSClient extends Client {
 					break ;
 				case GET_DEFAULT_DRIVE:
 					HashMap<String, String> driveAttrs = new HashMap<>();
-					driveAttrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid()); // TODO;
-					// TODO;
+					driveAttrs.put(Drive.Info.driveId, rpcHelper.getIpfsEntry().getUid());
 					Drive.Info driveInfo = new Drive.Info(driveAttrs);
 					IPFSDrive drive = new IPFSDrive(driveInfo, rpcHelper);
 					this.callback.onSuccess(drive);

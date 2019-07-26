@@ -389,7 +389,7 @@ final class OneDriveDrive extends Drive {
 					HashMap<String, String> attrs = new HashMap<>();
 					attrs.put(Drive.Info.driveId, driveResponse.getId());
 
-					Drive.Info driveInfo = new Drive.Info(attrs);
+					driveInfo = new Drive.Info(attrs);
 					this.callback.onSuccess(driveInfo);
 					future.complete(driveInfo);
 					break;
