@@ -52,10 +52,6 @@ public class OneDriveFileOperatorTest {
 					tmpBuf.flip();
 					tmpBuf.get(bytes, 0, len);
 					readBuf.put(bytes);
-					
-					//write the content to a file.
-//					String localTestReadFile = String.format("%s/%s", System.getProperty("user.dir"), "tmp.txt");
-//					ByteBuffer2File(localTestReadFile, tmpBuf);
 				}
 			}
 

@@ -98,9 +98,18 @@ class OneDriveDirectory extends Directory {
 			callback = new NullCallback<Directory.Info>();
 
 		try {
-			ConnectionManager.getOnedriveApi()
-					.getDirAndFileInfo(pathName)
-					.enqueue(new DirectoryCallback(future , callback ,pathName, Type.GET_INFO));
+			OneDriveApi api = ConnectionManager.getOnedriveApi();
+			Call<FileOrDirPropResponse> call;
+			if (this.pathName.equals("/")) {
+				//Get the root directory's info
+				call = api.getRootDirInfo();
+			}
+			else {
+				//Get the other directory's info
+				call = api.getDirAndFileInfo(this.pathName);
+			}
+
+			call.enqueue(new DirectoryCallback(future , callback ,pathName, Type.GET_INFO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -121,14 +130,14 @@ class OneDriveDirectory extends Directory {
 				.thenCompose(padding -> moveTo(padding, pathName, callback));
 	}
 
-	private CompletableFuture<Void> moveTo(Void padding, String pathName, Callback<Void> callback) {
+	private CompletableFuture<Void> moveTo(Void padding, String parentPath, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
 			callback = new NullCallback<Void>();
 
 		// the pathname must be a absolute path name
-		if (!pathName.startsWith("/")) {
+		if (!parentPath.startsWith("/")) {
 			HiveException e = new HiveException("Need a absolute path to moveTo");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -142,7 +151,7 @@ class OneDriveDirectory extends Directory {
 			return future;
 		}
 
-		if (this.pathName.equals(pathName)) {
+		if (this.pathName.equals(parentPath)) {
 			HiveException e = new HiveException("Can't move to same path name");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -154,8 +163,8 @@ class OneDriveDirectory extends Directory {
 			String name = this.pathName.substring(LastPos + 1);
 
 			ConnectionManager.getOnedriveApi()
-					.moveTo(this.pathName , new MoveAndCopyReqest(pathName,name))
-					.enqueue(new DirectoryCallback(future , callback ,pathName+"/"+name, Type.MOVE_TO));
+					.moveTo(this.pathName , new MoveAndCopyReqest(parentPath, name))
+					.enqueue(new DirectoryCallback(future , callback ,parentPath + "/" + name, Type.MOVE_TO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
@@ -176,13 +185,13 @@ class OneDriveDirectory extends Directory {
 				.thenCompose(padding -> copyTo(padding, pathName, callback));
 	}
 
-	private CompletableFuture<Void> copyTo(Void padding, String pathName, Callback<Void> callback) {
+	private CompletableFuture<Void> copyTo(Void padding, String parentPath, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
 		if (callback == null)
 			callback = new NullCallback<Void>();
 
-		if (!pathName.startsWith("/")) {
+		if (!parentPath.startsWith("/")) {
 			HiveException e = new HiveException("Need a absolute path to copyTo");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -196,7 +205,7 @@ class OneDriveDirectory extends Directory {
 			return future;
 		}
 
-		if (this.pathName.equals(pathName)) {
+		if (this.pathName.equals(parentPath)) {
 			HiveException e = new HiveException("Can't copy to same path name");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -208,7 +217,7 @@ class OneDriveDirectory extends Directory {
 			String name = this.pathName.substring(LastPos + 1);
 
 			ConnectionManager.getOnedriveApi()
-					.copyTo(this.pathName , new MoveAndCopyReqest(pathName,name))
+					.copyTo(this.pathName , new MoveAndCopyReqest(parentPath, name))
 					.enqueue(new DirectoryCallback(future , callback ,pathName, Type.COPY_TO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
