@@ -231,7 +231,7 @@ public class OneDriveDirectoryTest {
 	@Test public void testCopyTo() {
 		Directory parentDir = null;
 		try {
-			String parentPath = "/parentDir" + System.currentTimeMillis();
+			String parentPath = "/copyToParentDir" + System.currentTimeMillis();
 			parentDir = drive.createDirectory(parentPath).get();
 			assertNotNull(parentDir);
 			testDirectory.copyTo(parentPath).get();
@@ -257,7 +257,7 @@ public class OneDriveDirectoryTest {
 	@Test public void testCopyToInvalid() {
 		Directory parentDir = null;
 		try {
-			String parentPath = "/parentDir" + System.currentTimeMillis();
+			String parentPath = "/copyToInvalidParentDir" + System.currentTimeMillis();
 			parentDir = drive.createDirectory(parentPath).get();
 			assertNotNull(parentDir);
 			String originPath = testDirectory.getPath();

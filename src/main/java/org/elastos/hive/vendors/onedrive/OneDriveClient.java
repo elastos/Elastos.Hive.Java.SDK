@@ -232,8 +232,7 @@ public final class OneDriveClient extends Client {
 					DriveResponse driveResponse= (DriveResponse) response.body();
 
 					HashMap<String, String> driveAttrs = new HashMap<String, String>();
-					driveAttrs.put(Client.Info.userId, driveResponse.getOwner().getUser().getId());
-					driveAttrs.put(Client.Info.name, driveResponse.getOwner().getUser().getDisplayName());
+					driveAttrs.put(Drive.Info.driveId, driveResponse.getId());
 
 					Drive.Info driveInfo = new Drive.Info(driveAttrs);
 					OneDriveDrive drive = new OneDriveDrive(driveInfo , authHelper);

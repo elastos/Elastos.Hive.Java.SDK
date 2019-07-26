@@ -30,6 +30,12 @@ public class IpfsDriveTest {
 		}
     }
 
+	@Test public void testGetLastInfo() {
+		Drive.Info info = drive.getLastInfo();
+		assertNotNull(info);
+		assertNotNull(info.get(Drive.Info.driveId));
+    }
+	
 	@Test public void testGetRootDir() {
 		try {
 			Directory root = drive.getRootDir().get();
