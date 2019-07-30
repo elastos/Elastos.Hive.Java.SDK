@@ -48,6 +48,7 @@ task createjavadoc(type: Javadoc) {
 
             "**/Parameter.java",
             "**/OAuthEntry.java",
+            "**/IPFSEntry.java",
 
             "**/DriveType.java",
             "**/DirectoryItem.java",
@@ -60,7 +61,10 @@ task createjavadoc(type: Javadoc) {
             "**/Children.java",
             "**/Result.java",
 
-            "**/AttributeMap.java"
+            "**/AttributeMap.java",
+
+            "**/ipfs/IPFSParameter.java",
+            "**/onedrive/OneDriveParameter.java"
     )
     source = sourceSets.main.java.srcDirs
     destinationDir = file("doc/")

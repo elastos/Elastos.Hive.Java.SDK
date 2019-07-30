@@ -26,25 +26,46 @@ import org.elastos.hive.DriveType;
 import org.elastos.hive.OAuthEntry;
 import org.elastos.hive.Parameter;
 
+/**
+ * Hive sdk OneDrive parameter<br>
+ * If you want to create an onedrive client, you need to create an onedrive parameter first
+ */
 public class OneDriveParameter implements Parameter<OAuthEntry> {
 	private final OAuthEntry authEntry;
 	private final String keyStorePath;
 
+	/**
+	 * OneDriveParameter constructor
+	 * @param data User OAuthEntry {@link OAuthEntry}
+	 * @param storePath Enter a path that store the user configuration
+	 */
 	public OneDriveParameter(OAuthEntry data, String storePath) {
 		this.authEntry = data;
 		this.keyStorePath = storePath;
 	}
 
+	/**
+	 * Get current drive type
+	 * @return Current drive type
+	 */
 	@Override
 	public DriveType getDriveType() {
 		return DriveType.oneDrive;
 	}
 
+	/**
+	 * Get current user auth entry
+	 * @return Current auth entry
+	 */
 	@Override
 	public OAuthEntry getAuthEntry() {
 		return authEntry;
 	}
 
+	/**
+	 * Get current user store data path
+	 * @return Current store path
+	 */
 	@Override
 	public String getKeyStorePath() {
 		return keyStorePath;

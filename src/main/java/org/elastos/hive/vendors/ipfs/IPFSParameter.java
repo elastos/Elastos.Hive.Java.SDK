@@ -26,25 +26,47 @@ import org.elastos.hive.DriveType;
 import org.elastos.hive.IPFSEntry;
 import org.elastos.hive.Parameter;
 
+/**
+ * Hive sdk IPFS parameter<br>
+ * If you want to create an IPFS client, you need to create an IPFS parameter first
+ */
 public class IPFSParameter implements Parameter<IPFSEntry> {
 	private final IPFSEntry entry;
 	private final String keyStorePath;
 
+
+	/**
+	 * IPFSParameter Constructor
+	 * @param entry IPFS entry {@link IPFSEntry}
+	 * @param storePath Enter a path that store the user configuration
+	 */
 	public IPFSParameter(IPFSEntry entry, String storePath)  {
 		this.entry = entry;
 		this.keyStorePath = storePath;
 	}
 
+	/**
+	 * Get current drive type
+	 * @return Current drive type
+	 */
 	@Override
 	public DriveType getDriveType() {
 		return DriveType.hiveIpfs;
 	}
 
+	/**
+	 * Get current user auth entry
+	 * @return Current auth entry
+	 */
 	@Override
 	public IPFSEntry getAuthEntry() {
 		return this.entry;
 	}
 
+	/**
+	 * Get current user store data path
+	 * @return Current store path
+	 */
 	@Override
 	public String getKeyStorePath() {
 		return keyStorePath;
