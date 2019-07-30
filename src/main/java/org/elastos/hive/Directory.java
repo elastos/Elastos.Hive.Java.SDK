@@ -27,9 +27,6 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Hive Directory
- * First of all , create Hive Client,
- * Second , build the Hive Drive from the Hive Client
- * Third , build the Hive Directory from the Hive Drive
  */
 public abstract class Directory extends Result implements ResourceItem<Directory.Info>, DirectoryItem,  FileItem {
 	/**

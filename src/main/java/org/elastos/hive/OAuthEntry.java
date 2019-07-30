@@ -23,7 +23,7 @@
 package org.elastos.hive;
 
 /**
- * Configuration for the ElastosHiveSDK.<br>
+ * Elastos Hive SDK configuration for oauth authentication.<br>
  * All app information should match the information in your app portal
  */
 public class OAuthEntry {

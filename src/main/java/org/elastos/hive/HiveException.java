@@ -24,6 +24,7 @@ package org.elastos.hive;
 
 /**
  * Hive exception
+ * If an exception occurs while you are using the hive SDK, throw this HiveException
  */
 public class HiveException extends Exception {
 	private static final long serialVersionUID = 1486850840770311509L;
