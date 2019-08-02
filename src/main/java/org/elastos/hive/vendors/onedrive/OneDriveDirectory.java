@@ -462,7 +462,7 @@ class OneDriveDirectory extends Directory {
 		private final Callback callback;
 		private final Type type ;
 
-		public DirectoryCallback(CompletableFuture future , Callback callback ,String pathName , Type type) {
+		DirectoryCallback(CompletableFuture future , Callback callback ,String pathName , Type type) {
 			this.future = future ;
 			this.callback = callback ;
 			this.pathName = pathName ;

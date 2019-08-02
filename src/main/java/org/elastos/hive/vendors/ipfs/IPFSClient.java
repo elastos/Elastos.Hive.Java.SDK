@@ -34,7 +34,6 @@ import org.elastos.hive.Void;
 import org.elastos.hive.utils.CacheHelper;
 import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendors.connection.ConnectionManager;
-import org.elastos.hive.vendors.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;

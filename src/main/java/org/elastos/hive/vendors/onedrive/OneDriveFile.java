@@ -284,8 +284,8 @@ final class OneDriveFile extends File {
 		if (position < 0) {
 			CompletableFuture<Length> future = new CompletableFuture<Length>();
 			HiveException e = new HiveException("the position must be non-negative");
-			future.completeExceptionally(e);
 			callback.onError(e);
+			future.completeExceptionally(e);
 			return future;
 		}
 
@@ -334,7 +334,9 @@ final class OneDriveFile extends File {
 	private CompletableFuture<Length> read(Length length, ByteBuffer dest, long position, Callback<Length> callback) {
 		CompletableFuture<Length> future = new CompletableFuture<Length>();
 		if (length.getLength() <= 0) {
-			future.complete(length);
+			HiveException e = new HiveException("the file length must be non-negative");
+			callback.onError(e);
+			future.completeExceptionally(e);
 			return future;
 		}
 
@@ -368,15 +370,14 @@ final class OneDriveFile extends File {
 				len = inChannel.read(dest, position);
 			}
 
-			future.complete(new Length(len));
+			Length readLen = new Length(len);
+			callback.onSuccess(readLen);
+			future.complete(readLen);
 		}
-		catch (FileNotFoundException e) {
-			future.completeExceptionally(new HiveException(e.getMessage()));
-			return future;
-		}
-		catch (IOException e) {
-			future.completeExceptionally(new HiveException(e.getMessage()));
-			return future;
+		catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
+			callback.onError(e);
+			future.completeExceptionally(e);
 		}
 		finally {
 			try {
@@ -387,8 +388,10 @@ final class OneDriveFile extends File {
 				if (fileInputStream != null) {
 					fileInputStream.close();
 				}
-			} catch (Exception e) {
-				future.completeExceptionally(new HiveException(e.getMessage()));
+			} catch (Exception ex) {
+				HiveException e = new HiveException(ex.getMessage());
+				callback.onError(e);
+				future.completeExceptionally(e);
 			}
 		}
 
@@ -417,8 +420,8 @@ final class OneDriveFile extends File {
 		if (position < 0) {
 			CompletableFuture<Length> future = new CompletableFuture<Length>();
 			HiveException e = new HiveException("the position must be non-negative");
-			future.completeExceptionally(e);
 			callback.onError(e);
+			future.completeExceptionally(e);
 			return future;
 		}
 
@@ -472,10 +475,13 @@ final class OneDriveFile extends File {
 				}
 				catch (Exception e) {
 					e.printStackTrace();
+					callback.onError(new HiveException(e.getMessage()));
 				}
 			}
 
-			return new Length(len);
+			Length writeLen = new Length(len);
+			callback.onSuccess(writeLen);
+			return writeLen;
 		});
 
 		return future;
@@ -645,7 +651,6 @@ final class OneDriveFile extends File {
 
 				default:
 					break;
-
 			}
 		}
 

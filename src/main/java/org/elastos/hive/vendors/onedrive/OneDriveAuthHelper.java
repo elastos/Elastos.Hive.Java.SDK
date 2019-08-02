@@ -134,8 +134,8 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 		if (token == null) {
 			HiveException e = new HiveException("Please login first");
+			callback.onError(e);
 			future.completeExceptionally(e);
-			callback.onError(e);;
 			return future;
 		}
 
@@ -147,7 +147,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 		return future;
 	}
 
-	protected CompletableFuture<String> accessAuthCode(Authenticator authenticator) {
+	private CompletableFuture<String> accessAuthCode(Authenticator authenticator) {
 		CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
 			Semaphore semph = new Semaphore(1);
 
@@ -325,7 +325,10 @@ public class OneDriveAuthHelper implements AuthHelper {
 								OneDriveConstance.ONE_DRIVE_API_BASE_URL,
 								baseServiceConfig);
 					} catch (Exception e) {
-						e.printStackTrace();
+						HiveException ex = new HiveException(e.getMessage());
+						callback.onError(ex);
+						future.completeExceptionally(ex);
+						return;
 					}
 
 					break;
@@ -337,7 +340,6 @@ public class OneDriveAuthHelper implements AuthHelper {
 				default:
 					break;
 			}
-
 
 			Void padding = new Void();
 		    callback.onSuccess(padding);

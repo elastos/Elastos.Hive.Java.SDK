@@ -188,7 +188,7 @@ public final class OneDriveClient extends Client {
 		Callback callback;
 		Type type;
 
-		public DriveClientCallback(CompletableFuture future , Callback callback , Type type) {
+		DriveClientCallback(CompletableFuture future , Callback callback , Type type) {
 			this.future = future;
 			this.callback = callback;
 			this.type = type;

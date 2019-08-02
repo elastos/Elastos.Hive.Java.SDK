@@ -424,6 +424,7 @@ final class IPFSFile extends File {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				HiveException e = new HiveException(ex.getMessage());
+				value.setException(e);
 				future.completeExceptionally(e);
 			}
 
@@ -487,14 +488,14 @@ final class IPFSFile extends File {
 				len = inChannel.read(dest, position);
 			}
 
-			future.complete(new Length(len));
+			Length readLen = new Length(len);
+			callback.onSuccess(readLen);
+			future.complete(readLen);
 		}
-		catch (FileNotFoundException e) {
-			future.completeExceptionally(new HiveException(e.getMessage()));
-			return future;
-		}
-		catch (IOException e) {
-			future.completeExceptionally(new HiveException(e.getMessage()));
+		catch (Exception e) {
+			HiveException ex = new HiveException(e.getMessage());
+			callback.onError(ex);
+			future.completeExceptionally(ex);
 			return future;
 		}
 		finally {
@@ -507,7 +508,9 @@ final class IPFSFile extends File {
 					fileInputStream.close();
 				}
 			} catch (Exception e) {
-				future.completeExceptionally(new HiveException(e.getMessage()));
+				HiveException ex = new HiveException(e.getMessage());
+				callback.onError(ex);
+				future.completeExceptionally(ex);
 			}
 		}
 
@@ -572,11 +575,16 @@ final class IPFSFile extends File {
 					}
 				}
 				catch (Exception e) {
+					HiveException ex = new HiveException(e.getMessage());
+					finalCallback.onError(ex);
+					value.setException(ex);
 					e.printStackTrace();
 				}
 			}
 
-			value.setValue(new Length(len));
+			Length writeLen = new Length(len);
+			finalCallback.onSuccess(writeLen);
+			value.setValue(writeLen);
 			return value;
 		});
 
@@ -592,7 +600,6 @@ final class IPFSFile extends File {
 		value.setCallback(callback);
 
 		if (value.getException() != null) {
-			callback.onError(value.getException());
 			future.completeExceptionally(value.getException());
 			return future;
 		}
@@ -600,7 +607,7 @@ final class IPFSFile extends File {
 		java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(this.pathName));
 		if (cacheFile.length() <= 0) {
 			HiveException e = new HiveException("the file to upload is invalid");
-			callback.onError(e);
+			value.setException(e);
 			future.completeExceptionally(e);
 			return future;
 		}
@@ -608,7 +615,7 @@ final class IPFSFile extends File {
 		final long limitSize = 4 * 1024 * 1024; //4M
 		if (cacheFile.length() > limitSize) {
 			HiveException e = new HiveException("the file size is too large");
-			callback.onError(e);
+			value.setException(e);
 			future.completeExceptionally(e);
 			return future;
 		}
@@ -626,6 +633,7 @@ final class IPFSFile extends File {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			HiveException e = new HiveException(ex.getMessage());
+			value.setException(e);
 			future.completeExceptionally(e);
 		}
 		
@@ -695,7 +703,9 @@ final class IPFSFile extends File {
 							total += length;
 						}
 					} catch (Exception e) {
-						future.completeExceptionally(new HiveException(e.getMessage()));
+						HiveException ex = new HiveException(e.getMessage());
+						value.setException(ex);
+						future.completeExceptionally(ex);
 						return;
 					}
 					finally {
@@ -704,7 +714,9 @@ final class IPFSFile extends File {
 								cacheStream.close();
 							}
 						} catch (Exception e) {
-							future.completeExceptionally(new HiveException(e.getMessage()));
+							HiveException ex = new HiveException(e.getMessage());
+							value.setException(ex);
+							future.completeExceptionally(ex);
 							return;
 						}
 					}
@@ -715,11 +727,8 @@ final class IPFSFile extends File {
 					return;
 				}
 				case WRITE: {
-					if (value != null && value.getCallback() != null) {
-						Callback<PackValue> callback = (Callback<PackValue>) value.getCallback();
-						callback.onSuccess(value);
-					}
-
+					Callback<PackValue> callback = (Callback<PackValue>) value.getCallback();
+					callback.onSuccess(value);
 					future.complete(value);
 					CacheHelper.deleteCache(IPFSFile.this.pathName);
 					return;
