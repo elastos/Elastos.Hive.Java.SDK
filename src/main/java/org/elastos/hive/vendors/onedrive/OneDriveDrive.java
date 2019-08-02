@@ -231,16 +231,16 @@ final class OneDriveDrive extends Drive {
 			callback = new NullCallback<File>();
 
 		if (!pathName.startsWith("/")) {
-			HiveException ex = new HiveException("Path name must be absulte path");
-			callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException("Path name must be absulte path");
+			callback.onError(e);
+			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (pathName.equals("/")) {
-			HiveException ex = new HiveException("Impossible to create root directory as file");
-			callback.onError(ex);
-			future.completeExceptionally(ex);
+			HiveException e = new HiveException("Impossible to create root directory as file");
+			callback.onError(e);
+			future.completeExceptionally(e);
 			return future;
 		}
 
