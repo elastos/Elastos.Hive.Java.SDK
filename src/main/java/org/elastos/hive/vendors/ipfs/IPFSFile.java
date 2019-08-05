@@ -34,9 +34,7 @@ import org.elastos.hive.vendors.connection.ConnectionManager;
 import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
@@ -414,7 +412,7 @@ final class IPFSFile extends File {
 			needDeleteCache = false;
 		}
 
-		if (!cacheFile.exists()) {
+		if (!cacheFile.exists() || cacheFile.length() <= 0) {
 			//get the file from the remote.
 			try {
 				ConnectionManager.getIPFSApi()
@@ -522,20 +520,15 @@ final class IPFSFile extends File {
 		if (callback == null)
 			callback = new NullCallback<Length>();
 
-		final Callback<Length> finalCallback = callback; 
+		value.setCallback(callback);
 
 		CompletableFuture<PackValue> future = CompletableFuture.supplyAsync(() -> {
-			value.setCallback(finalCallback);
-
 			if (value.getException() != null) {
-				finalCallback.onError(value.getException());
 				return value;
 			}
 
 			if (dest == null || dest.capacity() <= 0) {
-				HiveException e = new HiveException("the dest buffer is invalid");
-				finalCallback.onError(e);
-				value.setException(e);
+				value.setException(new HiveException("the dest buffer is invalid"));
 				return value;
 			}
 
@@ -562,7 +555,8 @@ final class IPFSFile extends File {
 			}
 			catch (Exception e) {
 				e.printStackTrace();
-				finalCallback.onError(new HiveException("write the buffer to cache file failed."));
+				value.setException(new HiveException("write the buffer to cache file failed."));
+				return value;
 			}
 			finally {
 				try {
@@ -575,15 +569,13 @@ final class IPFSFile extends File {
 					}
 				}
 				catch (Exception e) {
-					HiveException ex = new HiveException(e.getMessage());
-					finalCallback.onError(ex);
-					value.setException(ex);
 					e.printStackTrace();
+					value.setException(new HiveException(e.getMessage()));
+					return value;
 				}
 			}
 
 			Length writeLen = new Length(len);
-			finalCallback.onSuccess(writeLen);
 			value.setValue(writeLen);
 			return value;
 		});
@@ -727,8 +719,6 @@ final class IPFSFile extends File {
 					return;
 				}
 				case WRITE: {
-					Callback<PackValue> callback = (Callback<PackValue>) value.getCallback();
-					callback.onSuccess(value);
 					future.complete(value);
 					CacheHelper.deleteCache(IPFSFile.this.pathName);
 					return;

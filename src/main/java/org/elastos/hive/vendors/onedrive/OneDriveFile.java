@@ -311,7 +311,7 @@ final class OneDriveFile extends File {
 			needDeleteCache = false;
 		}
 
-		if (!cacheFile.exists()) {
+		if (!cacheFile.exists() || cacheFile.length() <= 0) {
 			//get the file from the remote.
 			try {
 				ConnectionManager.getOnedriveApi()
