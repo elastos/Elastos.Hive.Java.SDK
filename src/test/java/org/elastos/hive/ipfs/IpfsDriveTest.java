@@ -176,6 +176,33 @@ public class IpfsDriveTest {
 		}
     }
 
+	@Test public void testCreateDirectoryWithInvalidArgAsync() {
+		callbackInvoked = false;
+		Callback<Directory> callback = new Callback<Directory>() {
+			@Override
+			public void onError(HiveException e) {
+				e.printStackTrace();
+				callbackInvoked = true;
+			}
+
+			@Override
+			public void onSuccess(Directory directory) {
+				fail();
+			}
+		};
+		
+		try {
+			//Must include "/"
+			String pathName = "InvalidDirectoryPath";
+			drive.createDirectory(pathName, callback).get();
+			assertTrue(callbackInvoked);
+
+			fail();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+    }
+	
 	@Test public void testGetDirectory() {
 		Directory directory = null;
 		try {
