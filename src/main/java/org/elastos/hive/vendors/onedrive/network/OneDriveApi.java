@@ -76,9 +76,6 @@ public interface OneDriveApi {
     @DELETE(OneDriveConstance.DRIVE+"/root:{path}")
     Call<NoBodyEntity> deleteItem(@Path("path")String path);
 
-    @POST(OneDriveConstance.DRIVE+"/root:{path}:/children")
-    Call<FileOrDirPropResponse> createDirFromDir(@Path("path") String path , @Body CreateDirRequest dirRequest);
-
     @GET(OneDriveConstance.DRIVE+"/root:{path}")
     Call<FileOrDirPropResponse> getDirFromDir(@Path("path") String path);
 

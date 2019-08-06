@@ -290,10 +290,18 @@ class OneDriveDirectory extends Directory {
 		}
 
         try {
+    		String urlPath;
+    		if (pathName.equals("/")) {
+    			urlPath = "/root/children";
+    		}
+    		else {
+    			urlPath = "/root:/"+pathName+":/children";
+    		}
+
 			CreateDirRequest createDirRequest = new CreateDirRequest(name);
 			ConnectionManager.getOnedriveApi()
-					.createDirFromDir(this.pathName, createDirRequest)
-					.enqueue(new DirectoryCallback(future , callback ,this.pathName+"/"+name, Type.CREATE_DIR));
+					.createDir(urlPath, createDirRequest)
+					.enqueue(new DirectoryCallback(future , callback ,this.pathName + "/"+name, Type.CREATE_DIR));
         } catch (Exception ex) {
         	HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
