@@ -459,13 +459,6 @@ final class IPFSFile extends File {
 			return future;
 		}
 
-		if (length.getLength() < 0) {
-			HiveException e = new HiveException("the file length must be non-negative");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
 		//1. clear the buffer, and read
 		dest.clear();
 		FileInputStream fileInputStream = null;
