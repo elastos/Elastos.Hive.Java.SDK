@@ -325,15 +325,21 @@ final class OneDriveFile extends File {
 			return future;
 		}
 
-		java.io.File file = CacheHelper.getCacheFile(this.pathName);
-		Length length = new Length(file.length());
+		Length length = new Length(cacheFile.length());
 		future.complete(length);
 		return future;
 	}
 
 	private CompletableFuture<Length> read(Length length, ByteBuffer dest, long position, Callback<Length> callback) {
 		CompletableFuture<Length> future = new CompletableFuture<Length>();
-		if (length.getLength() <= 0) {
+		if (length.getLength() == 0) {
+			Length zero = new Length(0);
+			callback.onSuccess(zero);
+			future.complete(zero);
+			return future;
+		}
+
+		if (length.getLength() < 0) {
 			HiveException e = new HiveException("the file length must be non-negative");
 			callback.onError(e);
 			future.completeExceptionally(e);
@@ -345,7 +351,7 @@ final class OneDriveFile extends File {
 		FileInputStream fileInputStream = null;
 		FileChannel inChannel = null;
 		try {
-			java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(pathName));
+			java.io.File cacheFile = CacheHelper.getCacheFile(pathName);
 			if (!cacheFile.exists()) {
 				cacheFile.createNewFile();
 			}
@@ -462,6 +468,7 @@ final class OneDriveFile extends File {
 			catch (Exception e) {
 				e.printStackTrace();
 				callback.onError(new HiveException("write the buffer to cache file failed."));
+				return new Length(0);
 			}
 			finally {
 				try {
@@ -476,6 +483,7 @@ final class OneDriveFile extends File {
 				catch (Exception e) {
 					e.printStackTrace();
 					callback.onError(new HiveException(e.getMessage()));
+					return new Length(0);
 				}
 			}
 
@@ -533,6 +541,7 @@ final class OneDriveFile extends File {
 
 	@Override
 	public void discard() {
+		needDeleteCache = true;
 		writeCursor = 0;
 		CacheHelper.deleteCache(this.pathName);
 	}
@@ -622,6 +631,8 @@ final class OneDriveFile extends File {
 							cacheStream.write(b, 0, length);
 							total += length;
 						}
+
+						data.close();
 					} catch (Exception e) {
 						future.completeExceptionally(new HiveException(e.getMessage()));
 						return;
@@ -645,6 +656,7 @@ final class OneDriveFile extends File {
 					Void padding = new Void();
 					this.callback.onSuccess(padding);
 					future.complete(padding);
+					needDeleteCache = true;
 					CacheHelper.deleteCache(OneDriveFile.this.pathName);
 					break;
 				}
