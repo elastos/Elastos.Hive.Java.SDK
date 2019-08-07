@@ -383,6 +383,7 @@ final class IPFSFile extends File {
 
 	@Override
 	public void discard() {
+		needDeleteCache = true;
 		writeCursor = 0;
 		CacheHelper.deleteCache(this.pathName);
 	}
@@ -451,8 +452,17 @@ final class IPFSFile extends File {
 		}
 
 		Length length = (Length) value.getValue();
-		if (length.getLength() <= 0) {
-			future.complete(length);
+		if (length.getLength() == 0) {
+			Length zero = new Length(0);
+			callback.onSuccess(zero);
+			future.complete(zero);
+			return future;
+		}
+
+		if (length.getLength() < 0) {
+			HiveException e = new HiveException("the file length must be non-negative");
+			callback.onError(e);
+			future.completeExceptionally(e);
 			return future;
 		}
 
@@ -720,6 +730,7 @@ final class IPFSFile extends File {
 				}
 				case WRITE: {
 					future.complete(value);
+					needDeleteCache = true;
 					CacheHelper.deleteCache(IPFSFile.this.pathName);
 					return;
 				}

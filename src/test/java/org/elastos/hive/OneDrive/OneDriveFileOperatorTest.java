@@ -184,7 +184,7 @@ public class OneDriveFileOperatorTest {
 	public void testFileWriteWithPosition() {
 		File file = null;
 		try {
-			String pathName = "/testFileWriteWithPosition.txt";
+			String pathName = "/onedrive_testFileWriteWithPosition.txt";
 			file = drive.createFile(pathName).get();
 			assertNotNull(file);
 
@@ -260,7 +260,7 @@ public class OneDriveFileOperatorTest {
 
 		File file = null;
 		try {
-			String pathName = "/ipfs_testFileWriteWithPosition_sync.txt";
+			String pathName = "/onedirve_testFileWriteWithPosition_sync.txt";
 			file = drive.createFile(pathName).get();
 			assertNotNull(file);
 
@@ -353,11 +353,8 @@ public class OneDriveFileOperatorTest {
 		try {
 			fileInputStream = new FileInputStream(path);
 			inChannel = fileInputStream.getChannel();
-			long len = 0;
-			//2. read by inner readCursor or position
-				//read, by-position
 			ByteBuffer buffer = ByteBuffer.allocate(fileInputStream.available());
-			len = inChannel.read(buffer);
+			inChannel.read(buffer);
 			buffer.flip();
 			return buffer;
 		}
