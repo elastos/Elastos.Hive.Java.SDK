@@ -4,7 +4,6 @@ import org.elastos.hive.*;
 import org.elastos.hive.Void;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.FileInputStream;
@@ -22,6 +21,17 @@ public class OneDriveFileOperatorTest {
 	private static Drive drive;
 	private static Client client;
 
+	@Test 
+	public void testMultiCases() {
+		final int count = 10;
+		for (int i = 0; i < count; i++) {
+			testFileWrite();
+			testFileWriteWithAsync();
+			testFileWriteWithPosition();
+			testFileWriteWithPositionAsync();
+		}
+	}
+	
 	@Test 
 	public void testFileWrite() {
 		File file = null;
