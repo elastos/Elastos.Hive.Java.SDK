@@ -162,15 +162,14 @@ public final class IPFSClient extends Client {
 
 	@Override
 	public CompletableFuture<Client.Info> getInfo(Callback<Client.Info> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> getInfo(value, callback));
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> getInfo(value));
 	}
 
-	private CompletableFuture<Client.Info> getInfo(PackValue value, Callback<Client.Info> callback) {
+	private CompletableFuture<Client.Info> getInfo(PackValue value) {
 		CompletableFuture<Client.Info> future = new CompletableFuture<Client.Info>();
 
-		if (callback == null)
-			callback = new NullCallback<Client.Info>();
+		Callback<Client.Info> callback = (Callback<Info>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -191,15 +190,14 @@ public final class IPFSClient extends Client {
 
 	@Override
 	public CompletableFuture<Drive> getDefaultDrive(Callback<Drive> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> getDefaultDrive(value, callback));
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> getDefaultDrive(value));
 	}
 
-	private CompletableFuture<Drive> getDefaultDrive(PackValue value, Callback<Drive> callback) {
+	private CompletableFuture<Drive> getDefaultDrive(PackValue value) {
 		CompletableFuture<Drive> future = new CompletableFuture<Drive>();
 
-		if (callback == null)
-			callback = new NullCallback<Drive>();
+		Callback<Client.Info> callback = (Callback<Info>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
