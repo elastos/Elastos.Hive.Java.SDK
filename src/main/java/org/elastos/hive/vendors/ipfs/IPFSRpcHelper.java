@@ -236,7 +236,7 @@ class IPFSRpcHelper implements AuthHelper {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
 		if (value.getException() != null) {
-			future.completeExceptionally(value.getException());
+			future.complete(value);
 			return future;
 		}
 		getStat(future,value,getBaseUrl(),getIpfsEntry().getUid(),path);
@@ -247,7 +247,7 @@ class IPFSRpcHelper implements AuthHelper {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
 		if (value.getException() != null) {
-			future.completeExceptionally(value.getException());
+			future.complete(value);
 			return future;
 		}
 
@@ -453,7 +453,7 @@ class IPFSRpcHelper implements AuthHelper {
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			value.setException(e);
-			future.completeExceptionally(e);
+			future.complete(value);
 		}
 	}
 
@@ -466,7 +466,7 @@ class IPFSRpcHelper implements AuthHelper {
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
 			value.setException(e);
-			future.completeExceptionally(e);
+			future.complete(value);
 		}
 	}
 
@@ -486,7 +486,7 @@ class IPFSRpcHelper implements AuthHelper {
 			if (response.code() != 200) {
 				HiveException e = new HiveException("Server Error: " + response.message());
 				value.setException(e);
-				future.completeExceptionally(e);
+				future.complete(value);
 				return;
 			}
 
@@ -510,7 +510,7 @@ class IPFSRpcHelper implements AuthHelper {
 
 			HiveException e = new HiveException(t.getMessage());
 			this.value.setException(e);
-			future.completeExceptionally(e);
+			future.complete(value);
 		}
 	}
 }

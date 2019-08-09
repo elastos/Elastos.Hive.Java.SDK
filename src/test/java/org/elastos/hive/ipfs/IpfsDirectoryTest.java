@@ -181,11 +181,10 @@ public class IpfsDirectoryTest {
 			//Must include "/"
 			String pathName = "InvalidDirectoryPath";
 			drive.createDirectory(pathName, callback).get();
-			assertTrue(callbackInvoked);
-
 			fail();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
+			assertTrue(callbackInvoked);
 		}
     }
 
@@ -534,8 +533,7 @@ public class IpfsDirectoryTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCopyTo failed");
-		}
-		finally {
+		} finally {
 			try {
 				parentDir.deleteItem().get();
 			} catch (Exception ex) {
@@ -576,8 +574,7 @@ public class IpfsDirectoryTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCopyToAsync failed");
-		}
-		finally {
+		} finally {
 			try {
 				parentDir.deleteItem().get();
 			} catch (Exception ex) {
@@ -615,8 +612,7 @@ public class IpfsDirectoryTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCopyToInvalid failed");
-		}
-		finally {
+		} finally {
 			try {
 				parentDir.deleteItem().get();
 			} catch (Exception ex) {

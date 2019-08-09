@@ -62,8 +62,7 @@ public class IpfsFileOperatorTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testFileWrite failed");
-		}
-		finally {
+		} finally {
 			try {
 				file.deleteItem().get();
 			} catch (Exception ex) {
@@ -168,8 +167,7 @@ public class IpfsFileOperatorTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testFileWriteWithAsync failed");
-		}
-		finally {
+		} finally {
 			try {
 				file.deleteItem().get();
 			} catch (Exception ex) {
@@ -242,8 +240,7 @@ public class IpfsFileOperatorTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testFileWriteWithPosition failed");
-		}
-		finally {
+		} finally {
 			try {
 				file.deleteItem().get();
 			} catch (Exception ex) {
@@ -335,8 +332,7 @@ public class IpfsFileOperatorTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testFileWriteWithPositionAsync failed");
-		}
-		finally {
+		} finally {
 			try {
 				file.deleteItem().get();
 			} catch (Exception ex) {
@@ -356,11 +352,9 @@ public class IpfsFileOperatorTest {
 			inChannel.read(buffer);
 			buffer.flip();
 			return buffer;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			try {
 				if (inChannel != null) {
 					inChannel.close();
@@ -390,22 +384,18 @@ public class IpfsFileOperatorTest {
 			outputStream = new FileOutputStream(path, true);
 			outputChannel = outputStream.getChannel();
 			outputChannel.write(buffer);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			try {
 				outputChannel.close();
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 			try {
 				outputStream.close();
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

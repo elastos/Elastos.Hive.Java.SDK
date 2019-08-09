@@ -33,7 +33,7 @@ public class OneDriveDriveTest {
 			fail("testGetInfo failed");
 		}
     }
-	
+
 	@Test public void testGetInfoAsync() {
 		callbackInvoked = false;
 		Callback<Drive.Info> callback = new Callback<Drive.Info>() {
@@ -50,7 +50,7 @@ public class OneDriveDriveTest {
 				assertNotNull(info.get(Drive.Info.driveId));
 			}
 		};
-		
+
 		try {
 			drive.getInfo(callback).get();
 			assertTrue(callbackInvoked);
@@ -75,7 +75,7 @@ public class OneDriveDriveTest {
 			fail("testGetRootDir failed");
 		}
     }
-	
+
 	@Test public void testGetRootDirAsync() {
 		callbackInvoked = false;
 		Callback<Directory> callback = new Callback<Directory>() {
@@ -91,7 +91,7 @@ public class OneDriveDriveTest {
 				assertNotNull(directory);
 			}
 		};
-		
+
 		try {
 			drive.getRootDir(callback).get();
 			assertTrue(callbackInvoked);
@@ -107,10 +107,6 @@ public class OneDriveDriveTest {
 			String pathName = "/testCreateDirectory" + System.currentTimeMillis();
 			directory = drive.createDirectory(pathName).get();
 			assertNotNull(directory);
-
-			pathName += "/" + System.currentTimeMillis();
-			Directory secondLevelDir = drive.createDirectory(pathName).get();
-			assertNotNull(secondLevelDir);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCreateDirectory failed");
@@ -124,7 +120,7 @@ public class OneDriveDriveTest {
 			}
 		}
     }
-	
+
 	private Directory testDirectory = null;
 	@Test public void testCreateDirectoryAsync() {
 		callbackInvoked = false;
@@ -147,10 +143,6 @@ public class OneDriveDriveTest {
 			String pathName = "/testCreateDirectoryAsync" + System.currentTimeMillis();
 			drive.createDirectory(pathName, callback).get();
 			assertTrue(callbackInvoked);
-
-			pathName += "/" + System.currentTimeMillis();
-			Directory secondLevelDir = drive.createDirectory(pathName).get();
-			assertNotNull(secondLevelDir);
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCreateDirectoryAsync failed");
@@ -175,7 +167,7 @@ public class OneDriveDriveTest {
 			e.printStackTrace();
 		}
     }
-	
+
 	@Test public void testCreateDirectoryWithInvalidArgAsync() {
 		callbackInvoked = false;
 		Callback<Directory> callback = new Callback<Directory>() {
@@ -190,7 +182,7 @@ public class OneDriveDriveTest {
 				fail();
 			}
 		};
-		
+
 		try {
 			//Must include "/"
 			String pathName = "InvalidDirectoryPath";
@@ -214,7 +206,7 @@ public class OneDriveDriveTest {
 			assertNotNull(directory);
 		} catch (InterruptedException | ExecutionException e) {
 			fail("testGetDirectory failed");
-		}		
+		}
 		finally {
 			try {
 				directory.deleteItem().get();
@@ -224,7 +216,7 @@ public class OneDriveDriveTest {
 			}
 		}
     }
-	
+
 	@Test public void testGetDirectoryAsync() {
 		callbackInvoked = false;
 		Callback<Directory> callback = new Callback<Directory>() {
@@ -250,7 +242,7 @@ public class OneDriveDriveTest {
 			assertTrue(callbackInvoked);
 		} catch (InterruptedException | ExecutionException e) {
 			fail("testGetDirectoryAsync failed");
-		}		
+		}
 		finally {
 			try {
 				testDirectory.deleteItem().get();
@@ -291,7 +283,7 @@ public class OneDriveDriveTest {
 			}
 		}
     }
-	
+
 	private File testFile = null;
 	@Test public void testCreateFileAsync() {
 		callbackInvoked = false;
@@ -360,7 +352,7 @@ public class OneDriveDriveTest {
 			}
 		}
     }
-	
+
 	@Test public void testGetFileAsync() {
 		callbackInvoked = false;
 		Callback<File> callback = new Callback<File>() {
@@ -452,7 +444,7 @@ public class OneDriveDriveTest {
 			}
 		}
     }
-	
+
 	@Test public void testGetItemInfoAsync() {
 		callbackInvoked = false;
 		Callback<ItemInfo> callback = new Callback<ItemInfo>() {
@@ -481,7 +473,7 @@ public class OneDriveDriveTest {
 
 			drive.getItemInfo(pathName, callback).get();
 			assertTrue(callbackInvoked);
-			
+
 			//2. directory
 			name = "testGetItemInfoAsync_Dir";
 			pathName = "/" + name;
