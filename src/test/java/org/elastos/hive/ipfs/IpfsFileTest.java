@@ -167,8 +167,7 @@ public class IpfsFileTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCopyTo failed");
-		}
-		finally {
+		} finally {
 			try {
 				parentDir.deleteItem().get();
 			} catch (Exception ex) {
@@ -206,8 +205,7 @@ public class IpfsFileTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCopyToAsync failed");
-		}
-		finally {
+		} finally {
 			try {
 				parentDir.deleteItem().get();
 			} catch (Exception ex) {
@@ -243,8 +241,7 @@ public class IpfsFileTest {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCopyToInvalid failed");
-		}
-		finally {
+		} finally {
 			try {
 				parentDir.deleteItem().get();
 			} catch (Exception ex) {

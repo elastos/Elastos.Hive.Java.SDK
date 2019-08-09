@@ -376,14 +376,9 @@ public final class IPFSClient extends Client {
 		@Override
 		public void onResponse(Call call, Response response) {
 			if (response.code() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.message());
-				if (callback!=null){
-					this.callback.onError(ex);
-				}
-
-				if (future!=null){
-					future.completeExceptionally(ex);
-				}
+				HiveException e = new HiveException("Server Error: " + response.message());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 

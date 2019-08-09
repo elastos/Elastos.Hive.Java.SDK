@@ -133,14 +133,14 @@ final class IPFSDrive extends Drive{
 
 		if (path == null || path.isEmpty()) {
 			HiveException e = new HiveException("Empty path name");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (!path.startsWith("/")) {
 			HiveException e = new HiveException("Path name must be a abosulte path");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
@@ -222,14 +222,14 @@ final class IPFSDrive extends Drive{
 
 		if (path == null || path.isEmpty()) {
 			HiveException e = new HiveException("Empty path name");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (!path.startsWith("/")) {
 			HiveException e = new HiveException("Path name must be a abosulte path");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
@@ -345,10 +345,9 @@ final class IPFSDrive extends Drive{
 			}
 		} catch (Exception ex) {
 				HiveException e = new HiveException(ex.getMessage());
-				value.setException(e);
+				value.getCallback().onError(e);
 				future.completeExceptionally(e);
 		}
-
 	}
 
 	private void createConnection(CompletableFuture future , Callback callback ,String url ,
@@ -392,7 +391,7 @@ final class IPFSDrive extends Drive{
 		public void onResponse(Call call, Response response) {
 			if (response.code() != 200) {
 				HiveException e = new HiveException("Server Error: " + response.message());
-				value.setException(e);
+				value.getCallback().onError(e);
 				future.completeExceptionally(e);
 				return;
 			}
@@ -440,7 +439,7 @@ final class IPFSDrive extends Drive{
 			}
 
 			HiveException e = new HiveException(t.getMessage());
-			value.setException(e);
+			value.getCallback().onError(e);
 			future.completeExceptionally(e);
 		}
 	}
@@ -461,14 +460,9 @@ final class IPFSDrive extends Drive{
 		@Override
 		public void onResponse(Call call, Response response) {
 			if (response.code() != 200) {
-				HiveException ex = new HiveException("Server Error: " + response.message());
-				if (callback != null) {
-					this.callback.onError(ex);
-				}
-
-				if (future != null) {
-					future.completeExceptionally(ex);
-				}
+				HiveException e = new HiveException("Server Error: " + response.message());
+				this.callback.onError(e);
+				future.completeExceptionally(e);
 				return;
 			}
 

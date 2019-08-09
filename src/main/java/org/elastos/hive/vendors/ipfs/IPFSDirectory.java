@@ -124,14 +124,14 @@ class IPFSDirectory extends Directory  {
 
 		if (path == null || path.isEmpty()) {
 			HiveException e = new HiveException("The path is invalid");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (path.contains("/")) {
 			HiveException e = new HiveException("Only need the path name");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
@@ -217,14 +217,14 @@ class IPFSDirectory extends Directory  {
 
 		if (path == null || path.isEmpty()) {
 			HiveException e = new HiveException("The path is invalid");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (path.contains("/")) {
 			HiveException e = new HiveException("Only need the name of a file.");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
@@ -325,21 +325,21 @@ class IPFSDirectory extends Directory  {
 
 		if (path == null || path.isEmpty()) {
 			HiveException e = new HiveException("The path is invalid");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (!path.startsWith("/")) {
 			HiveException e = new HiveException("Path name must be a abosulte path");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (path.equals(this.pathName)) {
 			HiveException e = new HiveException("Can't move to the oneself directory");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
@@ -390,21 +390,21 @@ class IPFSDirectory extends Directory  {
 
 		if (path == null || path.isEmpty()) {
 			HiveException e = new HiveException("The path is invalid");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (!path.startsWith("/")) {
 			HiveException e = new HiveException("Path name must be a abosulte path");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		if (path.equals(this.pathName)) {
 			HiveException e = new HiveException("Can't copy to the oneself directory");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
@@ -412,6 +412,7 @@ class IPFSDirectory extends Directory  {
 		String hash = value.getHash().getValue();
 		if (hash == null || hash.isEmpty()) {
 			HiveException e = new HiveException("The hash is invalid");
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
@@ -441,6 +442,7 @@ class IPFSDirectory extends Directory  {
 		return rpcHelper.checkExpiredNew()
 				.thenCompose(value -> deleteItem(value, callback))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
+				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
 	}
 
@@ -460,7 +462,7 @@ class IPFSDirectory extends Directory  {
 
 		if (pathName.equals("/")) {
 			HiveException e = new HiveException("Can't delete the root.");
-			value.setException(e);
+			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
@@ -534,10 +536,9 @@ class IPFSDirectory extends Directory  {
 			}
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
-			value.setException(e);
+			value.getCallback().onError(e);
 			future.completeExceptionally(e);
 		}
-
 	}
 
 	private void createConnection(CompletableFuture future , Callback callback ,String url ,
@@ -580,7 +581,7 @@ class IPFSDirectory extends Directory  {
 		public void onResponse(Call call, Response response) {
 			if (response.code() != 200) {
 				HiveException e = new HiveException("Server Error: " + response.message());
-				value.setException(e);
+				value.getCallback().onError(e);
 				future.completeExceptionally(e);
 				return;
 			}
@@ -661,7 +662,7 @@ class IPFSDirectory extends Directory  {
 			}
 
 			HiveException e = new HiveException(t.getMessage());
-			value.setException(e);
+			value.getCallback().onError(e);
 			future.completeExceptionally(e);
 		}
 	}
