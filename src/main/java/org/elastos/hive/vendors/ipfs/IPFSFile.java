@@ -79,15 +79,14 @@ final class IPFSFile extends File {
 
 	@Override
 	public CompletableFuture<Info> getInfo(Callback<Info> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> getInfo(value, callback));
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> getInfo(value));
 	}
 
-	private CompletableFuture<Info> getInfo(PackValue value, Callback<Info> callback) {
+	private CompletableFuture<Info> getInfo(PackValue value) {
 		CompletableFuture<File.Info> future = new CompletableFuture<File.Info>();
 
-		if (callback == null)
-			callback = new NullCallback<Info>();
+		Callback<Info> callback = (Callback<Info>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -125,20 +124,17 @@ final class IPFSFile extends File {
 
 	@Override
 	public CompletableFuture<Void> moveTo(String path, Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> moveTo(value, path, callback))
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> moveTo(value, path))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
 				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
 	}
 
-	private CompletableFuture<PackValue> moveTo(PackValue value, String path, Callback<Void> callback) {
+	private CompletableFuture<PackValue> moveTo(PackValue value, String path) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
-		if (callback == null)
-			callback = new NullCallback<Void>();
-
-		value.setCallback(callback);
+		Callback<Void> callback = (Callback<Void>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -190,21 +186,18 @@ final class IPFSFile extends File {
 
 	@Override
 	public CompletableFuture<Void> copyTo(String path, Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew()
+		return rpcHelper.checkExpiredNew(callback)
 				.thenCompose(value -> rpcHelper.getPathHash(value, this.pathName))
-				.thenCompose(value -> copyTo(value, path, callback))
+				.thenCompose(value -> copyTo(value, path))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
 				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
 	}
 
-	private CompletableFuture<PackValue> copyTo(PackValue value, String path, Callback<Void> callback) {
+	private CompletableFuture<PackValue> copyTo(PackValue value, String path) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
-		if (callback == null)
-			callback = new NullCallback<Void>();
-
-		value.setCallback(callback);
+		Callback<Void> callback = (Callback<Void>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -263,20 +256,17 @@ final class IPFSFile extends File {
 
 	@Override
 	public CompletableFuture<Void> deleteItem(Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> deleteItem(value, callback))
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> deleteItem(value))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
 				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
 	}
 
-	private CompletableFuture<PackValue> deleteItem(PackValue value, Callback<Void> callback) {
+	private CompletableFuture<PackValue> deleteItem(PackValue value) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
-		if (callback == null)
-			callback = new NullCallback<Void>();
-
-		value.setCallback(callback);
+		Callback<Void> callback = (Callback<Void>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -309,9 +299,9 @@ final class IPFSFile extends File {
 
 	@Override
 	public CompletableFuture<Length> read(ByteBuffer dest, Callback<Length> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> checkAndCache(value, dest, callback))
-				.thenCompose(value -> read(value, dest, -1, callback));
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> checkAndCache(value, dest))
+				.thenCompose(value -> read(value, dest, -1));
 	}
 
 	@Override
@@ -329,9 +319,9 @@ final class IPFSFile extends File {
 			return future;
 		}
 
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> checkAndCache(value, dest, callback))
-				.thenCompose(value -> read(value, dest, position, callback));
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> checkAndCache(value, dest))
+				.thenCompose(value -> read(value, dest, position));
 	}
 
 	@Override
@@ -341,9 +331,9 @@ final class IPFSFile extends File {
 
 	@Override
 	public CompletableFuture<Length> write(ByteBuffer dest, Callback<Length> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> checkAndCache(value, dest, callback))
-				.thenCompose(value -> localWrite(value, dest, -1, callback))
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> checkAndCache(value, dest))
+				.thenCompose(value -> localWrite(value, dest, -1))
 				.thenCompose(value -> rpcHelper.invokeLengthCallback(value));
 	}
 
@@ -362,9 +352,9 @@ final class IPFSFile extends File {
 			return future;
 		}
 
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> checkAndCache(value, dest, callback))
-				.thenCompose(value -> localWrite(value, dest, position, callback))
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> checkAndCache(value, dest))
+				.thenCompose(value -> localWrite(value, dest, position))
 				.thenCompose(value -> rpcHelper.invokeLengthCallback(value));
 	}
 
@@ -375,8 +365,8 @@ final class IPFSFile extends File {
 
 	@Override
 	public CompletableFuture<Void> commit(Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> commit(value, callback))
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> commit(value))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
 				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
@@ -389,8 +379,10 @@ final class IPFSFile extends File {
 		CacheHelper.deleteCache(this.pathName);
 	}
 
-	private CompletableFuture<PackValue> checkAndCache(PackValue value, ByteBuffer dest, Callback<Length> callback) {
+	private CompletableFuture<PackValue> checkAndCache(PackValue value, ByteBuffer dest) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
+		
+		Callback<Length> callback = (Callback<Length>) value.getCallback();
 		
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -440,12 +432,9 @@ final class IPFSFile extends File {
 	}
 	
 	private long readCursor = 0;
-	private CompletableFuture<Length> read(PackValue value, ByteBuffer dest, long position, Callback<Length> callback) {
+	private CompletableFuture<Length> read(PackValue value, ByteBuffer dest, long position) {
 		CompletableFuture<Length> future = new CompletableFuture<Length>();
-		if (callback == null)
-			callback = new NullCallback<Length>();
-
-		value.setCallback(callback);
+		Callback<Length> callback = (Callback<Length>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -521,11 +510,8 @@ final class IPFSFile extends File {
 	}
 	
 	private long writeCursor = 0;
-	private CompletableFuture<PackValue> localWrite(PackValue value, ByteBuffer dest, long position, Callback<Length> callback) {
-		if (callback == null)
-			callback = new NullCallback<Length>();
-
-		value.setCallback(callback);
+	private CompletableFuture<PackValue> localWrite(PackValue value, ByteBuffer dest, long position) {
+		Callback<Length> callback = (Callback<Length>) value.getCallback();
 
 		CompletableFuture<PackValue> future = CompletableFuture.supplyAsync(() -> {
 			if (value.getException() != null) {
@@ -588,13 +574,10 @@ final class IPFSFile extends File {
 		return future;
 	}
 	
-	private CompletableFuture<PackValue> commit(PackValue value, Callback<Void> callback) {
+	private CompletableFuture<PackValue> commit(PackValue value) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
-		if (callback == null)
-			callback = new NullCallback<Void>();
-
-		value.setCallback(callback);
+		Callback<Void> callback = (Callback<Void>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());

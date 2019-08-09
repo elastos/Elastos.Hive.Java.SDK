@@ -101,17 +101,23 @@ class IPFSRpcHelper implements AuthHelper {
 		return checkExpired(new NullCallback<Void>());
 	}
 
-	public CompletableFuture<PackValue> checkExpiredNew() {
+	public CompletableFuture<PackValue> checkExpiredNew(Callback callback) {
+		if (callback == null)
+			callback = new NullCallback();
+
 		if (isValid) {
 			CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
-			PackValue padding = new PackValue();
-		    future.complete(padding);
+			PackValue value = new PackValue();
+			value.setCallback(callback);
+		    future.complete(value);
 			return future;
 		}
 
+		final Callback finalCallback = callback;
 		//get home hash and login
 		CompletableFuture<PackValue> future = CompletableFuture.supplyAsync(() -> {
-			PackValue padding = new PackValue();
+			PackValue value = new PackValue();
+			value.setCallback(finalCallback);
 			try {
 				String homeHash = null;
 				//Using the older validAddress try to get the home hash.
@@ -140,21 +146,22 @@ class IPFSRpcHelper implements AuthHelper {
 				}
 
 				if (homeHash == null) {
-				    padding.setException(new HiveException("The PRC addresses cant be connected now."));
-					return padding;
+					value.setException(new HiveException("The PRC addresses cant be connected now."));
+					return value;
 				}
 
 				if (login(BASEURL , entry.getUid() , homeHash)){
 					isValid = true;
 				}
 				else {
-					padding.setException(new HiveException("Connect to ipfs failed."));
+					value.setException(new HiveException("Connect to ipfs failed."));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				value.setException(new HiveException(e.getMessage()));
 			}
 
-			return padding;
+			return value;
 		});
 
 		return future;
@@ -172,7 +179,7 @@ class IPFSRpcHelper implements AuthHelper {
 
 		//get home hash and login
 		CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
-			Void placeHolder = null;
+			Void placeHolder = new Void();
 			try {
 				String homeHash = null;
 				//Using the older validAddress try to get the home hash.
@@ -203,7 +210,6 @@ class IPFSRpcHelper implements AuthHelper {
 				}
 
 				if (homeHash == null) {
-					placeHolder = new Void();
 				    callback.onError(new HiveException("The PRC addresses cant be connected now."));
 					return placeHolder;
 				}
@@ -212,15 +218,15 @@ class IPFSRpcHelper implements AuthHelper {
 					isValid = true;
 				}
 				else {
-					placeHolder = new Void();
-				        callback.onError(new HiveException("Login failed."));
+				    callback.onError(new HiveException("Login failed."));
 					return placeHolder;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+			    callback.onError(new HiveException(e.getMessage()));
+				return placeHolder;
 			}
 
-			placeHolder = new Void();
 		    callback.onSuccess(placeHolder);
 			return placeHolder;
 		});

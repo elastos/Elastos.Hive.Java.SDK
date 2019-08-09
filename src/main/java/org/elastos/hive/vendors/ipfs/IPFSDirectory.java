@@ -72,15 +72,14 @@ class IPFSDirectory extends Directory  {
 
 	@Override
 	public CompletableFuture<Info> getInfo(Callback<Info> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> getInfo(value, callback));
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> getInfo(value));
 	}
 
-	private CompletableFuture<Info> getInfo(PackValue value, Callback<Info> callback) {
+	private CompletableFuture<Info> getInfo(PackValue value) {
 		CompletableFuture<Directory.Info> future = new CompletableFuture<Directory.Info>();
 
-		if (callback == null)
-			callback = new NullCallback<Info>();
+		Callback<Info> callback = (Callback<Info>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -101,20 +100,17 @@ class IPFSDirectory extends Directory  {
 
 	@Override
 	public CompletableFuture<Directory> createDirectory(String path, Callback<Directory> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> createDirectory(value, path, callback))
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> createDirectory(value, path))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
 				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeDirectoryCallback(value));
 	}
 
-	private CompletableFuture<PackValue> createDirectory(PackValue value, String path, Callback<Directory> callback) {
+	private CompletableFuture<PackValue> createDirectory(PackValue value, String path) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
-		if (callback == null)
-			callback = new NullCallback<Directory>();
-
-		value.setCallback(callback);
+		Callback<Directory> callback = (Callback<Directory>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -150,15 +146,14 @@ class IPFSDirectory extends Directory  {
 
 	@Override
 	public CompletableFuture<Directory> getDirectory(String path, Callback<Directory> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> getDirectory(value, path, callback));
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> getDirectory(value, path));
 	}
 
-	private CompletableFuture<Directory> getDirectory(PackValue value, String path, Callback<Directory> callback) {
+	private CompletableFuture<Directory> getDirectory(PackValue value, String path) {
 		CompletableFuture<Directory> future = new CompletableFuture<Directory>();
 
-		if (callback == null)
-			callback = new NullCallback<Directory>();
+		Callback<Directory> callback = (Callback<Directory>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -194,20 +189,17 @@ class IPFSDirectory extends Directory  {
 
 	@Override
 	public CompletableFuture<File> createFile(String path, Callback<File> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> createFile(value, path, callback))
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> createFile(value, path))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
 				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeFileCallback(value));
 	}
 
-	private CompletableFuture<PackValue> createFile(PackValue value, String path, Callback<File> callback) {
+	private CompletableFuture<PackValue> createFile(PackValue value, String path) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
-		if (callback == null)
-			callback = new NullCallback<File>();
-
-		value.setCallback(callback);
+		Callback<File> callback = (Callback<File>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -244,15 +236,14 @@ class IPFSDirectory extends Directory  {
 
 	@Override
 	public CompletableFuture<File> getFile(String path, Callback<File> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> getFile(value, path, callback));
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> getFile(value, path));
 	}
 
-	private CompletableFuture<File> getFile(PackValue value, String path, Callback<File> callback) {
+	private CompletableFuture<File> getFile(PackValue value, String path) {
 		CompletableFuture<File> future = new CompletableFuture<File>();
 
-		if (callback == null)
-			callback = new NullCallback<File>();
+		Callback<File> callback = (Callback<File>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -302,20 +293,17 @@ class IPFSDirectory extends Directory  {
 
 	@Override
 	public CompletableFuture<Void> moveTo(String path, Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> moveTo(value, path, callback))
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> moveTo(value, path))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
 				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
 	}
 
-	private CompletableFuture<PackValue> moveTo(PackValue value, String path, Callback<Void> callback) {
+	private CompletableFuture<PackValue> moveTo(PackValue value, String path) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
-		if (callback == null)
-			callback = new NullCallback<Void>();
-
-		value.setCallback(callback);
+		Callback<Void> callback = (Callback<Void>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -366,21 +354,18 @@ class IPFSDirectory extends Directory  {
 
 	@Override
 	public CompletableFuture<Void> copyTo(String path, Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew()
+		return rpcHelper.checkExpiredNew(callback)
 				.thenCompose(value -> rpcHelper.getPathHash(value, this.pathName))
-				.thenCompose(value -> copyTo(value, path, callback))
+				.thenCompose(value -> copyTo(value, path))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
 				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
 	}
 
-	private CompletableFuture<PackValue> copyTo(PackValue value, String path, Callback<Void> callback) {
+	private CompletableFuture<PackValue> copyTo(PackValue value, String path) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
-		if (callback == null)
-			callback = new NullCallback<Void>();
-
-		value.setCallback(callback);
+		Callback<Void> callback = (Callback<Void>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -439,20 +424,17 @@ class IPFSDirectory extends Directory  {
 
 	@Override
 	public CompletableFuture<Void> deleteItem(Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> deleteItem(value, callback))
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> deleteItem(value))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
 				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
 	}
 
-	private CompletableFuture<PackValue> deleteItem(PackValue value, Callback<Void> callback) {
+	private CompletableFuture<PackValue> deleteItem(PackValue value) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
-		if (callback == null)
-			callback = new NullCallback<Void>();
-
-		value.setCallback(callback);
+		Callback<Void> callback = (Callback<Void>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -485,15 +467,14 @@ class IPFSDirectory extends Directory  {
 
 	@Override
 	public CompletableFuture<Children> getChildren(Callback<Children> callback) {
-		return rpcHelper.checkExpiredNew()
-				.thenCompose(value -> getChildren(value, callback));
+		return rpcHelper.checkExpiredNew(callback)
+				.thenCompose(value -> getChildren(value));
 	}
 
-	private CompletableFuture<Children> getChildren(PackValue value, Callback<Children> callback) {
+	private CompletableFuture<Children> getChildren(PackValue value) {
 		CompletableFuture<Children> future = new CompletableFuture<Children>();
 
-		if (callback == null)
-			callback = new NullCallback<Children>();
+		Callback<Children> callback = (Callback<Children>) value.getCallback();
 
 		if (value.getException() != null) {
 			callback.onError(value.getException());
@@ -501,8 +482,6 @@ class IPFSDirectory extends Directory  {
 			return future;
 		}
 		
-		value.setCallback(callback);
-
 		try {
 			ConnectionManager.getIPFSApi()
 					.list(getId(), pathName)
