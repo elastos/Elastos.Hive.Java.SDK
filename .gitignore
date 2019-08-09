@@ -7,6 +7,11 @@ bin/
 doc/
 build/
 
+# Test
+.tmp
+ipfs.json
+onedrive.json
+
 # Maven build output folder
 /target/
 
