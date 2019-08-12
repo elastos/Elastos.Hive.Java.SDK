@@ -85,7 +85,7 @@ final class OneDriveDrive extends Drive {
 
 		try {
 			ConnectionManager.getOnedriveApi()
-					.getDrive()
+					.getDriveInfo()
 					.enqueue(new DriveDriveCallback(null, future , callback , Type.GET_INFO));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
