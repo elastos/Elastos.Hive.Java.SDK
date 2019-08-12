@@ -50,7 +50,7 @@ public interface OneDriveApi {
     Call<ClientResponse> getInfo();
 
     @GET(OneDriveConstance.DRIVE)
-    Call<DriveResponse> getDrive();
+    Call<DriveResponse> getDriveInfo();
 
     @GET(OneDriveConstance.DRIVE+"/{path}")
     Call<FileOrDirPropResponse> getFileOrDirProp(@Path("path") String pathName);
@@ -65,7 +65,7 @@ public interface OneDriveApi {
     Call<FileOrDirPropResponse> getDirAndFileInfo(@Path("path")String path);
     
     @GET(OneDriveConstance.DRIVE+"/root")
-    Call<FileOrDirPropResponse> getRootDirInfo();
+    Call<FileOrDirPropResponse> getRootDirectoryInfo();
 
     @PATCH(OneDriveConstance.DRIVE+"/root:{path}")
     Call<NoBodyEntity> moveTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);

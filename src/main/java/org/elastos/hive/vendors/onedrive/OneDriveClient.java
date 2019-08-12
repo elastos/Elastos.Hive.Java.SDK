@@ -172,7 +172,7 @@ public final class OneDriveClient extends Client {
 
 		try {
 			ConnectionManager.getOnedriveApi()
-					.getDrive()
+					.getDriveInfo()
 					.enqueue(new DriveClientCallback(future , callback , Type.GET_DEFAULT_DRIVE));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());

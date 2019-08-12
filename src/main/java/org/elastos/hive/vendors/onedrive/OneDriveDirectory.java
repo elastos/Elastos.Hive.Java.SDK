@@ -102,7 +102,7 @@ class OneDriveDirectory extends Directory {
 			Call<FileOrDirPropResponse> call;
 			if (this.pathName.equals("/")) {
 				//Get the root directory's info
-				call = api.getRootDirInfo();
+				call = api.getRootDirectoryInfo();
 			}
 			else {
 				//Get the other directory's info
