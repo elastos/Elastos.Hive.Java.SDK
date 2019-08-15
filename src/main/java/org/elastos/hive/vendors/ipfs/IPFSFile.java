@@ -754,6 +754,7 @@ final class IPFSFile extends File {
 
 			switch (type) {
 				case GET_INFO:
+
 					StatResponse statResponse = (StatResponse) response.body();
 					HashMap<String, String> attrs = new HashMap<>();
 					attrs.put(Info.itemId, getId());
@@ -762,6 +763,9 @@ final class IPFSFile extends File {
 					String name = IPFSFile.this.pathName.substring(LastPos + 1);
 					attrs.put(Info.name, name);
 					attrs.put(Info.size, Integer.toString(statResponse.getSize()));
+
+					attrs.put(Info.type, statResponse.getType());
+					attrs.put(Info.childCount, String.valueOf(statResponse.getBlocks()));
 
 					fileInfo = new File.Info(attrs);
 

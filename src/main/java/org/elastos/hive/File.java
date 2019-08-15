@@ -50,6 +50,15 @@ public abstract class File extends Result implements ResourceItem<File.Info>, Fi
 		public static final String size   = "Size";
 
 		/**
+		 * FileType
+		 */
+		public static final String type = "Type" ;
+
+		/**
+		 * Children Count
+		 */
+		public static final String childCount   = "ChildCount";
+		/**
 		 * Hive file info constructor
 		 * @param hash hive file information.
 		 */
