@@ -468,12 +468,12 @@ final class IPFSDrive extends Drive{
 				}
 				case GET_FILE: {
 					StatResponse fileStatResponse = (StatResponse) response.body();
-					if (!rpcHelper.isFile(fileStatResponse.getType())) {
-						HiveException e = new HiveException("This is not a file");
-						callback.onError(e);
-						future.completeExceptionally(e);
-						return;
-					}
+//					if (!rpcHelper.isFile(fileStatResponse.getType())) {
+//						HiveException e = new HiveException("This is not a file");
+//						callback.onError(e);
+//						future.completeExceptionally(e);
+//						return;
+//					}
 
 					HashMap<String, String> fileAttrs = new HashMap<>();
 					fileAttrs.put(File.Info.itemId, getId());
