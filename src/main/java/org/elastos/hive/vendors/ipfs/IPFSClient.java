@@ -270,10 +270,9 @@ public final class IPFSClient extends Client {
 			}
 			else {
 				uidArray = config.getJSONArray(uids);
-				Iterator<Object> values = uidArray.iterator();
 				boolean has = false;
-				while (values.hasNext()) {
-					JSONObject json = (JSONObject) values.next();
+				for (int i = 0 ;i<uidArray.length();i++){
+					JSONObject json = (JSONObject) uidArray.get(i);
 					if (uid.equals(json.getString(IPFSConstance.UID))) {
 						has = true;
 						break;
