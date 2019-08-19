@@ -164,15 +164,11 @@ public class IpfsFileTest {
 
 			int newChildCount = parentDir.getChildren().get().getContent().size();
 			assertEquals(childCount + 1, newChildCount);
+			
+			parentDir.deleteItem().get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCopyTo failed");
-		} finally {
-			try {
-				parentDir.deleteItem().get();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 	
@@ -202,15 +198,11 @@ public class IpfsFileTest {
 
 			int newChildCount = parentDir.getChildren().get().getContent().size();
 			assertEquals(childCount + 1, newChildCount);
+			
+			parentDir.deleteItem().get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCopyToAsync failed");
-		} finally {
-			try {
-				parentDir.deleteItem().get();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 
@@ -238,15 +230,11 @@ public class IpfsFileTest {
 				e.printStackTrace();
 				fail(String.format("The origin path should be valid: %s", originPath));
 			}
+			
+			parentDir.deleteItem().get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testCopyToInvalid failed");
-		} finally {
-			try {
-				parentDir.deleteItem().get();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 

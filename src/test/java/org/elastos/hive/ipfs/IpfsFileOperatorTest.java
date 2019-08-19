@@ -59,16 +59,12 @@ public class IpfsFileOperatorTest {
 			//3. check the valid length and buffer.
 			assertEquals(writeBuffer.limit(), readLen);
 			assertEquals(0, writeBuffer.compareTo(readBuf));
+			
+			//4. delete the test file
+			file.deleteItem().get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testFileWrite failed");
-		} finally {
-			try {
-				file.deleteItem().get();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				fail();
-			}
 		}
     }
 
@@ -164,16 +160,12 @@ public class IpfsFileOperatorTest {
 			//3. check the valid length and buffer.
 			assertEquals(writeBuffer.limit(), readLen);
 			assertEquals(0, writeBuffer.compareTo(readBuf));
+			
+			//4. delete the test file
+			file.deleteItem().get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testFileWriteWithAsync failed");
-		} finally {
-			try {
-				file.deleteItem().get();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				fail();
-			}
 		}
     }
 	
@@ -237,16 +229,12 @@ public class IpfsFileOperatorTest {
 			//3. check the valid length and buffer.
 			assertEquals(writeBuffer.limit(), readLen);
 			assertEquals(0, writeBuffer.compareTo(readBuf));
+			
+			//4. delete the test file
+			file.deleteItem().get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testFileWriteWithPosition failed");
-		} finally {
-			try {
-				file.deleteItem().get();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				fail();
-			}
 		}
     }
 
@@ -329,16 +317,12 @@ public class IpfsFileOperatorTest {
 			//3. check the valid length and buffer.
 			assertEquals(writeBuffer.limit(), readLen);
 			assertEquals(0, writeBuffer.compareTo(readBuf));
+			
+			//4. delete the test file
+			file.deleteItem().get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 			fail("testFileWriteWithPositionAsync failed");
-		} finally {
-			try {
-				file.deleteItem().get();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				fail();
-			}
 		}
     }
 	
