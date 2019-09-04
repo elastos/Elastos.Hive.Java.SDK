@@ -287,20 +287,20 @@ class IPFSDirectory extends Directory  {
 	}
 
 	@Override
-	public CompletableFuture<Void> moveTo(String path) {
-		return moveTo(path, new NullCallback<Void>());
+	public CompletableFuture<Void> moveTo(String destAbsPath) {
+		return moveTo(destAbsPath, new NullCallback<Void>());
 	}
 
 	@Override
-	public CompletableFuture<Void> moveTo(String path, Callback<Void> callback) {
+	public CompletableFuture<Void> moveTo(String destAbsPath, Callback<Void> callback) {
 		return rpcHelper.checkExpiredNew(callback)
-				.thenCompose(value -> moveTo(value, path))
+				.thenCompose(value -> moveTo(value, destAbsPath))
 				.thenCompose(value -> rpcHelper.getRootHash(value))
 				.thenCompose(value -> rpcHelper.publishHash(value))
 				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
 	}
 
-	private CompletableFuture<PackValue> moveTo(PackValue value, String path) {
+	private CompletableFuture<PackValue> moveTo(PackValue value, String destAbsPath) {
 		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
 
 		Callback<Void> callback = (Callback<Void>) value.getCallback();
@@ -311,35 +311,35 @@ class IPFSDirectory extends Directory  {
 			return future;
 		}
 
-		if (path == null || path.isEmpty()) {
+		if (destAbsPath == null || destAbsPath.isEmpty()) {
 			HiveException e = new HiveException("The path is invalid");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
-		if (!path.startsWith("/")) {
+		if (!destAbsPath.startsWith("/")) {
 			HiveException e = new HiveException("Path name must be a abosulte path");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
-		if (path.equals(this.pathName)) {
+		if (destAbsPath.equals(this.pathName)) {
 			HiveException e = new HiveException("Can't move to the oneself directory");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
-		int LastPos = this.pathName.lastIndexOf("/");
-		String name = this.pathName.substring(LastPos + 1);
-		final String newPath = String.format("%s/%s", path, name);
+//		int LastPos = this.pathName.lastIndexOf("/");
+//		String name = this.pathName.substring(LastPos + 1);
+//		final String newPath = String.format("%s/%s", path, name);
 
 		try {
 			ConnectionManager.getIPFSApi()
-					.moveTo(rpcHelper.getIpfsEntry().getUid(), pathName, newPath)
-					.enqueue(new IPFSDirForResultCallback(future,value,newPath, IPFSConstance.Type.MOVE_TO));
+					.moveTo(rpcHelper.getIpfsEntry().getUid(), pathName, destAbsPath)
+					.enqueue(new IPFSDirForResultCallback(future,value,destAbsPath, IPFSConstance.Type.MOVE_TO));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
