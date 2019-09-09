@@ -32,13 +32,15 @@ import org.elastos.hive.Void;
 import org.elastos.hive.utils.CacheHelper;
 import org.elastos.hive.utils.HeaderUtil;
 import org.elastos.hive.vendors.connection.ConnectionManager;
+import org.elastos.hive.vendors.connection.model.BaseServiceConfig;
+import org.elastos.hive.vendors.connection.model.HeaderConfig;
 import org.elastos.hive.vendors.onedrive.network.model.FileOrDirPropResponse;
 import org.elastos.hive.vendors.onedrive.network.model.MoveAndCopyReqest;
+import org.elastos.hive.vendors.onedrive.network.model.UploadSessionResponse;
+import org.json.JSONObject;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -57,10 +59,12 @@ final class OneDriveFile extends File {
 	private String pathName;
 	private volatile File.Info fileInfo;
 	private boolean needDeleteCache;
+	private String cTag;
 
-	OneDriveFile(String pathName, File.Info fileInfo, AuthHelper authHelper) {
-		this.fileInfo = fileInfo;
+	OneDriveFile(String pathName, String cTag, File.Info fileInfo, AuthHelper authHelper) {
 		this.pathName = pathName;
+		this.cTag = cTag;
+		this.fileInfo = fileInfo;
 		this.authHelper = authHelper;
 		this.needDeleteCache = true;
 	}
@@ -502,26 +506,71 @@ final class OneDriveFile extends File {
 	private CompletableFuture<Void> commit(Void padding, Callback<Void> callback) {
 		CompletableFuture<Void> future = new CompletableFuture<Void>();
 
-		java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(this.pathName));
-		if (cacheFile.length() <= 0) {
-			HiveException e = new HiveException("the file to upload is invalid");
+		try {
+			java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(this.pathName));
+			if (cacheFile.length() == 0) {
+				RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), cacheFile);
+				ConnectionManager.getOnedriveApi()
+						.write(pathName, requestBody)
+						.enqueue(new FileCallback(future , callback , pathName, Type.WRITE));				
+			}
+			else {
+				if (cTag == null || cTag.isEmpty()) {
+					HiveException e = new HiveException("the file's cTag is invalid");
+					callback.onError(e);
+					future.completeExceptionally(e);
+					return future;
+				}
+
+				return createUploadSession(callback).thenCompose(
+						uploadUrl -> uploadFile(uploadUrl, cacheFile.length(), callback));
+			}
+		} catch (Exception ex) {
+			HiveException e = new HiveException(ex.getMessage());
 			callback.onError(e);
 			future.completeExceptionally(e);
-			return future;
 		}
 
-		final long limitSize = 4 * 1024 * 1024; //4M
-		if (cacheFile.length() > limitSize) {
-			HiveException e = new HiveException("the file size is too large");
+		return future;
+	}
+	
+	private CompletableFuture<String> createUploadSession(Callback<Void> callback) {
+		CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+			//Create an upload session
+			try {
+				Response<UploadSessionResponse> response = ConnectionManager.getOnedriveApi().createSession(cTag, pathName).execute();
+				UploadSessionResponse body = response.body();
+				return body.getUploadUrl();
+			} catch (Exception ex) {
+				HiveException e = new HiveException(ex.getMessage());
+				callback.onError(e);
+				ex.printStackTrace();
+			}
+			return null;
+		});
+
+		return future;
+	}
+	
+	private CompletableFuture<Void> uploadFile(String uploadUrl, long fileLength, Callback<Void> callback) {
+		CompletableFuture<Void> future = new CompletableFuture<Void>();
+
+		if (uploadUrl == null || uploadUrl.isEmpty()) {
+			HiveException e = new HiveException("the uploadUrl is invalid");
 			callback.onError(e);
 			future.completeExceptionally(e);
 			return future;
 		}
 
 		try {
+			//TODO Upload bytes to the upload session
+			java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(this.pathName));
 			RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), cacheFile);
+			String contentType   = "application/json;charset=UTF-8";
+			String contentLength = Long.toString(fileLength);
+			String contentRange  = String.format("bytes 0-%d/%d", fileLength - 1, fileLength);
 			ConnectionManager.getOnedriveApi()
-					.write(pathName, requestBody)
+					.write(uploadUrl, contentType, contentLength, contentRange, requestBody)
 					.enqueue(new FileCallback(future , callback , pathName, Type.WRITE));
 		} catch (Exception ex) {
 			HiveException e = new HiveException(ex.getMessage());
@@ -635,6 +684,8 @@ final class OneDriveFile extends File {
 							if (cacheStream != null) {
 								cacheStream.close();
 							}
+
+							body.close();
 						} catch (Exception e) {
 							future.completeExceptionally(new HiveException(e.getMessage()));
 							return;
