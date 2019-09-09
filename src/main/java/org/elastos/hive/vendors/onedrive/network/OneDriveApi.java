@@ -27,6 +27,7 @@ import org.elastos.hive.vendors.onedrive.network.model.ClientResponse;
 import org.elastos.hive.vendors.onedrive.network.model.CreateDirRequest;
 import org.elastos.hive.vendors.onedrive.network.model.DirChildrenResponse;
 import org.elastos.hive.vendors.onedrive.network.model.MoveAndCopyReqest;
+import org.elastos.hive.vendors.onedrive.network.model.UploadSessionResponse;
 import org.elastos.hive.vendors.onedrive.network.model.DriveResponse;
 import org.elastos.hive.vendors.onedrive.network.model.FileOrDirPropResponse;
 import org.elastos.hive.vendors.connection.model.NoBodyEntity;
@@ -42,6 +43,7 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Url;
 
 public interface OneDriveApi {
 
@@ -93,4 +95,11 @@ public interface OneDriveApi {
 
     @PUT(OneDriveConstance.DRIVE+"/root:{path}:/content")
     Call<NoBodyEntity> write(@Path("path") String path, @Body RequestBody body);
+
+    @POST(OneDriveConstance.DRIVE+"/root:{path}:/createUploadSession")
+    Call<UploadSessionResponse> createSession(@Header("if-match") String cTag, @Path("path") String path);
+
+    @PUT()
+    Call<NoBodyEntity> write(@Url String url, @Header("Content-Type") String contentType, @Header("Content-Length") String length
+    		, @Header("Content-Range") String range, @Body RequestBody body);
 }

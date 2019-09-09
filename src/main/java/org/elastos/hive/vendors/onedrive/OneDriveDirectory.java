@@ -563,7 +563,7 @@ class OneDriveDirectory extends Directory {
 					fileAttrs.put(File.Info.size, Integer.toString(filePropResponse.getSize()));
 
 					File.Info fileInfo = new File.Info(fileAttrs);
-					OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
+					OneDriveFile file = new OneDriveFile(pathName, filePropResponse.getCTag(), fileInfo, authHelper);
 					this.callback.onSuccess(file);
 					future.complete(file);
 

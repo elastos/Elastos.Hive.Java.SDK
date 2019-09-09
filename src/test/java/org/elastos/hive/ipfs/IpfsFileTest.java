@@ -101,7 +101,7 @@ public class IpfsFileTest {
 
 			//3. Check: the origin path is invalid.
 			try {
-				drive.getDirectory(originPath).get();
+				drive.getFile(originPath).get();
 				fail(String.format("The file has moved, the origin path is invalid: %s", originPath));
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -77,6 +77,7 @@ public class FileOrDirPropResponse {
     private String id ;
     private String name;
     private int size;
+    private String cTag;
     private Folder folder;
 
     public FileOrDirPropResponse(String id) {
@@ -112,6 +113,14 @@ public class FileOrDirPropResponse {
         this.size = size;
     }
 
+    public String getCTag() {
+        return cTag;
+    }
+
+    public void setCTag(String cTag) {
+        this.cTag = cTag;
+    }
+    
     public Folder getFolder() {
         return folder;
     }

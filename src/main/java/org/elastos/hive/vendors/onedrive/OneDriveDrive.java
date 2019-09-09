@@ -424,9 +424,9 @@ final class OneDriveDrive extends Drive {
 				}
 				case CREATE_FILE:
 				case GET_FILE: {
-					FileOrDirPropResponse filePropResponse= (FileOrDirPropResponse) response.body();
+					FileOrDirPropResponse filePropResponse = (FileOrDirPropResponse) response.body();
 
-					if (filePropResponse == null || filePropResponse.getFolder() !=null) {
+					if (filePropResponse == null || filePropResponse.getFolder() != null) {
 						HiveException e = new HiveException("This is not a file");
 						this.callback.onError(e);
 						future.completeExceptionally(e);
@@ -439,7 +439,7 @@ final class OneDriveDrive extends Drive {
 					fileAttrs.put(File.Info.size, Integer.toString(filePropResponse.getSize()));
 
 					File.Info fileInfo = new File.Info(fileAttrs);
-					OneDriveFile file = new OneDriveFile(pathName, fileInfo, authHelper);
+					OneDriveFile file = new OneDriveFile(pathName, filePropResponse.getCTag(), fileInfo, authHelper);
 					this.callback.onSuccess(file);
 					future.complete(file);
 					break;

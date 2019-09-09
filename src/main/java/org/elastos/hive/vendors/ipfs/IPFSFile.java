@@ -163,10 +163,6 @@ final class IPFSFile extends File {
 			return future;
 		}
 
-//		int LastPos = this.pathName.lastIndexOf("/");
-//		String name = this.pathName.substring(LastPos + 1);
-//		final String newPath = String.format("%s/%s", path, name);
-
 		try {
 			ConnectionManager.getIPFSApi()
 					.moveTo(rpcHelper.getIpfsEntry().getUid(), pathName, destAbsPath)
@@ -693,6 +689,8 @@ final class IPFSFile extends File {
 							if (cacheStream != null) {
 								cacheStream.close();
 							}
+							
+							body.close();
 						} catch (Exception e) {
 							HiveException ex = new HiveException(e.getMessage());
 							value.getCallback().onError(ex);
