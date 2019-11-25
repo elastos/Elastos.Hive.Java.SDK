@@ -25,13 +25,14 @@ package org.elastos.hive.vendors.onedrive;
 public class OneDriveConstance {
     public static final String ONE_DRIVE_AUTH_URL = "https://login.microsoftonline.com/common/oauth2/v2.0" ;
     public static final String ONE_DRIVE_AUTH_BASE_URL = ONE_DRIVE_AUTH_URL+"/";
-    public static final String ONE_DRIVE_API_BASE_URL  = "https://graph.microsoft.com/v1.0/me/";
+    public static final String ONE_DRIVE_API_BASE_URL  = "https://graph.microsoft.com/v1.0/me/drive/";
 
     public static final String AUTHORIZE = "authorize";
     public static final String TOKEN = "token";
     public static final String LOGOUT = "logout";
 
     public static final String DRIVE = "drive" ;
+    public static final String APP_ROOT = "special/approot" ;
 
     public static final String CLIENT_ID = "client_id" ;
     public static final String REDIRECT_URL = "redirect_url" ;

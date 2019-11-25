@@ -23,12 +23,7 @@
 package org.elastos.hive.vendors.onedrive.network;
 
 import org.elastos.hive.vendors.onedrive.OneDriveConstance;
-import org.elastos.hive.vendors.onedrive.network.model.ClientResponse;
-import org.elastos.hive.vendors.onedrive.network.model.CreateDirRequest;
 import org.elastos.hive.vendors.onedrive.network.model.DirChildrenResponse;
-import org.elastos.hive.vendors.onedrive.network.model.MoveAndCopyReqest;
-import org.elastos.hive.vendors.onedrive.network.model.UploadSessionResponse;
-import org.elastos.hive.vendors.onedrive.network.model.DriveResponse;
 import org.elastos.hive.vendors.onedrive.network.model.FileOrDirPropResponse;
 import org.elastos.hive.vendors.connection.model.NoBodyEntity;
 
@@ -39,67 +34,35 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
-import retrofit2.http.PATCH;
-import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
-import retrofit2.http.Url;
 
 public interface OneDriveApi {
-
-    //https://graph.microsoft.com/v1.0/me/
-    @GET(OneDriveConstance.ONE_DRIVE_API_BASE_URL)
-    Call<ClientResponse> getInfo();
-
-    @GET(OneDriveConstance.DRIVE)
-    Call<DriveResponse> getDriveInfo();
-
-    @GET(OneDriveConstance.DRIVE+"/{path}")
-    Call<FileOrDirPropResponse> getFileOrDirProp(@Path("path") String pathName);
-
-    @PUT(OneDriveConstance.DRIVE+"/root:{path}:/content")
+    @PUT(OneDriveConstance.APP_ROOT+":{path}:/content")
     Call<FileOrDirPropResponse> createFile(@Path("path") String path);
 
-    @POST(OneDriveConstance.DRIVE+"/{path}")
-    Call<FileOrDirPropResponse> createDir(@Path("path") String path , @Body CreateDirRequest dirRequest);
-
-    @GET(OneDriveConstance.DRIVE+"/root:/{path}")
+    @GET(OneDriveConstance.APP_ROOT+":/{path}")
     Call<FileOrDirPropResponse> getDirAndFileInfo(@Path("path")String path);
-    
-    @GET(OneDriveConstance.DRIVE+"/root")
-    Call<FileOrDirPropResponse> getRootDirectoryInfo();
 
-    @PATCH(OneDriveConstance.DRIVE+"/root:{path}")
-    Call<NoBodyEntity> moveTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
-
-    @POST(OneDriveConstance.DRIVE+"/root:{path}:/copy")
-    Call<NoBodyEntity> copyTo(@Path("path")String path , @Body MoveAndCopyReqest moveAndCopyReqest);
-
-    @DELETE(OneDriveConstance.DRIVE+"/root:{path}")
+    @DELETE(OneDriveConstance.APP_ROOT+":{path}")
     Call<NoBodyEntity> deleteItem(@Path("path")String path);
 
-    @GET(OneDriveConstance.DRIVE+"/root:{path}")
-    Call<FileOrDirPropResponse> getDirFromDir(@Path("path") String path);
-
-    @GET(OneDriveConstance.DRIVE+"/root:{path}")
-    Call<FileOrDirPropResponse> getFileFromDir(@Path("path") String path);
-
-    @GET(OneDriveConstance.DRIVE+"/root:{path}:/children")
+    @GET(OneDriveConstance.APP_ROOT+":{path}:/children")
     Call<DirChildrenResponse> getChildren(@Path("path") String path);
     
     @GET(OneDriveConstance.DRIVE+"/root/children")
     Call<DirChildrenResponse> getRootChildren();
 
-    @GET(OneDriveConstance.DRIVE+"/root:{path}:/content")
+    @GET(OneDriveConstance.APP_ROOT+":{path}:/content")
     Call<ResponseBody> read(@Header("Accept-Encoding") String acceptEncoding, @Path("path") String path);
 
-    @PUT(OneDriveConstance.DRIVE+"/root:{path}:/content")
+    @PUT(OneDriveConstance.APP_ROOT+":{path}:/content")
     Call<NoBodyEntity> write(@Path("path") String path, @Body RequestBody body);
 
-    @POST(OneDriveConstance.DRIVE+"/root:{path}:/createUploadSession")
-    Call<UploadSessionResponse> createSession(@Header("if-match") String cTag, @Path("path") String path);
+//    @POST(OneDriveConstance.APP_ROOT+":{path}:/createUploadSession")
+//    Call<UploadSessionResponse> createSession(@Header("if-match") String cTag, @Path("path") String path);
 
-    @PUT()
-    Call<NoBodyEntity> write(@Url String url, @Header("Content-Type") String contentType, @Header("Content-Length") String length
-    		, @Header("Content-Range") String range, @Body RequestBody body);
+//    @PUT()
+//    Call<NoBodyEntity> write(@Url String url, @Header("Content-Type") String contentType, @Header("Content-Length") String length
+//    		, @Header("Content-Range") String range, @Body RequestBody body);
 }

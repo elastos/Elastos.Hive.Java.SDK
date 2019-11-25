@@ -92,7 +92,9 @@ public class NetworkLogInterceptor implements Interceptor{
             rbBody = buffer.clone().readString(charset);
         }
 
+        LogUtil.d("response Code ->"+response.code());
         if (!CheckTextUtil.isEmpty(rbBody)){
+
             LogUtil.d("response body ->"+rbBody);
         }
 

@@ -24,82 +24,29 @@ package org.elastos.hive.vendors.ipfs.network;
 
 import org.elastos.hive.vendors.connection.model.NoBodyEntity;
 import org.elastos.hive.vendors.ipfs.IPFSConstance;
-import org.elastos.hive.vendors.ipfs.network.model.ListChildResponse;
-import org.elastos.hive.vendors.ipfs.network.model.PublishResponse;
-import org.elastos.hive.vendors.ipfs.network.model.ResolveResponse;
-import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
-import org.elastos.hive.vendors.ipfs.network.model.UIDResponse;
+import org.elastos.hive.vendors.ipfs.network.model.AddFileResponse;
+import org.elastos.hive.vendors.ipfs.network.model.ListFileResponse;
 
-import okhttp3.RequestBody;
+import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface IPFSApi {
+    @Multipart
+    @POST(IPFSConstance.ADD)
+    Call<AddFileResponse> addFile(@Part MultipartBody.Part file);
 
-    @POST(IPFSConstance.NEW)
-    Call<UIDResponse> getNewUid();
+    @POST(IPFSConstance.LS)//arg [string]: The path to the IPFS object(s) to list links from. Required: yes.
+    Call<ListFileResponse> listFile(@Query(IPFSConstance.ARG) String ipfsObjPath);
 
-    @GET(IPFSConstance.NAMERESOLVE)
-    Call<ResolveResponse> resolve(@Query(IPFSConstance.ARG) String peerId);
+    @POST(IPFSConstance.CAT)//arg [string]: The path to the IPFS object(s) to be outputted. Required: yes.
+    Call<ResponseBody> catFile(@Query(IPFSConstance.ARG) String ipfsObjPath);
 
-    @POST(IPFSConstance.UID_INFO)
-    Call<UIDResponse> getUidInfo(@Query(IPFSConstance.UID) String uid);
-
-    @POST(IPFSConstance.LOGIN)
-    Call<NoBodyEntity> login(@Query(IPFSConstance.UID) String uid ,
-                             @Query(IPFSConstance.HASH) String hash);
-
-    @POST(IPFSConstance.PUBLISH)
-    Call<PublishResponse> publish(@Query(IPFSConstance.UID) String uid,
-                                  @Query(IPFSConstance.LIFETIME) String lifetime,
-                                  @Query(IPFSConstance.PATH) String path);
-
-    @POST(IPFSConstance.STAT)
-    Call<StatResponse> getStat(@Query(IPFSConstance.UID) String uid ,
-                               @Query(IPFSConstance.PATH) String path);
-
-    @POST(IPFSConstance.MKDIR)
-    Call<NoBodyEntity> mkdir(@Query(IPFSConstance.UID) String uid ,
-                             @Query(IPFSConstance.PATH) String path ,
-                             @Query(IPFSConstance.PARENTS) String parents);
-
-    @POST(IPFSConstance.WRITE)
-    Call<NoBodyEntity> createFile(@Header("Content-Type") String contentType ,
-                                  @Query(IPFSConstance.UID) String uid ,
-                                  @Query(IPFSConstance.PATH) String path ,
-                                  @Query(IPFSConstance.CREATE) boolean create);
-
-    @POST(IPFSConstance.MV)
-    Call<NoBodyEntity> moveTo(@Query(IPFSConstance.UID) String uid ,
-                              @Query(IPFSConstance.SOURCE) String source ,
-                              @Query(IPFSConstance.DEST) String dest);
-
-    @POST(IPFSConstance.CP)
-    Call<NoBodyEntity> copyTo(@Query(IPFSConstance.UID) String uid ,
-                              @Query(IPFSConstance.SOURCE) String source ,
-                              @Query(IPFSConstance.DEST) String dest);
-
-    @POST(IPFSConstance.RM)
-    Call<NoBodyEntity> deleteItem(@Query(IPFSConstance.UID) String uid ,
-                                  @Query(IPFSConstance.PATH) String path ,
-                                  @Query(IPFSConstance.RESCURSIVE) String rescursive);
-
-    @POST(IPFSConstance.LS)
-    Call<ListChildResponse> list(@Query(IPFSConstance.UID) String uid ,
-                                 @Query(IPFSConstance.PATH) String path);
-
-    @POST(IPFSConstance.READ)
-    Call<ResponseBody> read(@Query(IPFSConstance.UID) String uid ,
-                                  @Query(IPFSConstance.PATH) String path);
-
-    @POST(IPFSConstance.WRITE)
-    Call<NoBodyEntity> write(@Query(IPFSConstance.UID) String uid ,
-                                  @Query(IPFSConstance.PATH) String path ,
-                                  @Query(IPFSConstance.CREATE) boolean create, 
-                                  @Body RequestBody body);
+    @POST("http://{address}:{port}/version")
+    Call<NoBodyEntity> version(@Path("address") String address,@Path("port")int port);
 }

@@ -23,44 +23,13 @@
 package org.elastos.hive.vendors.ipfs;
 
 public class IPFSConstance {
-    public static final String URLFORMAT    = "http://%s/api/v0/";
-    public static final String DEFAULT_PORT = "9095";
+    public static final String URLFORMAT    = "http://%s:%d/api/v0/";
     public static final String JSON			= "application/json";
-    public static final String PREFIX       = "/ipfs/";
-    public static final String UID         	= "uid";
-    public static final String HASH        	= "hash";
     public static final String PATH        	= "path";
-    public static final String SOURCE      	= "source";
-    public static final String DEST        	= "dest";
     public static final String ARG 			= "arg" ;
-    public static final String PARENTS 		= "parents" ;
-    public static final String CREATE 		= "create" ;
-    public static final String RESCURSIVE 	= "recursive";
-    public static final String LIFETIME 	= "lifetime";
 
-    public static final String NEW		    = "uid/new";
-    public static final String LOGIN		= "uid/login";
-    public static final String UID_INFO 	= "uid/info";
-    public static final String MKDIR		= "files/mkdir";
-    public static final String RM  			= "files/rm";
-    public static final String CP  			= "files/cp";
-    public static final String MV  			= "files/mv";
-    public static final String LS  			= "files/ls";
-    public static final String WRITE  		= "files/write";
-    public static final String READ  		= "files/read";
-    public static final String STAT			= "files/stat";
-    public static final String PUBLISH		= "name/publish";
-    public static final String NAMERESOLVE 	= "name/resolve";
-
-
-    public enum Type{
-        GET_INFO , GET_DEFAULT_DRIVE,
-        GET_DIR , GET_FILE ,
-        CREATE_FILE , MKDIR ,
-        GET_STAT , PUBLISH ,
-        COPY_TO , DELETE_ITEM,
-        MOVE_TO , READ, WRITE,
-        GET_CHILDREN, GET_ITEMINFO
-    }
-
+    public static final String ADD          = "add";
+    public static final String CAT          = "cat";
+    public static final String LS          = "file/ls";
+    public static final String VERSION          = "version";
 }

@@ -1,786 +1,247 @@
-/*
- * Copyright (c) 2019 Elastos Foundation
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.elastos.hive.vendors.ipfs;
 
 import org.elastos.hive.Callback;
-import org.elastos.hive.File;
+import org.elastos.hive.HiveError;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.Length;
-import org.elastos.hive.NullCallback;
-import org.elastos.hive.Void;
-import org.elastos.hive.utils.CacheHelper;
-import org.elastos.hive.utils.HeaderUtil;
+import org.elastos.hive.HiveFile;
+import org.elastos.hive.result.CID;
+import org.elastos.hive.result.Data;
+import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendors.connection.ConnectionManager;
-import org.elastos.hive.vendors.ipfs.network.model.StatResponse;
+import org.elastos.hive.vendors.ipfs.network.model.AddFileResponse;
+import org.elastos.hive.vendors.ipfs.network.model.ListFileResponse;
+import org.elastos.hive.result.Length;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
 import retrofit2.Response;
 
-final class IPFSFile extends File {
-	private String pathName;
-	private volatile File.Info fileInfo;
-	private IPFSRpcHelper rpcHelper;
-	private boolean needDeleteCache;
 
-	IPFSFile(String pathName, File.Info fileInfo, IPFSRpcHelper rpcHelper) {
-		this.fileInfo = fileInfo;
-		this.pathName = pathName;
-		this.rpcHelper = rpcHelper;
-		this.needDeleteCache = true;
-	}
-
-	@Override
-	public String getId() {
-		return fileInfo.get(File.Info.itemId);
-	}
-
-	@Override
-	public Info getLastInfo() {
-		return fileInfo;
-	}
-
-	@Override
-	public CompletableFuture<Info> getInfo() {
-		return getInfo(new NullCallback<File.Info>());
-	}
-
-	@Override
-	public CompletableFuture<Info> getInfo(Callback<Info> callback) {
-		return rpcHelper.checkExpiredNew(callback)
-				.thenCompose(value -> getInfo(value));
-	}
-
-	private CompletableFuture<Info> getInfo(PackValue value) {
-		CompletableFuture<File.Info> future = new CompletableFuture<File.Info>();
-
-		Callback<Info> callback = (Callback<Info>) value.getCallback();
-
-		if (value.getException() != null) {
-			callback.onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		try {
-			ConnectionManager.getIPFSApi()
-					.getStat(getId(), pathName)
-					.enqueue(new IPFSFileCallback(future, callback, IPFSConstance.Type.GET_INFO));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return future;
-	}
-
-	@Override
-	public String getPath() {
-		return pathName;
-	}
-
-	@Override
-	public String getParentPath() {
-		if (pathName.equals("/"))
-			return pathName;
-
-		return pathName.substring(0, pathName.lastIndexOf("/") + 1);
-	}
-
-	@Override
-	public CompletableFuture<Void> moveTo(String destAbsPath) {
-		return moveTo(destAbsPath, new NullCallback<Void>());
-	}
-
-	@Override
-	public CompletableFuture<Void> moveTo(String destAbsPath, Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew(callback)
-				.thenCompose(value -> moveTo(value, destAbsPath))
-				.thenCompose(value -> rpcHelper.getRootHash(value))
-				.thenCompose(value -> rpcHelper.publishHash(value))
-				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
-	}
-
-	private CompletableFuture<PackValue> moveTo(PackValue value, String destAbsPath) {
-		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
-
-		Callback<Void> callback = (Callback<Void>) value.getCallback();
-
-		if (value.getException() != null) {
-			callback.onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		if (destAbsPath == null || destAbsPath.isEmpty()) {
-			HiveException e = new HiveException("The path is invalid");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		if (!destAbsPath.startsWith("/")) {
-			HiveException e = new HiveException("Path name must be a abosulte path");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		if (destAbsPath.equals(this.pathName)) {
-			HiveException e = new HiveException("Can't move to the oneself");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		try {
-			ConnectionManager.getIPFSApi()
-					.moveTo(rpcHelper.getIpfsEntry().getUid(), pathName, destAbsPath)
-					.enqueue(new IPFSFileForResultCallback(future, value, destAbsPath, IPFSConstance.Type.MOVE_TO));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return future;
-	}
-
-	@Override
-	public CompletableFuture<Void> copyTo(String path) {
-		return copyTo(path, new NullCallback<Void>());
-	}
-
-	@Override
-	public CompletableFuture<Void> copyTo(String path, Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew(callback)
-				.thenCompose(value -> rpcHelper.getPathHash(value, this.pathName))
-				.thenCompose(value -> copyTo(value, path))
-				.thenCompose(value -> rpcHelper.getRootHash(value))
-				.thenCompose(value -> rpcHelper.publishHash(value))
-				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
-	}
-
-	private CompletableFuture<PackValue> copyTo(PackValue value, String path) {
-		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
-
-		Callback<Void> callback = (Callback<Void>) value.getCallback();
-
-		if (value.getException() != null) {
-			callback.onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		if (path == null || path.isEmpty()) {
-			HiveException e = new HiveException("The path is invalid");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		if (!path.startsWith("/")) {
-			HiveException e = new HiveException("Path name must be a abosulte path");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		if (path.equals(this.pathName)) {
-			HiveException e = new HiveException("Can't copy to the oneself directory");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		String hash = value.getHash().getValue();
-		if (hash == null || hash.isEmpty()) {
-			HiveException e = new HiveException("The hash is invalid");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		int LastPos = this.pathName.lastIndexOf("/");
-		String name = this.pathName.substring(LastPos + 1);
-		final String newPath = String.format("%s/%s", path, name);
-
-		try {
-			ConnectionManager.getIPFSApi()
-					.copyTo(rpcHelper.getIpfsEntry().getUid(), IPFSConstance.PREFIX + hash, newPath)
-					.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.COPY_TO));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return future;
-	}
-
-	@Override
-	public CompletableFuture<Void> deleteItem() {
-		return deleteItem(new NullCallback<Void>());
-	}
-
-	@Override
-	public CompletableFuture<Void> deleteItem(Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew(callback)
-				.thenCompose(value -> deleteItem(value))
-				.thenCompose(value -> rpcHelper.getRootHash(value))
-				.thenCompose(value -> rpcHelper.publishHash(value))
-				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
-	}
-
-	private CompletableFuture<PackValue> deleteItem(PackValue value) {
-		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
-
-		Callback<Void> callback = (Callback<Void>) value.getCallback();
-
-		if (value.getException() != null) {
-			callback.onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		if (pathName.equals("/")) {
-			HiveException e = new HiveException("Can't delete the root.");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		try {
-			ConnectionManager.getIPFSApi()
-					.deleteItem(rpcHelper.getIpfsEntry().getUid(), pathName, "true")
-					.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.DELETE_ITEM));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return future;
-	}
-
-	@Override
-	public CompletableFuture<Length> read(ByteBuffer dest) {
-		return read(dest, new NullCallback<Length>());
-	}
-
-	@Override
-	public CompletableFuture<Length> read(ByteBuffer dest, Callback<Length> callback) {
-		return rpcHelper.checkExpiredNew(callback)
-				.thenCompose(value -> checkAndCache(value, dest))
-				.thenCompose(value -> read(value, dest, -1));
-	}
-
-	@Override
-	public CompletableFuture<Length> read(ByteBuffer dest, long position) {
-		return read(dest, position, new NullCallback<Length>());
-	}
-
-	@Override
-	public CompletableFuture<Length> read(ByteBuffer dest, long position, Callback<Length> callback) {
-		if (position < 0) {
-			CompletableFuture<Length> future = new CompletableFuture<Length>();
-			HiveException e = new HiveException("the position must be non-negative");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		return rpcHelper.checkExpiredNew(callback)
-				.thenCompose(value -> checkAndCache(value, dest))
-				.thenCompose(value -> read(value, dest, position));
-	}
-
-	@Override
-	public CompletableFuture<Length> write(ByteBuffer dest) {
-		return write(dest, new NullCallback<Length>());
-	}
-
-	@Override
-	public CompletableFuture<Length> write(ByteBuffer dest, Callback<Length> callback) {
-		return rpcHelper.checkExpiredNew(callback)
-				.thenCompose(value -> checkAndCache(value, dest))
-				.thenCompose(value -> localWrite(value, dest, -1))
-				.thenCompose(value -> rpcHelper.invokeLengthCallback(value));
-	}
-
-	@Override
-	public CompletableFuture<Length> write(ByteBuffer dest, long position) {
-		return write(dest, position, new NullCallback<Length>());
-	}
-
-	@Override
-	public CompletableFuture<Length> write(ByteBuffer dest, long position, Callback<Length> callback) {
-		if (position < 0) {
-			CompletableFuture<Length> future = new CompletableFuture<Length>();
-			HiveException e = new HiveException("the position must be non-negative");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		return rpcHelper.checkExpiredNew(callback)
-				.thenCompose(value -> checkAndCache(value, dest))
-				.thenCompose(value -> localWrite(value, dest, position))
-				.thenCompose(value -> rpcHelper.invokeLengthCallback(value));
-	}
-
-	@Override
-	public CompletableFuture<Void> commit() {
-		return commit(new NullCallback<Void>());
-	}
-
-	@Override
-	public CompletableFuture<Void> commit(Callback<Void> callback) {
-		return rpcHelper.checkExpiredNew(callback)
-				.thenCompose(value -> commit(value))
-				.thenCompose(value -> rpcHelper.getRootHash(value))
-				.thenCompose(value -> rpcHelper.publishHash(value))
-				.thenCompose(value -> rpcHelper.invokeVoidCallback(value));
-	}
-
-	@Override
-	public void discard() {
-		needDeleteCache = true;
-		writeCursor = 0;
-		CacheHelper.deleteCache(this.pathName);
-	}
-
-	private CompletableFuture<PackValue> checkAndCache(PackValue value, ByteBuffer dest) {
-		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
-		
-		Callback<Length> callback = (Callback<Length>) value.getCallback();
-		
-		if (value.getException() != null) {
-			callback.onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		if (dest == null || dest.capacity() <= 0) {
-			HiveException e = new HiveException("the dest buffer is invalid");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		//at the first read, if the cache file exists, delete it, and get a new one from the remote.
-		java.io.File cacheFile = CacheHelper.getCacheFile(pathName);
-		if (needDeleteCache) {
-			if (cacheFile.exists()) {
-				cacheFile.delete();
-			}
-
-			needDeleteCache = false;
-		}
-
-		if (!cacheFile.exists() || cacheFile.length() <= 0) {
-			//get the file from the remote.
-			try {
-				ConnectionManager.getIPFSApi()
-						.read(rpcHelper.getIpfsEntry().getUid(), pathName)
-						.enqueue(new IPFSFileForResultCallback(future, value,
-						CacheHelper.getCacheFileName(pathName), IPFSConstance.Type.READ));
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				HiveException e = new HiveException(ex.getMessage());
-				callback.onError(e);
-				future.completeExceptionally(e);
-			}
-
-			return future;
-		}
-
-		java.io.File file = CacheHelper.getCacheFile(this.pathName);
-		Length length = new Length(file.length());
-		value.setValue(length);
-		future.complete(value);
-		return future;
-	}
-	
-	private long readCursor = 0;
-	private CompletableFuture<Length> read(PackValue value, ByteBuffer dest, long position) {
-		CompletableFuture<Length> future = new CompletableFuture<Length>();
-		Callback<Length> callback = (Callback<Length>) value.getCallback();
-
-		if (value.getException() != null) {
-			callback.onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		Length length = (Length) value.getValue();
-		if (length.getLength() == 0) {
-			Length zero = new Length(0);
-			callback.onSuccess(zero);
-			future.complete(zero);
-			return future;
-		}
-
-		//1. clear the buffer, and read
-		dest.clear();
-		FileInputStream fileInputStream = null;
-		FileChannel inChannel = null;
-		try {
-			java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(pathName));
-			if (!cacheFile.exists()) {
-				cacheFile.createNewFile();
-			}
-			fileInputStream = new FileInputStream(cacheFile);
-			inChannel = fileInputStream.getChannel();
-			long len = 0;
-			//2. read by inner readCursor or position
-			if (position < 0) {
-				//read, non-position
-				len = inChannel.read(dest, readCursor);
-				if (len == -1) {
-					//reset the readCursor
-					readCursor = 0;
-				}
-				else {
-					//change the readCursor
-					readCursor += len;
-				}
-			}
-			else {
-				//read, by-position
-				len = inChannel.read(dest, position);
-			}
-
-			Length readLen = new Length(len);
-			callback.onSuccess(readLen);
-			future.complete(readLen);
-		}
-		catch (Exception e) {
-			HiveException ex = new HiveException(e.getMessage());
-			callback.onError(ex);
-			future.completeExceptionally(ex);
-			return future;
-		}
-		finally {
-			try {
-				if (inChannel != null) {
-					inChannel.close();
-				}
-
-				if (fileInputStream != null) {
-					fileInputStream.close();
-				}
-			} catch (Exception e) {
-				HiveException ex = new HiveException(e.getMessage());
-				callback.onError(ex);
-				future.completeExceptionally(ex);
-			}
-		}
-
-		return future;
-	}
-	
-	private long writeCursor = 0;
-	private CompletableFuture<PackValue> localWrite(PackValue value, ByteBuffer dest, long position) {
-		Callback<Length> callback = (Callback<Length>) value.getCallback();
-
-		CompletableFuture<PackValue> future = CompletableFuture.supplyAsync(() -> {
-			if (value.getException() != null) {
-				return value;
-			}
-
-			if (dest == null || dest.capacity() <= 0) {
-				value.setException(new HiveException("the dest buffer is invalid"));
-				return value;
-			}
-
-			//using writeCursor to write
-			FileChannel outputChannel = null;
-			FileOutputStream outputStream = null;
-			long len = 0;
-			try {
-				java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(this.pathName));
-				if (!cacheFile.exists()) {
-					cacheFile.createNewFile();						
-				}
-
-				outputStream = new FileOutputStream(cacheFile, true);
-				outputChannel = outputStream.getChannel();
-
-				if (position == -1) {
-					len = outputChannel.write(dest, writeCursor);
-					writeCursor += len;
-				}
-				else {
-					len = outputChannel.write(dest, position);
-				}
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				value.setException(new HiveException("write the buffer to cache file failed."));
-				return value;
-			}
-			finally {
-				try {
-					if (outputChannel != null) {
-						outputChannel.close();
-					}
-
-					if (outputStream != null) {
-						outputStream.close();
-					}
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-					value.setException(new HiveException(e.getMessage()));
-					return value;
-				}
-			}
-
-			Length writeLen = new Length(len);
-			value.setValue(writeLen);
-			return value;
-		});
-
-		return future;
-	}
-	
-	private CompletableFuture<PackValue> commit(PackValue value) {
-		CompletableFuture<PackValue> future = new CompletableFuture<PackValue>();
-
-		Callback<Void> callback = (Callback<Void>) value.getCallback();
-
-		if (value.getException() != null) {
-			callback.onError(value.getException());
-			future.completeExceptionally(value.getException());
-			return future;
-		}
-
-		java.io.File cacheFile = new java.io.File(CacheHelper.getCacheFileName(this.pathName));
-		if (cacheFile.length() <= 0) {
-			HiveException e = new HiveException("the file to upload is invalid");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		final long limitSize = 4 * 1024 * 1024; //4M
-		if (cacheFile.length() > limitSize) {
-			HiveException e = new HiveException("the file size is too large");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
-
-		try {
-			RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), cacheFile);
-			RequestBody requestBody = new MultipartBody.Builder()
-					.setType(MultipartBody.FORM)
-					.addFormDataPart("file", this.pathName, fileBody)
-					.build();
-
-			ConnectionManager.getIPFSApi()
-					.write(rpcHelper.getIpfsEntry().getUid(), pathName, true, requestBody)
-					.enqueue(new IPFSFileForResultCallback(future, value, null, IPFSConstance.Type.WRITE));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			HiveException e = new HiveException(ex.getMessage());
-			callback.onError(e);
-			future.completeExceptionally(e);
-		}
-		
-		return future;
-	}
-	
-	private class IPFSFileForResultCallback implements retrofit2.Callback{
-		private final String pathName ;
-		private final CompletableFuture future;
-		private final PackValue value;
-		private final IPFSConstance.Type type ;
-
-		IPFSFileForResultCallback(CompletableFuture future , PackValue value , String pathName , IPFSConstance.Type type){
-			this.future = future ;
-			this.value = value ;
-			this.pathName = pathName ;
-			this.type = type ;
-		}
-
-		@Override
-		public void onResponse(Call call, Response response) {
-			if (response.code() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.message());
-				value.getCallback().onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			switch (type){
-				case MOVE_TO:
-					IPFSFile.this.pathName = pathName;
-					break;
-				case DELETE_ITEM:
-				case COPY_TO:
-					break;
-				case READ: {
-					ResponseBody body = (ResponseBody) response.body();
-					Length lengthObj ;
-					if (body == null) {
-						lengthObj = new Length(0);
-						value.setValue(lengthObj);
-						future.complete(value);
-						return;
-					}
-
-					if (HeaderUtil.getContentLength(response) == -1
-							&& !HeaderUtil.isTrunced(response)){
-						lengthObj = new Length(0);
-						value.setValue(lengthObj);
-						future.complete(value);
-						return;
-					}
-
-					FileOutputStream cacheStream = null;
-					long total = 0;
-					try {
-						//write the data to the cache file.
-						InputStream data = body.byteStream();
-
-						cacheStream = new FileOutputStream(pathName);
-
-						byte[] b = new byte[1024];
-						int length = 0;
-
-						while((length = data.read(b)) > 0){
-							cacheStream.write(b, 0, length);
-							total += length;
-						}
-					} catch (Exception e) {
-						HiveException ex = new HiveException(e.getMessage());
-						value.getCallback().onError(ex);
-						future.completeExceptionally(ex);
-						return;
-					}
-					finally {
-						try {
-							if (cacheStream != null) {
-								cacheStream.close();
-							}
-							
-							body.close();
-						} catch (Exception e) {
-							HiveException ex = new HiveException(e.getMessage());
-							value.getCallback().onError(ex);
-							future.completeExceptionally(ex);
-							return;
-						}
-					}
-
-					lengthObj = new Length(total);
-					value.setValue(lengthObj);
-					future.complete(value);
-					return;
-				}
-				case WRITE: {
-					future.complete(value);
-					needDeleteCache = true;
-					CacheHelper.deleteCache(IPFSFile.this.pathName);
-					return;
-				}
-			}
-
-			Void padding = new Void();
-			value.setValue(padding);
-			future.complete(value);
-		}
-
-		@Override
-		public void onFailure(Call call, Throwable t) {
-			if (t instanceof SocketTimeoutException) {
-				rpcHelper.setStatus(false);
-			}
-
-			HiveException e = new HiveException(t.getMessage());
-			value.getCallback().onError(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private class IPFSFileCallback implements retrofit2.Callback{
-		private final CompletableFuture future;
-		private final Callback callback;
-		private final IPFSConstance.Type type;
-
-		IPFSFileCallback(CompletableFuture future , Callback callback , IPFSConstance.Type type) {
-			this.future = future;
-			this.callback = callback;
-			this.type = type;
-		}
-
-		@Override
-		public void onResponse(Call call, Response response) {
-			if (response.code() != 200) {
-				HiveException e = new HiveException("Server Error: " + response.message());
-				this.callback.onError(e);
-				future.completeExceptionally(e);
-				return;
-			}
-
-			switch (type) {
-				case GET_INFO:
-
-					StatResponse statResponse = (StatResponse) response.body();
-					HashMap<String, String> attrs = new HashMap<>();
-					attrs.put(Info.itemId, getId());
-
-					int LastPos = IPFSFile.this.pathName.lastIndexOf("/");
-					String name = IPFSFile.this.pathName.substring(LastPos + 1);
-					attrs.put(Info.name, name);
-					attrs.put(Info.size, Integer.toString(statResponse.getSize()));
-
-					attrs.put(Info.type, statResponse.getType());
-					attrs.put(Info.childCount, String.valueOf(statResponse.getBlocks()));
-
-					fileInfo = new File.Info(attrs);
-
-					this.callback.onSuccess(fileInfo);
-					future.complete(fileInfo);
-					break;
-			}
-		}
-
-		@Override
-		public void onFailure(Call call, Throwable t) {
-			if (t instanceof SocketTimeoutException) {
-				rpcHelper.setStatus(false);
-			}
-
-			HiveException e = new HiveException(t.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
+public class IPFSFile extends HiveFile implements IHiveIPFS {
+    IPFSRpc ipfsRpc ;
+    IPFSFile(IPFSRpc ipfsRpc){
+        this.ipfsRpc = ipfsRpc ;
+    }
+
+    private CompletableFuture<CID> doPutFile(String sorceFilename , Callback<CID> callback){
+        CompletableFuture future = new CompletableFuture() ;
+        if (!checkConnection(future)) return future;
+        try {
+            MultipartBody.Part requestBody = createFileRequestBody(sorceFilename);
+            Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
+            if (response == null || response.code() != 200){
+                HiveException exception = new HiveException(HiveError.PUT_FILE_ERROR);
+                if (callback != null) callback.onError(exception);
+                future.completeExceptionally(exception);
+                return future;
+            }
+            AddFileResponse addFileResponse = (AddFileResponse) response.body();
+            CID cid = new CID(addFileResponse.getHash());
+            if (callback != null) callback.onSuccess(cid);
+            future.complete(cid);
+        } catch (Exception e) {
+            e.printStackTrace();
+            HiveException exception = new HiveException(HiveError.PUT_FILE_ERROR);
+            if (callback != null) callback.onError(exception);
+            future.completeExceptionally(exception);
+        }
+        return future;
+    }
+
+    private CompletableFuture<CID> doPutBuffer(byte[] data , Callback<CID> callback){
+        CompletableFuture future = new CompletableFuture();
+        if (!checkConnection(future)) return future;
+        try {
+            MultipartBody.Part requestBody = createBufferRequestBody(data);
+            Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
+            if (response == null || response.code() != 200){
+                HiveException exception = new HiveException(HiveError.PUT_BUFFER_ERROR);
+                if (callback != null) callback.onError(exception);
+                future.completeExceptionally(exception);
+                return future;
+            }
+            AddFileResponse addFileResponse = (AddFileResponse) response.body();
+            CID cid = new CID(addFileResponse.getHash());
+            if (callback!=null) callback.onSuccess(cid);
+            future.complete(cid);
+        } catch (Exception e) {
+            HiveException exception = new HiveException(HiveError.PUT_BUFFER_ERROR) ;
+            if (callback != null) callback.onError(exception);
+            future.completeExceptionally(exception);
+        }
+
+        return future;
+    }
+
+    private MultipartBody.Part createFileRequestBody(String sorceFilename){
+        if (sorceFilename == null || sorceFilename.equals("")){
+            return null ;
+        }
+        File file = new File(sorceFilename);
+        RequestBody requestFile = RequestBody.create(null, file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        return body ;
+    }
+
+    private MultipartBody.Part createBufferRequestBody(byte[] data){
+        if (data == null || data.length == 0){
+            return null ;
+        }
+        RequestBody requestFile = RequestBody.create(null, data);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", "data", requestFile);
+        return body ;
+    }
+
+    private CompletableFuture<Length> doGetFileLength(CID cid ,Callback<Length> callback){
+        CompletableFuture<Length> future = new CompletableFuture();
+        if (!checkConnection(future)) return future;
+        String hash ;
+        int size = 0;
+        Response response = null;
+        try {
+            response = ConnectionManager.getIPFSApi().listFile(cid.getCid()).execute();
+        } catch (Exception e) {
+            future.completeExceptionally(new HiveException(HiveError.GET_FILE_LENGTH_ERROR));
+        }
+        if (response == null || response.code() != 200){
+            HiveException exception = new HiveException(HiveError.GET_FILE_LENGTH_ERROR);
+            if (callback!=null) callback.onError(exception);
+            future.completeExceptionally(exception);
+            return future;
+        }
+        ListFileResponse listFileResponse = (ListFileResponse) response.body();
+
+        HashMap<String, ListFileResponse.ObjectsBean.Bean> map = listFileResponse.getObjects();
+
+        if (null!=map && map.size()>0){
+            for (String key:map.keySet()){
+                hash = map.get(key).getHash();
+                size = map.get(key).getSize();
+                break;//if result only one
+            }
+            Length length = new Length(size);
+            if (callback!=null) callback.onSuccess(length);
+            future.complete(length);
+        }else{
+            HiveException exception = new HiveException(HiveError.GET_FILE_LENGTH_ERROR);
+            callback.onError(exception);
+            future.completeExceptionally(exception);
+        }
+        return future;
+    }
+
+    private CompletableFuture<Length> doCatFile(CID cid,String storeFilepath ,Callback<Length> callback){
+        CompletableFuture<Length> future = new CompletableFuture() ;
+        if (!checkConnection(future)) return future;
+        try {
+            Response response = getFileOrBuffer(cid.getCid());
+            if (response == null || response.code()!=200){
+                HiveException exception = new HiveException(HiveError.GET_FILE_ERROR);
+                if (callback != null) callback.onError(exception);
+                future.completeExceptionally(exception);
+                return future ;
+            }
+            long length = ResponseHelper.saveFileFromResponse(storeFilepath,response);
+            Length lengthObj = new Length(length);
+            if (callback!=null) callback.onSuccess(lengthObj);
+            future.complete(lengthObj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return future;
+    }
+
+    private CompletableFuture<Data> doGetBuffer(CID cid , Callback<Data> callback){
+        CompletableFuture<Data> future = new CompletableFuture();
+        if (!checkConnection(future)) return future;
+        try {
+            Response response = getFileOrBuffer(cid.getCid());
+            if (response!=null){
+                byte[] buffer = ResponseHelper.getBuffer(response);
+                Data data = new Data(buffer);
+                if (callback != null) callback.onSuccess(data);
+                future.complete(data);
+            }else{
+
+                future.completeExceptionally(new HiveException(HiveError.GET_FILE_ERROR));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return future;
+    }
+
+    private Response getFileOrBuffer(String cid) throws HiveException {
+        Response response ;
+        try {
+            response = ConnectionManager.getIPFSApi()
+                    .catFile(cid)
+                    .execute();
+        } catch (Exception ex) {
+            throw new HiveException(ex.getMessage());
+        }
+        return response;
+    }
+
+    private boolean checkConnection(CompletableFuture future){
+        if (!ipfsRpc.isAvailable()){
+            future.completeExceptionally(new HiveException(HiveError.NO_RPC_NODE_AVAILABLE));
+            return false;
+        }
+        return true ;
+    }
+
+    @Override
+    public CompletableFuture<CID> putFile(String absPath, boolean encrypt) {
+        return doPutFile(absPath , null);
+    }
+
+    @Override
+    public CompletableFuture<CID> putFile(String absPath, boolean encrypt, Callback<CID> callback) {
+        return doPutFile(absPath , callback);
+    }
+
+    @Override
+    public CompletableFuture<CID> putFileFromBuffer(byte[] data, boolean encrypt) {
+        return doPutBuffer(data , null);
+    }
+
+    @Override
+    public CompletableFuture<CID> putFileFromBuffer(byte[] data, boolean encrypt, Callback<CID> callback) {
+        return doPutBuffer(data , callback);
+    }
+
+    @Override
+    public CompletableFuture<Length> getFileLength(CID cid) {
+        return doGetFileLength(cid , null);
+    }
+
+    @Override
+    public CompletableFuture<Length> getFileLength(CID cid, Callback<Length> callback) {
+        return doGetFileLength(cid , callback);
+    }
+
+    @Override
+    public CompletableFuture<Data> getFileToBuffer(CID cid, boolean decrypt) {
+        return doGetBuffer(cid , null);
+    }
+
+    @Override
+    public CompletableFuture<Data> getFileToBuffer(CID cid, boolean decrypt, Callback<Data> callback) {
+        return doGetBuffer(cid , callback);
+    }
+
+    @Override
+    public CompletableFuture<Length> getFile(CID cid, boolean decrypt, String storeAbsPath) {
+        return doCatFile(cid,storeAbsPath , null);
+    }
+
+    @Override
+    public CompletableFuture<Length> getFile(CID cid, boolean decrypt, String storeAbsPath, Callback<Length> callback) {
+        return doCatFile(cid,storeAbsPath , callback);
+    }
 }

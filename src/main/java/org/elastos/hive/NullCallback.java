@@ -22,6 +22,8 @@
 
 package org.elastos.hive;
 
+import org.elastos.hive.result.Result;
+
 public class NullCallback<T extends Result> implements Callback<T> {
 	@Override
 	public void onError(HiveException e) {
