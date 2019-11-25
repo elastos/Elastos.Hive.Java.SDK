@@ -29,9 +29,8 @@ import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.NullCallback;
-import org.elastos.hive.OAuthEntry;
 import org.elastos.hive.Persistent;
-import org.elastos.hive.Void;
+import org.elastos.hive.result.Void;
 import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendors.connection.ConnectionManager;
 import org.elastos.hive.vendors.connection.model.BaseServiceConfig;
@@ -52,19 +51,23 @@ public class OneDriveAuthHelper implements AuthHelper {
 	private static final String refreshTokenKey 	= "refresh_token";
 	private static final String expireAtKey 		= "expires_at";
 
-	private final OAuthEntry authEntry;
+	private final String clientId;
+	private final String scope;
+	private final String redirectUrl;
+
 	private final Persistent persistent;
 	private AuthToken token;
 
-	OneDriveAuthHelper(OAuthEntry authEntry, Persistent persistent) {
-		this.authEntry = authEntry;
+	OneDriveAuthHelper(String clientId , String scope , String redirectUrl , Persistent persistent) {
+		this.clientId = clientId ;
+		this.scope = scope ;
+		this.redirectUrl = redirectUrl ;
 		this.persistent = persistent;
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
 			ConnectionManager.resetAuthApi(OneDriveConstance.ONE_DRIVE_AUTH_BASE_URL, config);
 		} catch (Exception e) {
 			e.printStackTrace();
-			// TODO:
 		}
 	}
 
@@ -94,7 +97,6 @@ public class OneDriveAuthHelper implements AuthHelper {
 				future.complete(placeHolder);
 				return future;
 			}
-
 			return redeemToken(callback);
 		}
 
@@ -113,7 +115,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 		try {
 			ConnectionManager.getAuthApi()
-                    .logout(authEntry.getRedirectURL())
+                    .logout(redirectUrl)
                     .enqueue(new AuthCallback(future,callback,Type.LOGOUT));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -151,7 +153,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 		CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
 			Semaphore semph = new Semaphore(1);
 
-			String hostUrl = authEntry.getRedirectURL() ;
+			String hostUrl = redirectUrl ;
 			String[] hostAndPort = UrlUtil.decodeHostAndPort(hostUrl , OneDriveConstance.DEFAULT_REDIRECT_URL , String.valueOf(OneDriveConstance.DEFAULT_REDIRECT_PORT));
 
 			String host = hostAndPort[0] ;
@@ -167,9 +169,9 @@ public class OneDriveAuthHelper implements AuthHelper {
 			String url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
 								OneDriveConstance.ONE_DRIVE_AUTH_URL,
 								OneDriveConstance.AUTHORIZE,
-								authEntry.getClientId(),
-								authEntry.getScope(),
-								authEntry.getRedirectURL())
+								clientId,
+								scope,
+								redirectUrl)
 						.replace(" ", "%20");
 
 			authenticator.requestAuthentication(url);
@@ -201,8 +203,8 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 		try {
 			ConnectionManager.getAuthApi()
-					.getToken(authEntry.getClientId(),authCode,
-                    authEntry.getRedirectURL(), OneDriveConstance.GRANT_TYPE_GET_TOKEN)
+					.getToken(clientId,authCode,
+                    redirectUrl, OneDriveConstance.GRANT_TYPE_GET_TOKEN)
                     .enqueue(new AuthCallback(future,callback,Type.GET_TOKEN));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -215,7 +217,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 		try {
 			ConnectionManager.getAuthApi()
-                    .refreshToken(authEntry.getClientId(),authEntry.getRedirectURL(),
+                    .refreshToken(clientId,redirectUrl,
                     token.getRefreshToken(), OneDriveConstance.GRANT_TYPE_REFRESH_TOKEN)
                     .enqueue(new AuthCallback(future,callback,Type.REDEEM_TOKEN));
 		} catch (Exception e) {
@@ -248,7 +250,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 	private void clearToken() {
 		try {
 			JSONObject json = new JSONObject();
-			json.put(clientIdKey, authEntry.getClientId());
+			json.put(clientIdKey, clientId);
 			persistent.upateContent(json);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -263,7 +265,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 
 		try {
 			JSONObject json = new JSONObject();
-			json.put(clientIdKey, authEntry.getClientId());
+			json.put(clientIdKey, clientId);
 			json.put(refreshTokenKey, token.getRefreshToken());
 			json.put(refreshTokenKey, token.getAccessToken());
 			json.put(expireAtKey, token.getExpiredTime());

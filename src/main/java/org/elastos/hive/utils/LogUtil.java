@@ -23,7 +23,7 @@
 package org.elastos.hive.utils;
 
 public class LogUtil{
-    public static boolean debug = false ;
+    public static boolean debug = true ;
     private static final String TAG = "Hive Debug";
     private static final String ERROR_TAG = "Hive Error";
 

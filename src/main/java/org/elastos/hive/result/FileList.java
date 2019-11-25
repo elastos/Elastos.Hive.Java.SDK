@@ -20,25 +20,16 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive;
+package org.elastos.hive.result;
 
-import org.elastos.hive.result.Result;
+public class FileList extends Result {
+	private final String[] list;
 
-/**
- * Callback result in Hive SDK
- */
-public interface Callback<T extends Result> {
-	/**
-	 * An exception occurred in the middle of obtaining the result
-	 * @param e {@link HiveException}
-	 */
-	void onError(HiveException e);
+	public FileList(String[] list) {
+		this.list = list;
+	}
 
-	/**
-	 * Callback when successful
-	 * @param body The information returned when the callback was successful<br>
-	 *            for example:<br>
-	 *            Drive , Directory , File , Drive.Info ,Directory.Info , File.Info and so on.
-	 */
-	void onSuccess(T body);
+	public String[] getList() {
+		return list;
+	}
 }

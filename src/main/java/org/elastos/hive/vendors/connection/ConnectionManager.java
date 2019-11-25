@@ -35,7 +35,7 @@ public class ConnectionManager {
 
     private static String onedriveBaseUrl ;
     private static String authBaseUrl ;
-    private static String ipfsBaseUrl ;
+    private static String ipfsBaseUrl ="https://www.elastos.org/";
 
     private static BaseServiceConfig onedriveConfig = new BaseServiceConfig.Builder().build();
     private static BaseServiceConfig authConfig = new BaseServiceConfig.Builder().build();

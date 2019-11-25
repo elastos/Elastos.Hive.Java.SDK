@@ -20,25 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive;
+package org.elastos.hive.result;
 
-import org.elastos.hive.result.Result;
-
-/**
- * Callback result in Hive SDK
- */
-public interface Callback<T extends Result> {
-	/**
-	 * An exception occurred in the middle of obtaining the result
-	 * @param e {@link HiveException}
-	 */
-	void onError(HiveException e);
-
-	/**
-	 * Callback when successful
-	 * @param body The information returned when the callback was successful<br>
-	 *            for example:<br>
-	 *            Drive , Directory , File , Drive.Info ,Directory.Info , File.Info and so on.
-	 */
-	void onSuccess(T body);
+public class Void extends Result {
 }

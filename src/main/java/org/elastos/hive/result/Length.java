@@ -20,25 +20,16 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive;
+package org.elastos.hive.result;
 
-import org.elastos.hive.result.Result;
+public class Length extends Result {
+	private final long length;
 
-/**
- * Callback result in Hive SDK
- */
-public interface Callback<T extends Result> {
-	/**
-	 * An exception occurred in the middle of obtaining the result
-	 * @param e {@link HiveException}
-	 */
-	void onError(HiveException e);
+	public Length(long length) {
+		this.length = length;
+	}
 
-	/**
-	 * Callback when successful
-	 * @param body The information returned when the callback was successful<br>
-	 *            for example:<br>
-	 *            Drive , Directory , File , Drive.Info ,Directory.Info , File.Info and so on.
-	 */
-	void onSuccess(T body);
+	public long getLength() {
+		return length;
+	}
 }
