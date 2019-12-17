@@ -37,7 +37,9 @@ public class OneDriveConnect implements IHiveConnect {
             ConnectionManager.resetOneDriveApi(OneDriveConstance.ONE_DRIVE_API_BASE_URL,config);
 
             if (oneDriveConnectOptions.getPersistent() == null){
-                oneDriveConnectOptions.setPersistent(new OneDriveAuthInfoStoreImpl(HiveConnectOptions.DEFAULT_STORE_PATH));
+                String storePath = oneDriveConnectOptions.getStorePath();
+                if (storePath == null || storePath.trim().equals("")) storePath = HiveConnectOptions.DEFAULT_STORE_PATH;
+                oneDriveConnectOptions.setPersistent(new OneDriveAuthInfoStoreImpl(storePath));
             }
 
             authHelper = new OneDriveAuthHelper(oneDriveConnectOptions.getClientId(),
