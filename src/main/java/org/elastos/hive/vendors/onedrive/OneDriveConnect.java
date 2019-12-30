@@ -68,6 +68,6 @@ public class OneDriveConnect implements IHiveConnect {
 
     @Override
     public <T extends HiveFile> T createHiveFile() {
-        return (T) new OneDriveFile("" , authHelper);
+        return (T) new OneDriveFile("/" , authHelper);
     }
 }

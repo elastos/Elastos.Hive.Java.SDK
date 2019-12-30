@@ -50,6 +50,10 @@ public interface OneDriveApi {
     @GET(OneDriveConstance.APP_ROOT+":{path}:/children")
     Call<DirChildrenResponse> getChildren(@Path("path") String path);
 
+    @GET(OneDriveConstance.APP_ROOT+"/children")
+    Call<DirChildrenResponse> getRootChildren();
+
+
     @GET(OneDriveConstance.APP_ROOT+":{path}:/content")
     Call<ResponseBody> read(@Header("Accept-Encoding") String acceptEncoding, @Path("path") String path);
 
