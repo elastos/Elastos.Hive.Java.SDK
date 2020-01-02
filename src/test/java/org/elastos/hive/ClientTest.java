@@ -1,7 +1,5 @@
 package org.elastos.hive;
 
-import org.elastos.hive.HiveClient;
-import org.elastos.hive.HiveClientOptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,17 +11,17 @@ public class ClientTest {
 
     @Test
     public void testGetInstance() {
-        assertNotNull(HiveClient.getInstance());
+        assertNotNull(hiveClient);
     }
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void setUp() {
         HiveClientOptions hiveOptions = new HiveClientOptions();
-        hiveClient = HiveClient.createInstance(hiveOptions);
+        hiveClient = new HiveClient(hiveOptions);
     }
 
     @AfterClass
-    public static void tearDown() throws Exception {
+    public static void tearDown() {
         hiveClient.close();
     }
 }

@@ -20,10 +20,9 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendors.onedrive;
+package org.elastos.hive;
 
-import org.elastos.hive.HiveException;
-import org.elastos.hive.Persistent;
+import org.elastos.hive.vendors.onedrive.OneDriveConstance;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -31,10 +30,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class OneDriveAuthInfoStoreImpl implements Persistent {
+public class AuthInfoStoreImpl implements Persistent {
     private String storePath;
 
-    OneDriveAuthInfoStoreImpl(String storePath) {
+    AuthInfoStoreImpl(String storePath) {
         this.storePath = String.format("%s/%s", storePath, OneDriveConstance.CONFIG);
     }
 

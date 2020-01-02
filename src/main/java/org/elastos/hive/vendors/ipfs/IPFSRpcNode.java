@@ -20,12 +20,33 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive;
+package org.elastos.hive.vendors.ipfs;
 
-public interface IHiveConnect {
-    void connect(Authenticator authenticator) throws HiveException;
-    void disConnect();
-    void setEncryptKey(String encryptKey);
-    <T extends HiveFile> T createHiveFile(String filename);
-    <T extends HiveFile> T createHiveFile();
+public class IPFSRpcNode {
+    String ipv4 ;
+    String ipv6 ;
+    int port ;
+
+    public IPFSRpcNode(String ipv4, int port) {
+        this.ipv4 = ipv4;
+        this.port = port;
+    }
+
+    public IPFSRpcNode(String ipv4, String ipv6, int port) {
+        this.ipv4 = ipv4;
+        this.ipv6 = ipv6;
+        this.port = port;
+    }
+
+    public String getIpv4() {
+        return ipv4;
+    }
+
+    public String getIpv6() {
+        return ipv6;
+    }
+
+    public int getPort() {
+        return port;
+    }
 }

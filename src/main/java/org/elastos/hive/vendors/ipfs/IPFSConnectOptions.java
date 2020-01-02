@@ -23,19 +23,18 @@
 package org.elastos.hive.vendors.ipfs;
 
 import org.elastos.hive.HiveConnectOptions;
-import org.elastos.hive.vendors.HiveRpcNode;
 
 public class IPFSConnectOptions extends HiveConnectOptions {
 
-    private HiveRpcNode[] hiveRpcNodes;
+    private IPFSRpcNode[] hiveRpcNodes;
 
-    public IPFSConnectOptions(HiveRpcNode[] hiveRpcNodes) {
+    public IPFSConnectOptions(IPFSRpcNode[] hiveRpcNodes) {
         this.hiveRpcNodes = hiveRpcNodes ;
         setBackendType(HiveBackendType.HiveBackendType_IPFS);
     }
 
 
-    public HiveRpcNode[] getHiveRpcNodes() {
+    public IPFSRpcNode[] getHiveRpcNodes() {
         return hiveRpcNodes;
     }
 }
