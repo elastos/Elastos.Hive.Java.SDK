@@ -20,20 +20,24 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendors.onedrive;
+package org.elastos.hive;
 
-
-import org.elastos.hive.Callback;
+import org.elastos.hive.result.CID;
 import org.elastos.hive.result.Data;
 import org.elastos.hive.result.FileList;
 import org.elastos.hive.result.Length;
 import org.elastos.hive.result.ValueList;
 import org.elastos.hive.result.Void;
 
-import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
-public interface IHiveFile {
+public interface HiveConnect {
+    void disConnect();
+    void setEncryptKey(String encryptKey);
+
+    CompletableFuture<Void> connect(Authenticator authenticator);
+    CompletableFuture<Void> connect(Authenticator authenticator , Callback<Void> callback);
+
     CompletableFuture<Void> putFile(String destFilename , String sorceFilename , boolean encrypt);
     CompletableFuture<Void> putFile(String destFilename , String sorceFilename , boolean encrypt , Callback<Void> callback);
 
@@ -67,4 +71,21 @@ public interface IHiveFile {
 
     CompletableFuture<Void> deleteValueFromKey(String key);
     CompletableFuture<Void> deleteValueFromKey(String key , Callback<Void> callback);
+
+    CompletableFuture<CID> putIPFSFile(String absPath, boolean encrypt);
+    CompletableFuture<CID> putIPFSFile(String absPath, boolean encrypt , Callback<CID> callback);
+
+    CompletableFuture<CID> putIPFSFileFromBuffer(byte[] data, boolean encrypt);
+    CompletableFuture<CID> putIPFSFileFromBuffer(byte[] data, boolean encrypt , Callback<CID> callback);
+
+    CompletableFuture<Length> getIPFSFileLength(CID cid);
+    CompletableFuture<Length> getIPFSFileLength(CID cid , Callback<Length> callback);
+
+    CompletableFuture<Data> getIPFSFileToBuffer(CID cid, boolean decrypt);
+    CompletableFuture<Data> getIPFSFileToBuffer(CID cid, boolean decrypt , Callback<Data> callback);
+
+    CompletableFuture<Length> getIPFSFile(CID cid , boolean decrypt, String storeAbsPath);
+    CompletableFuture<Length> getIPFSFile(CID cid , boolean decrypt, String storeAbsPath , Callback<Length> callback);
+
+
 }

@@ -22,42 +22,38 @@
 
 package org.elastos.hive;
 
+import org.elastos.hive.result.Void;
 import org.elastos.hive.vendors.ipfs.IPFSConnect;
 import org.elastos.hive.vendors.ipfs.IPFSConnectOptions;
 import org.elastos.hive.vendors.onedrive.OneDriveConnect;
 import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
 
 public class HiveClient {
-    private static HiveClient mInstance ;
+    private OneDriveConnect oneDriveConnect ;
+    private IPFSConnect ipfsConnect ;
+    private HiveClientOptions options ;
 
-    private HiveClient(HiveClientOptions hiveOptions){
-    }
 
-    public static HiveClient createInstance(HiveClientOptions hiveOptions) {
-        if (mInstance == null){
-            mInstance = new HiveClient(hiveOptions);
-        }
-
-        return mInstance;
-    }
-
-    public static HiveClient getInstance() {
-        return mInstance;
+    public HiveClient(HiveClientOptions hiveOptions){
+        options = hiveOptions ;
     }
 
     public void close() {
-        mInstance = null ;
     }
 
-    public IHiveConnect connect(HiveConnectOptions hiveConnectOptions) throws HiveException {
+    public HiveConnect connect(HiveConnectOptions hiveConnectOptions , Callback<Void> callback){
         HiveConnectOptions.HiveBackendType backendType = hiveConnectOptions.getBackendType();
-        IHiveConnect hiveConnect = null ;
+        HiveConnect hiveConnect = null ;
         switch (backendType){
             case HiveBackendType_IPFS:
-                hiveConnect = IPFSConnect.createInstance((IPFSConnectOptions)hiveConnectOptions);
+                if (ipfsConnect == null)
+                    ipfsConnect = IPFSConnect.createInstance((IPFSConnectOptions)hiveConnectOptions);
+                hiveConnect = ipfsConnect;
                 break;
             case HiveBackendType_OneDrive:
-                hiveConnect = OneDriveConnect.createInstance((OneDriveConnectOptions)hiveConnectOptions);
+                if (oneDriveConnect == null)
+                    oneDriveConnect = OneDriveConnect.createInstance((OneDriveConnectOptions)hiveConnectOptions , options.getPersistent());
+                hiveConnect = oneDriveConnect;
                 break;
             case HiveBackendType_ownCloud:
                 break;
@@ -66,11 +62,13 @@ public class HiveClient {
             default:
                 break;
         }
-        hiveConnect.connect(hiveConnectOptions.getAuthenticator());
+
+        hiveConnect.connect(hiveConnectOptions.getAuthenticator() , callback);
+
         return hiveConnect;
     }
 
-    public int disConnect(IHiveConnect hiveConnect) {
+    public int disConnect(HiveConnect hiveConnect) {
         if (hiveConnect!=null) hiveConnect.disConnect();
         return 0;
     }

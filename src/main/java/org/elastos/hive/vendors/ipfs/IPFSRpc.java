@@ -22,38 +22,36 @@
 
 package org.elastos.hive.vendors.ipfs;
 
-import org.elastos.hive.HiveError;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.vendors.HiveRpcNode;
 import org.elastos.hive.vendors.connection.ConnectionManager;
 
 import retrofit2.Response;
 
 public class IPFSRpc {
-    HiveRpcNode[] mHiveRpcNodes ;
-    HiveRpcNode mHiveRpcNode ;
+    IPFSRpcNode[] mHiveRpcNodes ;
+    IPFSRpcNode mHiveRpcNode ;
 
-    public IPFSRpc(HiveRpcNode[] hiveRpcNodes) {
+    public IPFSRpc(IPFSRpcNode[] hiveRpcNodes) {
         this.mHiveRpcNodes = hiveRpcNodes;
     }
 
     void checkReachable() throws HiveException {
         if (mHiveRpcNodes == null || mHiveRpcNodes.length == 0){
-            throw new HiveException(HiveError.RPC_NODE_NULL);
+            throw new HiveException(HiveException.RPC_NODE_NULL);
         }
 
-        for (HiveRpcNode hiveRpcNode : mHiveRpcNodes){
+        for (IPFSRpcNode hiveRpcNode : mHiveRpcNodes){
             if (checkConnect(hiveRpcNode)){
                 return ;
             }
         }
 
         if (mHiveRpcNode == null){
-            throw new HiveException(HiveError.NO_RPC_NODE_AVAILABLE);
+            throw new HiveException(HiveException.NO_RPC_NODE_AVAILABLE);
         }
     }
 
-    void selectBootstrap(HiveRpcNode hiveRpcNode)  {
+    void selectBootstrap(IPFSRpcNode hiveRpcNode)  {
         mHiveRpcNode = hiveRpcNode ;
         String baseUrl = String.format(IPFSConstance.URLFORMAT, mHiveRpcNode.getIpv4(),mHiveRpcNode.getPort());
         try {
@@ -63,7 +61,7 @@ public class IPFSRpc {
         }
     }
 
-    HiveRpcNode getCurrentNode(){
+    IPFSRpcNode getCurrentNode(){
         return mHiveRpcNode;
     }
 
@@ -74,9 +72,9 @@ public class IPFSRpc {
         return true ;
     }
 
-    boolean checkConnect(HiveRpcNode hiveRpcNode) throws HiveException {
+    boolean checkConnect(IPFSRpcNode hiveRpcNode) throws HiveException {
         if (hiveRpcNode == null){
-            throw new HiveException(HiveError.RPC_NODE_NULL);
+            throw new HiveException(HiveException.RPC_NODE_NULL);
         }
 
         boolean isSelect = false ;
@@ -84,7 +82,7 @@ public class IPFSRpc {
         String ipv6 = hiveRpcNode.getIpv6();
         int port = hiveRpcNode.getPort();
         if (port == 0){
-            throw new HiveException(HiveError.RPC_NODE_PORT_NULL);
+            throw new HiveException(HiveException.RPC_NODE_PORT_NULL);
         }
 
         if (checkConnect(ipv4 , port)!=null){
