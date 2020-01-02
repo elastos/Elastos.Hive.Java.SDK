@@ -5,7 +5,7 @@ import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
 import org.elastos.hive.HiveConnectOptions;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.IHiveConnect;
+import org.elastos.hive.HiveConnect;
 import org.elastos.hive.result.Data;
 import org.elastos.hive.result.FileList;
 import org.elastos.hive.result.Result;
@@ -15,7 +15,6 @@ import org.elastos.hive.result.Length;
 import org.elastos.hive.result.Void;
 import org.elastos.hive.utils.LogUtil;
 import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
-import org.elastos.hive.vendors.onedrive.OneDriveFile;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -31,7 +30,6 @@ import java.util.concurrent.ExecutionException;
 
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -53,15 +51,14 @@ public class OneDriveFileTest {
     private String testBufferString = "this is test for buffer";
 
 
-    private static IHiveConnect hiveConnect ;
+    private static HiveConnect hiveConnect ;
     private static HiveClient hiveClient ;
-    private static OneDriveFile hiveFile ;
 
     @Test
     public void test_00_Prepare() {
         String[] result = null;
         try {
-            FileList fileList = hiveFile.listFile().get();
+            FileList fileList = hiveConnect.listFile().get();
             result = fileList.getList();
             for (int i = 0 ; i<result.length ; i++){
                 LogUtil.d("file = "+result[i]);
@@ -70,7 +67,7 @@ public class OneDriveFileTest {
             if (result==null || result.length<1) return;
 
             for (String name :result){
-                hiveFile.deleteFile(name).get();
+                hiveConnect.deleteFile(name).get();
             }
 
         } catch (InterruptedException e) {
@@ -83,7 +80,7 @@ public class OneDriveFileTest {
     @Test
     public void test_01_PutFile() {
         try {
-            hiveFile.putFile(testFileName,testFilepath,false).get();
+            hiveConnect.putFile(testFileName,testFilepath,false).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
             assertNull(e);
@@ -95,7 +92,7 @@ public class OneDriveFileTest {
 
     @Test
     public void test_11_PutFileAsync() {
-        CompletableFuture future = hiveFile.putFile(testFileName, testFilepath, false, new Callback<Void>() {
+        CompletableFuture future = hiveConnect.putFile(testFileName, testFilepath, false, new Callback<Void>() {
             @Override
             public void onError(HiveException e) {
                 assertNull(e);
@@ -108,13 +105,12 @@ public class OneDriveFileTest {
         });
 
         TestUtils.waitFinish(future);
-        assertFalse(future.isCompletedExceptionally());
     }
 
     @Test
     public void test_02_PutBuffer() {
         try {
-            hiveFile.putFileFromBuffer(testBufferFileName,testBufferString.getBytes() ,false).get();
+            hiveConnect.putFileFromBuffer(testBufferFileName,testBufferString.getBytes() ,false).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
             assertNull(e);
@@ -126,7 +122,7 @@ public class OneDriveFileTest {
 
     @Test
     public void test_12_PutBufferAsync() {
-        CompletableFuture future = hiveFile.putFileFromBuffer(testBufferFileName, testBufferString.getBytes(), false, new Callback<Void>() {
+        CompletableFuture future = hiveConnect.putFileFromBuffer(testBufferFileName, testBufferString.getBytes(), false, new Callback<Void>() {
             @Override
             public void onError(HiveException e) {
                 assertNull(e);
@@ -139,13 +135,12 @@ public class OneDriveFileTest {
         });
 
         TestUtils.waitFinish(future);
-        assertFalse(future.isCompletedExceptionally());
     }
 
     @Test
     public void test_03_FileLength(){
         try {
-            Length length = hiveFile.getFileLength(testFileName).get();
+            Length length = hiveConnect.getFileLength(testFileName).get();
             LogUtil.d("length = "+length.getLength());
 
             assertEquals(EXPECT_FILE_LENGTH,length.getLength());
@@ -160,7 +155,7 @@ public class OneDriveFileTest {
 
     @Test
     public void test_13_FileLengthAsync(){
-        CompletableFuture future = hiveFile.getFileLength(testFileName, new Callback<Length>() {
+        CompletableFuture future = hiveConnect.getFileLength(testFileName, new Callback<Length>() {
             @Override
             public void onError(HiveException e) {
                 assertNull(e);
@@ -174,7 +169,6 @@ public class OneDriveFileTest {
         });
 
         TestUtils.waitFinish(future);
-        assertFalse(future.isCompletedExceptionally());
     }
 
     @Test
@@ -183,7 +177,7 @@ public class OneDriveFileTest {
         if (file.exists()) file.delete();
 
         try {
-            hiveFile.getFile(testFileName,false,storeFilepath).get();
+            hiveConnect.getFile(testFileName,false,storeFilepath).get();
 
             String expectMd5 = Md5CaculateUtil.getFileMD5(testFilepath);
             String actualMd5 = Md5CaculateUtil.getFileMD5(storeFilepath);
@@ -206,7 +200,7 @@ public class OneDriveFileTest {
         File file = new File(storeFilepath);
         if (file.exists()) file.delete();
 
-        CompletableFuture future = hiveFile.getFile(testFileName, false, storeFilepath, new Callback<Length>() {
+        CompletableFuture future = hiveConnect.getFile(testFileName, false, storeFilepath, new Callback<Length>() {
             @Override
             public void onError(HiveException e) {
                 assertNull(e);
@@ -227,14 +221,13 @@ public class OneDriveFileTest {
         assertEquals(expectMd5,actualMd5);
 
         TestUtils.waitFinish(future);
-        assertFalse(future.isCompletedExceptionally());
     }
 
 
     @Test
     public void test_05_GetFileBuffer(){
         try {
-            Data data = hiveFile.getFileToBuffer(testBufferFileName,false).get();
+            Data data = hiveConnect.getFileToBuffer(testBufferFileName,false).get();
 
             byte[] expectBytes = testBufferString.getBytes() ;
             byte[] actualBytes = data.getData();
@@ -254,7 +247,7 @@ public class OneDriveFileTest {
 
     @Test
     public void test_15_GetFileBufferAsync(){
-        CompletableFuture future = hiveFile.getFileToBuffer(testBufferFileName, false, new Callback<Data>() {
+        CompletableFuture future = hiveConnect.getFileToBuffer(testBufferFileName, false, new Callback<Data>() {
             @Override
             public void onError(HiveException e) {
                 assertNull(e);
@@ -275,14 +268,13 @@ public class OneDriveFileTest {
         });
 
         TestUtils.waitFinish(future);
-        assertFalse(future.isCompletedExceptionally());
     }
 
 
     @Test
     public void test_06_ListFiles(){
         try {
-            FileList fileList = hiveFile.listFile().get();
+            FileList fileList = hiveConnect.listFile().get();
             String[] result = fileList.getList();
             for (int i = 0 ; i<result.length ; i++){
                 LogUtil.d("file = "+result[i]);
@@ -299,7 +291,7 @@ public class OneDriveFileTest {
 
     @Test
     public void test_16_ListFilesAsync(){
-        CompletableFuture future = hiveFile.listFile(new Callback<FileList>() {
+        CompletableFuture future = hiveConnect.listFile(new Callback<FileList>() {
             @Override
             public void onError(HiveException e) {
                 assertNull(e);
@@ -322,7 +314,7 @@ public class OneDriveFileTest {
     @Test
     public void test_07_DeleteFile(){
         try {
-            Void result = hiveFile.deleteFile(testFileName).get();
+            Void result = hiveConnect.deleteFile(testFileName).get();
             assertNotNull(result);
         } catch (InterruptedException e) {
             assertNull(e);
@@ -335,7 +327,7 @@ public class OneDriveFileTest {
 
     @Test
     public void test_17_DeleteFileAsync(){
-        CompletableFuture future = hiveFile.deleteFile(testFileName, new Callback() {
+        CompletableFuture future = hiveConnect.deleteFile(testFileName, new Callback() {
             @Override
             public void onError(HiveException e) {
                 assertNull(e);
@@ -347,15 +339,14 @@ public class OneDriveFileTest {
             }
         });
         TestUtils.waitFinish(future);
-        assertFalse(future.isCompletedExceptionally());
     }
 
     @BeforeClass
-    public static void setUp() throws Exception {
-        HiveClientOptions hiveOptions = new HiveClientOptions();
-        hiveClient = HiveClient.createInstance(hiveOptions);
+    public static void setUp() {
+        HiveClientOptions hiveOptions = new HiveClientOptions(STORE_PATH);
 
-        HiveConnectOptions hiveConnectOptions = new OneDriveConnectOptions(APPID,SCOPE,REDIRECTURL, STORE_PATH, requestUrl -> {
+        hiveClient = new HiveClient(hiveOptions);
+        HiveConnectOptions hiveConnectOptions = new OneDriveConnectOptions(APPID,SCOPE,REDIRECTURL, requestUrl -> {
             try {
                 Desktop.getDesktop().browse(new URI(requestUrl));
             }
@@ -365,8 +356,19 @@ public class OneDriveFileTest {
             }
         });
 
-        hiveConnect = hiveClient.connect(hiveConnectOptions);
-        hiveFile = hiveConnect.createHiveFile("/bar");
+        hiveConnect = hiveClient.connect(hiveConnectOptions, new Callback<Void>() {
+            @Override
+            public void onError(HiveException e) {
+            }
+
+            @Override
+            public void onSuccess(Void body) {
+                assertNotNull(body);
+                TestUtils.changeFlag();
+            }
+        });
+
+        TestUtils.waitFinish();
     }
 
 

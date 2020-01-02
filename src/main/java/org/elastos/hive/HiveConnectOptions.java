@@ -23,7 +23,6 @@
 package org.elastos.hive;
 
 public class HiveConnectOptions {
-    public static final String DEFAULT_STORE_PATH = System.getProperty("user.dir");
     protected enum HiveBackendType {
         HiveBackendType_IPFS,
         HiveBackendType_OneDrive,
@@ -33,7 +32,6 @@ public class HiveConnectOptions {
 
     private HiveBackendType backendType ;
     private Authenticator authenticator ;
-    private Persistent persistent ;
 
     protected HiveBackendType getBackendType(){
         return this.backendType;
@@ -50,13 +48,4 @@ public class HiveConnectOptions {
     protected void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
     }
-
-    public Persistent getPersistent() {
-        return persistent;
-    }
-
-    public void setPersistent(Persistent persistent) {
-        this.persistent = persistent;
-    }
-
 }
