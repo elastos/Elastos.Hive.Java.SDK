@@ -31,13 +31,16 @@ import org.elastos.hive.result.Void;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface HiveConnect {
+public interface HiveConnect extends Connect, HiveFile, IPFSFile{
+}
+
+interface Connect{
+    void connect(Authenticator authenticator);
     void disConnect();
     void setEncryptKey(String encryptKey);
+}
 
-    CompletableFuture<Void> connect(Authenticator authenticator);
-    CompletableFuture<Void> connect(Authenticator authenticator , Callback<Void> callback);
-
+interface HiveFile{
     CompletableFuture<Void> putFile(String destFilename , String sorceFilename , boolean encrypt);
     CompletableFuture<Void> putFile(String destFilename , String sorceFilename , boolean encrypt , Callback<Void> callback);
 
@@ -71,7 +74,9 @@ public interface HiveConnect {
 
     CompletableFuture<Void> deleteValueFromKey(String key);
     CompletableFuture<Void> deleteValueFromKey(String key , Callback<Void> callback);
+}
 
+interface IPFSFile{
     CompletableFuture<CID> putIPFSFile(String absPath, boolean encrypt);
     CompletableFuture<CID> putIPFSFile(String absPath, boolean encrypt , Callback<CID> callback);
 
@@ -86,6 +91,4 @@ public interface HiveConnect {
 
     CompletableFuture<Length> getIPFSFile(CID cid , boolean decrypt, String storeAbsPath);
     CompletableFuture<Length> getIPFSFile(CID cid , boolean decrypt, String storeAbsPath , Callback<Length> callback);
-
-
 }

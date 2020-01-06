@@ -3,14 +3,13 @@ package org.elastos.hive.ipfs;
 import org.elastos.hive.Callback;
 import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
+import org.elastos.hive.HiveConnect;
 import org.elastos.hive.HiveConnectOptions;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.HiveConnect;
 import org.elastos.hive.result.CID;
 import org.elastos.hive.result.Data;
 import org.elastos.hive.result.Length;
 
-import org.elastos.hive.result.Void;
 import org.elastos.hive.util.Md5CaculateUtil;
 import org.elastos.hive.util.TestUtils;
 import org.elastos.hive.utils.LogUtil;
@@ -47,10 +46,10 @@ public class IPFSFileTest {
 
     private static final String STORE_FILE_PATH = System.getProperty("user.dir")+"/src/resources/org/elastos/hive/storetest.txt";
 
-
+    private static final String STORE_PATH = System.getProperty("user.dir");
     @BeforeClass
     public static void setUp() {
-        HiveClientOptions hiveOptions = new HiveClientOptions();
+        HiveClientOptions hiveOptions = new HiveClientOptions(STORE_PATH);
         hiveClient = new HiveClient(hiveOptions);
 
         hiveRpcNodes[0] = new IPFSRpcNode("127.0.0.1",5001);
@@ -60,16 +59,7 @@ public class IPFSFileTest {
         hiveRpcNodes[4] = new IPFSRpcNode("107.191.44.124",5001);
 
         HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions(hiveRpcNodes);
-        hiveConnect = hiveClient.connect(hiveConnectOptions, new Callback<Void>() {
-            @Override
-            public void onError(HiveException e) {
-            }
-
-            @Override
-            public void onSuccess(Void body) {
-                assertNotNull(body);
-            }
-        });
+        hiveConnect = hiveClient.connect(hiveConnectOptions);
     }
 
     @AfterClass
