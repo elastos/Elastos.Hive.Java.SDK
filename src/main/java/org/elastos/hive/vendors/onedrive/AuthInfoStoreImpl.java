@@ -20,9 +20,10 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive;
+package org.elastos.hive.vendors.onedrive;
 
-import org.elastos.hive.vendors.onedrive.OneDriveConstance;
+import org.elastos.hive.HiveException;
+import org.elastos.hive.Persistent;
 import org.json.JSONObject;
 
 import java.io.File;

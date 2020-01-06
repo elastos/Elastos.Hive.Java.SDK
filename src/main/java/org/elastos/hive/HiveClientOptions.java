@@ -23,30 +23,11 @@
 package org.elastos.hive;
 
 public class HiveClientOptions {
-    public static final String DEFAULT_STORE_PATH = System.getProperty("user.dir");
-    private Persistent persistent ;
-
-    public HiveClientOptions(Persistent persistent) {
-        setPersistent(persistent);
+    private final String storePath ;
+    public HiveClientOptions(String persistentStorePath) {
+        this.storePath = persistentStorePath;
     }
-
-    public HiveClientOptions(String storePath) {
-        setPersistent(storePath);
-    }
-
-    public HiveClientOptions() {
-        setPersistent(HiveClientOptions.DEFAULT_STORE_PATH);
-    }
-
-    Persistent getPersistent() {
-        return persistent;
-    }
-
-    private void setPersistent(Persistent persistent) {
-        this.persistent = persistent;
-    }
-
-    private void setPersistent(String storePath) {
-        this.persistent = new AuthInfoStoreImpl(storePath);
+    public String getStorePath() {
+        return storePath;
     }
 }

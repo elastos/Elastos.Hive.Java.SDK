@@ -29,24 +29,75 @@ public class OneDriveConnectOptions extends HiveConnectOptions {
     private final String clientId;
     private final String scope;
     private final String redirectUrl;
+    private final Authenticator authenticator;
 
-    public OneDriveConnectOptions(String clientId, String scope, String redirectUrl, Authenticator authenticator) {
-        this.clientId = clientId;
-        this.scope = scope;
-        this.redirectUrl = redirectUrl;
+    OneDriveConnectOptions() {
+        this(new Builder());
+    }
+
+    OneDriveConnectOptions(Builder builder) {
+        this.clientId = builder.clientId;
+        this.scope = builder.scope;
+        this.redirectUrl = builder.redirectUrl;
+        this.authenticator = builder.authenticator;
         setBackendType(HiveBackendType.HiveBackendType_OneDrive);
         setAuthenticator(authenticator);
     }
 
-    public String getClientId() {
+    String getClientId() {
         return clientId;
     }
 
-    public String getScope() {
+    String getScope() {
         return scope;
     }
 
-    public String getRedirectUrl() {
+    String getRedirectUrl() {
         return redirectUrl;
+    }
+
+    public static class Builder{
+        private String clientId;
+        private String scope;
+        private String redirectUrl;
+        private Authenticator authenticator;
+
+        public Builder(){
+            clientId = "afd3d647-a8b7-4723-bf9d-1b832f43b881";
+            scope = "User.Read Files.ReadWrite.All offline_access";
+            redirectUrl = "http://localhost:12345" ;
+            authenticator = requestUrl -> {};
+        }
+
+        Builder(OneDriveConnectOptions oneDriveConnectOptions){
+            this.clientId = oneDriveConnectOptions.clientId;
+            this.scope = oneDriveConnectOptions.scope;
+            this.redirectUrl = oneDriveConnectOptions.redirectUrl;
+            this.authenticator = oneDriveConnectOptions.authenticator;
+        }
+
+        public Builder clientId(String clientId){
+            this.clientId = clientId;
+            return this ;
+        }
+
+        public Builder scope(String scope){
+            this.scope = scope ;
+            return this ;
+        }
+
+        public Builder redirectUrl(String redirectUrl){
+            this.redirectUrl = redirectUrl ;
+            return this ;
+        }
+
+        public Builder authenticator(Authenticator authenticator){
+            this.authenticator = authenticator ;
+            return this ;
+        }
+
+        public OneDriveConnectOptions build(){
+            return new OneDriveConnectOptions(this);
+        }
     }
 }

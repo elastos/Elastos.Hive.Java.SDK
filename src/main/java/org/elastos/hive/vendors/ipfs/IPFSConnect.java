@@ -24,8 +24,8 @@ package org.elastos.hive.vendors.ipfs;
 
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
-import org.elastos.hive.HiveException;
 import org.elastos.hive.HiveConnect;
+import org.elastos.hive.HiveException;
 import org.elastos.hive.result.CID;
 import org.elastos.hive.result.Data;
 import org.elastos.hive.result.FileList;
@@ -45,54 +45,20 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-public class IPFSConnect implements HiveConnect {
-    private static IPFSConnect mIPFSConnectInstance ;
-    private static IPFSRpc ipfsRpc ;
+public class IPFSConnect implements HiveConnect{
+    private IPFSRpc ipfsRpc ;
 
-    private IPFSConnect(){
-    }
-
-    public static IPFSConnect createInstance(IPFSConnectOptions hiveConnectOptions){
-        if (null == mIPFSConnectInstance){
-            mIPFSConnectInstance = new IPFSConnect();
-        }
+    public IPFSConnect(IPFSConnectOptions hiveConnectOptions){
         ipfsRpc = new IPFSRpc(hiveConnectOptions.getHiveRpcNodes());
-        return mIPFSConnectInstance;
-    }
-
-    public static HiveConnect getInstance(){
-        return  mIPFSConnectInstance;
     }
 
     @Override
-    public CompletableFuture<Void> connect(Authenticator authenticator){
-        CompletableFuture<Void> completableFuture = new CompletableFuture<>();
+    public void connect(Authenticator authenticator){
         try {
             ipfsRpc.checkReachable();
-            completableFuture.complete(new Void());
         } catch (HiveException e) {
-            HiveException ex = new HiveException(HiveException.CONNECT_ERROR);
-            completableFuture.completeExceptionally(ex);
             e.printStackTrace();
         }
-        return completableFuture;
-    }
-
-    @Override
-    public CompletableFuture<Void> connect(Authenticator authenticator , Callback<Void> callback){
-        CompletableFuture<Void> completableFuture = new CompletableFuture<>();
-        try {
-            ipfsRpc.checkReachable();
-            Void result = new Void() ;
-            callback.onSuccess(result);
-            completableFuture.complete(result);
-        } catch (HiveException e) {
-            HiveException ex = new HiveException(HiveException.CONNECT_ERROR);
-            completableFuture.completeExceptionally(ex);
-            callback.onError(ex);
-            e.printStackTrace();
-        }
-        return completableFuture;
     }
 
     @Override

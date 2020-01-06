@@ -58,11 +58,12 @@ public class OneDriveAuthHelper implements AuthHelper {
 	private final Persistent persistent;
 	private AuthToken token;
 
-	OneDriveAuthHelper(String clientId , String scope , String redirectUrl , Persistent persistent) {
+	OneDriveAuthHelper(String clientId , String scope , String redirectUrl , String persistentStorePath) {
 		this.clientId = clientId ;
 		this.scope = scope ;
 		this.redirectUrl = redirectUrl ;
-		this.persistent = persistent;
+		this.persistent = new AuthInfoStoreImpl(persistentStorePath);
+
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
 			ConnectionManager.resetAuthApi(OneDriveConstance.ONE_DRIVE_AUTH_BASE_URL, config);
