@@ -1,12 +1,9 @@
 package org.elastos.hive.ipfs;
 
-import org.elastos.hive.Callback;
 import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
-import org.elastos.hive.HiveConnectOptions;
-import org.elastos.hive.HiveException;
 import org.elastos.hive.HiveConnect;
-import org.elastos.hive.result.Void;
+import org.elastos.hive.HiveConnectOptions;
 import org.elastos.hive.vendors.ipfs.IPFSRpcNode;
 import org.elastos.hive.vendors.ipfs.IPFSConnectOptions;
 import org.junit.AfterClass;
@@ -20,10 +17,11 @@ public class IPFSConnectTest {
     private static HiveConnect hiveConnect ;
     private static HiveClient hiveClient ;
     private static IPFSRpcNode[] hiveRpcNodes = new IPFSRpcNode[5];
+    private static final String STORE_PATH = System.getProperty("user.dir");
 
     @BeforeClass
     public static void setUp() {
-        HiveClientOptions hiveOptions = new HiveClientOptions();
+        HiveClientOptions hiveOptions = new HiveClientOptions(STORE_PATH);
         hiveClient = new HiveClient(hiveOptions);
         hiveRpcNodes[0] = new IPFSRpcNode("3.133.166.156",5001);
         hiveRpcNodes[1] = new IPFSRpcNode("13.59.79.222",5001);
@@ -36,16 +34,7 @@ public class IPFSConnectTest {
     @Test
     public void testConnect(){
         HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions(hiveRpcNodes);
-        hiveConnect = hiveClient.connect(hiveConnectOptions, new Callback<Void>() {
-            @Override
-            public void onError(HiveException e) {
-            }
-
-            @Override
-            public void onSuccess(Void body) {
-                assertNotNull(body);
-            }
-        });
+        hiveConnect = hiveClient.connect(hiveConnectOptions);
         assertNotNull(hiveConnect);
     }
 

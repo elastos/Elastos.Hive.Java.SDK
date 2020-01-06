@@ -33,8 +33,7 @@ public class IPFSConnectOptions extends HiveConnectOptions {
         setBackendType(HiveBackendType.HiveBackendType_IPFS);
     }
 
-
-    public IPFSRpcNode[] getHiveRpcNodes() {
+    IPFSRpcNode[] getHiveRpcNodes() {
         return hiveRpcNodes;
     }
 }

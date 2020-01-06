@@ -3,9 +3,8 @@ package org.elastos.hive.vendors.onedrive;
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
-import org.elastos.hive.HiveException;
 import org.elastos.hive.HiveConnect;
-import org.elastos.hive.Persistent;
+import org.elastos.hive.HiveException;
 import org.elastos.hive.result.CID;
 import org.elastos.hive.result.Data;
 import org.elastos.hive.result.FileList;
@@ -31,32 +30,19 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-public class OneDriveConnect implements HiveConnect {
-    private static OneDriveConnect mOneDriveConnectInstance ;
-    private static OneDriveConnectOptions oneDriveConnectOptions ;
-    private static AuthHelper authHelper;
-    private static Persistent persistent ;
-    private boolean isConnect = false;
+public class OneDriveConnect implements HiveConnect{
+    private OneDriveConnectOptions oneDriveConnectOptions ;
+    private AuthHelper authHelper;
 
-    private OneDriveConnect(){
-    }
+    private String storePath ;
 
-    public static OneDriveConnect createInstance(OneDriveConnectOptions hiveConnectOptions , Persistent persistent){
-        if (null == mOneDriveConnectInstance){
-            mOneDriveConnectInstance = new OneDriveConnect();
-        }
-        OneDriveConnect.persistent = persistent ;
-        oneDriveConnectOptions = hiveConnectOptions;
-        return mOneDriveConnectInstance;
-    }
-
-    public static HiveConnect getInstance(){
-        return mOneDriveConnectInstance ;
+    public OneDriveConnect(OneDriveConnectOptions hiveConnectOptions , String storePath){
+        this.oneDriveConnectOptions = hiveConnectOptions ;
+        this.storePath = storePath ;
     }
 
     @Override
-    public CompletableFuture<Void> connect(Authenticator authenticator) {
-        CompletableFuture<Void> completableFuture = new CompletableFuture<>();
+    public void connect(Authenticator authenticator) {
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
             ConnectionManager.resetOneDriveApi(OneDriveConstance.ONE_DRIVE_API_BASE_URL,config);
@@ -64,53 +50,12 @@ public class OneDriveConnect implements HiveConnect {
             authHelper = new OneDriveAuthHelper(oneDriveConnectOptions.getClientId(),
                     oneDriveConnectOptions.getScope(),
                     oneDriveConnectOptions.getRedirectUrl(),
-                    OneDriveConnect.persistent);
+                    storePath);
 
             authHelper.loginAsync(authenticator).get();
-
-            Void result = new Void();
-            completableFuture.complete(result);
         } catch (Exception e) {
-            HiveException ex = new HiveException(HiveException.CONNECT_ERROR);
-            completableFuture.completeExceptionally(ex);
             e.printStackTrace();
         }
-        return completableFuture;
-    }
-
-    @Override
-    public CompletableFuture<Void> connect(Authenticator authenticator , Callback<Void> callback) {
-        CompletableFuture<Void> completableFuture = new CompletableFuture<>();
-        try {
-            BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-            ConnectionManager.resetOneDriveApi(OneDriveConstance.ONE_DRIVE_API_BASE_URL,config);
-
-            authHelper = new OneDriveAuthHelper(oneDriveConnectOptions.getClientId(),
-                    oneDriveConnectOptions.getScope(),
-                    oneDriveConnectOptions.getRedirectUrl(),
-                    OneDriveConnect.persistent);
-
-            authHelper.loginAsync(authenticator, new Callback<Void>() {
-                @Override
-                public void onError(HiveException e) {
-                    callback.onError(e);
-                    completableFuture.completeExceptionally(e);
-                }
-
-                @Override
-                public void onSuccess(Void body) {
-                    callback.onSuccess(body);
-                    completableFuture.complete(body);
-                }
-            });
-        } catch (Exception e) {
-            HiveException ex = new HiveException(HiveException.CONNECT_ERROR);
-            callback.onError(ex);
-            completableFuture.completeExceptionally(ex);
-            e.printStackTrace();
-            return completableFuture;
-        }
-        return completableFuture;
     }
 
     @Override
@@ -308,16 +253,6 @@ public class OneDriveConnect implements HiveConnect {
         return unSupportFunction();
     }
 
-//    @Override
-//    public <T extends HiveFile> T createHiveFile(String filename) {
-//        return (T) new OneDriveFile(filename , authHelper);
-//    }
-//
-//    @Override
-//    public <T extends HiveFile> T createHiveFile() {
-//        return (T) new OneDriveFile("/" , authHelper);
-//    }
-
     private CompletableFuture<ValueList> doGetValue(String key , boolean decrypt , Callback<ValueList> callback){
         CompletableFuture<ValueList> future = new CompletableFuture<>();
         ArrayList<Data> arrayList = new ArrayList<>();
@@ -412,7 +347,6 @@ public class OneDriveConnect implements HiveConnect {
     private CompletableFuture<Length> doGetFileLength(String destFilePath , org.elastos.hive.Callback<Length> callback){
         CompletableFuture<Length> future = new CompletableFuture() ;
         try {
-//            String destFilePath = creatDestFilePath(filename);
             Response response = requestFileInfo(destFilePath);
             int checkResponseCode = checkResponseCode(response) ;
             if (checkResponseCode == 0){
@@ -577,7 +511,6 @@ public class OneDriveConnect implements HiveConnect {
         try {
             OneDriveApi api = ConnectionManager.getOnedriveApi();
             Response<DirChildrenResponse> response ;
-//            if (this.filename.equals("/")) response = api.getRootChildren().execute();
             response = api.getChildren("/Files").execute();
             int checkResponseCode = checkResponseCode(response) ;
             if(checkResponseCode == 404){

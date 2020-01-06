@@ -3,9 +3,9 @@ package org.elastos.hive.OneDrive;
 import org.elastos.hive.Callback;
 import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
+import org.elastos.hive.HiveConnect;
 import org.elastos.hive.HiveConnectOptions;
 import org.elastos.hive.HiveException;
-import org.elastos.hive.HiveConnect;
 import org.elastos.hive.result.Data;
 import org.elastos.hive.result.FileList;
 import org.elastos.hive.result.Result;
@@ -346,29 +346,23 @@ public class OneDriveFileTest {
         HiveClientOptions hiveOptions = new HiveClientOptions(STORE_PATH);
 
         hiveClient = new HiveClient(hiveOptions);
-        HiveConnectOptions hiveConnectOptions = new OneDriveConnectOptions(APPID,SCOPE,REDIRECTURL, requestUrl -> {
-            try {
-                Desktop.getDesktop().browse(new URI(requestUrl));
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-                fail("Authenticator failed");
-            }
-        });
 
-        hiveConnect = hiveClient.connect(hiveConnectOptions, new Callback<Void>() {
-            @Override
-            public void onError(HiveException e) {
-            }
+        HiveConnectOptions hiveConnectOptions =
+                new OneDriveConnectOptions.Builder()
+                        .clientId(APPID)
+                        .scope(SCOPE)
+                        .redirectUrl(REDIRECTURL)
+                        .authenticator(requestUrl -> {
+                            try {
+                                Desktop.getDesktop().browse(new URI(requestUrl));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                fail("Authenticator failed");
+                            }
+                        })
+                        .build();
 
-            @Override
-            public void onSuccess(Void body) {
-                assertNotNull(body);
-                TestUtils.changeFlag();
-            }
-        });
-
-        TestUtils.waitFinish();
+        hiveConnect = hiveClient.connect(hiveConnectOptions);
     }
 
 
