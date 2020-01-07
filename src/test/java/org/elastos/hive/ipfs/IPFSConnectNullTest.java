@@ -10,29 +10,38 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class IPFSConnectNullTest {
+import static org.junit.Assert.assertNull;
 
-    private static HiveConnect hiveConnect ;
-    private static Client hiveClient ;
-    private static IPFSRpcNode[] hiveRpcNodes = new IPFSRpcNode[1];
+public class IPFSConnectNullTest {
+    private static HiveConnect connect ;
+    private static Client client ;
+    private static IPFSRpcNode[] rpcNodes = new IPFSRpcNode[1];
     private static final String STORE_PATH = System.getProperty("user.dir");
 
     @BeforeClass
     public static void setUp() {
-        ClientOptions hiveOptions = new ClientOptions.Builder().setStorePath(STORE_PATH).build();
-        hiveClient = new Client(hiveOptions);
-        hiveRpcNodes[0] = null;
-    }
+        ClientOptions options = new ClientOptions
+                .Builder()
+                .setStorePath(STORE_PATH)
+                .build();
 
+        client = new Client(options);
+        rpcNodes[0] = null;
+    }
 
     @Test
     public void testConnect(){
-        ConnectOptions hiveConnectOptions = new IPFSConnectOptions.Builder().setRpcNodes(hiveRpcNodes).build();
-        hiveConnect = hiveClient.connect(hiveConnectOptions);
+        ConnectOptions options = new IPFSConnectOptions
+                .Builder()
+                .setRpcNodes(rpcNodes)
+                .build();
+
+        connect = client.connect(options);
+        assertNull(connect);
     }
 
     @AfterClass
     public static void tearDown() {
-        hiveClient.disConnect(hiveConnect);
+        client.disConnect(connect);
     }
 }
