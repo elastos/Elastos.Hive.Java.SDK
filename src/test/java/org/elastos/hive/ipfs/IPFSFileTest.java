@@ -1,7 +1,7 @@
 package org.elastos.hive.ipfs;
 
 import org.elastos.hive.Callback;
-import org.elastos.hive.HiveClient;
+import org.elastos.hive.Client;
 import org.elastos.hive.ClientOptions;
 import org.elastos.hive.HiveConnect;
 import org.elastos.hive.ConnectOptions;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertNull;
 
 public class IPFSFileTest {
     private static HiveConnect hiveConnect ;
-    private static HiveClient hiveClient ;
+    private static Client hiveClient ;
     private static IPFSRpcNode[] hiveRpcNodes = new IPFSRpcNode[5];
 
     private static final CID EXPECTED_CID = new CID("QmaY6wjwnybJgd5F4FD6pPL6h9vjXrGv2BJbxxUC1ojUbQ");
@@ -50,7 +50,7 @@ public class IPFSFileTest {
     @BeforeClass
     public static void setUp() {
         ClientOptions hiveOptions = new ClientOptions.Builder().setStorePath(STORE_PATH).build();
-        hiveClient = new HiveClient(hiveOptions);
+        hiveClient = new Client(hiveOptions);
 
         hiveRpcNodes[0] = new IPFSRpcNode("127.0.0.1",5001);
         hiveRpcNodes[1] = new IPFSRpcNode("3.133.166.156",5001);

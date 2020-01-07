@@ -7,7 +7,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 
 public class ClientTest {
-    private static HiveClient hiveClient ;
+    private static Client hiveClient ;
     private static final String STORE_PATH = System.getProperty("user.dir");
 
     @Test
@@ -18,7 +18,7 @@ public class ClientTest {
     @BeforeClass
     public static void setUp() {
         ClientOptions hiveOptions = new ClientOptions.Builder().setStorePath(STORE_PATH).build();
-        hiveClient = new HiveClient(hiveOptions);
+        hiveClient = new Client(hiveOptions);
     }
 
     @AfterClass

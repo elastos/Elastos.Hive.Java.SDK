@@ -1,7 +1,7 @@
 package org.elastos.hive.OneDrive;
 
 import org.elastos.hive.Callback;
-import org.elastos.hive.HiveClient;
+import org.elastos.hive.Client;
 import org.elastos.hive.ClientOptions;
 import org.elastos.hive.HiveConnect;
 import org.elastos.hive.ConnectOptions;
@@ -52,7 +52,7 @@ public class OneDriveFileTest {
 
 
     private static HiveConnect hiveConnect ;
-    private static HiveClient hiveClient ;
+    private static Client hiveClient ;
 
     @Test
     public void test_00_Prepare() {
@@ -345,7 +345,7 @@ public class OneDriveFileTest {
     public static void setUp() {
         ClientOptions hiveOptions = new ClientOptions.Builder().setStorePath(STORE_PATH).build();
 
-        hiveClient = new HiveClient(hiveOptions);
+        hiveClient = new Client(hiveOptions);
 
         ConnectOptions hiveConnectOptions =
                 new OneDriveConnectOptions.Builder()

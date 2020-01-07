@@ -30,11 +30,11 @@ import java.util.HashMap;
 import static org.elastos.hive.ConnectType.IPFS;
 import static org.elastos.hive.ConnectType.OneDrive;
 
-public class HiveClient {
+public class Client {
     private HashMap<ConnectType, HiveConnect> connectMap;
     private ClientOptions options ;
 
-    public HiveClient(ClientOptions options){
+    public Client(ClientOptions options){
         this.options = options;
         this.connectMap = new HashMap<>();
     }
