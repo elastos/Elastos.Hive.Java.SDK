@@ -51,7 +51,10 @@ public final class ClientOptions {
             if (options.getStorePath() == null)
                 return null;
 
-            return options;
+            ClientOptions opts = options;
+            this.options = null;
+
+            return opts;
         }
     }
 }

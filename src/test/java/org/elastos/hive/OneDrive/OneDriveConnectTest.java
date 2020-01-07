@@ -39,10 +39,9 @@ public class OneDriveConnectTest {
     public void testConnect() {
         ConnectOptions hiveConnectOptions =
                 new OneDriveConnectOptions.Builder()
-                        .clientId(APPID)
-                        .scope(SCOPE)
-                        .redirectUrl(REDIRECTURL)
-                        .authenticator(requestUrl -> {
+                        .setClientId(APPID)
+                        .setRedirectUrl(REDIRECTURL)
+                        .setAuthenticator(requestUrl -> {
                             try {
                                 Desktop.getDesktop().browse(new URI(requestUrl));
                             } catch (Exception e) {
@@ -56,6 +55,5 @@ public class OneDriveConnectTest {
     @AfterClass
     public static void tearDown() {
         hiveClient.disConnect(hiveConnect);
-        hiveClient.close();
     }
 }

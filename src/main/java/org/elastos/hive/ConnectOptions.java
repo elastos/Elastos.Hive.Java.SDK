@@ -23,32 +23,24 @@
 package org.elastos.hive;
 
 public class ConnectOptions {
-    protected enum HiveBackendType {
-        HiveBackendType_IPFS,
-        HiveBackendType_OneDrive,
-        HiveBackendType_ownCloud,
-        HiveDriveType_Butt
-    }
+    private ConnectType type;
+    private Authenticator authenticator;
 
-    private HiveBackendType backendType ;
-    private Authenticator authenticator ;
+    private ConnectOptions() {}
 
-    protected ConnectOptions(){
-    }
-
-    HiveBackendType getBackendType(){
-        return this.backendType;
-    }
-
-    protected void setBackendType(HiveBackendType backendType) {
-        this.backendType = backendType;
-    }
-
-    protected Authenticator getAuthenticator() {
-        return authenticator;
+    protected ConnectOptions(ConnectType type) {
+        this.type = type;
     }
 
     protected void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
+    }
+
+    public ConnectType getConnectType() {
+        return type;
+    }
+
+    public Authenticator getAuthenticator() {
+        return authenticator;
     }
 }
