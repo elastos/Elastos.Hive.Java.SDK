@@ -286,7 +286,7 @@ public class OneDriveKVTest {
 
     @BeforeClass
     public static void setUp(){
-        HiveClientOptions hiveOptions = new HiveClientOptions(STORE_PATH);
+        HiveClientOptions hiveOptions = new HiveClientOptions.Builder().storePath(STORE_PATH).build();
         hiveClient = new HiveClient(hiveOptions);
 
         HiveConnectOptions hiveConnectOptions =
