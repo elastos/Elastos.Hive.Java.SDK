@@ -30,10 +30,10 @@ import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
 public class HiveClient {
     private OneDriveConnect oneDriveConnect ;
     private IPFSConnect ipfsConnect ;
-    private HiveClientOptions options ;
+    private ClientOptions options ;
 
 
-    public HiveClient(HiveClientOptions hiveOptions){
+    public HiveClient(ClientOptions hiveOptions){
         options = hiveOptions ;
     }
 
