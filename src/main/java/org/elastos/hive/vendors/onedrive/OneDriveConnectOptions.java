@@ -25,7 +25,6 @@ package org.elastos.hive.vendors.onedrive;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.ConnectOptions;
 import org.elastos.hive.ConnectType;
-import org.elastos.hive.vendors.ipfs.IPFSConnectOptions;
 
 public class OneDriveConnectOptions extends ConnectOptions {
     private static String scope = "Files.ReadWrite.AppFolder offline_access";

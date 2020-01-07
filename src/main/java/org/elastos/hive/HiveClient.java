@@ -23,9 +23,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.vendors.ipfs.IPFSConnect;
-import org.elastos.hive.vendors.ipfs.IPFSConnectOptions;
 import org.elastos.hive.vendors.onedrive.OneDriveConnect;
-import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
 
 import java.util.HashMap;
 
@@ -50,12 +48,12 @@ public class HiveClient {
 
         switch (type){
             case IPFS:
-                connector = new IPFSConnect((IPFSConnectOptions)connectOptions);
+                connector = new IPFSConnect(connectOptions);
                 connectMap.put(IPFS, connector);
                 break;
 
             case OneDrive:
-                connector = new OneDriveConnect((OneDriveConnectOptions)connectOptions, options.getStorePath());
+                connector = new OneDriveConnect(connectOptions, options.getStorePath());
                 connectMap.put(OneDrive, connector);
                 break;
 
