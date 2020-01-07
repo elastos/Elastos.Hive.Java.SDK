@@ -343,7 +343,7 @@ public class OneDriveFileTest {
 
     @BeforeClass
     public static void setUp() {
-        HiveClientOptions hiveOptions = new HiveClientOptions.Builder().storePath(STORE_PATH).build();
+        HiveClientOptions hiveOptions = new HiveClientOptions.Builder().setStorePath(STORE_PATH).build();
 
         hiveClient = new HiveClient(hiveOptions);
 
