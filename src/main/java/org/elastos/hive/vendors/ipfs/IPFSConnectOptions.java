@@ -52,7 +52,7 @@ public class IPFSConnectOptions extends ConnectOptions {
             return this;
         }
 
-        public IPFSConnectOptions build(){
+        public IPFSConnectOptions build() {
             if (options.getRpcNodes().length == 0)
                 return null;
 

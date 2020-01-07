@@ -30,6 +30,6 @@ public class IPFSConstance {
 
     public static final String ADD          = "add";
     public static final String CAT          = "cat";
-    public static final String LS          = "file/ls";
-    public static final String VERSION          = "version";
+    public static final String LS           = "file/ls";
+    public static final String VERSION      = "version";
 }

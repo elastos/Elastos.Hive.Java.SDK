@@ -24,6 +24,7 @@ package org.elastos.hive.vendors.ipfs;
 
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
+import org.elastos.hive.ConnectOptions;
 import org.elastos.hive.HiveConnect;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.result.CID;
@@ -48,8 +49,9 @@ import retrofit2.Response;
 public class IPFSConnect implements HiveConnect{
     private IPFSRpc ipfsRpc ;
 
-    public IPFSConnect(IPFSConnectOptions hiveConnectOptions){
-        ipfsRpc = new IPFSRpc(hiveConnectOptions.getRpcNodes());
+    public IPFSConnect(ConnectOptions connectOptions){
+        IPFSConnectOptions options = (IPFSConnectOptions)connectOptions;
+        ipfsRpc = new IPFSRpc(options.getRpcNodes());
     }
 
     @Override

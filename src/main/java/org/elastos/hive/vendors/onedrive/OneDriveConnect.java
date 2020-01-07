@@ -3,6 +3,7 @@ package org.elastos.hive.vendors.onedrive;
 import org.elastos.hive.AuthHelper;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
+import org.elastos.hive.ConnectOptions;
 import org.elastos.hive.HiveConnect;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.result.CID;
@@ -16,6 +17,7 @@ import org.elastos.hive.utils.HeaderUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendors.connection.ConnectionManager;
 import org.elastos.hive.vendors.connection.model.BaseServiceConfig;
+import org.elastos.hive.vendors.ipfs.IPFSConnectOptions;
 import org.elastos.hive.vendors.onedrive.network.OneDriveApi;
 import org.elastos.hive.vendors.onedrive.network.model.DirChildrenResponse;
 import org.elastos.hive.vendors.onedrive.network.model.FileOrDirPropResponse;
@@ -31,13 +33,13 @@ import okhttp3.RequestBody;
 import retrofit2.Response;
 
 public class OneDriveConnect implements HiveConnect{
-    private OneDriveConnectOptions oneDriveConnectOptions ;
+    private OneDriveConnectOptions options ;
     private AuthHelper authHelper;
 
     private String storePath ;
 
-    public OneDriveConnect(OneDriveConnectOptions hiveConnectOptions , String storePath){
-        this.oneDriveConnectOptions = hiveConnectOptions ;
+    public OneDriveConnect(ConnectOptions connectOptions, String storePath){
+        this.options = (OneDriveConnectOptions)connectOptions;
         this.storePath = storePath ;
     }
 
@@ -47,9 +49,9 @@ public class OneDriveConnect implements HiveConnect{
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
             ConnectionManager.resetOneDriveApi(OneDriveConstance.ONE_DRIVE_API_BASE_URL,config);
 
-            authHelper = new OneDriveAuthHelper(oneDriveConnectOptions.getClientId(),
-                    oneDriveConnectOptions.getScope(),
-                    oneDriveConnectOptions.getRedirectUrl(),
+            authHelper = new OneDriveAuthHelper(options.getClientId(),
+                    options.getScope(),
+                    options.getRedirectUrl(),
                     storePath);
 
             authHelper.loginAsync(authenticator).get();
