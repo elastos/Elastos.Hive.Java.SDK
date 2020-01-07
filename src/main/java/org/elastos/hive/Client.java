@@ -34,7 +34,7 @@ public class Client {
     private HashMap<ConnectType, HiveConnect> connectMap;
     private ClientOptions options ;
 
-    public Client(ClientOptions options){
+    public Client(ClientOptions options) {
         this.options = options;
         this.connectMap = new HashMap<>();
     }
