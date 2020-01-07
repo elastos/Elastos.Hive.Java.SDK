@@ -27,13 +27,12 @@ public class IPFSConnectNullTest {
 
     @Test
     public void testConnect(){
-        ConnectOptions hiveConnectOptions = new IPFSConnectOptions.Builder().ipfsRPCNodes(hiveRpcNodes).build();
+        ConnectOptions hiveConnectOptions = new IPFSConnectOptions.Builder().setRpcNodes(hiveRpcNodes).build();
         hiveConnect = hiveClient.connect(hiveConnectOptions);
     }
 
     @AfterClass
     public static void tearDown() {
         hiveClient.disConnect(hiveConnect);
-        hiveClient.close();
     }
 }
