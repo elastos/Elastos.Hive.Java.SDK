@@ -25,15 +25,39 @@ package org.elastos.hive.vendors.ipfs;
 import org.elastos.hive.HiveConnectOptions;
 
 public class IPFSConnectOptions extends HiveConnectOptions {
+    private final IPFSRpcNode[] hiveRpcNodes;
 
-    private IPFSRpcNode[] hiveRpcNodes;
+    IPFSConnectOptions(){
+        this(new Builder());
+    }
 
-    public IPFSConnectOptions(IPFSRpcNode[] hiveRpcNodes) {
-        this.hiveRpcNodes = hiveRpcNodes ;
+    IPFSConnectOptions(Builder builder){
+        this.hiveRpcNodes = builder.hiveRpcNodes;
         setBackendType(HiveBackendType.HiveBackendType_IPFS);
     }
 
     IPFSRpcNode[] getHiveRpcNodes() {
         return hiveRpcNodes;
+    }
+
+    public static class Builder{
+        private IPFSRpcNode[] hiveRpcNodes ;
+
+        public Builder(){
+            IPFSRpcNode node = new IPFSRpcNode("127.0.0.1",5001);
+            hiveRpcNodes = new IPFSRpcNode[]{node};
+        }
+        Builder(IPFSConnectOptions ipfsConnectOptions){
+            this.hiveRpcNodes = ipfsConnectOptions.hiveRpcNodes;
+        }
+
+        public Builder ipfsRPCNodes(IPFSRpcNode[] ipfsRpcNodes){
+            this.hiveRpcNodes = ipfsRpcNodes ;
+            return this ;
+        }
+
+        public IPFSConnectOptions build(){
+            return new IPFSConnectOptions(this);
+        }
     }
 }

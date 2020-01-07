@@ -33,6 +33,9 @@ public class HiveConnectOptions {
     private HiveBackendType backendType ;
     private Authenticator authenticator ;
 
+    protected HiveConnectOptions(){
+    }
+
     HiveBackendType getBackendType(){
         return this.backendType;
     }

@@ -24,10 +24,37 @@ package org.elastos.hive;
 
 public class HiveClientOptions {
     private final String storePath ;
-    public HiveClientOptions(String persistentStorePath) {
-        this.storePath = persistentStorePath;
+    public HiveClientOptions() {
+        this(new Builder());
     }
-    public String getStorePath() {
-        return storePath;
+
+    public HiveClientOptions(Builder builder) {
+        this.storePath = builder.storePath;
+    }
+
+    String getStorePath() {
+        return this.storePath;
+    }
+
+    public static class Builder{
+        private String storePath ;
+
+        public Builder(){
+            this.storePath = System.getProperty("user.dir");
+        }
+
+        Builder(HiveClientOptions clientOptions){
+            this.storePath = clientOptions.storePath;
+        }
+
+        public Builder storePath(String storePath){
+            this.storePath = storePath;
+            return this ;
+        }
+
+        public HiveClientOptions build(){
+            return new HiveClientOptions(this);
+
+        }
     }
 }
