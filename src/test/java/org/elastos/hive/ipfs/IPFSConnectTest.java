@@ -1,6 +1,6 @@
 package org.elastos.hive.ipfs;
 
-import org.elastos.hive.HiveClient;
+import org.elastos.hive.Client;
 import org.elastos.hive.ClientOptions;
 import org.elastos.hive.HiveConnect;
 import org.elastos.hive.ConnectOptions;
@@ -15,14 +15,14 @@ import static org.junit.Assert.assertNotNull;
 public class IPFSConnectTest {
 
     private static HiveConnect hiveConnect ;
-    private static HiveClient hiveClient ;
+    private static Client hiveClient ;
     private static IPFSRpcNode[] hiveRpcNodes = new IPFSRpcNode[5];
     private static final String STORE_PATH = System.getProperty("user.dir");
 
     @BeforeClass
     public static void setUp() {
         ClientOptions hiveOptions = new ClientOptions.Builder().setStorePath(STORE_PATH).build();
-        hiveClient = new HiveClient(hiveOptions);
+        hiveClient = new Client(hiveOptions);
         hiveRpcNodes[0] = new IPFSRpcNode("3.133.166.156",5001);
         hiveRpcNodes[1] = new IPFSRpcNode("13.59.79.222",5001);
         hiveRpcNodes[2] = new IPFSRpcNode("3.133.71.168",5001);
