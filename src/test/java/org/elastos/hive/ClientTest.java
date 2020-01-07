@@ -23,6 +23,5 @@ public class ClientTest {
 
     @AfterClass
     public static void tearDown() {
-        hiveClient.close();
     }
 }

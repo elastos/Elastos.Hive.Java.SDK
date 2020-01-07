@@ -58,14 +58,13 @@ public class IPFSFileTest {
         hiveRpcNodes[3] = new IPFSRpcNode("3.133.71.168",5001);
         hiveRpcNodes[4] = new IPFSRpcNode("107.191.44.124",5001);
 
-        ConnectOptions hiveConnectOptions = new IPFSConnectOptions.Builder().ipfsRPCNodes(hiveRpcNodes).build();
+        ConnectOptions hiveConnectOptions = new IPFSConnectOptions.Builder().setRpcNodes(hiveRpcNodes).build();
         hiveConnect = hiveClient.connect(hiveConnectOptions);
     }
 
     @AfterClass
     public static void tearDown() {
         hiveClient.disConnect(hiveConnect);
-        hiveClient.close();
     }
 
     @Test

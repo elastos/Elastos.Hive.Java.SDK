@@ -27,46 +27,55 @@ import org.elastos.hive.vendors.ipfs.IPFSConnectOptions;
 import org.elastos.hive.vendors.onedrive.OneDriveConnect;
 import org.elastos.hive.vendors.onedrive.OneDriveConnectOptions;
 
+import java.util.HashMap;
+
+import static org.elastos.hive.ConnectType.IPFS;
+import static org.elastos.hive.ConnectType.OneDrive;
+
 public class HiveClient {
-    private OneDriveConnect oneDriveConnect ;
-    private IPFSConnect ipfsConnect ;
+    private HashMap<ConnectType, HiveConnect> connectMap;
     private ClientOptions options ;
 
-
-    public HiveClient(ClientOptions hiveOptions){
-        options = hiveOptions ;
+    public HiveClient(ClientOptions options){
+        this.options = options;
+        this.connectMap = new HashMap<>();
     }
 
-    public void close() {
-    }
+    synchronized public HiveConnect connect(ConnectOptions connectOptions) {
+        ConnectType type = connectOptions.getConnectType();
+        HiveConnect connector = null ;
 
-    public HiveConnect connect(ConnectOptions hiveConnectOptions){
-        ConnectOptions.HiveBackendType backendType = hiveConnectOptions.getBackendType();
-        HiveConnect hiveConnect = null ;
-        switch (backendType){
-            case HiveBackendType_IPFS:
-                if (ipfsConnect == null)
-                    ipfsConnect = new IPFSConnect((IPFSConnectOptions)hiveConnectOptions);
-                hiveConnect = ipfsConnect;
+        if (connectMap.containsKey(type))
+            return connectMap.get(type);
+
+        switch (type){
+            case IPFS:
+                connector = new IPFSConnect((IPFSConnectOptions)connectOptions);
+                connectMap.put(IPFS, connector);
                 break;
-            case HiveBackendType_OneDrive:
-                if (oneDriveConnect == null)
-                    oneDriveConnect = new OneDriveConnect((OneDriveConnectOptions)hiveConnectOptions , options.getStorePath());
-                hiveConnect = oneDriveConnect;
+
+            case OneDrive:
+                connector = new OneDriveConnect((OneDriveConnectOptions)connectOptions, options.getStorePath());
+                connectMap.put(OneDrive, connector);
                 break;
-            case HiveBackendType_ownCloud:
-                break;
-            case HiveDriveType_Butt:
-                break;
+
+            case OwnCloud:
             default:
-                break;
+                return null;
         }
 
-        hiveConnect.connect(hiveConnectOptions.getAuthenticator());
-
-        return hiveConnect;
+        connector.connect(connectOptions.getAuthenticator()); // TODO: if error.
+        return connector;
     }
 
+    public HiveConnect getConnect(ConnectType type) {
+        if (!connectMap.containsKey(type))
+            return null;
+
+        return connectMap.get(type);
+    }
+
+    // TODO: really need this one.
     public int disConnect(HiveConnect hiveConnect) {
         if (hiveConnect!=null) hiveConnect.disConnect();
         return 0;

@@ -49,7 +49,7 @@ public class IPFSConnect implements HiveConnect{
     private IPFSRpc ipfsRpc ;
 
     public IPFSConnect(IPFSConnectOptions hiveConnectOptions){
-        ipfsRpc = new IPFSRpc(hiveConnectOptions.getHiveRpcNodes());
+        ipfsRpc = new IPFSRpc(hiveConnectOptions.getRpcNodes());
     }
 
     @Override

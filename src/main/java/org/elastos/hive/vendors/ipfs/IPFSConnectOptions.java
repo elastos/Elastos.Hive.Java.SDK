@@ -23,41 +23,43 @@
 package org.elastos.hive.vendors.ipfs;
 
 import org.elastos.hive.ConnectOptions;
+import org.elastos.hive.ConnectType;
 
 public class IPFSConnectOptions extends ConnectOptions {
-    private final IPFSRpcNode[] hiveRpcNodes;
+    private IPFSRpcNode[] rpcNodes;
 
-    IPFSConnectOptions(){
-        this(new Builder());
+    private IPFSConnectOptions(){
+        super(ConnectType.IPFS);
     }
 
-    IPFSConnectOptions(Builder builder){
-        this.hiveRpcNodes = builder.hiveRpcNodes;
-        setBackendType(HiveBackendType.HiveBackendType_IPFS);
+    private void setRpcNodes(IPFSRpcNode[] nodes) {
+        this.rpcNodes = nodes;
     }
 
-    IPFSRpcNode[] getHiveRpcNodes() {
-        return hiveRpcNodes;
+    public IPFSRpcNode[] getRpcNodes() {
+        return rpcNodes;
     }
 
     public static class Builder{
-        private IPFSRpcNode[] hiveRpcNodes ;
+        IPFSConnectOptions options;
 
-        public Builder(){
-            IPFSRpcNode node = new IPFSRpcNode("127.0.0.1",5001);
-            hiveRpcNodes = new IPFSRpcNode[]{node};
-        }
-        Builder(IPFSConnectOptions ipfsConnectOptions){
-            this.hiveRpcNodes = ipfsConnectOptions.hiveRpcNodes;
+        public Builder() {
+            options = new IPFSConnectOptions();
         }
 
-        public Builder ipfsRPCNodes(IPFSRpcNode[] ipfsRpcNodes){
-            this.hiveRpcNodes = ipfsRpcNodes ;
-            return this ;
+        public Builder setRpcNodes(IPFSRpcNode[] nodes) {
+            options.setRpcNodes(nodes);
+            return this;
         }
 
         public IPFSConnectOptions build(){
-            return new IPFSConnectOptions(this);
+            if (options.getRpcNodes().length == 0)
+                return null;
+
+            IPFSConnectOptions opts = options;
+            this.options = null;
+
+            return opts;
         }
     }
 }
