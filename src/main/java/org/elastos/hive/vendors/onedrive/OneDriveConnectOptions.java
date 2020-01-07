@@ -23,9 +23,9 @@
 package org.elastos.hive.vendors.onedrive;
 
 import org.elastos.hive.Authenticator;
-import org.elastos.hive.HiveConnectOptions;
+import org.elastos.hive.ConnectOptions;
 
-public class OneDriveConnectOptions extends HiveConnectOptions {
+public class OneDriveConnectOptions extends ConnectOptions {
     private final String clientId;
     private final String scope;
     private final String redirectUrl;

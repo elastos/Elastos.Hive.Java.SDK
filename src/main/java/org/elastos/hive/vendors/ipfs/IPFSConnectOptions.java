@@ -22,9 +22,9 @@
 
 package org.elastos.hive.vendors.ipfs;
 
-import org.elastos.hive.HiveConnectOptions;
+import org.elastos.hive.ConnectOptions;
 
-public class IPFSConnectOptions extends HiveConnectOptions {
+public class IPFSConnectOptions extends ConnectOptions {
     private final IPFSRpcNode[] hiveRpcNodes;
 
     IPFSConnectOptions(){
