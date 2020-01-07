@@ -4,7 +4,7 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.HiveClient;
 import org.elastos.hive.HiveClientOptions;
 import org.elastos.hive.HiveConnect;
-import org.elastos.hive.HiveConnectOptions;
+import org.elastos.hive.ConnectOptions;
 import org.elastos.hive.HiveException;
 import org.elastos.hive.result.Data;
 import org.elastos.hive.result.ValueList;
@@ -289,7 +289,7 @@ public class OneDriveKVTest {
         HiveClientOptions hiveOptions = new HiveClientOptions.Builder().setStorePath(STORE_PATH).build();
         hiveClient = new HiveClient(hiveOptions);
 
-        HiveConnectOptions hiveConnectOptions =
+        ConnectOptions hiveConnectOptions =
                 new OneDriveConnectOptions.Builder()
                         .clientId(APPID)
                         .scope(SCOPE)

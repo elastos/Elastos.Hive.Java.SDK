@@ -22,7 +22,7 @@
 
 package org.elastos.hive;
 
-public class HiveConnectOptions {
+public class ConnectOptions {
     protected enum HiveBackendType {
         HiveBackendType_IPFS,
         HiveBackendType_OneDrive,
@@ -33,7 +33,7 @@ public class HiveConnectOptions {
     private HiveBackendType backendType ;
     private Authenticator authenticator ;
 
-    protected HiveConnectOptions(){
+    protected ConnectOptions(){
     }
 
     HiveBackendType getBackendType(){
