@@ -49,7 +49,7 @@ public class IPFSFileTest {
     private static final String STORE_PATH = System.getProperty("user.dir");
     @BeforeClass
     public static void setUp() {
-        HiveClientOptions hiveOptions = new HiveClientOptions(STORE_PATH);
+        HiveClientOptions hiveOptions = new HiveClientOptions.Builder().storePath(STORE_PATH).build();
         hiveClient = new HiveClient(hiveOptions);
 
         hiveRpcNodes[0] = new IPFSRpcNode("127.0.0.1",5001);
@@ -58,7 +58,7 @@ public class IPFSFileTest {
         hiveRpcNodes[3] = new IPFSRpcNode("3.133.71.168",5001);
         hiveRpcNodes[4] = new IPFSRpcNode("107.191.44.124",5001);
 
-        HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions(hiveRpcNodes);
+        HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions.Builder().ipfsRPCNodes(hiveRpcNodes).build();
         hiveConnect = hiveClient.connect(hiveConnectOptions);
     }
 

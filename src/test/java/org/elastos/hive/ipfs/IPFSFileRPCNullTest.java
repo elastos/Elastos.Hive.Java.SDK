@@ -18,7 +18,7 @@ public class IPFSFileRPCNullTest {
 
     @BeforeClass
     public static void setUp() {
-        HiveClientOptions hiveOptions = new HiveClientOptions(STORE_PATH);
+        HiveClientOptions hiveOptions = new HiveClientOptions.Builder().storePath(STORE_PATH).build();
         hiveClient = new HiveClient(hiveOptions);
 
         hiveRpcNodes[0] = null ;
@@ -33,7 +33,7 @@ public class IPFSFileRPCNullTest {
 
     @Test
     public void testConnect() {
-        HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions(hiveRpcNodes);
+        HiveConnectOptions hiveConnectOptions = new IPFSConnectOptions.Builder().ipfsRPCNodes(hiveRpcNodes).build();
         hiveConnect = hiveClient.connect(hiveConnectOptions);
     }
 }
