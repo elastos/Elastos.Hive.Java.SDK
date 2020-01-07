@@ -13,8 +13,8 @@ import org.junit.Test;
 import static org.junit.Assert.assertNull;
 
 public class IPFSConnectNullTest {
-    private static HiveConnect connect ;
     private static Client client ;
+    private static HiveConnect connect ;
     private static IPFSRpcNode[] rpcNodes = new IPFSRpcNode[1];
     private static final String STORE_PATH = System.getProperty("user.dir");
 
@@ -24,8 +24,8 @@ public class IPFSConnectNullTest {
                 .Builder()
                 .setStorePath(STORE_PATH)
                 .build();
-
         client = new Client(options);
+
         rpcNodes[0] = null;
     }
 
