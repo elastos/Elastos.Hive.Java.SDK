@@ -22,10 +22,10 @@
 
 package org.elastos.hive;
 
-public final class HiveClientOptions {
+public final class ClientOptions {
     private String storePath;
 
-    private HiveClientOptions() {}
+    private ClientOptions() {}
 
     private void setStorePath(String storePath) {
         this.storePath = storePath;
@@ -36,10 +36,10 @@ public final class HiveClientOptions {
     }
 
     public static class Builder {
-        private HiveClientOptions options;
+        private ClientOptions options;
 
         public Builder() {
-            this.options = new HiveClientOptions();
+            this.options = new ClientOptions();
         }
 
         public Builder setStorePath(String storePath) {
@@ -47,7 +47,7 @@ public final class HiveClientOptions {
             return this;
         }
 
-        public HiveClientOptions build() {
+        public ClientOptions build() {
             if (options.getStorePath() == null)
                 return null;
 
