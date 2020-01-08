@@ -28,11 +28,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 public class IPFSFileTest {
-    private static HiveConnect hiveConnect ;
-    private static Client hiveClient ;
-    private static IPFSRpcNode[] hiveRpcNodes = new IPFSRpcNode[5];
+    private static Client client ;
+    private static HiveConnect connect ;
+    private static IPFSRpcNode[] rpcNodes = new IPFSRpcNode[5];
 
     private static final CID EXPECTED_CID = new CID("QmaY6wjwnybJgd5F4FD6pPL6h9vjXrGv2BJbxxUC1ojUbQ");
     private static final CID TEST_CID = new CID("QmaY6wjwnybJgd5F4FD6pPL6h9vjXrGv2BJbxxUC1ojUbQ");
@@ -49,35 +50,38 @@ public class IPFSFileTest {
     private static final String STORE_PATH = System.getProperty("user.dir");
     @BeforeClass
     public static void setUp() {
-        ClientOptions hiveOptions = new ClientOptions.Builder().setStorePath(STORE_PATH).build();
-        hiveClient = new Client(hiveOptions);
+        ClientOptions options = new ClientOptions
+                .Builder()
+                .setStorePath(STORE_PATH)
+                .build();
+        client = new Client(options);
 
-        hiveRpcNodes[0] = new IPFSRpcNode("127.0.0.1",5001);
-        hiveRpcNodes[1] = new IPFSRpcNode("3.133.166.156",5001);
-        hiveRpcNodes[2] = new IPFSRpcNode("13.59.79.222",5001);
-        hiveRpcNodes[3] = new IPFSRpcNode("3.133.71.168",5001);
-        hiveRpcNodes[4] = new IPFSRpcNode("107.191.44.124",5001);
+        rpcNodes[0] = new IPFSRpcNode("127.0.0.1",5001);
+        rpcNodes[1] = new IPFSRpcNode("3.133.166.156",5001);
+        rpcNodes[2] = new IPFSRpcNode("13.59.79.222",5001);
+        rpcNodes[3] = new IPFSRpcNode("3.133.71.168",5001);
+        rpcNodes[4] = new IPFSRpcNode("107.191.44.124",5001);
 
-        ConnectOptions hiveConnectOptions = new IPFSConnectOptions.Builder().setRpcNodes(hiveRpcNodes).build();
-        hiveConnect = hiveClient.connect(hiveConnectOptions);
+        ConnectOptions connectOptions = new IPFSConnectOptions
+                .Builder()
+                .setRpcNodes(rpcNodes)
+                .build();
+        connect = client.connect(connectOptions);
     }
 
     @AfterClass
     public static void tearDown() {
-        hiveClient.disConnect(hiveConnect);
+        client.disConnect(connect);
     }
 
     @Test
     public void testPutFile() {
-        if (hiveConnect!=null){
+        if (connect != null){
             try {
-                CID cid = hiveConnect.putIPFSFile(TEST_FILE_PATH,false).get();
+                CID cid = connect.putIPFSFile(TEST_FILE_PATH,false).get();
                 assertEquals(EXPECTED_CID.getCid() , cid.getCid());
-            } catch (InterruptedException e) {
-                assertNull(e);
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                assertNull(e);
+            } catch (ExecutionException | InterruptedException e) {
+                fail();
                 e.printStackTrace();
             }
         }
@@ -85,11 +89,11 @@ public class IPFSFileTest {
 
     @Test
     public void testPutFileAsync() {
-        if (hiveConnect!=null) {
-            CompletableFuture future = hiveConnect.putIPFSFile(TEST_FILE_PATH, false, new Callback<CID>() {
+        if (connect !=null) {
+            CompletableFuture future = connect.putIPFSFile(TEST_FILE_PATH, false, new Callback<CID>() {
                 @Override
                 public void onError(HiveException e) {
-
+                    fail();
                 }
 
                 @Override
@@ -106,28 +110,25 @@ public class IPFSFileTest {
 
     @Test
     public void testPutBuffer() {
-        if (hiveConnect!=null) {
+        if (connect!=null) {
             try {
-                CID cid = hiveConnect.putIPFSFileFromBuffer(EXPECTED_STR.getBytes(), false).get();
+                CID cid = connect.putIPFSFileFromBuffer(EXPECTED_STR.getBytes(), false).get();
                 LogUtil.d("result == " + cid.getCid());
                 assertEquals(EXPECTED_CID.getCid(), cid.getCid());
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
-                assertNull(e);
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-                assertNull(e);
+                fail();
             }
         }
     }
 
     @Test
     public void testPutBufferAsync() {
-        if (hiveConnect!=null) {
-            CompletableFuture future = hiveConnect.putIPFSFileFromBuffer(EXPECTED_STR.getBytes(), false, new Callback<CID>() {
+        if (connect!=null) {
+            CompletableFuture future = connect.putIPFSFileFromBuffer(EXPECTED_STR.getBytes(), false, new Callback<CID>() {
                 @Override
                 public void onError(HiveException e) {
-                    assertNull(e);
+                    fail();
                 }
 
                 @Override
@@ -136,6 +137,7 @@ public class IPFSFileTest {
                     assertEquals(EXPECTED_CID.getCid(), body.getCid());
                 }
             });
+
             TestUtils.waitFinish(future);
             assertFalse(future.isCompletedExceptionally());
         }
@@ -143,27 +145,24 @@ public class IPFSFileTest {
 
     @Test
     public void testGetFileLength() {
-        if (hiveConnect!=null) {
+        if (connect !=null) {
             try {
-                Length length = hiveConnect.getIPFSFileLength(TEST_CID).get();
+                Length length = connect.getIPFSFileLength(TEST_CID).get();
                 LogUtil.d("length=" + length.getLength());
                 assertEquals(EXPECTED_LENGTH.getLength(), length.getLength());
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
-                assertNull(e);
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-                assertNull(e);
+                fail();
             }
         }
     }
 
     @Test
     public void testGetFileLengthAsync() {
-        CompletableFuture future = hiveConnect.getIPFSFileLength(TEST_CID, new Callback<Length>() {
+        CompletableFuture future = connect.getIPFSFileLength(TEST_CID, new Callback<Length>() {
             @Override
             public void onError(HiveException e) {
-                assertNull(e);
+                fail();
             }
 
             @Override
@@ -180,10 +179,12 @@ public class IPFSFileTest {
     @Test
     public void testGetFile() {
         File file = new File(STORE_FILE_PATH);
-        if (file.exists()) file.delete();
+        if (file.exists()) {
+            file.delete();
+        }
 
         try {
-            Length length = hiveConnect.getIPFSFile(TEST_CID,false,STORE_FILE_PATH).get();
+            Length length = connect.getIPFSFile(TEST_CID,false,STORE_FILE_PATH).get();
 
             String actualMD5 = Md5CaculateUtil.getFileMD5(STORE_FILE_PATH) ;
 
@@ -192,21 +193,18 @@ public class IPFSFileTest {
 
             LogUtil.d("actualMD5="+actualMD5);
             LogUtil.d("length="+length.getLength());
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             assertNull(e);
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            assertNull(e);
-            e.printStackTrace();
+            fail();
         }
     }
 
     @Test
     public void testGetFileAsync() {
-        CompletableFuture future = hiveConnect.getIPFSFile(TEST_CID, false, STORE_FILE_PATH, new Callback<Length>() {
+        CompletableFuture future = connect.getIPFSFile(TEST_CID, false, STORE_FILE_PATH, new Callback<Length>() {
             @Override
             public void onError(HiveException e) {
-                assertNull(e);
+                fail();
             }
 
             @Override
@@ -228,24 +226,21 @@ public class IPFSFileTest {
     @Test
     public void testGetBuffer() {
         try {
-            Data data = hiveConnect.getIPFSFileToBuffer(TEST_CID,false).get();
+            Data data = connect.getIPFSFileToBuffer(TEST_CID,false).get();
             Assert.assertArrayEquals(EXPECTED_STR.getBytes(),data.getData());
-        } catch (InterruptedException e) {
-            assertNull(e);
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            assertNull(e);
-            e.printStackTrace();
+            fail();
         }
     }
 
 
     @Test
     public void testGetBufferAsync() {
-        CompletableFuture future = hiveConnect.getIPFSFileToBuffer(TEST_CID, false, new Callback<Data>() {
+        CompletableFuture future = connect.getIPFSFileToBuffer(TEST_CID, false, new Callback<Data>() {
             @Override
             public void onError(HiveException e) {
-                assertNull(e);
+                fail();
             }
 
             @Override
@@ -254,6 +249,7 @@ public class IPFSFileTest {
                 Assert.assertArrayEquals(EXPECTED_STR.getBytes(),body.getData());
             }
         });
+
         TestUtils.waitFinish(future);
         assertFalse(future.isCompletedExceptionally());
     }
