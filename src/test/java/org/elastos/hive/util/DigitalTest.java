@@ -20,7 +20,4 @@ public class DigitalTest {
         byte[] bytes = DigitalUtil.intToByteArray(100000);
         assertArrayEquals(dataBytes,bytes);
     }
-
-
-
 }
