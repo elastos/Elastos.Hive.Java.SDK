@@ -37,8 +37,8 @@ public class OneDriveKVTest {
     private static final String REDIRECTURL = "http://localhost:12345";//http://localhost:44316
     private static final String STORE_PATH = System.getProperty("user.dir");
 
-    private static HiveConnect hiveConnect ;
-    private static Client hiveClient ;
+    private static Client client;
+    private static HiveConnect connect;
 
     private String key = "KEY";
     private String[] values = {"value1","value2","value3"};
@@ -48,36 +48,32 @@ public class OneDriveKVTest {
     @Test
     public void test_00_Prepare() {
         try {
-            hiveConnect.deleteFile(key).get();
-        } catch (InterruptedException e) {
+            connect.deleteFile(key).get();
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            fail(e.getMessage());
         }
     }
 
     @Test
     public void test_01_PutValue() {
         try {
-            hiveConnect.putValue(key,values[0].getBytes(),false).get();
-            hiveConnect.putValue(key,values[1].getBytes(),false).get();
-            hiveConnect.putValue(key,values[2].getBytes(),false).get();
+            connect.putValue(key,values[0].getBytes(),false).get();
+            connect.putValue(key,values[1].getBytes(),false).get();
+            connect.putValue(key,values[2].getBytes(),false).get();
 
-        } catch (InterruptedException e) {
-            assertNull(e);
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            assertNull(e);
-            e.printStackTrace();
+            fail(e.getMessage());
         }
     }
 
     @Test
     public void test_11_PutValueAsync() {
-        CompletableFuture future1 = hiveConnect.putValue(key, values[0].getBytes(), false, new Callback<Void>() {
+        CompletableFuture future1 = connect.putValue(key, values[0].getBytes(), false, new Callback<Void>() {
             @Override
             public void onError(HiveException e) {
-                assertNull(e);
+                fail(e.getMessage());
             }
 
             @Override
@@ -85,10 +81,10 @@ public class OneDriveKVTest {
                 assertNotNull(body);
             }
         });
-        CompletableFuture future2 = hiveConnect.putValue(key, values[1].getBytes(), false, new Callback<Void>() {
+        CompletableFuture future2 = connect.putValue(key, values[1].getBytes(), false, new Callback<Void>() {
             @Override
             public void onError(HiveException e) {
-                assertNull(e);
+                fail(e.getMessage());
             }
 
             @Override
@@ -97,10 +93,10 @@ public class OneDriveKVTest {
             }
         });
 
-        CompletableFuture future3 = hiveConnect.putValue(key, values[2].getBytes(), false, new Callback<Void>() {
+        CompletableFuture future3 = connect.putValue(key, values[2].getBytes(), false, new Callback<Void>() {
             @Override
             public void onError(HiveException e) {
-                assertNull(e);
+                fail(e.getMessage());
             }
 
             @Override
@@ -117,27 +113,24 @@ public class OneDriveKVTest {
     @Test
     public void test_02_GetValue() {
         try {
-            ValueList valueList = hiveConnect.getValue(key,false).get();
+            ValueList valueList = connect.getValue(key,false).get();
             ArrayList<Data> arrayDatas = valueList.getList();
             assertEquals(3,arrayDatas.size());
             for (int i = 0 ; i < arrayDatas.size() ; i++){
                 assertArrayEquals(values[i].getBytes(), arrayDatas.get(i).getData());
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-            assertNull(e);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            assertNull(e);
+            fail(e.getMessage());
         }
     }
 
     @Test
     public void test_12_GetValueAsync() {
-        CompletableFuture future = hiveConnect.getValue(key, false, new Callback<ValueList>() {
+        CompletableFuture future = connect.getValue(key, false, new Callback<ValueList>() {
             @Override
             public void onError(HiveException e) {
-                assertNull(e);
+                fail(e.getMessage());
             }
 
             @Override
@@ -149,6 +142,7 @@ public class OneDriveKVTest {
                 }
             }
         });
+
         TestUtils.waitFinish(future);
     }
 
@@ -156,22 +150,19 @@ public class OneDriveKVTest {
     @Test
     public void test_03_SetValue() {
         try {
-            hiveConnect.setValue(key,newValue.getBytes(),false).get();
-        } catch (InterruptedException e) {
+            connect.setValue(key,newValue.getBytes(),false).get();
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-            assertNull(e);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            assertNull(e);
+            fail(e.getMessage());
         }
     }
 
     @Test
     public void test_13_SetValueAsync() {
-        CompletableFuture future = hiveConnect.setValue(key, newValue.getBytes(), false, new Callback<Void>() {
+        CompletableFuture future = connect.setValue(key, newValue.getBytes(), false, new Callback<Void>() {
             @Override
             public void onError(HiveException e) {
-                assertNull(e);
+                fail(e.getMessage());
             }
 
             @Override
@@ -179,33 +170,31 @@ public class OneDriveKVTest {
                 assertNotNull(body);
             }
         });
+
         TestUtils.waitFinish(future);
     }
 
     @Test
     public void test_04_GetValue() {
         try {
-            ValueList valueList = hiveConnect.getValue(key,false).get();
+            ValueList valueList = connect.getValue(key,false).get();
             ArrayList<Data> arrayDatas = valueList.getList();
             assertEquals(1,arrayDatas.size());
             for (int i = 0 ; i < arrayDatas.size() ; i++){
                 assertArrayEquals(newValue.getBytes(), arrayDatas.get(i).getData());
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-            assertNull(e);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            assertNull(e);
+            fail(e.getMessage());
         }
     }
 
     @Test
     public void test_14_GetValueAsync() {
-        CompletableFuture future = hiveConnect.getValue(key, false, new Callback<ValueList>() {
+        CompletableFuture future = connect.getValue(key, false, new Callback<ValueList>() {
             @Override
             public void onError(HiveException e) {
-                assertNull(e);
+                fail(e.getMessage());
             }
 
             @Override
@@ -217,28 +206,26 @@ public class OneDriveKVTest {
                 }
             }
         });
+
         TestUtils.waitFinish(future);
     }
 
     @Test
     public void test_05_DeleteKey() {
         try {
-            hiveConnect.deleteValueFromKey(key).get();
-        } catch (InterruptedException e) {
+            connect.deleteValueFromKey(key).get();
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-            assertNull(e);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            assertNull(e);
+            fail(e.getMessage());
         }
     }
 
     @Test
     public void test_15_DeleteKeyAsync() {
-        CompletableFuture future = hiveConnect.deleteValueFromKey(key, new Callback<Void>() {
+        CompletableFuture future = connect.deleteValueFromKey(key, new Callback<Void>() {
             @Override
             public void onError(HiveException e) {
-                assertNull(e);
+                fail(e.getMessage());
             }
 
             @Override
@@ -252,7 +239,7 @@ public class OneDriveKVTest {
 
     @Test
     public void test_06_GetValue(){
-        CompletableFuture future = hiveConnect.getValue(key, false, new Callback<ValueList>() {
+        CompletableFuture future = connect.getValue(key, false, new Callback<ValueList>() {
             @Override
             public void onError(HiveException e) {
                 assertNotNull(e);
@@ -263,12 +250,13 @@ public class OneDriveKVTest {
             public void onSuccess(ValueList body) {
             }
         });
+
         TestUtils.waitFinish(future);
     }
 
     @Test
     public void test_16_GetValue(){
-        CompletableFuture future = hiveConnect.getValue(key, false, new Callback<ValueList>() {
+        CompletableFuture future = connect.getValue(key, false, new Callback<ValueList>() {
             @Override
             public void onError(HiveException e) {
                 assertNotNull(e);
@@ -279,33 +267,35 @@ public class OneDriveKVTest {
             public void onSuccess(ValueList body) {
             }
         });
+
         TestUtils.waitFinish(future);
     }
 
-
-
     @BeforeClass
     public static void setUp(){
-        ClientOptions hiveOptions = new ClientOptions.Builder().setStorePath(STORE_PATH).build();
-        hiveClient = new Client(hiveOptions);
+        ClientOptions options = new ClientOptions
+                .Builder()
+                .setStorePath(STORE_PATH)
+                .build();
+        client = new Client(options);
 
-        ConnectOptions hiveConnectOptions =
-                new OneDriveConnectOptions.Builder()
-                        .setClientId(APPID)
-                        .setRedirectUrl(REDIRECTURL)
-                        .setAuthenticator(requestUrl -> {
-                            try {
-                                Desktop.getDesktop().browse(new URI(requestUrl));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                fail("Authenticator failed");
-                            }
-                        }).build();
-        hiveConnect = hiveClient.connect(hiveConnectOptions);
+        ConnectOptions connectOptions = new OneDriveConnectOptions.Builder()
+                .setClientId(APPID)
+                .setRedirectUrl(REDIRECTURL)
+                .setAuthenticator(requestUrl -> {
+                    try {
+                        Desktop.getDesktop().browse(new URI(requestUrl));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        fail("Authenticator failed");
+                    }
+                }).build();
+
+        connect = client.connect(connectOptions);
     }
 
     @AfterClass
     public static void tearDown(){
-        hiveClient.disConnect(hiveConnect);
+        client.disConnect(connect);
     }
 }
