@@ -22,10 +22,10 @@
 
 package org.elastos.hive.result;
 
-public class CID extends Result {
+public class Hash extends Result {
 	private final String cid;
 
-	public CID(String cid) {
+	public Hash(String cid) {
 		this.cid = cid;
 	}
 
