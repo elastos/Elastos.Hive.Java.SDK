@@ -22,60 +22,72 @@
 
 package org.elastos.hive;
 
-import org.elastos.hive.vendors.ipfs.IPFSConnect;
-import org.elastos.hive.vendors.onedrive.OneDriveConnect;
+import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.NotImplementedException;
+import org.elastos.hive.interfaces.Files;
+import org.elastos.hive.interfaces.IPFS;
+import org.elastos.hive.interfaces.KeyValues;
 
-import java.util.HashMap;
+import java.lang.reflect.Type;
 
-import static org.elastos.hive.ConnectType.IPFS;
-import static org.elastos.hive.ConnectType.OneDrive;
 
-public class Client {
-    private HashMap<ConnectType, HiveConnect> connectMap;
-    private ClientOptions options ;
+public abstract class Client {
+    public abstract void connect() throws HiveException;
+    public abstract void disconnect();
+    public abstract boolean isConnected();
 
-    public Client(ClientOptions options) {
-        this.options = options;
-        this.connectMap = new HashMap<>();
+    protected abstract Object getInterface(Type type);
+
+    public abstract void setEncryptKey(String encryptKey);
+
+    public Files getFiles() {
+        return (Files)getInterface(Files.class);
     }
 
-    synchronized public HiveConnect connect(ConnectOptions connectOptions) {
-        ConnectType type = connectOptions.getConnectType();
-        HiveConnect connector = null ;
+    public IPFS getIPFS() {
+        return (IPFS)getInterface(IPFS.class);
+    }
 
-        if (connectMap.containsKey(type))
-            return connectMap.get(type);
+    public KeyValues getKeyValues() {
+        return (KeyValues)getInterface(KeyValues.class);
+    }
 
-        switch (type){
-            case IPFS:
-                connector = new IPFSConnect(connectOptions);
-                connectMap.put(IPFS, connector);
-                break;
 
-            case OneDrive:
-                connector = new OneDriveConnect(connectOptions, options.getStorePath());
-                connectMap.put(OneDrive, connector);
-                break;
+    public static abstract class Options {
+        private String storePath;
+        private Authenticator authenticator;
 
-            case OwnCloud:
-            default:
-                return null;
+        protected Options() {}
+
+        protected void setStorePath(String storePath) {
+            this.storePath = storePath;
         }
 
-        connector.connect(connectOptions.getAuthenticator()); // TODO: if error.
-        return connector;
+        public String storePath() {
+            return storePath;
+        }
+
+        protected void setAuthenticator(Authenticator authenticator) {
+            this.authenticator = authenticator;
+        }
+
+        public Authenticator authenticator() {
+            return authenticator;
+        }
+
+        protected abstract Client buildClient();
     }
 
-    public HiveConnect getConnect(ConnectType type) {
-        if (!connectMap.containsKey(type))
-            return null;
+    public static Client createInstance(Options options) throws HiveException {
+        if (options == null) {
+            throw new IllegalArgumentException();
+        }
 
-        return connectMap.get(type);
-    }
+        Client client = options.buildClient();
+        if (client == null) {
+            throw new NotImplementedException();
+        }
 
-    // TODO: really need this one.
-    public int disConnect(HiveConnect hiveConnect) {
-        if (hiveConnect!=null) hiveConnect.disConnect();
-        return 0;
+        return client;
     }
 }

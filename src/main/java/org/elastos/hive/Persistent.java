@@ -22,6 +22,7 @@
 
 package org.elastos.hive;
 
+import org.elastos.hive.exception.HiveException;
 import org.json.JSONObject;
 
 public interface Persistent {

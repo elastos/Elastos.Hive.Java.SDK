@@ -25,13 +25,13 @@ package org.elastos.hive.result;
 import java.util.ArrayList;
 
 public class ValueList extends Result {
-	private final ArrayList<Data> list;
+	private final ArrayList<Value> list;
 
-	public ValueList(ArrayList<Data> list) {
+	public ValueList(ArrayList<Value> list) {
 		this.list = list;
 	}
 
-	public ArrayList<Data> getList() {
+	public ArrayList<Value> getList() {
 		return list;
 	}
 }

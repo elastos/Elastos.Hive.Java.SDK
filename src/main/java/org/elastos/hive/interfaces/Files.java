@@ -1,15 +1,10 @@
 package org.elastos.hive.interfaces;
 
-import com.sun.xml.internal.ws.util.CompletedFuture;
-
 import org.elastos.hive.Callback;
-import org.elastos.hive.result.Data;
 import org.elastos.hive.result.FileList;
 import org.elastos.hive.result.Length;
 import org.elastos.hive.result.Void;
 
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
