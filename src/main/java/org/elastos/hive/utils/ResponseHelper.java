@@ -22,7 +22,7 @@
 
 package org.elastos.hive.utils;
 
-import org.elastos.hive.HiveException;
+import org.elastos.hive.exception.HiveException;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
