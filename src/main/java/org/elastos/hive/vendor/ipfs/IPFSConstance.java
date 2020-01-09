@@ -20,26 +20,16 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive;
+package org.elastos.hive.vendor.ipfs;
 
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.result.Result;
+class IPFSConstance {
+    public static final String URLFORMAT    = "http://%s:%d/api/v0/";
+    public static final String JSON			= "application/json";
+    public static final String PATH        	= "path";
+    public static final String ARG 			= "arg" ;
 
-/**
- * Callback result in Hive SDK
- */
-public interface Callback<T extends Result> {
-	/**
-	 * An exception occurred in the middle of obtaining the result
-	 * @param e {@link HiveException}
-	 */
-	void onError(HiveException e);
-
-	/**
-	 * Callback when successful
-	 * @param body The information returned when the callback was successful<br>
-	 *            for example:<br>
-	 *            Drive , Directory , File , Drive.Info ,Directory.Info , File.Info and so on.
-	 */
-	void onSuccess(T body);
+    public static final String ADD          = "add";
+    public static final String CAT          = "cat";
+    public static final String LS           = "file/ls";
+    public static final String VERSION      = "version";
 }
