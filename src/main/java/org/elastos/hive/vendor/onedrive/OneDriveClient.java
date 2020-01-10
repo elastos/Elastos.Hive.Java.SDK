@@ -50,181 +50,177 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
     @Override
     public CompletableFuture<Void> put(byte[] from, String remoteFile) {
-        return put(from, remoteFile, false);
+        return put(from, remoteFile, new NullCallback<Void>());
     }
 
     @Override
-    public CompletableFuture<Void> put(byte[] from, String remoteFile, boolean encrypt) {
-        return put(from, remoteFile, encrypt, new NullCallback<Void>());
-    }
-
-    @Override
-    public CompletableFuture<Void> put(byte[] from, String remoteFile, boolean encrypt, Callback<Void> callback) {
+    public CompletableFuture<Void> put(byte[] data, String remoteFile, Callback<Void> callback) {
+        // TODO:
         return null;
     }
 
     @Override
-    public CompletableFuture<Void> put(String localPath, String remoteFile) {
-        return null;
+    public CompletableFuture<Void> put(String data, String remoteFile) {
+        return put(data, remoteFile, new NullCallback<Void>());
     }
 
     @Override
-    public CompletableFuture<Void> put(String localPath, String remoteFile, boolean encrypt) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Void> put(String localPath, String remoteFile, boolean encrypt, Callback<Void> callback) {
+    public CompletableFuture<Void> put(String data, String remoteFile, Callback<Void> callback) {
+        // TODO;
         return null;
     }
 
     @Override
     public CompletableFuture<Void> put(InputStream input, String remoteFile) {
-        return null;
+        return put(input, remoteFile, new NullCallback<Void>());
     }
 
     @Override
-    public CompletableFuture<Void> put(InputStream input, String remoteFile, boolean encrypt) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Void> put(InputStream input, String remoteFile, boolean encrypt, Callback<Void> callback) {
+    public CompletableFuture<Void> put(InputStream input, String remoteFile, Callback<Void> callback) {
+        // TODO;
         return null;
     }
 
     @Override
     public CompletableFuture<Void> put(Reader reader, String remoteFile) {
-        return null;
+        return put(reader, remoteFile, new NullCallback<Void>());
     }
 
     @Override
-    public CompletableFuture<Void> put(Reader reader, String remoteFile, boolean encrypt) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Void> put(Reader reader, String remoteFile, boolean encrypt, Callback<Void> callback) {
+    public CompletableFuture<Void> put(Reader reader, String remoteFile, Callback<Void> callback) {
+        // TODO;
         return null;
     }
 
     @Override
     public CompletableFuture<Length> size(String remoteFile) {
-        return null;
+        return size(remoteFile, new NullCallback<Length>());
     }
 
     @Override
     public CompletableFuture<Length> size(String remoteFile, Callback<Length> callback) {
+        // TODO;
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Length> get(String remoteFile, StringBuffer buffer) {
+        return get(remoteFile, buffer, new NullCallback<Length>());
+    }
+
+    @Override
+    public CompletableFuture<Length> get(String remoteFile, StringBuffer buffer, Callback<Length> callback) {
+        // TODO;
         return null;
     }
 
     @Override
     public CompletableFuture<Length> get(String remoteFile, byte[] byteArray) {
-        return null;
+        return get(remoteFile, byteArray, new NullCallback<Length>());
     }
 
     @Override
-    public CompletableFuture<Length> get(String remoteFile, byte[] byteArray, boolean decrypt) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String remoteFile, byte[] byteArray, boolean decrypt, Callback<Length> callback) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String remoteFile, String localPath) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String remoteFile, String localPath, boolean decrypt) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String remoteFile, String localPath, boolean decrypt, Callback<Length> callback) {
+    public CompletableFuture<Length> get(String remoteFile, byte[] byteArray, Callback<Length> callback) {
+        // TODO;
         return null;
     }
 
     @Override
     public CompletableFuture<Length> get(String remoteFile, OutputStream output) {
-        return null;
+        return get(remoteFile, output, new NullCallback<Length>());
     }
 
     @Override
-    public CompletableFuture<Length> get(String remoteFile, OutputStream output, boolean decrypt) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String remoteFile, OutputStream output, boolean decrypt, Callback<Length> callback) {
+    public CompletableFuture<Length> get(String remoteFile, OutputStream output, Callback<Length> callback) {
+        // TODO;
         return null;
     }
 
     @Override
     public CompletableFuture<Length> get(String remoteFile, Writer writer) {
+        return get(remoteFile, writer, new NullCallback<Length>());
+    }
+
+    @Override
+    public CompletableFuture<Length> get(String remoteFile, Writer writer, Callback<Length> callback) {
+        // TODO;
         return null;
     }
 
     @Override
-    public CompletableFuture<Length> get(String remoteFile, Writer writer, boolean decrypt) {
-        return null;
+    public CompletableFuture<Void> putValue(String key, String value) {
+        return putValue(key, value, new NullCallback<Void>());
     }
 
     @Override
-    public CompletableFuture<Length> get(String remoteFile, Writer writer, boolean decrypt, Callback<Length> callback) {
+    public CompletableFuture<Void> putValue(String key, String value, Callback<Void> callback) {
+        // TODO;
         return null;
     }
 
     @Override
     public CompletableFuture<Void> putValue(String key, byte[] value) {
-        return null;
+        return putValue(key, value, new NullCallback<Void>());
     }
 
     @Override
     public CompletableFuture<Void> putValue(String key, byte[] value, Callback<Void> callback) {
+        // TODO;
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Void> setValue(String key, String value) {
+        return setValue(key, value, new NullCallback<Void>());
+    }
+
+    @Override
+    public CompletableFuture<Void> setValue(String key, String value, Callback<Void> callback) {
+        // TODO:
         return null;
     }
 
     @Override
     public CompletableFuture<Void> setValue(String key, byte[] value) {
-        return null;
+        return setValue(key, value, new NullCallback<Void>());
     }
 
     @Override
     public CompletableFuture<Void> setValue(String key, byte[] value, Callback<Void> callback) {
+        // TODO;
         return null;
     }
 
     @Override
     public CompletableFuture<ValueList> getValues(String key) {
-        return null;
+        return getValues(key, new NullCallback<ValueList>());
     }
 
     @Override
     public CompletableFuture<ValueList> getValues(String key, Callback<ValueList> callback) {
+        // TODO;
         return null;
     }
 
     @Override
     public CompletableFuture<Void> delete(String remoteFile) {
-        return null;
+        return delete(remoteFile, new NullCallback<Void>());
     }
 
     @Override
     public CompletableFuture<Void> delete(String remoteFile, Callback<Void> callback) {
+        // TODO:
         return null;
     }
 
     @Override
     public CompletableFuture<FileList> list() {
-        return null;
+        return list(new NullCallback<FileList>());
     }
 
     @Override
     public CompletableFuture<FileList> list(Callback<FileList> callback) {
+        // TODO;
         return null;
     }
 }
