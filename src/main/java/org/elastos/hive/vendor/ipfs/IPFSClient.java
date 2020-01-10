@@ -49,61 +49,45 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<Hash> put(byte[] data) {
-        return put(data, false);
+        return put(data, new NullCallback<Hash>());
     }
 
     @Override
-    public CompletableFuture<Hash> put(byte[] data, boolean encrypt) {
-        return put(data, encrypt, new NullCallback<Hash>());
-    }
-
-    @Override
-    public CompletableFuture<Hash> put(byte[] data, boolean encrypt, Callback<Hash> callback) {
+    public CompletableFuture<Hash> put(byte[] data, Callback<Hash> callback) {
+        // TODO:
         return null;
     }
 
     @Override
-    public CompletableFuture<Hash> put(String localPath) {
-        return put(localPath, false);
+    public CompletableFuture<Hash> put(String data) {
+        return put(data, new NullCallback<Hash>());
     }
 
     @Override
-    public CompletableFuture<Hash> put(String localPath, boolean encrypt) {
-        return put(localPath, encrypt, new NullCallback<Hash>());
-    }
-
-    @Override
-    public CompletableFuture<Hash> put(String localPath, boolean encrypt, Callback<Hash> callback) {
+    public CompletableFuture<Hash> put(String data, Callback<Hash> callback) {
+        // TODO:
         return null;
     }
 
     @Override
     public CompletableFuture<Hash> put(InputStream input) {
-        return put(input, false);
+        return put(input, new NullCallback<Hash>());
     }
 
     @Override
-    public CompletableFuture<Hash> put(InputStream input, boolean encrypt) {
-        return put(input, false, new NullCallback<Hash>());
-    }
-
-    @Override
-    public CompletableFuture<Hash> put(InputStream input, boolean encrypt, Callback<Hash> callback) {
+    public CompletableFuture<Hash> put(InputStream input, Callback<Hash> callback) {
+        // TODO:
         return null;
     }
 
     @Override
     public CompletableFuture<Hash> put(Reader reader) {
-        return put(reader, false);
+        return put(reader, new NullCallback<Hash>());
     }
 
     @Override
-    public CompletableFuture<Hash> put(Reader reader, boolean encrypt) {
-        return put(reader, false, new NullCallback<Hash>());
-    }
-
-    @Override
-    public CompletableFuture<Hash> put(Reader reader, boolean encrypt, Callback<Hash> callback) {
+    public CompletableFuture<Hash> put(Reader reader, Callback<Hash> callback) {
+        // TODO:
         return null;
     }
 
@@ -114,66 +98,51 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<Length> size(Hash cid, Callback<Length> callback) {
+        // TODO:
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Length> get(String cid, StringBuffer buffer) {
+        return get(cid, buffer, new NullCallback<Length>());
+    }
+
+    @Override
+    public CompletableFuture<Length> get(String cid, StringBuffer buffer, Callback<Length> callback) {
+        // TODO:
         return null;
     }
 
     @Override
     public CompletableFuture<Length> get(String cid, byte[] buffer) {
-        return get(cid, buffer, false);
+        return get(cid, buffer, new NullCallback<Length>());
     }
 
     @Override
-    public CompletableFuture<Length> get(String cid, byte[] buffer, boolean decrypt) {
-        return get(cid, buffer, decrypt, new NullCallback<Length>());
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String cid, byte[] buffer, boolean decrypt, Callback<Length> callback) {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String cid, String localPath) {
-        return get(cid, localPath, false);
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String cid, String localPath, boolean decrypt) {
-        return get(cid, localPath, decrypt, new NullCallback<Length>());
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String cid, String localPath, boolean decrypt, Callback<Length> callback) {
+    public CompletableFuture<Length> get(String cid, byte[] buffer, Callback<Length> callback) {
+        // TODO:
         return null;
     }
 
     @Override
     public CompletableFuture<Length> get(String cid, OutputStream output) {
-        return get(cid, output, false);
+        return get(cid, output, new NullCallback<Length>());
     }
 
     @Override
-    public CompletableFuture<Length> get(String cid, OutputStream output, boolean decrypt) {
-        return get(cid, output, false, new NullCallback<Length>());
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String cid, OutputStream output, boolean decrypt, Callback<Length> callback) {
+    public CompletableFuture<Length> get(String cid, OutputStream output, Callback<Length> callback) {
+        // TODO:
         return null;
     }
 
     @Override
     public CompletableFuture<Length> get(String cid, Writer writer) {
-        return get(cid, writer, false);
+        return get(cid, writer, new NullCallback<Length>());
     }
 
     @Override
-    public CompletableFuture<Length> get(String cid, Writer writer, boolean decrypt) {
-        return get(cid, writer, decrypt, new NullCallback<>());
-    }
-
-    @Override
-    public CompletableFuture<Length> get(String cid, Writer writer, boolean decrypt, Callback<Hash> callback) {
+    public CompletableFuture<Length> get(String cid, Writer writer, Callback<Length> callback) {
+        // TODO:
         return null;
     }
 }
