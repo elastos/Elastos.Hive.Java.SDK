@@ -12,40 +12,32 @@ import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
 public interface Files {
-    CompletableFuture<Void> put(byte[] from, String remoteFile);
-    CompletableFuture<Void> put(byte[] from, String remoteFile, boolean encrypt);
-    CompletableFuture<Void> put(byte[] from, String remoteFile, boolean encrypt, Callback<Void> callback);
+    CompletableFuture<Void> put(String data, String remoteFile);
+    CompletableFuture<Void> put(String data, String remoteFile, Callback<Void> callback);
 
-    CompletableFuture<Void> put(String localPath, String remoteFile);
-    CompletableFuture<Void> put(String localPath, String remoteFile, boolean encrypt);
-    CompletableFuture<Void> put(String localPath, String remoteFile, boolean encrypt, Callback<Void> callback);
+    CompletableFuture<Void> put(byte[] data, String remoteFile);
+    CompletableFuture<Void> put(byte[] data, String remoteFile, Callback<Void> callback);
 
     CompletableFuture<Void> put(InputStream input, String remoteFile);
-    CompletableFuture<Void> put(InputStream input, String remoteFile, boolean encrypt);
-    CompletableFuture<Void> put(InputStream input, String remoteFile, boolean encrypt, Callback<Void> callback);
+    CompletableFuture<Void> put(InputStream input, String remoteFile, Callback<Void> callback);
 
     CompletableFuture<Void> put(Reader reader, String remoteFile);
-    CompletableFuture<Void> put(Reader reader, String remoteFile, boolean encrypt);
-    CompletableFuture<Void> put(Reader reader, String remoteFile, boolean encrypt, Callback<Void> callback);
+    CompletableFuture<Void> put(Reader reader, String remoteFile, Callback<Void> callback);
 
     CompletableFuture<Length> size(String remoteFile);
     CompletableFuture<Length> size(String remoteFile, Callback<Length> callback);
 
-    CompletableFuture<Length> get(String remoteFile, byte[] byteArray);
-    CompletableFuture<Length> get(String remoteFile, byte[] byteArray, boolean decrypt);
-    CompletableFuture<Length> get(String remoteFile, byte[] byteArray, boolean decrypt, Callback<Length> callback);
+    CompletableFuture<Length> get(String remoteFile, StringBuffer buffer);
+    CompletableFuture<Length> get(String remoteFile, StringBuffer buffer, Callback<Length> callback);
 
-    CompletableFuture<Length> get(String remoteFile, String localPath);
-    CompletableFuture<Length> get(String remoteFile, String localPath, boolean decrypt);
-    CompletableFuture<Length> get(String remoteFile, String localPath, boolean decrypt, Callback<Length> callback);
+    CompletableFuture<Length> get(String remoteFile, byte[] byteArray);
+    CompletableFuture<Length> get(String remoteFile, byte[] byteArray, Callback<Length> callback);
 
     CompletableFuture<Length> get(String remoteFile, OutputStream output);
-    CompletableFuture<Length> get(String remoteFile, OutputStream output, boolean decrypt);
-    CompletableFuture<Length> get(String remoteFile, OutputStream output, boolean decrypt, Callback<Length> callback);
+    CompletableFuture<Length> get(String remoteFile, OutputStream output, Callback<Length> callback);
 
     CompletableFuture<Length> get(String remoteFile, Writer writer);
-    CompletableFuture<Length> get(String remoteFile, Writer writer, boolean decrypt);
-    CompletableFuture<Length> get(String remoteFile, Writer writer, boolean decrypt, Callback<Length> callback);
+    CompletableFuture<Length> get(String remoteFile, Writer writer, Callback<Length> callback);
 
     CompletableFuture<Void> delete(String remoteFile);
     CompletableFuture<Void> delete(String remoteFile, Callback<Void> callback);

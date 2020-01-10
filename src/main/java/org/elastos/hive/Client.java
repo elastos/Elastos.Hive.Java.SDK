@@ -52,7 +52,6 @@ public abstract class Client {
         return (KeyValues)getInterface(KeyValues.class);
     }
 
-
     public static abstract class Options {
         private String storePath;
         private Authenticator authenticator;
