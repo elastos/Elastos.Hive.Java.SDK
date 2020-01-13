@@ -19,13 +19,14 @@ public class ClientIPFSInterfaceTest {
     @Test
     public void testPutData() {
         IPFS ipfsAPIs = client.getIPFS();
-        // TODO;
+        ipfsAPIs.put("aaa");
     }
 
     @Test
     public void testPutDataFrom() {
         IPFS ipfsAPIs = client.getIPFS();
-        // TODO;
+        byte[] buf = "aaa".getBytes();
+        ipfsAPIs.put(buf);
     }
 
     @Test
@@ -36,12 +37,6 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testPutDataFromReader() {
-        IPFS ipfsAPIs = client.getIPFS();
-        // TODO;
-    }
-
-    @Test
-    public void testDelete() {
         IPFS ipfsAPIs = client.getIPFS();
         // TODO;
     }
