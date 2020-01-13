@@ -28,29 +28,14 @@ import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
 
-import java.lang.reflect.Type;
-
-
 public abstract class Client {
     public abstract void connect() throws HiveException;
     public abstract void disconnect();
     public abstract boolean isConnected();
 
-    protected abstract Object getInterface(Type type);
-
-    public abstract void setEncryptKey(String encryptKey);
-
-    public Files getFiles() {
-        return (Files)getInterface(Files.class);
-    }
-
-    public IPFS getIPFS() {
-        return (IPFS)getInterface(IPFS.class);
-    }
-
-    public KeyValues getKeyValues() {
-        return (KeyValues)getInterface(KeyValues.class);
-    }
+    public abstract Files getFiles();
+    public abstract IPFS getIPFS();
+    public abstract KeyValues getKeyValues();
 
     public static abstract class Options {
         private String storePath;

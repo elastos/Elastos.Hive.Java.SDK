@@ -37,11 +37,18 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     @Override
-    protected Object getInterface(Type type) {
-        if (Files.class == type || KeyValues.class == type)
-            return this;
+    public Files getFiles() {
+        return (Files)this;
+    }
 
+    @Override
+    public IPFS getIPFS() {
         return null;
+    }
+
+    @Override
+    public KeyValues getKeyValues() {
+        return (KeyValues)this;
     }
 
     @Override

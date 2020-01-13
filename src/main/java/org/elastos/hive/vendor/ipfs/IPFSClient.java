@@ -14,8 +14,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
+
 
 final class IPFSClient extends Client implements IPFS {
     IPFSClient(Options options) {
@@ -32,14 +32,21 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public boolean isConnected() {
-        return false;
+        return true;
     }
 
     @Override
-    public Object getInterface(Type type) {
-        if (IPFS.class == type)
-            return this;
+    public Files getFiles() {
+        return null;
+    }
 
+    @Override
+    public IPFS getIPFS() {
+        return (IPFS)this;
+    }
+
+    @Override
+    public KeyValues getKeyValues() {
         return null;
     }
 
