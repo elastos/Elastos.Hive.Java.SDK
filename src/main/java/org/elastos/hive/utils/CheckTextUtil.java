@@ -23,8 +23,8 @@
 package org.elastos.hive.utils;
 
 public final class CheckTextUtil {
-    public static boolean isEmpty(final String text){
-        if (text == null ||text.length() == 0) {
+    public static boolean isEmpty(final String text) {
+        if (text == null || text.length() == 0) {
             return true;
         }
         return false;

@@ -23,40 +23,40 @@
 package org.elastos.hive.utils;
 
 public class UrlUtil {
-    public static String[] decodeHostAndPort(String requestUrl , String defaultHost , String defaultPort){
+    public static String[] decodeHostAndPort(String requestUrl, String defaultHost, String defaultPort) {
         String[] hostAndPort = new String[2];
 
-        if (requestUrl.contains("//")){
-            String[] urlInfo =requestUrl.split("//");
-            requestUrl = urlInfo[1] ;
+        if (requestUrl.contains("//")) {
+            String[] urlInfo = requestUrl.split("//");
+            requestUrl = urlInfo[1];
         }
 
         hostAndPort[0] = defaultHost;
         hostAndPort[1] = defaultPort;
 
-        String[] hostInfo = null ;
-        if (requestUrl.contains(":")){
+        String[] hostInfo = null;
+        if (requestUrl.contains(":")) {
             hostInfo = requestUrl.split(":");
         }
 
-        if (null != hostInfo && hostInfo.length == 2){
+        if (null != hostInfo && hostInfo.length == 2) {
             try {
                 hostAndPort[0] = hostInfo[0];
                 hostAndPort[1] = hostInfo[1];
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        return hostAndPort ;
+        return hostAndPort;
     }
 
-    public static String checkPort(String requestUrl , String defaultPort){
-        if (requestUrl.contains(":")){
+    public static String checkPort(String requestUrl, String defaultPort) {
+        if (requestUrl.contains(":")) {
             return requestUrl;
         }
 
-        return requestUrl+":"+defaultPort;
+        return requestUrl + ":" + defaultPort;
 
     }
 

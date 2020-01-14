@@ -27,44 +27,44 @@ package org.elastos.hive.exception;
  * If an exception occurs while you are using the hive SDK, throw this HiveException
  */
 public class HiveException extends Exception {
-	private static final long serialVersionUID = 1486850840770311509L;
-
-	/*
-	public static final String RPC_NODE_NULL = "Rpc node is null .";
-	public static final String RPC_NODE_PORT_NULL = "Rpc node port is null .";
-	public static final String NO_RPC_NODE_AVAILABLE = "No RPC nodes are available .";
-
-	public static final String GET_FILE_LENGTH_ERROR = "Get file length error .";
-	public static final String GET_FILE_ERROR = "Get file error .";
-	public static final String PUT_FILE_ERROR = "Put file error .";
-	public static final String LIST_FILE_ERROR = "List file error .";
-	public static final String PUT_BUFFER_ERROR = "Put buffer error .";
-	public static final String GET_BUFFER_ERROR = "Get buffer error .";
-	public static final String DEL_FILE_ERROR = "Delete file error .";
-	public static final String GET_VALUE_ERROR = "Get value error .";
+    private static final long serialVersionUID = 1486850840770311509L;
 
 
-	public static final String FILE_ALREADY_EXIST_ERROR = "File already exist error .";
-	public static final String ITEM_NOT_FOUND = "Item not found.";
+    public static final String RPC_NODE_NULL = "Rpc node is null .";
+    public static final String RPC_NODE_PORT_NULL = "Rpc node port is null .";
+    public static final String NO_RPC_NODE_AVAILABLE = "No RPC nodes are available .";
 
-	public static final String UNSUPPORT_FUNCTION = "Unsupport this function.";
+    public static final String GET_FILE_LENGTH_ERROR = "Get file length error .";
+    public static final String GET_FILE_ERROR = "Get file error .";
+    public static final String PUT_FILE_ERROR = "Put file error .";
+    public static final String LIST_FILE_ERROR = "List file error .";
+    public static final String PUT_BUFFER_ERROR = "Put buffer error .";
+    public static final String GET_BUFFER_ERROR = "Get buffer error .";
+    public static final String DEL_FILE_ERROR = "Delete file error .";
+    public static final String GET_VALUE_ERROR = "Get value error .";
 
-	public static final String CONNECT_ERROR = "Connect error.";
-	*/
 
-	public HiveException() {
-		super();
-	}
+    public static final String FILE_ALREADY_EXIST_ERROR = "File already exist error .";
+    public static final String ITEM_NOT_FOUND = "Item not found.";
 
-	public HiveException(String message) {
-		super(message);
-	}
+    public static final String UNSUPPORT_FUNCTION = "Unsupport this function.";
 
-	public HiveException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public static final String CONNECT_ERROR = "Connect error.";
 
-	public HiveException(Throwable cause) {
-		super(cause);
-	}
+
+    public HiveException() {
+        super();
+    }
+
+    public HiveException(String message) {
+        super(message);
+    }
+
+    public HiveException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public HiveException(Throwable cause) {
+        super(cause);
+    }
 }

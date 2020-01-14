@@ -20,18 +20,35 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.result;
+package org.elastos.hive.vendor.ipfs.network;
 
-import java.util.ArrayList;
+import org.elastos.hive.vendor.connection.model.NoBodyEntity;
+import org.elastos.hive.vendor.ipfs.network.model.AddFileResponse;
+import org.elastos.hive.vendor.ipfs.network.model.ListFileResponse;
 
-public class ValueList extends Result {
-	private final ArrayList<Value> list;
+import java.io.InputStream;
 
-	public ValueList(ArrayList<Value> list) {
-		this.list = list;
-	}
+import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.Multipart;
+import retrofit2.http.POST;
+import retrofit2.http.Part;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
-	public ArrayList<Value> getList() {
-		return list;
-	}
+public interface IPFSApi {
+    @Multipart
+    @POST(ConnectConstance.ADD)
+    Call<AddFileResponse> addFile(@Part MultipartBody.Part file);
+
+    @POST(ConnectConstance.LS)
+    Call<ListFileResponse> listFile(@Query(ConnectConstance.ARG) String ipfsObjPath);
+
+    @POST(ConnectConstance.CAT)
+    Call<ResponseBody> catFile(@Query(ConnectConstance.ARG) String ipfsObjPath);
+
+    @POST("http://{address}:{port}/version")
+    Call<NoBodyEntity> version(@Path("address") String address, @Path("port") int port);
 }

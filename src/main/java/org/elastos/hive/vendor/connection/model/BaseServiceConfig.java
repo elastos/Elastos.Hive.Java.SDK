@@ -20,16 +20,37 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.result;
+package org.elastos.hive.vendor.connection.model;
 
-public class Hash extends Result {
-	private final String cid;
+public class BaseServiceConfig {
+    private final HeaderConfig headerConfig;
 
-	public Hash(String cid) {
-		this.cid = cid;
-	}
+    private BaseServiceConfig() {
+        this.headerConfig = null;
+    }
 
-	public String getCid() {
-		return cid;
-	}
+    private BaseServiceConfig(Builder builder) {
+        this.headerConfig = builder.headerConfig;
+    }
+
+    public HeaderConfig getHeaderConfig() {
+        return headerConfig;
+    }
+
+    public static final class Builder {
+        HeaderConfig headerConfig;
+
+        public Builder() {
+            this.headerConfig = null;
+        }
+
+        public Builder headerConfig(HeaderConfig headerConfig) {
+            this.headerConfig = headerConfig;
+            return this;
+        }
+
+        public BaseServiceConfig build() {
+            return new BaseServiceConfig(this);
+        }
+    }
 }

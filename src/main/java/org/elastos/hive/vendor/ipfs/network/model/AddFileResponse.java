@@ -20,16 +20,34 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor.ipfs;
+package org.elastos.hive.vendor.ipfs.network.model;
 
-class IPFSConstance {
-    public static final String URLFORMAT    = "http://%s:%d/api/v0/";
-    public static final String JSON			= "application/json";
-    public static final String PATH        	= "path";
-    public static final String ARG 			= "arg" ;
+public class AddFileResponse {
+    private String Name;
+    private String Hash;
+    private String Size;
 
-    public static final String ADD          = "add";
-    public static final String CAT          = "cat";
-    public static final String LS           = "file/ls";
-    public static final String VERSION      = "version";
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String Name) {
+        this.Name = Name;
+    }
+
+    public String getHash() {
+        return Hash;
+    }
+
+    public void setHash(String Hash) {
+        this.Hash = Hash;
+    }
+
+    public String getSize() {
+        return Size;
+    }
+
+    public void setSize(String Size) {
+        this.Size = Size;
+    }
 }
