@@ -86,8 +86,8 @@ public class OneDriveOptions extends Client.Options {
                 throw new HiveException("Builder should be deprecated");
             }
             if (options.clientId() == null ||
-                options.redirectUrl() == null ||
-                options.authenticator() == null) {
+                    options.redirectUrl() == null ||
+                    options.authenticator() == null) {
                 throw new HiveException("Some options fields are invalid");
             }
 

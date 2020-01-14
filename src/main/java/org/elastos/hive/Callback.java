@@ -23,23 +23,24 @@
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.result.Result;
 
 /**
  * Callback result in Hive SDK
  */
-public interface Callback<T extends Result> {
-	/**
-	 * An exception occurred in the middle of obtaining the result
-	 * @param e {@link HiveException}
-	 */
-	void onError(HiveException e);
+public interface Callback<T> {
+    /**
+     * An exception occurred in the middle of obtaining the result
+     *
+     * @param e {@link HiveException}
+     */
+    void onError(HiveException e);
 
-	/**
-	 * Callback when successful
-	 * @param body The information returned when the callback was successful<br>
-	 *            for example:<br>
-	 *            Drive , Directory , File , Drive.Info ,Directory.Info , File.Info and so on.
-	 */
-	void onSuccess(T body);
+    /**
+     * Callback when successful
+     *
+     * @param body The information returned when the callback was successful<br>
+     *             for example:<br>
+     *             Drive , Directory , File , Drive.Info ,Directory.Info , File.Info and so on.
+     */
+    void onSuccess(T body);
 }

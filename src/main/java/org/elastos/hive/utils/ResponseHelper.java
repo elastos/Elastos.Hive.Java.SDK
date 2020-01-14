@@ -24,16 +24,20 @@ package org.elastos.hive.utils;
 
 import org.elastos.hive.exception.HiveException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 public class ResponseHelper {
 
-    public static byte[] getBuffer(Response response){
+    public static byte[] getBuffer(Response response) {
         byte[] data = null;
         try {
             ResponseBody body = (ResponseBody) response.body();
@@ -44,7 +48,18 @@ public class ResponseHelper {
         return data;
     }
 
-    public static long saveFileFromResponse(String storeFilepath , Response response) throws HiveException {
+    public static StringBuffer getStringBuffer(Response response) {
+        StringBuffer stringBuffer = null;
+        try {
+            ResponseBody body = (ResponseBody) response.body();
+            stringBuffer = new StringBuffer(body.string());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringBuffer;
+    }
+
+    public static long saveFileFromResponse(String storeFilepath, Response response) throws HiveException {
         ResponseBody body = (ResponseBody) response.body();
         FileOutputStream cacheStream = null;
         long total = 0;
@@ -56,7 +71,7 @@ public class ResponseHelper {
             byte[] b = new byte[1024];
             int length = 0;
 
-            while((length = data.read(b)) > 0){
+            while ((length = data.read(b)) > 0) {
                 cacheStream.write(b, 0, length);
                 total += length;
             }
@@ -64,8 +79,7 @@ public class ResponseHelper {
             data.close();
         } catch (Exception e) {
             throw new HiveException(e.getMessage());
-        }
-        finally {
+        } finally {
             try {
                 if (cacheStream != null) cacheStream.close();
                 body.close();
@@ -75,5 +89,41 @@ public class ResponseHelper {
         }
 
         return total;
+    }
+
+    public static OutputStream getOutputStream(Response response) {
+        ResponseBody body = (ResponseBody) response.body();
+
+//        OutputStream os = System.out;
+//        try {
+//            String str = body.string();
+//            os.write(str.getBytes());
+//            os.flush();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        OutputStream os = new ByteArrayOutputStream();
+        try {
+            String str = body.string();
+            os.write(str.getBytes());
+            os.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return os;
+    }
+
+    public static Writer getWriter(Response response) {
+        ResponseBody body = (ResponseBody) response.body();
+        Writer writer = new StringWriter();
+        try {
+            writer.write(body.string());
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return writer;
     }
 }

@@ -23,38 +23,38 @@
 package org.elastos.hive;
 
 public class AuthToken {
-	private final String refreshToken;
-	private final String accessToken;
-	private long experitime;
+    private final String refreshToken;
+    private final String accessToken;
+    private long experitime;
 
-	public AuthToken(String refreshToken, String accessToken, long experitime) {
-		this.refreshToken = refreshToken;
-		this.accessToken = accessToken;
-		this.experitime = experitime;
-	}
+    public AuthToken(String refreshToken, String accessToken, long experitime) {
+        this.refreshToken = refreshToken;
+        this.accessToken = accessToken;
+        this.experitime = experitime;
+    }
 
-	public String getRefreshToken() {
-		return refreshToken;
-	}
+    public String getRefreshToken() {
+        return refreshToken;
+    }
 
-	public String getAccessToken() {
-		return accessToken;
-	}
+    public String getAccessToken() {
+        return accessToken;
+    }
 
-	public long getExpiredTime() {
-		return experitime;
-	}
+    public long getExpiredTime() {
+        return experitime;
+    }
 
-	public boolean isExpired() {
-		long currentSeconds = System.currentTimeMillis() / 1000;
-		if (currentSeconds >= experitime) {
-			return true;
-		}
+    public boolean isExpired() {
+        long currentSeconds = System.currentTimeMillis() / 1000;
+        if (currentSeconds >= experitime) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public void expired() {
-		this.experitime = 0;
-	}
+    public void expired() {
+        this.experitime = 0;
+    }
 }

@@ -28,20 +28,30 @@ import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public abstract class Client {
     public abstract void connect() throws HiveException;
+
     public abstract void disconnect();
+
     public abstract boolean isConnected();
 
     public abstract Files getFiles();
+
     public abstract IPFS getIPFS();
+
     public abstract KeyValues getKeyValues();
+
+    protected ExecutorService clientThreadPool = Executors.newCachedThreadPool();
 
     public static abstract class Options {
         private String storePath;
         private Authenticator authenticator;
 
-        protected Options() {}
+        protected Options() {
+        }
 
         protected void setStorePath(String storePath) {
             this.storePath = storePath;

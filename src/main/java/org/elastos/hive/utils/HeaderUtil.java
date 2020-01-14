@@ -29,44 +29,44 @@ public class HeaderUtil {
     private static final String TRANSFER_ENCODING = "Transfer-Encoding";
 
     private static final String CHUNKED = "chunked";
-    private static final int DEFAULT_CONTENT_LENGTH = -1 ;
+    private static final int DEFAULT_CONTENT_LENGTH = -1;
 
-    public static int getContentLength(Response response){
-        if (isResponseHeaderEmpty(response , CONTENT_LENGTH)){
-            return DEFAULT_CONTENT_LENGTH ;
+    public static int getContentLength(Response response) {
+        if (isResponseHeaderEmpty(response, CONTENT_LENGTH)) {
+            return DEFAULT_CONTENT_LENGTH;
         }
 
-        String contentLengthStr = response.headers().get(CONTENT_LENGTH) ;
+        String contentLengthStr = response.headers().get(CONTENT_LENGTH);
         int contentLength = Integer.valueOf(contentLengthStr);
-        if (contentLength < 0){
-            return DEFAULT_CONTENT_LENGTH ;
-        }else{
+        if (contentLength < 0) {
+            return DEFAULT_CONTENT_LENGTH;
+        } else {
             return contentLength;
         }
     }
 
-    public static boolean isTrunced(Response response){
-        if (isResponseHeaderEmpty(response , TRANSFER_ENCODING)){
-            return false ;
+    public static boolean isTrunced(Response response) {
+        if (isResponseHeaderEmpty(response, TRANSFER_ENCODING)) {
+            return false;
         }
 
-        String transferEncoding = response.headers().get(TRANSFER_ENCODING) ;
-        if (transferEncoding.equals(CHUNKED)){
-            return true ;
+        String transferEncoding = response.headers().get(TRANSFER_ENCODING);
+        if (transferEncoding.equals(CHUNKED)) {
+            return true;
         }
 
-        return false ;
+        return false;
     }
 
-    private static boolean isResponseHeaderEmpty(Response response , String headerKey){
-        if (response == null){
+    private static boolean isResponseHeaderEmpty(Response response, String headerKey) {
+        if (response == null) {
             return true;
         }
 
-        String headerValue = response.headers().get(headerKey) ;
-        if (headerValue == null || headerValue.equals("null")){
+        String headerValue = response.headers().get(headerKey);
+        if (headerValue == null || headerValue.equals("null")) {
             return true;
         }
-        return false ;
+        return false;
     }
 }

@@ -23,21 +23,21 @@
 package org.elastos.hive.exception;
 
 public class NotImplementedException extends HiveException {
-	private static final long serialVersionUID = -3106736642975911944L;
+    private static final long serialVersionUID = -3106736642975911944L;
 
-	public NotImplementedException() {
-		super();
-	}
+    public NotImplementedException() {
+        super();
+    }
 
-	public NotImplementedException(String message) {
-		super(message);
-	}
+    public NotImplementedException(String message) {
+        super(message);
+    }
 
-	public NotImplementedException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public NotImplementedException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public NotImplementedException(Throwable cause) {
-		super(cause);
-	}
+    public NotImplementedException(Throwable cause) {
+        super(cause);
+    }
 }
