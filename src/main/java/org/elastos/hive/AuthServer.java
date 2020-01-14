@@ -26,27 +26,27 @@ import java.util.concurrent.Semaphore;
 
 import fi.iki.elonen.NanoHTTPD;
 
-public final class AuthServer extends NanoHTTPD{
-	private Semaphore authLock;
-	private String authCode = "";
+public final class AuthServer extends NanoHTTPD {
+    private Semaphore authLock;
+    private String authCode = "";
 
-	public AuthServer(Semaphore semaphore , String host , int port){
-        this(host,port);
+    public AuthServer(Semaphore semaphore, String host, int port) {
+        this(host, port);
         authLock = semaphore;
-		try {
-			authLock.acquire();
+        try {
+            authLock.acquire();
         } catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public AuthServer(String host, int port) {
-		super(host,port);
+            e.printStackTrace();
+        }
     }
 
-	@Override
-	public Response serve(IHTTPSession session){
-		StringBuilder builder = new StringBuilder();
+    public AuthServer(String host, int port) {
+        super(host, port);
+    }
+
+    @Override
+    public Response serve(IHTTPSession session) {
+        StringBuilder builder = new StringBuilder();
         builder.append("<!DOCTYPE html><html><body>");
         builder.append("</body></html>\n");
 
@@ -61,7 +61,7 @@ public final class AuthServer extends NanoHTTPD{
                 break;
         }
 
-        if(authLock!=null){
+        if (authLock != null) {
             authLock.release();
         }
         return newFixedLengthResponse(builder.toString());

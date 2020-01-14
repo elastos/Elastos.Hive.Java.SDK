@@ -19,17 +19,22 @@ public class ClientInstanceTest {
     @Test
     public void testCreateInstance() {
         try {
-            IPFSOptions.RpcNode node = new IPFSOptions.RpcNode("3.133.166.156",5001);
+            IPFSOptions.RpcNode node = new IPFSOptions.RpcNode("3.133.166.156", 5001);
+            IPFSOptions.RpcNode node2 = new IPFSOptions.RpcNode("127.0.0.1", 5001);
+
             Client.Options options = new IPFSOptions
                     .Builder()
                     .setStorePath(STORE_PATH)
                     .addRpcNode(node)
+                    .addRpcNode(node2)
                     .build();
             assertNotNull(options);
 
             Client client = Client.createInstance(options);
             assertNotNull(client);
-            assertFalse(client.isConnected());
+
+            client.connect();
+            assertTrue(client.isConnected());
 
         } catch (HiveException e) {
             fail(e.getMessage());
@@ -39,10 +44,13 @@ public class ClientInstanceTest {
     @Test
     public void testCreateInstanceFailed1() {
         try {
-            IPFSOptions.RpcNode node = new IPFSOptions.RpcNode("3.133.166.156",5001);
+            IPFSOptions.RpcNode node = new IPFSOptions.RpcNode("3.133.166.156", 5001);
+            IPFSOptions.RpcNode node2 = new IPFSOptions.RpcNode("127.0.0.1", 5001);
+
             Client.Options options = new IPFSOptions
                     .Builder()
                     .addRpcNode(node)
+                    .addRpcNode(node2)
                     .build();
             assertNull(options);
         } catch (HiveException e) {
@@ -53,7 +61,6 @@ public class ClientInstanceTest {
     @Test
     public void testCreateInstanceFailed2() {
         try {
-            IPFSOptions.RpcNode node = new IPFSOptions.RpcNode("3.133.166.156",5001);
             Client.Options options = new IPFSOptions
                     .Builder()
                     .setStorePath(STORE_PATH)

@@ -20,14 +20,14 @@ public class IPFSOptions extends Client.Options {
         return rpcNodes.size() > 0;
     }
 
-    public ArrayList<RpcNode> rpcNodes() {
+    ArrayList<RpcNode> getRpcNodes() {
         return rpcNodes;
     }
 
     public static class RpcNode {
-        private String ipv4 ;
-        private String ipv6 ;
-        private int port ;
+        private String ipv4;
+        private String ipv6;
+        private int port;
 
         public RpcNode(String ipv4, int port) {
             this.ipv4 = ipv4;
@@ -39,21 +39,20 @@ public class IPFSOptions extends Client.Options {
             this.ipv6 = ipv6;
         }
 
-        public String getIpv4() {
+        String getIpv4() {
             return ipv4;
         }
 
-        public String getIpv6() {
+        String getIpv6() {
             return ipv6;
         }
 
-        public int getPort() {
+        int getPort() {
             return port;
         }
-
     }
 
-    public static class Builder{
+    public static class Builder {
         IPFSOptions options;
 
         public Builder() {
@@ -70,12 +69,12 @@ public class IPFSOptions extends Client.Options {
             return this;
         }
 
-        public Client.Options build() throws HiveException  {
+        public Client.Options build() throws HiveException {
             if (options == null) {
                 throw new HiveException("Builder should be deprecated");
             }
 
-            if (options.hasRpcNodes() || options.storePath() != null) {
+            if (!options.hasRpcNodes() || options.storePath() == null) {
                 throw new HiveException("Some options fields are invalid");
             }
 

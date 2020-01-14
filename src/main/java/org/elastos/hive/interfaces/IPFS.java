@@ -1,8 +1,6 @@
 package org.elastos.hive.interfaces;
 
 import org.elastos.hive.Callback;
-import org.elastos.hive.result.Hash;
-import org.elastos.hive.result.Length;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,30 +9,39 @@ import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
 public interface IPFS {
-    CompletableFuture<Hash> put(String data);
-    CompletableFuture<Hash> put(String data, Callback<Hash> callback);
+    CompletableFuture<String> put(String data);
 
-    CompletableFuture<Hash> put(byte[] data);
-    CompletableFuture<Hash> put(byte[] data, Callback<Hash> callback);
+    CompletableFuture<String> put(String data, Callback<String> callback);
 
-    CompletableFuture<Hash> put(InputStream input);
-    CompletableFuture<Hash> put(InputStream input, Callback<Hash> callback);
+    CompletableFuture<String> put(byte[] data);
 
-    CompletableFuture<Hash> put(Reader reader);
-    CompletableFuture<Hash> put(Reader reader, Callback<Hash> callback);
+    CompletableFuture<String> put(byte[] data, Callback<String> callback);
 
-    CompletableFuture<Length> size(Hash cid);
-    CompletableFuture<Length> size(Hash cid, Callback<Length> callback);
+    CompletableFuture<String> put(InputStream input);
 
-    CompletableFuture<Length> get(String cid, StringBuffer buffer);
-    CompletableFuture<Length> get(String cid, StringBuffer buffer, Callback<Length> callback);
+    CompletableFuture<String> put(InputStream input, Callback<String> callback);
 
-    CompletableFuture<Length> get(String cid, byte[] buffer);
-    CompletableFuture<Length> get(String cid, byte[] buffer, Callback<Length> callback);
+    CompletableFuture<String> put(Reader reader);
 
-    CompletableFuture<Length> get(String cid, OutputStream output);
-    CompletableFuture<Length> get(String cid, OutputStream output, Callback<Length> callback);
+    CompletableFuture<String> put(Reader reader, Callback<String> callback);
 
-    CompletableFuture<Length> get(String cid, Writer writer);
-    CompletableFuture<Length> get(String cid, Writer writer, Callback<Length> callback);
+    CompletableFuture<Long> size(String cid);
+
+    CompletableFuture<Long> size(String cid, Callback<Long> callback);
+
+    CompletableFuture<StringBuffer> getFileToStringBuffer(String cid);
+
+    CompletableFuture<StringBuffer> getFileToStringBuffer(String cid, Callback<StringBuffer> callback);
+
+    CompletableFuture<byte[]> getFileToBuffer(String cid);
+
+    CompletableFuture<byte[]> getFileToBuffer(String cid, Callback<byte[]> callback);
+
+    CompletableFuture<OutputStream> getFileToOutputStream(String cid);
+
+    CompletableFuture<OutputStream> getFileToOutputStream(String cid, Callback<OutputStream> callback);
+
+    CompletableFuture<Writer> getFileToWriter(String cid);
+
+    CompletableFuture<Writer> getFileToWriter(String cid, Callback<Writer> callback);
 }

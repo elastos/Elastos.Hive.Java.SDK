@@ -20,16 +20,41 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive;
+package org.elastos.hive.vendor.connection;
 
-import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.vendor.connection.model.NoBodyEntity;
 
-public class NullCallback<T> implements Callback<T> {
-    @Override
-    public void onError(HiveException e) {
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Converter;
+import retrofit2.Retrofit;
+
+public class NobodyConverterFactory extends Converter.Factory {
+    public static final NobodyConverterFactory create() {
+        return new NobodyConverterFactory();
     }
 
     @Override
-    public void onSuccess(T object) {
+    public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
+        if (NoBodyEntity.class.equals(type)) {
+            return (Converter<ResponseBody, NoBodyEntity>) value -> null;
+        }
+        return super.responseBodyConverter(type, annotations, retrofit);
+    }
+
+    @Override
+    public Converter<?, RequestBody> requestBodyConverter(Type type, Annotation[] parameterAnnotations, Annotation[] methodAnnotations, Retrofit retrofit) {
+        return null;
+    }
+
+    @Override
+    public Converter<?, String> stringConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
+        return null;
     }
 }
+
+

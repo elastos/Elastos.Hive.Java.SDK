@@ -56,8 +56,7 @@ class AuthInfoStoreImpl implements Persistent {
             }
         } catch (Exception e) {
             throw new HiveException(e.getMessage());
-        }
-        finally {
+        } finally {
             if (reader != null) {
                 try {
                     reader.close();
@@ -79,8 +78,7 @@ class AuthInfoStoreImpl implements Persistent {
             fileWriter.write(conetnt.toString());
         } catch (Exception e) {
             throw new HiveException(e.getMessage());
-        }
-        finally {
+        } finally {
             if (fileWriter != null) {
                 try {
                     fileWriter.close();
