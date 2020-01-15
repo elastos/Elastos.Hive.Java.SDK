@@ -28,7 +28,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -48,15 +50,10 @@ public class ResponseHelper {
         return data;
     }
 
-    public static StringBuffer getStringBuffer(Response response) {
-        StringBuffer stringBuffer = null;
-        try {
-            ResponseBody body = (ResponseBody) response.body();
-            stringBuffer = new StringBuffer(body.string());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return stringBuffer;
+    public static String getString(Response response) throws IOException {
+        ResponseBody body = (ResponseBody) response.body();
+        String result = body.string();
+        return result;
     }
 
     public static long saveFileFromResponse(String storeFilepath, Response response) throws HiveException {
@@ -91,39 +88,44 @@ public class ResponseHelper {
         return total;
     }
 
-    public static OutputStream getOutputStream(Response response) {
+    public static InputStream getStream(Response response) {
         ResponseBody body = (ResponseBody) response.body();
-
-//        OutputStream os = System.out;
-//        try {
-//            String str = body.string();
-//            os.write(str.getBytes());
-//            os.flush();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        OutputStream os = new ByteArrayOutputStream();
-        try {
-            String str = body.string();
-            os.write(str.getBytes());
-            os.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return os;
+        InputStream inputStream = body.byteStream();
+        return inputStream;
     }
 
-    public static Writer getWriter(Response response) {
+    public static Reader getReader(Response response) {
         ResponseBody body = (ResponseBody) response.body();
-        Writer writer = new StringWriter();
-        try {
-            writer.write(body.string());
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        InputStream inputStream = body.byteStream();
+        Reader reader = new InputStreamReader(inputStream);
 
-        return writer;
+        return reader;
+    }
+
+    public static long writeDataToWriter(Response response, Writer writer) throws IOException {
+        ResponseBody body = (ResponseBody) response.body();
+        String bodyStr = body.string();
+
+        if (bodyStr == null) return 0;
+
+        writer.write(bodyStr);
+        writer.flush();
+
+        return bodyStr.length();
+    }
+
+    public static long writeOutput(Response response, OutputStream outputStream) throws IOException {
+        ResponseBody body = (ResponseBody) response.body();
+        InputStream inputStream = body.byteStream();
+        int length = 0;
+
+        if (inputStream == null) return 0;
+
+        int ch;
+        while ((ch = inputStream.read()) != -1) {
+            length++;
+            outputStream.write(ch);
+        }
+        return length;
     }
 }
