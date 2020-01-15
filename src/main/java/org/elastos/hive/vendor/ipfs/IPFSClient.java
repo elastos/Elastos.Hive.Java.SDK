@@ -14,24 +14,17 @@ import org.elastos.hive.vendor.ipfs.network.model.AddFileResponse;
 import org.elastos.hive.vendor.ipfs.network.model.ListFileResponse;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PipedReader;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okio.Buffer;
-import okio.Okio;
-import okio.Source;
 import retrofit2.Response;
 
 
@@ -136,47 +129,66 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     @Override
-    public CompletableFuture<StringBuffer> getFileToStringBuffer(String cid) {
-        return getFileToStringBuffer(cid, new NullCallback<>());
+    public CompletableFuture<String> getFileString(String cid) {
+        return getFileString(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<StringBuffer> getFileToStringBuffer(String cid, Callback<StringBuffer> callback) {
+    public CompletableFuture<String> getFileString(String cid, Callback<String> callback) {
         // TODO:
-        return doGetFileToStrBuff(cid, callback);
+        return doGetFileStr(cid, callback);
     }
 
     @Override
-    public CompletableFuture<byte[]> getFileToBuffer(String cid) {
-        return getFileToBuffer(cid, new NullCallback<>());
+    public CompletableFuture<byte[]> getFileBuffer(String cid) {
+        return getFileBuffer(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<byte[]> getFileToBuffer(String cid, Callback<byte[]> callback) {
+    public CompletableFuture<byte[]> getFileBuffer(String cid, Callback<byte[]> callback) {
         // TODO:
         return doGetFileBuff(cid, callback);
     }
 
     @Override
-    public CompletableFuture<OutputStream> getFileToOutputStream(String cid) {
-        return getFileToOutputStream(cid, new NullCallback<>());
+    public CompletableFuture<InputStream> getFileStream(String cid) {
+        return getFileStream(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<OutputStream> getFileToOutputStream(String cid, Callback<OutputStream> callback) {
+    public CompletableFuture<InputStream> getFileStream(String cid, Callback<InputStream> callback) {
         // TODO:
-        return doGetFileOutputSteam(cid, callback);
+        return doGetFileStream(cid, callback);
     }
 
     @Override
-    public CompletableFuture<Writer> getFileToWriter(String cid) {
-        return getFileToWriter(cid, new NullCallback<>());
+    public CompletableFuture<Reader> getFileReader(String cid) {
+        return getFileReader(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Writer> getFileToWriter(String cid, Callback<Writer> callback) {
-        // TODO:
-        return doGetFileWriter(cid, callback);
+    public CompletableFuture<Reader> getFileReader(String cid, Callback<Reader> callback) {
+        return doGetFileReader(cid, callback);
+    }
+
+    @Override
+    public CompletableFuture<Long> get(String cid, OutputStream output) {
+        return get(cid, output, new NullCallback<>());
+    }
+
+    @Override
+    public CompletableFuture<Long> get(String cid, OutputStream output, Callback<Long> callback) {
+        return doWriteToOutput(cid, output, callback);
+    }
+
+    @Override
+    public CompletableFuture<Long> get(String cid, Writer writer) {
+        return get(cid, writer, new NullCallback<>());
+    }
+
+    @Override
+    public CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback) {
+        return doWriteToWriter(cid, writer,callback);
     }
 
     ////
@@ -340,15 +352,15 @@ final class IPFSClient extends Client implements IPFS {
         return future;
     }
 
-    private CompletableFuture<StringBuffer> doGetFileToStrBuff(String cid, Callback<StringBuffer> callback) {
-        CompletableFuture<StringBuffer> future = new CompletableFuture<>();
+    private CompletableFuture<String> doGetFileStr(String cid, Callback<String> callback) {
+        CompletableFuture<String> future = new CompletableFuture<>();
         clientThreadPool.execute(() -> {
             try {
                 Response response = getFileOrBuffer(cid);
                 if (response != null) {
-                    StringBuffer buffer = ResponseHelper.getStringBuffer(response);
-                    if (callback != null) callback.onSuccess(buffer);
-                    future.complete(buffer);
+                    String result = ResponseHelper.getString(response);
+                    if (callback != null) callback.onSuccess(result);
+                    future.complete(result);
                 } else {
                     HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
                     if (callback != null) callback.onError(hiveException);
@@ -388,15 +400,15 @@ final class IPFSClient extends Client implements IPFS {
         return future;
     }
 
-    private CompletableFuture<OutputStream> doGetFileOutputSteam(String cid, Callback<OutputStream> callback) {
-        CompletableFuture<OutputStream> future = new CompletableFuture<>();
+    private CompletableFuture<InputStream> doGetFileStream(String cid, Callback<InputStream> callback) {
+        CompletableFuture<InputStream> future = new CompletableFuture<>();
         clientThreadPool.execute(() -> {
             try {
                 Response response = getFileOrBuffer(cid);
                 if (response != null) {
-                    OutputStream outputStream = ResponseHelper.getOutputStream(response);
-                    if (callback != null) callback.onSuccess(outputStream);
-                    future.complete(outputStream);
+                    InputStream inputStream = ResponseHelper.getStream(response);
+                    if (callback != null) callback.onSuccess(inputStream);
+                    future.complete(inputStream);
                 } else {
                     HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
                     if (callback != null) callback.onError(hiveException);
@@ -413,15 +425,65 @@ final class IPFSClient extends Client implements IPFS {
         return future;
     }
 
-    private CompletableFuture<Writer> doGetFileWriter(String cid, Callback<Writer> callback) {
-        CompletableFuture<Writer> future = new CompletableFuture<>();
+    private CompletableFuture<Long> doWriteToOutput(String cid, OutputStream outputStream, Callback<Long> callback) {
+        CompletableFuture<Long> future = new CompletableFuture<>();
         clientThreadPool.execute(() -> {
             try {
                 Response response = getFileOrBuffer(cid);
                 if (response != null) {
-                    Writer outputStream = ResponseHelper.getWriter(response);
-                    if (callback != null) callback.onSuccess(outputStream);
-                    future.complete(outputStream);
+                    long length = ResponseHelper.writeOutput(response, outputStream);
+                    if (callback != null) callback.onSuccess(length);
+                    future.complete(length);
+                } else {
+                    HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
+                    if (callback != null) callback.onError(hiveException);
+                    future.completeExceptionally(hiveException);
+                }
+            } catch (Exception e) {
+                HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
+                if (callback != null) callback.onError(hiveException);
+                future.completeExceptionally(hiveException);
+                e.printStackTrace();
+            }
+        });
+
+        return future;
+    }
+
+
+    private CompletableFuture<Reader> doGetFileReader(String cid, Callback<Reader> callback) {
+        CompletableFuture<Reader> future = new CompletableFuture<>();
+        clientThreadPool.execute(() -> {
+            try {
+                Response response = getFileOrBuffer(cid);
+                if (response != null) {
+                    Reader reader = ResponseHelper.getReader(response);
+                    if (callback != null) callback.onSuccess(reader);
+                    future.complete(reader);
+                } else {
+                    HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
+                    if (callback != null) callback.onError(hiveException);
+                    future.completeExceptionally(hiveException);
+                }
+            } catch (Exception e) {
+                HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
+                if (callback != null) callback.onError(hiveException);
+                future.completeExceptionally(hiveException);
+                e.printStackTrace();
+            }
+        });
+        return future;
+    }
+
+    private CompletableFuture<Long> doWriteToWriter(String cid, Writer writer, Callback<Long> callback) {
+        CompletableFuture<Long> future = new CompletableFuture<>();
+        clientThreadPool.execute(() -> {
+            try {
+                Response response = getFileOrBuffer(cid);
+                if (response != null) {
+                    long length = ResponseHelper.writeDataToWriter(response, writer);
+                    if (callback != null) callback.onSuccess(length);
+                    future.complete(length);
                 } else {
                     HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
                     if (callback != null) callback.onError(hiveException);
