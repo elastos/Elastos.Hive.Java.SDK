@@ -29,19 +29,27 @@ public interface IPFS {
 
     CompletableFuture<Long> size(String cid, Callback<Long> callback);
 
-    CompletableFuture<StringBuffer> getFileToStringBuffer(String cid);
+    CompletableFuture<String> getFileString(String cid);
 
-    CompletableFuture<StringBuffer> getFileToStringBuffer(String cid, Callback<StringBuffer> callback);
+    CompletableFuture<String> getFileString(String cid, Callback<String> callback);
 
-    CompletableFuture<byte[]> getFileToBuffer(String cid);
+    CompletableFuture<byte[]> getFileBuffer(String cid);
 
-    CompletableFuture<byte[]> getFileToBuffer(String cid, Callback<byte[]> callback);
+    CompletableFuture<byte[]> getFileBuffer(String cid, Callback<byte[]> callback);
 
-    CompletableFuture<OutputStream> getFileToOutputStream(String cid);
+    CompletableFuture<InputStream> getFileStream(String cid);
 
-    CompletableFuture<OutputStream> getFileToOutputStream(String cid, Callback<OutputStream> callback);
+    CompletableFuture<InputStream> getFileStream(String cid, Callback<InputStream> callback);
 
-    CompletableFuture<Writer> getFileToWriter(String cid);
+    CompletableFuture<Reader> getFileReader(String cid);
 
-    CompletableFuture<Writer> getFileToWriter(String cid, Callback<Writer> callback);
+    CompletableFuture<Reader> getFileReader(String cid, Callback<Reader> callback);
+
+    CompletableFuture<Long> get(String cid, OutputStream output);
+
+    CompletableFuture<Long> get(String cid, OutputStream output, Callback<Long> callback);
+
+    CompletableFuture<Long> get(String cid, Writer writer);
+
+    CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback);
 }

@@ -9,13 +9,18 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
+import java.nio.CharBuffer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -31,8 +36,7 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testPutData() {
-//        IPFS ipfsAPIs = client.getIPFS();
-//        ipfsAPIs.put("aaa");
+
     }
 
     @Test
@@ -114,7 +118,7 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testGetBuffer() {
-        CompletableFuture<byte[]> completableFuture = ipfsAPIs.getFileToBuffer(cid);
+        CompletableFuture<byte[]> completableFuture = ipfsAPIs.getFileBuffer(cid);
         try {
             byte[] buffer = completableFuture.get();
             String result = new String(buffer);
@@ -128,10 +132,9 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testGetStringBuffer() {
-        CompletableFuture<StringBuffer> completableFuture = ipfsAPIs.getFileToStringBuffer(cid);
+        CompletableFuture<String> completableFuture = ipfsAPIs.getFileString(cid);
         try {
-            StringBuffer buffer = completableFuture.get();
-            String result = new String(buffer);
+            String result = completableFuture.get();
             System.out.println(result);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -142,14 +145,21 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testGetWriter() {
-        CompletableFuture<Writer> completableFuture = ipfsAPIs.getFileToWriter(cid);
+        CompletableFuture<Reader> completableFuture = ipfsAPIs.getFileReader(cid);
         try {
-            Writer writer = completableFuture.get();
-
-            System.out.println(writer.toString());
+            Reader reader = completableFuture.get();
+            BufferedReader in = new BufferedReader(reader);
+            StringBuffer buffer = new StringBuffer();
+            String line = "";
+            while ((line = in.readLine()) != null) {
+                buffer.append(line);
+            }
+            System.out.println(buffer.toString());
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -157,10 +167,32 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testGetOutputStream() {
-        CompletableFuture<OutputStream> completableFuture = ipfsAPIs.getFileToOutputStream(cid);
+        CompletableFuture<InputStream> completableFuture = ipfsAPIs.getFileStream(cid);
         try {
-            OutputStream outputStream = completableFuture.get();
+            InputStream inputStream = completableFuture.get();
+            StringBuffer out = new StringBuffer();
+            byte[] b = new byte[1024];
+            for (int n; (n = inputStream.read(b)) != -1; ) {
+                out.append(new String(b, 0, n));
+            }
 
+            System.out.println(out.toString());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testGetOutput() {
+        OutputStream outputStream = new ByteArrayOutputStream();
+        CompletableFuture<Long> completableFuture = ipfsAPIs.get(cid, outputStream);
+        try {
+            long length = completableFuture.get();
+            System.out.println(length);
             System.out.println(outputStream.toString());
         } catch (InterruptedException e) {
             e.printStackTrace();
