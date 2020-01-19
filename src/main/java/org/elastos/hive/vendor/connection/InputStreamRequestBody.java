@@ -25,10 +25,14 @@ public class InputStreamRequestBody extends RequestBody {
         this.contentType = contentType;
         this.inputStream = inputStream;
     }
+    public long contentLength() {
+        return 0;
+    }
+
 
     @Override
     public MediaType contentType() {
-        return contentType;
+        return MediaType.parse("application/octet-stream");
     }
 
     @Override

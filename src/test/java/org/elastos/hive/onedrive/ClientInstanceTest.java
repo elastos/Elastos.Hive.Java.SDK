@@ -1,5 +1,6 @@
 package org.elastos.hive.onedrive;
 
+import org.elastos.hive.Authenticator;
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.vendor.onedrive.OneDriveOptions;
@@ -8,7 +9,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.awt.Desktop;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -24,13 +27,25 @@ public class ClientInstanceTest {
     @Test
     public void testCreateInstance() {
         try {
+            Authenticator authenticator = requestUrl -> {
+                try {
+                    Desktop.getDesktop().browse(new URI(requestUrl));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            };
+
             Client.Options options = new OneDriveOptions
                     .Builder()
                     .setStorePath(STORE_PATH)
                     .setClientId(CLIENTID)
                     .setRedirectUrl(REDIRECTURL)
+                    .setAuthenticator(authenticator)
                     .build();
             assertNotNull(options);
+
 
             Client client = Client.createInstance(options);
             assertNotNull(client);

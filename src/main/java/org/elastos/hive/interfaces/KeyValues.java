@@ -26,7 +26,7 @@ public interface KeyValues {
 
     CompletableFuture<ArrayList<byte[]>> getValues(String key, Callback<ArrayList<byte[]>> callback);
 
-    CompletableFuture<Void> delete(String key);
+    CompletableFuture<Void> deleteKey(String key);
 
-    CompletableFuture<Void> delete(String key, Callback<Void> callback);
+    CompletableFuture<Void> deleteKey(String key, Callback<Void> callback);
 }
