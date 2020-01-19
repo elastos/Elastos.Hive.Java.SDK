@@ -30,21 +30,21 @@ public interface Files {
 
     CompletableFuture<Long> size(String remoteFile, Callback<Long> callback);
 
-    CompletableFuture<StringBuffer> getStringBuffer(String remoteFile);
+    CompletableFuture<String> getAsString(String remoteFile);
 
-    CompletableFuture<StringBuffer> getStringBuffer(String remoteFile, Callback<StringBuffer> callback);
+    CompletableFuture<String> getAsString(String remoteFile, Callback<String> callback);
 
-    CompletableFuture<byte[]> get(String remoteFile);
+    CompletableFuture<byte[]> getAsBuffer(String remoteFile);
 
-    CompletableFuture<byte[]> get(String remoteFile, Callback<byte[]> callback);
+    CompletableFuture<byte[]> getAsBuffer(String remoteFile, Callback<byte[]> callback);
 
-    CompletableFuture<OutputStream> getOutputStream(String remoteFile);
+    CompletableFuture<Long> get(String remoteFile, OutputStream output);
 
-    CompletableFuture<OutputStream> getOutputStream(String remoteFile, Callback<OutputStream> callback);
+    CompletableFuture<Long> get(String remoteFile, OutputStream output, Callback<Long> callback);
 
-    CompletableFuture<Writer> getWriter(String remoteFile);
+    CompletableFuture<Long> get(String remoteFile, Writer writer);
 
-    CompletableFuture<Writer> getWriter(String remoteFile, Callback<Writer> callback);
+    CompletableFuture<Long> get(String remoteFile, Writer writer, Callback<Long> callback);
 
     CompletableFuture<Void> delete(String remoteFile);
 
@@ -53,4 +53,5 @@ public interface Files {
     CompletableFuture<ArrayList<String>> list();
 
     CompletableFuture<ArrayList<String>> list(Callback<ArrayList<String>> callback);
+
 }

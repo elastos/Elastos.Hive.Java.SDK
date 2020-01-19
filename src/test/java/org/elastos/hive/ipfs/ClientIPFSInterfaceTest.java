@@ -9,18 +9,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.CharBuffer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -29,9 +24,10 @@ import static org.junit.Assert.fail;
 public class ClientIPFSInterfaceTest {
     private static Client client;
     private static final String STORE_PATH = System.getProperty("user.dir");
-    static IPFS ipfsAPIs;
+    private static IPFS ipfsAPIs;
 
     String cid = "QmaY6wjwnybJgd5F4FD6pPL6h9vjXrGv2BJbxxUC1ojUbQ";
+
     String filePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
 
     @Test
@@ -118,7 +114,7 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testGetBuffer() {
-        CompletableFuture<byte[]> completableFuture = ipfsAPIs.getFileBuffer(cid);
+        CompletableFuture<byte[]> completableFuture = ipfsAPIs.getAsBuffer(cid);
         try {
             byte[] buffer = completableFuture.get();
             String result = new String(buffer);
@@ -132,56 +128,14 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testGetStringBuffer() {
-        CompletableFuture<String> completableFuture = ipfsAPIs.getFileString(cid);
+        CompletableFuture<String> completableFuture = ipfsAPIs.getAsString(cid);
         try {
             String result = completableFuture.get();
+            System.out.println("result="+result);
             System.out.println(result);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testGetWriter() {
-        CompletableFuture<Reader> completableFuture = ipfsAPIs.getFileReader(cid);
-        try {
-            Reader reader = completableFuture.get();
-            BufferedReader in = new BufferedReader(reader);
-            StringBuffer buffer = new StringBuffer();
-            String line = "";
-            while ((line = in.readLine()) != null) {
-                buffer.append(line);
-            }
-            System.out.println(buffer.toString());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    @Test
-    public void testGetOutputStream() {
-        CompletableFuture<InputStream> completableFuture = ipfsAPIs.getFileStream(cid);
-        try {
-            InputStream inputStream = completableFuture.get();
-            StringBuffer out = new StringBuffer();
-            byte[] b = new byte[1024];
-            for (int n; (n = inputStream.read(b)) != -1; ) {
-                out.append(new String(b, 0, n));
-            }
-
-            System.out.println(out.toString());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }

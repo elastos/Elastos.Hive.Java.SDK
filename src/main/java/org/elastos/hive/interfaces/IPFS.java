@@ -29,21 +29,13 @@ public interface IPFS {
 
     CompletableFuture<Long> size(String cid, Callback<Long> callback);
 
-    CompletableFuture<String> getFileString(String cid);
+    CompletableFuture<String> getAsString(String cid);
 
-    CompletableFuture<String> getFileString(String cid, Callback<String> callback);
+    CompletableFuture<String> getAsString(String cid, Callback<String> callback);
 
-    CompletableFuture<byte[]> getFileBuffer(String cid);
+    CompletableFuture<byte[]> getAsBuffer(String cid);
 
-    CompletableFuture<byte[]> getFileBuffer(String cid, Callback<byte[]> callback);
-
-    CompletableFuture<InputStream> getFileStream(String cid);
-
-    CompletableFuture<InputStream> getFileStream(String cid, Callback<InputStream> callback);
-
-    CompletableFuture<Reader> getFileReader(String cid);
-
-    CompletableFuture<Reader> getFileReader(String cid, Callback<Reader> callback);
+    CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback);
 
     CompletableFuture<Long> get(String cid, OutputStream output);
 

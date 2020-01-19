@@ -25,12 +25,16 @@ public class ClientConnectTest {
     public void testConnect() {
         try {
             assertFalse(client.isConnected());
+            System.out.println(client.isConnected());
+
 
             client.connect();
             assertTrue(client.isConnected());
+            System.out.println(client.isConnected());
 
             client.disconnect();
             assertFalse(client.isConnected());
+            System.out.println(client.isConnected());
 
         } catch (HiveException e) {
             fail(e.getMessage());
@@ -63,6 +67,7 @@ public class ClientConnectTest {
 
     @AfterClass
     public static void tearDown() {
+        client.disconnect();
         client = null;
     }
 }

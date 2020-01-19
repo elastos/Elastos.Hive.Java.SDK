@@ -14,6 +14,7 @@ import org.elastos.hive.vendor.ipfs.network.model.AddFileResponse;
 import org.elastos.hive.vendor.ipfs.network.model.ListFileResponse;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,6 +26,7 @@ import java.util.concurrent.CompletableFuture;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okio.Buffer;
 import retrofit2.Response;
 
 
@@ -129,46 +131,25 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     @Override
-    public CompletableFuture<String> getFileString(String cid) {
-        return getFileString(cid, new NullCallback<>());
+    public CompletableFuture<String> getAsString(String cid) {
+        return getAsString(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> getFileString(String cid, Callback<String> callback) {
+    public CompletableFuture<String> getAsString(String cid, Callback<String> callback) {
         // TODO:
         return doGetFileStr(cid, callback);
     }
 
     @Override
-    public CompletableFuture<byte[]> getFileBuffer(String cid) {
-        return getFileBuffer(cid, new NullCallback<>());
+    public CompletableFuture<byte[]> getAsBuffer(String cid) {
+        return getAsBuffer(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<byte[]> getFileBuffer(String cid, Callback<byte[]> callback) {
+    public CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback) {
         // TODO:
         return doGetFileBuff(cid, callback);
-    }
-
-    @Override
-    public CompletableFuture<InputStream> getFileStream(String cid) {
-        return getFileStream(cid, new NullCallback<>());
-    }
-
-    @Override
-    public CompletableFuture<InputStream> getFileStream(String cid, Callback<InputStream> callback) {
-        // TODO:
-        return doGetFileStream(cid, callback);
-    }
-
-    @Override
-    public CompletableFuture<Reader> getFileReader(String cid) {
-        return getFileReader(cid, new NullCallback<>());
-    }
-
-    @Override
-    public CompletableFuture<Reader> getFileReader(String cid, Callback<Reader> callback) {
-        return doGetFileReader(cid, callback);
     }
 
     @Override
@@ -188,7 +169,7 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback) {
-        return doWriteToWriter(cid, writer,callback);
+        return doWriteToWriter(cid, writer, callback);
     }
 
     ////
@@ -228,17 +209,21 @@ final class IPFSClient extends Client implements IPFS {
         return body;
     }
 
-    private MultipartBody.Part createBufferRequestBody(InputStream inputStream) {
-        RequestBody requestBody = new InputStreamRequestBody(null, inputStream);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("file", "data", requestBody);
-        return body;
+    private MultipartBody.Part createBufferRequestBody(InputStream inputStream) throws IOException {
+        Buffer buffer = new Buffer();
+        byte[] cache = new byte[1024];
+        int length = 0;
+        while ((length = inputStream.read(cache)) != -1) {
+            buffer.write(cache, 0, length);
+        }
+        return createBufferRequestBody(buffer.readByteArray());
     }
 
     private MultipartBody.Part createBufferRequestBody(Reader reader) throws IOException {
         return createBufferRequestBody(transReader(reader).toString().getBytes());
     }
 
-    static StringBuffer transReader(Reader reader) throws IOException {
+    private StringBuffer transReader(Reader reader) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(reader);
         StringBuffer stringBuffer = new StringBuffer();
         String line;
