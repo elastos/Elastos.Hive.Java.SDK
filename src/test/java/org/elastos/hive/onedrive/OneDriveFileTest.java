@@ -435,7 +435,7 @@ public class OneDriveFileTest {
     @Test
     public void testGetString() {
         try {
-            String result = onedriveFileApi.getAsString("testBuffer.txt").get();
+            String result = onedriveFileApi.getAsString("testbuffer.txt").get();
             System.out.println(result);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -447,7 +447,7 @@ public class OneDriveFileTest {
     @Test
     public void testGetBuffer() {
         try {
-            byte[] result = onedriveFileApi.getAsBuffer("testBuffer.txt").get();
+            byte[] result = onedriveFileApi.getAsBuffer("testbuffer.txt").get();
             String resultStr = new String(result);
             System.out.println(resultStr);
         } catch (InterruptedException e) {
@@ -460,7 +460,7 @@ public class OneDriveFileTest {
     @Test
     public void testGetLength() {
         try {
-            long size = onedriveFileApi.size("testBuffer.txt").get();
+            long size = onedriveFileApi.size("testbuffer.txt").get();
             System.out.println(size);
         } catch (InterruptedException e) {
             e.printStackTrace();

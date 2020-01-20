@@ -51,6 +51,7 @@ public class HiveException extends Exception {
 
     public static final String CONNECT_ERROR = "Connect error.";
 
+    public static final String ERROR = "Error";
 
     public HiveException() {
         super();

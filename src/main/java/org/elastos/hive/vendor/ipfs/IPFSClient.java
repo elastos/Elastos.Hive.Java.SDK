@@ -415,6 +415,7 @@ final class IPFSClient extends Client implements IPFS {
         clientThreadPool.execute(() -> {
             try {
                 Response response = getFileOrBuffer(cid);
+                System.out.println(Thread.currentThread().getName());
                 if (response != null) {
                     long length = ResponseHelper.writeOutput(response, outputStream);
                     if (callback != null) callback.onSuccess(length);
