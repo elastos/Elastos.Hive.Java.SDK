@@ -47,332 +47,427 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 public class OneDriveAuthHelper implements AuthHelper {
-	private static final String clientIdKey 		= "client_id";
-	private static final String accessTokenKey 		= "access_token";
-	private static final String refreshTokenKey 	= "refresh_token";
-	private static final String expireAtKey 		= "expires_at";
+    private static final String clientIdKey = "client_id";
+    private static final String accessTokenKey = "access_token";
+    private static final String refreshTokenKey = "refresh_token";
+    private static final String expireAtKey = "expires_at";
 
-	private final String clientId;
-	private final String scope;
-	private final String redirectUrl;
+    private final String clientId;
+    private final String scope;
+    private final String redirectUrl;
 
-	private final Persistent persistent;
-	private AuthToken token;
-	AtomicBoolean connectState = new AtomicBoolean(false);
+    private final Persistent persistent;
+    private AuthToken token;
+    AtomicBoolean connectState = new AtomicBoolean(false);
 
-	OneDriveAuthHelper(String clientId , String scope , String redirectUrl , String persistentStorePath) {
-		this.clientId = clientId ;
-		this.scope = scope ;
-		this.redirectUrl = redirectUrl ;
-		this.persistent = new AuthInfoStoreImpl(persistentStorePath);
+    OneDriveAuthHelper(String clientId, String scope, String redirectUrl, String persistentStorePath) {
+        this.clientId = clientId;
+        this.scope = scope;
+        this.redirectUrl = redirectUrl;
+        this.persistent = new AuthInfoStoreImpl(persistentStorePath);
 
-		try {
-			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-			ConnectionManager.resetAuthApi(OneDriveConstance.ONE_DRIVE_AUTH_BASE_URL, config);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        try {
+            BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+            ConnectionManager.resetAuthApi(OneDriveConstance.ONE_DRIVE_AUTH_BASE_URL, config);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @Override
+    public CompletableFuture<Void> loginAsync(Authenticator authenticator) {
+        return loginAsync(authenticator, new NullCallback<>());
+    }
 
-	@Override
-	public AuthToken getToken() {
-		return token;
-	}
+    @Override
+    public CompletableFuture<Void> loginAsync(Authenticator authenticator,
+                                              Callback<Void> callback) {
+        CompletableFuture future = CompletableFuture.runAsync(() -> {
+            try {
+                doLogin(authenticator);
+                callback.onSuccess(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                HiveException hiveException = new HiveException(e.getLocalizedMessage());
+                callback.onError(hiveException);
+            }
+        });
+        return future;
+    }
 
-	@Override
-	public CompletableFuture<Void> loginAsync(Authenticator authenticator) {
-		return loginAsync(authenticator, new NullCallback<Void>());
-	}
+    @Override
+    public CompletableFuture<Void> checkExpired() {
+        return checkExpired(new NullCallback<>());
+    }
 
-	@Override
-	public CompletableFuture<Void> loginAsync(Authenticator authenticator,
-		Callback<Void> callback) {
-		connectState.set(false);
+    @Override
+    public CompletableFuture<Void> checkExpired(Callback<Void> callback) {
+        CompletableFuture future = CompletableFuture.runAsync(() -> {
+            try {
+                doCheckExpired();
+                callback.onSuccess(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                HiveException hiveException = new HiveException(e.getLocalizedMessage());
+                callback.onError(hiveException);
+            }
+        });
+
+        return future;
+    }
+
+    private void doCheckExpired() throws Exception {
+        connectState.set(false);
+        System.out.println("doCheckExpired ="+Thread.currentThread().getName());
+        if (token == null) {
+            throw new HiveException("Please login first");
+        }
+        if (token.isExpired())
+            redeemToken();
+        connectState.set(true);
+    }
+//    @Override
+//    public CompletableFuture<Void> checkExpired(Callback<Void> callback) {
+//	    CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+//            if (token == null) {
+//                HiveException e = new HiveException("Please login first");
+//                callback.onError(e);
+////                throw e;
+//                return;
+//            }
+//
+//            if (token.isExpired())
+//                return redeemToken(callback);
+//        });
+//        connectState.set(false);
+//        CompletableFuture<Void> future = new CompletableFuture<Void>();
+//        Void padding = null;
+//
+//        if (token == null) {
+//            HiveException e = new HiveException("Please login first");
+//            callback.onError(e);
+//            future.completeExceptionally(e);
+//            return future;
+//        }
+//
+//        if (token.isExpired())
+//            return redeemToken(callback);
+//
+//        callback.onSuccess(padding);
+//        future.complete(padding);
+//        connectState.set(true);
+//        return future;
+//    }
+
+    private void doLogin(Authenticator authenticator) throws Exception {
+        connectState.set(false);
+        tryRestoreToken();
+        System.out.println(Thread.currentThread().getName());
+        if (token != null) {
+            long current = System.currentTimeMillis() / 1000;
+            //Check the expire time
+            if (token.getExpiredTime() > current) {
+                connectState.set(true);
+                return;
+            }
+            redeemToken();
+            connectState.set(true);
+            return;
+        }
+
+        String authCode = accessAuthCode(authenticator);
+        accessToken(authCode);
+        connectState.set(true);
+    }
+
+    private String accessAuthCode(Authenticator authenticator) throws Exception {
+        Semaphore semph = new Semaphore(1);
+
+        System.out.println("ttt = " + Thread.currentThread().getName());
+        String hostUrl = redirectUrl;
+        String[] hostAndPort = UrlUtil.decodeHostAndPort(hostUrl, OneDriveConstance.DEFAULT_REDIRECT_URL, String.valueOf(OneDriveConstance.DEFAULT_REDIRECT_PORT));
+
+        String host = hostAndPort[0];
+        int port = Integer.valueOf(hostAndPort[1]);
+
+        AuthServer server = new AuthServer(semph, host, port);
+        server.start();
+
+        String url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
+                OneDriveConstance.ONE_DRIVE_AUTH_URL,
+                OneDriveConstance.AUTHORIZE,
+                clientId,
+                scope,
+                redirectUrl)
+                .replace(" ", "%20");
+
+        authenticator.requestAuthentication(url);
+        semph.acquire();
+
+        String authCode = server.getAuthCode();
+        server.stop();
+
+        semph.release();
+        connectState.set(true);
+        return authCode;
+    }
+
+    private void accessToken(String authCode) throws Exception {
+        Response response = ConnectionManager.getAuthApi()
+                .getToken(clientId, authCode,
+                        redirectUrl, OneDriveConstance.GRANT_TYPE_GET_TOKEN)
+                .execute();
+        handleTokenResponse(response);
+    }
+
+    private void redeemToken() throws Exception {
+        Response response = ConnectionManager.getAuthApi()
+                .refreshToken(clientId, redirectUrl,
+                        token.getRefreshToken(), OneDriveConstance.GRANT_TYPE_REFRESH_TOKEN)
+                .execute();
+        handleTokenResponse(response);
+    }
+
+    private void handleTokenResponse(Response response) throws Exception {
+        TokenResponse tokenResponse = (TokenResponse) response.body();
+        long experitime = System.currentTimeMillis() / 1000 + tokenResponse.getExpires_in();
+
+        token = new AuthToken(tokenResponse.getRefresh_token(),
+                tokenResponse.getAccess_token(),
+                experitime);
+
+        //Store the local data.
+        writebackToken();
+
+        HeaderConfig headerConfig = new HeaderConfig.Builder()
+                .authToken(token)
+                .build();
+        BaseServiceConfig baseServiceConfig = new BaseServiceConfig.Builder()
+                .headerConfig(headerConfig)
+                .build();
+        ConnectionManager.resetOneDriveApi(
+                OneDriveConstance.ONE_DRIVE_API_BASE_URL,
+                baseServiceConfig);
+    }
 
 
-		tryRestoreToken();
+//	private CompletableFuture<String> accessAuthCode(Authenticator authenticator) {
+//		CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+//			Semaphore semph = new Semaphore(1);
+//
+//			System.out.println("ttt = "+Thread.currentThread().getName());
+//			String hostUrl = redirectUrl ;
+//			String[] hostAndPort = UrlUtil.decodeHostAndPort(hostUrl , OneDriveConstance.DEFAULT_REDIRECT_URL , String.valueOf(OneDriveConstance.DEFAULT_REDIRECT_PORT));
+//
+//			String host = hostAndPort[0] ;
+//			int port = Integer.valueOf(hostAndPort[1]) ;
+//
+//			AuthServer server = new AuthServer(semph, host , port);
+//			try {
+//				server.start();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//
+//			String url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
+//								OneDriveConstance.ONE_DRIVE_AUTH_URL,
+//								OneDriveConstance.AUTHORIZE,
+//								clientId,
+//								scope,
+//								redirectUrl)
+//						.replace(" ", "%20");
+//
+//			authenticator.requestAuthentication(url);
+//
+//			try {
+//				semph.acquire();
+//			}catch (InterruptedException e) {
+//				e.printStackTrace();
+//				// TODO: error
+//			}
+//
+//			String authCode = server.getAuthCode();
+//			try{
+//				server.stop();
+//			}catch (Exception e){
+//				// TODO;
+//			}
+//
+//			semph.release();
+//			connectState.set(true);
+//			return authCode;
+//		});
+//
+//		return future;
+//	}
 
-		if (token != null) {
-			long current = System.currentTimeMillis() / 1000;
-			//Check the expire time
-			if (token.getExpiredTime() > current) {
-				CompletableFuture<Void> future = new CompletableFuture<Void>();
-				Void placeHolder = null;
-			    callback.onSuccess(placeHolder);
-				future.complete(placeHolder);
-				connectState.set(true);
-				return future;
-			}
-			return redeemToken(callback);
-		}
+    private CompletableFuture<Void> accessToken(String authCode, Callback<Void> callback) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
 
-		return accessAuthCode(authenticator)
-				.thenCompose(code -> accessToken(code, callback));
-	}
+        try {
+            ConnectionManager.getAuthApi()
+                    .getToken(clientId, authCode,
+                            redirectUrl, OneDriveConstance.GRANT_TYPE_GET_TOKEN)
+                    .enqueue(new AuthCallback(future, callback, Type.GET_TOKEN));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return future;
+    }
 
-	@Override
-	public CompletableFuture<Void> logoutAsync() {
-		return logoutAsync(new NullCallback<Void>());
-	}
+    private CompletableFuture<Void> redeemToken(Callback<Void> callback) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        try {
+            ConnectionManager.getAuthApi()
+                    .refreshToken(clientId, redirectUrl,
+                            token.getRefreshToken(), OneDriveConstance.GRANT_TYPE_REFRESH_TOKEN)
+                    .enqueue(new AuthCallback(future, callback, Type.REDEEM_TOKEN));
+            connectState.set(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return future;
+    }
 
-	@Override
-	public CompletableFuture<Void> logoutAsync(Callback<Void> callback) {
-		CompletableFuture<Void> future = new CompletableFuture<Void>();
+    private void tryRestoreToken() {
+        try {
+            JSONObject json = persistent.parseFrom();
+            String refreshToken = null;
+            String accessToken = null;
+            long expiresAt = -1;
 
-		try {
-			ConnectionManager.getAuthApi()
-                    .logout(redirectUrl)
-                    .enqueue(new AuthCallback(future,callback,Type.LOGOUT));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            if (json.has(refreshTokenKey))
+                refreshToken = json.getString(refreshTokenKey);
+            if (json.has(accessTokenKey))
+                accessToken = json.getString(accessTokenKey);
+            if (json.has(expireAtKey))
+                expiresAt = json.getLong(expireAtKey);
 
-		return future;
-	}
+            if (refreshToken != null && accessToken != null && expiresAt > 0)
+                this.token = new AuthToken(refreshToken, accessToken, expiresAt);
+        } catch (Exception e) {
+            // TODO: Log output.
+        }
+    }
 
-	@Override
-	public CompletableFuture<Void> checkExpired() {
-		return checkExpired(new NullCallback<Void>());
-	}
+    private void clearToken() {
+        try {
+            JSONObject json = new JSONObject();
+            json.put(clientIdKey, clientId);
+            persistent.upateContent(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	@Override
-	public CompletableFuture<Void> checkExpired(Callback<Void> callback) {
-		connectState.set(false);
-		CompletableFuture<Void> future = new CompletableFuture<Void>();
-		Void padding = null;
+        token = null;
+    }
 
-		if (token == null) {
-			HiveException e = new HiveException("Please login first");
-			callback.onError(e);
-			future.completeExceptionally(e);
-			return future;
-		}
+    private void writebackToken() {
+        if (token == null)
+            return;
 
-		if (token.isExpired())
-			return redeemToken(callback);
+        try {
+            JSONObject json = new JSONObject();
+            json.put(clientIdKey, clientId);
+            json.put(refreshTokenKey, token.getRefreshToken());
+            json.put(refreshTokenKey, token.getAccessToken());
+            json.put(expireAtKey, token.getExpiredTime());
 
-	    callback.onSuccess(padding);
-		future.complete(padding);
-		connectState.set(true);
-		return future;
-	}
+            persistent.upateContent(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	private CompletableFuture<String> accessAuthCode(Authenticator authenticator) {
-		CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-			Semaphore semph = new Semaphore(1);
+    private class AuthCallback implements retrofit2.Callback {
 
-			String hostUrl = redirectUrl ;
-			String[] hostAndPort = UrlUtil.decodeHostAndPort(hostUrl , OneDriveConstance.DEFAULT_REDIRECT_URL , String.valueOf(OneDriveConstance.DEFAULT_REDIRECT_PORT));
+        private final CompletableFuture<Void> future;
+        private final Callback<Void> callback;
+        private Type type;
 
-			String host = hostAndPort[0] ;
-			int port = Integer.valueOf(hostAndPort[1]) ;
+        AuthCallback(CompletableFuture<Void> future, Callback<Void> callback, Type type) {
+            this.future = future;
+            this.callback = callback;
+            this.type = type;
+        }
 
-			AuthServer server = new AuthServer(semph, host , port);
-			try {
-				server.start();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+        @Override
+        public void onResponse(Call call, Response response) {
+            if (response.code() != 200) {
+                HiveException ex = new HiveException(response.message());
+                this.callback.onError(ex);
+                future.completeExceptionally(ex);
+                return;
+            }
 
-			String url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-								OneDriveConstance.ONE_DRIVE_AUTH_URL,
-								OneDriveConstance.AUTHORIZE,
-								clientId,
-								scope,
-								redirectUrl)
-						.replace(" ", "%20");
+            AuthToken token = null;
 
-			authenticator.requestAuthentication(url);
+            switch (type) {
+                case GET_TOKEN:
+                case REDEEM_TOKEN:
+                    TokenResponse tokenResponse = (TokenResponse) response.body();
+                    long experitime = System.currentTimeMillis() / 1000 + tokenResponse.getExpires_in();
 
-			try {
-				semph.acquire();
-			}catch (InterruptedException e) {
-				e.printStackTrace();
-				// TODO: error
-			}
+                    token = new AuthToken(tokenResponse.getRefresh_token(),
+                            tokenResponse.getAccess_token(),
+                            experitime);
 
-			String authCode = server.getAuthCode();
-			try{
-				server.stop();
-			}catch (Exception e){
-				// TODO;
-			}
+                    OneDriveAuthHelper.this.token = token;
 
-			semph.release();
-			connectState.set(true);
-			return authCode;
-		});
+                    //Store the local data.
+                    writebackToken();
 
-		return future;
-	}
+                    try {
+                        HeaderConfig headerConfig =
+                                new HeaderConfig.Builder()
+                                        .authToken(token)
+                                        .build();
+                        BaseServiceConfig baseServiceConfig =
+                                new BaseServiceConfig.Builder()
+                                        .headerConfig(headerConfig)
+                                        .build();
+                        ConnectionManager.resetOneDriveApi(
+                                OneDriveConstance.ONE_DRIVE_API_BASE_URL,
+                                baseServiceConfig);
+                    } catch (Exception e) {
+                        HiveException ex = new HiveException(e.getMessage());
+                        callback.onError(ex);
+                        future.completeExceptionally(ex);
+                        return;
+                    }
 
-	private CompletableFuture<Void> accessToken(String authCode, Callback<Void> callback) {
-		CompletableFuture<Void> future = new CompletableFuture<Void>();
+                    break;
 
-		try {
-			ConnectionManager.getAuthApi()
-					.getToken(clientId,authCode,
-                    redirectUrl, OneDriveConstance.GRANT_TYPE_GET_TOKEN)
-                    .enqueue(new AuthCallback(future,callback,Type.GET_TOKEN));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return future;
-	}
+                case LOGOUT:
+                    OneDriveAuthHelper.this.clearToken();
+                    break;
 
-	private CompletableFuture<Void> redeemToken(Callback<Void> callback) {
-		CompletableFuture<Void> future = new CompletableFuture<Void>();
-		try {
-			ConnectionManager.getAuthApi()
-                    .refreshToken(clientId,redirectUrl,
-                    token.getRefreshToken(), OneDriveConstance.GRANT_TYPE_REFRESH_TOKEN)
-                    .enqueue(new AuthCallback(future,callback,Type.REDEEM_TOKEN));
-			connectState.set(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return future;
-	}
+                default:
+                    break;
+            }
 
-	private void tryRestoreToken() {
-		try {
-			JSONObject json = persistent.parseFrom();
-			String refreshToken = null;
-			String accessToken = null;
-			long expiresAt = -1;
+            Void padding = null;
+            callback.onSuccess(padding);
+            future.complete(padding);
+        }
 
-			if (json.has(refreshTokenKey))
-				refreshToken = json.getString(refreshTokenKey);
-			if (json.has(accessTokenKey))
-				accessToken = json.getString(accessTokenKey);
-			if (json.has(expireAtKey))
-				expiresAt = json.getLong(expireAtKey);
+        @Override
+        public void onFailure(Call call, Throwable t) {
+            HiveException e = new HiveException(t.getMessage());
+            this.callback.onError(e);
+            future.completeExceptionally(e);
+        }
+    }
 
-			if (refreshToken != null && accessToken != null && expiresAt > 0)
-				this.token = new AuthToken(refreshToken, accessToken, expiresAt);
-		} catch (Exception e) {
-			// TODO: Log output.
-		}
-	}
+    private enum Type {
+        GET_TOKEN, REDEEM_TOKEN, LOGOUT
+    }
 
-	private void clearToken() {
-		try {
-			JSONObject json = new JSONObject();
-			json.put(clientIdKey, clientId);
-			persistent.upateContent(json);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    boolean getConnectState() {
+        return connectState.get();
+    }
 
-		token = null;
-	}
-
-	private void writebackToken() {
-		if (token == null)
-			return;
-
-		try {
-			JSONObject json = new JSONObject();
-			json.put(clientIdKey, clientId);
-			json.put(refreshTokenKey, token.getRefreshToken());
-			json.put(refreshTokenKey, token.getAccessToken());
-			json.put(expireAtKey, token.getExpiredTime());
-
-			persistent.upateContent(json);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private class AuthCallback implements retrofit2.Callback{
-
-		private final CompletableFuture<Void> future;
-		private final Callback<Void> callback;
-		private Type type ;
-
-		AuthCallback(CompletableFuture<Void> future, Callback<Void> callback , Type type){
-			this.future = future;
-			this.callback = callback;
-			this.type = type ;
-		}
-
-		@Override
-		public void onResponse(Call call, Response response) {
-			if (response.code() != 200){
-				HiveException ex = new HiveException(response.message());
-				this.callback.onError(ex);
-				future.completeExceptionally(ex);
-				return ;
-			}
-
-			AuthToken token = null ;
-
-			switch (type){
-				case GET_TOKEN:
-				case REDEEM_TOKEN:
-					TokenResponse tokenResponse = (TokenResponse) response.body();
-					long experitime = System.currentTimeMillis() / 1000 + tokenResponse.getExpires_in();
-
-					token = new AuthToken(tokenResponse.getRefresh_token(),
-							tokenResponse.getAccess_token(),
-							experitime);
-
-					OneDriveAuthHelper.this.token = token;
-
-					//Store the local data.
-					writebackToken();
-
-					try {
-						HeaderConfig headerConfig =
-								new HeaderConfig.Builder()
-										.authToken(token)
-										.build();
-						BaseServiceConfig baseServiceConfig =
-								new BaseServiceConfig.Builder()
-										.headerConfig(headerConfig)
-										.build();
-						ConnectionManager.resetOneDriveApi(
-								OneDriveConstance.ONE_DRIVE_API_BASE_URL,
-								baseServiceConfig);
-					} catch (Exception e) {
-						HiveException ex = new HiveException(e.getMessage());
-						callback.onError(ex);
-						future.completeExceptionally(ex);
-						return;
-					}
-
-					break;
-
-				case LOGOUT:
-					OneDriveAuthHelper.this.clearToken();
-					break;
-
-				default:
-					break;
-			}
-
-			Void padding = null;
-		    callback.onSuccess(padding);
-			future.complete(padding);
-		}
-
-		@Override
-		public void onFailure(Call call, Throwable t) {
-			HiveException e = new HiveException(t.getMessage());
-			this.callback.onError(e);
-			future.completeExceptionally(e);
-		}
-	}
-
-	private enum Type{
-		GET_TOKEN, REDEEM_TOKEN, LOGOUT
-	}
-
-	boolean getConnectState() {
-		return connectState.get();
-	}
-
-	void dissConnect() {
-		connectState.set(false);
-	}
+    void dissConnect() {
+        connectState.set(false);
+    }
 }

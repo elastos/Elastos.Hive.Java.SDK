@@ -303,7 +303,7 @@ public class OneDriveKVTest {
     @Test
     public void testPutString() {
         try {
-            onedriveKeyValueApi.putValue("testkey.txt", "test buffer").get();
+            onedriveKeyValueApi.putValue("testkey1.txt", "test buffer").get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

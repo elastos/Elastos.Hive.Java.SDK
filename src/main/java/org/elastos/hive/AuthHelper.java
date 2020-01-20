@@ -29,13 +29,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface AuthHelper {
     /**
-     * get AuthToken
-     *
-     * @return Current authtoken
-     */
-    AuthToken getToken();
-
-    /**
      * Login async with authenticator instance
      *
      * @param authenticator authenticator instance
@@ -51,21 +44,6 @@ public interface AuthHelper {
      * @return Returns 'Void' if the login succees
      */
     CompletableFuture<Void> loginAsync(Authenticator authenticator, Callback<Void> callback);
-
-    /**
-     * Logout account
-     *
-     * @return Returns `Void` if the logout succees
-     */
-    CompletableFuture<Void> logoutAsync();
-
-    /**
-     * Logout account
-     *
-     * @param callback Callback logoutAsync result
-     * @return Returns `Void` if the logout succees
-     */
-    CompletableFuture<Void> logoutAsync(Callback<Void> callback);
 
     /**
      * Check access token isExpired
