@@ -38,12 +38,10 @@ import org.elastos.hive.vendor.connection.model.HeaderConfig;
 import org.elastos.hive.vendor.onedrive.network.model.TokenResponse;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import retrofit2.Call;
 import retrofit2.Response;
 
 public class OneDriveAuthHelper implements AuthHelper {
@@ -126,38 +124,6 @@ public class OneDriveAuthHelper implements AuthHelper {
             redeemToken();
         connectState.set(true);
     }
-//    @Override
-//    public CompletableFuture<Void> checkExpired(Callback<Void> callback) {
-//	    CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-//            if (token == null) {
-//                HiveException e = new HiveException("Please login first");
-//                callback.onError(e);
-////                throw e;
-//                return;
-//            }
-//
-//            if (token.isExpired())
-//                return redeemToken(callback);
-//        });
-//        connectState.set(false);
-//        CompletableFuture<Void> future = new CompletableFuture<Void>();
-//        Void padding = null;
-//
-//        if (token == null) {
-//            HiveException e = new HiveException("Please login first");
-//            callback.onError(e);
-//            future.completeExceptionally(e);
-//            return future;
-//        }
-//
-//        if (token.isExpired())
-//            return redeemToken(callback);
-//
-//        callback.onSuccess(padding);
-//        future.complete(padding);
-//        connectState.set(true);
-//        return future;
-//    }
 
     private void doLogin(Authenticator authenticator) throws Exception {
         connectState.set(false);
@@ -250,85 +216,6 @@ public class OneDriveAuthHelper implements AuthHelper {
                 baseServiceConfig);
     }
 
-
-//	private CompletableFuture<String> accessAuthCode(Authenticator authenticator) {
-//		CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-//			Semaphore semph = new Semaphore(1);
-//
-//			System.out.println("ttt = "+Thread.currentThread().getName());
-//			String hostUrl = redirectUrl ;
-//			String[] hostAndPort = UrlUtil.decodeHostAndPort(hostUrl , OneDriveConstance.DEFAULT_REDIRECT_URL , String.valueOf(OneDriveConstance.DEFAULT_REDIRECT_PORT));
-//
-//			String host = hostAndPort[0] ;
-//			int port = Integer.valueOf(hostAndPort[1]) ;
-//
-//			AuthServer server = new AuthServer(semph, host , port);
-//			try {
-//				server.start();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//
-//			String url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-//								OneDriveConstance.ONE_DRIVE_AUTH_URL,
-//								OneDriveConstance.AUTHORIZE,
-//								clientId,
-//								scope,
-//								redirectUrl)
-//						.replace(" ", "%20");
-//
-//			authenticator.requestAuthentication(url);
-//
-//			try {
-//				semph.acquire();
-//			}catch (InterruptedException e) {
-//				e.printStackTrace();
-//				// TODO: error
-//			}
-//
-//			String authCode = server.getAuthCode();
-//			try{
-//				server.stop();
-//			}catch (Exception e){
-//				// TODO;
-//			}
-//
-//			semph.release();
-//			connectState.set(true);
-//			return authCode;
-//		});
-//
-//		return future;
-//	}
-
-    private CompletableFuture<Void> accessToken(String authCode, Callback<Void> callback) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-
-        try {
-            ConnectionManager.getAuthApi()
-                    .getToken(clientId, authCode,
-                            redirectUrl, OneDriveConstance.GRANT_TYPE_GET_TOKEN)
-                    .enqueue(new AuthCallback(future, callback, Type.GET_TOKEN));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return future;
-    }
-
-    private CompletableFuture<Void> redeemToken(Callback<Void> callback) {
-        CompletableFuture<Void> future = new CompletableFuture<>();
-        try {
-            ConnectionManager.getAuthApi()
-                    .refreshToken(clientId, redirectUrl,
-                            token.getRefreshToken(), OneDriveConstance.GRANT_TYPE_REFRESH_TOKEN)
-                    .enqueue(new AuthCallback(future, callback, Type.REDEEM_TOKEN));
-            connectState.set(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return future;
-    }
-
     private void tryRestoreToken() {
         try {
             JSONObject json = persistent.parseFrom();
@@ -350,6 +237,7 @@ public class OneDriveAuthHelper implements AuthHelper {
         }
     }
 
+    //When logout use this function
     private void clearToken() {
         try {
             JSONObject json = new JSONObject();
@@ -377,90 +265,6 @@ public class OneDriveAuthHelper implements AuthHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private class AuthCallback implements retrofit2.Callback {
-
-        private final CompletableFuture<Void> future;
-        private final Callback<Void> callback;
-        private Type type;
-
-        AuthCallback(CompletableFuture<Void> future, Callback<Void> callback, Type type) {
-            this.future = future;
-            this.callback = callback;
-            this.type = type;
-        }
-
-        @Override
-        public void onResponse(Call call, Response response) {
-            if (response.code() != 200) {
-                HiveException ex = new HiveException(response.message());
-                this.callback.onError(ex);
-                future.completeExceptionally(ex);
-                return;
-            }
-
-            AuthToken token = null;
-
-            switch (type) {
-                case GET_TOKEN:
-                case REDEEM_TOKEN:
-                    TokenResponse tokenResponse = (TokenResponse) response.body();
-                    long experitime = System.currentTimeMillis() / 1000 + tokenResponse.getExpires_in();
-
-                    token = new AuthToken(tokenResponse.getRefresh_token(),
-                            tokenResponse.getAccess_token(),
-                            experitime);
-
-                    OneDriveAuthHelper.this.token = token;
-
-                    //Store the local data.
-                    writebackToken();
-
-                    try {
-                        HeaderConfig headerConfig =
-                                new HeaderConfig.Builder()
-                                        .authToken(token)
-                                        .build();
-                        BaseServiceConfig baseServiceConfig =
-                                new BaseServiceConfig.Builder()
-                                        .headerConfig(headerConfig)
-                                        .build();
-                        ConnectionManager.resetOneDriveApi(
-                                OneDriveConstance.ONE_DRIVE_API_BASE_URL,
-                                baseServiceConfig);
-                    } catch (Exception e) {
-                        HiveException ex = new HiveException(e.getMessage());
-                        callback.onError(ex);
-                        future.completeExceptionally(ex);
-                        return;
-                    }
-
-                    break;
-
-                case LOGOUT:
-                    OneDriveAuthHelper.this.clearToken();
-                    break;
-
-                default:
-                    break;
-            }
-
-            Void padding = null;
-            callback.onSuccess(padding);
-            future.complete(padding);
-        }
-
-        @Override
-        public void onFailure(Call call, Throwable t) {
-            HiveException e = new HiveException(t.getMessage());
-            this.callback.onError(e);
-            future.completeExceptionally(e);
-        }
-    }
-
-    private enum Type {
-        GET_TOKEN, REDEEM_TOKEN, LOGOUT
     }
 
     boolean getConnectState() {
