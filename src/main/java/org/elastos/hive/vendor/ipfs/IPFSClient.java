@@ -9,12 +9,10 @@ import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.elastos.hive.vendor.connection.InputStreamRequestBody;
 import org.elastos.hive.vendor.ipfs.network.model.AddFileResponse;
 import org.elastos.hive.vendor.ipfs.network.model.ListFileResponse;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -138,7 +136,7 @@ final class IPFSClient extends Client implements IPFS {
     @Override
     public CompletableFuture<String> getAsString(String cid, Callback<String> callback) {
         // TODO:
-        return doGetFileStr(cid, callback);
+        return doGetAsStr(cid, callback);
     }
 
     @Override
@@ -149,7 +147,7 @@ final class IPFSClient extends Client implements IPFS {
     @Override
     public CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback) {
         // TODO:
-        return doGetFileBuff(cid, callback);
+        return doGetAsBuff(cid, callback);
     }
 
     @Override
@@ -174,30 +172,31 @@ final class IPFSClient extends Client implements IPFS {
 
     ////
     private CompletableFuture<String> doPutBuffer(byte[] data, Callback<String> callback) {
-        CompletableFuture<String> future = new CompletableFuture<>();
-        clientThreadPool.execute(() -> {
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            String result = null;
             try {
-                MultipartBody.Part requestBody = createBufferRequestBody(data);
-                Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
-                if (response == null || response.code() != 200) {
-                    HiveException exception = new HiveException(HiveException.PUT_BUFFER_ERROR);
-                    if (callback != null) callback.onError(exception);
-                    future.completeExceptionally(exception);
-                    return;
-                }
-
-                AddFileResponse addFileResponse = (AddFileResponse) response.body();
-                String cid = addFileResponse.getHash();
-                if (callback != null) callback.onSuccess(cid);
-                future.complete(cid);
+                result = putBufferImpl(data);
+                callback.onSuccess(result);
             } catch (Exception e) {
-                HiveException exception = new HiveException(HiveException.PUT_BUFFER_ERROR);
-                if (callback != null) callback.onError(exception);
-                future.completeExceptionally(exception);
                 e.printStackTrace();
+                callback.onError(new HiveException(e.getLocalizedMessage()));
             }
+            return result;
         });
         return future;
+    }
+
+    private String putBufferImpl(byte[] data) throws Exception {
+        if (data == null)
+            throw new HiveException("Data is null");
+
+        MultipartBody.Part requestBody = createBufferRequestBody(data);
+        Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
+        if (response == null || response.code() != 200)
+            throw new HiveException(HiveException.ERROR);
+
+        AddFileResponse addFileResponse = (AddFileResponse) response.body();
+        return addFileResponse.getHash();
     }
 
     private MultipartBody.Part createBufferRequestBody(byte[] data) {
@@ -245,244 +244,214 @@ final class IPFSClient extends Client implements IPFS {
 
 
     private CompletableFuture<String> doPutInputStream(InputStream inputStream, Callback callback) {
-        CompletableFuture future = new CompletableFuture();
-        clientThreadPool.execute(() -> {
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            String cid = null;
             try {
-                MultipartBody.Part requestBody = createBufferRequestBody(inputStream);
-                Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
-                if (response == null || response.code() != 200) {
-                    HiveException exception = new HiveException(HiveException.PUT_BUFFER_ERROR);
-                    if (callback != null) callback.onError(exception);
-                    future.completeExceptionally(exception);
-                    return;
-                }
-
-                AddFileResponse addFileResponse = (AddFileResponse) response.body();
-                String cid = addFileResponse.getHash();
-                if (callback != null) callback.onSuccess(cid);
-                future.complete(cid);
+                cid = putInputStreamImpl(inputStream);
+                callback.onSuccess(cid);
             } catch (Exception e) {
-                HiveException exception = new HiveException(HiveException.PUT_BUFFER_ERROR);
-                if (callback != null) callback.onError(exception);
-                future.completeExceptionally(exception);
                 e.printStackTrace();
+                callback.onError(new HiveException(e.getLocalizedMessage()));
             }
+            return cid;
         });
         return future;
+    }
+
+    private String putInputStreamImpl(InputStream inputStream) throws Exception {
+        if (inputStream == null)
+            throw new HiveException("Inputstream is null");
+
+        MultipartBody.Part requestBody = createBufferRequestBody(inputStream);
+        Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
+        if (response == null || response.code() != 200)
+            throw new HiveException(HiveException.ERROR);
+
+        AddFileResponse addFileResponse = (AddFileResponse) response.body();
+        return addFileResponse.getHash();
     }
 
     private CompletableFuture<String> doPutReader(Reader reader, Callback callback) {
-        CompletableFuture future = new CompletableFuture();
-        clientThreadPool.execute(() -> {
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            String cid = null;
             try {
-                MultipartBody.Part requestBody = createBufferRequestBody(reader);
-                Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
-                if (response == null || response.code() != 200) {
-                    HiveException exception = new HiveException(HiveException.PUT_BUFFER_ERROR);
-                    if (callback != null) callback.onError(exception);
-                    future.completeExceptionally(exception);
-                    return;
-                }
-
-                AddFileResponse addFileResponse = (AddFileResponse) response.body();
-                String cid = addFileResponse.getHash();
-                if (callback != null) callback.onSuccess(cid);
-                future.complete(cid);
+                cid = putReaderImpl(reader);
+                callback.onSuccess(cid);
             } catch (Exception e) {
-                HiveException exception = new HiveException(HiveException.PUT_BUFFER_ERROR);
-                if (callback != null) callback.onError(exception);
-                future.completeExceptionally(exception);
                 e.printStackTrace();
+                callback.onError(new HiveException(e.getLocalizedMessage()));
             }
+            return cid;
         });
 
         return future;
+    }
+
+    private String putReaderImpl(Reader reader) throws Exception {
+        if (reader == null)
+            throw new HiveException("Reader is null");
+
+        MultipartBody.Part requestBody = createBufferRequestBody(reader);
+        Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
+        if (response == null || response.code() != 200)
+            throw new HiveException(HiveException.ERROR);
+
+        AddFileResponse addFileResponse = (AddFileResponse) response.body();
+        return addFileResponse.getHash();
     }
 
     private CompletableFuture<Long> doGetFileLength(String cid, Callback<Long> callback) {
-        CompletableFuture<Long> future = new CompletableFuture();
-        clientThreadPool.execute(() -> {
-            long size = 0;
-            Response response = null;
+        CompletableFuture<Long> future = CompletableFuture.supplyAsync(() -> {
+            long length = 0;
             try {
-                response = ConnectionManager.getIPFSApi().listFile(cid).execute();
+                length = getFileLengthImpl(cid);
+                callback.onSuccess(length);
             } catch (Exception e) {
-                future.completeExceptionally(new HiveException(HiveException.GET_FILE_LENGTH_ERROR));
-            }
-            if (response == null || response.code() != 200) {
-                HiveException exception = new HiveException(HiveException.GET_FILE_LENGTH_ERROR);
-                if (callback != null) callback.onError(exception);
-                future.completeExceptionally(exception);
-                return;
-            }
-
-            ListFileResponse listFileResponse = (ListFileResponse) response.body();
-
-            HashMap<String, ListFileResponse.ObjectsBean.Bean> map = listFileResponse.getObjects();
-
-            if (null != map && map.size() > 0) {
-                for (String key : map.keySet()) {
-                    size = map.get(key).getSize();
-                    break;//if result only one
-                }
-                if (callback != null) callback.onSuccess(size);
-                future.complete(size);
-            } else {
-                HiveException exception = new HiveException(HiveException.GET_FILE_LENGTH_ERROR);
-                callback.onError(exception);
-                future.completeExceptionally(exception);
-            }
-        });
-
-        return future;
-    }
-
-    private CompletableFuture<String> doGetFileStr(String cid, Callback<String> callback) {
-        CompletableFuture<String> future = new CompletableFuture<>();
-        clientThreadPool.execute(() -> {
-            try {
-                Response response = getFileOrBuffer(cid);
-                if (response != null) {
-                    String result = ResponseHelper.getString(response);
-                    if (callback != null) callback.onSuccess(result);
-                    future.complete(result);
-                } else {
-                    HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                    if (callback != null) callback.onError(hiveException);
-                    future.completeExceptionally(hiveException);
-                }
-            } catch (Exception e) {
-                HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                if (callback != null) callback.onError(hiveException);
-                future.completeExceptionally(hiveException);
                 e.printStackTrace();
+                callback.onError(new HiveException(e.getLocalizedMessage()));
             }
+            return length;
         });
         return future;
     }
 
-    private CompletableFuture<byte[]> doGetFileBuff(String cid, Callback<byte[]> callback) {
-        CompletableFuture<byte[]> future = new CompletableFuture<>();
-        clientThreadPool.execute(() -> {
+    private long getFileLengthImpl(String cid) throws Exception {
+        if (cid == null || cid.equals(""))
+            throw new HiveException("CID is null");
+
+        long size = 0;
+        Response response = ConnectionManager.getIPFSApi().listFile(cid).execute();
+
+        if (response == null || response.code() != 200)
+            throw new HiveException(HiveException.ERROR);
+
+        ListFileResponse listFileResponse = (ListFileResponse) response.body();
+
+        HashMap<String, ListFileResponse.ObjectsBean.Bean> map = listFileResponse.getObjects();
+
+        if (map == null || map.size() <= 0)
+            throw new HiveException(HiveException.ERROR);
+
+        for (String key : map.keySet()) {
+            size = map.get(key).getSize();
+            break;//if result only one
+        }
+
+        return size;
+    }
+
+    private CompletableFuture<String> doGetAsStr(String cid, Callback<String> callback) {
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            String result = null;
             try {
-                Response response = getFileOrBuffer(cid);
-                if (response != null) {
-                    byte[] buffer = ResponseHelper.getBuffer(response);
-                    if (callback != null) callback.onSuccess(buffer);
-                    future.complete(buffer);
-                } else {
-                    HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                    if (callback != null) callback.onError(hiveException);
-                    future.completeExceptionally(hiveException);
-                }
+                result = getAsStrImpl(cid);
+                callback.onSuccess(result);
             } catch (Exception e) {
-                HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                if (callback != null) callback.onError(hiveException);
-                future.completeExceptionally(hiveException);
                 e.printStackTrace();
+                callback.onError(new HiveException(e.getLocalizedMessage()));
             }
+            return result;
         });
         return future;
     }
 
-    private CompletableFuture<InputStream> doGetFileStream(String cid, Callback<InputStream> callback) {
-        CompletableFuture<InputStream> future = new CompletableFuture<>();
-        clientThreadPool.execute(() -> {
-            try {
-                Response response = getFileOrBuffer(cid);
-                if (response != null) {
-                    InputStream inputStream = ResponseHelper.getStream(response);
-                    if (callback != null) callback.onSuccess(inputStream);
-                    future.complete(inputStream);
-                } else {
-                    HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                    if (callback != null) callback.onError(hiveException);
-                    future.completeExceptionally(hiveException);
-                }
-            } catch (Exception e) {
-                HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                if (callback != null) callback.onError(hiveException);
-                future.completeExceptionally(hiveException);
-                e.printStackTrace();
-            }
-        });
+    private String getAsStrImpl(String cid) throws Exception {
+        if (cid == null || cid.equals(""))
+            throw new HiveException("CID is null");
 
+        Response response = getFileOrBuffer(cid);
+
+        if (response == null || response.code() != 200)
+            throw new HiveException(HiveException.ERROR);
+
+        return ResponseHelper.getString(response);
+    }
+
+    private CompletableFuture<byte[]> doGetAsBuff(String cid, Callback<byte[]> callback) {
+        CompletableFuture<byte[]> future = CompletableFuture.supplyAsync(() -> {
+            byte[] result = new byte[0];
+            try {
+                result = getAsBufferImpl(cid);
+                callback.onSuccess(result);
+            } catch (HiveException e) {
+                e.printStackTrace();
+                callback.onError(new HiveException(e.getLocalizedMessage()));
+            }
+            return result;
+        });
         return future;
+    }
+
+    private byte[] getAsBufferImpl(String cid) throws HiveException {
+        if (cid == null || cid.equals(""))
+            throw new HiveException("CID is null");
+
+        Response response = getFileOrBuffer(cid);
+
+        if (response == null || response.code() != 200)
+            throw new HiveException(HiveException.ERROR);
+
+        return ResponseHelper.getBuffer(response);
     }
 
     private CompletableFuture<Long> doWriteToOutput(String cid, OutputStream outputStream, Callback<Long> callback) {
-        CompletableFuture<Long> future = new CompletableFuture<>();
-        clientThreadPool.execute(() -> {
+        CompletableFuture<Long> future = CompletableFuture.supplyAsync(() -> {
+            long length = 0;
             try {
-                Response response = getFileOrBuffer(cid);
-                System.out.println(Thread.currentThread().getName());
-                if (response != null) {
-                    long length = ResponseHelper.writeOutput(response, outputStream);
-                    if (callback != null) callback.onSuccess(length);
-                    future.complete(length);
-                } else {
-                    HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                    if (callback != null) callback.onError(hiveException);
-                    future.completeExceptionally(hiveException);
-                }
+                length = writeToOutputImpl(cid, outputStream);
+                callback.onSuccess(length);
             } catch (Exception e) {
-                HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                if (callback != null) callback.onError(hiveException);
-                future.completeExceptionally(hiveException);
                 e.printStackTrace();
+                callback.onError(new HiveException(e.getLocalizedMessage()));
             }
-        });
-
-        return future;
-    }
-
-
-    private CompletableFuture<Reader> doGetFileReader(String cid, Callback<Reader> callback) {
-        CompletableFuture<Reader> future = new CompletableFuture<>();
-        clientThreadPool.execute(() -> {
-            try {
-                Response response = getFileOrBuffer(cid);
-                if (response != null) {
-                    Reader reader = ResponseHelper.getReader(response);
-                    if (callback != null) callback.onSuccess(reader);
-                    future.complete(reader);
-                } else {
-                    HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                    if (callback != null) callback.onError(hiveException);
-                    future.completeExceptionally(hiveException);
-                }
-            } catch (Exception e) {
-                HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                if (callback != null) callback.onError(hiveException);
-                future.completeExceptionally(hiveException);
-                e.printStackTrace();
-            }
+            return length;
         });
         return future;
     }
 
-    private CompletableFuture<Long> doWriteToWriter(String cid, Writer writer, Callback<Long> callback) {
-        CompletableFuture<Long> future = new CompletableFuture<>();
-        clientThreadPool.execute(() -> {
+    private long writeToOutputImpl(String cid, OutputStream outputStream) throws Exception {
+        if (cid == null || cid.equals(""))
+            throw new HiveException("CID is null");
+
+        if (outputStream == null)
+            throw new HiveException("OutputStream is null");
+
+        Response response = getFileOrBuffer(cid);
+        if (response == null || response.code() != 200)
+            throw new HiveException(HiveException.ERROR);
+
+        return ResponseHelper.writeOutput(response, outputStream);
+    }
+
+    private CompletableFuture<Long> doWriteToWriter(String cid, Writer
+            writer, Callback<Long> callback) {
+        CompletableFuture<Long> future = CompletableFuture.supplyAsync(() -> {
+            long length = 0;
             try {
-                Response response = getFileOrBuffer(cid);
-                if (response != null) {
-                    long length = ResponseHelper.writeDataToWriter(response, writer);
-                    if (callback != null) callback.onSuccess(length);
-                    future.complete(length);
-                } else {
-                    HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                    if (callback != null) callback.onError(hiveException);
-                    future.completeExceptionally(hiveException);
-                }
+                length = writeToWriterImpl(cid, writer);
+                callback.onSuccess(length);
             } catch (Exception e) {
-                HiveException hiveException = new HiveException(HiveException.GET_FILE_ERROR);
-                if (callback != null) callback.onError(hiveException);
-                future.completeExceptionally(hiveException);
                 e.printStackTrace();
+                callback.onError(new HiveException(e.getLocalizedMessage()));
             }
+            return length;
         });
         return future;
+    }
+
+    private long writeToWriterImpl(String cid, Writer writer) throws Exception {
+        if (cid == null || cid.equals(""))
+            throw new HiveException("CID is null");
+
+        if (writer == null)
+            throw new HiveException("Writer is null");
+
+        Response response = getFileOrBuffer(cid);
+
+        if (response == null || response.code() != 200)
+            throw new HiveException(HiveException.ERROR);
+
+        return ResponseHelper.writeDataToWriter(response, writer);
     }
 
     private Response getFileOrBuffer(String cid) throws HiveException {
