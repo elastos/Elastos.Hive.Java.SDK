@@ -15,6 +15,7 @@ import org.junit.runners.MethodSorters;
 import java.awt.Desktop;
 import java.io.ByteArrayOutputStream;
 import java.io.CharArrayWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -75,8 +76,6 @@ public class OneDriveFileTest {
     public void test_101_PutString() {
         try {
             onedriveFileApi.put(testString, remoteStringFileName).get();
-            assertTrue(checkFileExist(remoteStringFileName));
-            checkFileContent(testString, remoteStringFileName);
         } catch (Exception e) {
             e.printStackTrace();
             assertNull(e);
@@ -88,8 +87,6 @@ public class OneDriveFileTest {
     public void test_102_PutBuffer() {
         try {
             onedriveFileApi.put(testBuffer, remoteBufferFileName).get();
-            assertTrue(checkFileExist(remoteBufferFileName));
-            checkFileContent(new String(testBuffer), remoteBufferFileName);
         } catch (Exception e) {
             e.printStackTrace();
             assertNull(e);
@@ -100,8 +97,6 @@ public class OneDriveFileTest {
     public void test_103_PutInputStream() {
         try {
             onedriveFileApi.put(createInputStream(testFilepath), remoteInputFileName).get();
-            assertTrue(checkFileExist(remoteInputFileName));
-            checkFileContent(readFromInputStream(createInputStream(testFilepath)), remoteInputFileName);
         } catch (Exception e) {
             e.printStackTrace();
             assertNull(e);
@@ -112,8 +107,6 @@ public class OneDriveFileTest {
     public void test_104_PutReader() {
         try {
             onedriveFileApi.put(createReader(stringReader), remoteReaderFileName).get();
-            assertTrue(checkFileExist(remoteReaderFileName));
-            checkFileContent(stringReader, remoteReaderFileName);
         } catch (Exception e) {
             e.printStackTrace();
             assertNull(e);
@@ -157,9 +150,11 @@ public class OneDriveFileTest {
     public void test_108_getOutput() {
         try {
             OutputStream outputStream = new ByteArrayOutputStream();
-            long size = onedriveFileApi.get(remoteStringFileName, outputStream).get();
-            assertEquals(testString, outputStream.toString());
-            assertEquals(testString.length(), size);
+            long size = onedriveFileApi.get(remoteInputFileName, outputStream).get();
+
+            File file = new File(testFilepath);
+            assertEquals(file.length(), size);
+            assertEquals(readFromInputStream(createInputStream(testFilepath)),outputStream.toString());
         } catch (Exception e) {
             e.printStackTrace();
             assertNull(e);
@@ -170,9 +165,9 @@ public class OneDriveFileTest {
     public void test_109_getWriter() {
         try {
             Writer writer = new CharArrayWriter();
-            long size = onedriveFileApi.get(remoteStringFileName, writer).get();
-            assertEquals(testString, writer.toString());
-            assertEquals(testString.length(), size);
+            long size = onedriveFileApi.get(remoteReaderFileName, writer).get();
+            assertEquals(stringReader, writer.toString());
+            assertEquals(stringReader.length(), size);
         } catch (Exception e) {
             e.printStackTrace();
             assertNull(e);
@@ -221,8 +216,6 @@ public class OneDriveFileTest {
 
                 @Override
                 public void onSuccess(Void result) {
-                    assertTrue(checkFileExist(remoteStringFileName));
-                    checkFileContent(testString, remoteStringFileName);
                 }
             });
             future.get();
@@ -243,8 +236,6 @@ public class OneDriveFileTest {
 
                 @Override
                 public void onSuccess(Void result) {
-                    assertTrue(checkFileExist(remoteBufferFileName));
-                    checkFileContent(new String(testBuffer), remoteBufferFileName);
                 }
             });
             future.get();
@@ -265,12 +256,6 @@ public class OneDriveFileTest {
 
                 @Override
                 public void onSuccess(Void result) {
-                    assertTrue(checkFileExist(remoteInputFileName));
-                    try {
-                        checkFileContent(readFromInputStream(createInputStream(testFilepath)), remoteInputFileName);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
                 }
             });
             future.get();
@@ -292,8 +277,6 @@ public class OneDriveFileTest {
 
                 @Override
                 public void onSuccess(Void result) {
-                    assertTrue(checkFileExist(remoteReaderFileName));
-                    checkFileContent(stringReader, remoteReaderFileName);
                 }
             });
             future.get();
@@ -370,7 +353,7 @@ public class OneDriveFileTest {
     public void test_208_getOutputAsync() {
         try {
             OutputStream outputStream = new ByteArrayOutputStream();
-            CompletableFuture future = onedriveFileApi.get(remoteStringFileName, outputStream, new Callback<Long>() {
+            CompletableFuture future = onedriveFileApi.get(remoteInputFileName, outputStream, new Callback<Long>() {
                 @Override
                 public void onError(HiveException e) {
                     assertNull(e);
@@ -378,8 +361,14 @@ public class OneDriveFileTest {
 
                 @Override
                 public void onSuccess(Long result) {
-                    assertEquals(testString, outputStream.toString());
-                    assertEquals(testString.length(), result.longValue());
+                    try {
+                        File file = new File(testFilepath);
+                        assertEquals(file.length(), result.longValue());
+                        assertEquals(readFromInputStream(createInputStream(testFilepath)),outputStream.toString());
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                        assertNull(e);
+                    }
                 }
             });
             future.get();
@@ -394,7 +383,7 @@ public class OneDriveFileTest {
     public void test_209_getWriterAsync() {
         try {
             Writer writer = new CharArrayWriter();
-            CompletableFuture future = onedriveFileApi.get(remoteStringFileName, writer, new Callback<Long>() {
+            CompletableFuture future = onedriveFileApi.get(remoteReaderFileName, writer, new Callback<Long>() {
                 @Override
                 public void onError(HiveException e) {
                     assertNull(e);
@@ -402,8 +391,8 @@ public class OneDriveFileTest {
 
                 @Override
                 public void onSuccess(Long result) {
-                    assertEquals(testString, writer.toString());
-                    assertEquals(testString.length(), result.longValue());
+                    assertEquals(stringReader, writer.toString());
+                    assertEquals(stringReader.length(), result.longValue());
                 }
             });
             future.get();
@@ -502,31 +491,6 @@ public class OneDriveFileTest {
     public static void tearDown() {
         hiveClient.disconnect();
         hiveClient = null;
-    }
-
-    private boolean checkFileExist(String remoteFile) {
-        try {
-            ArrayList<String> fileList = onedriveFileApi.list().get();
-            for (String fileName : fileList) {
-                if (fileName.equals(remoteFile)) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertNull(e);
-        }
-        return false;
-    }
-
-    private void checkFileContent(String expected, String remoteFile) {
-        try {
-            String actual = onedriveFileApi.getAsString(remoteFile).get();
-            assertEquals(expected, actual);
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertNull(e);
-        }
     }
 
     private String readFromInputStream(InputStream inputStream) {
