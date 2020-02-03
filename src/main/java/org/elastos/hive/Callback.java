@@ -38,9 +38,9 @@ public interface Callback<T> {
     /**
      * Callback when successful
      *
-     * @param body The information returned when the callback was successful<br>
+     * @param result The information returned when the callback was successful<br>
      *             for example:<br>
      *             Drive , Directory , File , Drive.Info ,Directory.Info , File.Info and so on.
      */
-    void onSuccess(T body);
+    void onSuccess(T result);
 }
