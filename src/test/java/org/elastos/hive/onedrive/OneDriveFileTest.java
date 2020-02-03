@@ -1,6 +1,7 @@
 package org.elastos.hive.onedrive;
 
 
+import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.Files;
@@ -12,23 +13,26 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.awt.Desktop;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.CharArrayWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
+import okio.Buffer;
+
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -38,307 +42,432 @@ public class OneDriveFileTest {
     private static final String REDIRECTURL = "http://localhost:12345";
     private static final String STORE_PATH = System.getProperty("user.dir");
     private String testFilepath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
-    private String storeFilepath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/storetest.txt";
 
-    private String testFileName = "testFile.txt";
-    private final long EXPECT_FILE_LENGTH = 17;
+    private String remoteBufferFileName = "testBuffer.txt";
+    private String remoteStringFileName = "testString.txt";
+    private String remoteInputFileName = "testInput.txt";
+    private String remoteReaderFileName = "testReader.txt";
 
-    private String testBufferFileName = "testBuffer.txt";
+    private byte[] testBuffer = "this is test for buffer".getBytes();
+    private String testString = "this is test for String";
 
-    private String testBufferString = "this is test for buffer";
-
+    private String stringReader = "this is test for reader";
 
     private static Client hiveClient;
+    private static Files onedriveFileApi;
 
-    private static Files onedriveFileApi ;
+    @Test
+    public void test_00_Prepare() {
+        try {
+            ArrayList<String> list = onedriveFileApi.list().get();
+            if (list == null || list.size() < 1)
+                return;
+            for (String fileName : list) {
+                onedriveFileApi.delete(fileName).get();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
 
-    //    @Test
-//    public void test_00_Prepare() {
-//        String[] result = null;
-//        try {
-//            FileList fileList = hiveConnect.listFile().get();
-//            result = fileList.getList();
-//            for (int i = 0 ; i<result.length ; i++){
-//                LogUtil.d("file = "+result[i]);
-//                assertNotNull(result[i]);
-//            }
-//            if (result==null || result.length<1) return;
-//
-//            for (String name :result){
-//                hiveConnect.deleteFile(name).get();
-//            }
-//
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    @Test
-//    public void test_01_PutFile() {
-//        try {
-//            hiveConnect.putFile(testFileName,testFilepath,false).get();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        }
-//    }
-//
-//    @Test
-//    public void test_11_PutFileAsync() {
-//        CompletableFuture future = hiveConnect.putFile(testFileName, testFilepath, false, new Callback<Void>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                assertNull(e);
-//            }
-//
-//            @Override
-//            public void onSuccess(Void body) {
-//                assertNotNull(body);
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//    @Test
-//    public void test_02_PutBuffer() {
-//        try {
-//            hiveConnect.putFileFromBuffer(testBufferFileName,testBufferString.getBytes() ,false).get();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        }
-//    }
-//
-//    @Test
-//    public void test_12_PutBufferAsync() {
-//        CompletableFuture future = hiveConnect.putFileFromBuffer(testBufferFileName, testBufferString.getBytes(), false, new Callback<Void>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                assertNull(e);
-//            }
-//
-//            @Override
-//            public void onSuccess(Void body) {
-//                assertNotNull(body);
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//    @Test
-//    public void test_03_FileLength(){
-//        try {
-//            Length length = hiveConnect.getFileLength(testFileName).get();
-//            LogUtil.d("length = "+length.getLength());
-//
-//            assertEquals(EXPECT_FILE_LENGTH,length.getLength());
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        }
-//    }
-//
-//    @Test
-//    public void test_13_FileLengthAsync(){
-//        CompletableFuture future = hiveConnect.getFileLength(testFileName, new Callback<Length>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                assertNull(e);
-//            }
-//
-//            @Override
-//            public void onSuccess(Length body) {
-//                assertNotNull(body);
-//                assertEquals(EXPECT_FILE_LENGTH,body.getLength());
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//    @Test
-//    public void test_04_GetFile(){
-//        File file = new File(storeFilepath);
-//        if (file.exists()) file.delete();
-//
-//        try {
-//            hiveConnect.getFile(testFileName,false,storeFilepath).get();
-//
-//            String expectMd5 = Md5CaculateUtil.getFileMD5(testFilepath);
-//            String actualMd5 = Md5CaculateUtil.getFileMD5(storeFilepath);
-//
-//            LogUtil.d("expectMd5 = "+expectMd5);
-//            LogUtil.d("actualMd5 = "+actualMd5);
-//
-//            assertEquals(expectMd5,actualMd5);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        }
-//    }
-//
-//    @Test
-//    public void test_14_GetFileAsync(){
-//        File file = new File(storeFilepath);
-//        if (file.exists()) file.delete();
-//
-//        CompletableFuture future = hiveConnect.getFile(testFileName, false, storeFilepath, new Callback<Length>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                assertNull(e);
-//            }
-//
-//            @Override
-//            public void onSuccess(Length body) {
-//                assertNotNull(body);
-//            }
-//        });
-//
-//        String expectMd5 = Md5CaculateUtil.getFileMD5(testFilepath);
-//        String actualMd5 = Md5CaculateUtil.getFileMD5(storeFilepath);
-//
-//        LogUtil.d("expectMd5 = "+expectMd5);
-//        LogUtil.d("actualMd5 = "+actualMd5);
-//
-//        assertEquals(expectMd5,actualMd5);
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//
-//    @Test
-//    public void test_05_GetFileBuffer(){
-//        try {
-//            Value data = hiveConnect.getFileToBuffer(testBufferFileName,false).get();
-//
-//            byte[] expectBytes = testBufferString.getBytes() ;
-//            byte[] actualBytes = data.getData();
-//
-//            Assert.assertArrayEquals(expectBytes,actualBytes);
-//
-//            String str = new String(data.getData());
-//            LogUtil.d("result = "+str);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        } catch (ExecutionException e) {
-//            assertNull(e);
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    @Test
-//    public void test_15_GetFileBufferAsync(){
-//        CompletableFuture future = hiveConnect.getFileToBuffer(testBufferFileName, false, new Callback<Value>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                assertNull(e);
-//            }
-//
-//            @Override
-//            public void onSuccess(Value body) {
-//                assertNotNull(body);
-//
-//                byte[] expectBytes = testBufferString.getBytes() ;
-//                byte[] actualBytes = body.getData();
-//
-//                Assert.assertArrayEquals(expectBytes,actualBytes);
-//
-//                String str = new String(body.getData());
-//                LogUtil.d("result = "+str);
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//
-//    @Test
-//    public void test_06_ListFiles(){
-//        try {
-//            FileList fileList = hiveConnect.listFile().get();
-//            String[] result = fileList.getList();
-//            for (int i = 0 ; i<result.length ; i++){
-//                LogUtil.d("file = "+result[i]);
-//                assertNotNull(result[i]);
-//            }
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//            assertNull(e);
-//        }
-//    }
-//
-//    @Test
-//    public void test_16_ListFilesAsync(){
-//        CompletableFuture future = hiveConnect.listFile(new Callback<FileList>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                assertNull(e);
-//            }
-//
-//            @Override
-//            public void onSuccess(FileList body) {
-//                String[] result = body.getList();
-//                for (int i = 0 ; i<result.length ; i++){
-//                    LogUtil.d("file = "+result[i]);
-//                    assertNotNull(result[i]);
-//                }
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//
-//    @Test
-//    public void test_07_DeleteFile(){
-//        try {
-//            Void result = hiveConnect.deleteFile(testFileName).get();
-//            assertNotNull(result);
-//        } catch (InterruptedException e) {
-//            assertNull(e);
-//            e.printStackTrace();
-//        } catch (ExecutionException e) {
-//            assertNull(e);
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    @Test
-//    public void test_17_DeleteFileAsync(){
-//        CompletableFuture future = hiveConnect.deleteFile(testFileName, new Callback() {
-//            @Override
-//            public void onError(HiveException e) {
-//                assertNull(e);
-//            }
-//
-//            @Override
-//            public void onSuccess(Result body) {
-//                assertNotNull(body);
-//            }
-//        });
-//        TestUtils.waitFinish(future);
-//    }
-//
+    @Test
+    public void test_101_PutString() {
+        try {
+            onedriveFileApi.put(testString, remoteStringFileName).get();
+            assertTrue(checkFileExist(remoteStringFileName));
+            checkFileContent(testString, remoteStringFileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+
+    @Test
+    public void test_102_PutBuffer() {
+        try {
+            onedriveFileApi.put(testBuffer, remoteBufferFileName).get();
+            assertTrue(checkFileExist(remoteBufferFileName));
+            checkFileContent(new String(testBuffer), remoteBufferFileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_103_PutInputStream() {
+        try {
+            onedriveFileApi.put(createInputStream(testFilepath), remoteInputFileName).get();
+            assertTrue(checkFileExist(remoteInputFileName));
+            checkFileContent(readFromInputStream(createInputStream(testFilepath)), remoteInputFileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_104_PutReader() {
+        try {
+            onedriveFileApi.put(createReader(stringReader), remoteReaderFileName).get();
+            assertTrue(checkFileExist(remoteReaderFileName));
+            checkFileContent(stringReader, remoteReaderFileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_105_Size() {
+        try {
+            long size = onedriveFileApi.size(remoteBufferFileName).get();
+            assertEquals(testBuffer.length, size);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_106_getAsString() {
+        try {
+            String result = onedriveFileApi.getAsString(remoteStringFileName).get();
+            assertEquals(testString, result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_107_getAsBuffer() {
+        try {
+            byte[] result = onedriveFileApi.getAsBuffer(remoteBufferFileName).get();
+            assertArrayEquals(testBuffer, result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_108_getOutput() {
+        try {
+            OutputStream outputStream = new ByteArrayOutputStream();
+            long size = onedriveFileApi.get(remoteStringFileName, outputStream).get();
+            assertEquals(testString, outputStream.toString());
+            assertEquals(testString.length(), size);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_109_getWriter() {
+        try {
+            Writer writer = new CharArrayWriter();
+            long size = onedriveFileApi.get(remoteStringFileName, writer).get();
+            assertEquals(testString, writer.toString());
+            assertEquals(testString.length(), size);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_110_list() {
+        try {
+            ArrayList<String> files = onedriveFileApi.list().get();
+            assertEquals(4, files.size());
+            for (String fileName : files) {
+                assertTrue(checkListFileName(fileName));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_111_Delete() {
+        try {
+            onedriveFileApi.delete(remoteStringFileName).get();
+            ArrayList<String> files = onedriveFileApi.list().get();
+            assertEquals(3, files.size());
+
+            for (String fileName : files) {
+                assertTrue(checkListFileNameAfterDel(fileName));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+
+    @Test
+    public void test_201_PutStringAsync() {
+        try {
+            CompletableFuture future = onedriveFileApi.put(testString, remoteStringFileName, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    assertTrue(checkFileExist(remoteStringFileName));
+                    checkFileContent(testString, remoteStringFileName);
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_202_PutBufferAsync() {
+        try {
+            CompletableFuture future = onedriveFileApi.put(testBuffer, remoteBufferFileName, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    assertTrue(checkFileExist(remoteBufferFileName));
+                    checkFileContent(new String(testBuffer), remoteBufferFileName);
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_203_PutInputStreamAsync() {
+        try {
+            CompletableFuture future = onedriveFileApi.put(createInputStream(testFilepath), remoteInputFileName, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    assertTrue(checkFileExist(remoteInputFileName));
+                    try {
+                        checkFileContent(readFromInputStream(createInputStream(testFilepath)), remoteInputFileName);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+
+    @Test
+    public void test_204_PutReaderAsync() {
+        try {
+            CompletableFuture future = onedriveFileApi.put(createReader(stringReader), remoteReaderFileName, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    assertTrue(checkFileExist(remoteReaderFileName));
+                    checkFileContent(stringReader, remoteReaderFileName);
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_205_SizeAsync() {
+        try {
+            CompletableFuture future = onedriveFileApi.size(remoteBufferFileName, new Callback<Long>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(Long result) {
+                    assertEquals(testBuffer.length, result.longValue());
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_206_getAsStringAsync() {
+        try {
+            CompletableFuture future = onedriveFileApi.getAsString(remoteStringFileName, new Callback<String>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(String result) {
+                    assertEquals(testString, result);
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_207_getAsBufferAsync() {
+        try {
+            CompletableFuture future = onedriveFileApi.getAsBuffer(remoteBufferFileName, new Callback<byte[]>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(byte[] result) {
+                    assertArrayEquals(testBuffer, result);
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_208_getOutputAsync() {
+        try {
+            OutputStream outputStream = new ByteArrayOutputStream();
+            CompletableFuture future = onedriveFileApi.get(remoteStringFileName, outputStream, new Callback<Long>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(Long result) {
+                    assertEquals(testString, outputStream.toString());
+                    assertEquals(testString.length(), result.longValue());
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+
+    @Test
+    public void test_209_getWriterAsync() {
+        try {
+            Writer writer = new CharArrayWriter();
+            CompletableFuture future = onedriveFileApi.get(remoteStringFileName, writer, new Callback<Long>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(Long result) {
+                    assertEquals(testString, writer.toString());
+                    assertEquals(testString.length(), result.longValue());
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_210_listAsync() {
+        try {
+            CompletableFuture future = onedriveFileApi.list(new Callback<ArrayList<String>>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(ArrayList<String> result) {
+                    assertEquals(4, result.size());
+                    for (String fileName : result) {
+                        assertTrue(checkListFileName(fileName));
+                    }
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_211_DeleteAsync() {
+        try {
+            onedriveFileApi.delete(remoteStringFileName, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                    assertNull(e);
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    try {
+                        ArrayList<String> files = onedriveFileApi.list().get();
+                        assertEquals(3, files.size());
+
+                        for (String fileName : files) {
+                            assertTrue(checkListFileNameAfterDel(fileName));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        assertNull(e);
+                    }
+
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
     @BeforeClass
     public static void setUp() {
         try {
@@ -362,9 +491,9 @@ public class OneDriveFileTest {
             hiveClient.connect();
 
             onedriveFileApi = hiveClient.getFiles();
-        } catch (
-                HiveException e) {
+        } catch (HiveException e) {
             fail(e.getMessage());
+            assertNull(e);
         }
 
     }
@@ -372,156 +501,74 @@ public class OneDriveFileTest {
     @AfterClass
     public static void tearDown() {
         hiveClient.disconnect();
-        hiveClient = null ;
+        hiveClient = null;
     }
 
-    @Test
-    public void testPutBuffer() {
+    private boolean checkFileExist(String remoteFile) {
         try {
-            onedriveFileApi.put("test buffer".getBytes(),"testbuffer.txt").get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testPutString() {
-        try {
-            onedriveFileApi.put("test","test.txt").get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testPutStream() {
-        String path = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
-
-        try {
-            InputStream inputStream = new FileInputStream(path);
-            CompletableFuture<Void> future = onedriveFileApi.put(inputStream,"test.txt");
-
-            future.get();
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testPutReader() {
-
-        try {
-            Reader reader = new StringReader("readertest");
-
-            CompletableFuture<Void> future = onedriveFileApi.put(reader,"test.txt");
-
-            System.out.println(future.get());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    @Test
-    public void testGetString() {
-        try {
-            String result = onedriveFileApi.getAsString("testbuffer.txt").get();
-            System.out.println(result);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testGetBuffer() {
-        try {
-            byte[] result = onedriveFileApi.getAsBuffer("testbuffer.txt").get();
-            String resultStr = new String(result);
-            System.out.println(resultStr);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testGetLength() {
-        try {
-            long size = onedriveFileApi.size("testbuffer.txt").get();
-            System.out.println(size);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testDelete() {
-        try {
-            onedriveFileApi.delete("testbuffer.txt").get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testList() {
-        try {
-            ArrayList<String> files = onedriveFileApi.list().get();
-            for (String fileName :files){
-                System.out.println(fileName);
+            ArrayList<String> fileList = onedriveFileApi.list().get();
+            for (String fileName : fileList) {
+                if (fileName.equals(remoteFile)) {
+                    return true;
+                }
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            assertNull(e);
         }
+        return false;
     }
 
-    @Test
-    public void testGetOutput() {
-        OutputStream outputStream = new ByteArrayOutputStream();
-        CompletableFuture<Long> completableFuture = onedriveFileApi.get("testbuffer.txt", outputStream);
+    private void checkFileContent(String expected, String remoteFile) {
         try {
-            long length = completableFuture.get();
-            System.out.println(length);
-            System.out.println(outputStream.toString());
-        } catch (InterruptedException e) {
+            String actual = onedriveFileApi.getAsString(remoteFile).get();
+            assertEquals(expected, actual);
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            assertNull(e);
         }
     }
 
-    @Test
-    public void testGetWriter() {
-        Writer writer = new StringWriter();
-        CompletableFuture<Long> completableFuture = onedriveFileApi.get("testbuffer.txt", writer);
+    private String readFromInputStream(InputStream inputStream) {
         try {
-            long length = completableFuture.get();
-            System.out.println(length);
-            System.out.println(writer.toString());
-        } catch (InterruptedException e) {
+            Buffer buffer = new Buffer();
+            byte[] bytes = new byte[1024];
+            int len;
+            while ((len = inputStream.read(bytes)) != -1) {
+                buffer.write(bytes, 0, len);
+            }
+            return buffer.readUtf8();
+        } catch (IOException e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            assertNull(e);
         }
+        return "";
     }
 
+    private InputStream createInputStream(String filepath) throws FileNotFoundException {
+        return new FileInputStream(filepath);
+    }
+
+    private Reader createReader(String str) {
+        return new StringReader(str);
+    }
+
+    private boolean checkListFileName(String filePath) {
+        if (filePath.equals(remoteBufferFileName) ||
+                filePath.equals(remoteStringFileName) ||
+                filePath.equals(remoteInputFileName) ||
+                filePath.equals(remoteReaderFileName)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkListFileNameAfterDel(String filePath) {
+        if (filePath.equals(remoteBufferFileName) ||
+                filePath.equals(remoteInputFileName) ||
+                filePath.equals(remoteReaderFileName)) {
+            return true;
+        }
+        return false;
+    }
 }

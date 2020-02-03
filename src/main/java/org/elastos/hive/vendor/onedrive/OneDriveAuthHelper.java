@@ -116,7 +116,6 @@ public class OneDriveAuthHelper implements AuthHelper {
 
     private void doCheckExpired() throws Exception {
         connectState.set(false);
-        System.out.println("doCheckExpired ="+Thread.currentThread().getName());
         if (token == null) {
             throw new HiveException("Please login first");
         }
@@ -128,7 +127,6 @@ public class OneDriveAuthHelper implements AuthHelper {
     private void doLogin(Authenticator authenticator) throws Exception {
         connectState.set(false);
         tryRestoreToken();
-        System.out.println(Thread.currentThread().getName());
         if (token != null) {
             long current = System.currentTimeMillis() / 1000;
             //Check the expire time
@@ -149,7 +147,6 @@ public class OneDriveAuthHelper implements AuthHelper {
     private String accessAuthCode(Authenticator authenticator) throws Exception {
         Semaphore semph = new Semaphore(1);
 
-        System.out.println("ttt = " + Thread.currentThread().getName());
         String hostUrl = redirectUrl;
         String[] hostAndPort = UrlUtil.decodeHostAndPort(hostUrl, OneDriveConstance.DEFAULT_REDIRECT_URL, String.valueOf(OneDriveConstance.DEFAULT_REDIRECT_PORT));
 
