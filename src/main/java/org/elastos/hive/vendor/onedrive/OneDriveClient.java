@@ -692,12 +692,15 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         writeBuffer(key, finalData);
     }
 
-    private byte[] mergeData(String key, byte[] value) throws Exception {
-        byte[] originData = doGetBuffer(key, null).get();
-
-        byte[] data = mergeLengthAndData(value);
-
-        return mergeData(originData, data);
+    private byte[] mergeData(String key, byte[] value) {
+        byte[] originData = new byte[0];
+        try {
+            originData = getBufferImpl(key);
+        } catch (HiveException e) {
+        } finally {
+            byte[] data = mergeLengthAndData(value);
+            return mergeData(originData, data);
+        }
     }
 
 

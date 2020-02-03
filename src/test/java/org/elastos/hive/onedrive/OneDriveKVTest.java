@@ -1,6 +1,7 @@
 package org.elastos.hive.onedrive;
 
 
+import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.KeyValues;
@@ -16,12 +17,9 @@ import java.awt.Desktop;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -34,236 +32,11 @@ public class OneDriveKVTest {
     private static Client hiveClient;
     private static KeyValues onedriveKeyValueApi;
 
-    private String key = "KEY";
-    private String[] values = {"value1", "value2", "value3"};
-    private String newValue = "newValue";
+    private String stringValue = "test string value";
+    private byte[] bufferValue = "test buffer value".getBytes();
 
-
-//    @Test
-//    public void test_00_Prepare() {
-//        try {
-//            connect.deleteFile(key).get();
-//        } catch (InterruptedException | ExecutionException e) {
-//            e.printStackTrace();
-//            fail(e.getMessage());
-//        }
-//    }
-//
-//    @Test
-//    public void test_01_PutValue() {
-//        try {
-//            connect.putValue(key,values[0].getBytes(),false).get();
-//            connect.putValue(key,values[1].getBytes(),false).get();
-//            connect.putValue(key,values[2].getBytes(),false).get();
-//
-//        } catch (InterruptedException | ExecutionException e) {
-//            e.printStackTrace();
-//            fail(e.getMessage());
-//        }
-//    }
-//
-//    @Test
-//    public void test_11_PutValueAsync() {
-//        CompletableFuture future1 = connect.putValue(key, values[0].getBytes(), false, new Callback<Void>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                fail(e.getMessage());
-//            }
-//
-//            @Override
-//            public void onSuccess(Void body) {
-//                assertNotNull(body);
-//            }
-//        });
-//        CompletableFuture future2 = connect.putValue(key, values[1].getBytes(), false, new Callback<Void>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                fail(e.getMessage());
-//            }
-//
-//            @Override
-//            public void onSuccess(Void body) {
-//                assertNotNull(body);
-//            }
-//        });
-//
-//        CompletableFuture future3 = connect.putValue(key, values[2].getBytes(), false, new Callback<Void>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                fail(e.getMessage());
-//            }
-//
-//            @Override
-//            public void onSuccess(Void body) {
-//                assertNotNull(body);
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future1);
-//        TestUtils.waitFinish(future2);
-//        TestUtils.waitFinish(future3);
-//    }
-//
-//    @Test
-//    public void test_02_GetValue() {
-//        try {
-//            ValueList valueList = connect.getValue(key,false).get();
-//            ArrayList<Value> arrayDatas = valueList.getList();
-//            assertEquals(3,arrayDatas.size());
-//            for (int i = 0 ; i < arrayDatas.size() ; i++){
-//                assertArrayEquals(values[i].getBytes(), arrayDatas.get(i).getData());
-//            }
-//        } catch (InterruptedException | ExecutionException e) {
-//            e.printStackTrace();
-//            fail(e.getMessage());
-//        }
-//    }
-//
-//    @Test
-//    public void test_12_GetValueAsync() {
-//        CompletableFuture future = connect.getValue(key, false, new Callback<ValueList>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                fail(e.getMessage());
-//            }
-//
-//            @Override
-//            public void onSuccess(ValueList body) {
-//                ArrayList<Value> arrayDatas = body.getList();
-//                assertEquals(3,arrayDatas.size());
-//                for (int i = 0 ; i < arrayDatas.size() ; i++){
-//                    assertArrayEquals(values[i].getBytes(), arrayDatas.get(i).getData());
-//                }
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//
-//    @Test
-//    public void test_03_SetValue() {
-//        try {
-//            connect.setValue(key,newValue.getBytes(),false).get();
-//        } catch (InterruptedException | ExecutionException e) {
-//            e.printStackTrace();
-//            fail(e.getMessage());
-//        }
-//    }
-//
-//    @Test
-//    public void test_13_SetValueAsync() {
-//        CompletableFuture future = connect.setValue(key, newValue.getBytes(), false, new Callback<Void>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                fail(e.getMessage());
-//            }
-//
-//            @Override
-//            public void onSuccess(Void body) {
-//                assertNotNull(body);
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//    @Test
-//    public void test_04_GetValue() {
-//        try {
-//            ValueList valueList = connect.getValue(key,false).get();
-//            ArrayList<Value> arrayDatas = valueList.getList();
-//            assertEquals(1,arrayDatas.size());
-//            for (int i = 0 ; i < arrayDatas.size() ; i++){
-//                assertArrayEquals(newValue.getBytes(), arrayDatas.get(i).getData());
-//            }
-//        } catch (InterruptedException | ExecutionException e) {
-//            e.printStackTrace();
-//            fail(e.getMessage());
-//        }
-//    }
-//
-//    @Test
-//    public void test_14_GetValueAsync() {
-//        CompletableFuture future = connect.getValue(key, false, new Callback<ValueList>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                fail(e.getMessage());
-//            }
-//
-//            @Override
-//            public void onSuccess(ValueList body) {
-//                ArrayList<Value> arrayDatas = body.getList();
-//                assertEquals(1,arrayDatas.size());
-//                for (int i = 0 ; i < arrayDatas.size() ; i++){
-//                    assertArrayEquals(newValue.getBytes(), arrayDatas.get(i).getData());
-//                }
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//    @Test
-//    public void test_05_DeleteKey() {
-//        try {
-//            connect.deleteValueFromKey(key).get();
-//        } catch (InterruptedException | ExecutionException e) {
-//            e.printStackTrace();
-//            fail(e.getMessage());
-//        }
-//    }
-//
-//    @Test
-//    public void test_15_DeleteKeyAsync() {
-//        CompletableFuture future = connect.deleteValueFromKey(key, new Callback<Void>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                fail(e.getMessage());
-//            }
-//
-//            @Override
-//            public void onSuccess(Void body) {
-//                assertNotNull(body);
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//    @Test
-//    public void test_06_GetValue(){
-//        CompletableFuture future = connect.getValue(key, false, new Callback<ValueList>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                assertNotNull(e);
-//                assertEquals("Item not found.",e.getMessage());
-//            }
-//
-//            @Override
-//            public void onSuccess(ValueList body) {
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
-//
-//    @Test
-//    public void test_16_GetValue(){
-//        CompletableFuture future = connect.getValue(key, false, new Callback<ValueList>() {
-//            @Override
-//            public void onError(HiveException e) {
-//                assertNotNull(e);
-//                assertEquals("Item not found.",e.getMessage());
-//            }
-//
-//            @Override
-//            public void onSuccess(ValueList body) {
-//            }
-//        });
-//
-//        TestUtils.waitFinish(future);
-//    }
+    private String strKey = "strKey";
+    private String bufferKey = "bufferKey";
 
     @BeforeClass
     public static void setUp() {
@@ -301,72 +74,397 @@ public class OneDriveKVTest {
     }
 
     @Test
-    public void testPutString() {
+    public void test_00_prepare() {
         try {
-            onedriveKeyValueApi.putValue("testkey1.txt", "test buffer").get();
-        } catch (InterruptedException e) {
+            onedriveKeyValueApi.deleteKey(strKey).get();
+            onedriveKeyValueApi.deleteKey(bufferKey).get();
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            assertNull(e);
         }
     }
 
     @Test
-    public void testPutBuffer() {
+    public void test_101_putStr() {
         try {
-            onedriveKeyValueApi.putValue("testkey1.txt", "test buffer".getBytes()).get();
-        } catch (InterruptedException e) {
+            onedriveKeyValueApi.putValue(strKey, stringValue).get();
+            onedriveKeyValueApi.putValue(strKey, stringValue).get();
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            assertNull(e);
         }
     }
 
     @Test
-    public void testSetStr() {
+    public void test_102_putBuffer() {
         try {
-            onedriveKeyValueApi.setValue("testkey1.txt", "test buffer2").get();
-        } catch (InterruptedException e) {
+            onedriveKeyValueApi.putValue(bufferKey, bufferValue).get();
+            onedriveKeyValueApi.putValue(bufferKey, bufferValue).get();
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            assertNull(e);
         }
     }
 
     @Test
-    public void testSetBuffer() {
+    public void test_103_getStr() {
         try {
-            onedriveKeyValueApi.setValue("testkey1.txt", "test buffer2".getBytes()).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testGetValue() {
-        try {
-            ArrayList<byte[]> values = onedriveKeyValueApi.getValues("testkey1.txt").get();
-            for (byte[] value : values) {
-                System.out.println(new String(value));
+            ArrayList<byte[]> valueList = onedriveKeyValueApi.getValues(strKey).get();
+            assertEquals(2, valueList.size());
+            for (byte[] value : valueList) {
+                value.equals(stringValue.getBytes());
+                assertArrayEquals(stringValue.getBytes(), value);
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            assertNull(e);
         }
     }
 
+    @Test
+    public void test_104_getBuffer() {
+        try {
+            ArrayList<byte[]> valueList = onedriveKeyValueApi.getValues(bufferKey).get();
+            assertEquals(2, valueList.size());
+            for (byte[] value : valueList) {
+                value.equals(bufferValue);
+                assertArrayEquals(bufferValue, value);
+                System.out.println(new String(bufferValue));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
 
     @Test
-    public void testDelValue() {
+    public void test_105_setStr() {
         try {
-            onedriveKeyValueApi.deleteKey("testkey1.txt").get();
-        } catch (InterruptedException e) {
+            onedriveKeyValueApi.setValue(strKey, stringValue).get();
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_106_setBuffer() {
+        try {
+            onedriveKeyValueApi.setValue(bufferKey, bufferValue).get();
+        } catch (Exception e) {
             e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_107_getStr() {
+        try {
+            ArrayList<byte[]> valueList = onedriveKeyValueApi.getValues(strKey).get();
+            assertEquals(1, valueList.size());
+            for (byte[] value : valueList) {
+                value.equals(stringValue.getBytes());
+                assertArrayEquals(stringValue.getBytes(), value);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_108_getBuffer() {
+        try {
+            ArrayList<byte[]> valueList = onedriveKeyValueApi.getValues(bufferKey).get();
+            assertEquals(1, valueList.size());
+            for (byte[] value : valueList) {
+                value.equals(bufferValue);
+                assertArrayEquals(bufferValue, value);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_109_delKey() {
+        try {
+            onedriveKeyValueApi.deleteKey(strKey).get();
+            onedriveKeyValueApi.deleteKey(bufferKey).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_110_getValue() {
+        try {
+            ArrayList<byte[]> strValues = onedriveKeyValueApi.getValues(strKey).get();
+            ArrayList<byte[]> bufferValues = onedriveKeyValueApi.getValues(bufferKey).get();
+            assertNull(strValues);
+            assertNull(bufferValues);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_201_putStrAsync() {
+        try {
+            CompletableFuture future = onedriveKeyValueApi.putValue(strKey, stringValue, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                }
+            }).thenCompose(result ->onedriveKeyValueApi.putValue(strKey, stringValue, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                }
+            }));
+
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_202_putBufferAsync() {
+        try {
+            CompletableFuture future = onedriveKeyValueApi.putValue(bufferKey, bufferValue, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                }
+            }).thenCompose(result -> onedriveKeyValueApi.putValue(bufferKey, bufferValue, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                }
+            }));
+
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_203_getStrAsync() {
+        try {
+            CompletableFuture future = onedriveKeyValueApi.getValues(strKey, new Callback<ArrayList<byte[]>>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(ArrayList<byte[]> result) {
+                    assertEquals(2, result.size());
+                    for (byte[] value : result) {
+                        value.equals(stringValue.getBytes());
+                        assertArrayEquals(stringValue.getBytes(), value);
+                    }
+                }
+            });
+
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_204_getBufferAsync() {
+        try {
+            CompletableFuture future = onedriveKeyValueApi.getValues(bufferKey, new Callback<ArrayList<byte[]>>() {
+                @Override
+                public void onError(HiveException e) {
+
+                }
+
+                @Override
+                public void onSuccess(ArrayList<byte[]> result) {
+                    assertEquals(2, result.size());
+                    for (byte[] value : result) {
+                        value.equals(bufferValue);
+                        assertArrayEquals(bufferValue, value);
+                        System.out.println(new String(bufferValue));
+                    }
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_205_setStrAsync() {
+        try {
+            CompletableFuture future = onedriveKeyValueApi.setValue(strKey, stringValue, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                }
+            });
+
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_206_setBufferAsync() {
+        try {
+            CompletableFuture future = onedriveKeyValueApi.setValue(bufferKey, bufferValue, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                }
+            });
+
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_207_getStrAsync() {
+        try {
+            CompletableFuture future = onedriveKeyValueApi.getValues(strKey, new Callback<ArrayList<byte[]>>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(ArrayList<byte[]> result) {
+                    assertEquals(1, result.size());
+                    for (byte[] value : result) {
+                        value.equals(stringValue.getBytes());
+                        assertArrayEquals(stringValue.getBytes(), value);
+                    }
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_208_getBufferAsync() {
+        try {
+            CompletableFuture future = onedriveKeyValueApi.getValues(bufferKey, new Callback<ArrayList<byte[]>>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(ArrayList<byte[]> result) {
+                    assertEquals(1, result.size());
+                    for (byte[] value : result) {
+                        value.equals(bufferValue);
+                        assertArrayEquals(bufferValue, value);
+                    }
+                }
+            });
+            future.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_209_delKeyAsync() {
+        try {
+            CompletableFuture future = onedriveKeyValueApi.deleteKey(strKey, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                }
+            });
+            CompletableFuture future1 = onedriveKeyValueApi.deleteKey(bufferKey, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                }
+            });
+            future.get();
+            future1.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
+        }
+    }
+
+    @Test
+    public void test_210_getValueAsync() {
+        try {
+            CompletableFuture future = onedriveKeyValueApi.getValues(strKey, new Callback<ArrayList<byte[]>>() {
+                @Override
+                public void onError(HiveException e) {
+
+                }
+
+                @Override
+                public void onSuccess(ArrayList<byte[]> result) {
+                    assertNull(result);
+                }
+            });
+            CompletableFuture future1 = onedriveKeyValueApi.getValues(bufferKey, new Callback<ArrayList<byte[]>>() {
+                @Override
+                public void onError(HiveException e) {
+                }
+
+                @Override
+                public void onSuccess(ArrayList<byte[]> result) {
+                    assertNull(result);
+                }
+            });
+
+            future.get();
+            future1.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull(e);
         }
     }
 }
