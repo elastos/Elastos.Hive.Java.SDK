@@ -37,7 +37,7 @@ public class Md5CaculateUtil {
 
     @Test
     public void testFileMd5() {
-        String filePath = "/Users/wangran/Development/elastos/hive/Elastos.NET.Hive.AndroidDemo/hivesdk/src/resources/org/elastos/hive/test.txt";
+        String filePath = System.getProperty("user.dir")+"/src/resources/org/elastos/hive/test.txt";
         String expectMd5 = "973131af48aa1d25bf187dacaa5ca7c0";
         String actualMd5 = getFileMD5(filePath);
         assertEquals(expectMd5, actualMd5);

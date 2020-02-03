@@ -30,6 +30,6 @@ public class NullCallback<T> implements Callback<T> {
     }
 
     @Override
-    public void onSuccess(T object) {
+    public void onSuccess(T result) {
     }
 }
