@@ -32,14 +32,12 @@ class OneDriveConstance {
     static final String AUTHORIZE = "authorize";
 
 
-    public static final String DEFAULT_REDIRECT_URL = "localhost";
-    public static final int    DEFAULT_REDIRECT_PORT = 12345;
+    static final String DEFAULT_REDIRECT_URL = "localhost";
+    static final int    DEFAULT_REDIRECT_PORT = 12345;
 
-    public static final String GRANT_TYPE_GET_TOKEN = "authorization_code";
-    public static final String GRANT_TYPE_REFRESH_TOKEN = "refresh_token";
+    static final String GRANT_TYPE_GET_TOKEN = "authorization_code";
+    static final String GRANT_TYPE_REFRESH_TOKEN = "refresh_token";
 
-    public static final String ROOT = "root";
-
-    public static final String CONFIG = "onedrive.json";
+    static final String CONFIG = "onedrive.json";
 
 }

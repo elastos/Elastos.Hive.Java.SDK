@@ -24,7 +24,6 @@ package org.elastos.hive.vendor.connection;
 
 import org.elastos.hive.vendor.connection.model.NoBodyEntity;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -34,7 +33,7 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 
 public class NobodyConverterFactory extends Converter.Factory {
-    public static final NobodyConverterFactory create() {
+    static NobodyConverterFactory create() {
         return new NobodyConverterFactory();
     }
 

@@ -50,21 +50,4 @@ public class UrlUtil {
 
         return hostAndPort;
     }
-
-    public static String checkPort(String requestUrl, String defaultPort) {
-        if (requestUrl.contains(":")) {
-            return requestUrl;
-        }
-
-        return requestUrl + ":" + defaultPort;
-
-    }
-
-    public static boolean checkAddress(String ipStr) {
-        return ipStr.matches("((25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))\\.){3}(25[0-5]|2[0-4]\\d|((1\\d{2})|([1-9]?\\d)))");
-    }
-
-    public static boolean checkPort(String portStr) {
-        return portStr.matches("^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)");
-    }
 }

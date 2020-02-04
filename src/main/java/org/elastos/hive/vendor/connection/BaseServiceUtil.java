@@ -22,7 +22,6 @@
 
 package org.elastos.hive.vendor.connection;
 
-import org.elastos.hive.utils.CheckTextUtil;
 import org.elastos.hive.utils.LogUtil;
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.jetbrains.annotations.NotNull;
@@ -33,22 +32,21 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class BaseServiceUtil {
+class BaseServiceUtil {
     private static final int DEFAULT_TIMEOUT = 30;
 
-    public static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl,
-                                      BaseServiceConfig baseServiceConfig) throws Exception {
+    static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl,
+                               BaseServiceConfig baseServiceConfig) throws Exception {
+
+        if (baseUrl.equals("") || !baseUrl.endsWith("/"))
+            throw new Exception("base url must not null , and end of /");
+
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
-        if (!CheckTextUtil.isEmpty(baseUrl)) {
-            retrofitBuilder.baseUrl(baseUrl);
-        } else {
-            throw new Exception("base url must not null , and end of /");
-        }
-
+        retrofitBuilder.baseUrl(baseUrl);
         retrofitBuilder.addConverterFactory(StringConverterFactory.create());
         retrofitBuilder.addConverterFactory(NobodyConverterFactory.create());
         retrofitBuilder.addConverterFactory(GsonConverterFactory.create());
