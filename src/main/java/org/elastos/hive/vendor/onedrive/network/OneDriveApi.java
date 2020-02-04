@@ -37,9 +37,6 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface OneDriveApi {
-    @PUT(ConnectConstance.APP_ROOT + ":{path}:/content")
-    Call<FileOrDirPropResponse> createFile(@Path("path") String path);
-
     @GET(ConnectConstance.APP_ROOT + ":/{path}")
     Call<FileOrDirPropResponse> getDirAndFileInfo(@Path("path") String path);
 
@@ -49,20 +46,9 @@ public interface OneDriveApi {
     @GET(ConnectConstance.APP_ROOT + ":{path}:/children")
     Call<DirChildrenResponse> getChildren(@Path("path") String path);
 
-    @GET(ConnectConstance.APP_ROOT + "/children")
-    Call<DirChildrenResponse> getRootChildren();
-
-
     @GET(ConnectConstance.APP_ROOT + ":{path}:/content")
     Call<ResponseBody> read(@Header("Accept-Encoding") String acceptEncoding, @Path("path") String path);
 
     @PUT(ConnectConstance.APP_ROOT + ":{path}:/content")
     Call<NoBodyEntity> write(@Path("path") String path, @Body RequestBody body);
-
-//    @POST(OneDriveConstance.APP_ROOT+":{path}:/createUploadSession")
-//    Call<UploadSessionResponse> createSession(@Header("if-match") String cTag, @Path("path") String path);
-
-//    @PUT()
-//    Call<NoBodyEntity> write(@Url String url, @Header("Content-Type") String contentType, @Header("Content-Length") String length
-//    		, @Header("Content-Range") String range, @Body RequestBody body);
 }

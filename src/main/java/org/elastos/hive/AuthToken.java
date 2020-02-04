@@ -47,14 +47,6 @@ public class AuthToken {
 
     public boolean isExpired() {
         long currentSeconds = System.currentTimeMillis() / 1000;
-        if (currentSeconds >= experitime) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public void expired() {
-        this.experitime = 0;
+        return currentSeconds >= experitime;
     }
 }

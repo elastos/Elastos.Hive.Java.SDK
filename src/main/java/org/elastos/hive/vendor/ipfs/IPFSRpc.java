@@ -31,11 +31,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import retrofit2.Response;
 
 class IPFSRpc {
-    static final String URLFORMAT = "http://%s:%d/api/v0/";
+    private static final String URLFORMAT = "http://%s:%d/api/v0/";
 
-    AtomicBoolean connectState = new AtomicBoolean(false);
-    ArrayList<IPFSOptions.RpcNode> mHiveRpcNodes;
-    IPFSOptions.RpcNode mHiveRpcNode;
+    private AtomicBoolean connectState = new AtomicBoolean(false);
+    private ArrayList<IPFSOptions.RpcNode> mHiveRpcNodes;
+    private IPFSOptions.RpcNode mHiveRpcNode;
 
     IPFSRpc(ArrayList<IPFSOptions.RpcNode> hiveRpcNodes) {
         this.mHiveRpcNodes = hiveRpcNodes;
@@ -65,7 +65,7 @@ class IPFSRpc {
         }
     }
 
-    void selectBootstrap(IPFSOptions.RpcNode hiveRpcNode) {
+    private void selectBootstrap(IPFSOptions.RpcNode hiveRpcNode) {
         mHiveRpcNode = hiveRpcNode;
         String baseUrl = String.format(URLFORMAT, mHiveRpcNode.getIpv4(), mHiveRpcNode.getPort());
         try {
@@ -77,18 +77,7 @@ class IPFSRpc {
         }
     }
 
-    IPFSOptions.RpcNode getCurrentNode() {
-        return mHiveRpcNode;
-    }
-
-    boolean isAvailable() {
-        if (mHiveRpcNode == null) {
-            return false;
-        }
-        return true;
-    }
-
-    boolean checkConnect(IPFSOptions.RpcNode hiveRpcNode) throws HiveException {
+    private boolean checkConnect(IPFSOptions.RpcNode hiveRpcNode) throws HiveException {
         if (hiveRpcNode == null)
             throw new HiveException(HiveException.RPC_NODE_NULL);
 

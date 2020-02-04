@@ -26,12 +26,9 @@ import org.elastos.hive.vendor.connection.model.NoBodyEntity;
 import org.elastos.hive.vendor.ipfs.network.model.AddFileResponse;
 import org.elastos.hive.vendor.ipfs.network.model.ListFileResponse;
 
-import java.io.InputStream;
-
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.http.Body;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;

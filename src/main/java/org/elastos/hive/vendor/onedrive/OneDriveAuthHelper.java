@@ -56,7 +56,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 
     private final Persistent persistent;
     private AuthToken token;
-    AtomicBoolean connectState = new AtomicBoolean(false);
+    private AtomicBoolean connectState = new AtomicBoolean(false);
 
     OneDriveAuthHelper(String clientId, String scope, String redirectUrl, String persistentStorePath) {
         this.clientId = clientId;
@@ -71,7 +71,7 @@ public class OneDriveAuthHelper implements AuthHelper {
             e.printStackTrace();
         }
     }
-    
+
     @Override
     public CompletableFuture<Void> loginAsync(Authenticator authenticator) {
         return loginAsync(authenticator, new NullCallback<>());
@@ -80,7 +80,7 @@ public class OneDriveAuthHelper implements AuthHelper {
     @Override
     public CompletableFuture<Void> loginAsync(Authenticator authenticator,
                                               Callback<Void> callback) {
-        CompletableFuture future = CompletableFuture.runAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 doLogin(authenticator);
                 callback.onSuccess(null);
@@ -90,7 +90,6 @@ public class OneDriveAuthHelper implements AuthHelper {
                 callback.onError(hiveException);
             }
         });
-        return future;
     }
 
     @Override
@@ -100,7 +99,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 
     @Override
     public CompletableFuture<Void> checkExpired(Callback<Void> callback) {
-        CompletableFuture future = CompletableFuture.runAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 doCheckExpired();
                 callback.onSuccess(null);
@@ -110,8 +109,6 @@ public class OneDriveAuthHelper implements AuthHelper {
                 callback.onError(hiveException);
             }
         });
-
-        return future;
     }
 
     private void doCheckExpired() throws Exception {
@@ -147,8 +144,7 @@ public class OneDriveAuthHelper implements AuthHelper {
     private String accessAuthCode(Authenticator authenticator) throws Exception {
         Semaphore semph = new Semaphore(1);
 
-        String hostUrl = redirectUrl;
-        String[] hostAndPort = UrlUtil.decodeHostAndPort(hostUrl, OneDriveConstance.DEFAULT_REDIRECT_URL, String.valueOf(OneDriveConstance.DEFAULT_REDIRECT_PORT));
+        String[] hostAndPort = UrlUtil.decodeHostAndPort(redirectUrl, OneDriveConstance.DEFAULT_REDIRECT_URL, String.valueOf(OneDriveConstance.DEFAULT_REDIRECT_PORT));
 
         String host = hostAndPort[0];
         int port = Integer.valueOf(hostAndPort[1]);
@@ -191,12 +187,12 @@ public class OneDriveAuthHelper implements AuthHelper {
         handleTokenResponse(response);
     }
 
-    private void handleTokenResponse(Response response) throws Exception {
+    private void handleTokenResponse(Response response) {
         TokenResponse tokenResponse = (TokenResponse) response.body();
-        long experitime = System.currentTimeMillis() / 1000 + tokenResponse.getExpires_in();
+        long experitime = System.currentTimeMillis() / 1000 + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
 
-        token = new AuthToken(tokenResponse.getRefresh_token(),
-                tokenResponse.getAccess_token(),
+        token = new AuthToken(tokenResponse != null ? tokenResponse.getRefresh_token() : "",
+                tokenResponse != null ? tokenResponse.getAccess_token() : "",
                 experitime);
 
         //Store the local data.
@@ -213,38 +209,21 @@ public class OneDriveAuthHelper implements AuthHelper {
                 baseServiceConfig);
     }
 
-    private void tryRestoreToken() {
-        try {
-            JSONObject json = persistent.parseFrom();
-            String refreshToken = null;
-            String accessToken = null;
-            long expiresAt = -1;
+    private void tryRestoreToken() throws HiveException {
+        JSONObject json = persistent.parseFrom();
+        String refreshToken = null;
+        String accessToken = null;
+        long expiresAt = -1;
 
-            if (json.has(refreshTokenKey))
-                refreshToken = json.getString(refreshTokenKey);
-            if (json.has(accessTokenKey))
-                accessToken = json.getString(accessTokenKey);
-            if (json.has(expireAtKey))
-                expiresAt = json.getLong(expireAtKey);
+        if (json.has(refreshTokenKey))
+            refreshToken = json.getString(refreshTokenKey);
+        if (json.has(accessTokenKey))
+            accessToken = json.getString(accessTokenKey);
+        if (json.has(expireAtKey))
+            expiresAt = json.getLong(expireAtKey);
 
-            if (refreshToken != null && accessToken != null && expiresAt > 0)
-                this.token = new AuthToken(refreshToken, accessToken, expiresAt);
-        } catch (Exception e) {
-            // TODO: Log output.
-        }
-    }
-
-    //When logout use this function
-    private void clearToken() {
-        try {
-            JSONObject json = new JSONObject();
-            json.put(clientIdKey, clientId);
-            persistent.upateContent(json);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        token = null;
+        if (refreshToken != null && accessToken != null && expiresAt > 0)
+            this.token = new AuthToken(refreshToken, accessToken, expiresAt);
     }
 
     private void writebackToken() {

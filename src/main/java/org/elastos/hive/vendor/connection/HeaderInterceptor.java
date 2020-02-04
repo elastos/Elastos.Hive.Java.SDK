@@ -37,7 +37,7 @@ public class HeaderInterceptor implements Interceptor {
 
     private final HeaderConfig headerConfig;
 
-    public HeaderInterceptor(HeaderConfig headerConfig) {
+    HeaderInterceptor(HeaderConfig headerConfig) {
         this.headerConfig = headerConfig;
     }
 
@@ -64,11 +64,9 @@ public class HeaderInterceptor implements Interceptor {
         }
 
         if (newRequest != null) {
-            Response response = chain.proceed(newRequest);
-            return response;
+            return chain.proceed(newRequest);
         } else {
-            Response response = chain.proceed(request);
-            return response;
+            return chain.proceed(request);
         }
     }
 
@@ -76,29 +74,26 @@ public class HeaderInterceptor implements Interceptor {
         if (headerConfig == null || headerConfig.getAuthToken() == null) {
             return realRequest;
         }
-        Request newRequest = realRequest.newBuilder()
+        return realRequest.newBuilder()
                 .addHeader(AUTHORIZATION, "bearer " + headerConfig.getAuthToken().getAccessToken())
                 .build();
-        return newRequest;
     }
 
     private Request addContentTypeHeader(Request realRequest) {
         if (headerConfig == null || headerConfig.getContentType() == null) {
             return realRequest;
         }
-        Request newRequest = realRequest.newBuilder()
+        return realRequest.newBuilder()
                 .addHeader(CONTENT_TYPE, headerConfig.getContentType())
                 .build();
-        return newRequest;
     }
 
     private Request addAcceptEncoding(Request realRequest) {
         if (headerConfig == null || headerConfig.getAcceptEncoding() == null) {
             return realRequest;
         }
-        Request newRequest = realRequest.newBuilder()
+        return realRequest.newBuilder()
                 .addHeader(ACCEPT_ENCODING, headerConfig.getAcceptEncoding())
                 .build();
-        return newRequest;
     }
 }

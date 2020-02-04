@@ -89,19 +89,19 @@ public class ConnectionManager {
         ConnectionManager.ipfsBaseUrl = ipfsBaseUrl;
     }
 
-    public static void resetAuthApi(String baseUrl, BaseServiceConfig baseServiceConfig) throws Exception {
+    public static void resetAuthApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
         authApi = null;
         updateAuthConfig(baseServiceConfig);
         updateAuthBaseUrl(baseUrl);
     }
 
-    public static void resetOneDriveApi(String baseUrl, BaseServiceConfig baseServiceConfig) throws Exception {
+    public static void resetOneDriveApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
         oneDriveApi = null;
         updateOneDriveBaseUrl(baseUrl);
         updateOneDriveConfig(baseServiceConfig);
     }
 
-    public static void resetIPFSApi(String baseUrl) throws Exception {
+    public static void resetIPFSApi(String baseUrl) {
         ipfsApi = null;
         updateIPFSBaseUrl(baseUrl);
         updateIPFSConfig(new BaseServiceConfig.Builder().build());

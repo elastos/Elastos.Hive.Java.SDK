@@ -70,7 +70,7 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public IPFS getIPFS() {
-        return (IPFS) this;
+        return this;
     }
 
     @Override
@@ -135,7 +135,6 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<String> getAsString(String cid, Callback<String> callback) {
-        // TODO:
         return doGetAsStr(cid, callback);
     }
 
@@ -146,7 +145,6 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback) {
-        // TODO:
         return doGetAsBuff(cid, callback);
     }
 
@@ -172,7 +170,7 @@ final class IPFSClient extends Client implements IPFS {
 
     ////
     private CompletableFuture<String> doPutBuffer(byte[] data, Callback<String> callback) {
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             String result = null;
             try {
                 result = putBufferImpl(data);
@@ -183,7 +181,6 @@ final class IPFSClient extends Client implements IPFS {
             }
             return result;
         });
-        return future;
     }
 
     private String putBufferImpl(byte[] data) throws Exception {
@@ -191,12 +188,12 @@ final class IPFSClient extends Client implements IPFS {
             throw new HiveException("Data is null");
 
         MultipartBody.Part requestBody = createBufferRequestBody(data);
-        Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
+        Response<AddFileResponse> response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
 
-        AddFileResponse addFileResponse = (AddFileResponse) response.body();
-        return addFileResponse.getHash();
+        AddFileResponse addFileResponse = response.body();
+        return addFileResponse != null ? addFileResponse.getHash() : null;
     }
 
     private MultipartBody.Part createBufferRequestBody(byte[] data) {
@@ -204,14 +201,13 @@ final class IPFSClient extends Client implements IPFS {
             return null;
         }
         RequestBody requestFile = RequestBody.create(null, data);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("file", "data", requestFile);
-        return body;
+        return MultipartBody.Part.createFormData("file", "data", requestFile);
     }
 
     private MultipartBody.Part createBufferRequestBody(InputStream inputStream) throws IOException {
         Buffer buffer = new Buffer();
         byte[] cache = new byte[1024];
-        int length = 0;
+        int length;
         while ((length = inputStream.read(cache)) != -1) {
             buffer.write(cache, 0, length);
         }
@@ -243,8 +239,8 @@ final class IPFSClient extends Client implements IPFS {
     }
 
 
-    private CompletableFuture<String> doPutInputStream(InputStream inputStream, Callback callback) {
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+    private CompletableFuture<String> doPutInputStream(InputStream inputStream, Callback<String> callback) {
+        return CompletableFuture.supplyAsync(() -> {
             String cid = null;
             try {
                 cid = putInputStreamImpl(inputStream);
@@ -255,7 +251,6 @@ final class IPFSClient extends Client implements IPFS {
             }
             return cid;
         });
-        return future;
     }
 
     private String putInputStreamImpl(InputStream inputStream) throws Exception {
@@ -263,17 +258,17 @@ final class IPFSClient extends Client implements IPFS {
             throw new HiveException("Inputstream is null");
 
         MultipartBody.Part requestBody = createBufferRequestBody(inputStream);
-        Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
+        Response<AddFileResponse> response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
 
-        AddFileResponse addFileResponse = (AddFileResponse) response.body();
-        return addFileResponse.getHash();
+        AddFileResponse addFileResponse = response.body();
+        return addFileResponse != null ? addFileResponse.getHash() : null;
     }
 
-    private CompletableFuture<String> doPutReader(Reader reader, Callback callback) {
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-            String cid = null;
+    private CompletableFuture<String> doPutReader(Reader reader, Callback<String> callback) {
+        return CompletableFuture.supplyAsync(() -> {
+            String cid = "";
             try {
                 cid = putReaderImpl(reader);
                 callback.onSuccess(cid);
@@ -283,8 +278,6 @@ final class IPFSClient extends Client implements IPFS {
             }
             return cid;
         });
-
-        return future;
     }
 
     private String putReaderImpl(Reader reader) throws Exception {
@@ -292,16 +285,16 @@ final class IPFSClient extends Client implements IPFS {
             throw new HiveException("Reader is null");
 
         MultipartBody.Part requestBody = createBufferRequestBody(reader);
-        Response response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
+        Response<AddFileResponse> response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
 
-        AddFileResponse addFileResponse = (AddFileResponse) response.body();
-        return addFileResponse.getHash();
+        AddFileResponse addFileResponse = response.body();
+        return addFileResponse != null ? addFileResponse.getHash() : null;
     }
 
     private CompletableFuture<Long> doGetFileLength(String cid, Callback<Long> callback) {
-        CompletableFuture<Long> future = CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             long length = 0;
             try {
                 length = getFileLengthImpl(cid);
@@ -312,36 +305,30 @@ final class IPFSClient extends Client implements IPFS {
             }
             return length;
         });
-        return future;
     }
 
     private long getFileLengthImpl(String cid) throws Exception {
         if (cid == null || cid.equals(""))
             throw new HiveException("CID is null");
 
-        long size = 0;
-        Response response = ConnectionManager.getIPFSApi().listFile(cid).execute();
+        Response<ListFileResponse> response = ConnectionManager.getIPFSApi().listFile(cid).execute();
 
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
 
-        ListFileResponse listFileResponse = (ListFileResponse) response.body();
+        ListFileResponse listFileResponse = response.body();
 
-        HashMap<String, ListFileResponse.ObjectsBean.Bean> map = listFileResponse.getObjects();
+        HashMap<String, ListFileResponse.ObjectsBean.Bean> map = listFileResponse != null ? listFileResponse.getObjects() : null;
 
         if (map == null || map.size() <= 0)
             throw new HiveException(HiveException.ERROR);
 
-        for (String key : map.keySet()) {
-            size = map.get(key).getSize();
-            break;//if result only one
-        }
-
-        return size;
+        String[] keys = map.keySet().toArray(new String[0]);
+        return map.get(keys[0]).getSize();
     }
 
     private CompletableFuture<String> doGetAsStr(String cid, Callback<String> callback) {
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             String result = null;
             try {
                 result = getAsStrImpl(cid);
@@ -352,14 +339,13 @@ final class IPFSClient extends Client implements IPFS {
             }
             return result;
         });
-        return future;
     }
 
     private String getAsStrImpl(String cid) throws Exception {
         if (cid == null || cid.equals(""))
             throw new HiveException("CID is null");
 
-        Response response = getFileOrBuffer(cid);
+        Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
 
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
@@ -368,7 +354,7 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private CompletableFuture<byte[]> doGetAsBuff(String cid, Callback<byte[]> callback) {
-        CompletableFuture<byte[]> future = CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             byte[] result = new byte[0];
             try {
                 result = getAsBufferImpl(cid);
@@ -379,14 +365,13 @@ final class IPFSClient extends Client implements IPFS {
             }
             return result;
         });
-        return future;
     }
 
     private byte[] getAsBufferImpl(String cid) throws HiveException {
         if (cid == null || cid.equals(""))
             throw new HiveException("CID is null");
 
-        Response response = getFileOrBuffer(cid);
+        Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
 
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
@@ -395,7 +380,7 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private CompletableFuture<Long> doWriteToOutput(String cid, OutputStream outputStream, Callback<Long> callback) {
-        CompletableFuture<Long> future = CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             long length = 0;
             try {
                 length = writeToOutputImpl(cid, outputStream);
@@ -406,7 +391,6 @@ final class IPFSClient extends Client implements IPFS {
             }
             return length;
         });
-        return future;
     }
 
     private long writeToOutputImpl(String cid, OutputStream outputStream) throws Exception {
@@ -416,7 +400,7 @@ final class IPFSClient extends Client implements IPFS {
         if (outputStream == null)
             throw new HiveException("OutputStream is null");
 
-        Response response = getFileOrBuffer(cid);
+        Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
 
@@ -425,7 +409,7 @@ final class IPFSClient extends Client implements IPFS {
 
     private CompletableFuture<Long> doWriteToWriter(String cid, Writer
             writer, Callback<Long> callback) {
-        CompletableFuture<Long> future = CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             long length = 0;
             try {
                 length = writeToWriterImpl(cid, writer);
@@ -436,7 +420,6 @@ final class IPFSClient extends Client implements IPFS {
             }
             return length;
         });
-        return future;
     }
 
     private long writeToWriterImpl(String cid, Writer writer) throws Exception {
@@ -446,7 +429,7 @@ final class IPFSClient extends Client implements IPFS {
         if (writer == null)
             throw new HiveException("Writer is null");
 
-        Response response = getFileOrBuffer(cid);
+        Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
 
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
@@ -454,8 +437,8 @@ final class IPFSClient extends Client implements IPFS {
         return ResponseHelper.writeDataToWriter(response, writer);
     }
 
-    private Response getFileOrBuffer(String cid) throws HiveException {
-        Response response;
+    private Response<okhttp3.ResponseBody> getFileOrBuffer(String cid) throws HiveException {
+        Response<okhttp3.ResponseBody> response;
         try {
             response = ConnectionManager.getIPFSApi()
                     .catFile(cid)
