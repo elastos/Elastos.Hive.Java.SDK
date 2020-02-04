@@ -40,15 +40,12 @@ public final class AuthServer extends NanoHTTPD {
         }
     }
 
-    public AuthServer(String host, int port) {
+    private AuthServer(String host, int port) {
         super(host, port);
     }
 
     @Override
     public Response serve(IHTTPSession session) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("<!DOCTYPE html><html><body>");
-        builder.append("</body></html>\n");
 
         String[] query = session.getQueryParameterString().split("=");
 
@@ -64,7 +61,9 @@ public final class AuthServer extends NanoHTTPD {
         if (authLock != null) {
             authLock.release();
         }
-        return newFixedLengthResponse(builder.toString());
+        String builder = "<!DOCTYPE html><html><body>" +
+                "</body></html>\n";
+        return newFixedLengthResponse(builder);
     }
 
     public String getAuthCode() {

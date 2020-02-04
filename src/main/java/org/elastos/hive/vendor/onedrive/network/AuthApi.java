@@ -27,9 +27,7 @@ import org.elastos.hive.vendor.onedrive.network.model.TokenResponse;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.GET;
 import retrofit2.http.POST;
-import retrofit2.http.Query;
 
 public interface AuthApi {
     @FormUrlEncoded
@@ -45,9 +43,4 @@ public interface AuthApi {
                                      @Field(ConnectConstance.REDIRECT_URL) String redirectUrl,
                                      @Field(ConnectConstance.REFRESH_TOKEN) String refreshToken,
                                      @Field(ConnectConstance.GRANT_TYPE) String grantType);
-
-
-    @GET(ConnectConstance.LOGOUT)
-    Call<String> logout(@Query(ConnectConstance.LOGOUT_REDIRECT_URL) String redirectUrl);
-
 }

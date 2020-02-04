@@ -23,13 +23,8 @@
 package org.elastos.hive.vendor.ipfs.network;
 
 class ConnectConstance {
-    public static final String URLFORMAT = "http://%s:%d/api/v0/";
-    public static final String JSON = "application/json";
-    public static final String PATH = "path";
     static final String ARG = "arg";
-
     static final String ADD = "add";
     static final String CAT = "cat";
     static final String LS = "file/ls";
-    public static final String VERSION = "version";
 }

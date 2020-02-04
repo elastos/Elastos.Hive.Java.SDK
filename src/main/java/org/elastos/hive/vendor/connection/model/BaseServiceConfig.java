@@ -25,10 +25,6 @@ package org.elastos.hive.vendor.connection.model;
 public class BaseServiceConfig {
     private final HeaderConfig headerConfig;
 
-    private BaseServiceConfig() {
-        this.headerConfig = null;
-    }
-
     private BaseServiceConfig(Builder builder) {
         this.headerConfig = builder.headerConfig;
     }

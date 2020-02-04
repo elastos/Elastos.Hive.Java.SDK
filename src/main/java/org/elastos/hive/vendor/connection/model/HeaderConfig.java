@@ -29,12 +29,6 @@ public class HeaderConfig {
     private final String contentType;
     private final String acceptEncoding;
 
-    private HeaderConfig() {
-        this.authToken = null;
-        this.contentType = null;
-        this.acceptEncoding = null;
-    }
-
     private HeaderConfig(Builder builder) {
         this.authToken = builder.authToken;
         this.contentType = builder.contentType;
@@ -66,16 +60,6 @@ public class HeaderConfig {
 
         public Builder authToken(AuthToken authToken) {
             this.authToken = authToken;
-            return this;
-        }
-
-        public Builder contentType(String contentType) {
-            this.contentType = contentType;
-            return this;
-        }
-
-        public Builder acceptEncoding(String acceptEncoding) {
-            this.acceptEncoding = acceptEncoding;
             return this;
         }
 

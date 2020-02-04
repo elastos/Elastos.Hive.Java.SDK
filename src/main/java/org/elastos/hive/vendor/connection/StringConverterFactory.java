@@ -31,7 +31,7 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 
 public class StringConverterFactory extends Converter.Factory {
-    public static final StringConverterFactory create() {
+    static StringConverterFactory create() {
         return new StringConverterFactory();
     }
 

@@ -22,12 +22,12 @@
 
 package org.elastos.hive.vendor.connection;
 
-import org.elastos.hive.utils.CheckTextUtil;
 import org.elastos.hive.utils.LogUtil;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.Objects;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -60,10 +60,12 @@ public class NetworkLogInterceptor implements Interceptor {
             if (contentType != null) {
                 charset = contentType.charset(charset);
             }
-            rbString = buffer.readString(charset);
+            if (charset != null) {
+                rbString = buffer.readString(charset);
+            }
         }
 
-        if (!CheckTextUtil.isEmpty(rbString)) {
+        if (rbString!=null && !rbString.equals("")) {
             LogUtil.d("request body->" + rbString);
         }
 
@@ -89,16 +91,16 @@ public class NetworkLogInterceptor implements Interceptor {
                     e.printStackTrace();
                 }
             }
-            rbBody = buffer.clone().readString(charset);
+            if (charset != null) {
+                rbBody = buffer.clone().readString(charset);
+            }
         }
 
         LogUtil.d("response Code ->" + response.code());
-        if (!CheckTextUtil.isEmpty(rbBody)) {
-
+        if (rbBody != null && !rbBody.equals(""))
             LogUtil.d("response body ->" + rbBody);
-        }
 
-        if (response.header("Content-Type").equals("text/html; charset=utf-8")) {
+        if (Objects.requireNonNull(response.header("Content-Type")).equals("text/html; charset=utf-8")) {
             try {
                 response.peekBody(0);
                 response.newBuilder()
@@ -106,6 +108,7 @@ public class NetworkLogInterceptor implements Interceptor {
                         .message(response.message())
                         .body(ResponseBody.create(null, "")).build();
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return response;

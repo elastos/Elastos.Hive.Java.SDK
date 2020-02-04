@@ -45,7 +45,7 @@ class AuthInfoStoreImpl implements Persistent {
             initialize();
             reader = new FileReader(storePath);
             char[] buf = new char[128];
-            int len = 0;
+            int len;
             StringBuilder content = new StringBuilder();
             while ((len = reader.read(buf)) != -1) {
                 content.append(new String(buf, 0, len));
@@ -61,7 +61,7 @@ class AuthInfoStoreImpl implements Persistent {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    throw new HiveException(e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }
@@ -83,7 +83,7 @@ class AuthInfoStoreImpl implements Persistent {
                 try {
                     fileWriter.close();
                 } catch (IOException e) {
-                    throw new HiveException(e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }
@@ -91,8 +91,7 @@ class AuthInfoStoreImpl implements Persistent {
 
     private void initialize() throws IOException {
         File config = new File(storePath);
-        if (!config.exists()) {
+        if (!config.exists())
             config.createNewFile();
-        }
     }
 }
