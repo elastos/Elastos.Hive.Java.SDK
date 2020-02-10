@@ -66,7 +66,7 @@ class AuthInfoStoreImpl implements Persistent {
             }
         }
 
-        return null;
+        return new JSONObject();
     }
 
     @Override
