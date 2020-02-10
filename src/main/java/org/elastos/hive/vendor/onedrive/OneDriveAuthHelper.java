@@ -113,10 +113,7 @@ public class OneDriveAuthHelper implements AuthHelper {
 
     private void doCheckExpired() throws Exception {
         connectState.set(false);
-        if (token == null) {
-            throw new HiveException("Please login first");
-        }
-        if (token.isExpired())
+        if (token == null || token.isExpired())
             redeemToken();
         connectState.set(true);
     }
@@ -180,9 +177,12 @@ public class OneDriveAuthHelper implements AuthHelper {
     }
 
     private void redeemToken() throws Exception {
+        String refreshToken = "";
+        if (token != null)
+            refreshToken = token.getRefreshToken();
         Response response = ConnectionManager.getAuthApi()
                 .refreshToken(clientId, redirectUrl,
-                        token.getRefreshToken(), OneDriveConstance.GRANT_TYPE_REFRESH_TOKEN)
+                        refreshToken, OneDriveConstance.GRANT_TYPE_REFRESH_TOKEN)
                 .execute();
         handleTokenResponse(response);
     }
