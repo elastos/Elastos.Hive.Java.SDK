@@ -61,8 +61,7 @@ public final class AuthServer extends NanoHTTPD {
         if (authLock != null) {
             authLock.release();
         }
-        String builder = "<!DOCTYPE html><html><body>" +
-                "</body></html>\n";
+        String builder = "<!DOCTYPE html><html><body></body></html>\n";
         return newFixedLengthResponse(builder);
     }
 
