@@ -45,8 +45,7 @@ public abstract class Client {
         private String storePath;
         private Authenticator authenticator;
 
-        protected Options() {
-        }
+        protected Options() {}
 
         protected void setStorePath(String storePath) {
             this.storePath = storePath;
@@ -62,6 +61,10 @@ public abstract class Client {
 
         public Authenticator authenticator() {
             return authenticator;
+        }
+
+        protected boolean checkValid(boolean all) {
+            return (storePath != null) && (!all || authenticator != null);
         }
 
         protected abstract Client buildClient();
