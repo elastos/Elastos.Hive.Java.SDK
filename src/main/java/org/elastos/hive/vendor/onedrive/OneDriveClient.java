@@ -33,13 +33,12 @@ import retrofit2.Response;
 final class OneDriveClient extends Client implements Files, KeyValues {
     private Authenticator authenticator;
     private OneDriveAuthHelper authHelper;
-    private String rootPath = "/Files";
 
     OneDriveClient(Client.Options options) {
-        OneDriveOptions oneDriveOptions = (OneDriveOptions) options;
-        authHelper = new OneDriveAuthHelper(oneDriveOptions.clientId(),
-                OneDriveConstance.appScope, oneDriveOptions.redirectUrl(), oneDriveOptions.storePath());
-        authenticator = oneDriveOptions.authenticator();
+        OneDriveOptions opts = (OneDriveOptions) options;
+        authHelper = new OneDriveAuthHelper(opts.clientId(),
+                OneDriveConstance.APP_SCOPE, opts.redirectUrl(), opts.storePath());
+        authenticator = opts.authenticator();
     }
 
     @Override
@@ -47,7 +46,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         try {
             authHelper.loginAsync(authenticator).get();
         } catch (Exception e) {
-            e.printStackTrace();
             throw new HiveException(e.getLocalizedMessage());
         }
     }
@@ -85,7 +83,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Void> put(byte[] data, String remoteFile, Callback<Void> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutBuffer(creatDestFilePath(remoteFile), data, callback));
+                .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data, callback));
     }
 
     @Override
@@ -96,7 +94,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Void> put(String data, String remoteFile, Callback<Void> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutBuffer(creatDestFilePath(remoteFile), data.getBytes(), callback));
+                .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data.getBytes(), callback));
     }
 
     @Override
@@ -107,7 +105,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Void> put(InputStream input, String remoteFile, Callback<Void> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutInputStream(creatDestFilePath(remoteFile), input, callback));
+                .thenCompose(result -> doPutInputStream(toRemoteFilePath(remoteFile), input, callback));
     }
 
     @Override
@@ -118,7 +116,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Void> put(Reader reader, String remoteFile, Callback<Void> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutReader(creatDestFilePath(remoteFile), reader, callback));
+                .thenCompose(result -> doPutReader(toRemoteFilePath(remoteFile), reader, callback));
     }
 
     @Override
@@ -129,7 +127,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Long> size(String remoteFile, Callback<Long> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doGetFileLength(creatDestFilePath(remoteFile), callback));
+                .thenCompose(result -> doGetFileLength(toRemoteFilePath(remoteFile), callback));
     }
 
     @Override
@@ -140,7 +138,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<String> getAsString(String remoteFile, Callback<String> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doGetString(creatDestFilePath(remoteFile), callback));
+                .thenCompose(result -> doGetString(toRemoteFilePath(remoteFile), callback));
     }
 
     @Override
@@ -151,9 +149,8 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<byte[]> getAsBuffer(String remoteFile, Callback<byte[]> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doGetBuffer(creatDestFilePath(remoteFile), callback));
+                .thenCompose(result -> doGetBuffer(toRemoteFilePath(remoteFile), callback));
     }
-
 
     @Override
     public CompletableFuture<Void> delete(String remoteFile) {
@@ -163,7 +160,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Void> delete(String remoteFile, Callback<Void> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doDeleteFile(creatDestFilePath(remoteFile), callback));
+                .thenCompose(result -> doDeleteFile(toRemoteFilePath(remoteFile), callback));
     }
 
     @Override
@@ -185,7 +182,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Long> get(String remoteFile, OutputStream output, Callback<Long> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doWriteToOutput(creatDestFilePath(remoteFile), output, callback));
+                .thenCompose(result -> doWriteToOutput(toRemoteFilePath(remoteFile), output, callback));
     }
 
     @Override
@@ -196,7 +193,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Long> get(String remoteFile, Writer writer, Callback<Long> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doWriteToWriter(creatDestFilePath(remoteFile), writer, callback));
+                .thenCompose(result -> doWriteToWriter(toRemoteFilePath(remoteFile), writer, callback));
     }
 
     @Override
@@ -207,7 +204,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Void> putValue(String key, String value, Callback<Void> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutValue(creatDestKeyPath(key), value.getBytes(), callback));
+                .thenCompose(result -> doPutValue(toRemoteKeyPath(key), value.getBytes(), callback));
     }
 
     @Override
@@ -218,7 +215,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Void> putValue(String key, byte[] value, Callback<Void> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutValue(creatDestKeyPath(key), value, callback));
+                .thenCompose(result -> doPutValue(toRemoteKeyPath(key), value, callback));
     }
 
     @Override
@@ -229,7 +226,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Void> setValue(String key, String value, Callback<Void> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doSetValue(creatDestKeyPath(key), value.getBytes(), callback));
+                .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value.getBytes(), callback));
     }
 
     @Override
@@ -240,7 +237,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Void> setValue(String key, byte[] value, Callback<Void> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doSetValue(creatDestKeyPath(key), value, callback));
+                .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value, callback));
 
     }
 
@@ -252,7 +249,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<ArrayList<byte[]>> getValues(String key, Callback<ArrayList<byte[]>> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doGetValue(creatDestKeyPath(key), callback));
+                .thenCompose(result -> doGetValue(toRemoteKeyPath(key), callback));
     }
 
     @Override
@@ -263,11 +260,10 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public CompletableFuture<Void> deleteKey(String key, Callback<Void> callback) {
         return authHelper.checkExpired()
-                .thenCompose(result -> doDeleteFile(creatDestKeyPath(key), callback));
+                .thenCompose(result -> doDeleteFile(toRemoteKeyPath(key), callback));
     }
 
 ////
-
     private CompletableFuture<ArrayList<byte[]>> doGetValue(String key, Callback<ArrayList<byte[]>> callback) {
         return CompletableFuture.supplyAsync(() -> {
             ArrayList<byte[]> list = null;
@@ -292,12 +288,22 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         return arrayList;
     }
 
-    private String creatDestFilePath(String destFileName) {
-        return rootPath + "/" + destFileName;
+    private String toRemoteFilePath(String destFileName) {
+        StringBuilder builder = new StringBuilder(512)
+                .append(OneDriveConstance.FILES_ROOT_PATH)
+                .append("/")
+                .append(destFileName);
+
+        return builder.toString();
     }
 
-    private String creatDestKeyPath(String key) {
-        return "/KeyValues/" + key;
+    private String toRemoteKeyPath(String key) {
+        StringBuilder builder = new StringBuilder(512)
+                .append(OneDriveConstance.KEYVALUES_ROOT_PATH)
+                .append("/")
+                .append(key);
+
+        return builder.toString();
     }
 
     private CompletableFuture<Void> doPutReader(String remoteFile, Reader reader, Callback<Void> callback) {
@@ -549,7 +555,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 length = writeToOutput(remoteFile, outputStream);
                 callback.onSuccess(length);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
             return length;
@@ -642,7 +647,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
     private ArrayList<String> listFile() throws Exception {
         OneDriveApi api = ConnectionManager.getOnedriveApi();
-        Response<DirChildrenResponse> response = api.getChildren(rootPath).execute();
+        Response<DirChildrenResponse> response = api.getChildren(OneDriveConstance.FILES_ROOT_PATH).execute();
 
         int checkResponseCode = checkResponseCode(response);
         if (checkResponseCode == 404) {
