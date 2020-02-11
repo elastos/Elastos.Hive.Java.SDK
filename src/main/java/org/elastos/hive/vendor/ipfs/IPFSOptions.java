@@ -24,6 +24,15 @@ public class IPFSOptions extends Client.Options {
         return rpcNodes;
     }
 
+    @Override
+    protected boolean checkValid(boolean all) {
+        return (rpcNodes.size() > 0 && super.checkValid(all));
+    }
+
+    boolean checkValid() {
+        return checkValid(false);
+    }
+
     public static class RpcNode {
         private String ipv4;
         private String ipv6;
@@ -71,11 +80,10 @@ public class IPFSOptions extends Client.Options {
 
         public Client.Options build() throws HiveException {
             if (options == null) {
-                throw new HiveException("Builder should be deprecated");
+                throw new HiveException("Builder deprecated");
             }
-
-            if (!options.hasRpcNodes() || options.storePath() == null) {
-                throw new HiveException("Some options fields are invalid");
+            if (!options.checkValid()) {
+                throw new HiveException("Missing options");
             }
 
             Client.Options opts = options;

@@ -50,6 +50,16 @@ public class OneDriveOptions extends Client.Options {
     }
 
     @Override
+    protected boolean checkValid(boolean all) {
+        return (clientId != null && redirectURL != null &&
+            super.checkValid(all));
+    }
+
+    boolean checkValid() {
+        return checkValid(true);
+    }
+
+    @Override
     protected Client buildClient() {
         return new OneDriveClient(this);
     }
@@ -83,12 +93,10 @@ public class OneDriveOptions extends Client.Options {
 
         public Client.Options build() throws HiveException {
             if (options == null) {
-                throw new HiveException("Builder should be deprecated");
+                throw new HiveException("Builder deprecated");
             }
-            if (options.clientId() == null ||
-                    options.redirectUrl() == null ||
-                    options.authenticator() == null) {
-                throw new HiveException("Some options fields are invalid");
+            if (!options.checkValid()) {
+                throw new HiveException("Missing options");
             }
 
             Client.Options opts = options;
