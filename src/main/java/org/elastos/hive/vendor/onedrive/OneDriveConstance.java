@@ -23,7 +23,7 @@
 package org.elastos.hive.vendor.onedrive;
 
 class OneDriveConstance {
-    static final String appScope = "Files.ReadWrite.AppFolder offline_access";
+    static final String APP_SCOPE = "Files.ReadWrite.AppFolder offline_access";
 
     static final String ONE_DRIVE_AUTH_URL = "https://login.microsoftonline.com/common/oauth2/v2.0" ;
     static final String ONE_DRIVE_AUTH_BASE_URL = ONE_DRIVE_AUTH_URL+"/";
@@ -40,4 +40,6 @@ class OneDriveConstance {
 
     static final String CONFIG = "onedrive.json";
 
+    static final String FILES_ROOT_PATH  = "/Files";
+    static final String KEYVALUES_ROOT_PATH = "/KeyValues";
 }

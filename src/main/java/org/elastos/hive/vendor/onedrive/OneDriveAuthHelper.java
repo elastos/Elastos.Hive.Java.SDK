@@ -53,8 +53,8 @@ public class OneDriveAuthHelper implements AuthHelper {
     private final String clientId;
     private final String scope;
     private final String redirectUrl;
-
     private final Persistent persistent;
+
     private AuthToken token;
     private AtomicBoolean connectState = new AtomicBoolean(false);
 
@@ -85,9 +85,7 @@ public class OneDriveAuthHelper implements AuthHelper {
                 doLogin(authenticator);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                e.printStackTrace();
-                HiveException hiveException = new HiveException(e.getLocalizedMessage());
-                callback.onError(hiveException);
+                callback.onError(new HiveException(e.getLocalizedMessage()));
             }
         });
     }
@@ -104,9 +102,7 @@ public class OneDriveAuthHelper implements AuthHelper {
                 doCheckExpired();
                 callback.onSuccess(null);
             } catch (Exception e) {
-                e.printStackTrace();
-                HiveException hiveException = new HiveException(e.getLocalizedMessage());
-                callback.onError(hiveException);
+                callback.onError(new HiveException(e.getLocalizedMessage()));
             }
         });
     }
