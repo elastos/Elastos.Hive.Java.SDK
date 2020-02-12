@@ -24,7 +24,6 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
-import org.elastos.hive.exception.UnsupportedException;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
@@ -36,11 +35,11 @@ public abstract class Client {
 
     public abstract boolean isConnected();
 
-    public abstract Files getFiles() throws UnsupportedException;
+    public abstract Files getFiles();
 
-    public abstract IPFS getIPFS() throws UnsupportedException;
+    public abstract IPFS getIPFS();
 
-    public abstract KeyValues getKeyValues() throws UnsupportedException;
+    public abstract KeyValues getKeyValues();
 
     public static abstract class Options {
         private String storePath;

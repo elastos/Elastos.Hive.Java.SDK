@@ -4,7 +4,6 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.UnsupportedException;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
@@ -32,7 +31,7 @@ final class IPFSClient extends Client implements IPFS {
     private IPFSRpc ipfsRpc;
 
     IPFSClient(Options options) {
-        ipfsRpc = new IPFSRpc(((IPFSOptions)options).getRpcNodes());
+        ipfsRpc = new IPFSRpc(((IPFSOptions) options).getRpcNodes());
     }
 
     @Override
@@ -51,8 +50,8 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     @Override
-    public Files getFiles() throws UnsupportedException {
-        throw new UnsupportedException();
+    public Files getFiles() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -61,137 +60,115 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     @Override
-    public KeyValues getKeyValues() throws UnsupportedException {
-        throw new UnsupportedException();
+    public KeyValues getKeyValues() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public CompletableFuture<String> put(byte[] data) throws HiveException {
+    public CompletableFuture<String> put(byte[] data) {
         return put(data, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> put(byte[] data, Callback<String> callback) throws HiveException {
-        if (null == data)
-            throw new HiveException(HiveException.DATANULL);
-        if (null == callback)
-            throw new HiveException(HiveException.CALLBACKNULL);
+    public CompletableFuture<String> put(byte[] data, Callback<String> callback) {
+        if (null == data || null == callback)
+            throw new IllegalArgumentException();
         return doPutBuffer(data, callback);
     }
 
     @Override
-    public CompletableFuture<String> put(String data) throws HiveException {
+    public CompletableFuture<String> put(String data) {
         return put(data, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> put(String data, Callback<String> callback) throws HiveException {
-        if (null == data)
-            throw new HiveException(HiveException.DATANULL);
-        if (null == callback)
-            throw new HiveException(HiveException.CALLBACKNULL);
+    public CompletableFuture<String> put(String data, Callback<String> callback) {
+        if (null == data || null == callback)
+            throw new IllegalArgumentException();
         return doPutBuffer(data.getBytes(), callback);
     }
 
     @Override
-    public CompletableFuture<String> put(InputStream input) throws HiveException {
+    public CompletableFuture<String> put(InputStream input) {
         return put(input, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> put(InputStream input, Callback<String> callback) throws HiveException {
-        if (null == input)
-            throw new HiveException(HiveException.ISNULL);
-        if (null == callback)
-            throw new HiveException(HiveException.CALLBACKNULL);
+    public CompletableFuture<String> put(InputStream input, Callback<String> callback) {
+        if (null == input || null == callback)
+            throw new IllegalArgumentException();
         return doPutInputStream(input, callback);
     }
 
     @Override
-    public CompletableFuture<String> put(Reader reader) throws HiveException {
+    public CompletableFuture<String> put(Reader reader) {
         return put(reader, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> put(Reader reader, Callback<String> callback) throws HiveException {
-        if (null == reader)
-            throw new HiveException(HiveException.READERNULL);
-        if (null == callback)
-            throw new HiveException(HiveException.CALLBACKNULL);
+    public CompletableFuture<String> put(Reader reader, Callback<String> callback) {
+        if (null == reader || null == callback)
+            throw new IllegalArgumentException();
         return doPutReader(reader, callback);
     }
 
     @Override
-    public CompletableFuture<Long> size(String cid) throws HiveException {
+    public CompletableFuture<Long> size(String cid) {
         return size(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Long> size(String cid, Callback<Long> callback) throws HiveException {
-        if (null == cid || cid.equals(""))
-            throw new HiveException(HiveException.CIDNULL);
-        if (null == callback)
-            throw new HiveException(HiveException.CALLBACKNULL);
+    public CompletableFuture<Long> size(String cid, Callback<Long> callback) {
+        if (null == cid || cid.equals("") || null == callback)
+            throw new IllegalArgumentException();
         return doGetFileLength(cid, callback);
     }
 
     @Override
-    public CompletableFuture<String> getAsString(String cid) throws HiveException {
+    public CompletableFuture<String> getAsString(String cid) {
         return getAsString(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> getAsString(String cid, Callback<String> callback) throws HiveException {
-        if (null == cid || cid.equals(""))
-            throw new HiveException(HiveException.CIDNULL);
-        if (null == callback)
-            throw new HiveException(HiveException.CALLBACKNULL);
+    public CompletableFuture<String> getAsString(String cid, Callback<String> callback) {
+        if (null == cid || cid.equals("") || null == callback)
+            throw new IllegalArgumentException();
         return doGetAsStr(cid, callback);
     }
 
     @Override
-    public CompletableFuture<byte[]> getAsBuffer(String cid) throws HiveException {
+    public CompletableFuture<byte[]> getAsBuffer(String cid) {
         return getAsBuffer(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback) throws HiveException {
-        if (null == cid || cid.equals(""))
-            throw new HiveException(HiveException.CIDNULL);
-        if (null == callback)
-            throw new HiveException(HiveException.CALLBACKNULL);
+    public CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback) {
+        if (null == cid || cid.equals("") || null == callback)
+            throw new IllegalArgumentException();
         return doGetAsBuff(cid, callback);
     }
 
     @Override
-    public CompletableFuture<Long> get(String cid, OutputStream output) throws HiveException {
+    public CompletableFuture<Long> get(String cid, OutputStream output) {
         return get(cid, output, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Long> get(String cid, OutputStream output, Callback<Long> callback) throws HiveException {
-        if (null == cid || cid.equals(""))
-            throw new HiveException(HiveException.CIDNULL);
-        if (null == output)
-            throw new HiveException(HiveException.OSNULL);
-        if (null == callback)
-            throw new HiveException(HiveException.CALLBACKNULL);
+    public CompletableFuture<Long> get(String cid, OutputStream output, Callback<Long> callback) {
+        if (null == cid || cid.equals("") || null == output || null == callback)
+            throw new IllegalArgumentException();
         return doWriteToOutput(cid, output, callback);
     }
 
     @Override
-    public CompletableFuture<Long> get(String cid, Writer writer) throws HiveException {
+    public CompletableFuture<Long> get(String cid, Writer writer) {
         return get(cid, writer, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback) throws HiveException {
-        if (null == cid || cid.equals(""))
-            throw new HiveException(HiveException.CIDNULL);
-        if (null == writer)
-            throw new HiveException(HiveException.WRITERNULL);
-        if (null == callback)
-            throw new HiveException(HiveException.CALLBACKNULL);
+    public CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback) {
+        if (null == cid || cid.equals("") || null == writer || null == callback)
+            throw new IllegalArgumentException();
         return doWriteToWriter(cid, writer, callback);
     }
 
