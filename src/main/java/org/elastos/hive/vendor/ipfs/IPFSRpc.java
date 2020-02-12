@@ -72,7 +72,6 @@ class IPFSRpc {
             ConnectionManager.resetIPFSApi(baseUrl);
             connectState.set(true);
         } catch (Exception e) {
-            e.printStackTrace();
             connectState.set(false);
         }
     }

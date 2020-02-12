@@ -31,21 +31,8 @@ import retrofit2.Response;
 final class IPFSClient extends Client implements IPFS {
     private IPFSRpc ipfsRpc;
 
-    private void checkNull(ArrayList<IPFSOptions.RpcNode> nodes) throws HiveException {
-        if (nodes == null)
-            throw new HiveException(HiveException.RPC_NODE_NULL);
-    }
-
     IPFSClient(Options options) {
-
-        ArrayList<IPFSOptions.RpcNode> nodes = ((IPFSOptions) options).getRpcNodes();
-        try {
-            checkNull(nodes);
-        } catch (HiveException e) {
-            e.printStackTrace();
-        }
-
-        ipfsRpc = new IPFSRpc(nodes);
+        ipfsRpc = new IPFSRpc(((IPFSOptions)options).getRpcNodes());
     }
 
     @Override
@@ -176,7 +163,6 @@ final class IPFSClient extends Client implements IPFS {
                 result = putBufferImpl(data);
                 callback.onSuccess(result);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
             return result;
@@ -192,8 +178,8 @@ final class IPFSClient extends Client implements IPFS {
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
 
-        AddFileResponse addFileResponse = response.body();
-        return addFileResponse != null ? addFileResponse.getHash() : null;
+        AddFileResponse respBody = response.body();
+        return respBody != null ? respBody.getHash() : null;
     }
 
     private MultipartBody.Part createBufferRequestBody(byte[] data) {
@@ -246,7 +232,6 @@ final class IPFSClient extends Client implements IPFS {
                 cid = putInputStreamImpl(inputStream);
                 callback.onSuccess(cid);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
             return cid;
@@ -300,7 +285,6 @@ final class IPFSClient extends Client implements IPFS {
                 length = getFileLengthImpl(cid);
                 callback.onSuccess(length);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
             return length;
@@ -334,7 +318,6 @@ final class IPFSClient extends Client implements IPFS {
                 result = getAsStrImpl(cid);
                 callback.onSuccess(result);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
             return result;
@@ -360,7 +343,6 @@ final class IPFSClient extends Client implements IPFS {
                 result = getAsBufferImpl(cid);
                 callback.onSuccess(result);
             } catch (HiveException e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
             return result;
@@ -386,7 +368,6 @@ final class IPFSClient extends Client implements IPFS {
                 length = writeToOutputImpl(cid, outputStream);
                 callback.onSuccess(length);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
             return length;
@@ -415,7 +396,6 @@ final class IPFSClient extends Client implements IPFS {
                 length = writeToWriterImpl(cid, writer);
                 callback.onSuccess(length);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
             return length;
