@@ -19,83 +19,89 @@ import java.io.Reader;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ClientIPFSInterfaceTest {
-    private static Client client;
     private static final String STORE_PATH = System.getProperty("user.dir");
+    private static final String[] IPADDRS = {"3.133.166.156", "127.0.0.1"};
+
+    private static Client client;
     private static IPFS ipfsAPIs;
 
-    String cid = "QmaY6wjwnybJgd5F4FD6pPL6h9vjXrGv2BJbxxUC1ojUbQ";
-
-    String filePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
+    private String data = "aaa";
+    private String cid  = "QmaY6wjwnybJgd5F4FD6pPL6h9vjXrGv2BJbxxUC1ojUbQ";
+    private String path = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
 
     @Test
     public void testPutData() {
-
     }
 
     @Test
-    public void testPutDataFrom() {
-        byte[] buf = "aaa".getBytes();
-        CompletableFuture<String> future = ipfsAPIs.put(buf);
-
+    public void testPutDataInByteArray() {
+        CompletableFuture<String> future = ipfsAPIs.put(data.getBytes());
         TestUtils.waitFinish(future);
 
-
         try {
-            System.out.println(future.get());
+            String result = future.get();
+            System.out.println(result);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            fail();
         } catch (ExecutionException e) {
             e.printStackTrace();
+            fail();
         }
     }
 
     @Test
-    public void testPutStringData() {
-
-        CompletableFuture<String> future = ipfsAPIs.put("aaa");
+    public void testPutString() {
         try {
+            CompletableFuture<String> future = ipfsAPIs.put(data);
             String cid = future.get();
             System.out.println(cid);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            fail();
         } catch (ExecutionException e) {
             e.printStackTrace();
+            fail();
         }
     }
 
     @Test
-    public void testPutDataFromStream() {
-        String path = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
-
+    public void testPutDataFromInputStream() {
         try {
-            InputStream inputStream = new FileInputStream(path);
-            CompletableFuture<String> future = ipfsAPIs.put(inputStream);
+            CompletableFuture<String> future = ipfsAPIs.put(new FileInputStream(path));
 
             System.out.println(future.get());
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
+            fail();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            fail();
         } catch (ExecutionException e) {
             e.printStackTrace();
+            fail();
         }
     }
 
     @Test
-    public void testPutDataFromReader() {
+    public void testPutDataFromFileReader() {
         try {
-            Reader reader = new FileReader(filePath);
+            Reader reader = new FileReader(path);
             CompletableFuture<String> future = ipfsAPIs.put(reader);
             System.out.println(future.get());
         } catch (InterruptedException e) {
             e.printStackTrace();
+            fail();
         } catch (ExecutionException e) {
             e.printStackTrace();
+            fail();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            fail();
         }
     }
 
@@ -107,8 +113,10 @@ public class ClientIPFSInterfaceTest {
             System.out.println(length);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            fail();
         } catch (ExecutionException e) {
             e.printStackTrace();
+            fail();
         }
     }
 
@@ -121,8 +129,10 @@ public class ClientIPFSInterfaceTest {
             System.out.println(result);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            fail();
         } catch (ExecutionException e) {
             e.printStackTrace();
+            fail();
         }
     }
 
@@ -135,8 +145,10 @@ public class ClientIPFSInterfaceTest {
             System.out.println(result);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            fail();
         } catch (ExecutionException e) {
             e.printStackTrace();
+            fail();
         }
     }
 
@@ -150,22 +162,21 @@ public class ClientIPFSInterfaceTest {
             System.out.println(outputStream.toString());
         } catch (InterruptedException e) {
             e.printStackTrace();
+            fail();
         } catch (ExecutionException e) {
             e.printStackTrace();
+            fail();
         }
     }
 
     @BeforeClass
     public static void setUp() {
         try {
-            IPFSOptions.RpcNode node = new IPFSOptions.RpcNode("3.133.166.156", 5001);
-            IPFSOptions.RpcNode node2 = new IPFSOptions.RpcNode("127.0.0.1", 5001);
-
             Client.Options options = new IPFSOptions
                     .Builder()
                     .setStorePath(STORE_PATH)
-                    .addRpcNode(node)
-                    .addRpcNode(node2)
+                    .addRpcNode(new IPFSOptions.RpcNode(IPADDRS[0], 5001))
+                    .addRpcNode(new IPFSOptions.RpcNode(IPADDRS[1], 5001))
                     .build();
 
             client = Client.createInstance(options);
@@ -179,7 +190,10 @@ public class ClientIPFSInterfaceTest {
 
     @AfterClass
     public static void tearDown() {
-        if (client != null) client.disconnect();
-        client = null;
+        if (client != null) {
+            if (client.isConnected())
+                client.disconnect();
+            client = null;
+        }
     }
 }
