@@ -35,6 +35,17 @@ public class HiveException extends Exception {
     public static final String GET_FILE_LENGTH_ERROR = "Get file length error .";
     public static final String ITEM_NOT_FOUND = "Item not found.";
     public static final String ERROR = "Error";
+    public static final String CALLBACKNULL = "Callback is null";
+    public static final String CIDNULL = "Cid is null";
+    public static final String OSNULL = "OutputStream is null";
+    public static final String WRITERNULL = "Writer is null";
+    public static final String READERNULL = "Reader is null";
+    public static final String ISNULL = "InputStream is null";
+    public static final String DATANULL = "Data is null";
+    public static final String REMOTENULL = "RemoteFile is null";
+    public static final String KEYNULL = "Key is null";
+    public static final String VALUENULL = "Value is null";
+
 
     public HiveException() {
         super();

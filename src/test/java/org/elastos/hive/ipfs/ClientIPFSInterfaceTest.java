@@ -13,13 +13,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ClientIPFSInterfaceTest {
@@ -30,7 +28,7 @@ public class ClientIPFSInterfaceTest {
     private static IPFS ipfsAPIs;
 
     private String data = "aaa";
-    private String cid  = "QmaY6wjwnybJgd5F4FD6pPL6h9vjXrGv2BJbxxUC1ojUbQ";
+    private String cid = "QmaY6wjwnybJgd5F4FD6pPL6h9vjXrGv2BJbxxUC1ojUbQ";
     private String path = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
 
     @Test
@@ -39,16 +37,13 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testPutDataInByteArray() {
-        CompletableFuture<String> future = ipfsAPIs.put(data.getBytes());
-        TestUtils.waitFinish(future);
-
         try {
+            CompletableFuture<String> future = ipfsAPIs.put(data.getBytes());
+            TestUtils.waitFinish(future);
+
             String result = future.get();
             System.out.println(result);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | HiveException | ExecutionException e) {
             e.printStackTrace();
             fail();
         }
@@ -60,10 +55,7 @@ public class ClientIPFSInterfaceTest {
             CompletableFuture<String> future = ipfsAPIs.put(data);
             String cid = future.get();
             System.out.println(cid);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | HiveException | ExecutionException e) {
             e.printStackTrace();
             fail();
         }
@@ -75,14 +67,8 @@ public class ClientIPFSInterfaceTest {
             CompletableFuture<String> future = ipfsAPIs.put(new FileInputStream(path));
 
             System.out.println(future.get());
-        } catch (FileNotFoundException ex) {
+        } catch (FileNotFoundException | InterruptedException | ExecutionException | HiveException ex) {
             ex.printStackTrace();
-            fail();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
             fail();
         }
     }
@@ -93,13 +79,7 @@ public class ClientIPFSInterfaceTest {
             Reader reader = new FileReader(path);
             CompletableFuture<String> future = ipfsAPIs.put(reader);
             System.out.println(future.get());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            fail();
-        } catch (FileNotFoundException e) {
+        } catch (InterruptedException | HiveException | ExecutionException | FileNotFoundException e) {
             e.printStackTrace();
             fail();
         }
@@ -107,14 +87,11 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testGetFileSize() {
-        CompletableFuture<Long> completableFuture = ipfsAPIs.size(cid);
         try {
+            CompletableFuture<Long> completableFuture = ipfsAPIs.size(cid);
             long length = completableFuture.get();
             System.out.println(length);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | HiveException | ExecutionException e) {
             e.printStackTrace();
             fail();
         }
@@ -122,15 +99,13 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testGetBuffer() {
-        CompletableFuture<byte[]> completableFuture = ipfsAPIs.getAsBuffer(cid);
         try {
+            CompletableFuture<byte[]> completableFuture = ipfsAPIs.getAsBuffer(cid);
+
             byte[] buffer = completableFuture.get();
             String result = new String(buffer);
             System.out.println(result);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | HiveException | ExecutionException e) {
             e.printStackTrace();
             fail();
         }
@@ -138,15 +113,13 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testGetStringBuffer() {
-        CompletableFuture<String> completableFuture = ipfsAPIs.getAsString(cid);
         try {
+            CompletableFuture<String> completableFuture = ipfsAPIs.getAsString(cid);
+
             String result = completableFuture.get();
-            System.out.println("result="+result);
+            System.out.println("result=" + result);
             System.out.println(result);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | HiveException | ExecutionException e) {
             e.printStackTrace();
             fail();
         }
@@ -154,16 +127,14 @@ public class ClientIPFSInterfaceTest {
 
     @Test
     public void testGetOutput() {
-        OutputStream outputStream = new ByteArrayOutputStream();
-        CompletableFuture<Long> completableFuture = ipfsAPIs.get(cid, outputStream);
         try {
+            OutputStream outputStream = new ByteArrayOutputStream();
+            CompletableFuture<Long> completableFuture = ipfsAPIs.get(cid, outputStream);
+
             long length = completableFuture.get();
             System.out.println(length);
             System.out.println(outputStream.toString());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | HiveException | ExecutionException e) {
             e.printStackTrace();
             fail();
         }

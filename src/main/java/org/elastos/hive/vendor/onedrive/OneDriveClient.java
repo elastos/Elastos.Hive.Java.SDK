@@ -5,12 +5,14 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.UnsupportedException;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
 import org.elastos.hive.utils.DigitalUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
+import org.elastos.hive.vendor.connection.model.NoBodyEntity;
 import org.elastos.hive.vendor.onedrive.network.OneDriveApi;
 import org.elastos.hive.vendor.onedrive.network.model.DirChildrenResponse;
 import org.elastos.hive.vendor.onedrive.network.model.FileOrDirPropResponse;
@@ -66,8 +68,8 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     @Override
-    public IPFS getIPFS() {
-        return null;
+    public IPFS getIPFS() throws UnsupportedException {
+        throw new UnsupportedException();
     }
 
     @Override
@@ -76,194 +78,323 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     @Override
-    public CompletableFuture<Void> put(byte[] from, String remoteFile) {
+    public CompletableFuture<Void> put(byte[] from, String remoteFile) throws HiveException {
         return put(from, remoteFile, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> put(byte[] data, String remoteFile, Callback<Void> callback) {
+    public CompletableFuture<Void> put(byte[] data, String remoteFile, Callback<Void> callback) throws HiveException {
+        if (null == remoteFile || remoteFile.equals(""))
+            throw new HiveException(HiveException.REMOTENULL);
+
+        if (null == data)
+            throw new HiveException(HiveException.DATANULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data, callback));
     }
 
     @Override
-    public CompletableFuture<Void> put(String data, String remoteFile) {
+    public CompletableFuture<Void> put(String data, String remoteFile) throws HiveException {
         return put(data, remoteFile, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> put(String data, String remoteFile, Callback<Void> callback) {
+    public CompletableFuture<Void> put(String data, String remoteFile, Callback<Void> callback) throws HiveException {
+        if (null == remoteFile || remoteFile.equals(""))
+            throw new HiveException(HiveException.REMOTENULL);
+
+        if (null == data)
+            throw new HiveException(HiveException.DATANULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data.getBytes(), callback));
     }
 
     @Override
-    public CompletableFuture<Void> put(InputStream input, String remoteFile) {
+    public CompletableFuture<Void> put(InputStream input, String remoteFile) throws HiveException {
         return put(input, remoteFile, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> put(InputStream input, String remoteFile, Callback<Void> callback) {
+    public CompletableFuture<Void> put(InputStream input, String remoteFile, Callback<Void> callback) throws HiveException {
+        if (null == remoteFile || remoteFile.equals(""))
+            throw new HiveException(HiveException.REMOTENULL);
+
+        if (null == input)
+            throw new HiveException(HiveException.ISNULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doPutInputStream(toRemoteFilePath(remoteFile), input, callback));
     }
 
     @Override
-    public CompletableFuture<Void> put(Reader reader, String remoteFile) {
+    public CompletableFuture<Void> put(Reader reader, String remoteFile) throws HiveException {
         return put(reader, remoteFile, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> put(Reader reader, String remoteFile, Callback<Void> callback) {
+    public CompletableFuture<Void> put(Reader reader, String remoteFile, Callback<Void> callback) throws HiveException {
+        if (null == remoteFile || remoteFile.equals(""))
+            throw new HiveException(HiveException.REMOTENULL);
+
+        if (null == reader)
+            throw new HiveException(HiveException.READERNULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doPutReader(toRemoteFilePath(remoteFile), reader, callback));
     }
 
     @Override
-    public CompletableFuture<Long> size(String remoteFile) {
+    public CompletableFuture<Long> size(String remoteFile) throws HiveException {
         return size(remoteFile, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Long> size(String remoteFile, Callback<Long> callback) {
+    public CompletableFuture<Long> size(String remoteFile, Callback<Long> callback) throws HiveException {
+        if (null == remoteFile || remoteFile.equals(""))
+            throw new HiveException(HiveException.REMOTENULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doGetFileLength(toRemoteFilePath(remoteFile), callback));
     }
 
     @Override
-    public CompletableFuture<String> getAsString(String remoteFile) {
+    public CompletableFuture<String> getAsString(String remoteFile) throws HiveException {
         return getAsString(remoteFile, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> getAsString(String remoteFile, Callback<String> callback) {
+    public CompletableFuture<String> getAsString(String remoteFile, Callback<String> callback) throws HiveException {
+        if (null == remoteFile || remoteFile.equals(""))
+            throw new HiveException(HiveException.REMOTENULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doGetString(toRemoteFilePath(remoteFile), callback));
     }
 
     @Override
-    public CompletableFuture<byte[]> getAsBuffer(String remoteFile) {
+    public CompletableFuture<byte[]> getAsBuffer(String remoteFile) throws HiveException {
         return getAsBuffer(remoteFile, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<byte[]> getAsBuffer(String remoteFile, Callback<byte[]> callback) {
+    public CompletableFuture<byte[]> getAsBuffer(String remoteFile, Callback<byte[]> callback) throws HiveException {
+        if (null == remoteFile || remoteFile.equals(""))
+            throw new HiveException(HiveException.REMOTENULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doGetBuffer(toRemoteFilePath(remoteFile), callback));
     }
 
     @Override
-    public CompletableFuture<Void> delete(String remoteFile) {
+    public CompletableFuture<Void> delete(String remoteFile) throws HiveException {
         return delete(remoteFile, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> delete(String remoteFile, Callback<Void> callback) {
+    public CompletableFuture<Void> delete(String remoteFile, Callback<Void> callback) throws HiveException {
+        if (null == remoteFile || remoteFile.equals(""))
+            throw new HiveException(HiveException.REMOTENULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doDeleteFile(toRemoteFilePath(remoteFile), callback));
     }
 
     @Override
-    public CompletableFuture<ArrayList<String>> list() {
+    public CompletableFuture<ArrayList<String>> list() throws HiveException {
         return list(new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<ArrayList<String>> list(Callback<ArrayList<String>> callback) {
+    public CompletableFuture<ArrayList<String>> list(Callback<ArrayList<String>> callback) throws HiveException {
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doListFile(callback));
     }
 
     @Override
-    public CompletableFuture<Long> get(String remoteFile, OutputStream output) {
+    public CompletableFuture<Long> get(String remoteFile, OutputStream output) throws HiveException {
         return get(remoteFile, output, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Long> get(String remoteFile, OutputStream output, Callback<Long> callback) {
+    public CompletableFuture<Long> get(String remoteFile, OutputStream output, Callback<Long> callback) throws HiveException {
+        if (null == remoteFile || remoteFile.equals(""))
+            throw new HiveException(HiveException.REMOTENULL);
+
+        if (null == output)
+            throw new HiveException(HiveException.OSNULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doWriteToOutput(toRemoteFilePath(remoteFile), output, callback));
     }
 
     @Override
-    public CompletableFuture<Long> get(String remoteFile, Writer writer) {
+    public CompletableFuture<Long> get(String remoteFile, Writer writer) throws HiveException {
         return get(remoteFile, writer, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Long> get(String remoteFile, Writer writer, Callback<Long> callback) {
+    public CompletableFuture<Long> get(String remoteFile, Writer writer, Callback<Long> callback) throws HiveException {
+        if (null == remoteFile || remoteFile.equals(""))
+            throw new HiveException(HiveException.REMOTENULL);
+
+        if (null == writer)
+            throw new HiveException(HiveException.WRITERNULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doWriteToWriter(toRemoteFilePath(remoteFile), writer, callback));
     }
 
     @Override
-    public CompletableFuture<Void> putValue(String key, String value) {
+    public CompletableFuture<Void> putValue(String key, String value) throws HiveException {
         return putValue(key, value, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> putValue(String key, String value, Callback<Void> callback) {
+    public CompletableFuture<Void> putValue(String key, String value, Callback<Void> callback) throws HiveException {
+        if (null == key || key.equals(""))
+            throw new HiveException(HiveException.KEYNULL);
+
+        if (null == value)
+            throw new HiveException(HiveException.VALUENULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doPutValue(toRemoteKeyPath(key), value.getBytes(), callback));
     }
 
     @Override
-    public CompletableFuture<Void> putValue(String key, byte[] value) {
+    public CompletableFuture<Void> putValue(String key, byte[] value) throws HiveException {
         return putValue(key, value, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> putValue(String key, byte[] value, Callback<Void> callback) {
+    public CompletableFuture<Void> putValue(String key, byte[] value, Callback<Void> callback) throws HiveException {
+        if (null == key || key.equals(""))
+            throw new HiveException(HiveException.KEYNULL);
+
+        if (null == value)
+            throw new HiveException(HiveException.VALUENULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doPutValue(toRemoteKeyPath(key), value, callback));
     }
 
     @Override
-    public CompletableFuture<Void> setValue(String key, String value) {
+    public CompletableFuture<Void> setValue(String key, String value) throws HiveException {
         return setValue(key, value, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> setValue(String key, String value, Callback<Void> callback) {
+    public CompletableFuture<Void> setValue(String key, String value, Callback<Void> callback) throws HiveException {
+        if (null == key || key.equals(""))
+            throw new HiveException(HiveException.KEYNULL);
+
+        if (null == value)
+            throw new HiveException(HiveException.VALUENULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value.getBytes(), callback));
     }
 
     @Override
-    public CompletableFuture<Void> setValue(String key, byte[] value) {
+    public CompletableFuture<Void> setValue(String key, byte[] value) throws HiveException {
         return setValue(key, value, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> setValue(String key, byte[] value, Callback<Void> callback) {
+    public CompletableFuture<Void> setValue(String key, byte[] value, Callback<Void> callback) throws HiveException {
+        if (null == key || key.equals(""))
+            throw new HiveException(HiveException.KEYNULL);
+
+        if (null == value)
+            throw new HiveException(HiveException.VALUENULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value, callback));
 
     }
 
     @Override
-    public CompletableFuture<ArrayList<byte[]>> getValues(String key) {
+    public CompletableFuture<ArrayList<byte[]>> getValues(String key) throws HiveException {
         return getValues(key, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<ArrayList<byte[]>> getValues(String key, Callback<ArrayList<byte[]>> callback) {
+    public CompletableFuture<ArrayList<byte[]>> getValues(String key, Callback<ArrayList<byte[]>> callback) throws HiveException {
+        if (null == key || key.equals(""))
+            throw new HiveException(HiveException.KEYNULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doGetValue(toRemoteKeyPath(key), callback));
     }
 
     @Override
-    public CompletableFuture<Void> deleteKey(String key) {
+    public CompletableFuture<Void> deleteKey(String key) throws HiveException {
         return deleteKey(key, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> deleteKey(String key, Callback<Void> callback) {
+    public CompletableFuture<Void> deleteKey(String key, Callback<Void> callback) throws HiveException {
+        if (null == key || key.equals(""))
+            throw new HiveException(HiveException.KEYNULL);
+
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
+
         return authHelper.checkExpired()
                 .thenCompose(result -> doDeleteFile(toRemoteKeyPath(key), callback));
     }
 
-////
+    ////
     private CompletableFuture<ArrayList<byte[]>> doGetValue(String key, Callback<ArrayList<byte[]>> callback) {
         return CompletableFuture.supplyAsync(() -> {
             ArrayList<byte[]> list = null;
@@ -279,9 +410,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     private ArrayList<byte[]> getValueImpl(String key) throws HiveException {
-        if (key == null || key.equals(""))
-            throw new HiveException("Key is null");
-
         ArrayList<byte[]> arrayList = new ArrayList<>();
         byte[] data = getBufferImpl(key);
         createValueResult(arrayList, data);
@@ -318,10 +446,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     private void writeReader(String remoteFile, Reader reader) throws Exception {
-        if (reader == null) {
-            throw new HiveException("Reader is null");
-        }
-
         RequestBody requestBody = createWriteRequestBody(reader);
         Response response = ConnectionManager.getOnedriveApi()
                 .write(remoteFile, requestBody)
@@ -348,10 +472,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     private void writeInputStream(String destFilePath, InputStream inputStream) throws Exception {
-        if (inputStream == null) {
-            throw new HiveException("InputStream is null");
-        }
-
         RequestBody requestBody = createWriteRequestBody(inputStream);
         Response response = ConnectionManager.getOnedriveApi()
                 .write(destFilePath, requestBody)
@@ -378,12 +498,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     private void writeBuffer(String remoteFile, byte[] data) throws Exception {
-        if (remoteFile == null || remoteFile.equals(""))
-            throw new HiveException("RemoteFile is null");
-
-        if (data == null)
-            throw new HiveException("Data is null");
-
         RequestBody requestBody = createWriteRequestBody(data);
         Response response = ConnectionManager.getOnedriveApi()
                 .write(remoteFile, requestBody)
@@ -451,9 +565,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     private Long getLength(String remoteFile) throws Exception {
-        if (remoteFile == null || remoteFile.equals(""))
-            throw new HiveException("RemoteFile is null");
-
         Response<FileOrDirPropResponse> response = requestFileInfo(remoteFile);
         int responseCode = checkResponseCode(response);
         if (responseCode == 0) {
@@ -477,10 +588,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     private void deleteFileImpl(String remoteFile) throws Exception {
-        if (remoteFile == null || remoteFile.equals(""))
-            throw new HiveException("RemoteFile is null");
-
-        Response<org.elastos.hive.vendor.connection.model.NoBodyEntity> response = ConnectionManager.getOnedriveApi()
+        Response<NoBodyEntity> response = ConnectionManager.getOnedriveApi()
                 .deleteItem(remoteFile)
                 .execute();
         int responseCode = checkResponseCode(response);
@@ -506,9 +614,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     private byte[] getBufferImpl(String remoteFile) throws HiveException {
-        if (remoteFile == null || remoteFile.equals(""))
-            throw new HiveException("RemoteFile is null");
-
         Response response = getFileOrBuffer(remoteFile);
 
         int responseCode = checkResponseCode(response);
@@ -560,12 +665,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     private long writeToOutput(String remoteFile, OutputStream outputStream) throws Exception {
-        if (remoteFile == null || remoteFile.equals(""))
-            throw new HiveException("RemoteFile is null");
-
-        if (outputStream == null)
-            throw new HiveException("OutputStream is null");
-
         Response response = getFileOrBuffer(remoteFile);
         if (response == null)
             throw new HiveException(HiveException.ERROR);
@@ -595,12 +694,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     private long writeToWriter(String remoteFile, Writer writer) throws Exception {
-        if (remoteFile == null || remoteFile.equals(""))
-            throw new HiveException("RemoteFile is null");
-
-        if (writer == null)
-            throw new HiveException("Writer is null");
-
         Response response = getFileOrBuffer(remoteFile);
 
         if (response == null)

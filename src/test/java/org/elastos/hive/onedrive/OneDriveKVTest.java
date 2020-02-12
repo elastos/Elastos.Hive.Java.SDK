@@ -214,6 +214,8 @@ public class OneDriveKVTest {
     @Test
     public void test_201_putStrAsync() {
         try {
+
+
             CompletableFuture future = onedriveKeyValueApi.putValue(strKey, stringValue, new Callback<Void>() {
                 @Override
                 public void onError(HiveException e) {
@@ -222,7 +224,10 @@ public class OneDriveKVTest {
                 @Override
                 public void onSuccess(Void result) {
                 }
-            }).thenCompose(result ->onedriveKeyValueApi.putValue(strKey, stringValue, new Callback<Void>() {
+            });
+            future.get();
+
+            CompletableFuture future1 = onedriveKeyValueApi.putValue(strKey, stringValue, new Callback<Void>() {
                 @Override
                 public void onError(HiveException e) {
                 }
@@ -230,9 +235,8 @@ public class OneDriveKVTest {
                 @Override
                 public void onSuccess(Void result) {
                 }
-            }));
-
-            future.get();
+            });
+            future1.get();
         } catch (Exception e) {
             e.printStackTrace();
             assertNull(e);
@@ -242,6 +246,7 @@ public class OneDriveKVTest {
     @Test
     public void test_202_putBufferAsync() {
         try {
+
             CompletableFuture future = onedriveKeyValueApi.putValue(bufferKey, bufferValue, new Callback<Void>() {
                 @Override
                 public void onError(HiveException e) {
@@ -250,7 +255,10 @@ public class OneDriveKVTest {
                 @Override
                 public void onSuccess(Void result) {
                 }
-            }).thenCompose(result -> onedriveKeyValueApi.putValue(bufferKey, bufferValue, new Callback<Void>() {
+            });
+            future.get();
+
+            CompletableFuture future1 = onedriveKeyValueApi.putValue(bufferKey, bufferValue, new Callback<Void>() {
                 @Override
                 public void onError(HiveException e) {
                 }
@@ -258,9 +266,8 @@ public class OneDriveKVTest {
                 @Override
                 public void onSuccess(Void result) {
                 }
-            }));
-
-            future.get();
+            });
+            future1.get();
         } catch (Exception e) {
             e.printStackTrace();
             assertNull(e);

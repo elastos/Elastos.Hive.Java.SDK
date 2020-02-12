@@ -4,6 +4,7 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.UnsupportedException;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
@@ -18,7 +19,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -51,8 +51,8 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     @Override
-    public Files getFiles() {
-        return null;
+    public Files getFiles() throws UnsupportedException {
+        throw new UnsupportedException();
     }
 
     @Override
@@ -61,97 +61,137 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     @Override
-    public KeyValues getKeyValues() {
-        return null;
+    public KeyValues getKeyValues() throws UnsupportedException {
+        throw new UnsupportedException();
     }
 
     @Override
-    public CompletableFuture<String> put(byte[] data) {
+    public CompletableFuture<String> put(byte[] data) throws HiveException {
         return put(data, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> put(byte[] data, Callback<String> callback) {
+    public CompletableFuture<String> put(byte[] data, Callback<String> callback) throws HiveException {
+        if (null == data)
+            throw new HiveException(HiveException.DATANULL);
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
         return doPutBuffer(data, callback);
     }
 
     @Override
-    public CompletableFuture<String> put(String data) {
+    public CompletableFuture<String> put(String data) throws HiveException {
         return put(data, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> put(String data, Callback<String> callback) {
+    public CompletableFuture<String> put(String data, Callback<String> callback) throws HiveException {
+        if (null == data)
+            throw new HiveException(HiveException.DATANULL);
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
         return doPutBuffer(data.getBytes(), callback);
     }
 
     @Override
-    public CompletableFuture<String> put(InputStream input) {
+    public CompletableFuture<String> put(InputStream input) throws HiveException {
         return put(input, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> put(InputStream input, Callback<String> callback) {
+    public CompletableFuture<String> put(InputStream input, Callback<String> callback) throws HiveException {
+        if (null == input)
+            throw new HiveException(HiveException.ISNULL);
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
         return doPutInputStream(input, callback);
     }
 
     @Override
-    public CompletableFuture<String> put(Reader reader) {
+    public CompletableFuture<String> put(Reader reader) throws HiveException {
         return put(reader, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> put(Reader reader, Callback<String> callback) {
+    public CompletableFuture<String> put(Reader reader, Callback<String> callback) throws HiveException {
+        if (null == reader)
+            throw new HiveException(HiveException.READERNULL);
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
         return doPutReader(reader, callback);
     }
 
     @Override
-    public CompletableFuture<Long> size(String cid) {
+    public CompletableFuture<Long> size(String cid) throws HiveException {
         return size(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Long> size(String cid, Callback<Long> callback) {
+    public CompletableFuture<Long> size(String cid, Callback<Long> callback) throws HiveException {
+        if (null == cid || cid.equals(""))
+            throw new HiveException(HiveException.CIDNULL);
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
         return doGetFileLength(cid, callback);
     }
 
     @Override
-    public CompletableFuture<String> getAsString(String cid) {
+    public CompletableFuture<String> getAsString(String cid) throws HiveException {
         return getAsString(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<String> getAsString(String cid, Callback<String> callback) {
+    public CompletableFuture<String> getAsString(String cid, Callback<String> callback) throws HiveException {
+        if (null == cid || cid.equals(""))
+            throw new HiveException(HiveException.CIDNULL);
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
         return doGetAsStr(cid, callback);
     }
 
     @Override
-    public CompletableFuture<byte[]> getAsBuffer(String cid) {
+    public CompletableFuture<byte[]> getAsBuffer(String cid) throws HiveException {
         return getAsBuffer(cid, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback) {
+    public CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback) throws HiveException {
+        if (null == cid || cid.equals(""))
+            throw new HiveException(HiveException.CIDNULL);
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
         return doGetAsBuff(cid, callback);
     }
 
     @Override
-    public CompletableFuture<Long> get(String cid, OutputStream output) {
+    public CompletableFuture<Long> get(String cid, OutputStream output) throws HiveException {
         return get(cid, output, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Long> get(String cid, OutputStream output, Callback<Long> callback) {
+    public CompletableFuture<Long> get(String cid, OutputStream output, Callback<Long> callback) throws HiveException {
+        if (null == cid || cid.equals(""))
+            throw new HiveException(HiveException.CIDNULL);
+        if (null == output)
+            throw new HiveException(HiveException.OSNULL);
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
         return doWriteToOutput(cid, output, callback);
     }
 
     @Override
-    public CompletableFuture<Long> get(String cid, Writer writer) {
+    public CompletableFuture<Long> get(String cid, Writer writer) throws HiveException {
         return get(cid, writer, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback) {
+    public CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback) throws HiveException {
+        if (null == cid || cid.equals(""))
+            throw new HiveException(HiveException.CIDNULL);
+        if (null == writer)
+            throw new HiveException(HiveException.WRITERNULL);
+        if (null == callback)
+            throw new HiveException(HiveException.CALLBACKNULL);
         return doWriteToWriter(cid, writer, callback);
     }
 
@@ -170,9 +210,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private String putBufferImpl(byte[] data) throws Exception {
-        if (data == null)
-            throw new HiveException("Data is null");
-
         MultipartBody.Part requestBody = createBufferRequestBody(data);
         Response<AddFileResponse> response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
         if (response == null || response.code() != 200)
@@ -239,9 +276,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private String putInputStreamImpl(InputStream inputStream) throws Exception {
-        if (inputStream == null)
-            throw new HiveException("Inputstream is null");
-
         MultipartBody.Part requestBody = createBufferRequestBody(inputStream);
         Response<AddFileResponse> response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
         if (response == null || response.code() != 200)
@@ -266,9 +300,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private String putReaderImpl(Reader reader) throws Exception {
-        if (reader == null)
-            throw new HiveException("Reader is null");
-
         MultipartBody.Part requestBody = createBufferRequestBody(reader);
         Response<AddFileResponse> response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
         if (response == null || response.code() != 200)
@@ -292,9 +323,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private long getFileLengthImpl(String cid) throws Exception {
-        if (cid == null || cid.equals(""))
-            throw new HiveException("CID is null");
-
         Response<ListFileResponse> response = ConnectionManager.getIPFSApi().listFile(cid).execute();
 
         if (response == null || response.code() != 200)
@@ -325,9 +353,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private String getAsStrImpl(String cid) throws Exception {
-        if (cid == null || cid.equals(""))
-            throw new HiveException("CID is null");
-
         Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
 
         if (response == null || response.code() != 200)
@@ -350,9 +375,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private byte[] getAsBufferImpl(String cid) throws HiveException {
-        if (cid == null || cid.equals(""))
-            throw new HiveException("CID is null");
-
         Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
 
         if (response == null || response.code() != 200)
@@ -375,12 +397,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private long writeToOutputImpl(String cid, OutputStream outputStream) throws Exception {
-        if (cid == null || cid.equals(""))
-            throw new HiveException("CID is null");
-
-        if (outputStream == null)
-            throw new HiveException("OutputStream is null");
-
         Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
@@ -403,12 +419,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private long writeToWriterImpl(String cid, Writer writer) throws Exception {
-        if (cid == null || cid.equals(""))
-            throw new HiveException("CID is null");
-
-        if (writer == null)
-            throw new HiveException("Writer is null");
-
         Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
 
         if (response == null || response.code() != 200)

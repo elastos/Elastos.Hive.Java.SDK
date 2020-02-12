@@ -24,6 +24,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
+import org.elastos.hive.exception.UnsupportedException;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
@@ -35,17 +36,18 @@ public abstract class Client {
 
     public abstract boolean isConnected();
 
-    public abstract Files getFiles();
+    public abstract Files getFiles() throws UnsupportedException;
 
-    public abstract IPFS getIPFS();
+    public abstract IPFS getIPFS() throws UnsupportedException;
 
-    public abstract KeyValues getKeyValues();
+    public abstract KeyValues getKeyValues() throws UnsupportedException;
 
     public static abstract class Options {
         private String storePath;
         private Authenticator authenticator;
 
-        protected Options() {}
+        protected Options() {
+        }
 
         protected void setStorePath(String storePath) {
             this.storePath = storePath;
