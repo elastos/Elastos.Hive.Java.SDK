@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -32,7 +31,7 @@ final class IPFSClient extends Client implements IPFS {
     private IPFSRpc ipfsRpc;
 
     IPFSClient(Options options) {
-        ipfsRpc = new IPFSRpc(((IPFSOptions)options).getRpcNodes());
+        ipfsRpc = new IPFSRpc(((IPFSOptions) options).getRpcNodes());
     }
 
     @Override
@@ -52,7 +51,7 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public Files getFiles() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -62,7 +61,7 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public KeyValues getKeyValues() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -72,6 +71,8 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<String> put(byte[] data, Callback<String> callback) {
+        if (null == data || null == callback)
+            throw new IllegalArgumentException();
         return doPutBuffer(data, callback);
     }
 
@@ -82,6 +83,8 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<String> put(String data, Callback<String> callback) {
+        if (null == data || null == callback)
+            throw new IllegalArgumentException();
         return doPutBuffer(data.getBytes(), callback);
     }
 
@@ -92,6 +95,8 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<String> put(InputStream input, Callback<String> callback) {
+        if (null == input || null == callback)
+            throw new IllegalArgumentException();
         return doPutInputStream(input, callback);
     }
 
@@ -102,6 +107,8 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<String> put(Reader reader, Callback<String> callback) {
+        if (null == reader || null == callback)
+            throw new IllegalArgumentException();
         return doPutReader(reader, callback);
     }
 
@@ -112,6 +119,8 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<Long> size(String cid, Callback<Long> callback) {
+        if (null == cid || cid.equals("") || null == callback)
+            throw new IllegalArgumentException();
         return doGetFileLength(cid, callback);
     }
 
@@ -122,6 +131,8 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<String> getAsString(String cid, Callback<String> callback) {
+        if (null == cid || cid.equals("") || null == callback)
+            throw new IllegalArgumentException();
         return doGetAsStr(cid, callback);
     }
 
@@ -132,6 +143,8 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback) {
+        if (null == cid || cid.equals("") || null == callback)
+            throw new IllegalArgumentException();
         return doGetAsBuff(cid, callback);
     }
 
@@ -142,6 +155,8 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<Long> get(String cid, OutputStream output, Callback<Long> callback) {
+        if (null == cid || cid.equals("") || null == output || null == callback)
+            throw new IllegalArgumentException();
         return doWriteToOutput(cid, output, callback);
     }
 
@@ -152,6 +167,8 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback) {
+        if (null == cid || cid.equals("") || null == writer || null == callback)
+            throw new IllegalArgumentException();
         return doWriteToWriter(cid, writer, callback);
     }
 
@@ -170,9 +187,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private String putBufferImpl(byte[] data) throws Exception {
-        if (data == null)
-            throw new HiveException("Data is null");
-
         MultipartBody.Part requestBody = createBufferRequestBody(data);
         Response<AddFileResponse> response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
         if (response == null || response.code() != 200)
@@ -239,9 +253,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private String putInputStreamImpl(InputStream inputStream) throws Exception {
-        if (inputStream == null)
-            throw new HiveException("Inputstream is null");
-
         MultipartBody.Part requestBody = createBufferRequestBody(inputStream);
         Response<AddFileResponse> response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
         if (response == null || response.code() != 200)
@@ -266,9 +277,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private String putReaderImpl(Reader reader) throws Exception {
-        if (reader == null)
-            throw new HiveException("Reader is null");
-
         MultipartBody.Part requestBody = createBufferRequestBody(reader);
         Response<AddFileResponse> response = ConnectionManager.getIPFSApi().addFile(requestBody).execute();
         if (response == null || response.code() != 200)
@@ -292,9 +300,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private long getFileLengthImpl(String cid) throws Exception {
-        if (cid == null || cid.equals(""))
-            throw new HiveException("CID is null");
-
         Response<ListFileResponse> response = ConnectionManager.getIPFSApi().listFile(cid).execute();
 
         if (response == null || response.code() != 200)
@@ -325,9 +330,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private String getAsStrImpl(String cid) throws Exception {
-        if (cid == null || cid.equals(""))
-            throw new HiveException("CID is null");
-
         Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
 
         if (response == null || response.code() != 200)
@@ -350,9 +352,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private byte[] getAsBufferImpl(String cid) throws HiveException {
-        if (cid == null || cid.equals(""))
-            throw new HiveException("CID is null");
-
         Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
 
         if (response == null || response.code() != 200)
@@ -375,12 +374,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private long writeToOutputImpl(String cid, OutputStream outputStream) throws Exception {
-        if (cid == null || cid.equals(""))
-            throw new HiveException("CID is null");
-
-        if (outputStream == null)
-            throw new HiveException("OutputStream is null");
-
         Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
         if (response == null || response.code() != 200)
             throw new HiveException(HiveException.ERROR);
@@ -403,12 +396,6 @@ final class IPFSClient extends Client implements IPFS {
     }
 
     private long writeToWriterImpl(String cid, Writer writer) throws Exception {
-        if (cid == null || cid.equals(""))
-            throw new HiveException("CID is null");
-
-        if (writer == null)
-            throw new HiveException("Writer is null");
-
         Response<okhttp3.ResponseBody> response = getFileOrBuffer(cid);
 
         if (response == null || response.code() != 200)

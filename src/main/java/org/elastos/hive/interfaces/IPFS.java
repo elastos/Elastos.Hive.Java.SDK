@@ -1,6 +1,7 @@
 package org.elastos.hive.interfaces;
 
 import org.elastos.hive.Callback;
+import org.elastos.hive.exception.HiveException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
