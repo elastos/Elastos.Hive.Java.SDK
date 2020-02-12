@@ -50,9 +50,8 @@ class IPFSRpc {
     }
 
     void checkReachable() throws HiveException {
-        if (mHiveRpcNodes == null || mHiveRpcNodes.size() == 0) {
-            throw new HiveException(HiveException.RPC_NODE_NULL);
-        }
+        if (mHiveRpcNodes == null || mHiveRpcNodes.size() == 0)
+            throw new IllegalArgumentException();
 
         for (IPFSOptions.RpcNode hiveRpcNode : mHiveRpcNodes) {
             if (checkConnect(hiveRpcNode)) {
@@ -60,9 +59,8 @@ class IPFSRpc {
             }
         }
 
-        if (mHiveRpcNode == null) {
+        if (mHiveRpcNode == null)
             throw new HiveException(HiveException.NO_RPC_NODE_AVAILABLE);
-        }
     }
 
     private void selectBootstrap(IPFSOptions.RpcNode hiveRpcNode) {
@@ -76,17 +74,17 @@ class IPFSRpc {
         }
     }
 
-    private boolean checkConnect(IPFSOptions.RpcNode hiveRpcNode) throws HiveException {
+    private boolean checkConnect(IPFSOptions.RpcNode hiveRpcNode) {
         if (hiveRpcNode == null)
-            throw new HiveException(HiveException.RPC_NODE_NULL);
+            throw new IllegalArgumentException();
+
+        int port = hiveRpcNode.getPort();
+        if (port <= 0)
+            throw new IllegalArgumentException();
 
         boolean isSelect = false;
         String ipv4 = hiveRpcNode.getIpv4();
         String ipv6 = hiveRpcNode.getIpv6();
-        int port = hiveRpcNode.getPort();
-        if (port == 0) {
-            throw new HiveException(HiveException.RPC_NODE_PORT_NULL);
-        }
 
         if (checkConnect(ipv4, port) != null) {
             selectBootstrap(hiveRpcNode);

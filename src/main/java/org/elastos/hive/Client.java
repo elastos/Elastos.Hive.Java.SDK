@@ -45,7 +45,8 @@ public abstract class Client {
         private String storePath;
         private Authenticator authenticator;
 
-        protected Options() {}
+        protected Options() {
+        }
 
         protected void setStorePath(String storePath) {
             this.storePath = storePath;
