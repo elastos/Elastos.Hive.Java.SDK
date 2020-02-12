@@ -312,7 +312,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 writeReader(remoteFile, reader);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
         });
@@ -322,14 +321,16 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (reader == null) {
             throw new HiveException("Reader is null");
         }
+
         RequestBody requestBody = createWriteRequestBody(reader);
         Response response = ConnectionManager.getOnedriveApi()
                 .write(remoteFile, requestBody)
                 .execute();
-        int checkResponseCode = checkResponseCode(response);
-        if (checkResponseCode == 404) {
+
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 404) {
             throw new HiveException(HiveException.ITEM_NOT_FOUND);
-        } else if (checkResponseCode != 0) {
+        } else if (responseCode != 0) {
             throw new HiveException(HiveException.ERROR);
         }
     }
@@ -341,7 +342,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 writeInputStream(destFilePath, inputStream);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
         });
@@ -351,14 +351,16 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (inputStream == null) {
             throw new HiveException("InputStream is null");
         }
+
         RequestBody requestBody = createWriteRequestBody(inputStream);
         Response response = ConnectionManager.getOnedriveApi()
                 .write(destFilePath, requestBody)
                 .execute();
-        int checkResponseCode = checkResponseCode(response);
-        if (checkResponseCode == 404) {
+
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 404) {
             throw new HiveException(HiveException.ITEM_NOT_FOUND);
-        } else if (checkResponseCode != 0) {
+        } else if (responseCode != 0) {
             throw new HiveException(HiveException.ERROR);
         }
     }
@@ -370,9 +372,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 writeBuffer(destFilePath, data);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                e.printStackTrace();
-                HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
+                callback.onError(new HiveException(e.getLocalizedMessage()));
             }
         });
     }
@@ -391,10 +391,10 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (response == null)
             throw new HiveException(HiveException.ERROR);
 
-        int checkResponseCode = checkResponseCode(response);
-        if (checkResponseCode == 404) {
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 404) {
             throw new HiveException(HiveException.ITEM_NOT_FOUND);
-        } else if (checkResponseCode != 0) {
+        } else if (responseCode != 0) {
             throw new HiveException(HiveException.ERROR);
         }
     }
@@ -455,10 +455,10 @@ final class OneDriveClient extends Client implements Files, KeyValues {
             throw new HiveException("RemoteFile is null");
 
         Response<FileOrDirPropResponse> response = requestFileInfo(remoteFile);
-        int checkResponseCode = checkResponseCode(response);
-        if (checkResponseCode == 0) {
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 0) {
             return decodeFileLength(response);
-        } else if (checkResponseCode == 404) {
+        } else if (responseCode == 404) {
             throw new HiveException(HiveException.ITEM_NOT_FOUND);
         } else {
             throw new HiveException(HiveException.GET_FILE_LENGTH_ERROR);
@@ -471,7 +471,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 deleteFileImpl(destFilePath);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
         });
@@ -484,10 +483,10 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         Response<org.elastos.hive.vendor.connection.model.NoBodyEntity> response = ConnectionManager.getOnedriveApi()
                 .deleteItem(remoteFile)
                 .execute();
-        int checkResponseCode = checkResponseCode(response);
-        if (checkResponseCode == 404) {
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 404) {
             throw new HiveException(HiveException.ITEM_NOT_FOUND);
-        } else if (checkResponseCode != 0) {
+        } else if (responseCode != 0) {
             throw new HiveException(HiveException.ERROR);
         }
     }
@@ -512,10 +511,10 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
         Response response = getFileOrBuffer(remoteFile);
 
-        int checkResponseCode = checkResponseCode(response);
-        if (checkResponseCode == 404) {
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 404) {
             throw new HiveException(HiveException.ITEM_NOT_FOUND);
-        } else if (checkResponseCode != 0) {
+        } else if (responseCode != 0) {
             throw new HiveException(HiveException.ERROR);
         }
 
@@ -533,7 +532,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 result = getString(remoteFile);
                 callback.onSuccess(result);
             } catch (HiveException e) {
-                e.printStackTrace();
                 callback.onError(e);
             }
             return result;
@@ -572,10 +570,10 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (response == null)
             throw new HiveException(HiveException.ERROR);
 
-        int checkResponseCode = checkResponseCode(response);
-        if (checkResponseCode == 404) {
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 404) {
             throw new HiveException(HiveException.ITEM_NOT_FOUND);
-        } else if (checkResponseCode != 0) {
+        } else if (responseCode != 0) {
             throw new HiveException(HiveException.ERROR);
         }
 
@@ -608,10 +606,10 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (response == null)
             throw new HiveException(HiveException.ERROR);
 
-        int checkResponseCode = checkResponseCode(response);
-        if (checkResponseCode == 404) {
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 404) {
             throw new HiveException(HiveException.ITEM_NOT_FOUND);
-        } else if (checkResponseCode != 0) {
+        } else if (responseCode != 0) {
             throw new HiveException(HiveException.ERROR);
         }
 
@@ -638,7 +636,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 list = listFile();
                 callback.onSuccess(list);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
             return list;
@@ -649,10 +646,10 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         OneDriveApi api = ConnectionManager.getOnedriveApi();
         Response<DirChildrenResponse> response = api.getChildren(OneDriveConstance.FILES_ROOT_PATH).execute();
 
-        int checkResponseCode = checkResponseCode(response);
-        if (checkResponseCode == 404) {
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 404) {
             throw new HiveException(HiveException.ITEM_NOT_FOUND);
-        } else if (checkResponseCode != 0) {
+        } else if (responseCode != 0) {
             throw new HiveException(HiveException.ERROR);
         }
 
@@ -778,7 +775,6 @@ final class OneDriveClient extends Client implements Files, KeyValues {
             return -1;
 
         int code = response.code();
-
         if (code < 300 && code >= 200)
             return 0;
 
