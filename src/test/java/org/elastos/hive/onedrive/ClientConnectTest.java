@@ -67,7 +67,6 @@ public class ClientConnectTest {
 
     @AfterClass
     public static void tearDown() {
-        client.disconnect();
         client = null;
     }
 }

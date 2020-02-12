@@ -37,7 +37,7 @@ public class OneDriveOptions extends Client.Options {
         this.clientId = clientId;
     }
 
-    String clientId() {
+    public String clientId() {
         return clientId;
     }
 
@@ -45,8 +45,12 @@ public class OneDriveOptions extends Client.Options {
         this.redirectURL = redirectURL;
     }
 
-    String redirectUrl() {
+    public String redirectUrl() {
         return redirectURL;
+    }
+
+    public String appScope() {
+        return OneDriveConstance.APP_SCOPE;
     }
 
     @Override

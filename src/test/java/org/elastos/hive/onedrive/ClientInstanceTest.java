@@ -30,10 +30,9 @@ public class ClientInstanceTest {
             Authenticator authenticator = requestUrl -> {
                 try {
                     Desktop.getDesktop().browse(new URI(requestUrl));
-                } catch (IOException e) {
+                } catch (IOException | URISyntaxException e) {
                     e.printStackTrace();
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
+                    fail();
                 }
             };
 
@@ -45,7 +44,8 @@ public class ClientInstanceTest {
                     .setAuthenticator(authenticator)
                     .build();
             assertNotNull(options);
-
+            assertNotNull(options.storePath());
+            assertNotNull(options.authenticator());
 
             Client client = Client.createInstance(options);
             assertNotNull(client);
@@ -59,11 +59,10 @@ public class ClientInstanceTest {
     @Test
     public void testCreateInstanceFailed1() {
         try {
-            Client.Options options = new OneDriveOptions
+            new OneDriveOptions
                     .Builder()
                     .setClientId(CLIENTID)
                     .build();
-            assertNull(options);
         } catch (HiveException e) {
             assertTrue(true);
         }
@@ -72,11 +71,10 @@ public class ClientInstanceTest {
     @Test
     public void testCreateInstanceFailed2() {
         try {
-            Client.Options options = new OneDriveOptions
+            new OneDriveOptions
                     .Builder()
                     .setRedirectUrl(REDIRECTURL)
                     .build();
-            assertNull(options);
         } catch (HiveException e) {
             assertTrue(true);
         }
@@ -85,7 +83,7 @@ public class ClientInstanceTest {
     @Test
     public void testCreateInstanceFailed3() {
         try {
-            Client.Options options = new OneDriveOptions
+            new OneDriveOptions
                     .Builder()
                     .setAuthenticator(requestUrl -> {
                         try {
@@ -96,7 +94,6 @@ public class ClientInstanceTest {
                         }
                     })
                     .build();
-            assertNull(options);
         } catch (HiveException e) {
             assertTrue(true);
         }
@@ -110,6 +107,41 @@ public class ClientInstanceTest {
                     .setStorePath(STORE_PATH)
                     .build();
             assertNull(options);
+        } catch (HiveException e) {
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testCreateInstanceFailed5() {
+        try {
+            Authenticator authenticator = requestUrl -> {
+                try {
+                    Desktop.getDesktop().browse(new URI(requestUrl));
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                    fail();
+                }
+            };
+
+            OneDriveOptions.Builder builder = new OneDriveOptions
+                    .Builder()
+                    .setStorePath(STORE_PATH)
+                    .setClientId(CLIENTID)
+                    .setRedirectUrl(REDIRECTURL)
+                    .setAuthenticator(authenticator);
+
+            Client.Options options = builder.build();
+            assertNotNull(options);
+            assertNotNull(options.storePath());
+            assertNotNull(options.authenticator());
+
+            OneDriveOptions opts = (OneDriveOptions)options;
+            assertNotNull(opts.clientId());
+            assertNotNull(opts.redirectUrl());
+            assertNotNull(opts.appScope());
+
+            builder.build();
         } catch (HiveException e) {
             assertTrue(true);
         }
