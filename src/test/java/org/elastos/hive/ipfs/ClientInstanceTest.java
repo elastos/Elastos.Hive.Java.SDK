@@ -7,28 +7,25 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ClientInstanceTest {
     private static final String STORE_PATH = System.getProperty("user.dir");
+    private static final String[] IPADDRS = {"3.133.166.156", "127.0.0.1"};
 
     @Test
     public void testCreateInstance() {
         try {
-            IPFSOptions.RpcNode node = new IPFSOptions.RpcNode("3.133.166.156", 5001);
-            IPFSOptions.RpcNode node2 = new IPFSOptions.RpcNode("127.0.0.1", 5001);
-
             Client.Options options = new IPFSOptions
                     .Builder()
                     .setStorePath(STORE_PATH)
-                    .addRpcNode(node)
-                    .addRpcNode(node2)
+                    .addRpcNode(new IPFSOptions.RpcNode(IPADDRS[0], 5001))
+                    .addRpcNode(new IPFSOptions.RpcNode(IPADDRS[1], 5001))
                     .build();
             assertNotNull(options);
+            assertNotNull(options.storePath());
 
             Client client = Client.createInstance(options);
             assertNotNull(client);
@@ -44,15 +41,10 @@ public class ClientInstanceTest {
     @Test
     public void testCreateInstanceFailed1() {
         try {
-            IPFSOptions.RpcNode node = new IPFSOptions.RpcNode("3.133.166.156", 5001);
-            IPFSOptions.RpcNode node2 = new IPFSOptions.RpcNode("127.0.0.1", 5001);
-
-            Client.Options options = new IPFSOptions
-                    .Builder()
-                    .addRpcNode(node)
-                    .addRpcNode(node2)
+            new IPFSOptions.Builder()
+                    .addRpcNode(new IPFSOptions.RpcNode(IPADDRS[0], 5001))
+                    .addRpcNode(new IPFSOptions.RpcNode(IPADDRS[1], 5001))
                     .build();
-            assertNull(options);
         } catch (HiveException e) {
             assertTrue(true);
         }
@@ -61,11 +53,9 @@ public class ClientInstanceTest {
     @Test
     public void testCreateInstanceFailed2() {
         try {
-            Client.Options options = new IPFSOptions
-                    .Builder()
+            new IPFSOptions.Builder()
                     .setStorePath(STORE_PATH)
                     .build();
-            assertNull(options);
         } catch (HiveException e) {
             assertTrue(true);
         }
@@ -74,9 +64,7 @@ public class ClientInstanceTest {
     @Test
     public void testCreateInstanceFailed3() {
         try {
-            Client client = Client.createInstance(null);
-            assertNull(client);
-
+            Client.createInstance(null);
         } catch (IllegalArgumentException e) {
             assertTrue(true);
         } catch (HiveException e) {
@@ -84,11 +72,30 @@ public class ClientInstanceTest {
         }
     }
 
-    @BeforeClass
-    public static void setUp() {
+    @Test
+    public void testCreateInstanceFailed4() {
+        try {
+            IPFSOptions.Builder builder = new IPFSOptions
+                    .Builder()
+                    .setStorePath(STORE_PATH)
+                    .addRpcNode(new IPFSOptions.RpcNode(IPADDRS[0], 5001))
+                    .addRpcNode(new IPFSOptions.RpcNode(IPADDRS[1], 5001));
+            assertNotNull(builder);
+
+            Client.Options options = builder.build();
+            assertNotNull(options);
+            assertNotNull(options.storePath());
+            assertNotNull(((IPFSOptions)options).getRpcNodes());
+
+            builder.build();
+        } catch (HiveException e) {
+            assertTrue(true);
+        }
     }
 
+    @BeforeClass
+    public static void setUp() {}
+
     @AfterClass
-    public static void tearDown() {
-    }
+    public static void tearDown() {}
 }

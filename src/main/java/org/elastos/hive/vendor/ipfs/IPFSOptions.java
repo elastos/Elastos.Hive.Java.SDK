@@ -16,11 +16,7 @@ public class IPFSOptions extends Client.Options {
         rpcNodes.add(node);
     }
 
-    private boolean hasRpcNodes() {
-        return rpcNodes.size() > 0;
-    }
-
-    ArrayList<RpcNode> getRpcNodes() {
+    public ArrayList<RpcNode> getRpcNodes() {
         return rpcNodes;
     }
 
