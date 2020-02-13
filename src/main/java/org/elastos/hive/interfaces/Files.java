@@ -54,5 +54,4 @@ public interface Files {
     CompletableFuture<ArrayList<String>> list();
 
     CompletableFuture<ArrayList<String>> list(Callback<ArrayList<String>> callback);
-
 }
