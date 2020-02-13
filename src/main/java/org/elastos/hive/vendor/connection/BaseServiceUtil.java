@@ -38,18 +38,15 @@ class BaseServiceUtil {
     static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl,
                                BaseServiceConfig baseServiceConfig) throws Exception {
 
-        if (baseUrl.equals("") || !baseUrl.endsWith("/"))
-            throw new Exception("base url must not null , and end of /");
-
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder();
-        retrofitBuilder.baseUrl(baseUrl);
-        retrofitBuilder.addConverterFactory(StringConverterFactory.create());
-        retrofitBuilder.addConverterFactory(NobodyConverterFactory.create());
-        retrofitBuilder.addConverterFactory(GsonConverterFactory.create());
+        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(StringConverterFactory.create())
+                .addConverterFactory(NobodyConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create());
 
         clientBuilder.interceptors().clear();
         if (baseServiceConfig != null && baseServiceConfig.getHeaderConfig() != null) {
