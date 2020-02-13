@@ -10,8 +10,8 @@ import org.junit.Test;
 import java.awt.Desktop;
 import java.net.URI;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ClientConnectTest {
