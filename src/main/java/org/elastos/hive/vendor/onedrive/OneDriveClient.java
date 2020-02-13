@@ -76,243 +76,244 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         return this;
     }
 
+    private <T> Callback<T> getCallback(Callback<T> callback) {
+        return (null == callback ? new NullCallback<T>(): callback);
+    }
+
     @Override
     public CompletableFuture<Void> put(byte[] from, String remoteFile) {
-        return put(from, remoteFile, new NullCallback<>());
+        return put(from, remoteFile, null);
     }
 
     @Override
     public CompletableFuture<Void> put(byte[] data, String remoteFile, Callback<Void> callback) {
-        if (null == remoteFile || remoteFile.equals("") || null == data || null == callback)
+        if (null == data || data.length == 0 || null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data, callback));
+                .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data, getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> put(String data, String remoteFile) {
-        return put(data, remoteFile, new NullCallback<>());
+        return put(data, remoteFile, null);
     }
 
     @Override
     public CompletableFuture<Void> put(String data, String remoteFile, Callback<Void> callback) {
-        if (null == remoteFile || remoteFile.equals("") || null == data || null == callback)
+        if (null == data || data.isEmpty() || null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data.getBytes(), callback));
+                .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data.getBytes(), getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> put(InputStream input, String remoteFile) {
-        return put(input, remoteFile, new NullCallback<>());
+        return put(input, remoteFile, null);
     }
 
     @Override
     public CompletableFuture<Void> put(InputStream input, String remoteFile, Callback<Void> callback) {
-        if (null == remoteFile || remoteFile.equals("") || null == input || null == callback)
+        if (null == input || null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutInputStream(toRemoteFilePath(remoteFile), input, callback));
+                .thenCompose(result -> doPutInputStream(toRemoteFilePath(remoteFile), input, getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> put(Reader reader, String remoteFile) {
-        return put(reader, remoteFile, new NullCallback<>());
+        return put(reader, remoteFile, null);
     }
 
     @Override
     public CompletableFuture<Void> put(Reader reader, String remoteFile, Callback<Void> callback) {
-        if (null == remoteFile || remoteFile.equals("") || null == reader || null == callback)
+        if (null == reader || null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutReader(toRemoteFilePath(remoteFile), reader, callback));
+                .thenCompose(result -> doPutReader(toRemoteFilePath(remoteFile), reader, getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Long> size(String remoteFile) {
-        return size(remoteFile, new NullCallback<>());
+        return size(remoteFile, null);
     }
 
     @Override
     public CompletableFuture<Long> size(String remoteFile, Callback<Long> callback) {
-        if (null == remoteFile || remoteFile.equals("") || null == callback)
+        if (null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doGetFileLength(toRemoteFilePath(remoteFile), callback));
+                .thenCompose(result -> doGetFileLength(toRemoteFilePath(remoteFile), getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<String> getAsString(String remoteFile) {
-        return getAsString(remoteFile, new NullCallback<>());
+        return getAsString(remoteFile, null);
     }
 
     @Override
     public CompletableFuture<String> getAsString(String remoteFile, Callback<String> callback) {
-        if (null == remoteFile || remoteFile.equals("") || null == callback)
+        if (null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doGetString(toRemoteFilePath(remoteFile), callback));
+                .thenCompose(result -> doGetString(toRemoteFilePath(remoteFile), getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<byte[]> getAsBuffer(String remoteFile) {
-        return getAsBuffer(remoteFile, new NullCallback<>());
+        return getAsBuffer(remoteFile, null);
     }
 
     @Override
     public CompletableFuture<byte[]> getAsBuffer(String remoteFile, Callback<byte[]> callback) {
-        if (null == remoteFile || remoteFile.equals("") || null == callback)
+        if (null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doGetBuffer(toRemoteFilePath(remoteFile), callback));
+                .thenCompose(result -> doGetBuffer(toRemoteFilePath(remoteFile), getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> delete(String remoteFile) {
-        return delete(remoteFile, new NullCallback<>());
+        return delete(remoteFile, null);
     }
 
     @Override
     public CompletableFuture<Void> delete(String remoteFile, Callback<Void> callback) {
-        if (null == remoteFile || remoteFile.equals("") || null == callback)
+        if (null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doDeleteFile(toRemoteFilePath(remoteFile), callback));
+                .thenCompose(result -> doDeleteFile(toRemoteFilePath(remoteFile), getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<ArrayList<String>> list() {
-        return list(new NullCallback<>());
+        return list(null);
     }
 
     @Override
     public CompletableFuture<ArrayList<String>> list(Callback<ArrayList<String>> callback) {
-        if (null == callback)
-            throw new IllegalArgumentException();
-
         return authHelper.checkExpired()
-                .thenCompose(result -> doListFile(callback));
+                .thenCompose(result -> doListFile(getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Long> get(String remoteFile, OutputStream output) {
-        return get(remoteFile, output, new NullCallback<>());
+        return get(remoteFile, output, null);
     }
 
     @Override
     public CompletableFuture<Long> get(String remoteFile, OutputStream output, Callback<Long> callback) {
-        if (null == remoteFile || remoteFile.equals("") || null == output || null == callback)
+        if (null == remoteFile || remoteFile.isEmpty() || null == output)
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doWriteToOutput(toRemoteFilePath(remoteFile), output, callback));
+                .thenCompose(result -> doWriteToOutput(toRemoteFilePath(remoteFile), output, getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Long> get(String remoteFile, Writer writer) {
-        return get(remoteFile, writer, new NullCallback<>());
+        return get(remoteFile, writer, null);
     }
 
     @Override
     public CompletableFuture<Long> get(String remoteFile, Writer writer, Callback<Long> callback) {
-        if (null == remoteFile || remoteFile.equals("") || null == writer || null == callback)
+        if (null == remoteFile || remoteFile.isEmpty() || null == writer)
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doWriteToWriter(toRemoteFilePath(remoteFile), writer, callback));
+                .thenCompose(result -> doWriteToWriter(toRemoteFilePath(remoteFile), writer, getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> putValue(String key, String value) {
-        return putValue(key, value, new NullCallback<>());
+        return putValue(key, value, null);
     }
 
     @Override
     public CompletableFuture<Void> putValue(String key, String value, Callback<Void> callback) {
-        if (null == key || key.equals("") || null == value || null == callback)
+        if (null == key ||  key.isEmpty() || null == value || value.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutValue(toRemoteKeyPath(key), value.getBytes(), callback));
+                .thenCompose(result -> doPutValue(toRemoteKeyPath(key), value.getBytes(), getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> putValue(String key, byte[] value) {
-        return putValue(key, value, new NullCallback<>());
+        return putValue(key, value, null);
     }
 
     @Override
     public CompletableFuture<Void> putValue(String key, byte[] value, Callback<Void> callback) {
-        if (null == key || key.equals("") || null == value || null == callback)
+        if (null == key || key.isEmpty() || null == value || value.length == 0)
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doPutValue(toRemoteKeyPath(key), value, callback));
+                .thenCompose(result -> doPutValue(toRemoteKeyPath(key), value, getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> setValue(String key, String value) {
-        return setValue(key, value, new NullCallback<>());
+        return setValue(key, value, null);
     }
 
     @Override
     public CompletableFuture<Void> setValue(String key, String value, Callback<Void> callback) {
-        if (null == key || key.equals("") || null == value || null == callback)
+        if (null == key || key.isEmpty() || null == value || value.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value.getBytes(), callback));
+                .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value.getBytes(), getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> setValue(String key, byte[] value) {
-        return setValue(key, value, new NullCallback<>());
+        return setValue(key, value, null);
     }
 
     @Override
     public CompletableFuture<Void> setValue(String key, byte[] value, Callback<Void> callback) {
-        if (null == key || key.equals("") || null == value || null == callback)
+        if (null == key || key.isEmpty() || null == value || value.length == 0)
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value, callback));
+                .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value, getCallback(callback)));
 
     }
 
     @Override
     public CompletableFuture<ArrayList<byte[]>> getValues(String key) {
-        return getValues(key, new NullCallback<>());
+        return getValues(key, null);
     }
 
     @Override
     public CompletableFuture<ArrayList<byte[]>> getValues(String key, Callback<ArrayList<byte[]>> callback) {
-        if (null == key || key.equals("") || null == callback)
+        if (null == key || key.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doGetValue(toRemoteKeyPath(key), callback));
+                .thenCompose(result -> doGetValue(toRemoteKeyPath(key), getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> deleteKey(String key) {
-        return deleteKey(key, new NullCallback<>());
+        return deleteKey(key, null);
     }
 
     @Override
     public CompletableFuture<Void> deleteKey(String key, Callback<Void> callback) {
-        if (null == key || key.equals("") || null == callback)
+        if (null == key || key.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkExpired()
-                .thenCompose(result -> doDeleteFile(toRemoteKeyPath(key), callback));
+                .thenCompose(result -> doDeleteFile(toRemoteKeyPath(key), getCallback(callback)));
     }
 
     ////

@@ -59,6 +59,10 @@ final class IPFSClient extends Client implements IPFS {
         return this;
     }
 
+    private <T> Callback<T> getCallback(Callback<T> callback) {
+        return (null == callback ? new NullCallback<T>() : callback);
+    }
+
     @Override
     public KeyValues getKeyValues() {
         throw new UnsupportedOperationException();
@@ -66,110 +70,119 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<String> put(byte[] data) {
-        return put(data, new NullCallback<>());
+        return put(data, null);
     }
 
     @Override
     public CompletableFuture<String> put(byte[] data, Callback<String> callback) {
-        if (null == data || null == callback)
+        if (null == data)
             throw new IllegalArgumentException();
-        return doPutBuffer(data, callback);
+
+        return doPutBuffer(data, getCallback(callback));
     }
 
     @Override
     public CompletableFuture<String> put(String data) {
-        return put(data, new NullCallback<>());
+        return put(data, null);
     }
 
     @Override
     public CompletableFuture<String> put(String data, Callback<String> callback) {
-        if (null == data || null == callback)
+        if (null == data)
             throw new IllegalArgumentException();
-        return doPutBuffer(data.getBytes(), callback);
+
+        return doPutBuffer(data.getBytes(), getCallback(callback));
     }
 
     @Override
     public CompletableFuture<String> put(InputStream input) {
-        return put(input, new NullCallback<>());
+        return put(input, null);
     }
 
     @Override
     public CompletableFuture<String> put(InputStream input, Callback<String> callback) {
-        if (null == input || null == callback)
+        if (null == input)
             throw new IllegalArgumentException();
-        return doPutInputStream(input, callback);
+
+        return doPutInputStream(input, getCallback(callback));
     }
 
     @Override
     public CompletableFuture<String> put(Reader reader) {
-        return put(reader, new NullCallback<>());
+        return put(reader, null);
     }
 
     @Override
     public CompletableFuture<String> put(Reader reader, Callback<String> callback) {
-        if (null == reader || null == callback)
+        if (null == reader)
             throw new IllegalArgumentException();
-        return doPutReader(reader, callback);
+
+        return doPutReader(reader, getCallback(callback));
     }
 
     @Override
     public CompletableFuture<Long> size(String cid) {
-        return size(cid, new NullCallback<>());
+        return size(cid, null);
     }
 
     @Override
     public CompletableFuture<Long> size(String cid, Callback<Long> callback) {
-        if (null == cid || cid.equals("") || null == callback)
+        if (null == cid || cid.isEmpty())
             throw new IllegalArgumentException();
-        return doGetFileLength(cid, callback);
+
+        return doGetFileLength(cid, getCallback(callback));
     }
 
     @Override
     public CompletableFuture<String> getAsString(String cid) {
-        return getAsString(cid, new NullCallback<>());
+        return getAsString(cid, null);
     }
 
     @Override
     public CompletableFuture<String> getAsString(String cid, Callback<String> callback) {
-        if (null == cid || cid.equals("") || null == callback)
+        if (null == cid || cid.isEmpty())
             throw new IllegalArgumentException();
-        return doGetAsStr(cid, callback);
+
+        return doGetAsStr(cid, getCallback(callback));
     }
 
     @Override
     public CompletableFuture<byte[]> getAsBuffer(String cid) {
-        return getAsBuffer(cid, new NullCallback<>());
+        return getAsBuffer(cid, null);
     }
 
     @Override
     public CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback) {
-        if (null == cid || cid.equals("") || null == callback)
+        if (null == cid || cid.isEmpty())
             throw new IllegalArgumentException();
-        return doGetAsBuff(cid, callback);
+
+        return doGetAsBuff(cid, getCallback(callback));
     }
 
     @Override
     public CompletableFuture<Long> get(String cid, OutputStream output) {
-        return get(cid, output, new NullCallback<>());
+        return get(cid, output, null);
     }
 
     @Override
     public CompletableFuture<Long> get(String cid, OutputStream output, Callback<Long> callback) {
-        if (null == cid || cid.equals("") || null == output || null == callback)
+        if (null == cid || cid.isEmpty() || null == output)
             throw new IllegalArgumentException();
-        return doWriteToOutput(cid, output, callback);
+
+        return doWriteToOutput(cid, output, getCallback(callback));
     }
 
     @Override
     public CompletableFuture<Long> get(String cid, Writer writer) {
-        return get(cid, writer, new NullCallback<>());
+        return get(cid, writer, null);
     }
 
     @Override
     public CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback) {
-        if (null == cid || cid.equals("") || null == writer || null == callback)
+        if (null == cid || cid.isEmpty()|| null == writer)
             throw new IllegalArgumentException();
-        return doWriteToWriter(cid, writer, callback);
+
+        return doWriteToWriter(cid, writer, getCallback(callback));
     }
 
     ////
@@ -269,7 +282,6 @@ final class IPFSClient extends Client implements IPFS {
                 cid = putReaderImpl(reader);
                 callback.onSuccess(cid);
             } catch (Exception e) {
-                e.printStackTrace();
                 callback.onError(new HiveException(e.getLocalizedMessage()));
             }
             return cid;
