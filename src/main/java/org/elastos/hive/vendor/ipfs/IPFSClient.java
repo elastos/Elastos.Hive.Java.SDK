@@ -147,7 +147,8 @@ final class IPFSClient extends Client implements IPFS {
     public CompletableFuture<String> getAsString(String cid, Callback<String> callback) {
         if (null == cid || cid.isEmpty())
             throw new IllegalArgumentException();
-        return ipfsRpc.checkValid().thenCompose(isValid -> doGetDataAsString(cid, getCallback(callback)));
+        return ipfsRpc.checkValid()
+                .thenCompose(isValid -> doGetDataAsString(cid, getCallback(callback)));
     }
 
     @Override
@@ -183,7 +184,7 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback) {
-        if (null == cid || cid.isEmpty()|| null == writer)
+        if (null == cid || cid.isEmpty() || null == writer)
             throw new IllegalArgumentException();
         return ipfsRpc.checkValid()
                 .thenCompose(isValid -> doGetData(cid, writer, getCallback(callback)));
@@ -191,16 +192,15 @@ final class IPFSClient extends Client implements IPFS {
 
     private CompletableFuture<String> doPutBuffer(byte[] data, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            String result;
             try {
-
-                result = putBufferImpl(data);
+                String result = putBufferImpl(data);
                 callback.onSuccess(result);
+                return result;
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
-                throw new CompletionException(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return result;
         });
     }
 
@@ -261,14 +261,14 @@ final class IPFSClient extends Client implements IPFS {
 
     private CompletableFuture<String> doPutData(InputStream input, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            String cid = null;
             try {
-                cid = putDataImpl(input);
+                String cid = putDataImpl(input);
                 callback.onSuccess(cid);
+                return cid;
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
-            }
-            return cid;
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);            }
         });
     }
 
@@ -286,14 +286,15 @@ final class IPFSClient extends Client implements IPFS {
 
     private CompletableFuture<String> doPutData(Reader reader, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            String cid = null;
             try {
-                cid = putDataImpl(reader);
+                String cid = putDataImpl(reader);
                 callback.onSuccess(cid);
+                return cid;
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return cid;
         });
     }
 
@@ -311,14 +312,15 @@ final class IPFSClient extends Client implements IPFS {
 
     private CompletableFuture<Long> doGetLength(String cid, Callback<Long> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            long length = 0;
             try {
-                length = getLengthImpl(cid);
+                long length = getLengthImpl(cid);
                 callback.onSuccess(length);
+                return length;
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return length;
         });
     }
 
@@ -342,14 +344,15 @@ final class IPFSClient extends Client implements IPFS {
 
     private CompletableFuture<String> doGetDataAsString(String cid, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            String result = null;
             try {
-                result = getDataAsStringImpl(cid);
+                String result = getDataAsStringImpl(cid);
                 callback.onSuccess(result);
+                return result;
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return result;
         });
     }
 
@@ -359,14 +362,15 @@ final class IPFSClient extends Client implements IPFS {
 
     private CompletableFuture<byte[]> doGetDataAsBuffer(String cid, Callback<byte[]> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            byte[] result = new byte[0];
             try {
-                result = getDataAsBufferImpl(cid);
+                byte[] result = getDataAsBufferImpl(cid);
                 callback.onSuccess(result);
+                return result;
             } catch (HiveException e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return result;
         });
     }
 
@@ -376,14 +380,15 @@ final class IPFSClient extends Client implements IPFS {
 
     private CompletableFuture<Long> doGetData(String cid, OutputStream output, Callback<Long> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            long length = 0;
             try {
-                length = getDataToOutputImpl(cid, output);
+                long length = getDataToOutputImpl(cid, output);
                 callback.onSuccess(length);
+                return length;
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return length;
         });
     }
 
@@ -393,14 +398,15 @@ final class IPFSClient extends Client implements IPFS {
 
     private CompletableFuture<Long> doGetData(String cid, Writer writer, Callback<Long> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            long length = 0;
             try {
-                length = getDataToWriterImpl(cid, writer);
+                long length = getDataToWriterImpl(cid, writer);
                 callback.onSuccess(length);
+                return length;
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return length;
         });
     }
 
