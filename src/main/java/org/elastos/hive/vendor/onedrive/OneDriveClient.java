@@ -45,7 +45,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public void connect() throws HiveException{
         try {
-            authHelper.loginAsync(authenticator).get();
+            authHelper.connectAsync(authenticator).get();
         } catch (Exception e) {
             throw new HiveException(e.getLocalizedMessage());
         }
@@ -90,7 +90,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == data || data.length == 0 || null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data, getCallback(callback)));
     }
 
@@ -104,7 +104,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == data || data.isEmpty() || null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data.getBytes(), getCallback(callback)));
     }
 
@@ -118,7 +118,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == input || null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doPutInputStream(toRemoteFilePath(remoteFile), input, getCallback(callback)));
     }
 
@@ -132,7 +132,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == reader || null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doPutReader(toRemoteFilePath(remoteFile), reader, getCallback(callback)));
     }
 
@@ -146,7 +146,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doGetFileLength(toRemoteFilePath(remoteFile), getCallback(callback)));
     }
 
@@ -160,7 +160,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doGetString(toRemoteFilePath(remoteFile), getCallback(callback)));
     }
 
@@ -174,7 +174,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doGetBuffer(toRemoteFilePath(remoteFile), getCallback(callback)));
     }
 
@@ -188,7 +188,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == remoteFile || remoteFile.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doDeleteFile(toRemoteFilePath(remoteFile), getCallback(callback)));
     }
 
@@ -199,7 +199,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
     @Override
     public CompletableFuture<ArrayList<String>> list(Callback<ArrayList<String>> callback) {
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doListFile(getCallback(callback)));
     }
 
@@ -213,7 +213,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == remoteFile || remoteFile.isEmpty() || null == output)
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doWriteToOutput(toRemoteFilePath(remoteFile), output, getCallback(callback)));
     }
 
@@ -227,7 +227,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == remoteFile || remoteFile.isEmpty() || null == writer)
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doWriteToWriter(toRemoteFilePath(remoteFile), writer, getCallback(callback)));
     }
 
@@ -241,7 +241,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == key ||  key.isEmpty() || null == value || value.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doPutValue(toRemoteKeyPath(key), value.getBytes(), getCallback(callback)));
     }
 
@@ -255,7 +255,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == key || key.isEmpty() || null == value || value.length == 0)
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doPutValue(toRemoteKeyPath(key), value, getCallback(callback)));
     }
 
@@ -269,7 +269,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == key || key.isEmpty() || null == value || value.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value.getBytes(), getCallback(callback)));
     }
 
@@ -283,9 +283,8 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == key || key.isEmpty() || null == value || value.length == 0)
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value, getCallback(callback)));
-
     }
 
     @Override
@@ -298,7 +297,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == key || key.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doGetValue(toRemoteKeyPath(key), getCallback(callback)));
     }
 
@@ -312,7 +311,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         if (null == key || key.isEmpty())
             throw new IllegalArgumentException();
 
-        return authHelper.checkExpired()
+        return authHelper.checkValid()
                 .thenCompose(result -> doDeleteFile(toRemoteKeyPath(key), getCallback(callback)));
     }
 

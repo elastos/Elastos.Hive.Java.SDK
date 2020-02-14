@@ -19,13 +19,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okio.Buffer;
 import retrofit2.Response;
 
 
@@ -38,7 +37,11 @@ final class IPFSClient extends Client implements IPFS {
 
     @Override
     public void connect() throws HiveException {
-        ipfsRpc.checkReachable();
+        try {
+            ipfsRpc.connectAsync(null).get();
+        } catch (Exception e) {
+            throw new HiveException(e.getLocalizedMessage());
+        }
     }
 
     @Override
@@ -79,8 +82,8 @@ final class IPFSClient extends Client implements IPFS {
     public CompletableFuture<String> put(byte[] data, Callback<String> callback) {
         if (null == data)
             throw new IllegalArgumentException();
-
-        return doPutBuffer(data, getCallback(callback));
+        return ipfsRpc.checkValid()
+                .thenCompose(isValid -> doPutBuffer(data, getCallback(callback)));
     }
 
     @Override
@@ -92,8 +95,8 @@ final class IPFSClient extends Client implements IPFS {
     public CompletableFuture<String> put(String data, Callback<String> callback) {
         if (null == data)
             throw new IllegalArgumentException();
-
-        return doPutBuffer(data.getBytes(), getCallback(callback));
+        return ipfsRpc.checkValid()
+                .thenCompose(isValid -> doPutBuffer(data.getBytes(), getCallback(callback)));
     }
 
     @Override
@@ -105,8 +108,8 @@ final class IPFSClient extends Client implements IPFS {
     public CompletableFuture<String> put(InputStream input, Callback<String> callback) {
         if (null == input)
             throw new IllegalArgumentException();
-
-        return doPutData(input, getCallback(callback));
+        return ipfsRpc.checkValid()
+                .thenCompose(isValid -> doPutData(input, getCallback(callback)));
     }
 
     @Override
@@ -118,8 +121,8 @@ final class IPFSClient extends Client implements IPFS {
     public CompletableFuture<String> put(Reader reader, Callback<String> callback) {
         if (null == reader)
             throw new IllegalArgumentException();
-
-        return doPutData(reader, getCallback(callback));
+        return ipfsRpc.checkValid()
+                .thenCompose(isValid -> doPutData(reader, getCallback(callback)));
     }
 
     @Override
@@ -131,8 +134,8 @@ final class IPFSClient extends Client implements IPFS {
     public CompletableFuture<Long> size(String cid, Callback<Long> callback) {
         if (null == cid || cid.isEmpty())
             throw new IllegalArgumentException();
-
-        return doGetLength(cid, getCallback(callback));
+        return ipfsRpc.checkValid()
+                .thenCompose(isValid -> doGetLength(cid, getCallback(callback)));
     }
 
     @Override
@@ -144,8 +147,7 @@ final class IPFSClient extends Client implements IPFS {
     public CompletableFuture<String> getAsString(String cid, Callback<String> callback) {
         if (null == cid || cid.isEmpty())
             throw new IllegalArgumentException();
-
-        return doGetDataAsString(cid, getCallback(callback));
+        return ipfsRpc.checkValid().thenCompose(isValid -> doGetDataAsString(cid, getCallback(callback)));
     }
 
     @Override
@@ -157,8 +159,8 @@ final class IPFSClient extends Client implements IPFS {
     public CompletableFuture<byte[]> getAsBuffer(String cid, Callback<byte[]> callback) {
         if (null == cid || cid.isEmpty())
             throw new IllegalArgumentException();
-
-        return doGetDataAsBuffer(cid, getCallback(callback));
+        return ipfsRpc.checkValid()
+                .thenCompose(isValid -> doGetDataAsBuffer(cid, getCallback(callback)));
     }
 
     @Override
@@ -170,8 +172,8 @@ final class IPFSClient extends Client implements IPFS {
     public CompletableFuture<Long> get(String cid, OutputStream output, Callback<Long> callback) {
         if (null == cid || cid.isEmpty() || null == output)
             throw new IllegalArgumentException();
-
-        return doGetData(cid, output, getCallback(callback));
+        return ipfsRpc.checkValid()
+                .thenCompose(isValid -> doGetData(cid, output, getCallback(callback)));
     }
 
     @Override
@@ -183,18 +185,20 @@ final class IPFSClient extends Client implements IPFS {
     public CompletableFuture<Long> get(String cid, Writer writer, Callback<Long> callback) {
         if (null == cid || cid.isEmpty()|| null == writer)
             throw new IllegalArgumentException();
-
-        return doGetData(cid, writer, getCallback(callback));
+        return ipfsRpc.checkValid()
+                .thenCompose(isValid -> doGetData(cid, writer, getCallback(callback)));
     }
 
     private CompletableFuture<String> doPutBuffer(byte[] data, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            String result = null;
+            String result;
             try {
+
                 result = putBufferImpl(data);
                 callback.onSuccess(result);
             } catch (Exception e) {
                 callback.onError(new HiveException(e.getLocalizedMessage()));
+                throw new CompletionException(new HiveException(e.getLocalizedMessage()));
             }
             return result;
         });

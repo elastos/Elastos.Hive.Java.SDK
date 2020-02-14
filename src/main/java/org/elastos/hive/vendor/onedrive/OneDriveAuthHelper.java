@@ -23,7 +23,7 @@
 package org.elastos.hive.vendor.onedrive;
 
 
-import org.elastos.hive.AuthHelper;
+import org.elastos.hive.ConnectHelper;
 import org.elastos.hive.AuthServer;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Response;
 
-public class OneDriveAuthHelper implements AuthHelper {
+public class OneDriveAuthHelper implements ConnectHelper {
     private static final String clientIdKey = "client_id";
     private static final String accessTokenKey = "access_token";
     private static final String refreshTokenKey = "refresh_token";
@@ -73,13 +73,13 @@ public class OneDriveAuthHelper implements AuthHelper {
     }
 
     @Override
-    public CompletableFuture<Void> loginAsync(Authenticator authenticator) {
-        return loginAsync(authenticator, new NullCallback<>());
+    public CompletableFuture<Void> connectAsync(Authenticator authenticator) {
+        return connectAsync(authenticator, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> loginAsync(Authenticator authenticator,
-                                              Callback<Void> callback) {
+    public CompletableFuture<Void> connectAsync(Authenticator authenticator,
+                                                Callback<Void> callback) {
         return CompletableFuture.runAsync(() -> {
             try {
                 doLogin(authenticator);
@@ -91,12 +91,12 @@ public class OneDriveAuthHelper implements AuthHelper {
     }
 
     @Override
-    public CompletableFuture<Void> checkExpired() {
-        return checkExpired(new NullCallback<>());
+    public CompletableFuture<Void> checkValid() {
+        return checkValid(new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> checkExpired(Callback<Void> callback) {
+    public CompletableFuture<Void> checkValid(Callback<Void> callback) {
         return CompletableFuture.runAsync(() -> {
             try {
                 doCheckExpired();

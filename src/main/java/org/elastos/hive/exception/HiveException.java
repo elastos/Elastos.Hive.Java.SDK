@@ -29,7 +29,7 @@ package org.elastos.hive.exception;
 public class HiveException extends Exception {
     private static final long serialVersionUID = 1486850840770311509L;
 
-    public static final String NO_RPC_NODE_AVAILABLE = "All RPC nodes are unavailable.";
+    public static final String NO_RPC_NODE_AVAILABLE = "RPC nodes are inValid.";
     public static final String ITEM_NOT_FOUND = "Item not found.";
     public static final String ERROR = "Error";
 

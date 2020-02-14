@@ -27,36 +27,36 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Provides author-related functionality
  */
-public interface AuthHelper {
+public interface ConnectHelper {
     /**
      * Login async with authenticator instance
      *
      * @param authenticator authenticator instance
      * @return Returns 'Void' if the login succees
      */
-    CompletableFuture<Void> loginAsync(Authenticator authenticator);
+    CompletableFuture<Void> connectAsync(Authenticator authenticator);
 
     /**
      * Login async with authenticator instance
      *
      * @param authenticator authenticator instance
-     * @param callback      Callback loginAsync result
+     * @param callback      Callback connectAsync result
      * @return Returns 'Void' if the login succees
      */
-    CompletableFuture<Void> loginAsync(Authenticator authenticator, Callback<Void> callback);
+    CompletableFuture<Void> connectAsync(Authenticator authenticator, Callback<Void> callback);
 
     /**
      * Check access token isExpired
      *
      * @return Returns `Void` if expired
      */
-    CompletableFuture<Void> checkExpired();
+    CompletableFuture<Void> checkValid();
 
     /**
      * Check access token isExpired
      *
-     * @param callback Callback checkExpired result
+     * @param callback Callback checkValid result
      * @return Returns `Void` if expired
      */
-    CompletableFuture<Void> checkExpired(Callback<Void> callback);
+    CompletableFuture<Void> checkValid(Callback<Void> callback);
 }
