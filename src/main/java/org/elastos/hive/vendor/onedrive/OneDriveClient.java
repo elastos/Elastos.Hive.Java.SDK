@@ -25,6 +25,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -43,7 +44,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     @Override
-    public void connect() throws HiveException{
+    public void connect() throws HiveException {
         try {
             authHelper.connectAsync(authenticator).get();
         } catch (Exception e) {
@@ -77,7 +78,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     private <T> Callback<T> getCallback(Callback<T> callback) {
-        return (null == callback ? new NullCallback<T>(): callback);
+        return (null == callback ? new NullCallback<T>() : callback);
     }
 
     @Override
@@ -238,7 +239,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
     @Override
     public CompletableFuture<Void> putValue(String key, String value, Callback<Void> callback) {
-        if (null == key ||  key.isEmpty() || null == value || value.isEmpty())
+        if (null == key || key.isEmpty() || null == value || value.isEmpty())
             throw new IllegalArgumentException();
 
         return authHelper.checkValid()
@@ -318,19 +319,19 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     ////
     private CompletableFuture<ArrayList<byte[]>> doGetValue(String key, Callback<ArrayList<byte[]>> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            ArrayList<byte[]> list = null;
             try {
-                list = getValueImpl(key);
+                ArrayList<byte[]> list = getValueImpl(key);
                 callback.onSuccess(list);
+                return list;
             } catch (HiveException e) {
-                e.printStackTrace();
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return list;
         });
     }
 
-    private ArrayList<byte[]> getValueImpl(String key) throws HiveException{
+    private ArrayList<byte[]> getValueImpl(String key) throws HiveException {
         ArrayList<byte[]> arrayList = new ArrayList<>();
         byte[] data = getBufferImpl(key);
         createValueResult(arrayList, data);
@@ -361,7 +362,9 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 writeReader(remoteFile, reader);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
         });
     }
@@ -387,7 +390,9 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 writeInputStream(destFilePath, inputStream);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
         });
     }
@@ -413,7 +418,9 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 writeBuffer(destFilePath, data);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
         });
     }
@@ -473,15 +480,15 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
     private CompletableFuture<Long> doGetFileLength(String destFilePath, Callback<Long> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            long length = 0;
             try {
-                length = getLength(destFilePath);
+                long length = getLength(destFilePath);
                 callback.onSuccess(length);
+                return length;
             } catch (Exception e) {
-                e.printStackTrace();
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return length;
         });
     }
 
@@ -503,7 +510,9 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 deleteFileImpl(destFilePath);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
         });
     }
@@ -522,19 +531,19 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
     private CompletableFuture<byte[]> doGetBuffer(String remoteFile, Callback<byte[]> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            byte[] bytes = new byte[0];
             try {
-                bytes = getBufferImpl(remoteFile);
+                byte[] bytes = getBufferImpl(remoteFile);
                 callback.onSuccess(bytes);
+                return bytes;
             } catch (HiveException e) {
-                e.printStackTrace();
-                callback.onError(e);
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return bytes;
         });
     }
 
-    private byte[] getBufferImpl(String remoteFile) throws HiveException{
+    private byte[] getBufferImpl(String remoteFile) throws HiveException {
         Response response = getFileOrBuffer(remoteFile);
 
         int responseCode = checkResponseCode(response);
@@ -553,18 +562,19 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
     private CompletableFuture<String> doGetString(String remoteFile, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            String result = "";
             try {
-                result = getString(remoteFile);
+                String result = getString(remoteFile);
                 callback.onSuccess(result);
+                return result;
             } catch (HiveException e) {
-                callback.onError(e);
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return result;
         });
     }
 
-    private String getString(String remoteFile) throws HiveException{
+    private String getString(String remoteFile) throws HiveException {
         byte[] bytes = getBufferImpl(remoteFile);
         if (bytes == null || bytes.length == 0)
             return "";
@@ -574,14 +584,15 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
     private CompletableFuture<Long> doWriteToOutput(String remoteFile, OutputStream outputStream, Callback<Long> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            long length = 0;
             try {
-                length = writeToOutput(remoteFile, outputStream);
+                long length = writeToOutput(remoteFile, outputStream);
                 callback.onSuccess(length);
+                return length;
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return length;
         });
     }
 
@@ -602,15 +613,15 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
     private CompletableFuture<Long> doWriteToWriter(String remoteFile, Writer writer, Callback<Long> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            long length = 0;
             try {
-                length = writeToWriter(remoteFile, writer);
+                long length = writeToWriter(remoteFile, writer);
                 callback.onSuccess(length);
+                return length;
             } catch (Exception e) {
-                e.printStackTrace();
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return length;
         });
     }
 
@@ -630,7 +641,7 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         return ResponseHelper.writeDataToWriter(response, writer);
     }
 
-    private Response getFileOrBuffer(String destFilePath) throws HiveException{
+    private Response getFileOrBuffer(String destFilePath) throws HiveException {
         Response<okhttp3.ResponseBody> response;
         try {
             response = ConnectionManager.getOnedriveApi()
@@ -645,14 +656,15 @@ final class OneDriveClient extends Client implements Files, KeyValues {
 
     private CompletableFuture<ArrayList<String>> doListFile(Callback<ArrayList<String>> callback) {
         return CompletableFuture.supplyAsync(() -> {
-            ArrayList<String> list = null;
             try {
-                list = listFile();
+                ArrayList<String> list = listFile();
                 callback.onSuccess(list);
+                return list;
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
-            return list;
         });
     }
 
@@ -676,8 +688,9 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 putValueImpl(key, value);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                e.printStackTrace();
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
         });
     }
@@ -687,12 +700,12 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         writeBuffer(key, finalData);
     }
 
-    private byte[] mergeData(String key, byte[] value) {
+    private byte[] mergeData(String key, byte[] value) throws HiveException {
         byte[] originData = new byte[0];
         try {
             originData = getBufferImpl(key);
         } catch (HiveException e) {
-            e.printStackTrace();
+            throw new HiveException("Merge data error");
         }
         byte[] data = mergeLengthAndData(value);
         return mergeData(originData, data);
@@ -725,8 +738,9 @@ final class OneDriveClient extends Client implements Files, KeyValues {
                 writeBuffer(remoteFile, mergeLengthAndData(data));
                 callback.onSuccess(null);
             } catch (Exception e) {
-                e.printStackTrace();
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
         });
     }
