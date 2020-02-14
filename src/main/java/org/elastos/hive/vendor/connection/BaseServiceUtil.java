@@ -36,8 +36,7 @@ class BaseServiceUtil {
     private static final int DEFAULT_TIMEOUT = 30;
 
     static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl,
-                               BaseServiceConfig baseServiceConfig) throws Exception {
-
+                               BaseServiceConfig baseServiceConfig) {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
