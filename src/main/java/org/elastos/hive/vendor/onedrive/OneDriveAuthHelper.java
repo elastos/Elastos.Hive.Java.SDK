@@ -39,6 +39,7 @@ import org.elastos.hive.vendor.onedrive.network.model.TokenResponse;
 import org.json.JSONObject;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -85,7 +86,9 @@ public class OneDriveAuthHelper implements ConnectHelper {
                 doLogin(authenticator);
                 callback.onSuccess(null);
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
         });
     }
@@ -102,7 +105,9 @@ public class OneDriveAuthHelper implements ConnectHelper {
                 doCheckExpired();
                 callback.onSuccess(null);
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
         });
     }
