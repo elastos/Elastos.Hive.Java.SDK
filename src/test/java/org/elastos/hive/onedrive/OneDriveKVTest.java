@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -44,10 +45,14 @@ public class OneDriveKVTest {
     public void test_00_prepare() {
         try {
             keyValues.deleteKey(strKey).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try{
             keyValues.deleteKey(bufferKey).get();
         } catch (Exception e) {
             e.printStackTrace();
-            fail();
         }
     }
 
@@ -174,7 +179,7 @@ public class OneDriveKVTest {
             assertNull(bufferValues);
         } catch (Exception e) {
             e.printStackTrace();
-            fail();
+            assertNotNull(e);
         }
     }
 
@@ -450,7 +455,7 @@ public class OneDriveKVTest {
             .get();
         } catch (Exception e) {
             e.printStackTrace();
-            fail();
+            assertNotNull(e);
         }
     }
 
@@ -475,8 +480,7 @@ public class OneDriveKVTest {
             client = Client.createInstance(options);
             client.connect();
             keyValues = client.getKeyValues();
-        } catch (
-                HiveException e) {
+        } catch (HiveException e) {
             Assert.fail(e.getMessage());
         }
     }

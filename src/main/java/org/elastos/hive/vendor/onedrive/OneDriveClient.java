@@ -700,12 +700,11 @@ final class OneDriveClient extends Client implements Files, KeyValues {
         writeBuffer(key, finalData);
     }
 
-    private byte[] mergeData(String key, byte[] value) throws HiveException {
+    private byte[] mergeData(String key, byte[] value) {
         byte[] originData = new byte[0];
         try {
             originData = getBufferImpl(key);
-        } catch (HiveException e) {
-            throw new HiveException("Merge data error");
+        } catch (HiveException ignored) {
         }
         byte[] data = mergeLengthAndData(value);
         return mergeData(originData, data);
