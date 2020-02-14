@@ -32,10 +32,6 @@ public class ClientIPFSInterfaceTest {
     private String path = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
 
     @Test
-    public void testPutData() {
-    }
-
-    @Test
     public void testPutDataInByteArray() {
         try {
             CompletableFuture<String> future = ipfsAPIs.put(data.getBytes());

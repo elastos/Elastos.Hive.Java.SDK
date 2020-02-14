@@ -35,33 +35,31 @@ public class ConnectionManager {
 
     private static String onedriveBaseUrl;
     private static String authBaseUrl;
-    private static String ipfsBaseUrl = "https://www.elastos.org/";
+    private static String ipfsBaseUrl ;
 
     private static BaseServiceConfig onedriveConfig = new BaseServiceConfig.Builder().build();
     private static BaseServiceConfig authConfig = new BaseServiceConfig.Builder().build();
     private static BaseServiceConfig ipfsConfig = new BaseServiceConfig.Builder().build();
 
-    public static OneDriveApi getOnedriveApi() throws Exception {
-        if (oneDriveApi == null) {
+    public static OneDriveApi getOnedriveApi() {
+        if (oneDriveApi == null)
             oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
                     ConnectionManager.onedriveBaseUrl, ConnectionManager.onedriveConfig);
-        }
         return oneDriveApi;
     }
 
-    public static AuthApi getAuthApi() throws Exception {
-        if (authApi == null) {
+    public static AuthApi getAuthApi() {
+        if (authApi == null)
             authApi = BaseServiceUtil.createService(AuthApi.class,
                     ConnectionManager.authBaseUrl, ConnectionManager.authConfig);
-        }
         return authApi;
     }
 
-    public static IPFSApi getIPFSApi() throws Exception {
-        if (ipfsApi == null) {
+    public static IPFSApi getIPFSApi() {
+        if (ipfsApi == null)
             ipfsApi = BaseServiceUtil.createService(IPFSApi.class,
                     ConnectionManager.ipfsBaseUrl, ipfsConfig);
-        }
+
         return ipfsApi;
     }
 
