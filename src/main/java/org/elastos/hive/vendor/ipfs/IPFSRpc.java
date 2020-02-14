@@ -138,7 +138,9 @@ class IPFSRpc implements ConnectHelper {
                 checkReachable();
                 callback.onSuccess(null);
             } catch (Exception e) {
-                callback.onError(new HiveException(e.getLocalizedMessage()));
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
             }
         });
     }
