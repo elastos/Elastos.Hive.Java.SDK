@@ -46,10 +46,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import retrofit2.Response;
 
 public class OneDriveAuthHelper implements ConnectHelper {
-    private static final String clientIdKey = "client_id";
-    private static final String accessTokenKey = "access_token";
-    private static final String refreshTokenKey = "refresh_token";
-    private static final String expireAtKey = "expires_at";
+    private static final String CLIENT_ID_KEY = "client_id";
+    private static final String ACCESS_TOKEN_KEY = "access_token";
+    private static final String REFRESH_TOKEN_KEY = "refresh_token";
+    private static final String EXPIRES_AT_KEY = "expires_at";
+    private static final String TOKEN_TYPE_KEY = "token_type";
 
     private final String clientId;
     private final String scope;
@@ -122,20 +123,23 @@ public class OneDriveAuthHelper implements ConnectHelper {
     private void doLogin(Authenticator authenticator) throws Exception {
         connectState.set(false);
         tryRestoreToken();
-        if (token != null) {
-            long current = System.currentTimeMillis() / 1000;
-            //Check the expire time
-            if (token.getExpiredTime() > current) {
-                connectState.set(true);
-                return;
-            }
-            redeemToken();
+
+        if (token == null){
+            String authCode = accessAuthCode(authenticator);
+            accessToken(authCode);
+            connectState.set(true);
+            return ;
+        }
+
+        long current = System.currentTimeMillis() / 1000;
+        //Check the expire time
+        if (token.getExpiredTime() > current) {
+            initConnection();
             connectState.set(true);
             return;
         }
 
-        String authCode = accessAuthCode(authenticator);
-        accessToken(authCode);
+        redeemToken();
         connectState.set(true);
     }
 
@@ -190,15 +194,58 @@ public class OneDriveAuthHelper implements ConnectHelper {
 
     private void handleTokenResponse(Response response) {
         TokenResponse tokenResponse = (TokenResponse) response.body();
-        long experitime = System.currentTimeMillis() / 1000 + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
+        long expiresTime = System.currentTimeMillis() / 1000 + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
 
         token = new AuthToken(tokenResponse != null ? tokenResponse.getRefresh_token() : "",
                 tokenResponse != null ? tokenResponse.getAccess_token() : "",
-                experitime);
+                expiresTime, tokenResponse != null ? tokenResponse.getToken_type() : "");
 
         //Store the local data.
         writebackToken();
 
+        //init connection
+        initConnection();
+    }
+
+    private void tryRestoreToken() throws HiveException {
+        JSONObject json = persistent.parseFrom();
+        String refreshToken = null;
+        String accessToken = null;
+        String tokenType = null;
+        long expiresAt = -1;
+
+        if (json.has(REFRESH_TOKEN_KEY))
+            refreshToken = json.getString(REFRESH_TOKEN_KEY);
+        if (json.has(ACCESS_TOKEN_KEY))
+            accessToken = json.getString(ACCESS_TOKEN_KEY);
+        if (json.has(EXPIRES_AT_KEY))
+            expiresAt = json.getLong(EXPIRES_AT_KEY);
+        if (json.has(TOKEN_TYPE_KEY))
+            tokenType = json.getString(TOKEN_TYPE_KEY);
+
+        if (refreshToken != null && accessToken != null && expiresAt > 0 && tokenType != null)
+            this.token = new AuthToken(refreshToken, accessToken, expiresAt, tokenType);
+    }
+
+    private void writebackToken() {
+        if (token == null)
+            return;
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put(CLIENT_ID_KEY, clientId);
+            json.put(REFRESH_TOKEN_KEY, token.getRefreshToken());
+            json.put(ACCESS_TOKEN_KEY, token.getAccessToken());
+            json.put(EXPIRES_AT_KEY, token.getExpiredTime());
+            json.put(TOKEN_TYPE_KEY, token.getTokenType());
+
+            persistent.upateContent(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initConnection() {
         HeaderConfig headerConfig = new HeaderConfig.Builder()
                 .authToken(token)
                 .build();
@@ -208,40 +255,6 @@ public class OneDriveAuthHelper implements ConnectHelper {
         ConnectionManager.resetOneDriveApi(
                 OneDriveConstance.ONE_DRIVE_API_BASE_URL,
                 baseServiceConfig);
-    }
-
-    private void tryRestoreToken() throws HiveException {
-        JSONObject json = persistent.parseFrom();
-        String refreshToken = null;
-        String accessToken = null;
-        long expiresAt = -1;
-
-        if (json.has(refreshTokenKey))
-            refreshToken = json.getString(refreshTokenKey);
-        if (json.has(accessTokenKey))
-            accessToken = json.getString(accessTokenKey);
-        if (json.has(expireAtKey))
-            expiresAt = json.getLong(expireAtKey);
-
-        if (refreshToken != null && accessToken != null && expiresAt > 0)
-            this.token = new AuthToken(refreshToken, accessToken, expiresAt);
-    }
-
-    private void writebackToken() {
-        if (token == null)
-            return;
-
-        try {
-            JSONObject json = new JSONObject();
-            json.put(clientIdKey, clientId);
-            json.put(refreshTokenKey, token.getRefreshToken());
-            json.put(refreshTokenKey, token.getAccessToken());
-            json.put(expireAtKey, token.getExpiredTime());
-
-            persistent.upateContent(json);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     boolean getConnectState() {
