@@ -22,7 +22,8 @@ import static org.junit.Assert.fail;
 
 public class ClientIPFSInterfaceTest {
     private static final String STORE_PATH = System.getProperty("user.dir");
-    private static final String[] IPADDRS = {"3.133.166.156", "127.0.0.1"};
+    private static final String[] IPADDRS = {"3.133.166.156", "13.59.79.222", "3.133.71.168",
+            "52.83.165.233", "52.83.238.247", "127.0.0.1"};
 
     private static Client client;
     private static IPFS ipfsAPIs;
