@@ -9,229 +9,206 @@ In order to get developers involved to have a brief overview of APIs,  here are 
 The first API to use Hive SDK is to create a client object to expected cloud storage service. For example,  the following paragraph is to create to a client to OneDrive:
 
 ```Java
-OAuthEntry entry = new OAuthEntry(YOUR-CLIENT-ID, YOUR-SCOPE, YOUR-REIRECTURL);
-Paramter  params = new OneDriveParameter(entry , YOUR-DATA-DIR);
-Client client = Client.createInstance(params);
+Client.Options options = new OneDriveOptions
+		                    .Builder()
+		                    .setStorePath(YOUR_STORE_PATH)
+		                    .setClientId(YOUR_CLIENTID)
+		                    .setRedirectUrl(YOUR_REDIRECTURL)
+		                    .setAuthenticator(requestUrl -> {
+		                        ...
+		                        ...
+		                    })
+		                    .build();
+client = Client.createInstance(options);
 ```
 
-#### 2. Login 
+#### 2. Connect 
 
-When you get a client object, you need to get login with user's authorisation before calling any other APIs, example for OneDrive.  And remember that an extend class has to be implement based on interface **Authenticator** before calling **login** API.
+When you get a client object, you need to connect backend server, example for OneDrive. 
 
 ```java
-// Supposed having a client object.
-Authenticator authenticator = new YOUR-OWN-AUTHENTICATOR();
-try {
-   client.login(authenticator);
-} catch (HiveException e) {
-   e.printstack();
-}
+client.connect();
 ```
 
-#### 3. Get drive
+#### 3. Disconnect
 
-As long as you get user's authorisation,  then you can follow the example to get a default drive object and to handle it for your own purpose:
+When you want to disconnect from your backend , follow these instructions:
 
 ```java
-// Supposed having a client object.
-client.getDefaultDrive()
-      .thenAccept(drive ->  {
-        // Here is your code to use drive.
-      });
+client.disconnect();
 ```
 
-#### 4. Logout
+### Files
 
-When you want to log out of your account after all your backend file operations, follow these instructions:
+#### 1. Get Files API
+
+After you connect backend server, you can get files api refer the following example:
 
 ```java
-// Supposed having a client object.
-try {
-	client.logout();
-} catch (HiveException e) {
-   e.printstack();
-}
+Files filesApi = client.getFiles();
 ```
 
-### Drive
 
-#### 1. Get directory
-
-After you get the drive, if you want to get the folder in the backend, you can refer to the following example:
+#### 2. Put data(string/buffer/InputStream/Reader)
+If you want to put data to the backend, you can refer to the following example:
 
 ```java
-// Supposed having a drive object.
-drive.getDirectory(YOUR-DIR-PATH)
-	.thenAccept(directory -> {
-        // Here is your code to use directory.
-	});
+filesApi.put(YOUR_DATA, REMOTE_FILE_NAME)
+			.thenAccept(v -> {
+				//Do another things after putting data to the backend.
+			});
 ```
 
-#### 2. Get file
-if you want to get the file in the backend, you can refer to the following example:
+#### 3. Size
+
+Get remote file size from the backend, you can refer to the following example:
 
 ```java
-// Supposed having a drive object.
-drive.getFile(YOUR-FILE-PATH)
-	.thenAccept(file -> {
-        // Here is your code to use file.
-	});
+filesApi.size(REMOTE_FILE_NAME)
+			.thenAccept(length -> {
+				//length is remote file size 
+				//Do another things after get remote file size from the backend.
+			});
 ```
 
-#### 3. Create directory 
+#### 4. Get data(string/buffer/OutputStream/Writer)
 
-You can also create a directory directly using drive, just like that:
+Get remote file data from the backend. For example, you can get a string of file data from a backend, you can refer to the following example:
 
 ```java
-// Supposed having a drive object.
-drive.createDirectory(YOUR-DIR-PATH)
-	.thenAccept(directory -> {
-        // Here is your code to use directory.
-	});
+filesApi.getAsString(REMOTE_FILE_NAME)
+			.thenAccept(str ->{
+				//str is remote file data
+				//Do another things after getting a string of file data.
+			});
 ```
 
-#### 4. Create file
+#### 5. List files
 
-Or use drive to create a directory, just like that:
+List all backend files name, refer to the following example:
 
 ```java
-// Supposed having a drive object.
-drive.createFile(YOUR-FILE-PATH)
-	.thenAccept(file -> {
-		// Here is your code to use file.
-	});
+filesApi.list()
+			.thenAccept(list -> {
+				//list is files name(ArrayList<String>)
+				//Do another things after list all backend files name.
+			});
 ```
 
-### Directory
 
-#### 1. Copy a directory
+#### 6. Delete file
 
-After you have an instance of directory, you can copy a directory:
+Delete backend file, refer to the following example:
 
 ```java
-// Supposed having a directory object.
-directory.copyTo(YOUR-DIR-PATH)
-	.thenAccept(v ->{
-		//Do another things after copy a directory.
-    });
-
+filesApi.delete(REMOTE_FILE_NAME)
+			.thenAccept(v -> {
+				//Do another things after delete backend file.
+			});
 ```
 
-#### 2. Move a directory
+### KeyValues
 
-Or move the directory, as in the following example:
+#### 1. Get KeyValues API
+
+Get KeyValues api, refer to the following example:
 
 ```java
-// Supposed having a directory object.
-directory.moveTo(YOUR-DIR-PATH)
-    .thenAccept(v ->{
-		//Do another things after Move a directory.
-    });
+KeyValues keyValues = client.getKeyValues();
 ```
 
+#### 2. Put value(string/buffer)
 
-#### 3. Delete a directory
-
-Or refer to the implementation below to delete a directory:
+Put a value to the backend, refer to the following example:
 
 ```java
-// Supposed having a directory object.
-directory.deleteItem()
-    .thenAccept(v ->{
-        //Do another things after delete a directory.
-    });
+keyValues.putValue(YOUR_KEY, YOUR_VALUE)
+			.thenAccept(v ->{
+				//Do another things after put a value to the backend.
+			});
 ```
 
-#### 4. List files
 
-You can also use directory to list all subdirectories in the current directory:
+#### 3. Get value
+
+Get value from the backend, refer to the following example:
 
 ```java
-// Supposed having a directory object.
-directory.getChildren()
-    .thenAccept(children -> {
-        //List children for current directory
-    });
+keyValues.getValues(YOUR_KEY)
+			.thenAccept(list -> {
+				//list is values(ArrayList<byte[])
+				//Do another things after get value from the backend
+			});
 ```
 
-### File
+#### 4. Set value
 
-When you have a file instance, you can do file related operations, such as copying a file:
-
-#### 1. Copy a file
+Set a new value with the key to the backend, refer to the following example:
 
 ```java
-// Supposed having a file object.
-file.copyTo(YOUR-FILE-PATH)
-    .thenAccept(v ->{
-		//Do another things after copy a file.
-    });
+keyValues.setValue(YOUR_KEY, YOUR_VALUE)
+			.thenAccept(v -> {
+				//Do another things after set value from the backend
+			});
 ```
 
+#### 5. Delete key
 
-
-#### 2. Move a file
-
-You can also use the following example to move files around:
+Delete key and value from the backend, refer to the following example:
 
 ```java
-// Supposed having a file object.
-file.moveTo(YOUR-FILE-PATH)
-    .thenAccept(v ->{
-		//Do another things after Move a file.
-    });
-
+keyValues.deleteKey(YOUR_KEY)
+			.thenAccept(v -> {
+				//Do another things after delete key and value from the backend
+			});
 ```
 
-#### 3. Delete a file
 
-If you want to delete files, you can refer to the following example：
+### IPFS
+
+#### 1. Get IPFS API
+
+Get KeyValues api, refer to the following example:
 
 ```java
-// Supposed having a file object.
-file.deleteItem()
-    .thenAccept(v ->{
-        //Do another things after delete a file.
-    });
+IPFS ipfsAPIs = client.getIPFS();
 ```
 
+#### 2. Put data(string/buffer/InputStream/Reader)
 
-#### 4. Read data
-
-When you want to read a file from the background, you can use the following example.
+If you want to put data to the backend, you can refer to the following example:
 
 ```java
-// Supposed having a file object.
-ByteBuffer readBuf = ByteBuffer.allocate(YOUR-BUFFER-LENGTH);
-
-file.read(readBuf)
-        .thenAccept(length -> {
-			//TODO
-        });
-
+ipfsAPIs.put(YOUR_DATA)
+			.thenAccept(str->{
+				//str is remote file CID
+				//Do another things after put data to the backend
+			});
 ```
 
-#### 5. Write data
+#### 3. Get data(string/buffer/InputStream/Reader)
 
-If you have some data that you want to store in the backend,you need to call the file.write interface to write the data, and then call the file.commit interface to commit the changes,as shown in the following example:
+Get remote file data from the backend. For example, you can get a string of file data from a backend, you can refer to the following example:
 
 ```java
-// Supposed having a file object.
-// prepare Bytebuffer
-ByteBuffer writeBuffer = YOUR-DATA-BUFFER ;
-
-file.write(writeBuffer)
-		.thenAccept(length -> {
-			// Do somthing after write buffer
-		});
-file.commit()
-		.thenAccept(v ->{
-			// Do another things after commit 	
-		});
-
+ipfsAPIs.getAsString(YOUR_FILE_CID)
+			.thenAccept(str -> {
+				//str is remote file data
+				//Do another things after get remote file data 
+			});
 ```
 
 
+#### 4.Size
+
+Get remote file size from the backend, you can refer to the following example:
+
+```java
+ipfsAPIs.size(YOUR_FILE_CID)
+			.thenAccept(length->{
+				//length is remote file size
+				//Do another things after get remote file size 			});
+```
 
 ***More guide refer to APIDoc and Sample***
 
