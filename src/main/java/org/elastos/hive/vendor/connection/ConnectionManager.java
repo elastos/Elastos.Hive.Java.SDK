@@ -23,6 +23,7 @@
 package org.elastos.hive.vendor.connection;
 
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
+import org.elastos.hive.vendor.hivevault.network.HiveVaultApi;
 import org.elastos.hive.vendor.ipfs.network.IPFSApi;
 import org.elastos.hive.vendor.onedrive.network.AuthApi;
 import org.elastos.hive.vendor.onedrive.network.OneDriveApi;
@@ -31,15 +32,26 @@ public class ConnectionManager {
 
     private static AuthApi authApi;
     private static OneDriveApi oneDriveApi;
+    private static HiveVaultApi hivevaultApi;
     private static IPFSApi ipfsApi;
 
+    private static String hivevaultBaseUrl;
     private static String onedriveBaseUrl;
     private static String authBaseUrl;
     private static String ipfsBaseUrl ;
 
+    private static BaseServiceConfig hivevaultConfig = new BaseServiceConfig.Builder().build() ;
     private static BaseServiceConfig onedriveConfig = new BaseServiceConfig.Builder().build();
     private static BaseServiceConfig authConfig = new BaseServiceConfig.Builder().build();
     private static BaseServiceConfig ipfsConfig = new BaseServiceConfig.Builder().build();
+
+    public static HiveVaultApi getHiveVaultApi() {
+        if(hivevaultApi == null) {
+            hivevaultApi = BaseServiceUtil.createService(HiveVaultApi.class,
+                    ConnectionManager.hivevaultBaseUrl, ConnectionManager.hivevaultConfig);
+        }
+        return hivevaultApi;
+    }
 
     public static OneDriveApi getOnedriveApi() {
         if (oneDriveApi == null)
@@ -63,6 +75,10 @@ public class ConnectionManager {
         return ipfsApi;
     }
 
+    private static void updateHiveVaultConfig(BaseServiceConfig hivenvaultConfig) {
+        ConnectionManager.hivevaultConfig = hivenvaultConfig;
+    }
+
     private static void updateOneDriveConfig(BaseServiceConfig onedriveConfig) {
         ConnectionManager.onedriveConfig = onedriveConfig;
     }
@@ -73,6 +89,10 @@ public class ConnectionManager {
 
     private static void updateIPFSConfig(BaseServiceConfig ipfsConfig) {
         ConnectionManager.ipfsConfig = ipfsConfig;
+    }
+
+    private static void updateHiveVaultBaseUrl(String hivevaultBaseUrl) {
+        ConnectionManager.hivevaultBaseUrl = hivevaultBaseUrl;
     }
 
     private static void updateOneDriveBaseUrl(String onedriveBaseUrl) {
@@ -91,6 +111,12 @@ public class ConnectionManager {
         authApi = null;
         updateAuthConfig(baseServiceConfig);
         updateAuthBaseUrl(baseUrl);
+    }
+
+    public static void resetHiveVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
+        hivevaultApi = null;
+        updateHiveVaultBaseUrl(baseUrl);
+        updateHiveVaultConfig(baseServiceConfig);
     }
 
     public static void resetOneDriveApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
