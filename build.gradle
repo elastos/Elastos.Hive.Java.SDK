@@ -44,34 +44,26 @@ task createjavadoc(type: Javadoc) {
         links "http://docs.oracle.com/javase/8/docs/api"
     }
     include(
+            //org.elastos.hive
             "**/Client.java",
-            "**/Drive.java",
-            "**/Directory.java",
-            "**/File.java",
-
-            "**/Callback.java",
-            "**/HiveException.java",
             "**/Authenticator.java",
+            "**/Callback.java",
+            "**/NullCallback.java",
 
-            "**/Parameter.java",
-            "**/OAuthEntry.java",
-            "**/IPFSEntry.java",
+            //org.elastos.hive.onedrive
+            "**/OneDriveOptions.java",
 
-            "**/DriveType.java",
-            "**/DirectoryItem.java",
-            "**/FileItem.java",
-//            "**/ResourceItem.java",
+            //org.elastos.hive.ipfs
+            "**/IPFSOptions.java",
 
-            "**/ItemInfo.java",
-            "**/Length.java",
-            "**/Void.java",
-            "**/Children.java",
-            "**/Result.java",
+            //org.elastos.hive.interfaces
+            "**/Files.java",
+            "**/IPFS.java",
+            "**/KeyValues.java",
 
-            "**/AttributeMap.java",
-
-            "**/ipfs/IPFSParameter.java",
-            "**/onedrive/OneDriveParameter.java"
+            //org.elastos.hive.exception
+            "**/HiveException.java",
+            "**/NotImplementedException.java",
     )
     source = sourceSets.main.java.srcDirs
     destinationDir = file("doc/")
