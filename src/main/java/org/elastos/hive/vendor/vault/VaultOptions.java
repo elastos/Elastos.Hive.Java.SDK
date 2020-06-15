@@ -1,11 +1,10 @@
-package org.elastos.hive.vendor.hivevault;
+package org.elastos.hive.vendor.vault;
 
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
 
-public class HiveVaultOptions extends Client.Options {
+public class VaultOptions extends Client.Options {
 
-    private long expiration;
     private String did;
     private String pwd;
 
@@ -13,7 +12,7 @@ public class HiveVaultOptions extends Client.Options {
         return did;
     }
 
-    public void setDid(String did) {
+    private void setDid(String did) {
         this.did = did;
     }
 
@@ -21,21 +20,14 @@ public class HiveVaultOptions extends Client.Options {
         return pwd;
     }
 
-    public void setPassword(String pwd) {
+    private void setPassword(String pwd) {
         this.pwd = pwd;
-    }
-
-    public long expiration() {
-        return expiration;
-    }
-
-    public void setExpiration(long expiration) {
-        this.expiration = expiration;
     }
 
     @Override
     protected boolean checkValid(boolean all) {
-        return (storePath()!=null) && (expiration>=0);
+        return (did != null && pwd != null &&
+                super.checkValid(all));
     }
 
     boolean checkValid() {
@@ -44,14 +36,14 @@ public class HiveVaultOptions extends Client.Options {
 
     @Override
     protected Client buildClient() {
-        return new HiveVaultClient(this);
+        return new VaultClient(this);
     }
 
     public static class Builder {
-        private HiveVaultOptions options;
+        private VaultOptions options;
 
         public Builder() {
-            options = new HiveVaultOptions();
+            options = new VaultOptions();
         }
 
         public Builder setDid(String did) {
@@ -66,11 +58,6 @@ public class HiveVaultOptions extends Client.Options {
 
         public Builder setStorePath(String storePath) {
             options.setStorePath(storePath);
-            return this;
-        }
-
-        public Builder setExpiration(long expiration) {
-            options.setExpiration(expiration);
             return this;
         }
 

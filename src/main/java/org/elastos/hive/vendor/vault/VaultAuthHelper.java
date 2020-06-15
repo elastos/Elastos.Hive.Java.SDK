@@ -1,4 +1,4 @@
-package org.elastos.hive.vendor.hivevault;
+package org.elastos.hive.vendor.vault;
 
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
@@ -7,10 +7,11 @@ import org.elastos.hive.ConnectHelper;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.connection.model.HeaderConfig;
-import org.elastos.hive.vendor.hivevault.network.model.TokenResponse;
+import org.elastos.hive.vendor.vault.network.model.TokenResponse;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -21,29 +22,31 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Response;
 
-public class HiveVaultAuthHelper implements ConnectHelper {
+public class VaultAuthHelper implements ConnectHelper {
 
+    private static final String CLIENT_ID_KEY = "client_id";
     private static final String ACCESS_TOKEN_KEY = "access_token";
+    private static final String REFRESH_TOKEN_KEY = "refresh_token";
+    private static final String EXPIRES_AT_KEY = "expires_at";
+    private static final String TOKEN_TYPE_KEY = "token_type";
 
     private final String storePath;
     private final String did;
     private final String pwd;
-    private final long expiration;
 
     private AuthToken token;
     private AtomicBoolean loginState = new AtomicBoolean(false);
     private final Persistent persistent;
 
-    HiveVaultAuthHelper(String did, String pwd, String storePath, long expiration) {
+    VaultAuthHelper(String did, String pwd, String storePath) {
         this.did = did;
         this.pwd = pwd;
         this.storePath = storePath;
-        this.expiration = expiration;
-        this.persistent = new AuthInfoStoreImpl(storePath);
+        this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
 
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-            ConnectionManager.resetHiveVaultApi(HiveVaultConstance.HIVE_AULT_BASE_URL, config);
+            ConnectionManager.resetHiveVaultApi(VaultConstance.AULT_BASE_URL, config);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,8 +92,7 @@ public class HiveVaultAuthHelper implements ConnectHelper {
 
     private void doCheckExpired() throws Exception {
         loginState.set(false);
-        long current = System.currentTimeMillis() / 1000;
-        if (token == null || expiration > current)
+        if (token == null || token.isExpired())
             accessToken();
         loginState.set(true);
     }
@@ -107,7 +109,7 @@ public class HiveVaultAuthHelper implements ConnectHelper {
 
         long current = System.currentTimeMillis() / 1000;
         //Check the expire time
-        if (expiration < current) {
+        if (token.getExpiredTime() > current) {
             initConnection();
             loginState.set(true);
             return;
@@ -126,9 +128,11 @@ public class HiveVaultAuthHelper implements ConnectHelper {
 
     private void handleTokenResponse(Response response) {
         TokenResponse tokenResponse = (TokenResponse) response.body();
-        token = new AuthToken(null,
-                tokenResponse != null ? tokenResponse.getToken() : "",
-                expiration, "token");
+        long expiresTime = System.currentTimeMillis() / 1000 + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
+
+        token = new AuthToken(tokenResponse != null ? tokenResponse.getRefresh_token() : "",
+                tokenResponse != null ? tokenResponse.getAccess_token() : "",
+                expiresTime, tokenResponse != null ? tokenResponse.getToken_type() : "");
 
         //Store the local data.
         writebackToken();
@@ -139,13 +143,22 @@ public class HiveVaultAuthHelper implements ConnectHelper {
 
     private void tryRestoreToken() throws HiveException {
         JSONObject json = persistent.parseFrom();
+        String refreshToken = null;
         String accessToken = null;
+        String tokenType = null;
+        long expiresAt = -1;
 
+        if (json.has(REFRESH_TOKEN_KEY))
+            refreshToken = json.getString(REFRESH_TOKEN_KEY);
         if (json.has(ACCESS_TOKEN_KEY))
             accessToken = json.getString(ACCESS_TOKEN_KEY);
+        if (json.has(EXPIRES_AT_KEY))
+            expiresAt = json.getLong(EXPIRES_AT_KEY);
+        if (json.has(TOKEN_TYPE_KEY))
+            tokenType = json.getString(TOKEN_TYPE_KEY);
 
-        if (accessToken != null)
-            this.token = new AuthToken(null, accessToken, expiration, "token");
+        if (refreshToken != null && accessToken != null && expiresAt > 0 && tokenType != null)
+            this.token = new AuthToken(refreshToken, accessToken, expiresAt, tokenType);
     }
 
     private void writebackToken() {
@@ -169,7 +182,7 @@ public class HiveVaultAuthHelper implements ConnectHelper {
         BaseServiceConfig baseServiceConfig = new BaseServiceConfig.Builder()
                 .headerConfig(headerConfig)
                 .build();
-        ConnectionManager.resetHiveVaultApi(HiveVaultConstance.HIVE_AULT_BASE_URL,
+        ConnectionManager.resetHiveVaultApi(VaultConstance.AULT_BASE_URL,
                 baseServiceConfig);
     }
 

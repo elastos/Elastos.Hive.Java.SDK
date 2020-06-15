@@ -32,6 +32,7 @@ import org.elastos.hive.NullCallback;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.utils.UrlUtil;
+import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.connection.model.HeaderConfig;
@@ -64,7 +65,7 @@ public class OneDriveAuthHelper implements ConnectHelper {
         this.clientId = clientId;
         this.scope = scope;
         this.redirectUrl = redirectUrl;
-        this.persistent = new AuthInfoStoreImpl(persistentStorePath);
+        this.persistent = new AuthInfoStoreImpl(persistentStorePath, OneDriveConstance.CONFIG);
 
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();

@@ -1,4 +1,4 @@
-package org.elastos.hive.vendor.hivevault;
+package org.elastos.hive.vendor.vault;
 
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
@@ -10,8 +10,8 @@ import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.elastos.hive.vendor.hivevault.network.HiveVaultApi;
-import org.elastos.hive.vendor.hivevault.network.model.FilesResponse;
+import org.elastos.hive.vendor.vault.network.VaultApi;
+import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,17 +30,16 @@ import okhttp3.RequestBody;
 import okio.Buffer;
 import retrofit2.Response;
 
-public class HiveVaultClient extends Client implements Files, KeyValues{
+public class VaultClient extends Client implements Files, KeyValues{
 
     private Authenticator authenticator;
-    private HiveVaultAuthHelper authHelper;
+    private VaultAuthHelper authHelper;
 
-    HiveVaultClient(Client.Options options) {
-        HiveVaultOptions opts = (HiveVaultOptions) options;
-        authHelper = new HiveVaultAuthHelper(opts.did(),
+    VaultClient(Client.Options options) {
+        VaultOptions opts = (VaultOptions) options;
+        authHelper = new VaultAuthHelper(opts.did(),
                 opts.password(),
-                opts.storePath(),
-                ((HiveVaultOptions) options).expiration());
+                opts.storePath());
         authenticator = opts.authenticator();
     }
 
@@ -439,7 +438,7 @@ public class HiveVaultClient extends Client implements Files, KeyValues{
 
     private String toRemoteFilePath(String destFileName) {
         StringBuilder builder = new StringBuilder(512)
-                .append(HiveVaultConstance.FILES_ROOT_PATH)
+                .append(VaultConstance.FILES_ROOT_PATH)
                 .append("/")
                 .append(destFileName);
 
@@ -461,7 +460,7 @@ public class HiveVaultClient extends Client implements Files, KeyValues{
     }
 
     private ArrayList<String> listFile() throws Exception {
-        HiveVaultApi api = ConnectionManager.getHiveVaultApi();
+        VaultApi api = ConnectionManager.getHiveVaultApi();
         Response<FilesResponse> response = api.files().execute();
 
         int responseCode = checkResponseCode(response);

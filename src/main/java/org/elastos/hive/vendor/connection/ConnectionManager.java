@@ -23,7 +23,7 @@
 package org.elastos.hive.vendor.connection;
 
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
-import org.elastos.hive.vendor.hivevault.network.HiveVaultApi;
+import org.elastos.hive.vendor.vault.network.VaultApi;
 import org.elastos.hive.vendor.ipfs.network.IPFSApi;
 import org.elastos.hive.vendor.onedrive.network.AuthApi;
 import org.elastos.hive.vendor.onedrive.network.OneDriveApi;
@@ -32,7 +32,7 @@ public class ConnectionManager {
 
     private static AuthApi authApi;
     private static OneDriveApi oneDriveApi;
-    private static HiveVaultApi hivevaultApi;
+    private static VaultApi hivevaultApi;
     private static IPFSApi ipfsApi;
 
     private static String hivevaultBaseUrl;
@@ -45,9 +45,9 @@ public class ConnectionManager {
     private static BaseServiceConfig authConfig = new BaseServiceConfig.Builder().build();
     private static BaseServiceConfig ipfsConfig = new BaseServiceConfig.Builder().build();
 
-    public static HiveVaultApi getHiveVaultApi() {
+    public static VaultApi getHiveVaultApi() {
         if(hivevaultApi == null) {
-            hivevaultApi = BaseServiceUtil.createService(HiveVaultApi.class,
+            hivevaultApi = BaseServiceUtil.createService(VaultApi.class,
                     ConnectionManager.hivevaultBaseUrl, ConnectionManager.hivevaultConfig);
         }
         return hivevaultApi;

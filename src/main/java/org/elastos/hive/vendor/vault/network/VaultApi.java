@@ -1,10 +1,10 @@
-package org.elastos.hive.vendor.hivevault.network;
+package org.elastos.hive.vendor.vault.network;
 
 
 
-import org.elastos.hive.vendor.hivevault.network.model.BaseResponse;
-import org.elastos.hive.vendor.hivevault.network.model.FilesResponse;
-import org.elastos.hive.vendor.hivevault.network.model.TokenResponse;
+import org.elastos.hive.vendor.vault.network.model.BaseResponse;
+import org.elastos.hive.vendor.vault.network.model.FilesResponse;
+import org.elastos.hive.vendor.vault.network.model.TokenResponse;
 
 import java.util.Map;
 
@@ -17,7 +17,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
-public interface HiveVaultApi {
+public interface VaultApi {
 
     //{"did":"iUWjzkS4Di75yCXiKJqxrHYxQdBcS2NaPk", "password":"adujejd"}
     @POST(ConnectConstance.API_PATH + "/did/register")

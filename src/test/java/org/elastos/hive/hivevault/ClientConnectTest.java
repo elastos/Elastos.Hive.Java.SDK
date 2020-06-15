@@ -2,7 +2,7 @@ package org.elastos.hive.hivevault;
 
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.vendor.hivevault.HiveVaultOptions;
+import org.elastos.hive.vendor.vault.VaultOptions;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class ClientConnectTest {
     @BeforeClass
     public static void setUp() {
         try {
-            Client.Options options = new HiveVaultOptions
+            Client.Options options = new VaultOptions
                     .Builder()
                     .setStorePath(STORE_PATH)
                     .setExpiration(10*000)

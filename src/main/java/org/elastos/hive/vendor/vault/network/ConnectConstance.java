@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor.hivevault.network;
+package org.elastos.hive.vendor.vault.network;
 
 class ConnectConstance {
     static final String API_PATH = "/api/v1";

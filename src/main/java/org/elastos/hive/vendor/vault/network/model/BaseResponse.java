@@ -1,4 +1,4 @@
-package org.elastos.hive.vendor.hivevault.network.model;
+package org.elastos.hive.vendor.vault.network.model;
 
 public abstract class BaseResponse {
     private String _status;
