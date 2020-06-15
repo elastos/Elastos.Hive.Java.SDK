@@ -1,75 +1,52 @@
-/*
- * Copyright (c) 2019 Elastos Foundation
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+package org.elastos.hive.vendor.vault;
 
-package org.elastos.hive.vendor.onedrive;
-
-
-import org.elastos.hive.ConnectHelper;
-import org.elastos.hive.AuthServer;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
+import org.elastos.hive.ConnectHelper;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.connection.model.HeaderConfig;
-import org.elastos.hive.vendor.onedrive.network.model.TokenResponse;
+import org.elastos.hive.vendor.vault.network.model.TokenResponse;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Response;
 
-public class OneDriveAuthHelper implements ConnectHelper {
+public class VaultAuthHelper implements ConnectHelper {
+
     private static final String CLIENT_ID_KEY = "client_id";
     private static final String ACCESS_TOKEN_KEY = "access_token";
     private static final String REFRESH_TOKEN_KEY = "refresh_token";
     private static final String EXPIRES_AT_KEY = "expires_at";
     private static final String TOKEN_TYPE_KEY = "token_type";
 
-    private final String clientId;
-    private final String scope;
-    private final String redirectUrl;
-    private final Persistent persistent;
+    private final String storePath;
+    private final String did;
+    private final String pwd;
 
     private AuthToken token;
-    private AtomicBoolean connectState = new AtomicBoolean(false);
+    private AtomicBoolean loginState = new AtomicBoolean(false);
+    private final Persistent persistent;
 
-    OneDriveAuthHelper(String clientId, String scope, String redirectUrl, String persistentStorePath) {
-        this.clientId = clientId;
-        this.scope = scope;
-        this.redirectUrl = redirectUrl;
-        this.persistent = new AuthInfoStoreImpl(persistentStorePath, OneDriveConstance.CONFIG);
+    VaultAuthHelper(String did, String pwd, String storePath) {
+        this.did = did;
+        this.pwd = pwd;
+        this.storePath = storePath;
+        this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
 
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-            ConnectionManager.resetAuthApi(OneDriveConstance.ONE_DRIVE_AUTH_BASE_URL, config);
+            ConnectionManager.resetHiveVaultApi(VaultConstance.AULT_BASE_URL, config);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,8 +58,7 @@ public class OneDriveAuthHelper implements ConnectHelper {
     }
 
     @Override
-    public CompletableFuture<Void> connectAsync(Authenticator authenticator,
-                                                Callback<Void> callback) {
+    public CompletableFuture<Void> connectAsync(Authenticator authenticator, Callback<Void> callback) {
         return CompletableFuture.runAsync(() -> {
             try {
                 doLogin(authenticator);
@@ -115,80 +91,37 @@ public class OneDriveAuthHelper implements ConnectHelper {
     }
 
     private void doCheckExpired() throws Exception {
-        connectState.set(false);
+        loginState.set(false);
         if (token == null || token.isExpired())
-            redeemToken();
-        connectState.set(true);
+            accessToken();
+        loginState.set(true);
     }
 
     private void doLogin(Authenticator authenticator) throws Exception {
-        connectState.set(false);
+        loginState.set(false);
         tryRestoreToken();
 
-        if (token == null){
-            String authCode = accessAuthCode(authenticator);
-            accessToken(authCode);
-            connectState.set(true);
-            return ;
+        if (token == null) {
+            accessToken();
+            loginState.set(true);
+            return;
         }
 
         long current = System.currentTimeMillis() / 1000;
         //Check the expire time
         if (token.getExpiredTime() > current) {
             initConnection();
-            connectState.set(true);
+            loginState.set(true);
             return;
         }
-
-        redeemToken();
-        connectState.set(true);
     }
 
-    private String accessAuthCode(Authenticator authenticator) throws Exception {
-        Semaphore semph = new Semaphore(1);
-
-        String[] hostAndPort = UrlUtil.decodeHostAndPort(redirectUrl, OneDriveConstance.DEFAULT_REDIRECT_URL, String.valueOf(OneDriveConstance.DEFAULT_REDIRECT_PORT));
-
-        String host = hostAndPort[0];
-        int port = Integer.valueOf(hostAndPort[1]);
-
-        AuthServer server = new AuthServer(semph, host, port);
-        server.start();
-
-        String url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-                OneDriveConstance.ONE_DRIVE_AUTH_URL,
-                OneDriveConstance.AUTHORIZE,
-                clientId,
-                scope,
-                redirectUrl)
-                .replace(" ", "%20");
-
-        authenticator.requestAuthentication(url);
-        semph.acquire();
-
-        String authCode = server.getAuthCode();
-        server.stop();
-
-        semph.release();
-        connectState.set(true);
-        return authCode;
-    }
-
-    private void accessToken(String authCode) throws Exception {
-        Response response = ConnectionManager.getAuthApi()
-                .getToken(clientId, authCode,
-                        redirectUrl, OneDriveConstance.GRANT_TYPE_GET_TOKEN)
-                .execute();
-        handleTokenResponse(response);
-    }
-
-    private void redeemToken() throws Exception {
-        String refreshToken = "";
-        if (token != null)
-            refreshToken = token.getRefreshToken();
-        Response response = ConnectionManager.getAuthApi()
-                .refreshToken(clientId, redirectUrl,
-                        refreshToken, OneDriveConstance.GRANT_TYPE_REFRESH_TOKEN)
+    private void accessToken() throws Exception {
+        Map map = new HashMap<>();
+        map.put("did", did);
+        map.put("password", pwd);
+        Response response = ConnectionManager.getHiveVaultApi()
+                .login(map)
                 .execute();
         handleTokenResponse(response);
     }
@@ -234,11 +167,7 @@ public class OneDriveAuthHelper implements ConnectHelper {
 
         try {
             JSONObject json = new JSONObject();
-            json.put(CLIENT_ID_KEY, clientId);
-            json.put(REFRESH_TOKEN_KEY, token.getRefreshToken());
-            json.put(ACCESS_TOKEN_KEY, token.getAccessToken());
-            json.put(EXPIRES_AT_KEY, token.getExpiredTime());
-            json.put(TOKEN_TYPE_KEY, token.getTokenType());
+            json.put(ACCESS_TOKEN_KEY, token);
 
             persistent.upateContent(json);
         } catch (Exception e) {
@@ -253,16 +182,15 @@ public class OneDriveAuthHelper implements ConnectHelper {
         BaseServiceConfig baseServiceConfig = new BaseServiceConfig.Builder()
                 .headerConfig(headerConfig)
                 .build();
-        ConnectionManager.resetOneDriveApi(
-                OneDriveConstance.ONE_DRIVE_API_BASE_URL,
+        ConnectionManager.resetHiveVaultApi(VaultConstance.AULT_BASE_URL,
                 baseServiceConfig);
     }
 
     boolean getConnectState() {
-        return connectState.get();
+        return loginState.get();
     }
 
     void dissConnect() {
-        connectState.set(false);
+        loginState.set(false);
     }
 }
