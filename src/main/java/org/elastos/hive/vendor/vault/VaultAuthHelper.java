@@ -1,7 +1,6 @@
 package org.elastos.hive.vendor.vault;
 
 import com.google.gson.Gson;
-
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
