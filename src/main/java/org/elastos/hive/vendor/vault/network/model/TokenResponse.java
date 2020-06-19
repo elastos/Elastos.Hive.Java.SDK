@@ -7,6 +7,7 @@ public class TokenResponse extends BaseResponse {
     private int ext_expires_in;
     private String access_token;
     private String refresh_token;
+    private String token;
 
     public TokenResponse(String token_type, String scope, int expires_in,
                          int ext_expires_in, String access_token, String refresh_token) {
@@ -16,6 +17,14 @@ public class TokenResponse extends BaseResponse {
         this.ext_expires_in = ext_expires_in;
         this.access_token = access_token;
         this.refresh_token = refresh_token;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getToken_type() {

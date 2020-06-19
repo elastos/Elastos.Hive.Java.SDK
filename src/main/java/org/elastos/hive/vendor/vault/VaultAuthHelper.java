@@ -1,5 +1,7 @@
 package org.elastos.hive.vendor.vault;
 
+import com.google.gson.Gson;
+
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
@@ -20,6 +22,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import retrofit2.Response;
 
 public class VaultAuthHelper implements ConnectHelper {
@@ -120,19 +124,23 @@ public class VaultAuthHelper implements ConnectHelper {
         Map map = new HashMap<>();
         map.put("did", did);
         map.put("password", pwd);
+        String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
-                .login(map)
+                .login(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                 .execute();
         handleTokenResponse(response);
     }
 
-    private void handleTokenResponse(Response response) {
+    private void handleTokenResponse(Response response) throws Exception {
         TokenResponse tokenResponse = (TokenResponse) response.body();
+        if(tokenResponse.get_error() != null) {
+            throw new HiveException(HiveException.ERROR);
+        }
         long expiresTime = System.currentTimeMillis() / 1000 + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
 
         token = new AuthToken(tokenResponse != null ? tokenResponse.getRefresh_token() : "",
-                tokenResponse != null ? tokenResponse.getAccess_token() : "",
-                expiresTime, tokenResponse != null ? tokenResponse.getToken_type() : "");
+                tokenResponse != null ? tokenResponse.getToken() : "",
+                expiresTime, "token");
 
         //Store the local data.
         writebackToken();

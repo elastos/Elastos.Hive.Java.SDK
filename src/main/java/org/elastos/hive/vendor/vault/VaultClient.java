@@ -8,10 +8,12 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
+import org.elastos.hive.utils.DigitalUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.vault.network.VaultApi;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okio.Buffer;
 import retrofit2.Response;
@@ -89,7 +92,7 @@ public class VaultClient extends Client implements Files, KeyValues{
             throw new IllegalArgumentException();
 
         return authHelper.checkValid()
-                .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data.getBytes(), getCallback(callback)));
+                .thenCompose(result -> doPutBuffer(/*toRemoteFilePath(remoteFile)*/remoteFile, data.getBytes(), getCallback(callback)));
     }
 
     private CompletableFuture<Void> doPutBuffer(String destFilePath, byte[] data, Callback<Void> callback) {
@@ -107,8 +110,9 @@ public class VaultClient extends Client implements Files, KeyValues{
 
     private void writeBuffer(String remoteFile, byte[] data) throws Exception {
         RequestBody requestBody = createWriteRequestBody(data);
+        MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file", remoteFile, requestBody);
         Response response = ConnectionManager.getHiveVaultApi()
-                .uploader(remoteFile, requestBody)
+                .uploader(multipartBody)
                 .execute();
         if (response == null)
             throw new HiveException(HiveException.ERROR);
@@ -136,7 +140,7 @@ public class VaultClient extends Client implements Files, KeyValues{
             throw new IllegalArgumentException();
 
         return authHelper.checkValid()
-                .thenCompose(result -> doPutBuffer(toRemoteFilePath(remoteFile), data, getCallback(callback)));
+                .thenCompose(result -> doPutBuffer(/*toRemoteFilePath(remoteFile)*/remoteFile, data, getCallback(callback)));
     }
 
     @Override
@@ -150,7 +154,7 @@ public class VaultClient extends Client implements Files, KeyValues{
             throw new IllegalArgumentException();
 
         return authHelper.checkValid()
-                .thenCompose(result -> doPutInputStream(toRemoteFilePath(remoteFile), input, getCallback(callback)));
+                .thenCompose(result -> doPutInputStream(/*toRemoteFilePath(remoteFile)*/remoteFile, input, getCallback(callback)));
     }
 
     private CompletableFuture<Void> doPutInputStream(String destFilePath, InputStream inputStream, Callback<Void> callback) {
@@ -168,8 +172,9 @@ public class VaultClient extends Client implements Files, KeyValues{
 
     private void writeInputStream(String destFilePath, InputStream inputStream) throws Exception {
         RequestBody requestBody = createWriteRequestBody(inputStream);
+        MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file", destFilePath, requestBody);
         Response response = ConnectionManager.getHiveVaultApi()
-                .uploader(destFilePath, requestBody)
+                .uploader(multipartBody)
                 .execute();
 
         int responseCode = checkResponseCode(response);
@@ -201,7 +206,7 @@ public class VaultClient extends Client implements Files, KeyValues{
             throw new IllegalArgumentException();
 
         return authHelper.checkValid()
-                .thenCompose(result -> doPutReader(toRemoteFilePath(remoteFile), reader, getCallback(callback)));
+                .thenCompose(result -> doPutReader(/*toRemoteFilePath(remoteFile)*/remoteFile, reader, getCallback(callback)));
     }
 
     private CompletableFuture<Void> doPutReader(String remoteFile, Reader reader, Callback<Void> callback) {
@@ -219,8 +224,9 @@ public class VaultClient extends Client implements Files, KeyValues{
 
     private void writeReader(String remoteFile, Reader reader) throws Exception {
         RequestBody requestBody = createWriteRequestBody(reader);
+        MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file", remoteFile, requestBody);
         Response response = ConnectionManager.getHiveVaultApi()
-                .uploader(remoteFile, requestBody)
+                .uploader(multipartBody)
                 .execute();
 
         int responseCode = checkResponseCode(response);
@@ -271,7 +277,33 @@ public class VaultClient extends Client implements Files, KeyValues{
 
     @Override
     public CompletableFuture<String> getAsString(String remoteFile, Callback<String> callback) {
-        return null;
+        if (null == remoteFile || remoteFile.isEmpty())
+            throw new IllegalArgumentException();
+
+        return authHelper.checkValid()
+                .thenCompose(result -> doGetString(/*toRemoteFilePath(remoteFile)*/remoteFile, getCallback(callback)));
+    }
+
+    private CompletableFuture<String> doGetString(String remoteFile, Callback<String> callback) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String result = getString(remoteFile);
+                callback.onSuccess(result);
+                return result;
+            } catch (HiveException e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
+            }
+        });
+    }
+
+    private String getString(String remoteFile) throws HiveException {
+        byte[] bytes = getBufferImpl(remoteFile);
+        if (bytes == null || bytes.length == 0)
+            return "";
+
+        return new String(bytes);
     }
 
     @Override
@@ -281,7 +313,25 @@ public class VaultClient extends Client implements Files, KeyValues{
 
     @Override
     public CompletableFuture<byte[]> getAsBuffer(String remoteFile, Callback<byte[]> callback) {
-        return null;
+        if (null == remoteFile || remoteFile.isEmpty())
+            throw new IllegalArgumentException();
+
+        return authHelper.checkValid()
+                .thenCompose(result -> doGetBuffer(/*toRemoteFilePath(remoteFile)*/remoteFile, getCallback(callback)));
+    }
+
+    private CompletableFuture<byte[]> doGetBuffer(String remoteFile, Callback<byte[]> callback) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                byte[] bytes = getBufferImpl(remoteFile);
+                callback.onSuccess(bytes);
+                return bytes;
+            } catch (HiveException e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
+            }
+        });
     }
 
     @Override
@@ -295,7 +345,7 @@ public class VaultClient extends Client implements Files, KeyValues{
             throw new IllegalArgumentException();
 
         return authHelper.checkValid()
-                .thenCompose(result -> doWriteToOutput(toRemoteFilePath(remoteFile), output, getCallback(callback)));
+                .thenCompose(result -> doWriteToOutput(/*toRemoteFilePath(remoteFile)*/remoteFile, output, getCallback(callback)));
     }
 
     private CompletableFuture<Long> doWriteToOutput(String remoteFile, OutputStream outputStream, Callback<Long> callback) {
@@ -351,7 +401,7 @@ public class VaultClient extends Client implements Files, KeyValues{
             throw new IllegalArgumentException();
 
         return authHelper.checkValid()
-                .thenCompose(result -> doWriteToWriter(toRemoteFilePath(remoteFile), writer, getCallback(callback)));
+                .thenCompose(result -> doWriteToWriter(/*toRemoteFilePath(remoteFile)*/remoteFile, writer, getCallback(callback)));
     }
 
     private CompletableFuture<Long> doWriteToWriter(String remoteFile, Writer writer, Callback<Long> callback) {
@@ -395,7 +445,7 @@ public class VaultClient extends Client implements Files, KeyValues{
             throw new IllegalArgumentException();
 
         return authHelper.checkValid()
-                .thenCompose(result -> doDeleteFile(toRemoteFilePath(remoteFile), getCallback(callback)));
+                .thenCompose(result -> doDeleteFile(/*toRemoteFilePath(remoteFile)*/remoteFile, getCallback(callback)));
     }
 
     private CompletableFuture<Void> doDeleteFile(String destFilePath, Callback<Void> callback) {
@@ -414,8 +464,9 @@ public class VaultClient extends Client implements Files, KeyValues{
     private void deleteFileImpl(String remoteFile) throws Exception {
         Map map = new HashMap<>();
         map.put("file_name", remoteFile);
+        String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
-                .delete(map)
+                .delete(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                 .execute();
         int responseCode = checkResponseCode(response);
         if (responseCode == 404) {
@@ -490,61 +541,219 @@ public class VaultClient extends Client implements Files, KeyValues{
 
     @Override
     public CompletableFuture<Void> putValue(String key, String value) {
-        return null;
+        return putValue(key, value, null);
     }
 
     @Override
     public CompletableFuture<Void> putValue(String key, String value, Callback<Void> callback) {
-        return null;
+        if (null == key || key.isEmpty() || null == value || value.isEmpty())
+            throw new IllegalArgumentException();
+
+        return authHelper.checkValid()
+                .thenCompose(result ->
+                        doPutValue(key, value.getBytes(), getCallback(callback)));
+    }
+
+    private CompletableFuture<Void> doPutValue(String key, byte[] value, Callback<Void> callback) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                putValueImpl(key, value);
+                callback.onSuccess(null);
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
+            }
+        });
+    }
+
+    private void putValueImpl(String key, byte[] value) throws Exception {
+        RequestBody requestBody = createWriteRequestBody(value);
+        MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file", key, requestBody);
+        Response response = ConnectionManager.getHiveVaultApi()
+                .uploader(multipartBody)
+                .execute();
+        if (response == null)
+            throw new HiveException(HiveException.ERROR);
+
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 404) {
+            throw new HiveException(HiveException.ITEM_NOT_FOUND);
+        } else if (responseCode != 0) {
+            throw new HiveException(HiveException.ERROR);
+        }
     }
 
     @Override
     public CompletableFuture<Void> putValue(String key, byte[] value) {
-        return null;
+        return putValue(key, value);
     }
 
     @Override
     public CompletableFuture<Void> putValue(String key, byte[] value, Callback<Void> callback) {
-        return null;
+        if (null == key || key.isEmpty() || null == value || value.length == 0)
+            throw new IllegalArgumentException();
+
+        return authHelper.checkValid()
+                .thenCompose(result ->
+                        doPutValue(key, value, getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> setValue(String key, String value) {
-        return null;
+        return setValue(key, value);
     }
 
     @Override
     public CompletableFuture<Void> setValue(String key, String value, Callback<Void> callback) {
-        return null;
+        if (null == key || key.isEmpty() || null == value || value.isEmpty())
+            throw new IllegalArgumentException();
+
+        return authHelper.checkValid()
+                .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value.getBytes(), getCallback(callback)));
     }
 
     @Override
     public CompletableFuture<Void> setValue(String key, byte[] value) {
-        return null;
+        return setValue(key, value);
     }
 
     @Override
     public CompletableFuture<Void> setValue(String key, byte[] value, Callback<Void> callback) {
-        return null;
+        if (null == key || key.isEmpty() || null == value || value.length == 0)
+            throw new IllegalArgumentException();
+
+        return authHelper.checkValid()
+                .thenCompose(result -> doSetValue(toRemoteKeyPath(key), value, getCallback(callback)));
+    }
+
+    private CompletableFuture<Void> doSetValue(String remoteFile, byte[] data, Callback<Void> callback) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                deleteFileImpl(remoteFile);
+                writeBuffer(remoteFile, mergeLengthAndData(data));
+                callback.onSuccess(null);
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
+            }
+        });
+    }
+
+    private byte[] mergeLengthAndData(byte[] data) {
+        byte[] lengthByte = DigitalUtil.intToByteArray(data.length);
+        return mergeData(lengthByte, data);
+    }
+
+    private byte[] mergeData(byte[] bytes1, byte[] bytes2) {
+        byte[] tmp = new byte[bytes1.length + bytes2.length];
+        System.arraycopy(bytes1, 0, tmp, 0, bytes1.length);
+        System.arraycopy(bytes2, 0, tmp, bytes1.length, bytes2.length);
+        return tmp;
     }
 
     @Override
     public CompletableFuture<ArrayList<byte[]>> getValues(String key) {
-        return null;
+        return getValues(key, null);
     }
 
     @Override
     public CompletableFuture<ArrayList<byte[]>> getValues(String key, Callback<ArrayList<byte[]>> callback) {
-        return null;
+        if (null == key || key.isEmpty())
+            throw new IllegalArgumentException();
+
+        return authHelper.checkValid()
+                .thenCompose(result -> doGetValue(toRemoteKeyPath(key), getCallback(callback)));
+    }
+
+    private String toRemoteKeyPath(String key) {
+        StringBuilder builder = new StringBuilder(512)
+                .append(VaultConstance.KEYVALUES_ROOT_PATH)
+                .append("/")
+                .append(key);
+
+        return builder.toString();
+    }
+
+    private CompletableFuture<ArrayList<byte[]>> doGetValue(String key, Callback<ArrayList<byte[]>> callback) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                ArrayList<byte[]> list = getValueImpl(key);
+                callback.onSuccess(list);
+                return list;
+            } catch (HiveException e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
+            }
+        });
+    }
+
+    private ArrayList<byte[]> getValueImpl(String key) throws HiveException {
+        ArrayList<byte[]> arrayList = new ArrayList<>();
+        byte[] data = getBufferImpl(key);
+        createValueResult(arrayList, data);
+        return arrayList;
+    }
+
+    private byte[] spliteBytes(byte[] data, int length) {
+        byte[] tmp = new byte[length];
+        System.arraycopy(data, 4, tmp, 0, length);
+
+        return tmp;
+    }
+
+    private int calcuLength(byte[] data) {
+        byte[] lengthByte = new byte[4];
+
+        System.arraycopy(data, 0, lengthByte, 0, 4);
+
+        return DigitalUtil.byteArrayToInt(lengthByte);
+    }
+
+    private void createValueResult(ArrayList<byte[]> arrayList, byte[] data) {
+        int total = data.length;
+        int dataLength = calcuLength(data);
+        byte[] strbytes = spliteBytes(data, dataLength);
+        arrayList.add(strbytes);
+        int remainingDataLength = total - (dataLength + 4);
+        if (remainingDataLength <= 0)
+            return;
+
+        byte[] remainingData = new byte[remainingDataLength];
+        System.arraycopy(data, dataLength + 4, remainingData, 0, remainingDataLength);
+        createValueResult(arrayList, remainingData);
+    }
+
+    private byte[] getBufferImpl(String remoteFile) throws HiveException {
+        Response response = getFileOrBuffer(remoteFile);
+
+        int responseCode = checkResponseCode(response);
+        if (responseCode == 404) {
+            throw new HiveException(HiveException.ITEM_NOT_FOUND);
+        } else if (responseCode != 0) {
+            throw new HiveException(HiveException.ERROR);
+        }
+
+        byte[] bytes = ResponseHelper.getBuffer(response);
+        if (bytes == null)
+            return new byte[0];
+
+        return bytes;
     }
 
     @Override
     public CompletableFuture<Void> deleteKey(String key) {
-        return null;
+        return deleteKey(key);
     }
 
     @Override
     public CompletableFuture<Void> deleteKey(String key, Callback<Void> callback) {
-        return null;
+        if (null == key || key.isEmpty())
+            throw new IllegalArgumentException();
+
+        return authHelper.checkValid()
+                .thenCompose(result -> doDeleteFile(toRemoteKeyPath(key), getCallback(callback)));
     }
 }
