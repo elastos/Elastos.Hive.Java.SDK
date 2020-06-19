@@ -38,7 +38,8 @@ public class ClientConnectTest {
             Client.Options options = new VaultOptions
                     .Builder()
                     .setStorePath(STORE_PATH)
-                    .setExpiration(10*000)
+                    .setDid("iUWjzkS4Di75yCXiKJqxrHYxQdBcS2NaPk")
+                    .setPassword("adujejd")
                     .build();
 
             client = Client.createInstance(options);

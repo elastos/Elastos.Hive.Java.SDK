@@ -26,8 +26,7 @@ public class VaultOptions extends Client.Options {
 
     @Override
     protected boolean checkValid(boolean all) {
-        return (did != null && pwd != null &&
-                super.checkValid(all));
+        return (did != null && pwd != null);
     }
 
     boolean checkValid() {

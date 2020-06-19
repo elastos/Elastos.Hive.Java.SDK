@@ -24,4 +24,7 @@ package org.elastos.hive.vendor.vault.network;
 
 class ConnectConstance {
     static final String API_PATH = "/api/v1";
+
+    static final String DID = "did";
+    static final String PWD = "password";
 }
