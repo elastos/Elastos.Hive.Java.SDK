@@ -7,6 +7,7 @@ public class VaultOptions extends Client.Options {
 
     private String did;
     private String pwd;
+    private String nodeUrl;
 
     public String did() {
         return did;
@@ -22,6 +23,14 @@ public class VaultOptions extends Client.Options {
 
     private void setPassword(String pwd) {
         this.pwd = pwd;
+    }
+
+    private void setNodeUrl(String url) {
+        this.nodeUrl = url;
+    }
+
+    public String nodeUrl() {
+        return nodeUrl;
     }
 
     @Override
@@ -52,6 +61,11 @@ public class VaultOptions extends Client.Options {
 
         public Builder setPassword(String pwd) {
             options.setPassword(pwd);
+            return this;
+        }
+
+        public Builder setNodeUrl(String nodeUrl) {
+            options.setNodeUrl(nodeUrl);
             return this;
         }
 

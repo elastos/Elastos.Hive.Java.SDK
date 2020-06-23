@@ -1,23 +1,18 @@
 package org.elastos.hive.vendor.vault.network;
 
 
-
 import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 import org.elastos.hive.vendor.vault.network.model.TokenResponse;
 
 import java.util.Map;
 
-
 import okhttp3.MultipartBody;
-import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -41,7 +36,10 @@ public interface VaultApi {
 
     //
     @POST(ConnectConstance.API_PATH + "db/col/{path}")
-    Call<BaseResponse> dbCol(@Path("path") String path);
+    Call<BaseResponse> post_dbCol(@Path("path") String path, @Body RequestBody body);
+
+    @GET(ConnectConstance.API_PATH + "db/col/{path}")
+    Call<ResponseBody> get_dbCol(@Path("path") String path, @Query("where") String json);
 
     //file="path/of/file/name"
     @Multipart

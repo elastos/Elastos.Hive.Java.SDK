@@ -18,8 +18,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class HiveVaultKVTest {
+public class VaultKVTest {
     private static final String STORE_PATH = System.getProperty("user.dir");
+    private static final String DID = "iUWjzkS4Di75yCXiKJqxrHYxQdBcS2NaPk";
+    private static final String PWD = "adujejd";
+    private static final String NODEURL = "http://127.0.0.1:5000";
 
     private static Client client;
     private static KeyValues keyValues;
@@ -454,8 +457,9 @@ public class HiveVaultKVTest {
             Client.Options options = new VaultOptions
                     .Builder()
                     .setStorePath(STORE_PATH)
-                    .setDid("iUWjzkS4Di75yCXiKJqxrHYxQdBcS2NaPk")
-                    .setPassword("adujejd")
+                    .setDid(DID)
+                    .setPassword(PWD)
+                    .setNodeUrl(NODEURL)
                     .build();
 
             client = Client.createInstance(options);
