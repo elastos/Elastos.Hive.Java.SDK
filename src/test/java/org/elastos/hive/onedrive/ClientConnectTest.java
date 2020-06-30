@@ -23,7 +23,7 @@ public class ClientConnectTest {
     private static final String CLIENTID = "afd3d647-a8b7-4723-bf9d-1b832f43b881";
     private static final String REDIRECTURL = "http://localhost:12345";
     private static final String STORE_PATH = System.getProperty("user.dir");
-    private String jsFile = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/jsss.js";
+    private static String authorizeHtl = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/Authorize.html";
 
     private static Client client;
 
@@ -65,7 +65,7 @@ public class ClientConnectTest {
 //        }
 
         try {
-            Desktop.getDesktop().browse(new URI("https://xidaokun.github.io"));
+//            Desktop.getDesktop().browse(new URI("https://xidaokun.github.io/Authorize.html"));
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -83,7 +83,7 @@ public class ClientConnectTest {
                     .setRedirectUrl(REDIRECTURL)
                     .setAuthenticator(requestUrl -> {
                         try {
-                            Desktop.getDesktop().browse(new URI(requestUrl));
+                            Desktop.getDesktop().browse(new URI("https://xidaokun.github.io/Authorize.html"));
                         } catch (Exception e) {
                             e.printStackTrace();
                             fail();

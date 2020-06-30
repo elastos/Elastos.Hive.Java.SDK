@@ -1,6 +1,5 @@
 package org.elastos.hive.vendor.vault;
 
-import com.google.gson.Gson;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
@@ -36,20 +35,22 @@ public class VaultAuthHelper implements ConnectHelper {
     private final String storePath;
     private final String did;
     private final String pwd;
+    private final String nodeUrl;
 
     private AuthToken token;
     private AtomicBoolean loginState = new AtomicBoolean(false);
     private final Persistent persistent;
 
-    VaultAuthHelper(String did, String pwd, String storePath) {
+    VaultAuthHelper(String did, String pwd, String storePath, String nodeUrl) {
         this.did = did;
         this.pwd = pwd;
+        this.nodeUrl = nodeUrl;
         this.storePath = storePath;
         this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
 
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-            ConnectionManager.resetHiveVaultApi(VaultConstance.AULT_BASE_URL, config);
+            ConnectionManager.resetHiveVaultApi(nodeUrl, config);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -189,7 +190,7 @@ public class VaultAuthHelper implements ConnectHelper {
         BaseServiceConfig baseServiceConfig = new BaseServiceConfig.Builder()
                 .headerConfig(headerConfig)
                 .build();
-        ConnectionManager.resetHiveVaultApi(VaultConstance.AULT_BASE_URL,
+        ConnectionManager.resetHiveVaultApi(this.nodeUrl,
                 baseServiceConfig);
     }
 

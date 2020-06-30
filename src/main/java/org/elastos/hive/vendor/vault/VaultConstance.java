@@ -11,7 +11,7 @@ class VaultConstance {
     static final String KEYVALUES_ROOT_PATH = "/KeyValues";
 
     static final String COLLECTION_NAME = "key_values";
-    static final String COLLECTION_SCHEMA = "{\"key\": {\"type\": \"string\"}, \"value\": {\"type\": \"binary\"}}";
+    static final String COLLECTION_SCHEMA = "{\"key\": {\"type\": \"string\"}, \"value\": {\"type\": \"string\"}}";
 
 //    static final String DICT_SCHEMA = "{'KV': {\n" +
 //            "        'type': 'dict',\n" +
