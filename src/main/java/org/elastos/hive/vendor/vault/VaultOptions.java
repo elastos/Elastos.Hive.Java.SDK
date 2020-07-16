@@ -1,13 +1,32 @@
 package org.elastos.hive.vendor.vault;
 
+import org.elastos.did.DIDDocument;
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
 
 public class VaultOptions extends Client.Options {
 
+    private DIDDocument doc;
     private String did;
-    private String pwd;
+    private String keyName;
+    private String storePass;
     private String nodeUrl;
+
+    public DIDDocument doc() {
+        return doc;
+    }
+
+    public void setDoc(DIDDocument doc) {
+        this.doc = doc;
+    }
+
+    public String keyName() {
+        return keyName;
+    }
+
+    public void setKeyName(String keyName) {
+        this.keyName = keyName;
+    }
 
     public String did() {
         return did;
@@ -17,12 +36,12 @@ public class VaultOptions extends Client.Options {
         this.did = did;
     }
 
-    public String password() {
-        return pwd;
+    public String storePass() {
+        return storePass;
     }
 
-    private void setPassword(String pwd) {
-        this.pwd = pwd;
+    private void setStorePass(String pwd) {
+        this.storePass = pwd;
     }
 
     private void setNodeUrl(String url) {
@@ -35,7 +54,7 @@ public class VaultOptions extends Client.Options {
 
     @Override
     protected boolean checkValid(boolean all) {
-        return (did != null && pwd != null);
+        return (did != null && storePass != null);
     }
 
     boolean checkValid() {
@@ -54,13 +73,23 @@ public class VaultOptions extends Client.Options {
             options = new VaultOptions();
         }
 
+        public Builder setDoc(DIDDocument doc) {
+            options.setDoc(doc);
+            return this;
+        }
+
+        public Builder setKeyName(String keyName) {
+            options.setKeyName(keyName);
+            return this;
+        }
+
         public Builder setDid(String did) {
             options.setDid(did);
             return this;
         }
 
         public Builder setPassword(String pwd) {
-            options.setPassword(pwd);
+            options.setStorePass(pwd);
             return this;
         }
 

@@ -20,7 +20,21 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+
 	compile 'org.jetbrains:annotations:17.0.0'
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'com.google.guava:guava:26.0-jre'
+    implementation 'org.antlr:antlr4-runtime:4.7.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.9'
+    implementation 'com.madgag.spongycastle:core:1.58.0.0'
+    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.0'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.0'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.0'
 
     implementation 'org.json:json:20160212'
     implementation 'com.squareup.retrofit2:retrofit:2.6.0'

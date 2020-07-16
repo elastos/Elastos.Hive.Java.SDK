@@ -1,6 +1,7 @@
 package org.elastos.hive.vendor.vault.network;
 
 
+import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 import org.elastos.hive.vendor.vault.network.model.TokenResponse;
@@ -22,23 +23,28 @@ import retrofit2.http.Query;
 
 public interface VaultApi {
 
-    //{"did":"iUWjzkS4Di75yCXiKJqxrHYxQdBcS2NaPk", "password":"adujejd"}
-    @POST(ConnectConstance.API_PATH + "/did/register")
-    Call<BaseResponse> register(@FieldMap Map<String, Object> map);
+    //{"iss":" "did:elastos:iWFAUYhTa35c1fPe3iCJvihZHx6quumnym"}
+    @GET(ConnectConstance.API_PATH + "/did/auth")
+    Call<AuthResponse> auth(@Body RequestBody body);
 
-    //{"did":"iUWjzkS4Di75yCXiKJqxrHYxQdBcS2NaPk", "password":"adujejd"}
-    @POST(ConnectConstance.API_PATH + "/did/login")
-    Call<TokenResponse> login(@Body RequestBody body);
+    //{"subject":"didauth",
+    //           "iss":"did:elastos:iWFAUYhTa35c1fPe3iCJvihZHx6quumnym",
+    //           "realm": "elastos_hive_node",
+    //           "nonce" : "4607e6de-b5f0-11ea-a859-f45c898fba57"
+    //           "key_name" : "key2",
+    //           "sig" : "iWFAUYhTa35c1fPiWFAUYhTa35c1fPe3iCJvihZHx6quumnyme3iCJvihZHx6quumnymiWFAUYhTa35c1fPe3iCJvihZHx6quumnym"
+    //           }
+    @GET(ConnectConstance.API_PATH + "/did/{path}/callback")
+    Call<TokenResponse> authCallback(@Path("path") String path, @Body RequestBody body);
 
     //{ "collection":"works","schema": {"title": {"type": "string"}, "author": {"type": "string"}}}
     @POST(ConnectConstance.API_PATH + "/db/create_collection")
     Call<BaseResponse> createCollection(@FieldMap Map<String, Object> map);
 
-    //
-    @POST(ConnectConstance.API_PATH + "db/col/{path}")
+    @POST(ConnectConstance.API_PATH + "/db/col/{path}")
     Call<BaseResponse> post_dbCol(@Path("path") String path, @Body RequestBody body);
 
-    @GET(ConnectConstance.API_PATH + "db/col/{path}")
+    @GET(ConnectConstance.API_PATH + "/db/col/{path}")
     Call<ResponseBody> get_dbCol(@Path("path") String path, @Query("where") String json);
 
     //file="path/of/file/name"

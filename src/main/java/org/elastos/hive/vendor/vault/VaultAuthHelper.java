@@ -1,5 +1,7 @@
 package org.elastos.hive.vendor.vault;
 
+import org.elastos.did.DIDDocument;
+import org.elastos.did.DIDURL;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
@@ -11,6 +13,7 @@ import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.connection.model.HeaderConfig;
+import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.TokenResponse;
 import org.json.JSONObject;
 
@@ -32,18 +35,22 @@ public class VaultAuthHelper implements ConnectHelper {
     private static final String EXPIRES_AT_KEY = "expires_at";
     private static final String TOKEN_TYPE_KEY = "token_type";
 
+    private final DIDDocument doc;
+    private final String keyname;
     private final String storePath;
     private final String did;
-    private final String pwd;
+    private final String storePass;
     private final String nodeUrl;
 
     private AuthToken token;
     private AtomicBoolean loginState = new AtomicBoolean(false);
     private final Persistent persistent;
 
-    VaultAuthHelper(String did, String pwd, String storePath, String nodeUrl) {
+    VaultAuthHelper(DIDDocument doc, String did, String keyname,String storePass, String storePath, String nodeUrl) {
+        this.doc = doc;
+        this.keyname = keyname;
         this.did = did;
-        this.pwd = pwd;
+        this.storePass = storePass;
         this.nodeUrl = nodeUrl;
         this.storePath = storePath;
         this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
@@ -97,7 +104,7 @@ public class VaultAuthHelper implements ConnectHelper {
     private void doCheckExpired() throws Exception {
         loginState.set(false);
         if (token == null || token.isExpired())
-            accessToken();
+            auth();
         loginState.set(true);
     }
 
@@ -106,7 +113,7 @@ public class VaultAuthHelper implements ConnectHelper {
         tryRestoreToken();
 
         if (token == null) {
-            accessToken();
+            auth();
             loginState.set(true);
             return;
         }
@@ -120,18 +127,46 @@ public class VaultAuthHelper implements ConnectHelper {
         }
     }
 
-    private void accessToken() throws Exception {
+    private void auth() throws Exception {
         Map map = new HashMap<>();
-        map.put("did", did);
-        map.put("password", pwd);
+        map.put("iss", getIss(did));
         String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
-                .login(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                .auth(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                 .execute();
-        handleTokenResponse(response);
+        handleAuthResponse(response);
     }
 
-    private void handleTokenResponse(Response response) throws Exception {
+    private void handleAuthResponse(Response response) throws Exception {
+        AuthResponse authResponse = (AuthResponse) response.body();
+        String nonce = authResponse.getNonce();
+        if(null != nonce) {
+            DIDURL pkid = new DIDURL(doc.getSubject(), this.keyname);
+            String sig = doc.sign(pkid, this.storePass, nonce.getBytes());
+            callback(authResponse.getSubject(), getIss(did), nonce, authResponse.getIss(), sig);
+        }
+    }
+
+    private void callback(String subject, String iss, String nonce, String realm, String sig) throws Exception {
+        Map map = new HashMap<>();
+        map.put("subject", subject);
+        map.put("iss", iss);
+        map.put("realm", realm);
+        map.put("nonce", nonce);
+        map.put("key_name", this.keyname);
+        map.put("sig", sig);
+        String json = new JSONObject(map).toString();
+        Response response = ConnectionManager.getHiveVaultApi()
+                .authCallback(did, RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                .execute();
+        handleCallbackResponse(response);
+    }
+
+    private String getIss(String did) {
+        return "did:elastos:" + did;
+    }
+
+    private void handleCallbackResponse(Response response) throws Exception {
         TokenResponse tokenResponse = (TokenResponse) response.body();
         if(tokenResponse.get_error() != null) {
             throw new HiveException(HiveException.ERROR);

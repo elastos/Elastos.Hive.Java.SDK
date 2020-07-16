@@ -1,6 +1,6 @@
-package org.elastos.hive.hivevault;
+package org.elastos.hive.vault;
 
-public class HiveVaultDBTest {
+public class DBTest {
     private static final String STORE_PATH = System.getProperty("user.dir");
     private static final String DID = "iUWjzkS4Di75yCXiKJqxrHYxQdBcS2NaPk";
     private static final String PWD = "adujejd";
