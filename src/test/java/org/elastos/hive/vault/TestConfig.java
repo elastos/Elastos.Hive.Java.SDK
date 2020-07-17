@@ -22,51 +22,22 @@
 
 package org.elastos.hive.vault;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
 public final class TestConfig {
-	public static String networkConfig;
-	public static String resolver;
+	public static String networkConfig = "TestNet";
+	public static String resolver = "http://api.elastos.io:21606";
 
-	public static boolean verbose;
+	//dummystore.verbose
+	public static boolean verbose = true;
+	//mnemnoic.passphrase
+	public static String passphrase = "secret";
+	//temp.dir
+	public static String tempDir = "TEMP";
+	//store
+	public static String storeRoot = "DIDStore";
+	public static String storePass = "passwd";
+	//wallet.dir
+	public static String walletDir = "";
+	public static String walletId = "test";
+	public static String walletPassword = "passwd";
 
-	public static String passphrase;
-
-	public static String tempDir;
-
-	public static String storeRoot;
-	public static String storePass;
-
-	public static String walletDir;
-	public static String walletId;
-	public static String walletPassword;
-
-	static {
-		InputStream input = TestConfig.class
-				.getClassLoader().getResourceAsStream("test.conf");
-
-		Properties config = new Properties();
-		try {
-			config.load(input);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		networkConfig = config.getProperty("network");
-		resolver = config.getProperty("resolver");
-		verbose = Boolean.valueOf(config.getProperty("dummystore.verbose"));
-
-		passphrase = config.getProperty("mnemnoic.passphrase");
-
-		tempDir = config.getProperty("temp.dir");
-
-		storeRoot = config.getProperty("store.root");
-		storePass = config.getProperty("store.pass");
-
-		walletDir = config.getProperty("wallet.dir");
-		walletId = config.getProperty("wallet.id");
-		walletPassword = config.getProperty("wallet.password");
-	}
 }

@@ -29,13 +29,10 @@ import org.elastos.did.DIDResolver;
 import org.elastos.did.DIDStore;
 import org.elastos.did.DIDURL;
 import org.elastos.did.Mnemonic;
-import org.elastos.did.VerifiableCredential;
-import org.elastos.did.VerifiablePresentation;
 import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.adapter.SPVAdapter;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.crypto.Base58;
-import org.elastos.did.crypto.HDKey;
 import org.elastos.did.exception.DIDException;
 
 import java.io.BufferedReader;
@@ -48,44 +45,11 @@ public final class TestData {
 	private static DummyAdapter dummyAdapter;
 	private static DIDAdapter spvAdapter;
 
-	private static HDKey rootKey;
-	private static int index;
-
 	private DIDAdapter adapter;
 
 	private DIDDocument testIssuer;
-	private String issuerCompactJson;
-	private String issuerNormalizedJson;
 
-	private DIDDocument testDocument;
-	private String testCompactJson;
-	private String testNormalizedJson;
-
-	private VerifiableCredential profileVc;
-	private String profileVcCompactJson;
-	private String profileVcNormalizedJson;
-
-	private VerifiableCredential emailVc;
-	private String emailVcCompactJson;
-	private String emailVcNormalizedJson;
-
-	private VerifiableCredential passportVc;
-	private String passportVcCompactJson;
-	private String passportVcNormalizedJson;
-
-	private VerifiableCredential twitterVc;
-	private String twitterVcCompactJson;
-	private String twitterVcNormalizedJson;
-
-	private VerifiableCredential jsonVc;
-	private String jsonVcCompactJson;
-	private String jsonVcNormalizedJson;
-
-	private VerifiablePresentation testVp;
-	private String testVpNormalizedJson;
-
-	private String restoreMnemonic;
-
+	private DIDDocument didDocument;
 	private DIDStore store;
 
 	protected static File getResolverCacheDir() {
@@ -125,34 +89,6 @@ public final class TestData {
     	return store;
 	}
 
-	public DIDAdapter getAdapter() {
-		return adapter;
-	}
-
-	public void waitForWalletAvaliable() throws DIDException {
-		SPVAdapter spvAdapter = null;
-
-		// need synchronize?
-		if (adapter instanceof SPVAdapter)
-			spvAdapter = (SPVAdapter)adapter;
-
-		if (spvAdapter != null) {
-			System.out.print("Waiting for wallet available...");
-			long start = System.currentTimeMillis();
-			while (true) {
-				try {
-					Thread.sleep(30000);
-				} catch (InterruptedException ignore) {
-				}
-
-				if (spvAdapter.isAvailable()) {
-					long duration = (System.currentTimeMillis() - start + 500) / 1000;
-					System.out.println("OK(" + duration + "s)");
-					break;
-				}
-			}
-		}
-	}
 
 	public String initIdentity() throws DIDException {
     	String mnemonic =  Mnemonic.getInstance().generate();
@@ -199,82 +135,17 @@ public final class TestData {
 	public DIDDocument loadTestDocument() throws DIDException, IOException {
 		loadTestIssuer();
 
-		if (testDocument == null) {
-			testDocument = loadDIDDocument("document.json");
+		if (didDocument == null) {
+			didDocument = loadDIDDocument("document.json");
 
-			importPrivateKey(testDocument.getDefaultPublicKey(), "document.primary.sk");
-			importPrivateKey(testDocument.getPublicKey("key2").getId(), "document.key2.sk");
-			importPrivateKey(testDocument.getPublicKey("key3").getId(), "document.key3.sk");
+			importPrivateKey(didDocument.getDefaultPublicKey(), "document.primary.sk");
+			importPrivateKey(didDocument.getPublicKey("key2").getId(), "document.key2.sk");
+			importPrivateKey(didDocument.getPublicKey("key3").getId(), "document.key3.sk");
 
-			store.publishDid(testDocument.getSubject(), TestConfig.storePass);
+			store.publishDid(didDocument.getSubject(), TestConfig.storePass);
 		}
 
-		return testDocument;
-	}
-
-	private VerifiableCredential loadCredential(String fileName)
-			throws DIDException, IOException {
-		Reader input = new InputStreamReader(getClass()
-				.getClassLoader().getResourceAsStream("testdata/" + fileName));
-		VerifiableCredential vc = VerifiableCredential.fromJson(input);
-		input.close();
-
-		if (store != null)
-			store.storeCredential(vc);
-
-		return vc;
-	}
-
-	public VerifiableCredential loadProfileCredential()
-			throws DIDException, IOException {
-		if (profileVc == null)
-			profileVc = loadCredential("vc-profile.json");
-
-		return profileVc;
-	}
-
-	public VerifiableCredential loadEmailCredential()
-			throws DIDException, IOException {
-		if (emailVc == null)
-			emailVc = loadCredential("vc-email.json");
-
-		return emailVc;
-	}
-
-	public VerifiableCredential loadPassportCredential()
-			throws DIDException, IOException {
-		if (passportVc == null)
-			passportVc = loadCredential("vc-passport.json");
-
-		return passportVc;
-	}
-
-	public VerifiableCredential loadTwitterCredential()
-			throws DIDException, IOException {
-		if (twitterVc == null)
-			twitterVc = loadCredential("vc-twitter.json");
-
-		return twitterVc;
-	}
-
-	public VerifiableCredential loadJsonCredential()
-			throws DIDException, IOException {
-		if (jsonVc == null)
-			jsonVc = loadCredential("vc-json.json");
-
-		return jsonVc;
-	}
-
-	public VerifiablePresentation loadPresentation()
-			throws DIDException, IOException {
-		if (testVp == null) {
-			Reader input = new InputStreamReader(getClass()
-					.getClassLoader().getResourceAsStream("testdata/vp.json"));
-			testVp = VerifiablePresentation.fromJson(input);
-			input.close();
-		}
-
-		return testVp;
+		return didDocument;
 	}
 
 	private String loadText(String fileName) throws IOException {
@@ -286,126 +157,4 @@ public final class TestData {
 		return text;
 	}
 
-	public String loadIssuerCompactJson() throws IOException {
-		if (issuerCompactJson == null)
-			issuerCompactJson = loadText("issuer.compact.json");
-
-		return issuerCompactJson;
-	}
-
-	public String loadIssuerNormalizedJson() throws IOException {
-		if (issuerNormalizedJson == null)
-			issuerNormalizedJson = loadText("issuer.normalized.json");
-
-		return issuerNormalizedJson;
-	}
-
-	public String loadTestCompactJson() throws IOException {
-		if (testCompactJson == null)
-			testCompactJson = loadText("document.compact.json");
-
-		return testCompactJson;
-	}
-
-	public String loadTestNormalizedJson() throws IOException {
-		if (testNormalizedJson == null)
-			testNormalizedJson = loadText("document.normalized.json");
-
-		return testNormalizedJson;
-	}
-
-	public String loadProfileVcCompactJson() throws IOException {
-		if (profileVcCompactJson == null)
-			profileVcCompactJson = loadText("vc-profile.compact.json");
-
-		return profileVcCompactJson;
-	}
-
-	public String loadProfileVcNormalizedJson() throws IOException {
-		if (profileVcNormalizedJson == null)
-			profileVcNormalizedJson = loadText("vc-profile.normalized.json");
-
-		return profileVcNormalizedJson;
-	}
-
-	public String loadEmailVcCompactJson() throws IOException {
-		if (emailVcCompactJson == null)
-			emailVcCompactJson = loadText("vc-email.compact.json");
-
-		return emailVcCompactJson;
-	}
-
-	public String loadEmailVcNormalizedJson() throws IOException {
-		if (emailVcNormalizedJson == null)
-			emailVcNormalizedJson = loadText("vc-email.normalized.json");
-
-		return emailVcNormalizedJson;
-	}
-
-	public String loadPassportVcCompactJson() throws IOException {
-		if (passportVcCompactJson == null)
-			passportVcCompactJson = loadText("vc-passport.compact.json");
-
-		return passportVcCompactJson;
-	}
-
-	public String loadPassportVcNormalizedJson() throws IOException {
-		if (passportVcNormalizedJson == null)
-			passportVcNormalizedJson = loadText("vc-passport.normalized.json");
-
-		return passportVcNormalizedJson;
-	}
-
-	public String loadTwitterVcCompactJson() throws IOException {
-		if (twitterVcCompactJson == null)
-			twitterVcCompactJson = loadText("vc-twitter.compact.json");
-
-		return twitterVcCompactJson;
-	}
-
-	public String loadTwitterVcNormalizedJson() throws IOException {
-		if (twitterVcNormalizedJson == null)
-			twitterVcNormalizedJson = loadText("vc-twitter.normalized.json");
-
-		return twitterVcNormalizedJson;
-	}
-
-	public String loadJsonVcCompactJson() throws IOException {
-		if (jsonVcCompactJson == null)
-			jsonVcCompactJson = loadText("vc-json.compact.json");
-
-		return jsonVcCompactJson;
-	}
-
-	public String loadJsonVcNormalizedJson() throws IOException {
-		if (jsonVcNormalizedJson == null)
-			jsonVcNormalizedJson = loadText("vc-json.normalized.json");
-
-		return jsonVcNormalizedJson;
-	}
-
-	public String loadPresentationNormalizedJson() throws IOException {
-		if (testVpNormalizedJson == null)
-			testVpNormalizedJson = loadText("vp.normalized.json");
-
-		return testVpNormalizedJson;
-	}
-
-	public String loadRestoreMnemonic() throws IOException {
-		if (restoreMnemonic == null)
-			restoreMnemonic = loadText("mnemonic.restore");
-
-		return restoreMnemonic;
-	}
-
-	public static synchronized HDKey generateKeypair()
-			throws DIDException {
-		if (rootKey == null) {
-	    	String mnemonic =  Mnemonic.getInstance().generate();
-	    	rootKey = new HDKey(mnemonic, "");
-	    	index = 0;
-		}
-
-		return rootKey.derive(HDKey.DERIVE_PATH_PREFIX + index++);
-	}
 }
