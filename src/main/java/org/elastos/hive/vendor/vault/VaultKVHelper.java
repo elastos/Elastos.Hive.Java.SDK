@@ -38,10 +38,10 @@ public class VaultKVHelper {
         this.scheme = scheme;
 
         VaultOptions opts = (VaultOptions) options;
-        authHelper = new VaultAuthHelper(opts.did(),
-                opts.password(),
-                opts.storePath(),
-                opts.nodeUrl());
+//        authHelper = new VaultAuthHelper(opts.did(),
+//                opts.storePass(),
+//                opts.storePath(),
+//                opts.nodeUrl());
     }
 
     private void createCollection(String collection, String scheme) throws Exception {

@@ -1,6 +1,7 @@
 package org.elastos.hive.vendor.vault.network;
 
 
+import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 import org.elastos.hive.vendor.vault.network.model.TokenResponse;
@@ -12,8 +13,10 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -22,24 +25,35 @@ import retrofit2.http.Query;
 
 public interface VaultApi {
 
-    //{"did":"iUWjzkS4Di75yCXiKJqxrHYxQdBcS2NaPk", "password":"adujejd"}
-    @POST(ConnectConstance.API_PATH + "/did/register")
-    Call<BaseResponse> register(@FieldMap Map<String, Object> map);
+    //{"iss":" "did:elastos:iWFAUYhTa35c1fPe3iCJvihZHx6quumnym"}
+    @GET(ConnectConstance.API_PATH + "/did/auth")
+    Call<AuthResponse> auth(@Body RequestBody body);
 
-    //{"did":"iUWjzkS4Di75yCXiKJqxrHYxQdBcS2NaPk", "password":"adujejd"}
-    @POST(ConnectConstance.API_PATH + "/did/login")
-    Call<TokenResponse> login(@Body RequestBody body);
+    //{"subject":"didauth",
+    //           "iss":"did:elastos:iWFAUYhTa35c1fPe3iCJvihZHx6quumnym",
+    //           "realm": "elastos_hive_node",
+    //           "nonce" : "4607e6de-b5f0-11ea-a859-f45c898fba57"
+    //           "key_name" : "key2",
+    //           "sig" : "iWFAUYhTa35c1fPiWFAUYhTa35c1fPe3iCJvihZHx6quumnyme3iCJvihZHx6quumnymiWFAUYhTa35c1fPe3iCJvihZHx6quumnym"
+    //           }
+    @GET(ConnectConstance.API_PATH + "/did/{path}/callback")
+    Call<TokenResponse> authCallback(@Path("path") String path, @Body RequestBody body);
 
     //{ "collection":"works","schema": {"title": {"type": "string"}, "author": {"type": "string"}}}
     @POST(ConnectConstance.API_PATH + "/db/create_collection")
     Call<BaseResponse> createCollection(@FieldMap Map<String, Object> map);
 
-    //
-    @POST(ConnectConstance.API_PATH + "db/col/{path}")
+    @POST(ConnectConstance.API_PATH + "/db/col/{path}")
     Call<BaseResponse> post_dbCol(@Path("path") String path, @Body RequestBody body);
 
-    @GET(ConnectConstance.API_PATH + "db/col/{path}")
+    @GET(ConnectConstance.API_PATH + "/db/col/{path}")
     Call<ResponseBody> get_dbCol(@Path("path") String path, @Query("where") String json);
+
+    @HTTP(method = "PUT", hasBody = true)
+    Call<ResponseBody> put_dbCol(@Field("id") String user_id);
+
+    @HTTP(method = "DELETE", hasBody = true)
+    Call<ResponseBody> delete_dbCol(@Field("id") String user_id);
 
     //file="path/of/file/name"
     @Multipart

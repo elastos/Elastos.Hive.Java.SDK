@@ -1,4 +1,4 @@
-package org.elastos.hive.hivevault;
+package org.elastos.hive.vault;
 
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
@@ -15,6 +15,7 @@ public class ClientConnectTest {
     private static final String STORE_PATH = System.getProperty("user.dir");
     private static final String DID = "iUWjzkS4Di75yCXiKJqxrHYxQdBcS2NaPk";
     private static final String PWD = "adujejd";
+    private static final String KEYNAME = "key2";
     private static final String NODEURL = "http://127.0.0.1:5000";
 
     private static Client client;
@@ -40,6 +41,7 @@ public class ClientConnectTest {
         try {
             Client.Options options = new VaultOptions
                     .Builder()
+                    .setKeyName(KEYNAME)
                     .setStorePath(STORE_PATH)
                     .setDid(DID)
                     .setPassword(PWD)
@@ -47,7 +49,7 @@ public class ClientConnectTest {
                     .build();
 
             client = Client.createInstance(options);
-        } catch (HiveException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
     }

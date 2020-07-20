@@ -1,4 +1,4 @@
-package org.elastos.hive.hivevault;
+package org.elastos.hive.vault;
 
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Client;
@@ -109,7 +109,7 @@ public class ClientInstanceTest {
             VaultOptions opts = (VaultOptions) options;
             assertNotNull(opts.storePath());
             assertNotNull(opts.did());
-            assertNotNull(opts.password());
+            assertNotNull(opts.storePass());
 
             builder.build();
         } catch (HiveException e) {
