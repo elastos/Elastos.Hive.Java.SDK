@@ -1,5 +1,7 @@
 package org.elastos.hive.vendor.vault;
 
+import com.google.gson.Gson;
+
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDURL;
 import org.elastos.hive.AuthToken;
