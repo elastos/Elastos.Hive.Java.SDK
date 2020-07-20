@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vault;
+package org.elastos.hive.vendor.vault;
 
 import org.elastos.did.DIDAdapter;
 import org.elastos.did.DIDBackend;
@@ -34,74 +34,73 @@ import org.elastos.did.adapter.SPVAdapter;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.crypto.Base58;
 import org.elastos.did.exception.DIDException;
+import org.elastos.hive.utils.FileUtil;
 
-import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 
-public final class TestData {
+public final class DIDData {
 	private static DummyAdapter dummyAdapter;
 	private static DIDAdapter spvAdapter;
 
 	private DIDAdapter adapter;
 
-	private DIDDocument testIssuer;
+	private DIDDocument issuer;
 
 	private DIDDocument didDocument;
 	private DIDStore store;
+
+	private VaultOptions options;
 
 	protected static File getResolverCacheDir() {
 		return new File(System.getProperty("user.home") +
 				File.separator + ".cache.did.elastos");
 	}
 
+	public DIDData(VaultOptions options) {
+		this.options = options;
+	}
+
 	public DIDStore setup(boolean dummyBackend) throws DIDException {
 		if (dummyBackend) {
-			if (TestData.dummyAdapter == null)
-				TestData.dummyAdapter = new DummyAdapter(TestConfig.verbose);
+			if (DIDData.dummyAdapter == null)
+				DIDData.dummyAdapter = new DummyAdapter(options.verbose());
 			else
-				TestData.dummyAdapter.reset();
+				DIDData.dummyAdapter.reset();
 
-			adapter = TestData.dummyAdapter;
+			adapter = DIDData.dummyAdapter;
 
 			DIDBackend.initialize((DIDResolver)adapter, getResolverCacheDir());
 		} else {
-			if (TestData.spvAdapter == null)
-				TestData.spvAdapter = new SPVAdapter(TestConfig.walletDir,
-						TestConfig.walletId, TestConfig.networkConfig,
-						new SPVAdapter.PasswordCallback() {
-							@Override
-							public String getPassword(String walletDir, String walletId) {
-								return TestConfig.walletPassword;
-							}
-						});
+			if (DIDData.spvAdapter == null)
+				DIDData.spvAdapter = new SPVAdapter(options.walletDir(),
+						options.walletId(), options.network(),
+						(walletDir, walletId) -> options.walletPassword());
 
-			adapter = TestData.spvAdapter;
+			adapter = DIDData.spvAdapter;
 
-			DIDBackend.initialize(TestConfig.resolver, getResolverCacheDir());
+			DIDBackend.initialize(options.resolver(), getResolverCacheDir());
 		}
 
 		ResolverCache.reset();
-    	Utils.deleteFile(new File(TestConfig.storeRoot));
-    	store = DIDStore.open("filesystem", TestConfig.storeRoot, adapter);
+    	FileUtil.deleteFile(new File(options.storeRoot()));
+    	store = DIDStore.open("filesystem", options.storeRoot(), adapter);
     	return store;
 	}
-
 
 	public String initIdentity() throws DIDException {
     	String mnemonic =  Mnemonic.getInstance().generate();
     	store.initPrivateIdentity(Mnemonic.ENGLISH, mnemonic,
-    			TestConfig.passphrase, TestConfig.storePass, true);
+				options.passphrase(), options.storePass(), true);
 
     	return mnemonic;
 	}
 
 	private DIDDocument loadDIDDocument(String fileName)
 			throws DIDException, IOException {
-		Reader input = new InputStreamReader(getClass()
-				.getClassLoader().getResourceAsStream("testdata/" + fileName));
+		Reader input = new FileReader(options.storePath() + fileName);
 		DIDDocument doc = DIDDocument.fromJson(input);
 		input.close();
 
@@ -117,23 +116,23 @@ public final class TestData {
 		String skBase58 = loadText(fileName);
 		byte[] sk = Base58.decode(skBase58);
 
-		store.storePrivateKey(id.getDid(), id, sk, TestConfig.storePass);
+		store.storePrivateKey(id.getDid(), id, sk, options.storePass());
 	}
 
-	public DIDDocument loadTestIssuer() throws DIDException, IOException {
-		if (testIssuer == null) {
-			testIssuer = loadDIDDocument("issuer.json");
+	public DIDDocument loadIssuer() throws DIDException, IOException {
+		if (issuer == null) {
+			issuer = loadDIDDocument("issuer.json");
 
-			importPrivateKey(testIssuer.getDefaultPublicKey(), "issuer.primary.sk");
+			importPrivateKey(issuer.getDefaultPublicKey(), "issuer.primary.sk");
 
-			store.publishDid(testIssuer.getSubject(), TestConfig.storePass);
+			store.publishDid(issuer.getSubject(), options.storePass());
 		}
 
-		return testIssuer;
+		return issuer;
 	}
 
-	public DIDDocument loadTestDocument() throws DIDException, IOException {
-		loadTestIssuer();
+	public DIDDocument loadDocument() throws DIDException, IOException {
+		loadIssuer();
 
 		if (didDocument == null) {
 			didDocument = loadDIDDocument("document.json");
@@ -142,19 +141,37 @@ public final class TestData {
 			importPrivateKey(didDocument.getPublicKey("key2").getId(), "document.key2.sk");
 			importPrivateKey(didDocument.getPublicKey("key3").getId(), "document.key3.sk");
 
-			store.publishDid(didDocument.getSubject(), TestConfig.storePass);
+			store.publishDid(didDocument.getSubject(), options.storePass());
 		}
 
 		return didDocument;
 	}
 
 	private String loadText(String fileName) throws IOException {
-		BufferedReader input = new BufferedReader(new InputStreamReader(
-				getClass().getClassLoader().getResourceAsStream("testdata/" + fileName)));
-		String text = input.readLine();
-		input.close();
 
-		return text;
+		FileReader reader = null;
+		try {
+			reader = new FileReader(options.storePath() + fileName);
+			char[] buf = new char[128];
+			int len;
+			StringBuilder content = new StringBuilder();
+			while ((len = reader.read(buf)) != -1) {
+				content.append(new String(buf, 0, len));
+			}
+
+			return content.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return "";
 	}
 
 }

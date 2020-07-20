@@ -35,32 +35,29 @@ public class VaultAuthHelper implements ConnectHelper {
     private static final String EXPIRES_AT_KEY = "expires_at";
     private static final String TOKEN_TYPE_KEY = "token_type";
 
-    private final DIDDocument doc;
-    private final String keyname;
-    private final String storePath;
-    private final String did;
-    private final String storePass;
-    private final String nodeUrl;
-
     private AuthToken token;
     private AtomicBoolean loginState = new AtomicBoolean(false);
     private final Persistent persistent;
 
-    VaultAuthHelper(DIDDocument doc, String did, String keyname,String storePass, String storePath, String nodeUrl) {
-        this.doc = doc;
-        this.keyname = keyname;
-        this.did = did;
-        this.storePass = storePass;
-        this.nodeUrl = nodeUrl;
-        this.storePath = storePath;
-        this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
+    private VaultOptions options;
+    private DIDDocument doc;
+
+    VaultAuthHelper(VaultOptions options) {
+        this.options = options;
+        this.persistent = new AuthInfoStoreImpl(options.storePath(), VaultConstance.CONFIG);
 
         try {
+            DIDData didData = new DIDData(options);
+            didData.setup(true);
+            didData.initIdentity();
+            doc = didData.loadDocument();
+
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-            ConnectionManager.resetHiveVaultApi(nodeUrl, config);
+            ConnectionManager.resetHiveVaultApi(options.nodeUrl(), config);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     @Override
@@ -129,7 +126,7 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private void auth() throws Exception {
         Map map = new HashMap<>();
-        map.put("iss", getIss(did));
+        map.put("iss", getIss(this.options.did()));
         String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
                 .auth(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
@@ -141,9 +138,9 @@ public class VaultAuthHelper implements ConnectHelper {
         AuthResponse authResponse = (AuthResponse) response.body();
         String nonce = authResponse.getNonce();
         if(null != nonce) {
-            DIDURL pkid = new DIDURL(doc.getSubject(), this.keyname);
-            String sig = doc.sign(pkid, this.storePass, nonce.getBytes());
-            callback(authResponse.getSubject(), getIss(did), nonce, authResponse.getIss(), sig);
+            DIDURL pkid = new DIDURL(doc.getSubject(), options.keyName());
+            String sig = doc.sign(pkid, options.storePass(), nonce.getBytes());
+            callback(authResponse.getSubject(), getIss(options.did()), nonce, authResponse.getIss(), sig);
         }
     }
 
@@ -153,11 +150,11 @@ public class VaultAuthHelper implements ConnectHelper {
         map.put("iss", iss);
         map.put("realm", realm);
         map.put("nonce", nonce);
-        map.put("key_name", this.keyname);
+        map.put("key_name", this.options.keyName());
         map.put("sig", sig);
         String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
-                .authCallback(did, RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                .authCallback(this.options.did(), RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                 .execute();
         handleCallbackResponse(response);
     }
@@ -225,7 +222,7 @@ public class VaultAuthHelper implements ConnectHelper {
         BaseServiceConfig baseServiceConfig = new BaseServiceConfig.Builder()
                 .headerConfig(headerConfig)
                 .build();
-        ConnectionManager.resetHiveVaultApi(this.nodeUrl,
+        ConnectionManager.resetHiveVaultApi(this.options.nodeUrl(),
                 baseServiceConfig);
     }
 

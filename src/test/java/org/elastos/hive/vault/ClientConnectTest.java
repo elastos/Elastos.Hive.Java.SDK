@@ -1,6 +1,5 @@
 package org.elastos.hive.vault;
 
-import org.elastos.did.DIDDocument;
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.vendor.vault.VaultOptions;
@@ -40,15 +39,8 @@ public class ClientConnectTest {
     @BeforeClass
     public static void setUp() {
         try {
-
-            TestData testData = new TestData();
-            testData.setup(true);
-            testData.initIdentity();
-            DIDDocument doc = testData.loadTestDocument();
-
             Client.Options options = new VaultOptions
                     .Builder()
-                    .setDoc(doc)
                     .setKeyName(KEYNAME)
                     .setStorePath(STORE_PATH)
                     .setDid(DID)

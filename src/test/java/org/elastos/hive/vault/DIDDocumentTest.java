@@ -25,6 +25,7 @@ package org.elastos.hive.vault;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDURL;
 import org.elastos.did.exception.DIDException;
+import org.elastos.hive.vendor.vault.DIDData;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -37,11 +38,11 @@ public class DIDDocumentTest {
 
 	@Test
 	public void testSignAndVerify() throws DIDException, IOException {
-		TestData testData = new TestData();
-		testData.setup(true);
-		testData.initIdentity();
+		DIDData DIDData = new DIDData();
+		DIDData.setup(true);
+		DIDData.initIdentity();
 
-		DIDDocument doc = testData.loadTestDocument();
+		DIDDocument doc = DIDData.loadDocument();
 		assertNotNull(doc);
 		assertTrue(doc.isValid());
 
