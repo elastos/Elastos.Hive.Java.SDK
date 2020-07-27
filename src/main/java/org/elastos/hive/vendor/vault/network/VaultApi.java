@@ -17,8 +17,11 @@ import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
+import retrofit2.http.Header;
 import retrofit2.http.Multipart;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -49,11 +52,14 @@ public interface VaultApi {
     @GET(ConnectConstance.API_PATH + "/db/col/{path}")
     Call<ResponseBody> get_dbCol(@Path("path") String path, @Query("where") String json);
 
-    @HTTP(method = "PUT", hasBody = true)
-    Call<ResponseBody> put_dbCol(@Field("id") String user_id);
+    @PUT(ConnectConstance.API_PATH + "/db/col/{path}")
+    Call<ResponseBody> put_dbCol(@Path("path") String path, @Header("If-Match") String match, @Body RequestBody body);
 
-    @HTTP(method = "DELETE", hasBody = true)
-    Call<ResponseBody> delete_dbCol(@Field("id") String user_id);
+    @PATCH(ConnectConstance.API_PATH + "/db/col/{path}")
+    Call<ResponseBody> patch_dbCol(@Path("path") String path, @Header("If-Match") String match, @Body RequestBody body);
+
+    @DELETE(ConnectConstance.API_PATH + "/db/col/{path}")
+    Call<ResponseBody> delete_dbCol(@Path("path") String path, @Header("If-Match") String match);
 
     //file="path/of/file/name"
     @Multipart

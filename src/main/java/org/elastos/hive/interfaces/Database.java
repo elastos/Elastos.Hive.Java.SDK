@@ -7,7 +7,6 @@ import java.util.concurrent.CompletableFuture;
 public interface Database {
 
     /**
-     *
      * @param collection
      * @param schema
      */
@@ -15,49 +14,51 @@ public interface Database {
             throws Exception;
 
     /**
-     *
      * @param collection
      */
-    CompletableFuture<Void> dropCol(String collection)
-            throws Exception;
+    CompletableFuture<Void> dropCol(String collection);
 
     /**
-     *
      * @param collection
-     * @param id
-     * @return
-     */
-    CompletableFuture<Map<String, Object>> queryByID(String collection, String id)
-            throws Exception;
-
-    /**
-     *
-     * @param collection
-     * @return
-     */
-    CompletableFuture<List<Map<String, Object>>> queryAll(String collection)
-            throws Exception;
-
-    /**
-     *
-     * @param collection
-     * @param doc
+     * @param item
      * @return
      * @throws Exception
      */
-    CompletableFuture<Boolean> insert(String collection, String doc)
-            throws Exception;
+    CompletableFuture<String> insert(String collection, String item);
 
     /**
-     *
-     * @param table
-     * @param oldDoc
-     * @param newDoc
+     * @param collection
+     * @param params
      * @return
      * @throws Exception
      */
-    CompletableFuture<Boolean> update(String table, String oldDoc,
-                                      String newDoc)
-            throws Exception;
+    CompletableFuture<String> query(String collection, String params);
+
+    /**
+     *
+     * @param _id
+     * @param etag
+     * @return
+     * @throws Exception
+     */
+    CompletableFuture<String> put(String collection, String _id, String etag, String item);
+
+    /**
+     *
+     * @param _id
+     * @param etag
+     * @return
+     * @throws Exception
+     */
+    CompletableFuture<String> patch(String collection, String _id, String etag, String item);
+
+    /**
+     *
+     * @param _id
+     * @param etag
+     * @return
+     * @throws Exception
+     */
+    CompletableFuture<String> delete(String collection, String _id, String etag);
 
 }
