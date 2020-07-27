@@ -45,6 +45,11 @@ public class VaultAuthHelper implements ConnectHelper {
         this.persistent = new AuthInfoStoreImpl(options.storePath(), VaultConstance.CONFIG);
 
         try {
+            DIDData didData = new DIDData(options);
+            didData.setup(true);
+            didData.initIdentity();
+            doc = didData.loadDocument();
+
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
             ConnectionManager.resetHiveVaultApi(options.nodeUrl(), config);
         } catch (Exception e) {

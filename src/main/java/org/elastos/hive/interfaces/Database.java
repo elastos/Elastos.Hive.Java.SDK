@@ -6,7 +6,6 @@ import java.util.concurrent.CompletableFuture;
 
 public interface Database {
 
-
     /**
      * @param collection
      * @param schema
@@ -61,4 +60,5 @@ public interface Database {
      * @throws Exception
      */
     CompletableFuture<String> delete(String collection, String _id, String etag);
+
 }

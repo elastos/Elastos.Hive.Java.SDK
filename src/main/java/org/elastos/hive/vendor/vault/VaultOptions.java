@@ -1,5 +1,6 @@
 package org.elastos.hive.vendor.vault;
 
+import org.elastos.did.DIDDocument;
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
 
@@ -80,8 +81,6 @@ public class VaultOptions extends Client.Options {
         public Builder() {
             options = new VaultOptions();
         }
-
-
 
         public Builder setDid(String did) {
             options.setDid(did);
