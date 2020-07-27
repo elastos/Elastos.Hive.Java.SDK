@@ -6,7 +6,6 @@ import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -16,35 +15,6 @@ import okhttp3.RequestBody;
 import retrofit2.Response;
 
 public class DatabaseImp implements Database {
-    @Override
-    public CompletableFuture<Void> createCol(String collection, String schema) throws Exception {
-        return createCollection(collection, schema);
-    }
-
-    @Override
-    public CompletableFuture<Void> dropCol(String collection) throws Exception {
-        return dropCollection(collection);
-    }
-
-    @Override
-    public CompletableFuture<Map<String, Object>> queryByID(String collection, String id) throws Exception {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<List<Map<String, Object>>> queryAll(String collection) throws Exception {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Boolean> insert(String collection, String doc) throws Exception {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Boolean> update(String table, String oldDoc, String newDoc) throws Exception {
-        return null;
-    }
 
     private CompletableFuture<Void> createCollection(String collection, String schema) throws Exception {
         return CompletableFuture.runAsync(() -> {
@@ -79,4 +49,108 @@ public class DatabaseImp implements Database {
         });
     }
 
+    private CompletableFuture<String> deleteImp(String collection, String _id, String match) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .delete_dbCol(collection + "/" + _id, match)
+                        .execute();
+                return response.body().toString();
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                throw new CompletionException(exception);
+            }
+        });
+    }
+
+    private CompletableFuture<String> patchImp(String collection, String _id, String etag, String item) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .patch_dbCol(collection + "/" + _id, etag, RequestBody.create(MediaType.parse("Content-Type, application/json"), item))
+                        .execute();
+                return response.body().toString();
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                throw new CompletionException(exception);
+            }
+        });
+    }
+
+    private CompletableFuture<String> putImp(String collection, String _id, String etag, String item) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .put_dbCol(collection + "/" + _id, etag, RequestBody.create(MediaType.parse("Content-Type, application/json"), item))
+                        .execute();
+                return response.body().toString();
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                throw new CompletionException(exception);
+            }
+        });
+    }
+
+    private CompletableFuture<String> queryImp(String collection, String item) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .get_dbCol(collection, item)
+                        .execute();
+                return response.body().toString();
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                throw new CompletionException(exception);
+            }
+        });
+    }
+
+    private CompletableFuture<String> insertImp(String collection, String item) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .post_dbCol(collection, RequestBody.create(MediaType.parse("Content-Type, application/json"), item))
+                        .execute();
+                return response.body().toString();
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                throw new CompletionException(exception);
+            }
+        });
+    }
+
+    @Override
+    public CompletableFuture<Void> createCol(String collection, String schema) throws Exception {
+        return createCollection(collection, schema);
+    }
+
+    @Override
+    public CompletableFuture<Void> dropCol(String collection) {
+        return dropCollection(collection);
+    }
+
+    @Override
+    public CompletableFuture<String> insert(String collection, String item) {
+        return insertImp(collection, item);
+    }
+
+    @Override
+    public CompletableFuture<String> query(String collection, String params) {
+        return queryImp(collection, params);
+    }
+
+    @Override
+    public CompletableFuture<String> put(String collection, String _id, String etag, String item) {
+        return putImp(collection, _id, etag, item);
+    }
+
+    @Override
+    public CompletableFuture<String> patch(String collection, String _id, String etag, String item) {
+        return patchImp(collection, _id, etag, item);
+    }
+
+    @Override
+    public CompletableFuture<String> delete(String collection, String _id, String etag) {
+        return deleteImp(collection, _id, etag);
+    }
 }

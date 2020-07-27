@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor.vault;
+package org.elastos.hive.vault;
 
 import org.elastos.did.DIDAdapter;
 import org.elastos.did.DIDBackend;
@@ -35,6 +35,7 @@ import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.crypto.Base58;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.utils.FileUtil;
+import org.elastos.hive.vendor.vault.VaultOptions;
 
 import java.io.File;
 import java.io.FileReader;

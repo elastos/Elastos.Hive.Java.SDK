@@ -1,8 +1,5 @@
 package org.elastos.hive.vendor.vault;
 
-import com.google.gson.Gson;
-
-import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDURL;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
@@ -42,18 +39,12 @@ public class VaultAuthHelper implements ConnectHelper {
     private final Persistent persistent;
 
     private VaultOptions options;
-    private DIDDocument doc;
 
     VaultAuthHelper(VaultOptions options) {
         this.options = options;
         this.persistent = new AuthInfoStoreImpl(options.storePath(), VaultConstance.CONFIG);
 
         try {
-            DIDData didData = new DIDData(options);
-            didData.setup(true);
-            didData.initIdentity();
-            doc = didData.loadDocument();
-
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
             ConnectionManager.resetHiveVaultApi(options.nodeUrl(), config);
         } catch (Exception e) {
