@@ -31,9 +31,7 @@ public class ClientInstanceTest {
     public void testCreateInstance() {
         try {
             Client.Options options = new VaultOptions.Builder()
-                    .setStorePath(STORE_PATH)
                     .setDid(DID)
-                    .setPassword(PWD)
                     .setNodeUrl(NODEURL)
                     .build();
             assertNotNull(options);
@@ -64,7 +62,6 @@ public class ClientInstanceTest {
     public void testCreateInstanceFailed2() {
         try {
             new VaultOptions.Builder()
-                    .setPassword(PWD)
                     .build();
         } catch (HiveException e) {
             assertTrue(true);
@@ -76,7 +73,6 @@ public class ClientInstanceTest {
     public void testCreateInstanceFailed3() {
         try {
             Client.Options options = new VaultOptions.Builder()
-                    .setStorePath(STORE_PATH)
                     .build();
             assertNull(options);
         } catch (HiveException e) {
@@ -97,9 +93,7 @@ public class ClientInstanceTest {
             };
 
             VaultOptions.Builder builder = new VaultOptions.Builder()
-                    .setStorePath(STORE_PATH)
-                    .setDid(DID)
-                    .setPassword(PWD);
+                    .setDid(DID);
 
             Client.Options options = builder.build();
             assertNotNull(options);
@@ -109,7 +103,6 @@ public class ClientInstanceTest {
             VaultOptions opts = (VaultOptions) options;
             assertNotNull(opts.storePath());
             assertNotNull(opts.did());
-            assertNotNull(opts.storePass());
 
             builder.build();
         } catch (HiveException e) {

@@ -41,10 +41,7 @@ public class ClientConnectTest {
         try {
             Client.Options options = new VaultOptions
                     .Builder()
-                    .setKeyName(KEYNAME)
-                    .setStorePath(STORE_PATH)
                     .setDid(DID)
-                    .setPassword(PWD)
                     .setNodeUrl(NODEURL)
                     .build();
 
