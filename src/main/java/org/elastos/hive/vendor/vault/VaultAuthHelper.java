@@ -1,6 +1,5 @@
 package org.elastos.hive.vendor.vault;
 
-import org.elastos.did.DIDURL;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
@@ -45,11 +44,6 @@ public class VaultAuthHelper implements ConnectHelper {
         this.persistent = new AuthInfoStoreImpl(options.storePath(), VaultConstance.CONFIG);
 
         try {
-            DIDData didData = new DIDData(options);
-            didData.setup(true);
-            didData.initIdentity();
-            doc = didData.loadDocument();
-
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
             ConnectionManager.resetHiveVaultApi(options.nodeUrl(), config);
         } catch (Exception e) {
@@ -135,11 +129,6 @@ public class VaultAuthHelper implements ConnectHelper {
     private void handleAuthResponse(Response response) throws Exception {
         AuthResponse authResponse = (AuthResponse) response.body();
         String nonce = authResponse.getNonce();
-        if(null != nonce) {
-            DIDURL pkid = new DIDURL(doc.getSubject(), options.keyName());
-            String sig = doc.sign(pkid, options.storePass(), nonce.getBytes());
-            callback(authResponse.getSubject(), getIss(options.did()), nonce, authResponse.getIss(), sig);
-        }
     }
 
     private void callback(String subject, String iss, String nonce, String realm, String sig) throws Exception {
@@ -148,7 +137,6 @@ public class VaultAuthHelper implements ConnectHelper {
         map.put("iss", iss);
         map.put("realm", realm);
         map.put("nonce", nonce);
-        map.put("key_name", this.options.keyName());
         map.put("sig", sig);
         String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()

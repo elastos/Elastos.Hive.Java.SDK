@@ -456,9 +456,7 @@ public class KVTest {
         try {
             Client.Options options = new VaultOptions
                     .Builder()
-                    .setStorePath(STORE_PATH)
                     .setDid(DID)
-                    .setPassword(PWD)
                     .setNodeUrl(NODEURL)
                     .build();
 

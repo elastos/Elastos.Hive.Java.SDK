@@ -1,7 +1,5 @@
 package org.elastos.hive.interfaces;
 
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public interface Database {
@@ -10,8 +8,7 @@ public interface Database {
      * @param collection
      * @param schema
      */
-    CompletableFuture<Void> createCol(String collection, String schema)
-            throws Exception;
+    CompletableFuture<Void> createCol(String collection, String schema);
 
     /**
      * @param collection
@@ -24,7 +21,7 @@ public interface Database {
      * @return
      * @throws Exception
      */
-    CompletableFuture<String> insert(String collection, String item);
+    CompletableFuture<String> post(String collection, String item);
 
     /**
      * @param collection
@@ -32,12 +29,13 @@ public interface Database {
      * @return
      * @throws Exception
      */
-    CompletableFuture<String> query(String collection, String params);
+    CompletableFuture<String> get(String collection, String params);
 
     /**
      *
      * @param _id
      * @param etag
+     * @see <a href="https://docs.python-eve.org/en/stable/features.html#full-range-of-crud-operations">Data Integrity and Concurrency Control</a>
      * @return
      * @throws Exception
      */
@@ -47,6 +45,7 @@ public interface Database {
      *
      * @param _id
      * @param etag
+     * @see <a href="https://docs.python-eve.org/en/stable/features.html#full-range-of-crud-operations">Data Integrity and Concurrency Control</a>
      * @return
      * @throws Exception
      */
@@ -56,6 +55,7 @@ public interface Database {
      *
      * @param _id
      * @param etag
+     * @see <a href="https://docs.python-eve.org/en/stable/features.html#full-range-of-crud-operations">Data Integrity and Concurrency Control</a>
      * @return
      * @throws Exception
      */

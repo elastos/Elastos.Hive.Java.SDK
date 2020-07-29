@@ -13,19 +13,6 @@ class VaultConstance {
     static final String COLLECTION_NAME = "key_values";
     static final String COLLECTION_SCHEMA = "{\"key\": {\"type\": \"string\"}, \"value\": {\"type\": \"string\"}}";
 
-    public static String networkConfig = "MainNet";
-    public static String resolver = "http://api.elastos.io:20606";
-
-    //dummystore.verbose
-    public static boolean verbose = true;
-    //temp.dir
-    public static String tempDir = "TEMP";
-    //store
-    public static String storeRoot = "DIDStore";
-    //wallet.dir
-    public static String walletDir = "";
-    public static String walletId = "test";
-
 //    static final String DICT_SCHEMA = "{'KV': {\n" +
 //            "        'type': 'dict',\n" +
 //            "        'schema': {\n" +

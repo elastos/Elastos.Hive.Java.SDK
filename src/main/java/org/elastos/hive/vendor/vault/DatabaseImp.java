@@ -16,7 +16,7 @@ import retrofit2.Response;
 
 public class DatabaseImp implements Database {
 
-    private CompletableFuture<Void> createCollection(String collection, String schema) throws Exception {
+    private CompletableFuture<Void> createCollection(String collection, String schema) {
         return CompletableFuture.runAsync(() -> {
             try {
                 Map map = new HashMap<>();
@@ -120,7 +120,7 @@ public class DatabaseImp implements Database {
     }
 
     @Override
-    public CompletableFuture<Void> createCol(String collection, String schema) throws Exception {
+    public CompletableFuture<Void> createCol(String collection, String schema) {
         return createCollection(collection, schema);
     }
 
@@ -130,12 +130,12 @@ public class DatabaseImp implements Database {
     }
 
     @Override
-    public CompletableFuture<String> insert(String collection, String item) {
+    public CompletableFuture<String> post(String collection, String item) {
         return insertImp(collection, item);
     }
 
     @Override
-    public CompletableFuture<String> query(String collection, String params) {
+    public CompletableFuture<String> get(String collection, String params) {
         return queryImp(collection, params);
     }
 
