@@ -8,13 +8,13 @@ import org.elastos.hive.ConnectHelper;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.utils.DateUtil;
 import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.connection.model.HeaderConfig;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
-import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.TokenResponse;
 import org.json.JSONObject;
 
@@ -65,7 +65,7 @@ public class VaultAuthHelper implements ConnectHelper {
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
             ConnectionManager.resetHiveVaultApi(nodeUrl, config);
-            ConnectionManager.resetAuthApi(VaultConstance.VAULT_AUTH_BASE_URL, config);
+            ConnectionManager.resetAuthApi(VaultConstance.TOKEN_URI, config);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,7 +121,7 @@ public class VaultAuthHelper implements ConnectHelper {
         if (token != null)
             refreshToken = token.getRefreshToken();
         Response response = ConnectionManager.getVaultAuthApi()
-                .refreshToken(clientId, redirectUrl,
+                .refreshToken(clientId, clientSecret,
                         refreshToken, VaultConstance.GRANT_TYPE_REFRESH_TOKEN)
                 .execute();
         handleTokenResponse(response);
@@ -131,11 +131,8 @@ public class VaultAuthHelper implements ConnectHelper {
         connectState.set(false);
         tryRestoreToken();
 
-        if(accessToken == null) {
-            nodeAuth();
-        }
-
         if (token == null){
+            nodeAuth();
             String authCode = accessAuthCode(authenticator);
             accessToken(authCode);
             connectState.set(true);
@@ -171,29 +168,22 @@ public class VaultAuthHelper implements ConnectHelper {
                         redirectUrl, VaultConstance.GRANT_TYPE_GET_TOKEN)
                 .execute();
         handleTokenResponse(response);
+        syncGoogleDrive(response);
     }
 
-    private void handleTokenResponse(Response response) throws IOException {
+    private void handleTokenResponse(Response response) {
         TokenResponse tokenResponse = (TokenResponse) response.body();
-        long expiresTime = System.currentTimeMillis() / 1000 + 10*1000;
+        long expiresTime = System.currentTimeMillis() / 1000 + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
 
         token = new AuthToken(tokenResponse != null ? tokenResponse.getRefresh_token() : "",
                 accessToken,
-                expiresTime, "token");
+                expiresTime, tokenResponse != null ? tokenResponse.getToken_type() : "");
 
         //Store the local data.
         writebackToken();
 
         //init connection
         initConnection();
-
-        syncGoogleDrive(tokenResponse.getToken(),
-                tokenResponse.getRefresh_token(),
-                tokenResponse.getToken_uri(),
-                tokenResponse.getClient_id(),
-                tokenResponse.getClient_secret(),
-                tokenResponse.getScopes(),
-                tokenResponse.getExpiry());
     }
 
     private void handleAuthResponse(Response response) throws Exception {
@@ -215,9 +205,8 @@ public class VaultAuthHelper implements ConnectHelper {
         AuthServer server = new AuthServer(semph, host, port);
         server.start();
 
-        String url = String.format("%s/%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-                VaultConstance.VAULT_AUTH_URL,
-                VaultConstance.AUTH,
+        String url = String.format("%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
+                VaultConstance.AUTH_URI,
                 this.clientId,
                 this.scope,
                 this.redirectUrl)
@@ -234,26 +223,22 @@ public class VaultAuthHelper implements ConnectHelper {
         return authCode;
     }
 
-    private void syncGoogleDrive(String token, String refreshToken, String tokenUri, String clientId, String clientSecret, String scopes, String expiry) throws IOException {
+    private void syncGoogleDrive(Response response) throws IOException {
+        TokenResponse tokenResponse = (TokenResponse) response.body();
+        long expiresTime = System.currentTimeMillis() / 1000 + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
         Map map = new HashMap<>();
-        map.put("token", token);
-        map.put("refresh_token", refreshToken);
-        map.put("token_uri", tokenUri);
+        map.put("token", tokenResponse.getAccess_token());
+        map.put("refresh_token", tokenResponse.getRefresh_token());
+        map.put("token_uri", VaultConstance.TOKEN_URI);
         map.put("client_id", clientId);
         map.put("client_secret", clientSecret);
-        map.put("scopes", scopes);
-        map.put("expiry", expiry);
+        map.put("scopes", VaultConstance.SCOPES);
+        map.put("expiry", DateUtil.getCurrentEpochTimeStamp(expiresTime));
 
         String json = new JSONObject(map).toString();
-        Response response = ConnectionManager.getHiveVaultApi()
+        ConnectionManager.getHiveVaultApi()
                 .googleDrive(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                 .execute();
-        handleDriveResponse(response);
-    }
-
-    private void handleDriveResponse(Response response) {
-        BaseResponse baseResponse = (BaseResponse) response.body();
-        syncState.set(baseResponse.get_error()!=null);
     }
 
     private void tryRestoreToken() throws HiveException {
@@ -282,7 +267,11 @@ public class VaultAuthHelper implements ConnectHelper {
 
         try {
             JSONObject json = new JSONObject();
-            json.put(ACCESS_TOKEN_KEY, token);
+            json.put(CLIENT_ID_KEY, clientId);
+            json.put(REFRESH_TOKEN_KEY, token.getRefreshToken());
+            json.put(ACCESS_TOKEN_KEY, token.getAccessToken());
+            json.put(EXPIRES_AT_KEY, token.getExpiredTime());
+            json.put(TOKEN_TYPE_KEY, token.getTokenType());
 
             persistent.upateContent(json);
         } catch (Exception e) {

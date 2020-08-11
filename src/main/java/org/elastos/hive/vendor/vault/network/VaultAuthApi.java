@@ -13,7 +13,7 @@ public interface VaultAuthApi {
 
     @FormUrlEncoded
     @POST(ConnectConstance.TOKEN)
-    @Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
+//    @Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
     Call<TokenResponse> getToken(@Field(ConnectConstance.CODE) String code,
                                  @Field(ConnectConstance.CLIENT_ID) String clientId,
                                  @Field(ConnectConstance.CLIENT_SCERET) String clientSecret,
@@ -24,7 +24,7 @@ public interface VaultAuthApi {
     @POST(ConnectConstance.TOKEN)
     @Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
     Call<TokenResponse> refreshToken(@Field(ConnectConstance.CLIENT_ID) String clientId,
-                                     @Field(ConnectConstance.REDIRECT_URI) String redirectUrl,
+                                     @Field(ConnectConstance.CLIENT_SCERET) String clientSceret,
                                      @Field(ConnectConstance.REFRESH_TOKEN) String refreshToken,
                                      @Field(ConnectConstance.GRANT_TYPE) String grantType);
 }

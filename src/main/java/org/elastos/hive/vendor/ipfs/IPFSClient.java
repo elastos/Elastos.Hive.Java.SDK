@@ -7,6 +7,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
+import org.elastos.hive.interfaces.VaultFiles;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.ipfs.network.model.AddFileResponse;
@@ -57,6 +58,11 @@ final class IPFSClient extends Client implements IPFS {
     @Override
     public Files getFiles() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public VaultFiles getVaultFiles() {
+        return null;
     }
 
     @Override

@@ -27,6 +27,7 @@ import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
+import org.elastos.hive.interfaces.VaultFiles;
 
 public abstract class Client {
     public abstract void connect() throws HiveException;
@@ -36,6 +37,8 @@ public abstract class Client {
     public abstract boolean isConnected();
 
     public abstract Files getFiles();
+
+    public abstract VaultFiles getVaultFiles();
 
     public abstract IPFS getIPFS();
 
