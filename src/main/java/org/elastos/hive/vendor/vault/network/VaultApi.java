@@ -30,18 +30,14 @@ import retrofit2.http.Query;
 public interface VaultApi {
 
     //{"iss":" "did:elastos:iWFAUYhTa35c1fPe3iCJvihZHx6quumnym"}
-    @GET(ConnectConstance.API_PATH + "/did/auth")
+    @POST(ConnectConstance.API_PATH + "/did/auth")
     Call<AuthResponse> auth(@Body RequestBody body);
 
-    //{"subject":"didauth",
-    //           "iss":"did:elastos:iWFAUYhTa35c1fPe3iCJvihZHx6quumnym",
-    //           "realm": "elastos_hive_node",
-    //           "nonce" : "4607e6de-b5f0-11ea-a859-f45c898fba57"
-    //           "key_name" : "key2",
-    //           "sig" : "iWFAUYhTa35c1fPiWFAUYhTa35c1fPe3iCJvihZHx6quumnyme3iCJvihZHx6quumnymiWFAUYhTa35c1fPe3iCJvihZHx6quumnym"
-    //           }
-    @GET(ConnectConstance.API_PATH + "/did/{path}/callback")
-    Call<TokenResponse> authCallback(@Path("path") String path, @Body RequestBody body);
+    //   data: {
+    //           "token": "ya29.a0AfH6SMAVaP_gNAdbF25L5hktoPRdV8mBkcra6UaneG2w7ZYSusXevycqvhUrGrQ_FpsBPYYvxq2Sdx13zEwG1-m8I-pSFV05UY52X6wNnVlpxG7hsyBteEdUiiQPDT52zbK5ceQZ4-cpfXSlrplsQ8kZvPYC5nR1yks", "refresh_token": "1//06llFKBe-DBkRCgYIARAAGAYSNwF-L9Irfka2E6GP-J9gKBZN5AQS3z19vHOtjHq67p2ezCsJiVUZO-jKMSDKLgkiGfXgmBYimwc", "token_uri": "https://oauth2.googleapis.com/token", "client_id": "24235223939-7335upec07n0c3qc7mnd19jqoeglrg3t.apps.googleusercontent.com", "client_secret": "-7Ls5u1NpRe77Dy6VkL5W4pe", "scopes": ["https://www.googleapis.com/auth/drive.file"], "expiry": "2020-06-24 03:10:49.960710"
+    //            }
+    @POST(ConnectConstance.API_PATH + "/sync/setup/google_drive")
+    Call<BaseResponse> googleDrive(@Body RequestBody body);
 
     //{ "collection":"works","schema": {"title": {"type": "string"}, "author": {"type": "string"}}}
     @POST(ConnectConstance.API_PATH + "/db/create_collection")
@@ -67,7 +63,7 @@ public interface VaultApi {
     @POST(ConnectConstance.API_PATH + "/file/uploader")
     Call<BaseResponse> uploader(@Part MultipartBody.Part part);
 
-    @GET(ConnectConstance.API_PATH + "/file/list")
+    @GET(ConnectConstance.API_PATH + "/files/list/folder")
     Call<FilesResponse> files();
 
     @GET(ConnectConstance.API_PATH + "/file/downloader")
@@ -76,4 +72,6 @@ public interface VaultApi {
     //{"file_name": "test.png"}
     @POST(ConnectConstance.API_PATH + "/file/delete")
     Call<BaseResponse> delete(@Body RequestBody body);
+
+
 }

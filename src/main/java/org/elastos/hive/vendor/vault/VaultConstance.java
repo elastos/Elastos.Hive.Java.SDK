@@ -10,8 +10,17 @@ class VaultConstance {
     static final String FILES_ROOT_PATH  = "/Files";
     static final String KEYVALUES_ROOT_PATH = "/KeyValues";
 
-    static final String COLLECTION_NAME = "key_values";
-    static final String COLLECTION_SCHEMA = "{\"key\": {\"type\": \"string\"}, \"value\": {\"type\": \"string\"}}";
+    static final String VAULT_AUTH_URL = "https://accounts.google.com/o/oauth2";
+    static final String VAULT_AUTH_BASE_URL = VAULT_AUTH_URL+"/";
+    static final String AUTH = "auth";
+
+    static final String SCOPES = "https://www.googleapis.com/auth/drive";
+
+    static final String GRANT_TYPE_GET_TOKEN = "authorization_code";
+    static final String GRANT_TYPE_REFRESH_TOKEN = "refresh_token";
+
+    static final String DEFAULT_REDIRECT_URL = "localhost";
+    static final int    DEFAULT_REDIRECT_PORT = 12345;
 
 //    static final String DICT_SCHEMA = "{'KV': {\n" +
 //            "        'type': 'dict',\n" +

@@ -1,22 +1,42 @@
 package org.elastos.hive.vendor.vault.network.model;
 
 public class TokenResponse extends BaseResponse {
-    private String token_type;
-    private String scope;
-    private int expires_in;
-    private int ext_expires_in;
-    private String access_token;
-    private String refresh_token;
     private String token;
+    private String refresh_token;
+    private String token_uri;
+    private String client_id;
+    private String client_secret;
+    private String scopes;
+    private String expiry;
 
-    public TokenResponse(String token_type, String scope, int expires_in,
-                         int ext_expires_in, String access_token, String refresh_token) {
-        this.token_type = token_type;
-        this.scope = scope;
-        this.expires_in = expires_in;
-        this.ext_expires_in = ext_expires_in;
-        this.access_token = access_token;
+    public TokenResponse(String scopes, String expiry, String refresh_token) {
+        this.scopes = scopes;
+        this.expiry = expiry;
         this.refresh_token = refresh_token;
+    }
+
+    public String getClient_secret() {
+        return client_secret;
+    }
+
+    public void setClient_secret(String client_secret) {
+        this.client_secret = client_secret;
+    }
+
+    public String getClient_id() {
+        return client_id;
+    }
+
+    public void setClient_id(String client_id) {
+        this.client_id = client_id;
+    }
+
+    public String getToken_uri() {
+        return token_uri;
+    }
+
+    public void setToken_uri(String token_uri) {
+        this.token_uri = token_uri;
     }
 
     public String getToken() {
@@ -27,44 +47,20 @@ public class TokenResponse extends BaseResponse {
         this.token = token;
     }
 
-    public String getToken_type() {
-        return token_type;
+    public String getScopes() {
+        return scopes;
     }
 
-    public void setToken_type(String token_type) {
-        this.token_type = token_type;
+    public void setScopes(String scopes) {
+        this.scopes = scopes;
     }
 
-    public String getScope() {
-        return scope;
+    public String getExpiry() {
+        return expiry;
     }
 
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    public int getExpires_in() {
-        return expires_in;
-    }
-
-    public void setExpires_in(int expires_in) {
-        this.expires_in = expires_in;
-    }
-
-    public int getExt_expires_in() {
-        return ext_expires_in;
-    }
-
-    public void setExt_expires_in(int ext_expires_in) {
-        this.ext_expires_in = ext_expires_in;
-    }
-
-    public String getAccess_token() {
-        return access_token;
-    }
-
-    public void setAccess_token(String access_token) {
-        this.access_token = access_token;
+    public void setExpiry(String expiry) {
+        this.expiry = expiry;
     }
 
     public String getRefresh_token() {
@@ -78,11 +74,8 @@ public class TokenResponse extends BaseResponse {
     @Override
     public String toString() {
         return "TokenResponse{" +
-                "token_type='" + token_type + '\'' +
-                ", scope='" + scope + '\'' +
-                ", expires_in=" + expires_in +
-                ", ext_expires_in=" + ext_expires_in +
-                ", access_token='" + access_token + '\'' +
+                ", scope='" + scopes + '\'' +
+                ", expires_in=" + expiry +
                 ", refresh_token='" + refresh_token + '\'' +
                 '}';
     }

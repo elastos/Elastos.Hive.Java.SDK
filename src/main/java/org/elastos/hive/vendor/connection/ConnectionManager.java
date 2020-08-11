@@ -27,10 +27,12 @@ import org.elastos.hive.vendor.vault.network.VaultApi;
 import org.elastos.hive.vendor.ipfs.network.IPFSApi;
 import org.elastos.hive.vendor.onedrive.network.AuthApi;
 import org.elastos.hive.vendor.onedrive.network.OneDriveApi;
+import org.elastos.hive.vendor.vault.network.VaultAuthApi;
 
 public class ConnectionManager {
 
     private static AuthApi authApi;
+    private static VaultAuthApi vaultAuthApi;
     private static OneDriveApi oneDriveApi;
     private static VaultApi hivevaultApi;
     private static IPFSApi ipfsApi;
@@ -39,6 +41,8 @@ public class ConnectionManager {
     private static String onedriveBaseUrl;
     private static String authBaseUrl;
     private static String ipfsBaseUrl ;
+
+    private static String authorization;
 
     private static BaseServiceConfig hivevaultConfig = new BaseServiceConfig.Builder().build() ;
     private static BaseServiceConfig onedriveConfig = new BaseServiceConfig.Builder().build();
@@ -49,6 +53,14 @@ public class ConnectionManager {
         if(hivevaultApi == null) {
             hivevaultApi = BaseServiceUtil.createService(VaultApi.class,
                     ConnectionManager.hivevaultBaseUrl, ConnectionManager.hivevaultConfig);
+        }
+        return hivevaultApi;
+    }
+
+    public static VaultApi getTestHiveVaultApi() {
+        if(hivevaultApi == null) {
+            hivevaultApi = BaseServiceUtil.createService(VaultApi.class,
+                    "http://127.0.0.1:5000", ConnectionManager.hivevaultConfig);
         }
         return hivevaultApi;
     }
@@ -65,6 +77,14 @@ public class ConnectionManager {
             authApi = BaseServiceUtil.createService(AuthApi.class,
                     ConnectionManager.authBaseUrl, ConnectionManager.authConfig);
         return authApi;
+    }
+
+    public static VaultAuthApi getVaultAuthApi() {
+        if(vaultAuthApi == null) {
+            vaultAuthApi = BaseServiceUtil.createService(VaultAuthApi.class,
+                    ConnectionManager.authBaseUrl, ConnectionManager.authConfig);
+        }
+        return vaultAuthApi;
     }
 
     public static IPFSApi getIPFSApi() {

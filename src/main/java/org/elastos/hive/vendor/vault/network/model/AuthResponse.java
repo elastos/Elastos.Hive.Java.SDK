@@ -4,11 +4,9 @@ public class AuthResponse extends BaseResponse {
 
     private String subject;
 
-    private String iss;
+    private String issuer;
 
-    private String nonce;
-
-    private String callback;
+    private String token;
 
     public String getSubject() {
         return subject;
@@ -18,27 +16,19 @@ public class AuthResponse extends BaseResponse {
         this.subject = subject;
     }
 
-    public String getIss() {
-        return iss;
+    public String getIssuer() {
+        return issuer;
     }
 
-    public void setIss(String iss) {
-        this.iss = iss;
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 
-    public String getNonce() {
-        return nonce;
+    public String getToken() {
+        return token;
     }
 
-    public void setNonce(String nonce) {
-        this.nonce = nonce;
-    }
-
-    public String getCallback() {
-        return callback;
-    }
-
-    public void setCallback(String callback) {
-        this.callback = callback;
+    public void setToken(String token) {
+        this.token = token;
     }
 }

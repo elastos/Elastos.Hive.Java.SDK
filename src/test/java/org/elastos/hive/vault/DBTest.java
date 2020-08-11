@@ -16,49 +16,29 @@ public class DBTest {
     private static final String NODEURL = "http://127.0.0.1:5000";
 
     private static Database database;
-    private String testCollection = "works";
-    private String testSchema = "'item_title': 'person',\n" +
-            "    'additional_lookup': {\n" +
-            "        'url': 'regex(\"[\\w]+\")',\n" +
-            "        'field': 'lastname'\n" +
+    private String testCollection = "people";
+    private String testSchema = "{\n" +
+            "    \"firstname\": {\n" +
+            "        \"type\":  \"string\",\n" +
+            "        \"minlength\": 1,\n" +
+            "        \"maxlength\": 10\n" +
             "    },\n" +
-            "\n" +
-            "    'schema': {\n" +
-            "        'firstname': {\n" +
-            "            'type': 'string',\n" +
-            "            'minlength': 1,\n" +
-            "            'maxlength': 10,\n" +
-            "        },\n" +
-            "        'lastname': {\n" +
-            "            'type': 'string',\n" +
-            "            'minlength': 1,\n" +
-            "            'maxlength': 15,\n" +
-            "            'required': True,\n" +
-            "            'unique': True,\n" +
-            "        },\n" +
-            "        'role': {\n" +
-            "            'type': 'list',\n" +
-            "            'allowed': [\"author\", \"contributor\", \"copy\"],\n" +
-            "        },\n" +
-            "        'location': {\n" +
-            "            'type': 'dict',\n" +
-            "            'schema': {\n" +
-            "                'address': {'type': 'string'},\n" +
-            "                'city': {'type': 'string'}\n" +
-            "            },\n" +
-            "        },\n" +
-            "        'born': {\n" +
-            "            'type': 'datetime',\n" +
-            "        },\n" +
-            "    }";
+            "    \"lastname\": {\n" +
+            "        \"type\": \"string\",\n" +
+            "        \"minlength\": 1,\n" +
+            "        \"maxlength\": 15,\n" +
+            "        \"required\": true,\n" +
+            "        \"unique\": true\n" +
+            "    }\n" +
+            "}\n";
 
-    private String item = "{\"firstname\": \"barack01\", \"lastname\": \"obama01\"}";
+    private String item = "{\"firstname\": \"barack\", \"lastname\": \"obama\"}";
 
-    private String itemPut = "{\"firstname\": \"barack02\", \"lastname\": \"obama02\"}";
+    private String itemPut = "{\"firstname\": \"barack01\", \"lastname\": \"obama01\"}";
 
-    private String itemPatch = "{\"firstname\": \"barack03\", \"lastname\": \"obama03\"}";
+    private String itemPatch = "{\"firstname\": \"barack02\", \"lastname\": \"obama02\"}";
 
-    private String queryParams = "where=lastname==\"obama01\""; //sort=-lastname，max_results=1&page=1，where={"lastname":"obama01"}
+    private String queryParams = "where=lastname==\"obama\""; //sort=-lastname，max_results=1&page=1，where={"lastname":"obama"}
 
     @BeforeClass
     public static void  setUp() {

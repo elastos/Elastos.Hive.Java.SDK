@@ -65,7 +65,7 @@ public abstract class Client {
         }
 
         protected boolean checkValid(boolean all) {
-            return (storePath != null) && (!all || authenticator != null);
+            return /*(storePath != null) && (!all || authenticator != null)*/true;
         }
 
         protected abstract Client buildClient();

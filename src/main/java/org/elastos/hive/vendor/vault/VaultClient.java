@@ -40,7 +40,13 @@ public class VaultClient extends Client implements Files, KeyValues{
 
     VaultClient(Client.Options options) {
         VaultOptions opts = (VaultOptions) options;
-        authHelper = new VaultAuthHelper(opts);
+        authHelper = new VaultAuthHelper(opts.nodeUrl(),
+                opts.authToken(),
+                opts.storePath(),
+                opts.clientId(),
+                opts.clientSecret(),
+                opts.redirectURL(),
+                VaultConstance.SCOPES);
         authenticator = opts.authenticator();
     }
 

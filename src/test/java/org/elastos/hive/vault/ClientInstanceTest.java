@@ -31,7 +31,6 @@ public class ClientInstanceTest {
     public void testCreateInstance() {
         try {
             Client.Options options = new VaultOptions.Builder()
-                    .setDid(DID)
                     .setNodeUrl(NODEURL)
                     .build();
             assertNotNull(options);
@@ -51,7 +50,6 @@ public class ClientInstanceTest {
     public void testCreateInstanceFailed1() {
         try {
             new VaultOptions.Builder()
-                    .setDid(DID)
                     .build();
         } catch (HiveException e) {
             assertTrue(true);
@@ -92,8 +90,7 @@ public class ClientInstanceTest {
                 }
             };
 
-            VaultOptions.Builder builder = new VaultOptions.Builder()
-                    .setDid(DID);
+            VaultOptions.Builder builder = new VaultOptions.Builder();
 
             Client.Options options = builder.build();
             assertNotNull(options);
@@ -102,7 +99,6 @@ public class ClientInstanceTest {
 
             VaultOptions opts = (VaultOptions) options;
             assertNotNull(opts.storePath());
-            assertNotNull(opts.did());
 
             builder.build();
         } catch (HiveException e) {

@@ -12,6 +12,7 @@ import java.util.concurrent.CompletionException;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 public class DatabaseImp implements Database {
@@ -23,7 +24,7 @@ public class DatabaseImp implements Database {
                 map.put("collection", collection);
                 map.put("schema", schema);
                 String json = new JSONObject(map).toString();
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = ConnectionManager.getTestHiveVaultApi()
                         .auth(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
             } catch (Exception e) {
@@ -39,7 +40,7 @@ public class DatabaseImp implements Database {
                 Map map = new HashMap<>();
                 map.put("collection", collection);
                 String json = new JSONObject(map).toString();
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = ConnectionManager.getTestHiveVaultApi()
                         .auth(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
             } catch (Exception e) {
@@ -52,10 +53,11 @@ public class DatabaseImp implements Database {
     private CompletableFuture<String> deleteImp(String collection, String _id, String match) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = ConnectionManager.getTestHiveVaultApi()
                         .delete_dbCol(collection + "/" + _id, match)
                         .execute();
-                return response.body().toString();
+                ResponseBody body = (ResponseBody) response.body();
+                return body.string();
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);
@@ -66,10 +68,11 @@ public class DatabaseImp implements Database {
     private CompletableFuture<String> patchImp(String collection, String _id, String etag, String item) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = ConnectionManager.getTestHiveVaultApi()
                         .patch_dbCol(collection + "/" + _id, etag, RequestBody.create(MediaType.parse("Content-Type, application/json"), item))
                         .execute();
-                return response.body().toString();
+                ResponseBody body = (ResponseBody) response.body();
+                return body.string();
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);
@@ -80,10 +83,11 @@ public class DatabaseImp implements Database {
     private CompletableFuture<String> putImp(String collection, String _id, String etag, String item) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = ConnectionManager.getTestHiveVaultApi()
                         .put_dbCol(collection + "/" + _id, etag, RequestBody.create(MediaType.parse("Content-Type, application/json"), item))
                         .execute();
-                return response.body().toString();
+                ResponseBody body = (ResponseBody) response.body();
+                return body.string();
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);
@@ -94,10 +98,11 @@ public class DatabaseImp implements Database {
     private CompletableFuture<String> queryImp(String collection, String item) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = ConnectionManager.getTestHiveVaultApi()
                         .get_dbCol(collection, item)
                         .execute();
-                return response.body().toString();
+                ResponseBody body = (ResponseBody) response.body();
+                return body.string();
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);
@@ -108,10 +113,11 @@ public class DatabaseImp implements Database {
     private CompletableFuture<String> insertImp(String collection, String item) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = ConnectionManager.getTestHiveVaultApi()
                         .post_dbCol(collection, RequestBody.create(MediaType.parse("Content-Type, application/json"), item))
                         .execute();
-                return response.body().toString();
+                ResponseBody body = (ResponseBody) response.body();
+                return body.string();
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);

@@ -1,57 +1,44 @@
 package org.elastos.hive.vendor.vault;
 
-import org.elastos.did.DIDDocument;
+import org.elastos.hive.Authenticator;
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.vendor.onedrive.OneDriveOptions;
 
 public class VaultOptions extends Client.Options {
 
-    private String packageId; // application id, bundle id
-    private String appDid; // published on the ID sidechain
-    private String scope; // the service defined scope, could be a list
-    private String claims; //optional, for credential request
-    private String did;
+    private String authToken;
+    private String clientId;
+    private String clientSecret;
+    private String redirectURL;
     private String nodeUrl;
 
-    public String packageId() {
-        return packageId;
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
-    public void setPackageId(String packageId) {
-        this.packageId = packageId;
+    public String authToken() {return this.authToken;}
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
-    public String appDid() {
-        return appDid;
+    public String clientId() {return this.clientId;}
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
     }
 
-    public void setAppDid(String appDid) {
-        this.appDid = appDid;
+    public String clientSecret() {
+        return this.clientSecret;
     }
 
-    public String scope() {
-        return scope;
+    public void setRedirectURL(String redirectURL) {
+        this.redirectURL = redirectURL;
     }
 
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    public String claims() {
-        return claims;
-    }
-
-    public void setClaims(String claims) {
-        this.claims = claims;
-    }
-
-    public String did() {
-        return did;
-    }
-
-    private void setDid(String did) {
-        this.did = did;
-    }
+    public String redirectURL() {return this.redirectURL;}
 
     private void setNodeUrl(String url) {
         this.nodeUrl = url;
@@ -59,11 +46,6 @@ public class VaultOptions extends Client.Options {
 
     public String nodeUrl() {
         return nodeUrl;
-    }
-
-    @Override
-    protected boolean checkValid(boolean all) {
-        return did != null;
     }
 
     boolean checkValid() {
@@ -82,33 +64,38 @@ public class VaultOptions extends Client.Options {
             options = new VaultOptions();
         }
 
-        public Builder setDid(String did) {
-            options.setDid(did);
-            return this;
-        }
-
         public Builder setNodeUrl(String nodeUrl) {
             options.setNodeUrl(nodeUrl);
             return this;
         }
 
-        public Builder setPackageId(String packageId) {
-            options.setPackageId(packageId);
+        public Builder setStorePath(String storePath) {
+            options.setStorePath(storePath);
             return this;
         }
 
-        public Builder setAppDid(String appDid) {
-            options.setAppDid(appDid);
+        public Builder setAuthToken(String authToken) {
+            options.setAuthToken(authToken);
             return this;
         }
 
-        public Builder setScope(String scope) {
-            options.setScope(scope);
+        public Builder setClientId(String clientId) {
+            options.setClientId(clientId);
             return this;
         }
 
-        public Builder setClaims(String claims) {
-            options.setClaims(claims);
+        public Builder setClientSecret(String clientSecret) {
+            options.setClientSecret(clientSecret);
+            return this;
+        }
+
+        public Builder setRedirectURL(String redirectURL) {
+            options.setRedirectURL(redirectURL);
+            return this;
+        }
+
+        public Builder setAuthenticator(Authenticator authenticator) {
+            options.setAuthenticator(authenticator);
             return this;
         }
 
