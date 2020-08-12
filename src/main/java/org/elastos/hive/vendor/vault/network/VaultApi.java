@@ -21,6 +21,7 @@ import retrofit2.http.FieldMap;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
@@ -38,10 +39,11 @@ public interface VaultApi {
     Call<BaseResponse> googleDrive(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/create_collection")
-    Call<BaseResponse> createCollection(@FieldMap Map<String, Object> map);
+    Call<BaseResponse> createCollection(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/col/{path}")
-    Call<BaseResponse> post_dbCol(@Path("path") String path, @Body RequestBody body);
+    @Headers({ "Content-Type: application/json;charset=UTF-8"})
+    Call<ResponseBody> post_dbCol(@Path("path") String path, @Body RequestBody body);
 
     @GET(ConnectConstance.API_PATH + "/db/col/{path}")
     Call<ResponseBody> get_dbCol(@Path("path") String path, @Query("where") String json);
@@ -66,6 +68,7 @@ public interface VaultApi {
     @POST(ConnectConstance.API_PATH + "/files/creator/file")
     Call<UploadResponse> createFile(@Body RequestBody body);
 
+    @Multipart
     @POST("{path}")
     Call<BaseResponse> uploadFile(@Path("path") String path, @Part MultipartBody.Part part);
 

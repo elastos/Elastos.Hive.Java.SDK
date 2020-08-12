@@ -4,6 +4,7 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.interfaces.Database;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
@@ -68,6 +69,11 @@ final class IPFSClient extends Client implements IPFS {
     @Override
     public IPFS getIPFS() {
         return this;
+    }
+
+    @Override
+    public Database getDatabase() {
+        return null;
     }
 
     private <T> Callback<T> getCallback(Callback<T> callback) {

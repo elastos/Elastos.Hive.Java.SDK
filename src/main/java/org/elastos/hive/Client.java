@@ -24,6 +24,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
+import org.elastos.hive.interfaces.Database;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
@@ -41,6 +42,8 @@ public abstract class Client {
     public abstract VaultFiles getVaultFiles();
 
     public abstract IPFS getIPFS();
+
+    public abstract Database getDatabase();
 
     public abstract KeyValues getKeyValues();
 

@@ -111,8 +111,10 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private void doCheckExpired() throws Exception {
         connectState.set(false);
-        if (token == null || token.isExpired())
+        if (token == null || token.isExpired()) {
+            nodeAuth();
             redeemToken();
+        }
         connectState.set(true);
     }
 
@@ -225,7 +227,7 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private void syncGoogleDrive(Response response) throws IOException {
         TokenResponse tokenResponse = (TokenResponse) response.body();
-        long expiresTime = System.currentTimeMillis() / 1000 + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
+        long expiresTime = System.currentTimeMillis() + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
         Map map = new HashMap<>();
         map.put("token", tokenResponse.getAccess_token());
         map.put("refresh_token", tokenResponse.getRefresh_token());

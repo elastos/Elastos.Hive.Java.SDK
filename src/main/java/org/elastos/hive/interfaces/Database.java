@@ -1,5 +1,7 @@
 package org.elastos.hive.interfaces;
 
+import org.elastos.hive.Callback;
+
 import java.util.concurrent.CompletableFuture;
 
 public interface Database {
@@ -10,10 +12,14 @@ public interface Database {
      */
     CompletableFuture<Void> createCol(String collection, String schema);
 
+    CompletableFuture<Void> createCol(String collection, String schema, Callback<Long> callback);
+
     /**
      * @param collection
      */
     CompletableFuture<Void> dropCol(String collection);
+
+    CompletableFuture<Void> dropCol(String collection, Callback<Long> callback);
 
     /**
      * @param collection
@@ -21,15 +27,19 @@ public interface Database {
      * @return
      * @throws Exception
      */
-    CompletableFuture<String> post(String collection, String item);
+    CompletableFuture<String> insert(String collection, String item);
+
+    CompletableFuture<String> insert(String collection, String item, Callback<Long> callback);
 
     /**
      * @param collection
-     * @param params
+     * @param where
      * @return
      * @throws Exception
      */
-    CompletableFuture<String> get(String collection, String params);
+    CompletableFuture<String> query(String collection, String where);
+
+    CompletableFuture<String> query(String collection, String where, Callback<Long> callback);
 
     /**
      *
@@ -41,6 +51,8 @@ public interface Database {
      */
     CompletableFuture<String> put(String collection, String _id, String etag, String item);
 
+    CompletableFuture<String> put(String collection, String _id, String etag, String item, Callback<Long> callback);
+
     /**
      *
      * @param _id
@@ -51,6 +63,8 @@ public interface Database {
      */
     CompletableFuture<String> patch(String collection, String _id, String etag, String item);
 
+    CompletableFuture<String> patch(String collection, String _id, String etag, String item, Callback<Long> callback);
+
     /**
      *
      * @param _id
@@ -60,5 +74,7 @@ public interface Database {
      * @throws Exception
      */
     CompletableFuture<String> delete(String collection, String _id, String etag);
+
+    CompletableFuture<String> delete(String collection, String _id, String etag, Callback<Long> callback);
 
 }
