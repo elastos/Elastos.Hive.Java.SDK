@@ -27,7 +27,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -131,12 +130,12 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<String> createFile(String remoteFile, Callback<Long> callback) {
+    public CompletableFuture<String> createFile(String remoteFile, Callback<String> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> createFileImp(remoteFile, getCallback(callback)));
     }
 
-    private CompletableFuture<String> createFileImp(String remoteFile, Callback<Long> callback) {
+    private CompletableFuture<String> createFileImp(String remoteFile, Callback<String> callback) {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -152,8 +151,9 @@ public class VaultClient extends Client implements VaultFiles, Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return response.body().getUpload_file_url();
+                String uploadUrl = response.body().getUpload_file_url();
+                callback.onSuccess(uploadUrl);
+                return uploadUrl;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -170,20 +170,21 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<Void> upload(String url, byte[] data, String remoteFile, Callback<Long> callback) {
+    public CompletableFuture<Void> upload(String url, byte[] data, String remoteFile, Callback<Void> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> uploadImp(url, remoteFile, data, callback));
     }
 
-    private CompletableFuture<Void> uploadImp(String url, String remoteFile, byte[] data, Callback<Long> callback) {
+    private CompletableFuture<Void> uploadImp(String url, String remoteFile, byte[] data, Callback<Void> callback) {
 
         return CompletableFuture.runAsync(() -> {
             try {
                 RequestBody requestBody = createWriteRequestBody(data);
-                MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file", remoteFile, requestBody);
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .uploadFile(url, multipartBody)
+                        .uploadFile(url, requestBody)
                         .execute();
+                if (response == null)
+                    throw new HiveException(HiveException.ERROR);
 
                 int responseCode = checkResponseCode(response);
                 if (responseCode == 404) {
@@ -226,7 +227,6 @@ public class VaultClient extends Client implements VaultFiles, Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                ResponseBody body = (ResponseBody) response.body();
                 callback.onSuccess(null);
                 return ResponseHelper.writeOutput(response, output);
             } catch (Exception e) {
@@ -281,12 +281,12 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<Void> deleteFile(String remoteFile, Callback<Long> callback) {
+    public CompletableFuture<Void> deleteFile(String remoteFile, Callback<Void> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> deleteFileImp(remoteFile, getCallback(callback)));
     }
 
-    private CompletableFuture<Void> deleteFileImp(String remoteFile, Callback<Long> callback) {
+    private CompletableFuture<Void> deleteFileImp(String remoteFile, Callback<Void> callback) {
         return CompletableFuture.runAsync(() -> {
             try {
                 Map map = new HashMap<>();
@@ -316,8 +316,34 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<Void> createFolder(String folder, Callback<Long> callback) {
-        return null;
+    public CompletableFuture<Void> createFolder(String folder, Callback<Void> callback) {
+        return authHelper.checkValid()
+                .thenCompose(result -> createFolderImp(folder, getCallback(callback)));
+    }
+
+    private CompletableFuture<Void> createFolderImp(String folder, Callback<Void> callback) {
+
+        return CompletableFuture.runAsync(() -> {
+            try {
+                Map map = new HashMap<>();
+                map.put("name", folder);
+                String json = new JSONObject(map).toString();
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .createFolder(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                        .execute();
+                int responseCode = checkResponseCode(response);
+                if (responseCode == 404) {
+                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
+                } else if (responseCode != 0) {
+                    throw new HiveException(HiveException.ERROR);
+                }
+                callback.onSuccess(null);
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
+            }
+        });
     }
 
     @Override
@@ -326,7 +352,7 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<Void> move(String src, String dst, Callback<Long> callback) {
+    public CompletableFuture<Void> move(String src, String dst, Callback<Void> callback) {
         return null;
     }
 
@@ -336,7 +362,7 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<Void> copy(String src, String dst, Callback<Long> callback) {
+    public CompletableFuture<Void> copy(String src, String dst, Callback<Void> callback) {
         return null;
     }
 
@@ -346,7 +372,7 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<Void> hash(String remoteFile, Callback<Long> callback) {
+    public CompletableFuture<Void> hash(String remoteFile, Callback<Void> callback) {
         return null;
     }
 
@@ -356,12 +382,12 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<ArrayList<String>> list(String folder, Callback<Long> callback) {
+    public CompletableFuture<ArrayList<String>> list(String folder, Callback<ArrayList<String>> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> listImp(folder, getCallback(callback)));
     }
 
-    private CompletableFuture<ArrayList<String>> listImp(String folder, Callback<Long> callback) {
+    private CompletableFuture<ArrayList<String>> listImp(String folder, Callback<ArrayList<String>> callback) {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -374,8 +400,9 @@ public class VaultClient extends Client implements VaultFiles, Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return new ArrayList<>(response.body().getFiles());
+                ArrayList<String> list = new ArrayList<>(response.body().getFiles());
+                callback.onSuccess(list);
+                return list;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -424,12 +451,12 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<Void> createCol(String collection, String schema, Callback<Long> callback) {
+    public CompletableFuture<Void> createCol(String collection, String schema, Callback<Void> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> createColImp(collection, schema, getCallback(callback)));
     }
 
-    private CompletableFuture<Void> createColImp(String collection, String schema, Callback<Long> callback) {
+    private CompletableFuture<Void> createColImp(String collection, String schema, Callback<Void> callback) {
         return CompletableFuture.runAsync(() -> {
             try {
 
@@ -458,53 +485,17 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<Void> dropCol(String collection) {
-        return dropCol(collection, null);
-    }
-
-    @Override
-    public CompletableFuture<Void> dropCol(String collection, Callback<Long> callback) {
-        return authHelper.checkValid()
-                .thenCompose(result -> dropColImp(collection, getCallback(callback)));
-    }
-
-    private CompletableFuture<Void> dropColImp(String collection, Callback<Long> callback) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                Map map = new HashMap<>();
-                map.put("collection", collection);
-                String json = new JSONObject(map).toString();
-                Response response = ConnectionManager.getTestHiveVaultApi()
-                        .auth(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-                        .execute();
-
-                int responseCode = checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-                callback.onSuccess(null);
-            } catch (Exception e) {
-                HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
-                throw new CompletionException(exception);
-            }
-        });
-    }
-
-    @Override
     public CompletableFuture<String> insert(String collection, String item) {
         return insert(collection, item, null);
     }
 
     @Override
-    public CompletableFuture<String> insert(String collection, String item, Callback<Long> callback) {
+    public CompletableFuture<String> insert(String collection, String item, Callback<String> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> insertImp(collection, item, getCallback(callback)));
     }
 
-    private CompletableFuture<String> insertImp(String collection, String item, Callback<Long> callback) {
+    private CompletableFuture<String> insertImp(String collection, String item, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Response response = ConnectionManager.getTestHiveVaultApi()
@@ -517,9 +508,10 @@ public class VaultClient extends Client implements VaultFiles, Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
                 ResponseBody body = (ResponseBody) response.body();
-                return body.string();
+                String ret = body.string();
+                callback.onSuccess(ret);
+                return ret;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -534,12 +526,12 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<String> query(String collection, String where, Callback<Long> callback) {
+    public CompletableFuture<String> query(String collection, String where, Callback<String> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> queryImp(collection, where, getCallback(callback)));
     }
 
-    private CompletableFuture<String> queryImp(String collection, String item, Callback<Long> callback) {
+    private CompletableFuture<String> queryImp(String collection, String item, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Response response = ConnectionManager.getTestHiveVaultApi()
@@ -552,9 +544,10 @@ public class VaultClient extends Client implements VaultFiles, Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
                 ResponseBody body = (ResponseBody) response.body();
-                return body.string();
+                String ret = body.string();
+                callback.onSuccess(ret);
+                return ret;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -569,12 +562,12 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<String> put(String collection, String _id, String etag, String item, Callback<Long> callback) {
+    public CompletableFuture<String> put(String collection, String _id, String etag, String item, Callback<String> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> putImp(collection, _id, etag, item, getCallback(callback)));
     }
 
-    private CompletableFuture<String> putImp(String collection, String _id, String etag, String item, Callback<Long> callback) {
+    private CompletableFuture<String> putImp(String collection, String _id, String etag, String item, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Response response = ConnectionManager.getTestHiveVaultApi()
@@ -587,9 +580,10 @@ public class VaultClient extends Client implements VaultFiles, Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
                 ResponseBody body = (ResponseBody) response.body();
-                return body.string();
+                String ret = body.string();
+                callback.onSuccess(ret);
+                return ret;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -604,12 +598,12 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<String> patch(String collection, String _id, String etag, String item, Callback<Long> callback) {
+    public CompletableFuture<String> patch(String collection, String _id, String etag, String item, Callback<String> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> patchImp(collection, _id, etag, item, getCallback(callback)));
     }
 
-    private CompletableFuture<String> patchImp(String collection, String _id, String etag, String item, Callback<Long> callback) {
+    private CompletableFuture<String> patchImp(String collection, String _id, String etag, String item, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Response response = ConnectionManager.getTestHiveVaultApi()
@@ -624,9 +618,12 @@ public class VaultClient extends Client implements VaultFiles, Database {
                 }
 
                 ResponseBody body = (ResponseBody) response.body();
-                return body.string();
+                String ret = body.string();
+                callback.onSuccess(ret);
+                return ret;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -638,12 +635,12 @@ public class VaultClient extends Client implements VaultFiles, Database {
     }
 
     @Override
-    public CompletableFuture<String> delete(String collection, String _id, String etag, Callback<Long> callback) {
+    public CompletableFuture<String> delete(String collection, String _id, String etag, Callback<String> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> deleteImp(collection, _id, etag, getCallback(callback)));
     }
 
-    private CompletableFuture<String> deleteImp(String collection, String _id, String match, Callback<Long> callback) {
+    private CompletableFuture<String> deleteImp(String collection, String _id, String match, Callback<String> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Response response = ConnectionManager.getTestHiveVaultApi()
@@ -656,9 +653,10 @@ public class VaultClient extends Client implements VaultFiles, Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
                 ResponseBody body = (ResponseBody) response.body();
-                return body.string();
+                String ret = body.string();
+                callback.onSuccess(ret);
+                return ret;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);

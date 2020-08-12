@@ -2,7 +2,9 @@ package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.Database;
 import org.elastos.hive.vendor.vault.VaultOptions;
 import org.junit.BeforeClass;
@@ -12,6 +14,7 @@ import java.awt.Desktop;
 import java.net.URI;
 import java.util.Map;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class DBTest {
@@ -27,14 +30,14 @@ public class DBTest {
     private static Database database;
     private static Client client;
 
-    private String testCollection = "people10";
+    private String testCollection = "people08";
     private String testSchema = "{\"firstname\":{\"type\":\"string\",\"minlength\":1,\"maxlength\":10},\"lastname\":{\"type\":\"string\",\"minlength\":1,\"maxlength\":15,\"required\":true,\"unique\":true}}";
 
-    private String item = "{\"firstname\": \"barack06\", \"lastname\": \"obama06\"}";
+    private String item = "{\"firstname\": \"barack\", \"lastname\": \"obama\"}";
 
-    private String itemPut = "{\"firstname\": \"barack01\", \"lastname\": \"obama01\"}";
+    private String itemPut = "{\"firstname\": \"barack\", \"lastname\": \"obama\"}";
 
-    private String itemPatch = "{\"firstname\": \"barack02\", \"lastname\": \"obama02\"}";
+    private String itemPatch = "{\"firstname\": \"barack\", \"lastname\": \"obama\"}";
 
     private String queryParams = "where=lastname==\"obama\""; //sort=-lastname，max_results=1&page=1，where={"lastname":"obama"}
 
@@ -114,16 +117,6 @@ public class DBTest {
             String _id = (String) testMapDes.get("_id");
             String _etag = (String) testMapDes.get("_etag");
             database.delete(testCollection, _id, _etag);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void testDrop() {
-        try {
-            database.dropCol(testCollection);
         } catch (Exception e) {
             e.printStackTrace();
             fail();

@@ -68,9 +68,8 @@ public interface VaultApi {
     @POST(ConnectConstance.API_PATH + "/files/creator/file")
     Call<UploadResponse> createFile(@Body RequestBody body);
 
-    @Multipart
     @POST("{path}")
-    Call<BaseResponse> uploadFile(@Path("path") String path, @Part MultipartBody.Part part);
+    Call<BaseResponse> uploadFile(@Path("path") String path, @Body RequestBody body);
 
     @GET(ConnectConstance.API_PATH + "/files/downloader")
     Call<ResponseBody> downloader(@Query("name") String filename);

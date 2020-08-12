@@ -1,6 +1,8 @@
 package org.elastos.hive.vault;
 
+import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.VaultFiles;
 import org.elastos.hive.vendor.vault.VaultOptions;
 import org.junit.BeforeClass;
@@ -11,17 +13,14 @@ import org.junit.runners.MethodSorters;
 import java.awt.Desktop;
 import java.io.ByteArrayOutputStream;
 import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
-import okio.Buffer;
-
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -34,7 +33,6 @@ public class FileTest {
     private static final String authToken = "eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAifQ.eyJpc3MiOiAiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsICJzdWIiOiAiRElEQXV0aENyZWRlbnRpYWwiLCAiYXVkIjogIkhpdmUiLCAiaWF0IjogMTU5Njc2NDk3NCwgImV4cCI6IDE1OTY3NzQ5NzQsICJuYmYiOiAxNTk2NzY0OTc0LCAidnAiOiB7InR5cGUiOiAiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiIsICJjcmVhdGVkIjogIjIwMjAtMDgtMDdUMDE6NDk6MzNaIiwgInZlcmlmaWFibGVDcmVkZW50aWFsIjogW3siaWQiOiAiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSNkaWRhcHAiLCAidHlwZSI6IFsiIl0sICJpc3N1ZXIiOiAiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsICJpc3N1YW5jZURhdGUiOiAiMjAyMC0wOC0wN1QwMTo0OTozM1oiLCAiZXhwaXJhdGlvbkRhdGUiOiAiMjAyNC0xMi0yN1QwODo1MzoyN1oiLCAiY3JlZGVudGlhbFN1YmplY3QiOiB7ImlkIjogImRpZDplbGFzdG9zOmlqVW5ENEtlUnBlQlVGbWNFRENiaHhNVEpSelVZQ1FDWk0iLCAiYXBwRGlkIjogImRpZDplbGFzdG9zOmlqVW5ENEtlUnBlQlVGbWNFRENiaHhNVEpSelVZQ1FDWk0iLCAicHVycG9zZSI6ICJkaWQ6ZWxhc3RvczppZWFBNVZNV3lkUW1WSnRNNWRhVzVob1RRcGN1VjM4bUhNIiwgInNjb3BlIjogWyJyZWFkIiwgIndyaXRlIl0sICJ1c2VyRGlkIjogImRpZDplbGFzdG9zOmlXRkFVWWhUYTM1YzFmUGUzaUNKdmloWkh4NnF1dW1ueW0ifSwgInByb29mIjogeyJ0eXBlIjogIkVDRFNBc2VjcDI1NnIxIiwgInZlcmlmaWNhdGlvbk1ldGhvZCI6ICJkaWQ6ZWxhc3RvczppalVuRDRLZVJwZUJVRm1jRURDYmh4TVRKUnpVWUNRQ1pNI3ByaW1hcnkiLCAic2lnbmF0dXJlIjogIlN4RlkxQW5GLXhsU2dCTDUzYW5YdDRFOHFWNEptd0NkYUNXQVo4QmFpdnFKSTkwV2xkQ3Q4XzdHejllSm0zSlRNQTMxQjBrem5sSmVEUkJ3LXcyUU53In19XSwgInByb29mIjogeyJ0eXBlIjogIkVDRFNBc2VjcDI1NnIxIiwgInZlcmlmaWNhdGlvbk1ldGhvZCI6ICJkaWQ6ZWxhc3RvczppalVuRDRLZVJwZUJVRm1jRURDYmh4TVRKUnpVWUNRQ1pNI3ByaW1hcnkiLCAicmVhbG0iOiAidGVzdGFwcCIsICJub25jZSI6ICI4NzMxNzJmNTg3MDFhOWVlNjg2ZjA2MzAyMDRmZWU1OSIsICJzaWduYXR1cmUiOiAidDYxV3dFM1pqR21EdktfZmtJM3h0ZkRGczFpNUFxVXVjZFIteEVDSVlzLTB4dHpNWGE2RTlkS0RFanJ3V2xwRjRUWElsTHduZlJWZXgzRl9KN0F6cUEifX19.";
 
     private static final String storePath = System.getProperty("user.dir");
-    private static final String remoteFile = "test.txt";
     private String stringReader = "this is test for reader";
 
     private static Client client;
@@ -43,13 +41,78 @@ public class FileTest {
 
     private static VaultFiles filesApi;
 
-    private String uploadUrl = "api/v1/files/uploader/test.txt"; ///api/v1/files/uploader/test.txt
+    private static final String folder = "cache/";
+    private static final String remoteFile = folder + "test.txt";
+
+    private String uploadUrl = "api/v1/files/uploader/cache/test.txt"; ///api/v1/files/uploader/test.txt
+
+
+    @Test
+    public void test_00_Prepare() {
+        try {
+            filesApi.createFolder(folder, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    try {
+                        filesApi.list(folder, new Callback<ArrayList<String>>() {
+                            @Override
+                            public void onError(HiveException e) {
+                                fail();
+                            }
+
+                            @Override
+                            public void onSuccess(ArrayList<String> result) {
+                                assertTrue(true);
+                            }
+                        }).get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 
     @Test
     public void test_create_file() {
         try {
-            uploadUrl = filesApi.createFile(remoteFile).get();
-            assertFalse(uploadUrl == null);
+            uploadUrl = filesApi.createFile(remoteFile, new Callback<String>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
+
+                @Override
+                public void onSuccess(String result) {
+                    try {
+                        filesApi.list(folder, new Callback<ArrayList<String>>() {
+                            @Override
+                            public void onError(HiveException e) {
+                                fail();
+                            }
+
+                            @Override
+                            public void onSuccess(ArrayList<String> result) {
+                                assertTrue(true);
+                            }
+                        }).get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).get();
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -59,8 +122,17 @@ public class FileTest {
     @Test
     public void test_upload_file() {
         try {
-            filesApi.upload(uploadUrl, stringReader.getBytes(), remoteFile);
-            assertFalse(uploadUrl == null);
+            filesApi.upload(uploadUrl, stringReader.getBytes(), remoteFile, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    assertTrue(true);
+                }
+            }).get();
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -74,10 +146,6 @@ public class FileTest {
             OutputStream output = new ByteArrayOutputStream();
             long size = filesApi.downloader(remoteFile, output).get();
             assertNotEquals(size, 0);
-
-//            File file = new File(testFile);
-//            assertEquals(file.length(), size);
-//            assertEquals(readFromInputStream(new FileInputStream(testFile)),output.toString());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -86,28 +154,31 @@ public class FileTest {
 
     @Test
     public void test_download_file02() {
-
         try {
             Writer writer = new CharArrayWriter();
             long size = filesApi.downloader(remoteFile, writer).get();
             assertNotEquals(size, 0);
-//            assertEquals(stringReader, writer.toString());
-//            assertEquals(stringReader.length(), size);
         } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
     }
 
-    @Test
-    public void test_list_file() {
-
-    }
 
     @Test
     public void test_delete_file() {
         try {
-            filesApi.deleteFile(remoteFile);
+            filesApi.deleteFile(remoteFile, new Callback<Void>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    assertTrue(true);
+                }
+            }).get();
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -142,21 +213,4 @@ public class FileTest {
             fail(e.getMessage());
         }
     }
-
-    private String readFromInputStream(InputStream inputStream) {
-        try {
-            Buffer buffer = new Buffer();
-            byte[] bytes = new byte[1024];
-            int len;
-            while ((len = inputStream.read(bytes)) != -1) {
-                buffer.write(bytes, 0, len);
-            }
-            return buffer.readUtf8();
-        } catch (IOException e) {
-            e.printStackTrace();
-            assertNull(e);
-        }
-        return "";
-    }
-
 }

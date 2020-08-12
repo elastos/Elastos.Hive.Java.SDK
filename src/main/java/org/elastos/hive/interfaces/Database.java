@@ -12,14 +12,7 @@ public interface Database {
      */
     CompletableFuture<Void> createCol(String collection, String schema);
 
-    CompletableFuture<Void> createCol(String collection, String schema, Callback<Long> callback);
-
-    /**
-     * @param collection
-     */
-    CompletableFuture<Void> dropCol(String collection);
-
-    CompletableFuture<Void> dropCol(String collection, Callback<Long> callback);
+    CompletableFuture<Void> createCol(String collection, String schema, Callback<Void> callback);
 
     /**
      * @param collection
@@ -29,7 +22,7 @@ public interface Database {
      */
     CompletableFuture<String> insert(String collection, String item);
 
-    CompletableFuture<String> insert(String collection, String item, Callback<Long> callback);
+    CompletableFuture<String> insert(String collection, String item, Callback<String> callback);
 
     /**
      * @param collection
@@ -39,7 +32,7 @@ public interface Database {
      */
     CompletableFuture<String> query(String collection, String where);
 
-    CompletableFuture<String> query(String collection, String where, Callback<Long> callback);
+    CompletableFuture<String> query(String collection, String where, Callback<String> callback);
 
     /**
      *
@@ -51,7 +44,7 @@ public interface Database {
      */
     CompletableFuture<String> put(String collection, String _id, String etag, String item);
 
-    CompletableFuture<String> put(String collection, String _id, String etag, String item, Callback<Long> callback);
+    CompletableFuture<String> put(String collection, String _id, String etag, String item, Callback<String> callback);
 
     /**
      *
@@ -63,7 +56,7 @@ public interface Database {
      */
     CompletableFuture<String> patch(String collection, String _id, String etag, String item);
 
-    CompletableFuture<String> patch(String collection, String _id, String etag, String item, Callback<Long> callback);
+    CompletableFuture<String> patch(String collection, String _id, String etag, String item, Callback<String> callback);
 
     /**
      *
@@ -75,6 +68,6 @@ public interface Database {
      */
     CompletableFuture<String> delete(String collection, String _id, String etag);
 
-    CompletableFuture<String> delete(String collection, String _id, String etag, Callback<Long> callback);
+    CompletableFuture<String> delete(String collection, String _id, String etag, Callback<String> callback);
 
 }
