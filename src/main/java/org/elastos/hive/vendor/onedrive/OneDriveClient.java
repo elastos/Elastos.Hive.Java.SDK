@@ -5,9 +5,11 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.interfaces.Database;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
+import org.elastos.hive.interfaces.VaultFiles;
 import org.elastos.hive.utils.DigitalUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
@@ -68,8 +70,18 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     }
 
     @Override
+    public VaultFiles getVaultFiles() {
+        return null;
+    }
+
+    @Override
     public IPFS getIPFS() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Database getDatabase() {
+        return null;
     }
 
     @Override

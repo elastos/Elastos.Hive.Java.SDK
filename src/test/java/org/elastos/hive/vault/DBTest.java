@@ -3,98 +3,79 @@ package org.elastos.hive.vault;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.elastos.hive.Client;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.Database;
-import org.elastos.hive.vendor.vault.DatabaseImp;
 import org.elastos.hive.vendor.vault.VaultOptions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.awt.Desktop;
+import java.net.URI;
 import java.util.Map;
 
+import static org.junit.Assert.fail;
+
 public class DBTest {
-    private static final String NODEURL = "http://127.0.0.1:5000";
+    private static final String clientId = "1098324333865-q7he5l91a4pqnuq9s2pt5btj9kenebkl.apps.googleusercontent.com";
+    private static final String clientSecret = "0Ekmgx8dPbSxnTxxF-fqxjnz";
+    private static final String redirectUri = "http://localhost:12345";
+    private static final String nodeUrl = "http://127.0.0.1:5000";
+
+    private static final String authToken = "eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAifQ.eyJpc3MiOiAiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsICJzdWIiOiAiRElEQXV0aENyZWRlbnRpYWwiLCAiYXVkIjogIkhpdmUiLCAiaWF0IjogMTU5Njc2NDk3NCwgImV4cCI6IDE1OTY3NzQ5NzQsICJuYmYiOiAxNTk2NzY0OTc0LCAidnAiOiB7InR5cGUiOiAiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiIsICJjcmVhdGVkIjogIjIwMjAtMDgtMDdUMDE6NDk6MzNaIiwgInZlcmlmaWFibGVDcmVkZW50aWFsIjogW3siaWQiOiAiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSNkaWRhcHAiLCAidHlwZSI6IFsiIl0sICJpc3N1ZXIiOiAiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsICJpc3N1YW5jZURhdGUiOiAiMjAyMC0wOC0wN1QwMTo0OTozM1oiLCAiZXhwaXJhdGlvbkRhdGUiOiAiMjAyNC0xMi0yN1QwODo1MzoyN1oiLCAiY3JlZGVudGlhbFN1YmplY3QiOiB7ImlkIjogImRpZDplbGFzdG9zOmlqVW5ENEtlUnBlQlVGbWNFRENiaHhNVEpSelVZQ1FDWk0iLCAiYXBwRGlkIjogImRpZDplbGFzdG9zOmlqVW5ENEtlUnBlQlVGbWNFRENiaHhNVEpSelVZQ1FDWk0iLCAicHVycG9zZSI6ICJkaWQ6ZWxhc3RvczppZWFBNVZNV3lkUW1WSnRNNWRhVzVob1RRcGN1VjM4bUhNIiwgInNjb3BlIjogWyJyZWFkIiwgIndyaXRlIl0sICJ1c2VyRGlkIjogImRpZDplbGFzdG9zOmlXRkFVWWhUYTM1YzFmUGUzaUNKdmloWkh4NnF1dW1ueW0ifSwgInByb29mIjogeyJ0eXBlIjogIkVDRFNBc2VjcDI1NnIxIiwgInZlcmlmaWNhdGlvbk1ldGhvZCI6ICJkaWQ6ZWxhc3RvczppalVuRDRLZVJwZUJVRm1jRURDYmh4TVRKUnpVWUNRQ1pNI3ByaW1hcnkiLCAic2lnbmF0dXJlIjogIlN4RlkxQW5GLXhsU2dCTDUzYW5YdDRFOHFWNEptd0NkYUNXQVo4QmFpdnFKSTkwV2xkQ3Q4XzdHejllSm0zSlRNQTMxQjBrem5sSmVEUkJ3LXcyUU53In19XSwgInByb29mIjogeyJ0eXBlIjogIkVDRFNBc2VjcDI1NnIxIiwgInZlcmlmaWNhdGlvbk1ldGhvZCI6ICJkaWQ6ZWxhc3RvczppalVuRDRLZVJwZUJVRm1jRURDYmh4TVRKUnpVWUNRQ1pNI3ByaW1hcnkiLCAicmVhbG0iOiAidGVzdGFwcCIsICJub25jZSI6ICI4NzMxNzJmNTg3MDFhOWVlNjg2ZjA2MzAyMDRmZWU1OSIsICJzaWduYXR1cmUiOiAidDYxV3dFM1pqR21EdktfZmtJM3h0ZkRGczFpNUFxVXVjZFIteEVDSVlzLTB4dHpNWGE2RTlkS0RFanJ3V2xwRjRUWElsTHduZlJWZXgzRl9KN0F6cUEifX19.";
+
+    private static final String storePath = System.getProperty("user.dir");
 
     private static Database database;
-    private String testCollection = "works";
-    private String testSchema = "'item_title': 'person',\n" +
-            "    'additional_lookup': {\n" +
-            "        'url': 'regex(\"[\\w]+\")',\n" +
-            "        'field': 'lastname'\n" +
-            "    },\n" +
-            "\n" +
-            "    'schema': {\n" +
-            "        'firstname': {\n" +
-            "            'type': 'string',\n" +
-            "            'minlength': 1,\n" +
-            "            'maxlength': 10,\n" +
-            "        },\n" +
-            "        'lastname': {\n" +
-            "            'type': 'string',\n" +
-            "            'minlength': 1,\n" +
-            "            'maxlength': 15,\n" +
-            "            'required': True,\n" +
-            "            'unique': True,\n" +
-            "        },\n" +
-            "        'role': {\n" +
-            "            'type': 'list',\n" +
-            "            'allowed': [\"author\", \"contributor\", \"copy\"],\n" +
-            "        },\n" +
-            "        'location': {\n" +
-            "            'type': 'dict',\n" +
-            "            'schema': {\n" +
-            "                'address': {'type': 'string'},\n" +
-            "                'city': {'type': 'string'}\n" +
-            "            },\n" +
-            "        },\n" +
-            "        'born': {\n" +
-            "            'type': 'datetime',\n" +
-            "        },\n" +
-            "    }";
+    private static Client client;
 
-    private String item = "{\"firstname\": \"barack01\", \"lastname\": \"obama01\"}";
+    private String testCollection = "people08";
+    private String testSchema = "{\"firstname\":{\"type\":\"string\",\"minlength\":1,\"maxlength\":10},\"lastname\":{\"type\":\"string\",\"minlength\":1,\"maxlength\":15,\"required\":true,\"unique\":true}}";
 
-    private String itemPut = "{\"firstname\": \"barack02\", \"lastname\": \"obama02\"}";
+    private String item = "{\"firstname\": \"barack\", \"lastname\": \"obama\"}";
 
-    private String itemPatch = "{\"firstname\": \"barack03\", \"lastname\": \"obama03\"}";
+    private String itemPut = "{\"firstname\": \"barack\", \"lastname\": \"obama\"}";
 
-    private String queryParams = "where=lastname==\"obama01\""; //sort=-lastname，max_results=1&page=1，where={"lastname":"obama01"}
+    private String itemPatch = "{\"firstname\": \"barack\", \"lastname\": \"obama\"}";
 
-    @BeforeClass
-    public static void  setUp() {
-
-        try {
-            Client.Options options = new VaultOptions
-                    .Builder()
-                    .setNodeUrl(NODEURL)
-                    .build();
-        } catch (HiveException e) {
-            e.printStackTrace();
-        }
-
-        database = new DatabaseImp();
-    }
+    private String queryParams = "where=lastname==\"obama\""; //sort=-lastname，max_results=1&page=1，where={"lastname":"obama"}
 
     @Test
     public void testCreate() {
-        database.createCol(testCollection, testSchema);
+        try {
+            database.createCol(testCollection, testSchema).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
     }
 
     @Test
-    public void testPost() {
-        database.post(testCollection, item);
+    public void testInsert() {
+        try {
+            database.insert(testCollection, item).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
     }
 
     @Test
-    public void testGet() {
-        database.get(testCollection, queryParams);
+    public void testQuery() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String ret = database.query(testCollection, queryParams).get();
+            Map<String, Object> testMapDes = mapper.readValue(ret, Map.class);
+            System.out.println("map:" + testMapDes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
     }
 
     @Test
     public void testPut() {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            String ret = database.get(testCollection, queryParams).get();
+            String ret = database.query(testCollection, queryParams).get();
             Map<String, Object> testMapDes = mapper.readValue(ret, Map.class);
             System.out.println("map:" + testMapDes);
             String _id = (String) testMapDes.get("_id");
@@ -103,6 +84,7 @@ public class DBTest {
 
         } catch (Exception e) {
             e.printStackTrace();
+            fail();
         }
     }
 
@@ -110,7 +92,7 @@ public class DBTest {
     public void testPatch() {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            String ret = database.get(testCollection, queryParams).get();
+            String ret = database.query(testCollection, queryParams).get();
             Map<String, Object> testMapDes = mapper.readValue(ret, Map.class);
             System.out.println("map:" + testMapDes);
             String _id = (String) testMapDes.get("_id");
@@ -118,6 +100,7 @@ public class DBTest {
             database.patch(testCollection, _id, _etag, itemPatch);
         } catch (Exception e) {
             e.printStackTrace();
+            fail();
         }
     }
 
@@ -125,7 +108,7 @@ public class DBTest {
     public void testDelete() {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            String ret = database.get(testCollection, queryParams).get();
+            String ret = database.query(testCollection, queryParams).get();
             Map<String, Object> testMapDes = mapper.readValue(ret, Map.class);
             System.out.println("map:" + testMapDes);
             String _id = (String) testMapDes.get("_id");
@@ -133,11 +116,36 @@ public class DBTest {
             database.delete(testCollection, _id, _etag);
         } catch (Exception e) {
             e.printStackTrace();
+            fail();
         }
     }
 
-    @Test
-    public void testDrop() {
-        database.dropCol(testCollection);
+    @BeforeClass
+    public static void setUp() {
+        try {
+            Client.Options options = new VaultOptions
+                    .Builder()
+                    .setNodeUrl(nodeUrl)
+                    .setClientId(clientId)
+                    .setClientSecret(clientSecret)
+                    .setRedirectURL(redirectUri)
+                    .setAuthToken(authToken)
+                    .setStorePath(storePath)
+                    .setAuthenticator(requestUrl -> {
+                        try {
+                            Desktop.getDesktop().browse(new URI(requestUrl));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            fail();
+                        }
+                    })
+                    .build();
+
+            client = Client.createInstance(options);
+            client.connect();
+            database = client.getDatabase();
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 }

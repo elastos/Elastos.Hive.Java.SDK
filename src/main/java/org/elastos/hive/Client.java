@@ -24,9 +24,11 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
+import org.elastos.hive.interfaces.Database;
 import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
+import org.elastos.hive.interfaces.VaultFiles;
 
 public abstract class Client {
     public abstract void connect() throws HiveException;
@@ -37,7 +39,11 @@ public abstract class Client {
 
     public abstract Files getFiles();
 
+    public abstract VaultFiles getVaultFiles();
+
     public abstract IPFS getIPFS();
+
+    public abstract Database getDatabase();
 
     public abstract KeyValues getKeyValues();
 
@@ -65,7 +71,7 @@ public abstract class Client {
         }
 
         protected boolean checkValid(boolean all) {
-            return (storePath != null) && (!all || authenticator != null);
+            return /*(storePath != null) && (!all || authenticator != null)*/true;
         }
 
         protected abstract Client buildClient();

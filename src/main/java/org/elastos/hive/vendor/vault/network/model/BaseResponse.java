@@ -20,7 +20,7 @@ public class BaseResponse {
         this._error = _error;
     }
 
-    private static class Error {
+    public static class Error {
         private String code;
         private String message;
 
@@ -36,8 +36,5 @@ public class BaseResponse {
             return message;
         }
 
-        public void setMessage(String message) {
-            this.message = message;
-        }
     }
 }
