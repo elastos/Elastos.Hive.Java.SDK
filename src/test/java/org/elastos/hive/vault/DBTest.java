@@ -2,9 +2,7 @@ package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.Database;
 import org.elastos.hive.vendor.vault.VaultOptions;
 import org.junit.BeforeClass;
@@ -14,7 +12,6 @@ import java.awt.Desktop;
 import java.net.URI;
 import java.util.Map;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class DBTest {
