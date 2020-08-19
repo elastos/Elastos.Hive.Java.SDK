@@ -3,6 +3,9 @@ package org.elastos.hive.interfaces.scripting.executables.database;
 import org.elastos.hive.interfaces.scripting.executables.Executable;
 import org.json.JSONObject;
 
+/**
+ * Client side representation of a back-end execution that runs a mongo "insert" query.
+ */
 public class InsertQuery extends Executable {
     private String collectionName;
     private JSONObject insertQuery;

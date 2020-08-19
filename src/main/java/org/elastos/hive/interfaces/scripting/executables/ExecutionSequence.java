@@ -2,6 +2,9 @@ package org.elastos.hive.interfaces.scripting.executables;
 
 import org.json.JSONArray;
 
+/**
+ * Convenient class to store and serialize a sequence of executables.
+ */
 public class ExecutionSequence {
     private Executable[] executables;
 

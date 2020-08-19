@@ -3,6 +3,10 @@ package org.elastos.hive.interfaces.scripting.executables.database;
 import org.elastos.hive.interfaces.scripting.executables.Executable;
 import org.json.JSONObject;
 
+/**
+ * Client side representation of a back-end execution that runs a mongo "find" query and returns some items
+ * as a result.
+ */
 public class FindQuery extends Executable {
     private String collectionName;
     private JSONObject findQuery;

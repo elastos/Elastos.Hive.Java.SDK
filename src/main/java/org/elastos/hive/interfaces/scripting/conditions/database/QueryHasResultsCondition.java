@@ -7,6 +7,8 @@ import org.json.JSONObject;
 
 /**
  * Vault script condition to check if a database query returns results or not.
+ * This is a way for example to check is a user is in a group, if a message contains comments, if a user
+ * is in a list, etc.
  */
 public class QueryHasResultsCondition extends Condition {
     private String collectionName;
