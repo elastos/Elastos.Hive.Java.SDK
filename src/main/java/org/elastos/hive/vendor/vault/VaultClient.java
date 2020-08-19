@@ -10,6 +10,10 @@ import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
 import org.elastos.hive.interfaces.VaultFiles;
+import org.elastos.hive.interfaces.scripting.Scripting;
+import org.elastos.hive.interfaces.scripting.conditions.Condition;
+import org.elastos.hive.interfaces.scripting.executables.Executable;
+import org.elastos.hive.interfaces.scripting.executables.ExecutionSequence;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.vault.network.VaultApi;
@@ -31,7 +35,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-public class VaultClient extends Client implements VaultFiles, Database {
+public class VaultClient extends Client implements VaultFiles, Database, Scripting {
 
     private Authenticator authenticator;
     private VaultAuthHelper authHelper;
@@ -92,6 +96,11 @@ public class VaultClient extends Client implements VaultFiles, Database {
     @Override
     public KeyValues getKeyValues() {
         return null;
+    }
+
+    @Override
+    public Scripting getScripting() {
+        return this;
     }
 
     private RequestBody createWriteRequestBody(byte[] data) {
@@ -667,5 +676,60 @@ public class VaultClient extends Client implements VaultFiles, Database {
 
     private <T> Callback<T> getCallback(Callback<T> callback) {
         return (null == callback ? new NullCallback<T>() : callback);
+    }
+
+    /*
+     * VAULT SCRIPTS
+     */
+
+    @Override
+    public CompletableFuture<Void> registerSubCondition(String conditionName, Condition condition) {
+        JSONObject httpPayload = new JSONObject();
+
+        httpPayload.put("conditionName", conditionName);
+        httpPayload.put("condition", condition.toJSON());
+
+        // TODO: Call the HTTP method to register the sub condition
+
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<Void> setScript(String functionName, ExecutionSequence executionSequence) {
+        return this.setScript(functionName, executionSequence, null);
+    }
+
+    @Override
+    public CompletableFuture<Void> setScript(String functionName, ExecutionSequence executionSequence, Condition accessCondition) {
+        JSONObject httpPayload = new JSONObject();
+
+        httpPayload.put("scriptName", functionName);
+        httpPayload.put("executionSequence", executionSequence.toJSON());
+
+        if (accessCondition != null)
+            httpPayload.put("accessCondition", accessCondition.toJSON());
+
+        // TODO: Call the HTTP method to set the script
+
+        return null;
+    }
+
+    @Override
+    public CompletableFuture<JSONObject> call(String functionName) {
+        return this.call(functionName, null);
+    }
+
+    @Override
+    public CompletableFuture<JSONObject> call(String functionName, JSONObject params) {
+        JSONObject httpPayload = new JSONObject();
+
+        httpPayload.put("scriptName", functionName);
+
+        if (params != null)
+            httpPayload.put("params", params);
+
+        // TODO: Call the HTTP method to call the script
+
+        return null;
     }
 }

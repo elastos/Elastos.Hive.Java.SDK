@@ -29,6 +29,7 @@ import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
 import org.elastos.hive.interfaces.VaultFiles;
+import org.elastos.hive.interfaces.scripting.Scripting;
 
 public abstract class Client {
     public abstract void connect() throws HiveException;
@@ -46,6 +47,8 @@ public abstract class Client {
     public abstract Database getDatabase();
 
     public abstract KeyValues getKeyValues();
+
+    public abstract Scripting getScripting();
 
     public static abstract class Options {
         private String storePath;

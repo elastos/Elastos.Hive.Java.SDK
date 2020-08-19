@@ -10,6 +10,7 @@ import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
 import org.elastos.hive.interfaces.VaultFiles;
+import org.elastos.hive.interfaces.scripting.Scripting;
 import org.elastos.hive.utils.DigitalUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
@@ -87,6 +88,11 @@ final class OneDriveClient extends Client implements Files, KeyValues {
     @Override
     public KeyValues getKeyValues() {
         return this;
+    }
+
+    @Override
+    public Scripting getScripting() {
+        return null;
     }
 
     private <T> Callback<T> getCallback(Callback<T> callback) {
