@@ -1,4 +1,4 @@
-package org.elastos.hive;
+package org.elastos.hive.file;
 
 import java.util.Date;
 
