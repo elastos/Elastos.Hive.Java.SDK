@@ -4,7 +4,7 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.FileInfo;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.interfaces.VaultFiles;
+import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.vault.network.VaultApi;
@@ -25,7 +25,7 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-class ClientFile implements VaultFiles {
+class ClientFile implements Files {
 
     private VaultAuthHelper authHelper;
 
@@ -41,37 +41,36 @@ class ClientFile implements VaultFiles {
 
     @Override
     public CompletableFuture<Writer> upload(String path, Callback<Writer> callback) {
-//        return authHelper.checkValid()
-//                .thenCompose(result -> uploadImp(path, callback));
-        return null;
+        return authHelper.checkValid()
+                .thenCompose(result -> uploadImp(path, callback));
     }
 
-//    private CompletableFuture<Writer> uploadImp(String path, Callback<Writer> callback) {
-//
-//        return CompletableFuture.runAsync(() -> {
-//            try {
-//                RequestBody requestBody = createWriteRequestBody(null);
-//                Response response = ConnectionManager.getHiveVaultApi()
-//                        .uploadFile(path, requestBody)
-//                        .execute();
-//                if (response == null)
-//                    throw new HiveException(HiveException.ERROR);
-//
-//                int responseCode = checkResponseCode(response);
-//                if (responseCode == 404) {
-//                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-//                } else if (responseCode != 0) {
-//                    throw new HiveException(HiveException.ERROR);
-//                }
-//                callback.onSuccess(null);
-//                return new FileWriter(new OutputStreamWriter());
-//            } catch (Exception e) {
-//                HiveException exception = new HiveException(e.getLocalizedMessage());
-//                callback.onError(exception);
-//                throw new CompletionException(exception);
-//            }
-//        });
-//    }
+    private CompletableFuture<Writer> uploadImp(String path, Callback<Writer> callback) {
+
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                RequestBody requestBody = createWriteRequestBody(null);
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .uploadFile(path, requestBody)
+                        .execute();
+                if (response == null)
+                    throw new HiveException(HiveException.ERROR);
+
+                int responseCode = checkResponseCode(response);
+                if (responseCode == 404) {
+                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
+                } else if (responseCode != 0) {
+                    throw new HiveException(HiveException.ERROR);
+                }
+                callback.onSuccess(null);
+                return ResponseHelper.writeToWriter(response);
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
+            }
+        });
+    }
 
     @Override
     public CompletableFuture<Reader> download(String path) {

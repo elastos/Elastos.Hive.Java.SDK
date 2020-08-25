@@ -1,8 +1,8 @@
 package org.elastos.hive.vendor.vault;
 
-import org.elastos.hive.interfaces.scripting.Scripting;
-import org.elastos.hive.interfaces.scripting.conditions.Condition;
-import org.elastos.hive.interfaces.scripting.executables.ExecutionSequence;
+import org.elastos.hive.interfaces.Scripting;
+import org.elastos.hive.scripting.conditions.Condition;
+import org.elastos.hive.scripting.executables.ExecutionSequence;
 import org.json.JSONObject;
 
 import java.util.concurrent.CompletableFuture;

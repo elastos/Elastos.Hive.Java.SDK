@@ -25,11 +25,9 @@ package org.elastos.hive;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.interfaces.Database;
-import org.elastos.hive.interfaces.Files;
-import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
-import org.elastos.hive.interfaces.VaultFiles;
-import org.elastos.hive.interfaces.scripting.Scripting;
+import org.elastos.hive.interfaces.Scripting;
+import org.elastos.hive.interfaces.Files;
 
 public abstract class Client {
     public abstract void connect() throws HiveException;
@@ -38,11 +36,8 @@ public abstract class Client {
 
     public abstract boolean isConnected();
 
-    public abstract Files getFiles();
 
-    public abstract VaultFiles getVaultFiles();
-
-    public abstract IPFS getIPFS();
+    public abstract Files getVaultFiles();
 
     public abstract Database getDatabase();
 

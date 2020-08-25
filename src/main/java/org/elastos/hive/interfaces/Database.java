@@ -1,73 +1,54 @@
 package org.elastos.hive.interfaces;
 
-import org.elastos.hive.Callback;
+import com.fasterxml.jackson.databind.JsonNode;
 
+import org.elastos.hive.Callback;
+import org.elastos.hive.database.CountOptions;
+import org.elastos.hive.database.CreateCollectionOptions;
+import org.elastos.hive.database.DeleteOptions;
+import org.elastos.hive.database.DeleteResult;
+import org.elastos.hive.database.FindOptions;
+import org.elastos.hive.database.InsertOptions;
+import org.elastos.hive.database.InsertResult;
+import org.elastos.hive.database.UpdateOptions;
+import org.elastos.hive.database.UpdateResult;
+
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface Database {
 
-    /**
-     * @param collection
-     * @param schema
-     */
-    CompletableFuture<Void> createCol(String collection, String schema);
+    CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options);
+    CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options, Callback<Boolean> callback);
 
-    CompletableFuture<Void> createCol(String collection, String schema, Callback<Void> callback);
+    CompletableFuture<Boolean> deleteCollection(String name);
+    CompletableFuture<Boolean> deleteCollection(String name, Callback<Boolean> callback);
 
-    /**
-     * @param collection
-     * @param item
-     * @return
-     * @throws Exception
-     */
-    CompletableFuture<String> insert(String collection, String item);
+    CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options);
+    CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options, Callback<InsertResult> callback);
 
-    CompletableFuture<String> insert(String collection, String item, Callback<String> callback);
+    CompletableFuture<InsertResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options);
+    CompletableFuture<InsertResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertResult> callback);
 
-    /**
-     * @param collection
-     * @param where
-     * @return
-     * @throws Exception
-     */
-    CompletableFuture<String> query(String collection, String where);
+    CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options);
+    CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options, Callback<Long> callback);
 
-    CompletableFuture<String> query(String collection, String where, Callback<String> callback);
+    CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options);
+    CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options, Callback<JsonNode> callback);
 
-    /**
-     *
-     * @param _id
-     * @param etag
-     * @see <a href="https://docs.python-eve.org/en/stable/features.html#full-range-of-crud-operations">Data Integrity and Concurrency Control</a>
-     * @return
-     * @throws Exception
-     */
-    CompletableFuture<String> put(String collection, String _id, String etag, String item);
+    CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options);
+    CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options, Callback<List<JsonNode>> callback);
 
-    CompletableFuture<String> put(String collection, String _id, String etag, String item, Callback<String> callback);
+    CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
+    CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback);
 
-    /**
-     *
-     * @param _id
-     * @param etag
-     * @see <a href="https://docs.python-eve.org/en/stable/features.html#full-range-of-crud-operations">Data Integrity and Concurrency Control</a>
-     * @return
-     * @throws Exception
-     */
-    CompletableFuture<String> patch(String collection, String _id, String etag, String item);
+    CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
+    CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback);
 
-    CompletableFuture<String> patch(String collection, String _id, String etag, String item, Callback<String> callback);
+    CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options);
+    CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback);
 
-    /**
-     *
-     * @param _id
-     * @param etag
-     * @see <a href="https://docs.python-eve.org/en/stable/features.html#full-range-of-crud-operations">Data Integrity and Concurrency Control</a>
-     * @return
-     * @throws Exception
-     */
-    CompletableFuture<String> delete(String collection, String _id, String etag);
-
-    CompletableFuture<String> delete(String collection, String _id, String etag, Callback<String> callback);
+    CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options);
+    CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback);
 
 }

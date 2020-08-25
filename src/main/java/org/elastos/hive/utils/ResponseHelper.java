@@ -77,4 +77,8 @@ public class ResponseHelper {
     public static Reader writeToReader(Response response) {
         return null;
     }
+
+    public static Writer writeToWriter(Response response) {
+        return null;
+    }
 }

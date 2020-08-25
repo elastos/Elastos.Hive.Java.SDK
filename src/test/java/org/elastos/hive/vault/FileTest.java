@@ -3,7 +3,7 @@ package org.elastos.hive.vault;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.interfaces.VaultFiles;
+import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.vendor.vault.VaultOptions;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -39,7 +39,7 @@ public class FileTest {
 
     private String testFile = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
 
-    private static VaultFiles filesApi;
+    private static Files filesApi;
 
     private static final String folder = "cache/";
     private static final String remoteFile = folder + "test.txt";

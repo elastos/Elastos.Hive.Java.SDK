@@ -4,17 +4,15 @@ import org.elastos.hive.Authenticator;
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.Database;
-import org.elastos.hive.interfaces.Files;
-import org.elastos.hive.interfaces.IPFS;
 import org.elastos.hive.interfaces.KeyValues;
-import org.elastos.hive.interfaces.VaultFiles;
-import org.elastos.hive.interfaces.scripting.Scripting;
+import org.elastos.hive.interfaces.Scripting;
+import org.elastos.hive.interfaces.Files;
 
 public class VaultClient extends Client {
 
     private Authenticator authenticator;
     private VaultAuthHelper authHelper;
-    private VaultFiles files;
+    private Files files;
     private Database database;
     private Scripting scripting;
 
@@ -55,19 +53,8 @@ public class VaultClient extends Client {
     }
 
     @Override
-    public Files getFiles() {
-        return null;
-    }
-
-
-    @Override
-    public VaultFiles getVaultFiles() {
+    public Files getVaultFiles() {
         return this.files;
-    }
-
-    @Override
-    public IPFS getIPFS() {
-        return null;
     }
 
     @Override

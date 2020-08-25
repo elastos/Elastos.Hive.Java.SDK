@@ -1,57 +1,207 @@
 package org.elastos.hive.interfaces;
 
 import org.elastos.hive.Callback;
-import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.FileInfo;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface Files {
-    CompletableFuture<Void> put(String data, String remoteFile);
 
-    CompletableFuture<Void> put(String data, String remoteFile, Callback<Void> callback);
+    /**
 
-    CompletableFuture<Void> put(byte[] data, String remoteFile);
+     * Create a new folder.
+     *
+     * @param path the path for the remote folder
+     * @return the new CompletionStage, the result is true if the folder
+     *         successfully created; false otherwise
+     */
+    CompletableFuture<Boolean> createFolder(String path);
+    /**
 
-    CompletableFuture<Void> put(byte[] data, String remoteFile, Callback<Void> callback);
+     * Create a new folder.
+     *
+     * @param path the path for the remote folder
+     * @param callback the given Callback will be called once the operation
+     *         completes, either success or not
+     * @return the new CompletionStage, the result is true if the folder
+     *         successfully created; false otherwise
+     */
+    CompletableFuture<Boolean> createFolder(String path, Callback<Boolean> callback);
+    /**
 
-    CompletableFuture<Void> put(InputStream input, String remoteFile);
+     * Initiates an upload sequence by returning a Write object that can be
+     * used to write small file chunks. After writing, flush() must be called
+     * to actually send the data remotely.
+     *
+     * @param path the path for the remote file
+     * @return the new CompletionStage, the result is the Writer interface for
+     *      upload the file content if success; null otherwise
+     */
+    CompletableFuture<Writer> upload(String path);
+    /**
 
-    CompletableFuture<Void> put(InputStream input, String remoteFile, Callback<Void> callback);
+     * Initiates an upload sequence by returning a Write object that can be
+     * used to write small file chunks. After writing, flush() must be called
+     * to actually send the data remotely.
+     *
+     * @param path the path for the remote file
+     * @param callback the given Callback will be called once the operation
+     *         completes, either Writer or null
+     * @return the new CompletionStage, the result is the Writer interface for
+     *      upload the file content if success; null otherwise
+     */
+    CompletableFuture<Writer> upload(String path, Callback<Writer> callback);
+    /**
 
-    CompletableFuture<Void> put(Reader reader, String remoteFile);
+     * Initiates a download sequence by returning a Reader object that can
+     * be used to read the downloaded file in chunks.
+     *
+     * @param path the path for the remote file
+     * @return the new CompletionStage, the result is the Reader interface for
+     *      read the file content if success; null otherwise
+     */
+    CompletableFuture<Reader> download(String path);
+    /**
 
-    CompletableFuture<Void> put(Reader reader, String remoteFile, Callback<Void> callback);
+     * Initiates a download sequence by returning a Reader object that can
+     * be used to read the downloaded file in chunks.
+     *
+     * @param path the path for the remote file
+     * @param callback the given Callback will be called once the operation
+     *         completes, either Reader or null
+     * @return the new CompletionStage, the result is the Reader interface for
+     *      read the file content if success; null otherwise
+     */
+    CompletableFuture<Reader> download(String path, Callback<Reader> callback);
+    /**
 
-    CompletableFuture<Long> size(String remoteFile);
+     * Deletes a file, or a folder. In case the given path is a folder,
+     * deletion is recursive.
+     *
+     * @param path the path for the remote file or folder
+     * @return the new CompletionStage, the result is true if the file or folder
+     *         successfully deleted; false otherwise
+     */
+    CompletableFuture<Boolean> delete(String path);
+    /**
 
-    CompletableFuture<Long> size(String remoteFile, Callback<Long> callback);
+     * Deletes a file, or a folder. In case the given path is a folder,
+     * deletion is recursive.
+     *
+     * @param path the path for the remote file or folder
+     * @param callback the given Callback will be called once the operation
+     *         completes, either success or not
+     * @return the new CompletionStage, the result is true if the file or folder
+     *         successfully deleted; false otherwise
+     */
+    CompletableFuture<Boolean> delete(String path, Callback<Boolean> callback);
+    /**
 
-    CompletableFuture<String> getAsString(String remoteFile);
+     * Moves (or renames) a file or a folder.
+     *
+     * @param src the path for the remote source file or folder
+     * @param dest the path for the remote destination file or folder
+     * @return the new CompletionStage, the result is true if the file or folder
+     *         successfully moved; false otherwise
+     */
+    CompletableFuture<Boolean> move(String src, String dest);
+    /**
 
-    CompletableFuture<String> getAsString(String remoteFile, Callback<String> callback);
+     * Moves (or renames) a file or a folder.
+     *
+     * @param src the path for the remote source file or folder
+     * @param dest the path for the remote destination file or folder
+     * @param callback the given Callback will be called once the operation
+     *         completes, either success or not
+     * @return the new CompletionStage, the result is true if the file or folder
+     *         successfully moved; false otherwise
+     */
+    CompletableFuture<Boolean> move(String src, String dest, Callback<Boolean> callback);
+    /**
 
-    CompletableFuture<byte[]> getAsBuffer(String remoteFile);
+     * Copies a file or a folder (recursively).
+     *
+     * @param src the path for the remote source file or folder
+     * @param dest the path for the remote destination file or folder
+     * @return the new CompletionStage, the result is true if the file or folder
+     *         successfully copied; false otherwise
+     */
+    CompletableFuture<Boolean> copy(String src, String dest);
+    /**
 
-    CompletableFuture<byte[]> getAsBuffer(String remoteFile, Callback<byte[]> callback);
+     * Copies a file or a folder (recursively).
+     *
+     * @param src the path for the remote source file or folder
+     * @param dest the path for the remote destination file or folder
+     * @param callback the given Callback will be called once the operation
+     *         completes, either success or not
+     * @return the new CompletionStage, the result is true if the file or folder
+     *         successfully copied; false otherwise
+     */
+    CompletableFuture<Boolean> copy(String src, String dest, Callback<Boolean> callback);
+    /**
 
-    CompletableFuture<Long> get(String remoteFile, OutputStream output);
+     * Returns the SHA256 hash of the given file.
+     *
+     * @param path path for the remote file
+     * @return the new CompletionStage, the result is the base64 hash string
+     *         if the hash successfully calculated; null otherwise
+     */
+    CompletableFuture<String> hash(String path);
+    /**
 
-    CompletableFuture<Long> get(String remoteFile, OutputStream output, Callback<Long> callback);
+     * Returns the SHA256 hash of the given file.
+     *
+     * @param path the path for the remote file
+     * @param callback the given Callback will be called once the operation
+     *         completes, either hash or null
+     * @return the new CompletionStage, the result is the base64 hash string
+     *         if the hash successfully calculated; null otherwise
+     */
+    CompletableFuture<String> hash(String path, Callback<String> callback);
+    /**
 
-    CompletableFuture<Long> get(String remoteFile, Writer writer);
+     * Returns the list of all files in a given folder.
+     *
+     * @param path the path for the remote folder
+     * @return the new CompletionStage, the result is List<FileInfo>
+     *         if success; null otherwise
+     */
+    CompletableFuture<List<FileInfo>> list(String path);
+    /**
 
-    CompletableFuture<Long> get(String remoteFile, Writer writer, Callback<Long> callback);
+     * Returns the list of all files in a given folder.
+     *
+     * @param path the path for the remote folder
+     * @param callback the given Callback will be called once the operation
+     *         completes, either List<FileInfo> or null
+     * @return the new CompletionStage, the result is List<FileInfo>
+     *         if success; null otherwise
+     */
+    CompletableFuture<List<FileInfo>> list(String path, Callback<List<FileInfo>> callback);
+    /**
 
-    CompletableFuture<Void> delete(String remoteFile);
+     * Information about the target file or folder.
+     *
+     * @param path the path for the remote file or folder
+     * @return the new CompletionStage, the result is FileInfo
+     *         if success; null otherwise
+     */
+    CompletableFuture<FileInfo> stat(String path);
+    /**
 
-    CompletableFuture<Void> delete(String remoteFile, Callback<Void> callback);
-
-    CompletableFuture<ArrayList<String>> list();
-
-    CompletableFuture<ArrayList<String>> list(Callback<ArrayList<String>> callback);
+     * Information about the target file or folder.
+     *
+     * @param path the path for the remote file or folder
+     * @param callback the given Callback will be called once the operation
+     *         completes, either FileInfo or null
+     * @return the new CompletionStage, the result is FileInfo
+     *         if success; null otherwise
+     */
+    CompletableFuture<FileInfo> stat(String path, Callback<FileInfo> callback);
 }
