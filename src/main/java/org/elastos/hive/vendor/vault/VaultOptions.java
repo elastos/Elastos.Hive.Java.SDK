@@ -3,7 +3,6 @@ package org.elastos.hive.vendor.vault;
 import org.elastos.hive.Authenticator;
 import org.elastos.hive.Client;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.vendor.onedrive.OneDriveOptions;
 
 public class VaultOptions extends Client.Options {
 

@@ -35,91 +35,91 @@ public class ScriptingTest {
 
     private static final String GROUPS_COLLECTION_NAME = "groups";
 
-    private void registerSubConditionUserInGroup() {
-        JSONObject queryParams = new JSONObject();
-        queryParams.put("id", "$groupid"); // $groupid is passed by the calling script
-        queryParams.put("friends", new JSONObject("{$contains: \"$callerdid\"}")); // Forgot the right mongo syntax here.
-
-        Condition condition = new QueryHasResultsCondition(GROUPS_COLLECTION_NAME, queryParams);
-        scripting.registerSubCondition("userInGroup", condition);
-    }
-
-    @Test
-    public void testRegisterGetGroups() {
-        try {
-            ExecutionSequence executionSequence = new ExecutionSequence(new Executable[]{
-                    new FindQuery(GROUPS_COLLECTION_NAME)
-            });
-
-            scripting.setScript("getGroups", executionSequence).get();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void testRegisterGetGroupMessages() {
-        try {
-            registerSubConditionUserInGroup();
-
-            // Execution sequence
-            JSONObject queryParams = new JSONObject();
-            queryParams.put("id", "$groupid");
-            ExecutionSequence executionSequence = new ExecutionSequence( new Executable[] {
-                    new FindQuery(GROUPS_COLLECTION_NAME, queryParams)
-            });
-
-            // Access condition - user must be in the group to get messages
-            Condition accessCondition = new SubCondition("userInGroup");
-
-            // Register the script
-            scripting.setScript("getGroupMessages", executionSequence, accessCondition).get();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void testAddFriendToGroup() {
-        try {
-            database.patch(GROUPS_COLLECTION_NAME, "TODO", "TODO", "TODO");
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @BeforeClass
-    public static void setUp() {
-        try {
-            Client.Options options = new VaultOptions
-                    .Builder()
-                    .setNodeUrl(nodeUrl)
-                    .setClientId(clientId)
-                    .setClientSecret(clientSecret)
-                    .setRedirectURL(redirectUri)
-                    .setAuthToken(authToken)
-                    .setStorePath(storePath)
-                    .setAuthenticator(requestUrl -> {
-                        try {
-                            Desktop.getDesktop().browse(new URI(requestUrl));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            fail();
-                        }
-                    })
-                    .build();
-
-            client = Client.createInstance(options);
-            client.connect();
-            scripting = client.getScripting();
-            database = client.getDatabase();
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
+//    private void registerSubConditionUserInGroup() {
+//        JSONObject queryParams = new JSONObject();
+//        queryParams.put("id", "$groupid"); // $groupid is passed by the calling script
+//        queryParams.put("friends", new JSONObject("{$contains: \"$callerdid\"}")); // Forgot the right mongo syntax here.
+//
+//        Condition condition = new QueryHasResultsCondition(GROUPS_COLLECTION_NAME, queryParams);
+//        scripting.registerSubCondition("userInGroup", condition);
+//    }
+//
+//    @Test
+//    public void testRegisterGetGroups() {
+//        try {
+//            ExecutionSequence executionSequence = new ExecutionSequence(new Executable[]{
+//                    new FindQuery(GROUPS_COLLECTION_NAME)
+//            });
+//
+//            scripting.setScript("getGroups", executionSequence).get();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            fail();
+//        }
+//    }
+//
+//    @Test
+//    public void testRegisterGetGroupMessages() {
+//        try {
+//            registerSubConditionUserInGroup();
+//
+//            // Execution sequence
+//            JSONObject queryParams = new JSONObject();
+//            queryParams.put("id", "$groupid");
+//            ExecutionSequence executionSequence = new ExecutionSequence( new Executable[] {
+//                    new FindQuery(GROUPS_COLLECTION_NAME, queryParams)
+//            });
+//
+//            // Access condition - user must be in the group to get messages
+//            Condition accessCondition = new SubCondition("userInGroup");
+//
+//            // Register the script
+//            scripting.setScript("getGroupMessages", executionSequence, accessCondition).get();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            fail();
+//        }
+//    }
+//
+//    @Test
+//    public void testAddFriendToGroup() {
+//        try {
+////            database.patch(GROUPS_COLLECTION_NAME, "TODO", "TODO", "TODO");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            fail();
+//        }
+//    }
+//
+//    @BeforeClass
+//    public static void setUp() {
+//        try {
+//            Client.Options options = new VaultOptions
+//                    .Builder()
+//                    .setNodeUrl(nodeUrl)
+//                    .setClientId(clientId)
+//                    .setClientSecret(clientSecret)
+//                    .setRedirectURL(redirectUri)
+//                    .setAuthToken(authToken)
+//                    .setStorePath(storePath)
+//                    .setAuthenticator(requestUrl -> {
+//                        try {
+//                            Desktop.getDesktop().browse(new URI(requestUrl));
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            fail();
+//                        }
+//                    })
+//                    .build();
+//
+//            client = Client.createInstance(options);
+//            client.connect();
+//            scripting = client.getScripting();
+//            database = client.getDatabase();
+//        } catch (Exception e) {
+//            fail(e.getMessage());
+//        }
+//    }
 }

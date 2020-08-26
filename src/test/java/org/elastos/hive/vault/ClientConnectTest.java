@@ -26,51 +26,51 @@ public class ClientConnectTest {
 
     private static Client client;
 
-    @Test
-    public void testConnect() {
-        try {
-            assertFalse(client.isConnected());
-
-            client.connect();
-            assertTrue(client.isConnected());
-
-            client.disconnect();
-            assertFalse(client.isConnected());
-
-        } catch (HiveException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @BeforeClass
-    public static void setUp() {
-        try {
-            Client.Options options = new VaultOptions
-                    .Builder()
-                    .setNodeUrl(nodeUrl)
-                    .setClientId(clientId)
-                    .setClientSecret(clientSecret)
-                    .setRedirectURL(redirectUri)
-                    .setAuthToken(authToken)
-                    .setStorePath(storePath)
-                    .setAuthenticator(requestUrl -> {
-                        try {
-                            Desktop.getDesktop().browse(new URI(requestUrl));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            fail();
-                        }
-                    })
-                    .build();
-
-            client = Client.createInstance(options);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        client = null;
-    }
+//    @Test
+//    public void testConnect() {
+//        try {
+//            assertFalse(client.isConnected());
+//
+//            client.connect();
+//            assertTrue(client.isConnected());
+//
+//            client.disconnect();
+//            assertFalse(client.isConnected());
+//
+//        } catch (HiveException e) {
+//            fail(e.getMessage());
+//        }
+//    }
+//
+//    @BeforeClass
+//    public static void setUp() {
+//        try {
+//            Client.Options options = new VaultOptions
+//                    .Builder()
+//                    .setNodeUrl(nodeUrl)
+//                    .setClientId(clientId)
+//                    .setClientSecret(clientSecret)
+//                    .setRedirectURL(redirectUri)
+//                    .setAuthToken(authToken)
+//                    .setStorePath(storePath)
+//                    .setAuthenticator(requestUrl -> {
+//                        try {
+//                            Desktop.getDesktop().browse(new URI(requestUrl));
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            fail();
+//                        }
+//                    })
+//                    .build();
+//
+//            client = Client.createInstance(options);
+//        } catch (Exception e) {
+//            fail(e.getMessage());
+//        }
+//    }
+//
+//    @AfterClass
+//    public static void tearDown() {
+//        client = null;
+//    }
 }

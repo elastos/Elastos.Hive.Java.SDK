@@ -47,170 +47,32 @@ public class FileTest {
     private String uploadUrl = "api/v1/files/uploader/cache/test.txt"; ///api/v1/files/uploader/test.txt
 
 
-    @Test
-    public void test_00_Prepare() {
-        try {
-            filesApi.createFolder(folder, new Callback<Void>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                    try {
-                        filesApi.list(folder, new Callback<ArrayList<String>>() {
-                            @Override
-                            public void onError(HiveException e) {
-                                fail();
-                            }
-
-                            @Override
-                            public void onSuccess(ArrayList<String> result) {
-                                assertTrue(true);
-                            }
-                        }).get();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void test_create_file() {
-        try {
-            uploadUrl = filesApi.createFile(remoteFile, new Callback<String>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(String result) {
-                    try {
-                        filesApi.list(folder, new Callback<ArrayList<String>>() {
-                            @Override
-                            public void onError(HiveException e) {
-                                fail();
-                            }
-
-                            @Override
-                            public void onSuccess(ArrayList<String> result) {
-                                assertTrue(true);
-                            }
-                        }).get();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void test_upload_file() {
-        try {
-            filesApi.upload(uploadUrl, stringReader.getBytes(), remoteFile, new Callback<Void>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                    assertTrue(true);
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void test_download_file01() {
-
-        try {
-            OutputStream output = new ByteArrayOutputStream();
-            long size = filesApi.downloader(remoteFile, output).get();
-            assertNotEquals(size, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void test_download_file02() {
-        try {
-            Writer writer = new CharArrayWriter();
-            long size = filesApi.downloader(remoteFile, writer).get();
-            assertNotEquals(size, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-
-    @Test
-    public void test_delete_file() {
-        try {
-            filesApi.deleteFile(remoteFile, new Callback<Void>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                    assertTrue(true);
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @BeforeClass
-    public static void setUp() {
-        try {
-            Client.Options options = new VaultOptions
-                    .Builder()
-                    .setNodeUrl(nodeUrl)
-                    .setClientId(clientId)
-                    .setClientSecret(clientSecret)
-                    .setRedirectURL(redirectUri)
-                    .setAuthToken(authToken)
-                    .setStorePath(storePath)
-                    .setAuthenticator(requestUrl -> {
-                        try {
-                            Desktop.getDesktop().browse(new URI(requestUrl));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            fail();
-                        }
-                    })
-                    .build();
-
-            client = Client.createInstance(options);
-            client.connect();
-            filesApi = client.getVaultFiles();
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
+//    @BeforeClass
+//    public static void setUp() {
+//        try {
+//            Client.Options options = new VaultOptions
+//                    .Builder()
+//                    .setNodeUrl(nodeUrl)
+//                    .setClientId(clientId)
+//                    .setClientSecret(clientSecret)
+//                    .setRedirectURL(redirectUri)
+//                    .setAuthToken(authToken)
+//                    .setStorePath(storePath)
+//                    .setAuthenticator(requestUrl -> {
+//                        try {
+//                            Desktop.getDesktop().browse(new URI(requestUrl));
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            fail();
+//                        }
+//                    })
+//                    .build();
+//
+//            client = Client.createInstance(options);
+//            client.connect();
+//            filesApi = client.getVaultFiles();
+//        } catch (Exception e) {
+//            fail(e.getMessage());
+//        }
+//    }
 }

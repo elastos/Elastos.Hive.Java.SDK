@@ -38,114 +38,32 @@ public class DBTest {
 
     private String queryParams = "where=lastname==\"obama\""; //sort=-lastname，max_results=1&page=1，where={"lastname":"obama"}
 
-    @Test
-    public void testCreate() {
-        try {
-            database.createCol(testCollection, testSchema).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void testInsert() {
-        try {
-            database.insert(testCollection, item).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void testQuery() {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String ret = database.query(testCollection, queryParams).get();
-            Map<String, Object> testMapDes = mapper.readValue(ret, Map.class);
-            System.out.println("map:" + testMapDes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void testPut() {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String ret = database.query(testCollection, queryParams).get();
-            Map<String, Object> testMapDes = mapper.readValue(ret, Map.class);
-            System.out.println("map:" + testMapDes);
-            String _id = (String) testMapDes.get("_id");
-            String _etag = (String) testMapDes.get("_etag");
-            database.put(testCollection, _id, _etag, itemPut);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void testPatch() {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String ret = database.query(testCollection, queryParams).get();
-            Map<String, Object> testMapDes = mapper.readValue(ret, Map.class);
-            System.out.println("map:" + testMapDes);
-            String _id = (String) testMapDes.get("_id");
-            String _etag = (String) testMapDes.get("_etag");
-            database.patch(testCollection, _id, _etag, itemPatch);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
-    public void testDelete() {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String ret = database.query(testCollection, queryParams).get();
-            Map<String, Object> testMapDes = mapper.readValue(ret, Map.class);
-            System.out.println("map:" + testMapDes);
-            String _id = (String) testMapDes.get("_id");
-            String _etag = (String) testMapDes.get("_etag");
-            database.delete(testCollection, _id, _etag);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @BeforeClass
-    public static void setUp() {
-        try {
-            Client.Options options = new VaultOptions
-                    .Builder()
-                    .setNodeUrl(nodeUrl)
-                    .setClientId(clientId)
-                    .setClientSecret(clientSecret)
-                    .setRedirectURL(redirectUri)
-                    .setAuthToken(authToken)
-                    .setStorePath(storePath)
-                    .setAuthenticator(requestUrl -> {
-                        try {
-                            Desktop.getDesktop().browse(new URI(requestUrl));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            fail();
-                        }
-                    })
-                    .build();
-
-            client = Client.createInstance(options);
-            client.connect();
-            database = client.getDatabase();
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
+//    @BeforeClass
+//    public static void setUp() {
+//        try {
+//            Client.Options options = new VaultOptions
+//                    .Builder()
+//                    .setNodeUrl(nodeUrl)
+//                    .setClientId(clientId)
+//                    .setClientSecret(clientSecret)
+//                    .setRedirectURL(redirectUri)
+//                    .setAuthToken(authToken)
+//                    .setStorePath(storePath)
+//                    .setAuthenticator(requestUrl -> {
+//                        try {
+//                            Desktop.getDesktop().browse(new URI(requestUrl));
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                            fail();
+//                        }
+//                    })
+//                    .build();
+//
+//            client = Client.createInstance(options);
+//            client.connect();
+//            database = client.getDatabase();
+//        } catch (Exception e) {
+//            fail(e.getMessage());
+//        }
+//    }
 }

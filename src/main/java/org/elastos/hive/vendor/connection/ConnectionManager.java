@@ -24,30 +24,18 @@ package org.elastos.hive.vendor.connection;
 
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.vault.network.VaultApi;
-import org.elastos.hive.vendor.ipfs.network.IPFSApi;
-import org.elastos.hive.vendor.onedrive.network.AuthApi;
-import org.elastos.hive.vendor.onedrive.network.OneDriveApi;
 import org.elastos.hive.vendor.vault.network.VaultAuthApi;
 
 public class ConnectionManager {
 
-    private static AuthApi authApi;
     private static VaultAuthApi vaultAuthApi;
-    private static OneDriveApi oneDriveApi;
     private static VaultApi hivevaultApi;
-    private static IPFSApi ipfsApi;
 
     private static String hivevaultBaseUrl;
-    private static String onedriveBaseUrl;
     private static String authBaseUrl;
-    private static String ipfsBaseUrl ;
-
-    private static String authorization;
 
     private static BaseServiceConfig hivevaultConfig = new BaseServiceConfig.Builder().build() ;
-    private static BaseServiceConfig onedriveConfig = new BaseServiceConfig.Builder().build();
     private static BaseServiceConfig authConfig = new BaseServiceConfig.Builder().build();
-    private static BaseServiceConfig ipfsConfig = new BaseServiceConfig.Builder().build();
 
     public static VaultApi getHiveVaultApi() {
         if(hivevaultApi == null) {
@@ -57,26 +45,10 @@ public class ConnectionManager {
         return hivevaultApi;
     }
 
-    public static VaultApi getTestHiveVaultApi() {
-        if(hivevaultApi == null) {
-            hivevaultApi = BaseServiceUtil.createService(VaultApi.class,
-                    "http://127.0.0.1:5000", ConnectionManager.hivevaultConfig);
-        }
-        return hivevaultApi;
-    }
-
-    public static OneDriveApi getOnedriveApi() {
-        if (oneDriveApi == null)
-            oneDriveApi = BaseServiceUtil.createService(OneDriveApi.class,
-                    ConnectionManager.onedriveBaseUrl, ConnectionManager.onedriveConfig);
-        return oneDriveApi;
-    }
-
-    public static AuthApi getAuthApi() {
-        if (authApi == null)
-            authApi = BaseServiceUtil.createService(AuthApi.class,
-                    ConnectionManager.authBaseUrl, ConnectionManager.authConfig);
-        return authApi;
+    public static void resetAuthApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
+        vaultAuthApi = null;
+        updateAuthConfig(baseServiceConfig);
+        updateAuthBaseUrl(baseUrl);
     }
 
     public static VaultAuthApi getVaultAuthApi() {
@@ -87,50 +59,20 @@ public class ConnectionManager {
         return vaultAuthApi;
     }
 
-    public static IPFSApi getIPFSApi() {
-        if (ipfsApi == null)
-            ipfsApi = BaseServiceUtil.createService(IPFSApi.class,
-                    ConnectionManager.ipfsBaseUrl, ipfsConfig);
-
-        return ipfsApi;
-    }
-
     private static void updateHiveVaultConfig(BaseServiceConfig hivenvaultConfig) {
         ConnectionManager.hivevaultConfig = hivenvaultConfig;
-    }
-
-    private static void updateOneDriveConfig(BaseServiceConfig onedriveConfig) {
-        ConnectionManager.onedriveConfig = onedriveConfig;
     }
 
     private static void updateAuthConfig(BaseServiceConfig authConfig) {
         ConnectionManager.authConfig = authConfig;
     }
 
-    private static void updateIPFSConfig(BaseServiceConfig ipfsConfig) {
-        ConnectionManager.ipfsConfig = ipfsConfig;
-    }
-
     private static void updateHiveVaultBaseUrl(String hivevaultBaseUrl) {
         ConnectionManager.hivevaultBaseUrl = hivevaultBaseUrl;
     }
 
-    private static void updateOneDriveBaseUrl(String onedriveBaseUrl) {
-        ConnectionManager.onedriveBaseUrl = onedriveBaseUrl;
-    }
-
     private static void updateAuthBaseUrl(String authBaseUrl) {
         ConnectionManager.authBaseUrl = authBaseUrl;
-    }
-
-    private static void updateIPFSBaseUrl(String ipfsBaseUrl) {
-        ConnectionManager.ipfsBaseUrl = ipfsBaseUrl;
-    }
-
-    public static void resetAuthApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
-        authApi = null;
-        updateAuthConfig(baseServiceConfig);
-        updateAuthBaseUrl(baseUrl);
     }
 
     public static void resetHiveVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
@@ -139,15 +81,4 @@ public class ConnectionManager {
         updateHiveVaultConfig(baseServiceConfig);
     }
 
-    public static void resetOneDriveApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
-        oneDriveApi = null;
-        updateOneDriveBaseUrl(baseUrl);
-        updateOneDriveConfig(baseServiceConfig);
-    }
-
-    public static void resetIPFSApi(String baseUrl) {
-        ipfsApi = null;
-        updateIPFSBaseUrl(baseUrl);
-        updateIPFSConfig(new BaseServiceConfig.Builder().build());
-    }
 }
