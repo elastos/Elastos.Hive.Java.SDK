@@ -1,8 +1,11 @@
 package org.elastos.hive.database;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class Options<T extends Options<T>> extends HashMap<String, Object> {
 	private static final long serialVersionUID = -735828709324637994L;
@@ -49,8 +52,12 @@ public class Options<T extends Options<T>> extends HashMap<String, Object> {
 		return (T)this;
 	}
 
-	public String serialize() {
-		// TODO: serialize this options object to JSON string
-		return null;
+	public String serialize() throws IOException {
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Index.class, new Index.Serializer());
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(module);
+
+        return mapper.writer().writeValueAsString(this);
 	}
 }
