@@ -37,7 +37,7 @@ public abstract class Client {
     public abstract boolean isConnected();
 
 
-    public abstract Files getVaultFiles();
+    public abstract Files getFiles();
 
     public abstract Database getDatabase();
 

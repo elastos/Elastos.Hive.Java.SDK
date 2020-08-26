@@ -53,7 +53,7 @@ public class VaultClient extends Client {
     }
 
     @Override
-    public Files getVaultFiles() {
+    public Files getFiles() {
         return this.files;
     }
 
