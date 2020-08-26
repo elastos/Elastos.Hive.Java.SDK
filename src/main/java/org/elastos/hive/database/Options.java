@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-public class Options<T extends Options<T>> extends HashMap<String, Object> {
+public abstract class Options<T extends Options<T>> extends HashMap<String, Object> {
 	private static final long serialVersionUID = -735828709324637994L;
 
 	@SuppressWarnings("unchecked")
