@@ -1,18 +1,16 @@
 package org.elastos.hive.vault;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.elastos.hive.Client;
+import org.elastos.hive.database.Collation;
+import org.elastos.hive.database.Collation.Alternate;
+import org.elastos.hive.database.Collation.CaseFirst;
+import org.elastos.hive.database.FindOptions;
+import org.elastos.hive.database.Index;
 import org.elastos.hive.interfaces.Database;
-import org.elastos.hive.vendor.vault.VaultOptions;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.awt.Desktop;
-import java.net.URI;
-import java.util.Map;
-
-import static org.junit.Assert.fail;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DBTest {
     private static final String clientId = "1098324333865-q7he5l91a4pqnuq9s2pt5btj9kenebkl.apps.googleusercontent.com";
@@ -38,6 +36,31 @@ public class DBTest {
 
     private String queryParams = "where=lastname==\"obama\""; //sort=-lastname，max_results=1&page=1，where={"lastname":"obama"}
 
+	@Test
+	public void testDbOptions() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = "{\"name\":\"mkyong\", \"age\":37, \"c\":[\"adc\",\"zfy\",\"aaa\"], \"d\": {\"foo\": 1, \"bar\": 2}}";
+
+        JsonNode p = mapper.readTree(json);
+
+		Collation co = new Collation();
+		co.locale("en_us")
+			.alternate(Alternate.SHIFTED)
+			.backwards(true)
+			.caseFirst(CaseFirst.OFF)
+			.caseLevel(true);
+
+		FindOptions fo = new FindOptions();
+
+		fo.allowDiskUse(true)
+			.batchSize(100)
+			.collation(co)
+			.hint(new Index[] { new Index("didurl", Index.Order.ASCENDING), new Index("type", Index.Order.DESCENDING)})
+			.projection(p)
+			.max(10);
+
+		System.out.println(fo.serialize());
+	}
 //    @BeforeClass
 //    public static void setUp() {
 //        try {

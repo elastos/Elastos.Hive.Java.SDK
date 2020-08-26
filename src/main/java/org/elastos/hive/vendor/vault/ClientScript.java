@@ -1,11 +1,17 @@
 package org.elastos.hive.vendor.vault;
 
+import java.io.Reader;
+import java.util.concurrent.CompletableFuture;
+
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.Scripting;
-import org.elastos.hive.scripting.conditions.Condition;
-import org.elastos.hive.scripting.executables.ExecutionSequence;
+import org.elastos.hive.scripting.Condition;
+import org.elastos.hive.scripting.Executable;
 import org.json.JSONObject;
 
-import java.util.concurrent.CompletableFuture;
+import com.fasterxml.jackson.databind.JsonNode;
+
+// TODO: change org.json to Jackson
 
 class ClientScript implements Scripting {
 
@@ -16,11 +22,11 @@ class ClientScript implements Scripting {
     }
 
     @Override
-    public CompletableFuture<Void> registerSubCondition(String conditionName, Condition condition) {
+    public CompletableFuture<Boolean> registerCondition(String name, Condition condition) throws HiveException {
         JSONObject httpPayload = new JSONObject();
 
-        httpPayload.put("conditionName", conditionName);
-        httpPayload.put("condition", condition.toJSON());
+        httpPayload.put("conditionName", name);
+        httpPayload.put("condition", condition);
 
         // TODO: Call the HTTP method to register the sub condition
 
@@ -28,19 +34,21 @@ class ClientScript implements Scripting {
     }
 
     @Override
-    public CompletableFuture<Void> setScript(String functionName, ExecutionSequence executionSequence) {
-        return this.setScript(functionName, executionSequence, null);
+    public CompletableFuture<Boolean> registerScript(String name, Executable executable) throws HiveException {
+        return this.registerScript(name, null, executable);
     }
 
     @Override
-    public CompletableFuture<Void> setScript(String functionName, ExecutionSequence executionSequence, Condition accessCondition) {
+    public CompletableFuture<Boolean> registerScript(String name, Condition accessCondition, Executable executable) throws HiveException {
         JSONObject httpPayload = new JSONObject();
 
-        httpPayload.put("scriptName", functionName);
-        httpPayload.put("executionSequence", executionSequence.toJSON());
+        httpPayload.put("scriptName", name);
 
         if (accessCondition != null)
-            httpPayload.put("accessCondition", accessCondition.toJSON());
+            httpPayload.put("accessCondition", accessCondition);
+
+        httpPayload.put("executable", executable);
+
 
         // TODO: Call the HTTP method to set the script
 
@@ -48,15 +56,15 @@ class ClientScript implements Scripting {
     }
 
     @Override
-    public CompletableFuture<JSONObject> call(String functionName) {
-        return this.call(functionName, null);
+    public CompletableFuture<Reader> call(String scriptName) {
+        return this.call(scriptName, null);
     }
 
     @Override
-    public CompletableFuture<JSONObject> call(String functionName, JSONObject params) {
+    public CompletableFuture<Reader> call(String scriptName, JsonNode params) {
         JSONObject httpPayload = new JSONObject();
 
-        httpPayload.put("scriptName", functionName);
+        httpPayload.put("scriptName", scriptName);
 
         if (params != null)
             httpPayload.put("params", params);

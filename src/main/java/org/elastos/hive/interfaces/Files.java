@@ -1,37 +1,16 @@
 package org.elastos.hive.interfaces;
 
-import org.elastos.hive.Callback;
-import org.elastos.hive.file.FileInfo;
-
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.hive.Callback;
+import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.file.FileInfo;
+
 public interface Files {
-
     /**
-
-     * Create a new folder.
-     *
-     * @param path the path for the remote folder
-     * @return the new CompletionStage, the result is true if the folder
-     *         successfully created; false otherwise
-     */
-    CompletableFuture<Boolean> createFolder(String path);
-    /**
-
-     * Create a new folder.
-     *
-     * @param path the path for the remote folder
-     * @param callback the given Callback will be called once the operation
-     *         completes, either success or not
-     * @return the new CompletionStage, the result is true if the folder
-     *         successfully created; false otherwise
-     */
-    CompletableFuture<Boolean> createFolder(String path, Callback<Boolean> callback);
-    /**
-
      * Initiates an upload sequence by returning a Write object that can be
      * used to write small file chunks. After writing, flush() must be called
      * to actually send the data remotely.
@@ -40,9 +19,9 @@ public interface Files {
      * @return the new CompletionStage, the result is the Writer interface for
      *      upload the file content if success; null otherwise
      */
-    CompletableFuture<Writer> upload(String path);
-    /**
+    CompletableFuture<Writer> upload(String path) throws HiveException;
 
+    /**
      * Initiates an upload sequence by returning a Write object that can be
      * used to write small file chunks. After writing, flush() must be called
      * to actually send the data remotely.
@@ -53,9 +32,9 @@ public interface Files {
      * @return the new CompletionStage, the result is the Writer interface for
      *      upload the file content if success; null otherwise
      */
-    CompletableFuture<Writer> upload(String path, Callback<Writer> callback);
-    /**
+    CompletableFuture<Writer> upload(String path, Callback<Writer> callback) throws HiveException;
 
+    /**
      * Initiates a download sequence by returning a Reader object that can
      * be used to read the downloaded file in chunks.
      *
@@ -63,9 +42,9 @@ public interface Files {
      * @return the new CompletionStage, the result is the Reader interface for
      *      read the file content if success; null otherwise
      */
-    CompletableFuture<Reader> download(String path);
-    /**
+    CompletableFuture<Reader> download(String path) throws HiveException;
 
+    /**
      * Initiates a download sequence by returning a Reader object that can
      * be used to read the downloaded file in chunks.
      *
@@ -75,9 +54,9 @@ public interface Files {
      * @return the new CompletionStage, the result is the Reader interface for
      *      read the file content if success; null otherwise
      */
-    CompletableFuture<Reader> download(String path, Callback<Reader> callback);
-    /**
+    CompletableFuture<Reader> download(String path, Callback<Reader> callback) throws HiveException;
 
+    /**
      * Deletes a file, or a folder. In case the given path is a folder,
      * deletion is recursive.
      *
@@ -85,9 +64,9 @@ public interface Files {
      * @return the new CompletionStage, the result is true if the file or folder
      *         successfully deleted; false otherwise
      */
-    CompletableFuture<Boolean> delete(String path);
-    /**
+    CompletableFuture<Boolean> delete(String path) throws HiveException;
 
+    /**
      * Deletes a file, or a folder. In case the given path is a folder,
      * deletion is recursive.
      *
@@ -97,9 +76,9 @@ public interface Files {
      * @return the new CompletionStage, the result is true if the file or folder
      *         successfully deleted; false otherwise
      */
-    CompletableFuture<Boolean> delete(String path, Callback<Boolean> callback);
-    /**
+    CompletableFuture<Boolean> delete(String path, Callback<Boolean> callback) throws HiveException;
 
+    /**
      * Moves (or renames) a file or a folder.
      *
      * @param src the path for the remote source file or folder
@@ -107,9 +86,9 @@ public interface Files {
      * @return the new CompletionStage, the result is true if the file or folder
      *         successfully moved; false otherwise
      */
-    CompletableFuture<Boolean> move(String src, String dest);
-    /**
+    CompletableFuture<Boolean> move(String src, String dest) throws HiveException;
 
+    /**
      * Moves (or renames) a file or a folder.
      *
      * @param src the path for the remote source file or folder
@@ -119,9 +98,10 @@ public interface Files {
      * @return the new CompletionStage, the result is true if the file or folder
      *         successfully moved; false otherwise
      */
-    CompletableFuture<Boolean> move(String src, String dest, Callback<Boolean> callback);
-    /**
 
+    CompletableFuture<Boolean> move(String src, String dest, Callback<Boolean> callback) throws HiveException;
+
+    /**
      * Copies a file or a folder (recursively).
      *
      * @param src the path for the remote source file or folder
@@ -129,9 +109,9 @@ public interface Files {
      * @return the new CompletionStage, the result is true if the file or folder
      *         successfully copied; false otherwise
      */
-    CompletableFuture<Boolean> copy(String src, String dest);
-    /**
+    CompletableFuture<Boolean> copy(String src, String dest) throws HiveException;
 
+    /**
      * Copies a file or a folder (recursively).
      *
      * @param src the path for the remote source file or folder
@@ -141,18 +121,18 @@ public interface Files {
      * @return the new CompletionStage, the result is true if the file or folder
      *         successfully copied; false otherwise
      */
-    CompletableFuture<Boolean> copy(String src, String dest, Callback<Boolean> callback);
-    /**
+    CompletableFuture<Boolean> copy(String src, String dest, Callback<Boolean> callback) throws HiveException;
 
+    /**
      * Returns the SHA256 hash of the given file.
      *
      * @param path path for the remote file
      * @return the new CompletionStage, the result is the base64 hash string
      *         if the hash successfully calculated; null otherwise
      */
-    CompletableFuture<String> hash(String path);
-    /**
+    CompletableFuture<String> hash(String path) throws HiveException;
 
+    /**
      * Returns the SHA256 hash of the given file.
      *
      * @param path the path for the remote file
@@ -161,18 +141,18 @@ public interface Files {
      * @return the new CompletionStage, the result is the base64 hash string
      *         if the hash successfully calculated; null otherwise
      */
-    CompletableFuture<String> hash(String path, Callback<String> callback);
-    /**
+    CompletableFuture<String> hash(String path, Callback<String> callback) throws HiveException;
 
+    /**
      * Returns the list of all files in a given folder.
      *
      * @param path the path for the remote folder
      * @return the new CompletionStage, the result is List<FileInfo>
      *         if success; null otherwise
      */
-    CompletableFuture<List<FileInfo>> list(String path);
-    /**
+    CompletableFuture<List<FileInfo>> list(String path) throws HiveException;
 
+    /**
      * Returns the list of all files in a given folder.
      *
      * @param path the path for the remote folder
@@ -181,18 +161,18 @@ public interface Files {
      * @return the new CompletionStage, the result is List<FileInfo>
      *         if success; null otherwise
      */
-    CompletableFuture<List<FileInfo>> list(String path, Callback<List<FileInfo>> callback);
-    /**
+    CompletableFuture<List<FileInfo>> list(String path, Callback<List<FileInfo>> callback) throws HiveException;
 
+    /**
      * Information about the target file or folder.
      *
      * @param path the path for the remote file or folder
      * @return the new CompletionStage, the result is FileInfo
      *         if success; null otherwise
      */
-    CompletableFuture<FileInfo> stat(String path);
-    /**
+    CompletableFuture<FileInfo> stat(String path) throws HiveException;
 
+    /**
      * Information about the target file or folder.
      *
      * @param path the path for the remote file or folder
@@ -201,5 +181,5 @@ public interface Files {
      * @return the new CompletionStage, the result is FileInfo
      *         if success; null otherwise
      */
-    CompletableFuture<FileInfo> stat(String path, Callback<FileInfo> callback);
+    CompletableFuture<FileInfo> stat(String path, Callback<FileInfo> callback) throws HiveException;
 }

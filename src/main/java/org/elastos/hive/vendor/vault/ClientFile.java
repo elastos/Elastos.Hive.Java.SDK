@@ -1,17 +1,5 @@
 package org.elastos.hive.vendor.vault;
 
-import org.elastos.hive.Callback;
-import org.elastos.hive.file.FileInfo;
-import org.elastos.hive.NullCallback;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.interfaces.Files;
-import org.elastos.hive.utils.ResponseHelper;
-import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.elastos.hive.vendor.vault.network.VaultApi;
-import org.elastos.hive.vendor.vault.network.model.FilesResponse;
-import org.elastos.hive.vendor.vault.network.model.PropertiesResponse;
-import org.json.JSONObject;
-
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -20,6 +8,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+
+import org.elastos.hive.Callback;
+import org.elastos.hive.NullCallback;
+import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.file.FileInfo;
+import org.elastos.hive.interfaces.Files;
+import org.elastos.hive.utils.ResponseHelper;
+import org.elastos.hive.vendor.connection.ConnectionManager;
+import org.elastos.hive.vendor.vault.network.VaultApi;
+import org.elastos.hive.vendor.vault.network.model.FilesResponse;
+import org.elastos.hive.vendor.vault.network.model.PropertiesResponse;
+import org.json.JSONObject;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -146,6 +146,7 @@ class ClientFile implements Files {
         });
     }
 
+    /*
     @Override
     public CompletableFuture<Boolean> createFolder(String folder) {
         return createFolder(folder, null);
@@ -156,6 +157,7 @@ class ClientFile implements Files {
         return authHelper.checkValid()
                 .thenCompose(result -> createFolderImp(folder, getCallback(callback)));
     }
+	*/
 
     private CompletableFuture<Boolean> createFolderImp(String folder, Callback<Boolean> callback) {
 

@@ -3,21 +3,18 @@ package org.elastos.hive.vault;
 import org.elastos.hive.Client;
 import org.elastos.hive.interfaces.Database;
 import org.elastos.hive.interfaces.Scripting;
-import org.elastos.hive.scripting.conditions.Condition;
-import org.elastos.hive.scripting.conditions.SubCondition;
-import org.elastos.hive.scripting.conditions.database.QueryHasResultsCondition;
-import org.elastos.hive.scripting.executables.Executable;
-import org.elastos.hive.scripting.executables.ExecutionSequence;
-import org.elastos.hive.scripting.executables.database.FindQuery;
-import org.elastos.hive.vendor.vault.VaultOptions;
-import org.json.JSONObject;
-import org.junit.BeforeClass;
+import org.elastos.hive.scripting.AggregatedExecutable;
+import org.elastos.hive.scripting.AndCondition;
+import org.elastos.hive.scripting.Condition;
+import org.elastos.hive.scripting.DbFindQuery;
+import org.elastos.hive.scripting.DbInsertQuery;
+import org.elastos.hive.scripting.Executable;
+import org.elastos.hive.scripting.OrCondition;
+import org.elastos.hive.scripting.QueryHasResultsCondition;
 import org.junit.Test;
 
-import java.awt.Desktop;
-import java.net.URI;
-
-import static org.junit.Assert.fail;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ScriptingTest {
     private static final String clientId = "1098324333865-q7he5l91a4pqnuq9s2pt5btj9kenebkl.apps.googleusercontent.com";
@@ -35,7 +32,45 @@ public class ScriptingTest {
 
     private static final String GROUPS_COLLECTION_NAME = "groups";
 
-//    private void registerSubConditionUserInGroup() {
+	@Test
+	public void testCondition() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = "{\"name\":\"mkyong\", \"age\":37, \"c\":[\"adc\",\"zfy\",\"aaa\"], \"d\": {\"foo\": 1, \"bar\": 2}}";
+
+        JsonNode n = mapper.readTree(json);
+
+        Condition cond1 = new QueryHasResultsCondition("cond1", "c1", n);
+        Condition cond2 = new QueryHasResultsCondition("cond2", "c2", n);
+        Condition cond3 = new QueryHasResultsCondition("cond3", "c3", n);
+        Condition cond4 = new QueryHasResultsCondition("cond4", "c4", n);
+
+        OrCondition orCond = new OrCondition("abc", new Condition[] { cond1, cond2});
+        AndCondition andCond = new AndCondition("xyz", new Condition[] { cond3, cond4});
+
+        OrCondition cond = new OrCondition("root");
+        cond.append(orCond).append(andCond);
+
+        System.out.println(cond.serialize());
+	}
+
+	@Test
+	public void testExecutable() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = "{\"name\":\"mkyong\", \"age\":37, \"c\":[\"adc\",\"zfy\",\"aaa\"], \"d\": {\"foo\": 1, \"bar\": 2}}";
+
+        JsonNode n = mapper.readTree(json);
+
+        Executable exec1 = new DbFindQuery("exec1", "c1", n);
+        Executable exec2 = new DbFindQuery("exec2", "c2", n);
+        Executable exec3 = new DbInsertQuery("exec3", "c3", n);
+
+        AggregatedExecutable exec = new AggregatedExecutable("ae");
+        exec.append(exec1).append(exec2).append(exec3);
+
+        System.out.println(exec.serialize());
+	}
+
+	//    private void registerSubConditionUserInGroup() {
 //        JSONObject queryParams = new JSONObject();
 //        queryParams.put("id", "$groupid"); // $groupid is passed by the calling script
 //        queryParams.put("friends", new JSONObject("{$contains: \"$callerdid\"}")); // Forgot the right mongo syntax here.
