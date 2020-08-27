@@ -6,10 +6,9 @@ import org.elastos.hive.Scripting;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.Executable;
+import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 
-import org.elastos.hive.utils.JsonUtil;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -18,8 +17,6 @@ import java.util.concurrent.CompletionException;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
-
-// TODO: change org.json to Jackson
 
 class ClientScript implements Scripting {
 

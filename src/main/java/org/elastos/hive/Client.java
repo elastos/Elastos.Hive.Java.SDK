@@ -51,7 +51,7 @@ public abstract class Client {
         }
 	}
 
-	private Client() {
+	public Client() {
 	}
 
 	public static Client createInstance(Options options) {
