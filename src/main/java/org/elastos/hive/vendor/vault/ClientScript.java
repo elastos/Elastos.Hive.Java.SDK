@@ -6,11 +6,13 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.Scripting;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.Executable;
+import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.json.JSONObject;
 
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -37,13 +39,13 @@ class ClientScript implements Scripting {
     private CompletableFuture<Boolean> registerConditionImp(String name, Condition condition) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-
-                JSONObject httpPayload = new JSONObject();
-                httpPayload.put("conditionName", name);
-                httpPayload.put("condition", condition);
+                Map map = new HashMap<>();
+                map.put("conditionName", name);
+                map.put("condition", condition);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .registerCondition(RequestBody.create(MediaType.parse("Content-Type, application/json"), httpPayload.toString()))
+                        .registerCondition(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
                 int responseCode = checkResponseCode(response);
                 if (responseCode == 404) {
@@ -73,15 +75,17 @@ class ClientScript implements Scripting {
     private CompletableFuture<Boolean> registerScriptImp(String name, Condition accessCondition, Executable executable) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject httpPayload = new JSONObject();
-                httpPayload.put("scriptName", name);
-                if (accessCondition != null)
-                    httpPayload.put("accessCondition", accessCondition);
 
-                httpPayload.put("executable", executable);
+                Map map = new HashMap<>();
+                map.put("scriptName", name);
+                if (accessCondition != null)
+                    map.put("accessCondition", accessCondition);
+                map.put("executable", executable);
+
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), httpPayload.toString()))
+                        .registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
                 int responseCode = checkResponseCode(response);
                 if (responseCode == 404) {
@@ -111,14 +115,16 @@ class ClientScript implements Scripting {
     private CompletableFuture<Reader> callImp(String scriptName, JsonNode params) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject httpPayload = new JSONObject();
-                httpPayload.put("scriptName", scriptName);
-
+                Map map = new HashMap<>();
+                map.put("scriptName", scriptName);
                 if (params != null)
-                    httpPayload.put("params", params);
+                    map.put("params", params);
+
+                String json = JsonUtil.getJsonFromObject(map);
+
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), httpPayload.toString()))
+                        .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
                 int responseCode = checkResponseCode(response);
                 if (responseCode == 404) {

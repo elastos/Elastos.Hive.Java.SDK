@@ -15,10 +15,12 @@ import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.interfaces.Database;
+import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -42,17 +44,18 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options, Callback<Boolean> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> createColImp(name, options, callback));
+                .thenCompose(result -> createColImp(name, options, getCallback(callback)));
     }
 
     private CompletableFuture<Boolean> createColImp(String collection, CreateCollectionOptions options, Callback<Boolean> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -79,17 +82,19 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<Boolean> deleteCollection(String name, Callback<Boolean> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> deleteColImp(name, callback));
+                .thenCompose(result -> deleteColImp(name, getCallback(callback)));
     }
 
     private CompletableFuture<Boolean> deleteColImp(String collection, Callback<Boolean> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -116,17 +121,18 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options, Callback<InsertResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> insertOneImp(collection, doc, options, callback));
+                .thenCompose(result -> insertOneImp(collection, doc, options, getCallback(callback)));
     }
 
     private CompletableFuture<InsertResult> insertOneImp(String collection, JsonNode doc, InsertOptions options, Callback<InsertResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -153,17 +159,18 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<InsertResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> insertManyImp(collection, docs, options, callback));
+                .thenCompose(result -> insertManyImp(collection, docs, options, getCallback(callback)));
     }
 
     private CompletableFuture<InsertResult> insertManyImp(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -190,17 +197,18 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options, Callback<Long> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> countDocumentsImp(collection, query, options, callback));
+                .thenCompose(result -> countDocumentsImp(collection, query, options, getCallback(callback)));
     }
 
     private CompletableFuture<Long> countDocumentsImp(String collection, JsonNode query, CountOptions options, Callback<Long> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -227,17 +235,18 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options, Callback<JsonNode> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> findOneImp(collection, query, options, callback));
+                .thenCompose(result -> findOneImp(collection, query, options, getCallback(callback)));
     }
 
     private CompletableFuture<JsonNode> findOneImp(String collection, JsonNode query, FindOptions options, Callback<JsonNode> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -264,17 +273,18 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options, Callback<List<JsonNode>> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> findManyImp(collection, query, options, callback));
+                .thenCompose(result -> findManyImp(collection, query, options, getCallback(callback)));
     }
 
     private CompletableFuture<List<JsonNode>> findManyImp(String collection, JsonNode query, FindOptions options, Callback<List<JsonNode>> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -301,17 +311,18 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> updateOneImp(collection, filter, update, options, callback));
+                .thenCompose(result -> updateOneImp(collection, filter, update, options, getCallback(callback)));
     }
 
     private CompletableFuture<UpdateResult> updateOneImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -338,17 +349,18 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> updateManyImp(collection, filter, update, options, callback));
+                .thenCompose(result -> updateManyImp(collection, filter, update, options, getCallback(callback)));
     }
 
     private CompletableFuture<UpdateResult> updateManyImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -375,17 +387,18 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> deleteOneImp(collection, filter, options, callback));
+                .thenCompose(result -> deleteOneImp(collection, filter, options, getCallback(callback)));
     }
 
     private CompletableFuture<DeleteResult> deleteOneImp(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -412,17 +425,18 @@ class ClientDatabase implements Database {
     @Override
     public CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> deleteManyImp(collection, filter, options, callback));
+                .thenCompose(result -> deleteManyImp(collection, filter, options, getCallback(callback)));
     }
 
     private CompletableFuture<DeleteResult> deleteManyImp(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                JSONObject root = new JSONObject();
-                root.put("collection", collection);
+                Map map = new HashMap<>();
+                map.put("collection", collection);
+                String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), root.toString()))
+                        .deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
                 int responseCode = checkResponseCode(response);
@@ -441,10 +455,6 @@ class ClientDatabase implements Database {
         });
     }
 
-    private RequestBody createWriteRequestBody(byte[] data) {
-        return RequestBody.create(MediaType.parse("multipart/form-data"), data);
-    }
-
     private int checkResponseCode(Response response) {
         if (response == null)
             return -1;
@@ -455,6 +465,7 @@ class ClientDatabase implements Database {
 
         return code;
     }
+
 
     private <T> Callback<T> getCallback(Callback<T> callback) {
         return (null == callback ? new NullCallback<T>() : callback);
