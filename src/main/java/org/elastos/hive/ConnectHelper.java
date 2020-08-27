@@ -24,6 +24,8 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.hive.oauth.Authenticator;
+
 /**
  * Provides author-related functionality
  */

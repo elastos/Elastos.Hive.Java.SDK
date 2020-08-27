@@ -1,12 +1,12 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.Client;
+import org.elastos.hive.Database;
 import org.elastos.hive.database.Collation;
 import org.elastos.hive.database.Collation.Alternate;
 import org.elastos.hive.database.Collation.CaseFirst;
 import org.elastos.hive.database.FindOptions;
 import org.elastos.hive.database.Index;
-import org.elastos.hive.interfaces.Database;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;

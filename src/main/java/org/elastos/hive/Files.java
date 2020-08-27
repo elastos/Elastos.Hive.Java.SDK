@@ -1,11 +1,10 @@
-package org.elastos.hive.interfaces;
+package org.elastos.hive;
 
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.elastos.hive.Callback;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.file.FileInfo;
 

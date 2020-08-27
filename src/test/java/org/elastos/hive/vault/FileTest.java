@@ -2,8 +2,8 @@ package org.elastos.hive.vault;
 
 import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
+import org.elastos.hive.Files;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.interfaces.Files;
 import org.elastos.hive.vendor.vault.VaultOptions;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;

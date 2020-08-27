@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive;
+package org.elastos.hive.oauth;
 
 /**
  * Authenticator interface

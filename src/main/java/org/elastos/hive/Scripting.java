@@ -1,6 +1,5 @@
-package org.elastos.hive.interfaces;
+package org.elastos.hive;
 
-import java.io.Reader;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.exception.HiveException;
@@ -31,7 +30,9 @@ public interface Scripting {
      * Call parameters (params field) are meant to be used by scripts on the server side, for example as injected parameters
      * to mongo queries. Ex: if "params" contains a field "name":"someone", then the called script is able to reference this parameter
      * using "$params.name".
+     *
+     * T: String, byte[], JsonNode, Reader
      */
-    CompletableFuture<Reader> call(String scriptName) throws HiveException;
-    CompletableFuture<Reader> call(String scriptName, JsonNode params) throws HiveException;
+    <T> CompletableFuture<T> call(String scriptName, Class<T> resultType) throws HiveException;
+    <T> CompletableFuture<T> call(String scriptName, JsonNode params, Class<T> resultType) throws HiveException;
 }

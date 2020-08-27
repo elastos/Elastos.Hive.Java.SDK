@@ -1,12 +1,12 @@
 package org.elastos.hive.vendor.vault;
 
-import org.elastos.hive.Authenticator;
 import org.elastos.hive.Client;
+import org.elastos.hive.Database;
+import org.elastos.hive.Files;
+import org.elastos.hive.KeyValues;
+import org.elastos.hive.Scripting;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.interfaces.Database;
-import org.elastos.hive.interfaces.KeyValues;
-import org.elastos.hive.interfaces.Scripting;
-import org.elastos.hive.interfaces.Files;
+import org.elastos.hive.oauth.Authenticator;
 
 public class VaultClient extends Client {
 
@@ -20,12 +20,12 @@ public class VaultClient extends Client {
         VaultOptions opts = (VaultOptions) options;
         this.authHelper = new VaultAuthHelper(opts.nodeUrl(),
                 opts.authToken(),
-                opts.storePath(),
+                opts.localDataPath(),
                 opts.clientId(),
                 opts.clientSecret(),
                 opts.redirectURL(),
                 VaultConstance.SCOPE);
-        this.authenticator = opts.authenticator();
+        //this.authenticator = opts.authenticator();
 
         this.files = new ClientFile(this.authHelper);
         this.database = new ClientDatabase(this.authHelper);

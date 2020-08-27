@@ -1,13 +1,13 @@
 package org.elastos.hive.vendor.vault;
 
-import org.elastos.hive.AuthServer;
-import org.elastos.hive.AuthToken;
-import org.elastos.hive.Authenticator;
 import org.elastos.hive.Callback;
 import org.elastos.hive.ConnectHelper;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.oauth.AuthServer;
+import org.elastos.hive.oauth.AuthToken;
+import org.elastos.hive.oauth.Authenticator;
 import org.elastos.hive.utils.DateUtil;
 import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendor.AuthInfoStoreImpl;

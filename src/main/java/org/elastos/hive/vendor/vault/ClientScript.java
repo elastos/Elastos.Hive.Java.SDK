@@ -1,18 +1,16 @@
 package org.elastos.hive.vendor.vault;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
+import org.elastos.hive.Scripting;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.interfaces.Scripting;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.Executable;
-import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.json.JSONObject;
 
-import java.io.Reader;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -98,17 +96,17 @@ class ClientScript implements Scripting {
     }
 
     @Override
-    public CompletableFuture<Reader> call(String scriptName) {
-        return this.call(scriptName, null);
+    public <T> CompletableFuture<T> call(String scriptName, Class<T> clazz) {
+        return this.call(scriptName, null, clazz);
     }
 
     @Override
-    public CompletableFuture<Reader> call(String scriptName, JsonNode params) {
+    public <T> CompletableFuture<T> call(String scriptName, JsonNode params, Class<T> clazz) {
         return authHelper.checkValid()
-                .thenCompose(result -> callImp(scriptName, params));
+                .thenCompose(result -> callImp(scriptName, params, clazz));
     }
 
-    private CompletableFuture<Reader> callImp(String scriptName, JsonNode params) {
+    private <T> CompletableFuture<T> callImp(String scriptName, JsonNode params, Class<T> clazz) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 JSONObject httpPayload = new JSONObject();
@@ -126,7 +124,11 @@ class ClientScript implements Scripting {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                return ResponseHelper.writeToReader(response);
+
+                // TODO: CHECKME!!!
+                // TODO: should support String, JsonNode, byte[], Reader
+            	// return ResponseHelper.writeToReader(response);
+               return null;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);
