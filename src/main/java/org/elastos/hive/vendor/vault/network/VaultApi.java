@@ -103,4 +103,15 @@ public interface VaultApi {
 
     @GET(ConnectConstance.API_PATH + "/files/file/hash")
     Call<BaseResponse> hash(@Query("name") String filename);
+
+    @POST(ConnectConstance.API_PATH + "/scripting/set_subcondition")
+    Call<BaseResponse> registerCondition(@Body RequestBody body);
+
+    @POST(ConnectConstance.API_PATH + "/scripting/set_script")
+    Call<BaseResponse> registerScript(@Body RequestBody body);
+
+    @POST(ConnectConstance.API_PATH + "/scripting/run_script")
+    Call<BaseResponse> callScript(@Body RequestBody body);
+
+
 }

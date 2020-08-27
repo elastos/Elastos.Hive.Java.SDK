@@ -24,6 +24,7 @@ package org.elastos.hive.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
@@ -75,7 +76,10 @@ public class ResponseHelper {
     }
 
     public static Reader writeToReader(Response response) {
-        return null;
+        ResponseBody body = (ResponseBody) response.body();
+        InputStream inputStream = body != null ? body.byteStream() : null;
+        if (inputStream == null) return null;
+        return new InputStreamReader(inputStream);
     }
 
     public static Writer writeToWriter(Response response) {
