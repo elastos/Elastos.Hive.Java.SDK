@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive;
+package org.elastos.hive.oauth;
 
 import java.util.concurrent.Semaphore;
 

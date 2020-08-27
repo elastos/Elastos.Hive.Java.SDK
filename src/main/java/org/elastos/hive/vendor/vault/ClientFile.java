@@ -1,11 +1,10 @@
 package org.elastos.hive.vendor.vault;
 
 import org.elastos.hive.Callback;
+import org.elastos.hive.Files;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.file.FileInfo;
-import org.elastos.hive.interfaces.Files;
-import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.vault.network.VaultApi;

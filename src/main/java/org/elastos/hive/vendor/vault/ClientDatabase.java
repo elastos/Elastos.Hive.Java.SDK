@@ -3,6 +3,7 @@ package org.elastos.hive.vendor.vault;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.elastos.hive.Callback;
+import org.elastos.hive.Database;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.database.CountOptions;
 import org.elastos.hive.database.CreateCollectionOptions;
@@ -14,10 +15,8 @@ import org.elastos.hive.database.InsertResult;
 import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.interfaces.Database;
-import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.vendor.connection.ConnectionManager;
-
+import org.elastos.hive.utils.JsonUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

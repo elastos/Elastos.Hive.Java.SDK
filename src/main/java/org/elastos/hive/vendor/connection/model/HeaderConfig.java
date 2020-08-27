@@ -22,7 +22,7 @@
 
 package org.elastos.hive.vendor.connection.model;
 
-import org.elastos.hive.AuthToken;
+import org.elastos.hive.oauth.AuthToken;
 
 public class HeaderConfig {
     private final AuthToken authToken;

@@ -22,69 +22,44 @@
 
 package org.elastos.hive;
 
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NotImplementedException;
-import org.elastos.hive.interfaces.Database;
-import org.elastos.hive.interfaces.KeyValues;
-import org.elastos.hive.interfaces.Scripting;
-import org.elastos.hive.interfaces.Files;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class Client {
-    public abstract void connect() throws HiveException;
+	public static class Options {
+		public Options setAuthenticationHandler(AuthenticationHandler authentcationHandler) {
+			// TODO:
+			return this;
+		}
 
-    public abstract void disconnect();
+		public AuthenticationHandler authenticationHandler() {
+			// TODO:
+			return null;
+		}
 
-    public abstract boolean isConnected();
+		public Options setLocalDataPath(String path) {
+			// TODO:
+			return this;
+		}
 
-
-    public abstract Files getFiles();
-
-    public abstract Database getDatabase();
-
-    public abstract KeyValues getKeyValues();
-
-    public abstract Scripting getScripting();
-
-    public static abstract class Options {
-        private String storePath;
-        private Authenticator authenticator;
-
-        protected Options() {
-        }
-
-        protected void setStorePath(String storePath) {
-            this.storePath = storePath;
-        }
-
-        public String storePath() {
-            return storePath;
-        }
-
-        protected void setAuthenticator(Authenticator authenticator) {
-            this.authenticator = authenticator;
-        }
-
-        public Authenticator authenticator() {
-            return authenticator;
-        }
+		public String localDataPath() {
+			// TODO:
+			return null;
+		}
 
         protected boolean checkValid(boolean all) {
             return /*(storePath != null) && (!all || authenticator != null)*/true;
         }
+	}
 
-        protected abstract Client buildClient();
-    }
+	private Client() {
+	}
 
-    public static Client createInstance(Options options) throws HiveException {
-        if (options == null) {
-            throw new IllegalArgumentException();
-        }
+	public static Client createInstance(Options options) {
+		// TODO:
+		return null;
+	}
 
-        Client client = options.buildClient();
-        if (client == null) {
-            throw new NotImplementedException();
-        }
-
-        return client;
-    }
+	public CompletableFuture<Vault> getVault(String vaultProvider, String ownerDid) {
+		return null;
+	}
 }

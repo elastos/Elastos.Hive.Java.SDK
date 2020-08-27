@@ -1,8 +1,8 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.Client;
-import org.elastos.hive.interfaces.Database;
-import org.elastos.hive.interfaces.Scripting;
+import org.elastos.hive.Database;
+import org.elastos.hive.Scripting;
 import org.elastos.hive.scripting.AggregatedExecutable;
 import org.elastos.hive.scripting.AndCondition;
 import org.elastos.hive.scripting.Condition;

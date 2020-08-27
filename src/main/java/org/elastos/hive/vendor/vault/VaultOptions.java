@@ -1,8 +1,6 @@
 package org.elastos.hive.vendor.vault;
 
-import org.elastos.hive.Authenticator;
 import org.elastos.hive.Client;
-import org.elastos.hive.exception.HiveException;
 
 public class VaultOptions extends Client.Options {
 
@@ -51,7 +49,6 @@ public class VaultOptions extends Client.Options {
         return checkValid(true);
     }
 
-    @Override
     protected Client buildClient() {
         return new VaultClient(this);
     }
@@ -68,8 +65,8 @@ public class VaultOptions extends Client.Options {
             return this;
         }
 
-        public Builder setStorePath(String storePath) {
-            options.setStorePath(storePath);
+        public Builder setLocalDataPath(String storePath) {
+            options.setLocalDataPath(storePath);
             return this;
         }
 
@@ -93,6 +90,7 @@ public class VaultOptions extends Client.Options {
             return this;
         }
 
+        /*
         public Builder setAuthenticator(Authenticator authenticator) {
             options.setAuthenticator(authenticator);
             return this;
@@ -110,6 +108,6 @@ public class VaultOptions extends Client.Options {
             this.options = null;
             return opts;
         }
+    	*/
     }
-
 }

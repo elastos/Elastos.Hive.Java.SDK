@@ -1,9 +1,8 @@
-package org.elastos.hive.interfaces;
+package org.elastos.hive;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.elastos.hive.Callback;
 import org.elastos.hive.database.CountOptions;
 import org.elastos.hive.database.CreateCollectionOptions;
 import org.elastos.hive.database.DeleteOptions;

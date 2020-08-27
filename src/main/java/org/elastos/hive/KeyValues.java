@@ -1,6 +1,5 @@
-package org.elastos.hive.interfaces;
+package org.elastos.hive;
 
-import org.elastos.hive.Callback;
 import org.elastos.hive.exception.HiveException;
 
 import java.util.ArrayList;
