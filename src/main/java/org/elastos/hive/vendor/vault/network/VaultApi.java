@@ -41,21 +41,35 @@ public interface VaultApi {
     @POST(ConnectConstance.API_PATH + "/db/create_collection")
     Call<BaseResponse> createCollection(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/col/{path}")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
-    Call<ResponseBody> post_dbCol(@Path("path") String path, @Body RequestBody body);
+    @POST(ConnectConstance.API_PATH + "/db/delete_collection")
+    Call<BaseResponse> deleteCollection(@Body RequestBody body);
 
-    @GET(ConnectConstance.API_PATH + "/db/col/{path}")
-    Call<ResponseBody> get_dbCol(@Path("path") String path, @Query("where") String json);
+    @POST(ConnectConstance.API_PATH + "/db/insert_one")
+    Call<BaseResponse> insertOne(@Body RequestBody body);
 
-    @PUT(ConnectConstance.API_PATH + "/db/col/{path}")
-    Call<ResponseBody> put_dbCol(@Path("path") String path, @Header("If-Match") String match, @Body RequestBody body);
+    @POST(ConnectConstance.API_PATH + "/db/insert_many")
+    Call<BaseResponse> insertMany(@Body RequestBody body);
 
-    @PATCH(ConnectConstance.API_PATH + "/db/col/{path}")
-    Call<ResponseBody> patch_dbCol(@Path("path") String path, @Header("If-Match") String match, @Body RequestBody body);
+    @POST(ConnectConstance.API_PATH + "/db/update_one")
+    Call<BaseResponse> updateOne(@Body RequestBody body);
 
-    @DELETE(ConnectConstance.API_PATH + "/db/col/{path}")
-    Call<ResponseBody> delete_dbCol(@Path("path") String path, @Header("If-Match") String match);
+    @POST(ConnectConstance.API_PATH + "/db/update_many")
+    Call<BaseResponse> updateMany(@Body RequestBody body);
+
+    @POST(ConnectConstance.API_PATH + "/db/delete_one")
+    Call<BaseResponse> deleteOne(@Body RequestBody body);
+
+    @POST(ConnectConstance.API_PATH + "/db/delete_many")
+    Call<BaseResponse> deleteMany(@Body RequestBody body);
+
+    @POST(ConnectConstance.API_PATH + "/db/count_documents")
+    Call<BaseResponse> countDocs(@Body RequestBody body);
+
+    @POST(ConnectConstance.API_PATH + "/db/find_one")
+    Call<BaseResponse> findOne(@Body RequestBody body);
+
+    @POST(ConnectConstance.API_PATH + "/db/find_many")
+    Call<BaseResponse> findMany(@Body RequestBody body);
 
     //file="path/of/file/name"
 //    @Multipart
@@ -89,15 +103,9 @@ public interface VaultApi {
     @POST(ConnectConstance.API_PATH + "/files/deleter/folder")
     Call<BaseResponse> deleteFolder(@Body RequestBody body);
 
-    //{"src_name": "path/of/src/folder/or/file",
-    //            "dst_name": "path/of/dst/folder/or/file",
-    //        }
     @POST(ConnectConstance.API_PATH + "/files/mover")
     Call<BaseResponse> move(@Body RequestBody body);
 
-    //{"src_name": "path/of/src/folder/or/file",
-    //            "dst_name": "path/of/dst/folder/or/file",
-    //        }
     @POST(ConnectConstance.API_PATH + "/files/copier")
     Call<BaseResponse> copy(@Body RequestBody body);
 
