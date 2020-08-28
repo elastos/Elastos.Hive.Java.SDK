@@ -26,22 +26,22 @@ public class Vault {
 		return null;
 	}
 
-	Database getDatabase() {
+	public Database getDatabase() {
 		// TODO:
 		return null;
 	}
 
-	Files getFiles() {
+	public Files getFiles() {
 		// TODO:
 		return null;
 	}
 
-	KeyValues getKeyValues() {
+	public KeyValues getKeyValues() {
 		// TODO:
 		return null;
 	}
 
-	Scripting getScripting() {
+	public Scripting getScripting() {
 		// TODO:
 		return null;
 	}
