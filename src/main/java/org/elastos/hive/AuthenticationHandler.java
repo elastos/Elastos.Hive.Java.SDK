@@ -1,5 +1,7 @@
 package org.elastos.hive;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface AuthenticationHandler {
     public interface OnAuthenticationCompleted {
         /**
@@ -20,6 +22,6 @@ public interface AuthenticationHandler {
      *   verify jwt (using local app instance did public key provided before)
      *   generate access token
      */
-    public String authenticationChallenge(String jwtToken, OnAuthenticationCompleted authCompletedCallback);
+    public CompletableFuture<String> authenticationChallenge(String jwtToken, OnAuthenticationCompleted authCompletedCallback);
 }
 

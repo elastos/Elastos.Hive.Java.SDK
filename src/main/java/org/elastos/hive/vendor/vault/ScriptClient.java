@@ -18,11 +18,11 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-class ClientScript implements Scripting {
+public class ScriptClient implements Scripting {
 
     private VaultAuthHelper authHelper;
 
-    ClientScript(VaultAuthHelper authHelper) {
+    public ScriptClient(VaultAuthHelper authHelper) {
         this.authHelper = authHelper;
     }
 

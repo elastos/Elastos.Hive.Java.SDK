@@ -1,49 +1,67 @@
 package org.elastos.hive;
 
+import org.elastos.hive.vendor.vault.DatabaseClient;
+import org.elastos.hive.vendor.vault.FileClient;
+import org.elastos.hive.vendor.vault.ScriptClient;
+import org.elastos.hive.vendor.vault.VaultAuthHelper;
+
 public class Vault {
-	public String getProviderAddress() {
-		// TODO:
-		return null;
-	}
 
-	public String getOwnerDid() {
-		// TODO:
-		return null;
-	}
+    private Files files;
+    private Database database;
+    private Scripting scripting;
+    private KeyValues keyValues;
 
-	public String getAppDid() {
-		// TODO:
-		return null;
-	}
+    private String vaultProvider;
+    private String ownerDid;
 
-	public String getAppInstanceDid() {
-		// TODO:
-		return null;
-	}
+    public Vault(VaultAuthHelper authHelper, String vaultProvider, String ownerDid) {
 
-	public String getUserDid() {
-		// TODO:
-		return null;
-	}
+        this.files = new FileClient(authHelper);
+        this.database = new DatabaseClient(authHelper);
+        this.scripting = new ScriptClient(authHelper);
 
-	Database getDatabase() {
-		// TODO:
-		return null;
-	}
+        this.vaultProvider = vaultProvider;
+        this.ownerDid = ownerDid;
+    }
 
-	Files getFiles() {
-		// TODO:
-		return null;
-	}
 
-	KeyValues getKeyValues() {
-		// TODO:
-		return null;
-	}
+    public String getProviderAddress() {
+        return this.vaultProvider;
+    }
 
-	Scripting getScripting() {
-		// TODO:
-		return null;
-	}
+    public String getOwnerDid() {
+        return this.ownerDid;
+    }
+
+    public String getAppDid() {
+        // TODO:
+        return null;
+    }
+
+    public String getAppInstanceDid() {
+        // TODO:
+        return null;
+    }
+
+    public String getUserDid() {
+        return null;
+    }
+
+    public Database getDatabase() {
+        return this.database;
+    }
+
+    public Files getFiles() {
+        return this.files;
+    }
+
+    public KeyValues getKeyValues() {
+        return this.keyValues;
+    }
+
+    public Scripting getScripting() {
+        return this.scripting;
+    }
 }
 

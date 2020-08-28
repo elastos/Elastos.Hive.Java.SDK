@@ -1,5 +1,6 @@
 package org.elastos.hive.vendor.vault;
 
+import org.elastos.hive.AuthenticationHandler;
 import org.elastos.hive.Callback;
 import org.elastos.hive.ConnectHelper;
 import org.elastos.hive.NullCallback;
@@ -44,7 +45,7 @@ public class VaultAuthHelper implements ConnectHelper {
     private final String clientSecret;
 
     private final String nodeUrl;
-    private final String authToken;
+    private final String did;
 
     private AuthToken token;
     private AtomicBoolean connectState = new AtomicBoolean(false);
@@ -52,9 +53,9 @@ public class VaultAuthHelper implements ConnectHelper {
     private String accessToken;
     private final Persistent persistent;
 
-    VaultAuthHelper(String nodeUrl, String authToken, String storePath, String clientId, String clientSecret, String redirectUrl, String scope) {
+    public VaultAuthHelper(String nodeUrl, String did, String storePath, String clientId, String clientSecret, String redirectUrl, String scope) {
         this.nodeUrl = nodeUrl;
-        this.authToken = authToken;
+        this.did = did;
         this.clientId = clientId;
         this.redirectUrl = redirectUrl;
         this.scope = scope;
@@ -72,15 +73,18 @@ public class VaultAuthHelper implements ConnectHelper {
     }
 
     @Override
-    public CompletableFuture<Void> connectAsync(Authenticator authenticator) {
-        return connectAsync(authenticator, new NullCallback<>());
+    public CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator) {
+        return authrizeAsync(handler, authenticator, new NullCallback<>());
     }
 
     @Override
-    public CompletableFuture<Void> connectAsync(Authenticator authenticator, Callback<Void> callback) {
+    public CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator, Callback<Void> callback) {
         return CompletableFuture.runAsync(() -> {
             try {
-                doLogin(authenticator);
+
+                if(null != authenticator) {
+                    cloudAccess(authenticator);
+                }
                 callback.onSuccess(null);
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -129,7 +133,7 @@ public class VaultAuthHelper implements ConnectHelper {
         handleTokenResponse(response);
     }
 
-    private void doLogin(Authenticator authenticator) throws Exception {
+    private void cloudAccess(Authenticator authenticator) throws Exception {
         connectState.set(false);
         tryRestoreToken();
 
@@ -153,9 +157,13 @@ public class VaultAuthHelper implements ConnectHelper {
         connectState.set(true);
     }
 
+    private void authChallenge(AuthenticationHandler handler) throws Exception {
+        //TODO
+    }
+
     private void nodeAuth() throws Exception {
         Map map = new HashMap<>();
-        map.put("jwt", this.authToken);
+        map.put("jwt", this.did);
         String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
                 .auth(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))

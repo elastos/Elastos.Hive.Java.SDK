@@ -1,18 +1,6 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.Client;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.vendor.vault.VaultOptions;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.awt.Desktop;
-import java.net.URI;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class ClientConnectTest {
     private static final String clientId = "1098324333865-q7he5l91a4pqnuq9s2pt5btj9kenebkl.apps.googleusercontent.com";

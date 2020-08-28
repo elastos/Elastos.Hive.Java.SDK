@@ -1,6 +1,6 @@
 package org.elastos.hive.vendor.vault;
 
-class VaultConstance {
+public class VaultConstance {
 
     static final String CONFIG = "hivesault.json";
 
@@ -9,7 +9,7 @@ class VaultConstance {
 
     static final String TOKEN_URI = "https://oauth2.googleapis.com";
 
-    static final String SCOPE = "https://www.googleapis.com/auth/drive";
+    public static final String SCOPE = "https://www.googleapis.com/auth/drive";
 
     static final String SCOPES = "[https://www.googleapis.com/auth/drive]";
 

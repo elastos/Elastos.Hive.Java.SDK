@@ -25,11 +25,11 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-class ClientFile implements Files {
+public class FileClient implements Files {
 
     private VaultAuthHelper authHelper;
 
-    ClientFile(VaultAuthHelper authHelper) {
+    public FileClient(VaultAuthHelper authHelper) {
         this.authHelper = authHelper;
     }
 

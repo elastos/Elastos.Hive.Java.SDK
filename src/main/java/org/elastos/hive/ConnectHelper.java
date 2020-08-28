@@ -22,30 +22,24 @@
 
 package org.elastos.hive;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.elastos.hive.oauth.Authenticator;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Provides author-related functionality
  */
 public interface ConnectHelper {
-    /**
-     * Login async with authenticator instance
-     *
-     * @param authenticator authenticator instance
-     * @return Returns 'Void' if the login succees
-     */
-    CompletableFuture<Void> connectAsync(Authenticator authenticator);
 
     /**
-     * Login async with authenticator instance
-     *
-     * @param authenticator authenticator instance
-     * @param callback      Callback connectAsync result
-     * @return Returns 'Void' if the login succees
+     * Login async with authenticator, handler instance
+     * @param authenticator
+     * @param handler
+     * @return
      */
-    CompletableFuture<Void> connectAsync(Authenticator authenticator, Callback<Void> callback);
+    CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator);
+
+    CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator, Callback<Void> callback);
 
     /**
      * Check access token isExpired

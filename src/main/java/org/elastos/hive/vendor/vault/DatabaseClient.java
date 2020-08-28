@@ -27,11 +27,11 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-class ClientDatabase implements Database {
+public class DatabaseClient implements Database {
 
     private VaultAuthHelper authHelper;
 
-    ClientDatabase(VaultAuthHelper authHelper) {
+    public DatabaseClient(VaultAuthHelper authHelper) {
         this.authHelper = authHelper;
     }
 
