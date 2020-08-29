@@ -11,7 +11,7 @@ public class DbInsertQuery extends Executable {
 	private static final String TYPE = "insert";
 	private Query query;
 
-	@JsonPropertyOrder({"collection", "doc"})
+	@JsonPropertyOrder({"collection", "document"})
 	public static class Query {
 		private String collection;
 		private JsonNode doc;
@@ -26,7 +26,7 @@ public class DbInsertQuery extends Executable {
 			return collection;
 		}
 
-		@JsonGetter("doc")
+		@JsonGetter("document")
 		public JsonNode getDoc() {
 			return doc;
 		}
