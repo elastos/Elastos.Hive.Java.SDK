@@ -43,7 +43,7 @@ public class FileTest {
 
             client = Client.createInstance(options);
             client.authrize();
-            filesApi = client.getVault("", "").get().getFiles();
+            filesApi = client.getVault("").get().getFiles();
         } catch (Exception e) {
             fail(e.getMessage());
         }
