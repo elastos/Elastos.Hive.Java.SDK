@@ -22,7 +22,6 @@
 
 package org.elastos.hive;
 
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.oauth.Authenticator;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
 
@@ -121,22 +120,14 @@ public class Client {
 		return new Client(options);
 	}
 
-	private VaultAuthHelper authHelper;
-	public void authrize() throws HiveException {
-		try {
-			this.authHelper = new VaultAuthHelper(opts.authentcationHandler);
-		} catch (Exception e) {
-			throw new HiveException(e.getLocalizedMessage());
-		}
-	}
-
 	public CompletableFuture<Vault> getVault(String ownerDid) {
 		String vaultProvider = null;
 		// TODO:
 		// 1. should resolve the vault provider from the DID document
 		// 2. if there is no vault entry in the DID document, use the local setted value
 
-		return CompletableFuture.supplyAsync(() -> new Vault(this.authHelper, vaultProvider, ownerDid));
+		VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
+		return CompletableFuture.supplyAsync(() -> new Vault(authHelper, vaultProvider, ownerDid));
 	}
 
 	/**

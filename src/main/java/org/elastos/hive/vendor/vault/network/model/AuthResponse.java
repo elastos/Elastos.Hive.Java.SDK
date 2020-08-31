@@ -8,6 +8,8 @@ public class AuthResponse extends BaseResponse {
 
     private String token;
 
+    private long exp;
+
     public String getSubject() {
         return subject;
     }
@@ -30,5 +32,13 @@ public class AuthResponse extends BaseResponse {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public long getExp() {
+        return exp;
+    }
+
+    public void setExp(long exp) {
+        this.exp = exp;
     }
 }

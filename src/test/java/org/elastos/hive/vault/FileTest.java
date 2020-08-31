@@ -6,6 +6,7 @@ import org.elastos.hive.Client;
 import org.elastos.hive.Files;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -29,8 +30,16 @@ public class FileTest {
     private static final String folder = "cache/";
     private static final String remoteFile = folder + "test.txt";
 
-    private String uploadUrl = "api/v1/files/uploader/cache/test.txt"; ///api/v1/files/uploader/test.txt
+    private static String uploadUrl = "api/v1/files/uploader/cache/test.txt"; ///api/v1/files/uploader/test.txt
 
+    @Test
+    public static void test_file_upload() {
+        try {
+            filesApi.upload(uploadUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @BeforeClass
     public static void setUp() {

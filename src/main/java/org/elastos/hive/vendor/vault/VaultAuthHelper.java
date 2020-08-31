@@ -15,7 +15,6 @@ import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.connection.model.HeaderConfig;
-import org.elastos.hive.vendor.vault.network.VaultAuthApi;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.TokenResponse;
@@ -56,8 +55,18 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private AuthenticationHandler authenticationHandler;
 
-    public VaultAuthHelper(AuthenticationHandler handler) {
+    public VaultAuthHelper(String storePath, AuthenticationHandler handler) {
         this.authenticationHandler = handler;
+
+        this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
+
+        try {
+            BaseServiceConfig config = new BaseServiceConfig.Builder().build();
+            ConnectionManager.resetHiveVaultApi(VaultConstance.NODE_URL, config);
+            ConnectionManager.resetAuthApi(VaultConstance.TOKEN_URI, config);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public VaultAuthHelper(String nodeUrl, String storePath, String clientId, String clientSecret, String redirectUrl, String scope) {
@@ -77,28 +86,6 @@ public class VaultAuthHelper implements ConnectHelper {
             e.printStackTrace();
         }
     }
-
-//    @Override
-//    public CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator) {
-//        return authrizeAsync(handler, authenticator, new NullCallback<>());
-//    }
-//
-//    @Override
-//    public CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator, Callback<Void> callback) {
-//        return CompletableFuture.runAsync(() -> {
-//            try {
-//
-//                if(null != authenticator) {
-//                    cloudAccess(authenticator);
-//                }
-//                callback.onSuccess(null);
-//            } catch (Exception e) {
-//                HiveException exception = new HiveException(e.getLocalizedMessage());
-//                callback.onError(exception);
-//                throw new CompletionException(exception);
-//            }
-//        });
-//    }
 
     @Override
     public CompletableFuture<Void> checkValid() {
@@ -121,13 +108,12 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private void doCheckExpired() throws Exception {
         connectState.set(false);
+        tryRestoreToken();
         if (token == null || token.isExpired()) {
             accessRequest(this.authenticationHandler);
-//            redeemToken();
         }
         connectState.set(true);
     }
-
 
 
     private void redeemToken() throws Exception {
@@ -145,12 +131,12 @@ public class VaultAuthHelper implements ConnectHelper {
         connectState.set(false);
         tryRestoreToken();
 
-        if (token == null){
+        if (token == null) {
             nodeAuth("");
             String authCode = accessAuthCode(authenticator);
             accessToken(authCode);
             connectState.set(true);
-            return ;
+            return;
         }
 
         long current = System.currentTimeMillis() / 1000;
@@ -170,14 +156,25 @@ public class VaultAuthHelper implements ConnectHelper {
         map.put("jwt", token);
         String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
-                .auth(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                .accessRequest(getJsonRequestBoy(json))
                 .execute();
         BaseResponse baseResponse = (BaseResponse) response.body();
-        if(baseResponse.get_error() != null) {
+        if (baseResponse.get_error() != null) {
             throw new HiveException(baseResponse.get_error().getMessage());
         }
         String jwtToken = "";
-        if(null!=handler && verifyToken(jwtToken)) handler.authenticationChallenge(jwtToken);
+        if (null != handler && verifyToken(jwtToken)) handler.authenticationChallenge(jwtToken);
+        nodeAuth(jwtToken);
+    }
+
+    private void nodeAuth(String token) throws Exception {
+        Map map = new HashMap<>();
+        map.put("jwt", token);
+        String json = new JSONObject(map).toString();
+        Response response = ConnectionManager.getHiveVaultApi()
+                .auth(getJsonRequestBoy(json))
+                .execute();
+        handleAuthResponse(response);
     }
 
     //TODO
@@ -185,16 +182,6 @@ public class VaultAuthHelper implements ConnectHelper {
         return true;
     }
 
-    //TODO
-    private void nodeAuth(String token) throws Exception {
-        Map map = new HashMap<>();
-        map.put("jwt", token);
-        String json = new JSONObject(map).toString();
-        Response response = ConnectionManager.getHiveVaultApi()
-                .auth(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-                .execute();
-        handleAuthResponse(response);
-    }
 
     private void accessToken(String authCode) throws Exception {
         String formatCode = authCode.replace("%2F", "/");
@@ -223,10 +210,22 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private void handleAuthResponse(Response response) throws Exception {
         AuthResponse authResponse = (AuthResponse) response.body();
-        if(authResponse.get_error() != null) {
+        if (authResponse.get_error() != null) {
             throw new HiveException(authResponse.get_error().getMessage());
         }
-        accessToken = authResponse.getToken();
+
+        long expiresTime = System.currentTimeMillis() / 1000 + (authResponse != null ? authResponse.getExp() : 0);
+
+        token = new AuthToken("",
+                authResponse.getToken(),
+                expiresTime, "token");
+
+        //Store the local data.
+        writebackToken();
+
+        //init connection
+        initConnection();
+
     }
 
     private String accessAuthCode(Authenticator authenticator) throws Exception {
@@ -272,7 +271,7 @@ public class VaultAuthHelper implements ConnectHelper {
 
         String json = new JSONObject(map).toString();
         ConnectionManager.getHiveVaultApi()
-                .googleDrive(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                .googleDrive(getJsonRequestBoy(json))
                 .execute();
     }
 
@@ -335,6 +334,10 @@ public class VaultAuthHelper implements ConnectHelper {
 
     boolean getSyncState() {
         return syncState.get();
+    }
+
+    private RequestBody getJsonRequestBoy(String json) {
+        return RequestBody.create(MediaType.parse("Content-Type, application/json"), json);
     }
 
 }

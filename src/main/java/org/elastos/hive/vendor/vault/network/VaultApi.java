@@ -32,6 +32,9 @@ import retrofit2.http.Query;
 
 public interface VaultApi {
 
+    @POST(ConnectConstance.API_PATH + "")
+    Call<BaseResponse> accessRequest(@Body RequestBody body);
+
     @POST(ConnectConstance.API_PATH + "/did/auth")
     Call<AuthResponse> auth(@Body RequestBody body);
 
