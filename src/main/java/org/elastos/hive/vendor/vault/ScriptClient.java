@@ -1,6 +1,9 @@
 package org.elastos.hive.vendor.vault;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.Scripting;
 import org.elastos.hive.exception.HiveException;
@@ -9,10 +12,7 @@ import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -24,12 +24,6 @@ public class ScriptClient implements Scripting {
 
     public ScriptClient(VaultAuthHelper authHelper) {
         this.authHelper = authHelper;
-    }
-
-    @Override
-    public CompletableFuture<Boolean> registerCondition(String name, Condition condition) throws HiveException {
-        return authHelper.checkValid()
-                .thenCompose(result -> registerConditionImp(name, condition));
     }
 
     private CompletableFuture<Boolean> registerConditionImp(String name, Condition condition) {

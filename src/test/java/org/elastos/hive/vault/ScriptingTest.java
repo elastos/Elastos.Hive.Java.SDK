@@ -17,6 +17,8 @@ import org.elastos.hive.scripting.DbInsertQuery;
 import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.scripting.OrCondition;
 import org.elastos.hive.scripting.QueryHasResultsCondition;
+import org.elastos.hive.scripting.RawCondition;
+import org.elastos.hive.scripting.RawExecutable;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -56,12 +58,13 @@ public class ScriptingTest {
         Condition cond2 = new QueryHasResultsCondition("cond2", "c2", n);
         Condition cond3 = new QueryHasResultsCondition("cond3", "c3", n);
         Condition cond4 = new QueryHasResultsCondition("cond4", "c4", n);
+        Condition cond5 = new RawCondition(json);
 
         OrCondition orCond = new OrCondition("abc", new Condition[] { cond1, cond2});
         AndCondition andCond = new AndCondition("xyz", new Condition[] { cond3, cond4});
 
         OrCondition cond = new OrCondition("root");
-        cond.append(orCond).append(andCond);
+        cond.append(orCond).append(cond5).append(andCond);
 
         System.out.println(cond.serialize());
 	}
@@ -76,9 +79,11 @@ public class ScriptingTest {
         Executable exec1 = new DbFindQuery("exec1", "c1", n);
         Executable exec2 = new DbFindQuery("exec2", "c2", n);
         Executable exec3 = new DbInsertQuery("exec3", "c3", n);
+        Executable exec4 = new RawExecutable(json);
+
 
         AggregatedExecutable exec = new AggregatedExecutable("ae");
-        exec.append(exec1).append(exec2).append(exec3);
+        exec.append(exec1).append(exec2).append(exec4).append(exec3);
 
         System.out.println(exec.serialize());
 	}
