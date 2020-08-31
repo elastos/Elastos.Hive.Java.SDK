@@ -22,12 +22,11 @@
 
 package org.elastos.hive;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.oauth.Authenticator;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
-import org.elastos.hive.vendor.vault.VaultConstance;
+
+import java.util.concurrent.CompletableFuture;
 
 public class Client {
 
@@ -125,14 +124,7 @@ public class Client {
 	private VaultAuthHelper authHelper;
 	public void authrize() throws HiveException {
 		try {
-			this.authHelper = new VaultAuthHelper(opts.nodeUrl(),
-					opts.getDid(),
-					opts.localDataPath(),
-					opts.clientId(),
-					opts.clientSecret(),
-					opts.redirectURL(),
-					VaultConstance.SCOPE);
-			authHelper.authrizeAsync(opts.authentcationHandler, opts.authenticator).get();
+			this.authHelper = new VaultAuthHelper(opts.authentcationHandler);
 		} catch (Exception e) {
 			throw new HiveException(e.getLocalizedMessage());
 		}

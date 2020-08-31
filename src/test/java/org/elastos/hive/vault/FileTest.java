@@ -36,13 +36,10 @@ public class FileTest {
     public static void setUp() {
         try {
             Client.Options options = new Client.Options();
-            options.setNodeUrl(nodeUrl);
-            options.setDid(did);
             options.setAuthenticationHandler((jwtToken) -> null);
             options.setLocalDataPath(localDataPath);
 
             client = Client.createInstance(options);
-            client.authrize();
             filesApi = client.getVault("").get().getFiles();
         } catch (Exception e) {
             fail(e.getMessage());
