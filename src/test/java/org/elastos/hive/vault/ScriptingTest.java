@@ -3,6 +3,12 @@ package org.elastos.hive.vault;
 import org.elastos.hive.Client;
 import org.elastos.hive.Database;
 import org.elastos.hive.Scripting;
+import org.elastos.hive.database.Date;
+import org.elastos.hive.database.MaxKey;
+import org.elastos.hive.database.MinKey;
+import org.elastos.hive.database.ObjectId;
+import org.elastos.hive.database.RegularExpression;
+import org.elastos.hive.database.Timestamp;
 import org.elastos.hive.scripting.AggregatedExecutable;
 import org.elastos.hive.scripting.AndCondition;
 import org.elastos.hive.scripting.Condition;
@@ -15,6 +21,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ScriptingTest {
     private static final String clientId = "1098324333865-q7he5l91a4pqnuq9s2pt5btj9kenebkl.apps.googleusercontent.com";
@@ -37,7 +44,13 @@ public class ScriptingTest {
         ObjectMapper mapper = new ObjectMapper();
         String json = "{\"name\":\"mkyong\", \"age\":37, \"c\":[\"adc\",\"zfy\",\"aaa\"], \"d\": {\"foo\": 1, \"bar\": 2}}";
 
-        JsonNode n = mapper.readTree(json);
+        ObjectNode n = (ObjectNode)mapper.readTree(json);
+        n.putPOJO("dateField", new Date());
+        n.putPOJO("idField", new ObjectId("123123123123123123"));
+        n.putPOJO("minKeyField", new MinKey(100));
+        n.putPOJO("maxKeyField", new MaxKey(200));
+        n.putPOJO("regexField", new RegularExpression("testpattern", "i"));
+        n.putPOJO("tsField", new Timestamp(100000, 1234));
 
         Condition cond1 = new QueryHasResultsCondition("cond1", "c1", n);
         Condition cond2 = new QueryHasResultsCondition("cond2", "c2", n);

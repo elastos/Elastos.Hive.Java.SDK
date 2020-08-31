@@ -35,6 +35,7 @@ public abstract class Executable {
 
 	public String serialize() throws HiveException {
         ObjectMapper mapper = new ObjectMapper();
+
         try {
 			return mapper.writer().writeValueAsString(this);
 		} catch (JsonProcessingException e) {

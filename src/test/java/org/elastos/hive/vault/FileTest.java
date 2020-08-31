@@ -1,13 +1,12 @@
 package org.elastos.hive.vault;
 
+import static org.junit.Assert.fail;
+
 import org.elastos.hive.Client;
 import org.elastos.hive.Files;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
-import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
-import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileTest {
@@ -39,12 +38,12 @@ public class FileTest {
             Client.Options options = new Client.Options();
             options.setNodeUrl(nodeUrl);
             options.setDid(did);
-            options.setAuthenticationHandler((jwtToken, authCompletedCallback) -> null);
+            options.setAuthenticationHandler((jwtToken) -> null);
             options.setLocalDataPath(localDataPath);
 
             client = Client.createInstance(options);
             client.authrize();
-            filesApi = client.getVault("", "").get().getFiles();
+            filesApi = client.getVault("").get().getFiles();
         } catch (Exception e) {
             fail(e.getMessage());
         }

@@ -22,12 +22,12 @@
 
 package org.elastos.hive;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.oauth.Authenticator;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
 import org.elastos.hive.vendor.vault.VaultConstance;
-
-import java.util.concurrent.CompletableFuture;
 
 public class Client {
 
@@ -138,7 +138,41 @@ public class Client {
 		}
 	}
 
-	public CompletableFuture<Vault> getVault(String vaultProvider, String ownerDid) {
+	public CompletableFuture<Vault> getVault(String ownerDid) {
+		String vaultProvider = null;
+		// TODO:
+		// 1. should resolve the vault provider from the DID document
+		// 2. if there is no vault entry in the DID document, use the local setted value
+
 		return CompletableFuture.supplyAsync(() -> new Vault(this.authHelper, vaultProvider, ownerDid));
+	}
+
+	/**
+	 * Tries to find a vault address in the public DID document of the given
+	 * user's DID.
+	 *
+	 * This API always tries to fetch this information from ID chain first
+	 * (vault address published publicly for this user) and falls back to the
+	 * local DID/Vault mapping if it fails to resolve from chain.
+	 *
+	 * After being able to resolve from chain, any previously set local mapping
+	 * is deleted.
+	 *
+	 * @param ownerDid the owner did for the vault
+	 * @return the vault address in String
+	 */
+	public static CompletableFuture<String> getVaultAddress(String ownerDid) {
+		return null;
+	}
+
+	/**
+	 * Locally maps the given owner DID with the given vault address. This is
+	 * useful for example in case a user doesn't publish his vault address on
+	 * the ID chain, and shared it privately.
+	 *
+	 * @param ownerDid the DID for the vault owner
+	 * @param vaultAddress the given vault address
+	 */
+	public static void setVaultAddress(String ownerDid, String vaultAddress) {
 	}
 }

@@ -34,7 +34,8 @@ public abstract class Condition {
 	public abstract Object getBody();
 
 	public String serialize() throws HiveException {
-        ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper mapper = new ObjectMapper();
+
         try {
 			return mapper.writer().writeValueAsString(this);
 		} catch (JsonProcessingException e) {
