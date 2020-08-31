@@ -37,9 +37,9 @@ public interface ConnectHelper {
      * @param handler
      * @return
      */
-    CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator);
-
-    CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator, Callback<Void> callback);
+//    CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator);
+//
+//    CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator, Callback<Void> callback);
 
     /**
      * Check access token isExpired

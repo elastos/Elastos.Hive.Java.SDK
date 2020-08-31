@@ -15,7 +15,9 @@ import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.connection.model.HeaderConfig;
+import org.elastos.hive.vendor.vault.network.VaultAuthApi;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
+import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.TokenResponse;
 import org.json.JSONObject;
 
@@ -39,23 +41,27 @@ public class VaultAuthHelper implements ConnectHelper {
     private static final String EXPIRES_AT_KEY = "expires_at";
     private static final String TOKEN_TYPE_KEY = "token_type";
 
-    private final String redirectUrl;
-    private final String clientId;
-    private final String scope;
-    private final String clientSecret;
+    private String redirectUrl;
+    private String clientId;
+    private String scope;
+    private String clientSecret;
 
-    private final String nodeUrl;
-    private final String did;
+    private String nodeUrl;
 
     private AuthToken token;
     private AtomicBoolean connectState = new AtomicBoolean(false);
     private AtomicBoolean syncState = new AtomicBoolean(false);
     private String accessToken;
-    private final Persistent persistent;
+    private Persistent persistent;
 
-    public VaultAuthHelper(String nodeUrl, String did, String storePath, String clientId, String clientSecret, String redirectUrl, String scope) {
+    private AuthenticationHandler authenticationHandler;
+
+    public VaultAuthHelper(AuthenticationHandler handler) {
+        this.authenticationHandler = handler;
+    }
+
+    public VaultAuthHelper(String nodeUrl, String storePath, String clientId, String clientSecret, String redirectUrl, String scope) {
         this.nodeUrl = nodeUrl;
-        this.did = did;
         this.clientId = clientId;
         this.redirectUrl = redirectUrl;
         this.scope = scope;
@@ -72,27 +78,27 @@ public class VaultAuthHelper implements ConnectHelper {
         }
     }
 
-    @Override
-    public CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator) {
-        return authrizeAsync(handler, authenticator, new NullCallback<>());
-    }
-
-    @Override
-    public CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator, Callback<Void> callback) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-
-                if(null != authenticator) {
-                    cloudAccess(authenticator);
-                }
-                callback.onSuccess(null);
-            } catch (Exception e) {
-                HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
-                throw new CompletionException(exception);
-            }
-        });
-    }
+//    @Override
+//    public CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator) {
+//        return authrizeAsync(handler, authenticator, new NullCallback<>());
+//    }
+//
+//    @Override
+//    public CompletableFuture<Void> authrizeAsync(AuthenticationHandler handler, Authenticator authenticator, Callback<Void> callback) {
+//        return CompletableFuture.runAsync(() -> {
+//            try {
+//
+//                if(null != authenticator) {
+//                    cloudAccess(authenticator);
+//                }
+//                callback.onSuccess(null);
+//            } catch (Exception e) {
+//                HiveException exception = new HiveException(e.getLocalizedMessage());
+//                callback.onError(exception);
+//                throw new CompletionException(exception);
+//            }
+//        });
+//    }
 
     @Override
     public CompletableFuture<Void> checkValid() {
@@ -116,11 +122,13 @@ public class VaultAuthHelper implements ConnectHelper {
     private void doCheckExpired() throws Exception {
         connectState.set(false);
         if (token == null || token.isExpired()) {
-            nodeAuth();
-            redeemToken();
+            accessRequest(this.authenticationHandler);
+//            redeemToken();
         }
         connectState.set(true);
     }
+
+
 
     private void redeemToken() throws Exception {
         String refreshToken = "";
@@ -138,7 +146,7 @@ public class VaultAuthHelper implements ConnectHelper {
         tryRestoreToken();
 
         if (token == null){
-            nodeAuth();
+            nodeAuth("");
             String authCode = accessAuthCode(authenticator);
             accessToken(authCode);
             connectState.set(true);
@@ -157,13 +165,30 @@ public class VaultAuthHelper implements ConnectHelper {
         connectState.set(true);
     }
 
-    private void authChallenge(AuthenticationHandler handler) throws Exception {
-        //TODO
+    private void accessRequest(AuthenticationHandler handler) throws Exception {
+        Map map = new HashMap<>();
+        map.put("jwt", token);
+        String json = new JSONObject(map).toString();
+        Response response = ConnectionManager.getHiveVaultApi()
+                .auth(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                .execute();
+        BaseResponse baseResponse = (BaseResponse) response.body();
+        if(baseResponse.get_error() != null) {
+            throw new HiveException(baseResponse.get_error().getMessage());
+        }
+        String jwtToken = "";
+        if(null!=handler && verifyToken(jwtToken)) handler.authenticationChallenge(jwtToken);
     }
 
-    private void nodeAuth() throws Exception {
+    //TODO
+    private boolean verifyToken(String token) {
+        return true;
+    }
+
+    //TODO
+    private void nodeAuth(String token) throws Exception {
         Map map = new HashMap<>();
-        map.put("jwt", this.did);
+        map.put("jwt", token);
         String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
                 .auth(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))

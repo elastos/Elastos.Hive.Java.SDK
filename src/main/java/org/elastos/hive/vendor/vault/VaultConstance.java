@@ -4,7 +4,6 @@ public class VaultConstance {
 
     static final String CONFIG = "hivesault.json";
 
-
     static final String AUTH_URI = "https://accounts.google.com/o/oauth2/auth";
 
     static final String TOKEN_URI = "https://oauth2.googleapis.com";
@@ -18,6 +17,8 @@ public class VaultConstance {
 
     static final String DEFAULT_REDIRECT_URL = "localhost";
     static final int    DEFAULT_REDIRECT_PORT = 12345;
+
+    static final String NODE_URL = "https://hive.trinity-tech.io";
 
 //    static final String DICT_SCHEMA = "{'KV': {\n" +
 //            "        'type': 'dict',\n" +

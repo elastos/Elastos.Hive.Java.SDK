@@ -3,13 +3,6 @@ package org.elastos.hive;
 import java.util.concurrent.CompletableFuture;
 
 public interface AuthenticationHandler {
-    public interface OnAuthenticationCompleted {
-        /**
-         * Callback to be called as a response to authenticationChallenge(), whenever the authentication
-         * response is ready to be sent to the vault (packaged and signed as JWT).
-         */
-        void onAuthenticationCompleted(String jwtToken);
-    }
     /*
      * auth challenge: JWT (iss, nonce)
      * hive sdk:
@@ -22,6 +15,6 @@ public interface AuthenticationHandler {
      *   verify jwt (using local app instance did public key provided before)
      *   generate access token
      */
-    public CompletableFuture<String> authenticationChallenge(String jwtToken, OnAuthenticationCompleted authCompletedCallback);
+    public CompletableFuture<String> authenticationChallenge(String jwtToken);
 }
 
