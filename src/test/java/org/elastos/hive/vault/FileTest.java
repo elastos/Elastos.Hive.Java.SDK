@@ -32,15 +32,6 @@ public class FileTest {
 
     private static String uploadUrl = "api/v1/files/uploader/cache/test.txt"; ///api/v1/files/uploader/test.txt
 
-    @Test
-    public static void test_file_upload() {
-        try {
-            filesApi.upload(uploadUrl);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @BeforeClass
     public static void setUp() {
         try {

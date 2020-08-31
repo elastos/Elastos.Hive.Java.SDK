@@ -1,18 +1,20 @@
 package org.elastos.hive.vendor.vault;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.elastos.hive.Scripting;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.utils.JsonUtil;
+import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -122,11 +124,7 @@ public class ScriptClient implements Scripting {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-
-                // TODO: CHECKME!!!
-                // TODO: should support String, JsonNode, byte[], Reader
-            	// return ResponseHelper.writeToReader(response);
-               return null;
+                return new ObjectMapper().readValue(ResponseHelper.getString(response), clazz);
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);
