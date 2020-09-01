@@ -10,7 +10,6 @@ import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.vault.network.VaultApi;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
-import org.elastos.hive.vendor.vault.network.model.PropertiesResponse;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -18,7 +17,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,12 +58,12 @@ public class FileClient implements Files {
                 conn.setDoInput(true);
                 conn.setUseCaches(false);
                 conn.setRequestMethod("POST");
-                conn.setRequestProperty("Transfer-Encoding","chunked");
+                conn.setRequestProperty("Transfer-Encoding", "chunked");
                 conn.setRequestProperty("Connection", "Keep-Alive");
                 conn.setRequestProperty("Charsert", "UTF-8");
                 conn.setConnectTimeout(5000);
                 conn.setReadTimeout(5000);
-                conn.setChunkedStreamingMode(20*1024); //指定流的大小，当内容达到这个值的时候就把流输出
+                conn.setChunkedStreamingMode(20 * 1024); //指定流的大小，当内容达到这个值的时候就把流输出
 
                 OutputStream outputStream = conn.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
@@ -137,46 +135,7 @@ public class FileClient implements Files {
                 String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
-                        .deleteFolder(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-                        .execute();
-                int responseCode = checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-                callback.onSuccess(true);
-                return true;
-            } catch (Exception e) {
-                HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
-                throw new CompletionException(exception);
-            }
-        });
-    }
-
-    /*
-    @Override
-    public CompletableFuture<Boolean> createFolder(String folder) {
-        return createFolder(folder, null);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> createFolder(String folder, Callback<Boolean> callback) {
-        return authHelper.checkValid()
-                .thenCompose(result -> createFolderImp(folder, getCallback(callback)));
-    }
-	*/
-
-    private CompletableFuture<Boolean> createFolderImp(String folder, Callback<Boolean> callback) {
-
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                Map map = new HashMap<>();
-                map.put("name", folder);
-                String json = JsonUtil.getJsonFromObject(map);
-                Response response = ConnectionManager.getHiveVaultApi()
-                        .createFolder(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                        .deleteFolder(createJsonRequestBody(json))
                         .execute();
                 int responseCode = checkResponseCode(response);
                 if (responseCode == 404) {
@@ -201,7 +160,34 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<Boolean> move(String src, String dst, Callback<Boolean> callback) {
-        return null;
+        return moveImp(src, dst, getCallback(callback));
+    }
+
+    private CompletableFuture<Boolean> moveImp(String src, String dst, Callback<Boolean> callback) {
+
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Map map = new HashMap<>();
+                map.put("src_path", src);
+                map.put("dst_path", dst);
+                String json = JsonUtil.getJsonFromObject(map);
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .move(createJsonRequestBody(json))
+                        .execute();
+                int responseCode = checkResponseCode(response);
+                if (responseCode == 404) {
+                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
+                } else if (responseCode != 0) {
+                    throw new HiveException(HiveException.ERROR);
+                }
+                callback.onSuccess(true);
+                return true;
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
+            }
+        });
     }
 
     @Override
@@ -211,7 +197,34 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<Boolean> copy(String src, String dst, Callback<Boolean> callback) {
-        return null;
+        return copyImp(src, dst, getCallback(callback));
+    }
+
+    private CompletableFuture<Boolean> copyImp(String src, String dst, Callback<Boolean> callback) {
+
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Map map = new HashMap<>();
+                map.put("src_path", src);
+                map.put("dst_path", dst);
+                String json = JsonUtil.getJsonFromObject(map);
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .copy(createJsonRequestBody(json))
+                        .execute();
+                int responseCode = checkResponseCode(response);
+                if (responseCode == 404) {
+                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
+                } else if (responseCode != 0) {
+                    throw new HiveException(HiveException.ERROR);
+                }
+                callback.onSuccess(true);
+                return true;
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
+            }
+        });
     }
 
     @Override
@@ -221,7 +234,31 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<String> hash(String remoteFile, Callback<String> callback) {
-        return null;
+        return hashImp(remoteFile, getCallback(callback));
+    }
+
+    private CompletableFuture<String> hashImp(String remoteFile, Callback<String> callback) {
+
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .hash(remoteFile)
+                        .execute();
+                int responseCode = checkResponseCode(response);
+                if (responseCode == 404) {
+                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
+                } else if (responseCode != 0) {
+                    throw new HiveException(HiveException.ERROR);
+                }
+                String ret = ResponseHelper.getString(response);
+                callback.onSuccess(ret);
+                return ret;
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                callback.onError(exception);
+                throw new CompletionException(exception);
+            }
+        });
     }
 
     @Override
@@ -248,9 +285,8 @@ public class FileClient implements Files {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                //TODO need node support
-//                List<FileInfo> list = new List<FileInfo>(response.body().getFiles());
-                List<FileInfo> list = new ArrayList<FileInfo>();
+
+                List<FileInfo> list = response.body().getFiles();
                 callback.onSuccess(list);
                 return list;
             } catch (Exception e) {
@@ -263,19 +299,19 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<FileInfo> stat(String path) {
-        return null;
+        return stat(path, null);
     }
 
     @Override
     public CompletableFuture<FileInfo> stat(String path, Callback<FileInfo> callback) {
-        return null;
+        return statImp(path, getCallback(callback));
     }
 
-    public CompletableFuture<Long> statImp(String remoteFile, Callback<Long> callback) {
+    public CompletableFuture<FileInfo> statImp(String path, Callback<FileInfo> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 VaultApi api = ConnectionManager.getHiveVaultApi();
-                Response<PropertiesResponse> response = api.getProperties(remoteFile).execute();
+                Response<FileInfo> response = api.getProperties(path).execute();
 
                 int responseCode = checkResponseCode(response);
                 if (responseCode == 404) {
@@ -284,7 +320,7 @@ public class FileClient implements Files {
                     throw new HiveException(HiveException.ERROR);
                 }
                 callback.onSuccess(null);
-                return response.body().getSt_size();
+                return response.body();
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -293,10 +329,9 @@ public class FileClient implements Files {
         });
     }
 
-    private RequestBody createWriteRequestBody(byte[] data) {
-        return RequestBody.create(MediaType.parse("multipart/form-data"), data);
+    private RequestBody createJsonRequestBody(String json) {
+        return RequestBody.create(MediaType.parse("Content-Type, application/json"), json);
     }
-
 
     private Response getFileOrBuffer(String destFilePath) throws HiveException {
         Response response;

@@ -24,7 +24,7 @@ public class FileInfo {
 
     private long size;
 
-    private Date LastModified;
+    private Date last_modify;
 
 
     public Type getType() {
@@ -51,11 +51,11 @@ public class FileInfo {
         this.size = size;
     }
 
-    public Date getLastModified() {
-        return LastModified;
+    public Date getLastModify() {
+        return last_modify;
     }
 
-    public void setLastModified(Date lastModified) {
-        LastModified = lastModified;
+    public void setLast_modify(Date last_modify) {
+        this.last_modify = last_modify;
     }
 }
