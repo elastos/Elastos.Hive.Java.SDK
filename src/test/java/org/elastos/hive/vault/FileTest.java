@@ -39,7 +39,6 @@ public class FileTest {
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler((jwtToken) -> null);
             options.setLocalDataPath(localDataPath);
-            options.setStorePass(storePath);
 
             client = Client.createInstance(options);
             filesApi = client.getVault("").get().getFiles();

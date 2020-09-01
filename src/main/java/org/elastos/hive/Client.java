@@ -22,13 +22,14 @@
 
 package org.elastos.hive;
 
+import org.elastos.did.DID;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDStore;
+import org.elastos.did.DIDURL;
 import org.elastos.did.adapter.DummyAdapter;
-import org.elastos.hive.oauth.Authenticator;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
-import org.elastos.hive.vendor.vault.VaultConstance;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Client {
@@ -52,7 +53,6 @@ public class Client {
 
 		private AuthenticationHandler authentcationHandler;
 		private String localPath;
-		private String storePass;
 
 //		public void setDid(String did) {
 //			this.did = did;
@@ -105,15 +105,6 @@ public class Client {
 			return this.authentcationHandler;
 		}
 
-		public Options setStorePass(String pass) {
-			this.storePass = pass;
-			return this;
-		}
-
-		public String storePass() {
-			return this.storePass;
-		}
-
 		public Options setLocalDataPath(String path) {
 			this.localPath = path;
 			return this;
@@ -135,22 +126,20 @@ public class Client {
 	}
 
 	public CompletableFuture<Vault> getVault(String ownerDid) {
-		String vaultProvider = null;
-		try {
-			DIDStore store = DIDStore.open("filesystem", opts.localPath, new DummyAdapter(false));
-
-			DIDDocument doc = store.loadDid(ownerDid);
-			DIDDocument.Builder db = doc.edit();
-			db.addService("HiveVault", "HiveVault", "http://test.com/");
-			doc = db.seal(opts.storePass);
-			vaultProvider = doc.getSubject().toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
-		String finalVaultProvider = vaultProvider==null? VaultConstance.DEFAULT_VAULT_PROVIDER : vaultProvider;
-		return CompletableFuture.supplyAsync(() -> new Vault(authHelper, finalVaultProvider, ownerDid));
+		return CompletableFuture.supplyAsync(() -> {
+			String vaultProvider = null;
+			try {
+				DID did = new DID(ownerDid);
+				DIDDocument doc = did.resolve();
+				List<DIDDocument.Service> services = doc.selectServices((DIDURL) null, "HiveVault");
+				if(services!=null && services.size()>1)
+					vaultProvider = services.get(0).getServiceEndpoint();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
+			return new Vault(authHelper, vaultProvider, ownerDid);
+		});
 	}
 
 	/**
