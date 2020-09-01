@@ -24,10 +24,9 @@ package org.elastos.hive;
 
 import org.elastos.did.DID;
 import org.elastos.did.DIDDocument;
-import org.elastos.did.DIDStore;
 import org.elastos.did.DIDURL;
-import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
+import org.elastos.hive.vendor.vault.VaultConstance;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -138,7 +137,7 @@ public class Client {
 				e.printStackTrace();
 			}
 			VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
-			return new Vault(authHelper, vaultProvider, ownerDid);
+			return vaultProvider==null ? null : new Vault(authHelper, vaultProvider, ownerDid);
 		});
 	}
 
@@ -157,8 +156,23 @@ public class Client {
 	 * @return the vault address in String
 	 */
 	public static CompletableFuture<String> getVaultAddress(String ownerDid) {
-		return null;
+		return CompletableFuture.supplyAsync(() -> {
+			String vaultProvider = null;
+			try {
+				DID did = new DID(ownerDid);
+				DIDDocument doc = did.resolve();
+				List<DIDDocument.Service> services = doc.selectServices((DIDURL) null, "HiveVault");
+				if(services!=null && services.size()>1)
+					vaultProvider = services.get(0).getServiceEndpoint();
+				else
+					vaultProvider = VaultConstance.NODE_URL;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return vaultProvider;
+		});
 	}
+
 
 	/**
 	 * Locally maps the given owner DID with the given vault address. This is
@@ -169,5 +183,6 @@ public class Client {
 	 * @param vaultAddress the given vault address
 	 */
 	public static void setVaultAddress(String ownerDid, String vaultAddress) {
+
 	}
 }
