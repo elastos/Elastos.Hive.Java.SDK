@@ -19,6 +19,7 @@ public class FileTest {
     private static final String did = "Instance DID public authentication key";
 
     private static final String localDataPath = System.getProperty("user.dir");
+    private static final String storePath = "did store pass";
     private String stringReader = "this is test for reader";
 
     private static Client client;
@@ -38,6 +39,7 @@ public class FileTest {
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler((jwtToken) -> null);
             options.setLocalDataPath(localDataPath);
+            options.setStorePass(storePath);
 
             client = Client.createInstance(options);
             filesApi = client.getVault("").get().getFiles();

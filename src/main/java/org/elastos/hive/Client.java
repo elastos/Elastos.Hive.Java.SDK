@@ -22,8 +22,12 @@
 
 package org.elastos.hive;
 
+import org.elastos.did.DIDDocument;
+import org.elastos.did.DIDStore;
+import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.hive.oauth.Authenticator;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
+import org.elastos.hive.vendor.vault.VaultConstance;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -37,51 +41,52 @@ public class Client {
 
 	public static class Options {
 
-		private String did;
-		private String clientId;
-		private String clientSecret;
-		private String redirectURL;
-		private String nodeUrl;
-		private Authenticator authenticator;
+//		private String did;
+//		private String clientId;
+//		private String clientSecret;
+//		private String redirectURL;
+//		private String nodeUrl;
+//		private Authenticator authenticator;
 
 		private boolean enableCloudSync;
 
 		private AuthenticationHandler authentcationHandler;
 		private String localPath;
+		private String storePass;
 
-		public void setDid(String did) {
-			this.did = did;
-		}
-
-		public String getDid() {return this.did;}
-
-		public void setClientId(String clientId) {
-			this.clientId = clientId;
-		}
-
-		public String clientId() {return this.clientId;}
-
-		public void setClientSecret(String clientSecret) {
-			this.clientSecret = clientSecret;
-		}
-
-		public String clientSecret() {
-			return this.clientSecret;
-		}
-
-		public void setRedirectURL(String redirectURL) {
-			this.redirectURL = redirectURL;
-		}
-
-		public String redirectURL() {return this.redirectURL;}
-
-		public void setNodeUrl(String url) {
-			this.nodeUrl = url;
-		}
-
-		public String nodeUrl() {
-			return nodeUrl;
-		}
+//		public void setDid(String did) {
+//			this.did = did;
+//		}
+//
+//		public String getDid() {return this.did;}
+//
+//		public void setClientId(String clientId) {
+//			this.clientId = clientId;
+//		}
+//
+//		public String clientId() {return this.clientId;}
+//
+//		public void setClientSecret(String clientSecret) {
+//			this.clientSecret = clientSecret;
+//		}
+//
+//		public String clientSecret() {
+//			return this.clientSecret;
+//		}
+//
+//		public void setRedirectURL(String redirectURL) {
+//			this.redirectURL = redirectURL;
+//		}
+//
+//		public String redirectURL() {return this.redirectURL;}
+//
+//		public void setNodeUrl(String url) {
+//			this.nodeUrl = url;
+//		}
+//
+//		public String nodeUrl() {
+//			return nodeUrl;
+//		}
 
 		public void setEnableCloudSync(boolean enable) {
 			this.enableCloudSync = enable;
@@ -98,6 +103,15 @@ public class Client {
 
 		public AuthenticationHandler authenticationHandler() {
 			return this.authentcationHandler;
+		}
+
+		public Options setStorePass(String pass) {
+			this.storePass = pass;
+			return this;
+		}
+
+		public String storePass() {
+			return this.storePass;
 		}
 
 		public Options setLocalDataPath(String path) {
@@ -122,12 +136,21 @@ public class Client {
 
 	public CompletableFuture<Vault> getVault(String ownerDid) {
 		String vaultProvider = null;
-		// TODO:
-		// 1. should resolve the vault provider from the DID document
-		// 2. if there is no vault entry in the DID document, use the local setted value
+		try {
+			DIDStore store = DIDStore.open("filesystem", opts.localPath, new DummyAdapter(false));
+
+			DIDDocument doc = store.loadDid(ownerDid);
+			DIDDocument.Builder db = doc.edit();
+			db.addService("HiveVault", "HiveVault", "http://test.com/");
+			doc = db.seal(opts.storePass);
+			vaultProvider = doc.getSubject().toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
-		return CompletableFuture.supplyAsync(() -> new Vault(authHelper, vaultProvider, ownerDid));
+		String finalVaultProvider = vaultProvider==null? VaultConstance.DEFAULT_VAULT_PROVIDER : vaultProvider;
+		return CompletableFuture.supplyAsync(() -> new Vault(authHelper, finalVaultProvider, ownerDid));
 	}
 
 	/**

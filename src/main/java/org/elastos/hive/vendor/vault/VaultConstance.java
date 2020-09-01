@@ -20,6 +20,8 @@ public class VaultConstance {
 
     static final String NODE_URL = "https://hive.trinity-tech.io";
 
+    public static final String DEFAULT_VAULT_PROVIDER = "did:elastos:iWFAUYhTa35c1fPe3iCJvihZHx6quumnym";
+
 //    static final String DICT_SCHEMA = "{'KV': {\n" +
 //            "        'type': 'dict',\n" +
 //            "        'schema': {\n" +
