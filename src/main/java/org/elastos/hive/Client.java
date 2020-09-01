@@ -25,18 +25,26 @@ package org.elastos.hive;
 import org.elastos.did.DID;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDURL;
+import org.elastos.did.util.LRUCache;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
-import org.elastos.hive.vendor.vault.VaultConstance;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class Client {
 
 	private Options opts;
 
+	private static Map<DID, Vault> vaultCache;
+	private static Map<String , String> providerCache;
+
 	public Client(Options options) {
 		this.opts = options;
+		providerCache = new HashMap<>();
+//		this.vaultCache = LRUCache.createInstance(16, 32);
 	}
 
 	public static class Options {
@@ -128,16 +136,18 @@ public class Client {
 		return CompletableFuture.supplyAsync(() -> {
 			String vaultProvider = null;
 			try {
-				DID did = new DID(ownerDid);
-				DIDDocument doc = did.resolve();
-				List<DIDDocument.Service> services = doc.selectServices((DIDURL) null, "HiveVault");
-				if(services!=null && services.size()>1)
-					vaultProvider = services.get(0).getServiceEndpoint();
-			} catch (Exception e) {
+				vaultProvider = getVaultProvider(ownerDid).get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
-			VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
-			return vaultProvider==null ? null : new Vault(authHelper, vaultProvider, ownerDid);
+			Vault vault = null;
+			if(vaultProvider != null) {
+				VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
+				vault = new Vault(authHelper, vaultProvider, ownerDid);
+			}
+			return vault;
 		});
 	}
 
@@ -155,17 +165,19 @@ public class Client {
 	 * @param ownerDid the owner did for the vault
 	 * @return the vault address in String
 	 */
-	public static CompletableFuture<String> getVaultAddress(String ownerDid) {
+	public static CompletableFuture<String> getVaultProvider(String ownerDid) {
 		return CompletableFuture.supplyAsync(() -> {
 			String vaultProvider = null;
 			try {
 				DID did = new DID(ownerDid);
 				DIDDocument doc = did.resolve();
 				List<DIDDocument.Service> services = doc.selectServices((DIDURL) null, "HiveVault");
-				if(services!=null && services.size()>1)
+				if(services!=null && services.size()>0) {
 					vaultProvider = services.get(0).getServiceEndpoint();
-				else
-					vaultProvider = VaultConstance.NODE_URL;
+					providerCache.put(ownerDid, vaultProvider);
+				} else {
+					vaultProvider = providerCache.get(ownerDid);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -182,7 +194,8 @@ public class Client {
 	 * @param ownerDid the DID for the vault owner
 	 * @param vaultAddress the given vault address
 	 */
-	public static void setVaultAddress(String ownerDid, String vaultAddress) {
-
+	public static void setVaultProvider(String ownerDid, String vaultAddress) {
+		if(null==ownerDid || vaultAddress==null) return;
+		providerCache.put(ownerDid, vaultAddress);
 	}
 }
