@@ -12,8 +12,12 @@ import org.elastos.hive.vendor.vault.network.VaultApi;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 import org.elastos.hive.vendor.vault.network.model.PropertiesResponse;
 
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,21 +53,25 @@ public class FileClient implements Files {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                RequestBody requestBody = createWriteRequestBody(null);
-                Response response = ConnectionManager.getHiveVaultApi()
-                        .uploadFile(path, requestBody)
-                        .execute();
-                if (response == null)
-                    throw new HiveException(HiveException.ERROR);
 
-                int responseCode = checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-                callback.onSuccess(null);
-                return ResponseHelper.writeToWriter(response);
+                URL reslUrl = new URL(path);
+                HttpURLConnection conn = (HttpURLConnection) reslUrl.openConnection();
+                conn.setDoOutput(true);
+                conn.setDoInput(true);
+                conn.setUseCaches(false);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Transfer-Encoding","chunked");
+                conn.setRequestProperty("Connection", "Keep-Alive");
+                conn.setRequestProperty("Charsert", "UTF-8");
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
+                conn.setChunkedStreamingMode(20*1024); //指定流的大小，当内容达到这个值的时候就把流输出
+
+                OutputStream outputStream = conn.getOutputStream();
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
+
+                return outputStreamWriter;
+
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);

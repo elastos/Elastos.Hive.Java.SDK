@@ -25,7 +25,6 @@ package org.elastos.hive;
 import org.elastos.did.DID;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDURL;
-import org.elastos.did.util.LRUCache;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
 
 import java.util.HashMap;
