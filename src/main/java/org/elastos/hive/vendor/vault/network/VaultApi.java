@@ -5,7 +5,6 @@ import org.elastos.hive.file.FileInfo;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
-import org.elastos.hive.vendor.vault.network.model.PropertiesResponse;
 import org.elastos.hive.vendor.vault.network.model.UploadResponse;
 
 import okhttp3.RequestBody;

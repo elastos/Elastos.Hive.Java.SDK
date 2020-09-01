@@ -23,8 +23,10 @@
 package org.elastos.hive;
 
 import org.elastos.did.DID;
+import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDURL;
+import org.elastos.did.backend.ResolverCache;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
 
 import java.util.HashMap;
@@ -35,7 +37,7 @@ import java.util.concurrent.ExecutionException;
 
 public class Client {
 
-	private Options opts;
+	private static Options opts;
 
 	private static Map<DID, Vault> vaultCache;
 	private static Map<String , String> providerCache;
@@ -120,9 +122,9 @@ public class Client {
 			return this.localPath;
 		}
 
-        protected boolean checkValid(boolean all) {
-            return /*(storePath != null) && (!all || authenticator != null)*/true;
-        }
+		protected boolean checkValid(boolean all) {
+			return /*(storePath != null) && (!all || authenticator != null)*/true;
+		}
 
 	}
 
@@ -168,6 +170,8 @@ public class Client {
 		return CompletableFuture.supplyAsync(() -> {
 			String vaultProvider = null;
 			try {
+				DIDBackend.initialize("http://api.elastos.io:20606", opts.localPath);
+				ResolverCache.reset();
 				DID did = new DID(ownerDid);
 				DIDDocument doc = did.resolve();
 				List<DIDDocument.Service> services = doc.selectServices((DIDURL) null, "HiveVault");

@@ -2,12 +2,16 @@ package org.elastos.hive.vault;
 
 import static org.junit.Assert.fail;
 
+import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.Files;
+import org.elastos.hive.exception.HiveException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import java.io.Writer;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileTest {
@@ -32,6 +36,30 @@ public class FileTest {
     private static final String remoteFile = folder + "test.txt";
 
     private static String uploadUrl = "api/v1/files/uploader/cache/test.txt"; ///api/v1/files/uploader/test.txt
+
+    @Test
+    public void testUpload() {
+        try {
+            filesApi.upload(uploadUrl, new Callback<Writer>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
+
+                @Override
+                public void onSuccess(Writer result) {
+                    try {
+                        result.write("aaaaaaaaaa");
+                        result.flush();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @BeforeClass
     public static void setUp() {
