@@ -141,13 +141,16 @@ public class Client {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-//			Vault vault = null;
-//			if(vaultProvider != null) {
-//				VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
-//				vault = new Vault(authHelper, vaultProvider, ownerDid);
-//			}
-			VaultAuthHelper authHelper = new VaultAuthHelper(vaultProvider, opts.localPath, opts.authentcationHandler);
-			return new Vault(authHelper, vaultProvider, ownerDid);
+			Vault vault = null;
+			if(vaultProvider != null) {
+				VaultAuthHelper authHelper = new VaultAuthHelper(vaultProvider, opts.localPath, opts.authentcationHandler);
+				vault = new Vault(authHelper, vaultProvider, ownerDid);
+			}
+
+			return vault;
+
+//			VaultAuthHelper authHelper = new VaultAuthHelper(vaultProvider, opts.localPath, opts.authentcationHandler);
+//			return new Vault(authHelper, vaultProvider, ownerDid);
 		});
 	}
 
