@@ -1,5 +1,6 @@
 package org.elastos.hive.vendor.vault;
 
+import org.elastos.did.DIDDocument;
 import org.elastos.hive.AuthenticationHandler;
 import org.elastos.hive.Callback;
 import org.elastos.hive.ConnectHelper;
@@ -53,9 +54,11 @@ public class VaultAuthHelper implements ConnectHelper {
     private String accessToken;
     private Persistent persistent;
 
+    private DIDDocument authenticationDIDDocument;
     private AuthenticationHandler authenticationHandler;
 
-    public VaultAuthHelper(String nodeUrl, String storePath, AuthenticationHandler handler) {
+    public VaultAuthHelper(String nodeUrl, String storePath, DIDDocument authenticationDIDDocument, AuthenticationHandler handler) {
+        this.authenticationDIDDocument = authenticationDIDDocument;
         this.authenticationHandler = handler;
 
         this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
@@ -153,7 +156,7 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private void accessRequest(AuthenticationHandler handler) throws Exception {
         Map map = new HashMap<>();
-        map.put("jwt", token);
+        map.put("document", authenticationDIDDocument.toString());
         String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
                 .accessRequest(getJsonRequestBoy(json))

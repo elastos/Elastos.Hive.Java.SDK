@@ -66,6 +66,7 @@ public class FileTest {
         try {
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler((jwtToken) -> null);
+            options.setAuthenticationDIDDocument(null);
             options.setLocalDataPath(localDataPath);
 
             client = Client.createInstance(options);

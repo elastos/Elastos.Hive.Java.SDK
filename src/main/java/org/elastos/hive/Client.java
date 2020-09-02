@@ -60,6 +60,7 @@ public class Client {
 		private boolean enableCloudSync;
 
 		private AuthenticationHandler authentcationHandler;
+		private DIDDocument authenticationDIDDocument;
 		private String localPath;
 
 //		public void setDid(String did) {
@@ -104,6 +105,15 @@ public class Client {
 			return this.enableCloudSync;
 		}
 
+		public Options setAuthenticationDIDDocument(DIDDocument document) {
+			this.authenticationDIDDocument = document;
+			return this;
+		}
+
+		public DIDDocument authenticationDIDDocument() {
+			return this.authenticationDIDDocument;
+		}
+
 		public Options setAuthenticationHandler(AuthenticationHandler authentcationHandler) {
 			this.authentcationHandler = authentcationHandler;
 			return this;
@@ -123,7 +133,8 @@ public class Client {
 		}
 
 		protected boolean checkValid(boolean all) {
-			return /*(storePath != null) && (!all || authenticator != null)*/true;
+			return (localPath != null) && (!all || authenticationDIDDocument != null)
+					&& (authentcationHandler != null);
 		}
 
 	}
@@ -143,7 +154,7 @@ public class Client {
 			}
 			Vault vault = null;
 			if(vaultProvider != null) {
-				VaultAuthHelper authHelper = new VaultAuthHelper(vaultProvider, opts.localPath, opts.authentcationHandler);
+				VaultAuthHelper authHelper = new VaultAuthHelper(vaultProvider, opts.localPath, opts.authenticationDIDDocument, opts.authentcationHandler);
 				vault = new Vault(authHelper, vaultProvider, ownerDid);
 			}
 
