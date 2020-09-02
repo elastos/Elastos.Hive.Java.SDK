@@ -143,12 +143,13 @@ public class Client {
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
-			Vault vault = null;
-			if(vaultProvider != null) {
-				VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
-				vault = new Vault(authHelper, vaultProvider, ownerDid);
-			}
-			return vault;
+//			Vault vault = null;
+//			if(vaultProvider != null) {
+//				VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
+//				vault = new Vault(authHelper, vaultProvider, ownerDid);
+//			}
+			VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
+			return new Vault(authHelper, vaultProvider, ownerDid);
 		});
 	}
 
@@ -174,12 +175,12 @@ public class Client {
 				ResolverCache.reset();
 				DID did = new DID(ownerDid);
 				DIDDocument doc = did.resolve();
-				List<DIDDocument.Service> services = doc.selectServices((DIDURL) null, "HiveVault");
+				List<DIDDocument.Service> services = (doc==null)?null:doc.selectServices((DIDURL) null, "HiveVault");
 				if(services!=null && services.size()>0) {
 					vaultProvider = services.get(0).getServiceEndpoint();
 					providerCache.put(ownerDid, vaultProvider);
 				} else {
-					vaultProvider = providerCache.get(ownerDid);
+					vaultProvider = (providerCache.get(ownerDid))==null? "":providerCache.get(ownerDid);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

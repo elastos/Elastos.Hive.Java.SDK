@@ -69,7 +69,7 @@ public class FileTest {
             options.setLocalDataPath(localDataPath);
 
             client = Client.createInstance(options);
-            filesApi = client.getVault("").get().getFiles();
+            filesApi = client.getVault("did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM").get().getFiles();
         } catch (Exception e) {
             fail(e.getMessage());
         }
