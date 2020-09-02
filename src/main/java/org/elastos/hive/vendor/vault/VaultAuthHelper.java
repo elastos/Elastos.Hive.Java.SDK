@@ -55,14 +55,14 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private AuthenticationHandler authenticationHandler;
 
-    public VaultAuthHelper(String storePath, AuthenticationHandler handler) {
+    public VaultAuthHelper(String nodeUrl, String storePath, AuthenticationHandler handler) {
         this.authenticationHandler = handler;
 
         this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
 
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-            ConnectionManager.resetHiveVaultApi(VaultConstance.NODE_URL, config);
+            ConnectionManager.resetHiveVaultApi(nodeUrl, config);
             ConnectionManager.resetAuthApi(VaultConstance.TOKEN_URI, config);
         } catch (Exception e) {
             e.printStackTrace();

@@ -138,9 +138,7 @@ public class Client {
 			String vaultProvider = null;
 			try {
 				vaultProvider = getVaultProvider(ownerDid).get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 //			Vault vault = null;
@@ -148,7 +146,7 @@ public class Client {
 //				VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
 //				vault = new Vault(authHelper, vaultProvider, ownerDid);
 //			}
-			VaultAuthHelper authHelper = new VaultAuthHelper(opts.localPath, opts.authentcationHandler);
+			VaultAuthHelper authHelper = new VaultAuthHelper(vaultProvider, opts.localPath, opts.authentcationHandler);
 			return new Vault(authHelper, vaultProvider, ownerDid);
 		});
 	}
