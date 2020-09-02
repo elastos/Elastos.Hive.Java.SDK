@@ -10,6 +10,16 @@ public class AuthResponse extends BaseResponse {
 
     private long exp;
 
+    private String jwt;
+
+    public String getJwt() {
+        return jwt;
+    }
+
+    public void setJwt(String jwt) {
+        this.jwt = jwt;
+    }
+
     public String getSubject() {
         return subject;
     }

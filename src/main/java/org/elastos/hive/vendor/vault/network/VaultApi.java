@@ -5,6 +5,7 @@ import org.elastos.hive.file.FileInfo;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
+import org.elastos.hive.vendor.vault.network.model.SignResponse;
 import org.elastos.hive.vendor.vault.network.model.UploadResponse;
 
 import okhttp3.RequestBody;
@@ -18,8 +19,8 @@ import retrofit2.http.Query;
 
 public interface VaultApi {
 
-    @POST(ConnectConstance.API_PATH + "/did/access")
-    Call<BaseResponse> accessRequest(@Body RequestBody body);
+    @POST(ConnectConstance.API_PATH + "/did/sign_in")
+    Call<SignResponse> signIn(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/did/auth")
     Call<AuthResponse> auth(@Body RequestBody body);

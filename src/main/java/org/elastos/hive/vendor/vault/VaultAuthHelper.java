@@ -11,6 +11,7 @@ import org.elastos.hive.oauth.AuthServer;
 import org.elastos.hive.oauth.AuthToken;
 import org.elastos.hive.oauth.Authenticator;
 import org.elastos.hive.utils.DateUtil;
+import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
@@ -18,6 +19,7 @@ import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.connection.model.HeaderConfig;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.BaseResponse;
+import org.elastos.hive.vendor.vault.network.model.SignResponse;
 import org.elastos.hive.vendor.vault.network.model.TokenResponse;
 import org.json.JSONObject;
 
@@ -159,15 +161,17 @@ public class VaultAuthHelper implements ConnectHelper {
         map.put("document", authenticationDIDDocument.toString());
         String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
-                .accessRequest(getJsonRequestBoy(json))
+                .signIn(getJsonRequestBoy(json))
                 .execute();
-        BaseResponse baseResponse = (BaseResponse) response.body();
-        if (baseResponse.get_error() != null) {
-            throw new HiveException(baseResponse.get_error().getMessage());
+        SignResponse signResponse = (SignResponse) response.body();
+        if (signResponse.get_error() != null) {
+            throw new HiveException(signResponse.get_error().getMessage());
         }
-        String jwtToken = "";
-        if (null != handler && verifyToken(jwtToken)) handler.authenticationChallenge(jwtToken);
-        nodeAuth(jwtToken);
+        String jwtToken = signResponse.getJwt();
+        if (null != handler && verifyToken(jwtToken)) {
+            String approveJwtToken = handler.authenticationChallenge(jwtToken).get();
+            nodeAuth(approveJwtToken);
+        }
     }
 
     private void nodeAuth(String token) throws Exception {
