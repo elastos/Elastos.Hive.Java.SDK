@@ -24,8 +24,16 @@ public class AggregatedExecutable extends Executable {
     	this(name, null);
     }
 
-    public AggregatedExecutable append(Executable condition) {
-    	executables.add(condition);
+    public AggregatedExecutable append(Executable executable) {
+    	if (executable instanceof AggregatedExecutable) {
+    		AggregatedExecutable ae = (AggregatedExecutable)executable;
+    		executables.addAll(ae.executables);
+    	} else if (executable instanceof RawExecutable) {
+    		throw new UnsupportedOperationException("Can not handle the RawExecutable");
+    	} else {
+    		executables.add(executable);
+    	}
+
     	return this;
     }
 
