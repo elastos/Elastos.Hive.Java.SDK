@@ -2,14 +2,14 @@ package org.elastos.hive.vendor.vault.network.model;
 
 public class SignResponse extends BaseResponse {
 
-    private String jwt;
+    private String challenge;
 
 
-    public String getJwt() {
-        return jwt;
+    public String getChallenge() {
+        return challenge;
     }
 
-    public void setJwt(String jwt) {
-        this.jwt = jwt;
+    public void setChallenge(String challenge) {
+        this.challenge = challenge;
     }
 }

@@ -11,14 +11,12 @@ import org.elastos.hive.oauth.AuthServer;
 import org.elastos.hive.oauth.AuthToken;
 import org.elastos.hive.oauth.Authenticator;
 import org.elastos.hive.utils.DateUtil;
-import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.connection.model.HeaderConfig;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
-import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.SignResponse;
 import org.elastos.hive.vendor.vault.network.model.TokenResponse;
 import org.json.JSONObject;
@@ -115,7 +113,7 @@ public class VaultAuthHelper implements ConnectHelper {
         connectState.set(false);
         tryRestoreToken();
         if (token == null || token.isExpired()) {
-            accessRequest(this.authenticationHandler);
+            signIn(this.authenticationHandler);
         }
         connectState.set(true);
     }
@@ -156,7 +154,7 @@ public class VaultAuthHelper implements ConnectHelper {
         connectState.set(true);
     }
 
-    private void accessRequest(AuthenticationHandler handler) throws Exception {
+    private void signIn(AuthenticationHandler handler) throws Exception {
         Map map = new HashMap<>();
         map.put("document", authenticationDIDDocument.toString());
         String json = new JSONObject(map).toString();
@@ -167,7 +165,7 @@ public class VaultAuthHelper implements ConnectHelper {
         if (signResponse.get_error() != null) {
             throw new HiveException(signResponse.get_error().getMessage());
         }
-        String jwtToken = signResponse.getJwt();
+        String jwtToken = signResponse.getChallenge();
         if (null != handler && verifyToken(jwtToken)) {
             String approveJwtToken = handler.authenticationChallenge(jwtToken).get();
             nodeAuth(approveJwtToken);
@@ -221,11 +219,17 @@ public class VaultAuthHelper implements ConnectHelper {
             throw new HiveException(authResponse.get_error().getMessage());
         }
 
-        long expiresTime = System.currentTimeMillis() / 1000 + (authResponse != null ? authResponse.getExp() : 0);
+        String jwt = authResponse.getAccess_token();
+        if(null == jwt) return;
 
-        token = new AuthToken("",
-                authResponse.getToken(),
-                expiresTime, "token");
+        //TODO
+//        long exp = JwtUtil.getBody(jwt).getExpiration();
+
+//        long expiresTime = System.currentTimeMillis() / 1000 + (authResponse != null ? authResponse.getExp() : 0);
+//
+//        token = new AuthToken("",
+//                authResponse.getToken(),
+//                expiresTime, "token");
 
         //Store the local data.
         writebackToken();
