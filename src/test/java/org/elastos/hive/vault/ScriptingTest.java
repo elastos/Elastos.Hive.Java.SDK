@@ -81,11 +81,15 @@ public class ScriptingTest {
         Executable exec3 = new DbInsertQuery("exec3", "c3", n);
         Executable exec4 = new RawExecutable(json);
 
+        AggregatedExecutable ae = new AggregatedExecutable("ae");
+        ae.append(exec1).append(exec2).append(exec3);
 
-        AggregatedExecutable exec = new AggregatedExecutable("ae");
-        exec.append(exec1).append(exec2).append(exec4).append(exec3);
+        System.out.println(ae.serialize());
 
-        System.out.println(exec.serialize());
+        AggregatedExecutable ae2 = new AggregatedExecutable("ae2");
+        ae2.append(exec1).append(exec2).append(ae).append(exec3);
+
+        System.out.println(ae2.serialize());
 	}
 
 	//    private void registerSubConditionUserInGroup() {
