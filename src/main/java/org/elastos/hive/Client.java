@@ -28,6 +28,7 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDURL;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
+import org.elastos.hive.vendor.vault.VaultConstance;
 
 import java.util.HashMap;
 import java.util.List;
@@ -192,7 +193,7 @@ public class Client {
 		return CompletableFuture.supplyAsync(() -> {
 			String vaultProvider = null;
 			try {
-				DIDBackend.initialize(opts.DIDResolverUrl, opts.localPath);
+				DIDBackend.initialize(opts.DIDResolverUrl==null? VaultConstance.MAIN_NET_RESOLVER : opts.DIDResolverUrl, opts.localPath);
 				ResolverCache.reset();
 				DID did = new DID(ownerDid);
 				DIDDocument doc = did.resolve();
