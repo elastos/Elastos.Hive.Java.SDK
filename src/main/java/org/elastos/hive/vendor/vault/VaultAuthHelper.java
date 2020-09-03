@@ -155,8 +155,12 @@ public class VaultAuthHelper implements ConnectHelper {
     }
 
     private void signIn(AuthenticationHandler handler) throws Exception {
+
+
         Map map = new HashMap<>();
-        map.put("document", authenticationDIDDocument.toString());
+        JSONObject docJsonObject = new JSONObject(authenticationDIDDocument.toString());
+        map.put("document", docJsonObject);
+
         String json = new JSONObject(map).toString();
         Response response = ConnectionManager.getHiveVaultApi()
                 .signIn(getJsonRequestBoy(json))
