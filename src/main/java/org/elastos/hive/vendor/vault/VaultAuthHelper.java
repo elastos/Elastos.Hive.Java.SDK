@@ -189,7 +189,18 @@ public class VaultAuthHelper implements ConnectHelper {
     }
 
     //TODO
-    private boolean verifyToken(String token) {
+    private boolean verifyToken(String jwtToken) {
+        try {
+            Claims claims = JwtUtil.getBody(jwtToken);
+            long exp = claims.getExpiration().getTime();
+            String subject = claims.getSubject();
+            String iss = claims.getIssuer();
+            String nonce = (String) claims.get("nonce");
+            String aud = claims.getAudience();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return true;
     }
 
@@ -225,18 +236,16 @@ public class VaultAuthHelper implements ConnectHelper {
             throw new HiveException(authResponse.get_error().getMessage());
         }
 
-        String jwt = authResponse.getAccess_token();
-        if(null == jwt) return;
-        Claims claims = JwtUtil.getBody(jwt);
+        String access_token = authResponse.getAccess_token();
+        if(null == access_token) return;
+        Claims claims = JwtUtil.getBody(access_token);
+        long exp = claims.getExpiration().getTime();
 
-        //TODO
-//        long exp = JwtUtil.getBody(jwt).getExpiration();
+        long expiresTime = System.currentTimeMillis() / 1000 + exp;
 
-//        long expiresTime = System.currentTimeMillis() / 1000 + (authResponse != null ? authResponse.getExp() : 0);
-//
-//        token = new AuthToken("",
-//                authResponse.getToken(),
-//                expiresTime, "token");
+        token = new AuthToken("",
+                access_token,
+                expiresTime, "token");
 
         //Store the local data.
         writebackToken();

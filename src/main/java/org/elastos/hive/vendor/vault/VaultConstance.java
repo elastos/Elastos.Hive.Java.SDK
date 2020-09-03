@@ -18,7 +18,9 @@ public class VaultConstance {
     static final String DEFAULT_REDIRECT_URL = "localhost";
     static final int    DEFAULT_REDIRECT_PORT = 12345;
 
-    public static final String NODE_URL = "https://hive.trinity-tech.io";
+    public static final String MAIN_NET_RESOLVER = "http://api.elastos.io:20606";
+
+    public static final String TEST_NODE_URL = "https://hive.trinity-tech.io";
 
 //    static final String DICT_SCHEMA = "{'KV': {\n" +
 //            "        'type': 'dict',\n" +
