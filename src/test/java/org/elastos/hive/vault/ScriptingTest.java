@@ -137,11 +137,13 @@ public class ScriptingTest {
 //            String json = doc.toString();
 
             Client.Options options = new Client.Options();
-            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(() -> jwtToken));
+            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
+                    -> "eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlkZnBLSkoxc29EeFQyR2NnQ1JuRHQzY3U5NFpuR2Z6TlgjcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppZGZwS0pKMXNvRHhUMkdjZ0NSbkR0M2N1OTRabkdmek5YIiwic3ViIjoiRElEQXV0aFJlc3BvbnNlIiwiYXVkIjoiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsImlhdCI6MTU5OTEyMzc5NSwiZXhwIjoxNTk5MTIzODU1LCJuYmYiOjE1OTkxMjM3OTUsInByZXNlbnRhdGlvbiI6eyJ0eXBlIjoiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiIsImNyZWF0ZWQiOiIyMDIwLTA5LTAzVDA5OjAzOjE1WiIsInZlcmlmaWFibGVDcmVkZW50aWFsIjpbeyJpZCI6ImRpZDplbGFzdG9zOmlkZnBLSkoxc29EeFQyR2NnQ1JuRHQzY3U5NFpuR2Z6TlgjZGlkYXBwIiwidHlwZSI6WyJBcHBBdXRoQ3JlZGVudGlhbCJdLCJpc3N1ZXIiOiJkaWQ6ZWxhc3RvczppajhrckFWUkppdFpLSm1jQ3Vmb0xIUWpxN01lZjNaalROIiwiaXNzdWFuY2VEYXRlIjoiMjAyMC0wOS0wM1QwOTowMzoxNVoiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDktMDFUMTk6NDc6MjRaIiwiY3JlZGVudGlhbFN1YmplY3QiOnsiaWQiOiJkaWQ6ZWxhc3RvczppZGZwS0pKMXNvRHhUMkdjZ0NSbkR0M2N1OTRabkdmek5YIiwiYXBwSWQiOiJhcHBJZCJ9LCJwcm9vZiI6eyJ0eXBlIjoiRUNEU0FzZWNwMjU2cjEiLCJ2ZXJpZmljYXRpb25NZXRob2QiOiJkaWQ6ZWxhc3RvczppajhrckFWUkppdFpLSm1jQ3Vmb0xIUWpxN01lZjNaalROI3ByaW1hcnkiLCJzaWduYXR1cmUiOiJKSG1wLVFGQmNxa2VtbXRlMHJJblVrSlNhNmh2ZFZJazM3aVE1VklVYUNTZkdhcmRNWXBWVWo1MUZQcE1VVndUSzJDLTcyWWtNUXlyYU91aU5uY2g4QSJ9fV0sInByb29mIjp7InR5cGUiOiJFQ0RTQXNlY3AyNTZyMSIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDplbGFzdG9zOmlkZnBLSkoxc29EeFQyR2NnQ1JuRHQzY3U5NFpuR2Z6TlgjcHJpbWFyeSIsInJlYWxtIjoiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsIm5vbmNlIjoiZmRhMmJiYTYtZWRjMy0xMWVhLWI1YmEtNjQ1YWVkZWIwNzYzIiwic2lnbmF0dXJlIjoiNF9keWlPVThvSUdxeTdtRDRrTUw1OUI1NnRoV0VBYU4tTjBYdm8zREZlZUFFaTZsQlNYMW5nRnFlQmV6dFQ3RmlyMEtILUN2aDdxM2RlbHV2akVCaUEifX19.v49489jxoBq7H6ra051uoOAJFIUAcsn9CY_3WcNGALuUvKHcrJ6pRj_pI621QarpFtu6t0mNNZGWHPXHcLe9EQ"));
             options.setAuthenticationDIDDocument(doc);
             options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);
 
+            Client.setVaultProvider("did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX", "http://0.0.0.0:5000");
             client = Client.createInstance(options);
             scripting = client.getVault("did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX").get().getScripting();
         } catch (Exception e) {

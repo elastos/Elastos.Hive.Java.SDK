@@ -232,7 +232,7 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private void handleAuthResponse(Response response) throws Exception {
         AuthResponse authResponse = (AuthResponse) response.body();
-        if (authResponse.get_error() != null) {
+        if (null==authResponse || authResponse.get_error()!=null) {
             throw new HiveException(authResponse.get_error().getMessage());
         }
 

@@ -40,11 +40,10 @@ public class Client {
 	private static Options opts;
 
 	private static Map<DID, Vault> vaultCache;
-	private static Map<String , String> providerCache;
+	private static Map<String , String> providerCache = new HashMap<>();
 
 	public Client(Options options) {
 		this.opts = options;
-		providerCache = new HashMap<>();
 //		this.vaultCache = LRUCache.createInstance(16, 32);
 	}
 
