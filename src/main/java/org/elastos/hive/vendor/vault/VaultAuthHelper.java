@@ -62,12 +62,13 @@ public class VaultAuthHelper implements ConnectHelper {
     public VaultAuthHelper(String nodeUrl, String storePath, DIDDocument authenticationDIDDocument, AuthenticationHandler handler) {
         this.authenticationDIDDocument = authenticationDIDDocument;
         this.authenticationHandler = handler;
+        this.nodeUrl = nodeUrl;
 
         this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
 
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-            ConnectionManager.resetHiveVaultApi(nodeUrl, config);
+            ConnectionManager.resetHiveVaultApi(this.nodeUrl, config);
             ConnectionManager.resetAuthApi(VaultConstance.TOKEN_URI, config);
         } catch (Exception e) {
             e.printStackTrace();
@@ -241,7 +242,7 @@ public class VaultAuthHelper implements ConnectHelper {
         Claims claims = JwtUtil.getBody(access_token);
         long exp = claims.getExpiration().getTime();
 
-        long expiresTime = System.currentTimeMillis() / 1000 + exp;
+        long expiresTime = System.currentTimeMillis() / 1000 + exp/1000;
 
         token = new AuthToken("",
                 access_token,
