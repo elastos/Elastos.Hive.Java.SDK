@@ -33,9 +33,11 @@ import java.io.IOException;
 
 public class AuthInfoStoreImpl implements Persistent {
     private String storePath;
+    private String config;
 
     public AuthInfoStoreImpl(String storePath, String config) {
-        this.storePath = String.format("%s/%s", storePath, config);
+        this.storePath = storePath;
+        this.config = config;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class AuthInfoStoreImpl implements Persistent {
         FileReader reader = null;
         try {
             initialize();
-            reader = new FileReader(storePath);
+            reader = new FileReader(this.configPath);
             char[] buf = new char[128];
             int len;
             StringBuilder content = new StringBuilder();
@@ -74,7 +76,7 @@ public class AuthInfoStoreImpl implements Persistent {
         FileWriter fileWriter = null;
         try {
             initialize();
-            fileWriter = new FileWriter(storePath);
+            fileWriter = new FileWriter(configPath);
             fileWriter.write(conetnt.toString());
         } catch (Exception e) {
             throw new HiveException(e.getMessage());
@@ -89,8 +91,14 @@ public class AuthInfoStoreImpl implements Persistent {
         }
     }
 
+    private String configPath;
     private void initialize() throws IOException {
-        File config = new File(storePath);
+        String tokenPath = String.format("%s/%s", storePath,"token");
+        File rootDir = new File(tokenPath);
+        if (!rootDir.exists())
+            rootDir.mkdirs();
+         this.configPath = String.format("%s/%s", tokenPath,config);
+        File config = new File(configPath);
         if (!config.exists())
             config.createNewFile();
     }

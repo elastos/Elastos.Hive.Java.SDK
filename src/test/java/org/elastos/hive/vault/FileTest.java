@@ -10,13 +10,14 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.io.File;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileTest {
 
-    private static final String localDataPath = System.getProperty("user.dir");
+    private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
 
     private static Client client;
 

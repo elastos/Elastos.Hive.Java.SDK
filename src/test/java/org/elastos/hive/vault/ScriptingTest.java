@@ -27,10 +27,11 @@ import org.elastos.hive.scripting.RawExecutable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 public class ScriptingTest {
-    private static final String localDataPath = System.getProperty("user.dir");
+    private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
 
     private static Scripting scripting;
     private static Client client;
@@ -89,7 +90,7 @@ public class ScriptingTest {
 	@Test
     public void registerScriptNoCondition() {
         try {
-            String json = "{\"executable\":{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"*caller_did\":\"friends\"}}}}";
+            String json = "{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"*caller_did\":\"friends\"}}}";
             scripting.registerScript("script_no_condition", new RawExecutable(json)).get();
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,7 +100,7 @@ public class ScriptingTest {
     @Test
     public void registerScriptWithCondition() {
         try {
-            String json = "{\"executable\":{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"*caller_did\":\"friends\"}}}}";
+            String json = "{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"*caller_did\":\"friends\"}}}";
             scripting.registerScript("script_condition", null, new RawExecutable(json));
         } catch (HiveException e) {
             e.printStackTrace();
@@ -138,7 +139,7 @@ public class ScriptingTest {
 
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> "eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlkZnBLSkoxc29EeFQyR2NnQ1JuRHQzY3U5NFpuR2Z6TlgjcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppZGZwS0pKMXNvRHhUMkdjZ0NSbkR0M2N1OTRabkdmek5YIiwic3ViIjoiRElEQXV0aFJlc3BvbnNlIiwiYXVkIjoiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsImlhdCI6MTU5OTE0MDQ4NCwiZXhwIjoxNTk5MTQwNTQ0LCJuYmYiOjE1OTkxNDA0ODQsInByZXNlbnRhdGlvbiI6eyJ0eXBlIjoiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiIsImNyZWF0ZWQiOiIyMDIwLTA5LTAzVDEzOjQxOjI0WiIsInZlcmlmaWFibGVDcmVkZW50aWFsIjpbeyJpZCI6ImRpZDplbGFzdG9zOmlkZnBLSkoxc29EeFQyR2NnQ1JuRHQzY3U5NFpuR2Z6TlgjZGlkYXBwIiwidHlwZSI6WyJBcHBBdXRoQ3JlZGVudGlhbCJdLCJpc3N1ZXIiOiJkaWQ6ZWxhc3RvczppajhrckFWUkppdFpLSm1jQ3Vmb0xIUWpxN01lZjNaalROIiwiaXNzdWFuY2VEYXRlIjoiMjAyMC0wOS0wM1QxMzo0MToyNFoiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDktMDFUMTk6NDc6MjRaIiwiY3JlZGVudGlhbFN1YmplY3QiOnsiaWQiOiJkaWQ6ZWxhc3RvczppZGZwS0pKMXNvRHhUMkdjZ0NSbkR0M2N1OTRabkdmek5YIiwiYXBwSWQiOiJhcHBJZCJ9LCJwcm9vZiI6eyJ0eXBlIjoiRUNEU0FzZWNwMjU2cjEiLCJ2ZXJpZmljYXRpb25NZXRob2QiOiJkaWQ6ZWxhc3RvczppajhrckFWUkppdFpLSm1jQ3Vmb0xIUWpxN01lZjNaalROI3ByaW1hcnkiLCJzaWduYXR1cmUiOiJ6aXVzd0lNX2phcjRFMl9BMm1VWVh0R01VdjZuMG5RY1kwR0JEcVl4UTE1NGNkcTUwQjY5YjEwT2tvMWlsQUowZUFlczZId1JCNzQ1REwxTDFUTXFtUSJ9fV0sInByb29mIjp7InR5cGUiOiJFQ0RTQXNlY3AyNTZyMSIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDplbGFzdG9zOmlkZnBLSkoxc29EeFQyR2NnQ1JuRHQzY3U5NFpuR2Z6TlgjcHJpbWFyeSIsInJlYWxtIjoiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsIm5vbmNlIjoiZjI5ZDk4MTItZWRlYS0xMWVhLWE5MTctNjQ1YWVkZWIwNzYzIiwic2lnbmF0dXJlIjoiRmg4ei03NU52NGtJYnhBaTFKWWJsQTRhX0hwVGRRVnloc20xNWstMGtHNy13SWJKQ0RkVjdHZjBVX2ZkMW9fQjhoUW9va2NjQUktclNUanZ4Vld0SGcifX19.JzHEXoz94MDTHDpMjGYhlJNUaP_j1X05Y_PfPIHlBi_ETXPdHYur2_b3oKe3zDu7AiFY67seeSiNZmrz_A1SJQ"));
+                    -> "eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlkZnBLSkoxc29EeFQyR2NnQ1JuRHQzY3U5NFpuR2Z6TlgjcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppZGZwS0pKMXNvRHhUMkdjZ0NSbkR0M2N1OTRabkdmek5YIiwic3ViIjoiRElEQXV0aFJlc3BvbnNlIiwiYXVkIjoiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsImlhdCI6MTU5OTE1MDg1MSwiZXhwIjoxNTk5MTUwOTExLCJuYmYiOjE1OTkxNTA4NTEsInByZXNlbnRhdGlvbiI6eyJ0eXBlIjoiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiIsImNyZWF0ZWQiOiIyMDIwLTA5LTAzVDE2OjM0OjExWiIsInZlcmlmaWFibGVDcmVkZW50aWFsIjpbeyJpZCI6ImRpZDplbGFzdG9zOmlkZnBLSkoxc29EeFQyR2NnQ1JuRHQzY3U5NFpuR2Z6TlgjZGlkYXBwIiwidHlwZSI6WyJBcHBBdXRoQ3JlZGVudGlhbCJdLCJpc3N1ZXIiOiJkaWQ6ZWxhc3RvczppajhrckFWUkppdFpLSm1jQ3Vmb0xIUWpxN01lZjNaalROIiwiaXNzdWFuY2VEYXRlIjoiMjAyMC0wOS0wM1QxNjozNDoxMVoiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDktMDFUMTk6NDc6MjRaIiwiY3JlZGVudGlhbFN1YmplY3QiOnsiaWQiOiJkaWQ6ZWxhc3RvczppZGZwS0pKMXNvRHhUMkdjZ0NSbkR0M2N1OTRabkdmek5YIiwiYXBwSWQiOiJhcHBJZCJ9LCJwcm9vZiI6eyJ0eXBlIjoiRUNEU0FzZWNwMjU2cjEiLCJ2ZXJpZmljYXRpb25NZXRob2QiOiJkaWQ6ZWxhc3RvczppajhrckFWUkppdFpLSm1jQ3Vmb0xIUWpxN01lZjNaalROI3ByaW1hcnkiLCJzaWduYXR1cmUiOiIyT1pNNkVvTTJ0LU5LdDEwLWtQZFpnbjlHdXBna3pKdlYyX2lmMzVlMjVHSnlTYmp3cHVDcUJaQjFWa2ZieldMY0VHaEwyeHQxTWZWY1JQWFBkZUN2ZyJ9fV0sInByb29mIjp7InR5cGUiOiJFQ0RTQXNlY3AyNTZyMSIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDplbGFzdG9zOmlkZnBLSkoxc29EeFQyR2NnQ1JuRHQzY3U5NFpuR2Z6TlgjcHJpbWFyeSIsInJlYWxtIjoiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsIm5vbmNlIjoiNDlhMTJlMjItZWUwMy0xMWVhLWI4NzItNjQ1YWVkZWIwNzYzIiwic2lnbmF0dXJlIjoiVnR0bDlLQmRjQXhIMDlMSVR0bDMzVTlnZTJQWjRWUWMzbWdNLW5uX1g4RllINEg4VDVzQlMzZ2ZvbEYzZ3VxYmRNWmF6U0laenByY0NCR0ZiY0N2bGcifX19.0HpH0g3Z1QzUEisLkg4NTwxgne4Sz7bsNSuFVmN6legvZu0W_ActGOylV9ojE5Ulk4bwxsizci_Sg9vV_ihI4Q"));
             options.setAuthenticationDIDDocument(doc);
             options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);

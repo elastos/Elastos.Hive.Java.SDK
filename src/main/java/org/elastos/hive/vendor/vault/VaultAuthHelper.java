@@ -118,6 +118,7 @@ public class VaultAuthHelper implements ConnectHelper {
         if (token == null || token.isExpired()) {
             signIn(this.authenticationHandler);
         }
+        initConnection();
         connectState.set(true);
     }
 
@@ -169,7 +170,7 @@ public class VaultAuthHelper implements ConnectHelper {
                 .signIn(getJsonRequestBoy(json))
                 .execute();
         SignResponse signResponse = (SignResponse) response.body();
-        if (signResponse.get_error() != null) {
+        if (null!=signResponse && signResponse.get_error() != null) {
             throw new HiveException(signResponse.get_error().getMessage());
         }
         String jwtToken = signResponse.getChallenge();
