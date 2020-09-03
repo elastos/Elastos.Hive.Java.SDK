@@ -28,31 +28,6 @@ public class ScriptClient implements Scripting {
         this.authHelper = authHelper;
     }
 
-    private CompletableFuture<Boolean> registerConditionImp(String name, Condition condition) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                Map map = new HashMap<>();
-                map.put("conditionName", name);
-                map.put("condition", condition);
-                String json = JsonUtil.getJsonFromObject(map);
-
-                Response response = ConnectionManager.getHiveVaultApi()
-                        .registerCondition(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-                        .execute();
-                int responseCode = checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-                return true;
-            } catch (Exception e) {
-                HiveException exception = new HiveException(e.getLocalizedMessage());
-                throw new CompletionException(exception);
-            }
-        });
-    }
-
     @Override
     public CompletableFuture<Boolean> registerScript(String name, Executable executable) throws HiveException {
         return this.registerScript(name, null, executable);
@@ -69,9 +44,9 @@ public class ScriptClient implements Scripting {
             try {
 
                 Map map = new HashMap<>();
-                map.put("scriptName", name);
+                map.put("name", name);
                 if (accessCondition != null)
-                    map.put("accessCondition", accessCondition);
+                    map.put("condition", accessCondition);
                 map.put("executable", executable);
 
                 String json = JsonUtil.getJsonFromObject(map);
@@ -108,7 +83,7 @@ public class ScriptClient implements Scripting {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Map map = new HashMap<>();
-                map.put("scriptName", scriptName);
+                map.put("name", scriptName);
                 if (params != null)
                     map.put("params", params);
 

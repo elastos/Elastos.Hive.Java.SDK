@@ -1,7 +1,11 @@
 package org.elastos.hive.vault;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import org.elastos.did.DIDDocument;
 import org.elastos.hive.Client;
-import org.elastos.hive.Database;
 import org.elastos.hive.Scripting;
 import org.elastos.hive.database.Date;
 import org.elastos.hive.database.MaxKey;
@@ -9,6 +13,7 @@ import org.elastos.hive.database.MinKey;
 import org.elastos.hive.database.ObjectId;
 import org.elastos.hive.database.RegularExpression;
 import org.elastos.hive.database.Timestamp;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.scripting.AggregatedExecutable;
 import org.elastos.hive.scripting.AndCondition;
 import org.elastos.hive.scripting.Condition;
@@ -19,27 +24,16 @@ import org.elastos.hive.scripting.OrCondition;
 import org.elastos.hive.scripting.QueryHasResultsCondition;
 import org.elastos.hive.scripting.RawCondition;
 import org.elastos.hive.scripting.RawExecutable;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.concurrent.CompletableFuture;
 
 public class ScriptingTest {
-    private static final String clientId = "1098324333865-q7he5l91a4pqnuq9s2pt5btj9kenebkl.apps.googleusercontent.com";
-    private static final String clientSecret = "0Ekmgx8dPbSxnTxxF-fqxjnz";
-    private static final String redirectUri = "http://localhost:12345";
-    private static final String nodeUrl = "http://127.0.0.1:5000";
+    private static final String localDataPath = System.getProperty("user.dir");
 
-    private static final String authToken = "eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAifQ.eyJpc3MiOiAiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsICJzdWIiOiAiRElEQXV0aENyZWRlbnRpYWwiLCAiYXVkIjogIkhpdmUiLCAiaWF0IjogMTU5Njc2NDk3NCwgImV4cCI6IDE1OTY3NzQ5NzQsICJuYmYiOiAxNTk2NzY0OTc0LCAidnAiOiB7InR5cGUiOiAiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiIsICJjcmVhdGVkIjogIjIwMjAtMDgtMDdUMDE6NDk6MzNaIiwgInZlcmlmaWFibGVDcmVkZW50aWFsIjogW3siaWQiOiAiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSNkaWRhcHAiLCAidHlwZSI6IFsiIl0sICJpc3N1ZXIiOiAiZGlkOmVsYXN0b3M6aWpVbkQ0S2VScGVCVUZtY0VEQ2JoeE1USlJ6VVlDUUNaTSIsICJpc3N1YW5jZURhdGUiOiAiMjAyMC0wOC0wN1QwMTo0OTozM1oiLCAiZXhwaXJhdGlvbkRhdGUiOiAiMjAyNC0xMi0yN1QwODo1MzoyN1oiLCAiY3JlZGVudGlhbFN1YmplY3QiOiB7ImlkIjogImRpZDplbGFzdG9zOmlqVW5ENEtlUnBlQlVGbWNFRENiaHhNVEpSelVZQ1FDWk0iLCAiYXBwRGlkIjogImRpZDplbGFzdG9zOmlqVW5ENEtlUnBlQlVGbWNFRENiaHhNVEpSelVZQ1FDWk0iLCAicHVycG9zZSI6ICJkaWQ6ZWxhc3RvczppZWFBNVZNV3lkUW1WSnRNNWRhVzVob1RRcGN1VjM4bUhNIiwgInNjb3BlIjogWyJyZWFkIiwgIndyaXRlIl0sICJ1c2VyRGlkIjogImRpZDplbGFzdG9zOmlXRkFVWWhUYTM1YzFmUGUzaUNKdmloWkh4NnF1dW1ueW0ifSwgInByb29mIjogeyJ0eXBlIjogIkVDRFNBc2VjcDI1NnIxIiwgInZlcmlmaWNhdGlvbk1ldGhvZCI6ICJkaWQ6ZWxhc3RvczppalVuRDRLZVJwZUJVRm1jRURDYmh4TVRKUnpVWUNRQ1pNI3ByaW1hcnkiLCAic2lnbmF0dXJlIjogIlN4RlkxQW5GLXhsU2dCTDUzYW5YdDRFOHFWNEptd0NkYUNXQVo4QmFpdnFKSTkwV2xkQ3Q4XzdHejllSm0zSlRNQTMxQjBrem5sSmVEUkJ3LXcyUU53In19XSwgInByb29mIjogeyJ0eXBlIjogIkVDRFNBc2VjcDI1NnIxIiwgInZlcmlmaWNhdGlvbk1ldGhvZCI6ICJkaWQ6ZWxhc3RvczppalVuRDRLZVJwZUJVRm1jRURDYmh4TVRKUnpVWUNRQ1pNI3ByaW1hcnkiLCAicmVhbG0iOiAidGVzdGFwcCIsICJub25jZSI6ICI4NzMxNzJmNTg3MDFhOWVlNjg2ZjA2MzAyMDRmZWU1OSIsICJzaWduYXR1cmUiOiAidDYxV3dFM1pqR21EdktfZmtJM3h0ZkRGczFpNUFxVXVjZFIteEVDSVlzLTB4dHpNWGE2RTlkS0RFanJ3V2xwRjRUWElsTHduZlJWZXgzRl9KN0F6cUEifX19.";
-
-    private static final String storePath = System.getProperty("user.dir");
-
-    private static Database database;
     private static Scripting scripting;
     private static Client client;
-
-    private static final String GROUPS_COLLECTION_NAME = "groups";
 
 	@Test
 	public void testCondition() throws Exception {
@@ -88,91 +82,66 @@ public class ScriptingTest {
         System.out.println(exec.serialize());
 	}
 
-	//    private void registerSubConditionUserInGroup() {
-//        JSONObject queryParams = new JSONObject();
-//        queryParams.put("id", "$groupid"); // $groupid is passed by the calling script
-//        queryParams.put("friends", new JSONObject("{$contains: \"$callerdid\"}")); // Forgot the right mongo syntax here.
-//
-//        Condition condition = new QueryHasResultsCondition(GROUPS_COLLECTION_NAME, queryParams);
-//        scripting.registerSubCondition("userInGroup", condition);
-//    }
-//
-//    @Test
-//    public void testRegisterGetGroups() {
-//        try {
-//            ExecutionSequence executionSequence = new ExecutionSequence(new Executable[]{
-//                    new FindQuery(GROUPS_COLLECTION_NAME)
-//            });
-//
-//            scripting.setScript("getGroups", executionSequence).get();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            fail();
-//        }
-//    }
-//
-//    @Test
-//    public void testRegisterGetGroupMessages() {
-//        try {
-//            registerSubConditionUserInGroup();
-//
-//            // Execution sequence
-//            JSONObject queryParams = new JSONObject();
-//            queryParams.put("id", "$groupid");
-//            ExecutionSequence executionSequence = new ExecutionSequence( new Executable[] {
-//                    new FindQuery(GROUPS_COLLECTION_NAME, queryParams)
-//            });
-//
-//            // Access condition - user must be in the group to get messages
-//            Condition accessCondition = new SubCondition("userInGroup");
-//
-//            // Register the script
-//            scripting.setScript("getGroupMessages", executionSequence, accessCondition).get();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            fail();
-//        }
-//    }
-//
-//    @Test
-//    public void testAddFriendToGroup() {
-//        try {
-////            database.patch(GROUPS_COLLECTION_NAME, "TODO", "TODO", "TODO");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            fail();
-//        }
-//    }
-//
-//    @BeforeClass
-//    public static void setUp() {
-//        try {
-//            Client.Options options = new VaultOptions
-//                    .Builder()
-//                    .setNodeUrl(nodeUrl)
-//                    .setClientId(clientId)
-//                    .setClientSecret(clientSecret)
-//                    .setRedirectURL(redirectUri)
-//                    .setAuthToken(authToken)
-//                    .setStorePath(storePath)
-//                    .setAuthenticator(requestUrl -> {
-//                        try {
-//                            Desktop.getDesktop().browse(new URI(requestUrl));
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                            fail();
-//                        }
-//                    })
-//                    .build();
-//
-//            client = Client.createInstance(options);
-//            client.connect();
-//            scripting = client.getScripting();
-//            database = client.getDatabase();
-//        } catch (Exception e) {
-//            fail(e.getMessage());
-//        }
-//    }
+	@Test
+    public void registerScriptNoCondition() {
+        try {
+            String json = "{\"executable\":{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"*caller_did\":\"friends\"}}}}";
+            scripting.registerScript("script_no_condition", new RawExecutable(json)).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void registerScriptWithCondition() {
+        try {
+            String json = "{\"executable\":{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"*caller_did\":\"friends\"}}}}";
+            scripting.registerScript("script_condition", null, new RawExecutable(json));
+        } catch (HiveException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void callScriptNoParams() {
+        try {
+            String ret = scripting.call("script_no_condition", String.class).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public @Test void callScriptWithParams() {
+        try {
+//            scripting.call("script_condition", );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @BeforeClass
+    public static void setUp() {
+        try {
+            String json = "{\"id\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX\",\"publicKey\":[{\"id\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX#primary\",\"type\":\"ECDSAsecp256r1\",\"controller\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX\",\"publicKeyBase58\":\"xNoB1aRBgZqG3fLMmNzK5wkuNwwDmXDYm44cu2n8siSz\"}],\"authentication\":[\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX#primary\"],\"expires\":\"2025-09-01T20:18:27Z\",\"proof\":{\"type\":\"ECDSAsecp256r1\",\"created\":\"2020-09-02T04:18:27Z\",\"creator\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX#primary\",\"signatureValue\":\"Gq6ookLCWlfsib3NttV5pR6zXZFk6AHSoauYil-RWTS1Z-4l_u_UFk7gn7TObdHS650dMwcqezHlzLsiFbVOOw\"}}";
+            DIDDocument doc = DIDDocument
+                    .fromJson(json);
+
+//            DID did = new DID("did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX");
+//            DIDBackend.initialize("http://api.elastos.io:21606", localDataPath);
+//            ResolverCache.reset();
+//            DIDDocument doc = did.resolve();
+//            String json = doc.toString();
+
+            Client.Options options = new Client.Options();
+            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(() -> jwtToken));
+            options.setAuthenticationDIDDocument(doc);
+            options.setDIDResolverUrl("http://api.elastos.io:21606");
+            options.setLocalDataPath(localDataPath);
+
+            client = Client.createInstance(options);
+            scripting = client.getVault("did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX").get().getScripting();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

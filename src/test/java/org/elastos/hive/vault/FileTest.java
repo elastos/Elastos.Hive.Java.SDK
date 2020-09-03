@@ -1,9 +1,6 @@
 package org.elastos.hive.vault;
 
-import org.elastos.did.DID;
-import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
-import org.elastos.did.backend.ResolverCache;
 import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.Files;
@@ -14,21 +11,12 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.Writer;
-
-import static org.junit.Assert.fail;
+import java.util.concurrent.CompletableFuture;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileTest {
-    private static final String clientId = "1098324333865-q7he5l91a4pqnuq9s2pt5btj9kenebkl.apps.googleusercontent.com";
-    private static final String clientSecret = "0Ekmgx8dPbSxnTxxF-fqxjnz";
-    private static final String redirectUri = "http://localhost:12345";
-    private static final String nodeUrl = "http://127.0.0.1:5000";
-
-    private static final String did = "Instance DID public authentication key";
 
     private static final String localDataPath = System.getProperty("user.dir");
-    private static final String storePath = "did store pass";
-    private String stringReader = "this is test for reader";
 
     private static Client client;
 
@@ -47,7 +35,7 @@ public class FileTest {
             filesApi.upload(uploadUrl, new Callback<Writer>() {
                 @Override
                 public void onError(HiveException e) {
-                    fail();
+                    e.printStackTrace();
                 }
 
                 @Override
@@ -68,24 +56,21 @@ public class FileTest {
     @BeforeClass
     public static void setUp() {
         try {
-            String json = "{\"id\":\"did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab\",\"publicKey\":[{\"id\":\"did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab#primary\",\"type\":\"ECDSAsecp256r1\",\"controller\":\"did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab\",\"publicKeyBase58\":\"21YM84C9hbap4GfFSB3QbjauUfhAN4ETKg2mn4bSqx4Kp\"}],\"authentication\":[\"did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab#primary\"],\"verifiableCredential\":[{\"id\":\"did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab#name\",\"type\":[\"BasicProfileCredential\",\"SelfProclaimedCredential\"],\"issuer\":\"did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab\",\"issuanceDate\":\"2020-07-01T00:46:40Z\",\"expirationDate\":\"2025-06-30T00:46:40Z\",\"credentialSubject\":{\"id\":\"did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab\",\"name\":\"KP Test\"},\"proof\":{\"type\":\"ECDSAsecp256r1\",\"verificationMethod\":\"did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab#primary\",\"signature\":\"jQ1OGwpkYqjxooyaPseqyr_1MncOZDrMS_SvwYzqkCHVrRfjv_b7qfGCjxy7Gbx-LS3bvxZKeMxU1B-k3Ysb3A\"}}],\"expires\":\"2025-07-01T00:46:40Z\",\"proof\":{\"type\":\"ECDSAsecp256r1\",\"created\":\"2020-07-01T00:47:20Z\",\"creator\":\"did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab#primary\",\"signatureValue\":\"TOpNt-pWeQDJFaS5EkpMOuCqnZKhPCizf7LYQQDBrNLVIZ_7AR73m-KJk7Aja0wmZWXd7S4n7SC2W4ZQayJlMA\"}}";
-            DID did = new DID("did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab");
+            String json = "{\"id\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX\",\"publicKey\":[{\"id\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX#primary\",\"type\":\"ECDSAsecp256r1\",\"controller\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX\",\"publicKeyBase58\":\"xNoB1aRBgZqG3fLMmNzK5wkuNwwDmXDYm44cu2n8siSz\"}],\"authentication\":[\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX#primary\"],\"expires\":\"2025-09-01T20:18:27Z\",\"proof\":{\"type\":\"ECDSAsecp256r1\",\"created\":\"2020-09-02T04:18:27Z\",\"creator\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX#primary\",\"signatureValue\":\"Gq6ookLCWlfsib3NttV5pR6zXZFk6AHSoauYil-RWTS1Z-4l_u_UFk7gn7TObdHS650dMwcqezHlzLsiFbVOOw\"}}";
 
-            DIDBackend.initialize("http://api.elastos.io:20606", localDataPath);
-            ResolverCache.reset();
-
-            DIDDocument doc = did.resolve();
+            DIDDocument doc = DIDDocument
+                    .fromJson(json);
 
             Client.Options options = new Client.Options();
-            options.setAuthenticationHandler((jwtToken) -> null);
+            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(() -> jwtToken));
             options.setAuthenticationDIDDocument(doc);
             options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);
 
             client = Client.createInstance(options);
-            filesApi = client.getVault("did:elastos:idFKwBpj3Buq3XbLAFqTy8LMAW8K7kp3Ab").get().getFiles();
+            filesApi = client.getVault("did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX").get().getFiles();
         } catch (Exception e) {
-            fail(e.getMessage());
+            e.printStackTrace();
         }
     }
 }
