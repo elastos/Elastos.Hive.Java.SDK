@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class Client {
 
@@ -61,6 +60,16 @@ public class Client {
 
 		private AuthenticationHandler authentcationHandler;
 		private DIDDocument authenticationDIDDocument;
+
+		public String didResolverUrl() {
+			return DIDResolverUrl;
+		}
+
+		public void setDIDResolverUrl(String DIDResolverUrl) {
+			this.DIDResolverUrl = DIDResolverUrl;
+		}
+
+		private String DIDResolverUrl;
 		private String localPath;
 
 //		public void setDid(String did) {
@@ -183,7 +192,7 @@ public class Client {
 		return CompletableFuture.supplyAsync(() -> {
 			String vaultProvider = null;
 			try {
-				DIDBackend.initialize("http://api.elastos.io:20606", opts.localPath);
+				DIDBackend.initialize(opts.DIDResolverUrl, opts.localPath);
 				ResolverCache.reset();
 				DID did = new DID(ownerDid);
 				DIDDocument doc = did.resolve();
@@ -192,7 +201,7 @@ public class Client {
 					vaultProvider = services.get(0).getServiceEndpoint();
 					providerCache.put(ownerDid, vaultProvider);
 				} else {
-					vaultProvider = (providerCache.get(ownerDid))==null? "":providerCache.get(ownerDid);
+					vaultProvider = (providerCache.get(ownerDid))==null? null:providerCache.get(ownerDid);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

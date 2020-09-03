@@ -79,6 +79,7 @@ public class FileTest {
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler((jwtToken) -> null);
             options.setAuthenticationDIDDocument(doc);
+            options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);
 
             client = Client.createInstance(options);

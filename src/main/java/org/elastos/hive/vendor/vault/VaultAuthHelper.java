@@ -1,6 +1,7 @@
 package org.elastos.hive.vendor.vault;
 
 import org.elastos.did.DIDDocument;
+import org.elastos.did.jwt.Claims;
 import org.elastos.hive.AuthenticationHandler;
 import org.elastos.hive.Callback;
 import org.elastos.hive.ConnectHelper;
@@ -11,6 +12,7 @@ import org.elastos.hive.oauth.AuthServer;
 import org.elastos.hive.oauth.AuthToken;
 import org.elastos.hive.oauth.Authenticator;
 import org.elastos.hive.utils.DateUtil;
+import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
@@ -225,6 +227,7 @@ public class VaultAuthHelper implements ConnectHelper {
 
         String jwt = authResponse.getAccess_token();
         if(null == jwt) return;
+        Claims claims = JwtUtil.getBody(jwt);
 
         //TODO
 //        long exp = JwtUtil.getBody(jwt).getExpiration();
