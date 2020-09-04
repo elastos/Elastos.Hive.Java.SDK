@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * is in a list, etc.
  */
 public class QueryHasResultsCondition extends Condition {
-	private static final String TYPE = "queryHasResult";
+	private static final String TYPE = "queryHasResults";
 	private Query query;
 
 	@JsonPropertyOrder({"collection", "filter"})
