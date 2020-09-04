@@ -4,6 +4,7 @@ package org.elastos.hive.vendor.vault.network;
 import org.elastos.hive.file.FileInfo;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.BaseResponse;
+import org.elastos.hive.vendor.vault.network.model.CountDocResponse;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 import org.elastos.hive.vendor.vault.network.model.SignResponse;
 import org.elastos.hive.vendor.vault.network.model.UploadResponse;
@@ -35,31 +36,31 @@ public interface VaultApi {
     Call<BaseResponse> deleteCollection(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/insert_one")
-    Call<BaseResponse> insertOne(@Body RequestBody body);
+    Call<ResponseBody> insertOne(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/insert_many")
-    Call<BaseResponse> insertMany(@Body RequestBody body);
+    Call<ResponseBody> insertMany(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/update_one")
-    Call<BaseResponse> updateOne(@Body RequestBody body);
+    Call<ResponseBody> updateOne(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/update_many")
-    Call<BaseResponse> updateMany(@Body RequestBody body);
+    Call<ResponseBody> updateMany(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/delete_one")
-    Call<BaseResponse> deleteOne(@Body RequestBody body);
+    Call<ResponseBody> deleteOne(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/delete_many")
-    Call<BaseResponse> deleteMany(@Body RequestBody body);
+    Call<ResponseBody> deleteMany(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/count_documents")
-    Call<BaseResponse> countDocs(@Body RequestBody body);
+    Call<CountDocResponse> countDocs(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/find_one")
-    Call<BaseResponse> findOne(@Body RequestBody body);
+    Call<ResponseBody> findOne(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/db/find_many")
-    Call<BaseResponse> findMany(@Body RequestBody body);
+    Call<ResponseBody> findMany(@Body RequestBody body);
 
     //file="path/of/file/name"
 //    @Multipart

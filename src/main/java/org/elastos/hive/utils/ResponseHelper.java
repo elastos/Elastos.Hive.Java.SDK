@@ -31,7 +31,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -70,42 +69,13 @@ public class ResponseHelper {
     }
 
     public static <T> T getVaule(Response response, Class<T> clz) throws IOException {
-        String json = getString(response);
+        String json = toString(response);
         return getVaule(json, clz);
-//        Object obj = null;
-//        try {
-//            String json = getString(response);
-//            if(null==json) return null;
-//            if(clz.isAssignableFrom(String.class)) {
-//                obj = json;
-//            } else if(clz.isAssignableFrom(byte[].class)) {
-//                obj = json.getBytes();
-//            } else if(clz.isAssignableFrom(JsonNode.class)) {
-//                obj = new ObjectMapper().readTree(json);
-//            } else if(clz.isAssignableFrom(Reader.class)) {
-//                obj = writeToReader(response);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return (T) obj;
     }
 
-    public static String getString(Response response) throws IOException {
+    public static String toString(Response response) throws IOException {
         ResponseBody body = (ResponseBody) response.body();
         return body != null ? body.string() : "";
-    }
-
-    public static long writeDataToWriter(Response response, Writer writer) throws IOException {
-        ResponseBody body = (ResponseBody) response.body();
-        String bodyStr = body != null ? body.string() : "";
-
-        if (bodyStr == null) return 0;
-
-        writer.write(bodyStr);
-        writer.flush();
-
-        return bodyStr.length();
     }
 
     public static long writeOutput(Response response, OutputStream outputStream) throws IOException {
@@ -126,9 +96,5 @@ public class ResponseHelper {
         InputStream inputStream = body != null ? body.byteStream() : null;
         if (inputStream == null) return null;
         return new InputStreamReader(inputStream);
-    }
-
-    public static Writer writeToWriter(Response response) {
-        return null;
     }
 }

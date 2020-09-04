@@ -250,7 +250,7 @@ public class FileClient implements Files {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                String ret = ResponseHelper.getString(response);
+                String ret = ResponseHelper.toString(response);
                 callback.onSuccess(ret);
                 return ret;
             } catch (Exception e) {

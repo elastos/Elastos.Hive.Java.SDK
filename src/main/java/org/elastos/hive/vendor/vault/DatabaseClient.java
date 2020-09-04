@@ -1,6 +1,9 @@
 package org.elastos.hive.vendor.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.elastos.hive.Callback;
 import org.elastos.hive.Database;
@@ -15,8 +18,11 @@ import org.elastos.hive.database.InsertResult;
 import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.utils.JsonUtil;
+import org.elastos.hive.utils.ResponseHelper;
+import org.elastos.hive.vendor.connection.ConnectionManager;
+import org.elastos.hive.vendor.vault.network.model.CountDocResponse;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +69,7 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
+                callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -102,7 +108,7 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
+                callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -126,10 +132,12 @@ public class DatabaseClient implements Database {
     private CompletableFuture<InsertResult> insertOneImp(String collection, JsonNode doc, InsertOptions options, Callback<InsertResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap<>();
-                map.put("collection", collection);
-                String json = JsonUtil.getJsonFromObject(map);
+                ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+                rootNode.put("collection", collection);
+                rootNode.put("document", doc);
+                if(null!=options) rootNode.put("options", options.serialize());
 
+                String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
                         .insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
@@ -140,8 +148,11 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return null;
+
+                InsertResult insertResult = new InsertResult();
+                insertResult.deserialize(ResponseHelper.toString(response));
+                callback.onSuccess(insertResult);
+                return insertResult;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -164,10 +175,14 @@ public class DatabaseClient implements Database {
     private CompletableFuture<InsertResult> insertManyImp(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap<>();
-                map.put("collection", collection);
-                String json = JsonUtil.getJsonFromObject(map);
+                ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+                ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
+                arrayNode.addAll(docs);
+                rootNode.put("collection", collection);
+                rootNode.put("document", arrayNode);
+                if(null!=options) rootNode.put("options", JsonUtil.getJsonFromObject(options.serialize()));
 
+                String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
                         .insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
@@ -178,7 +193,9 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
+                InsertResult insertResult = new InsertResult();
+                insertResult.deserialize(ResponseHelper.toString(response));
+                callback.onSuccess(insertResult);
                 return null;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -202,11 +219,13 @@ public class DatabaseClient implements Database {
     private CompletableFuture<Long> countDocumentsImp(String collection, JsonNode query, CountOptions options, Callback<Long> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap<>();
-                map.put("collection", collection);
-                String json = JsonUtil.getJsonFromObject(map);
+                ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+                rootNode.put("collection", collection);
+                if(null!=query) rootNode.put("filter", query);
+                if(null!=options) rootNode.put("options", options.serialize());
 
-                Response response = ConnectionManager.getHiveVaultApi()
+                String json = rootNode.toString();
+                Response<CountDocResponse> response = ConnectionManager.getHiveVaultApi()
                         .countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -216,8 +235,10 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return null;
+
+                long count = response.body().getCount();
+                callback.onSuccess(count);
+                return count;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -240,10 +261,12 @@ public class DatabaseClient implements Database {
     private CompletableFuture<JsonNode> findOneImp(String collection, JsonNode query, FindOptions options, Callback<JsonNode> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap<>();
-                map.put("collection", collection);
-                String json = JsonUtil.getJsonFromObject(map);
+                ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+                rootNode.put("collection", collection);
+                if(null!=query) rootNode.put("filter", query);
+                if(null!=options) rootNode.put("options", options.serialize());
 
+                String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
                         .findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
@@ -254,8 +277,11 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return null;
+
+                JsonNode jsonNode = ResponseHelper.getVaule(response, JsonNode.class);
+                JsonNode item = jsonNode.get("items");
+                callback.onSuccess(item);
+                return item;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -278,10 +304,12 @@ public class DatabaseClient implements Database {
     private CompletableFuture<List<JsonNode>> findManyImp(String collection, JsonNode query, FindOptions options, Callback<List<JsonNode>> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap<>();
-                map.put("collection", collection);
-                String json = JsonUtil.getJsonFromObject(map);
+                ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+                rootNode.put("collection", collection);
+                if(null!=query) rootNode.put("filter", query);
+                if(null!=options) rootNode.put("options", options.serialize());
 
+                String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
                         .findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
@@ -292,8 +320,11 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return null;
+
+                JsonNode jsonNode = ResponseHelper.getVaule(response, JsonNode.class);
+                List<JsonNode> jsonNodes = jsonNode.findValues("items");
+                callback.onSuccess(jsonNodes);
+                return jsonNodes;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -316,10 +347,12 @@ public class DatabaseClient implements Database {
     private CompletableFuture<UpdateResult> updateOneImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap<>();
-                map.put("collection", collection);
-                String json = JsonUtil.getJsonFromObject(map);
+                ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+                rootNode.put("collection", collection);
+                if(null!=filter) rootNode.put("update", update);
+                if(null!=options) rootNode.put("options", options.serialize());
 
+                String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
                         .updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
@@ -330,8 +363,10 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return null;
+                UpdateResult updateResult = new UpdateResult();
+                updateResult.deserialize(ResponseHelper.toString(response));
+                callback.onSuccess(updateResult);
+                return updateResult;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -354,10 +389,12 @@ public class DatabaseClient implements Database {
     private CompletableFuture<UpdateResult> updateManyImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap<>();
-                map.put("collection", collection);
-                String json = JsonUtil.getJsonFromObject(map);
+                ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+                rootNode.put("collection", collection);
+                if(null!=filter) rootNode.put("update", update);
+                if(null!=options) rootNode.put("options", options.serialize());
 
+                String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
                         .updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
@@ -368,7 +405,9 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
+                UpdateResult updateResult = new UpdateResult();
+                updateResult.deserialize(ResponseHelper.toString(response));
+                callback.onSuccess(updateResult);
                 return null;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -392,10 +431,11 @@ public class DatabaseClient implements Database {
     private CompletableFuture<DeleteResult> deleteOneImp(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap<>();
-                map.put("collection", collection);
-                String json = JsonUtil.getJsonFromObject(map);
+                ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+                rootNode.put("collection", collection);
+                if(null!=filter) rootNode.put("filter", filter);
 
+                String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
                         .deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
@@ -406,8 +446,11 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return null;
+
+                DeleteResult deleteResult = new DeleteResult();
+                deleteResult.deserialize(ResponseHelper.toString(response));
+                callback.onSuccess(deleteResult);
+                return deleteResult;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -430,10 +473,11 @@ public class DatabaseClient implements Database {
     private CompletableFuture<DeleteResult> deleteManyImp(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap<>();
-                map.put("collection", collection);
-                String json = JsonUtil.getJsonFromObject(map);
+                ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+                rootNode.put("collection", collection);
+                if(null!=filter) rootNode.put("filter", filter);
 
+                String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
                         .deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
@@ -444,8 +488,11 @@ public class DatabaseClient implements Database {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return null;
+
+                DeleteResult deleteResult = new DeleteResult();
+                deleteResult.deserialize(ResponseHelper.toString(response));
+                callback.onSuccess(deleteResult);
+                return deleteResult;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
