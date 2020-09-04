@@ -22,11 +22,15 @@
 
 package org.elastos.hive.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 
 import okhttp3.ResponseBody;
@@ -43,6 +47,48 @@ public class ResponseHelper {
             e.printStackTrace();
         }
         return data;
+    }
+
+    public static <T> T getVaule(String json, Class<T> clz) {
+        if(null==json) return null;
+
+        Object obj = null;
+        try {
+            if(clz.isAssignableFrom(String.class)) {
+                obj = json;
+            } else if(clz.isAssignableFrom(byte[].class)) {
+                obj = json.getBytes();
+            } else if(clz.isAssignableFrom(JsonNode.class)) {
+                obj = new ObjectMapper().readTree(json);
+            } else if(clz.isAssignableFrom(Reader.class)) {
+                obj = new StringReader(json);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return (T) obj;
+    }
+
+    public static <T> T getVaule(Response response, Class<T> clz) throws IOException {
+        String json = getString(response);
+        return getVaule(json, clz);
+//        Object obj = null;
+//        try {
+//            String json = getString(response);
+//            if(null==json) return null;
+//            if(clz.isAssignableFrom(String.class)) {
+//                obj = json;
+//            } else if(clz.isAssignableFrom(byte[].class)) {
+//                obj = json.getBytes();
+//            } else if(clz.isAssignableFrom(JsonNode.class)) {
+//                obj = new ObjectMapper().readTree(json);
+//            } else if(clz.isAssignableFrom(Reader.class)) {
+//                obj = writeToReader(response);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return (T) obj;
     }
 
     public static String getString(Response response) throws IOException {

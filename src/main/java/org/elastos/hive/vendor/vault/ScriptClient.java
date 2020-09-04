@@ -99,7 +99,8 @@ public class ScriptClient implements Scripting {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                return new ObjectMapper().readValue(ResponseHelper.getString(response), clazz);
+
+                return ResponseHelper.getVaule(response, clazz);
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);

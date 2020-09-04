@@ -109,7 +109,7 @@ public interface VaultApi {
     Call<BaseResponse> registerScript(@Body RequestBody body);
 
     @POST(ConnectConstance.API_PATH + "/scripting/run_script")
-    Call<BaseResponse> callScript(@Body RequestBody body);
+    Call<ResponseBody> callScript(@Body RequestBody body);
 
 
 }
