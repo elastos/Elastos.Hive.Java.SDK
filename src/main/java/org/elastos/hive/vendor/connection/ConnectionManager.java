@@ -81,4 +81,12 @@ public class ConnectionManager {
         updateHiveVaultConfig(baseServiceConfig);
     }
 
+    public static String getHivevaultBaseUrl() {
+        return ConnectionManager.hivevaultBaseUrl;
+    }
+
+    public static String getAccessToken() {
+        return ConnectionManager.hivevaultConfig.getHeaderConfig().getAuthToken().getAccessToken();
+    }
+
 }

@@ -76,8 +76,8 @@ public interface VaultApi {
     @POST("{path}")
     Call<BaseResponse> uploadFile(@Path("path") String path, @Body RequestBody body);
 
-    @GET(ConnectConstance.API_PATH + "/files/downloader")
-    Call<ResponseBody> downloader(@Query("name") String filename);
+    @GET(ConnectConstance.API_PATH + "/files/download")
+    Call<ResponseBody> downloader(@Query("path") String filename);
 
     @POST(ConnectConstance.API_PATH + "/files/deleter/file")
     Call<BaseResponse> deleteFile(@Body RequestBody body);

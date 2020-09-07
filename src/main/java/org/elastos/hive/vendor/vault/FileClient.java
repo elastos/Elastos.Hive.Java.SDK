@@ -50,30 +50,42 @@ public class FileClient implements Files {
     private CompletableFuture<Writer> uploadImp(String path, Callback<Writer> callback) {
 
         return CompletableFuture.supplyAsync(() -> {
+            HttpURLConnection httpURLConnection = null;
             try {
+                String url = ConnectionManager.getHivevaultBaseUrl()+ "/api/v1/files/upload/"+ path;
+                URL reslUrl = new URL(url);
+                httpURLConnection = (HttpURLConnection) reslUrl.openConnection();
 
-                URL reslUrl = new URL(path);
-                HttpURLConnection conn = (HttpURLConnection) reslUrl.openConnection();
-                conn.setDoOutput(true);
-                conn.setDoInput(true);
-                conn.setUseCaches(false);
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Transfer-Encoding", "chunked");
-                conn.setRequestProperty("Connection", "Keep-Alive");
-                conn.setRequestProperty("Charsert", "UTF-8");
-                conn.setConnectTimeout(5000);
-                conn.setReadTimeout(5000);
-                conn.setChunkedStreamingMode(20 * 1024); //指定流的大小，当内容达到这个值的时候就把流输出
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setConnectTimeout(5000);
+                httpURLConnection.setReadTimeout(5000);
 
-                OutputStream outputStream = conn.getOutputStream();
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setUseCaches(false);
+                httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
+                httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
+                httpURLConnection.setRequestProperty("Charsert", "UTF-8");
+                httpURLConnection.setRequestProperty("Authorization", "token " + ConnectionManager.getAccessToken());
+                httpURLConnection.setChunkedStreamingMode(4096); //指定流的大小，当内容达到这个值的时候就把流输出
+
+//                String method = httpURLConnection.getRequestMethod();
+//                Map headers = httpURLConnection.getHeaderFields();
+//                String contentType = httpURLConnection.getContentType();
+//                Map properties = httpURLConnection.getRequestProperties();
+
+                OutputStream outputStream = httpURLConnection.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
 
+                callback.onSuccess(outputStreamWriter);
                 return outputStreamWriter;
-
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
                 throw new CompletionException(exception);
+            } finally {
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
             }
         });
     }
@@ -104,8 +116,9 @@ public class FileClient implements Files {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return ResponseHelper.writeToReader(response);
+                Reader reader = ResponseHelper.writeToReader(response);
+                callback.onSuccess(reader);
+                return reader;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);

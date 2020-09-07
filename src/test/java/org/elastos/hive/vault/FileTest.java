@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.File;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
@@ -28,10 +29,12 @@ public class FileTest {
     private static final String folder = "cache/";
     private static final String remoteFile = folder + "test.txt";
 
-    private static String uploadUrl = "api/v1/files/uploader/cache/test.txt"; ///api/v1/files/uploader/test.txt
+    private static String uploadUrl = "test.txt"; ///api/v1/files/uploader/test.txt
+
+    private static String cacheFile = "test.txt";
 
     @Test
-    public void testUpload() {
+    public void testUploadFile() {
         try {
             filesApi.upload(uploadUrl, new Callback<Writer>() {
                 @Override
@@ -54,6 +57,69 @@ public class FileTest {
         }
     }
 
+
+    @Test
+    public void testDownloadFile() {
+        try {
+            filesApi.download(cacheFile, new Callback<Reader>() {
+                @Override
+                public void onError(HiveException e) {
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onSuccess(Reader result) {
+                    try {
+                        int len = 0;
+                        while ((len = result.read()) != -1) {
+                            System.out.println((char) len);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if(null != result) result.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testListFiles() {
+
+    }
+
+    @Test
+    public void testCopyFile() {
+
+    }
+
+    @Test
+    public void testMoveFile() {
+
+    }
+
+    @Test
+    public void testDeleteFile() {
+
+    }
+
+    @Test
+    public void testGetStatus() {
+
+    }
+
+    @Test
+    public void testGetHash() {
+
+    }
+
     @BeforeClass
     public static void setUp() {
         try {
@@ -63,11 +129,13 @@ public class FileTest {
                     .fromJson(json);
 
             Client.Options options = new Client.Options();
-            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(() -> jwtToken));
+            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
+                    -> "eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlqVW5ENEtlUnBlQlVGbWNFRENiaHhNVEpSelVZQ1FDWk0jcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppalVuRDRLZVJwZUJVRm1jRURDYmh4TVRKUnpVWUNRQ1pNIiwic3ViIjoiRElEQXV0aENoYWxsZW5nZSIsImF1ZCI6ImRpZDplbGFzdG9zOmlkZnBLSkoxc29EeFQyR2NnQ1JuRHQzY3U5NFpuR2Z6TlgiLCJub25jZSI6IjM5ZTYzYzZhLWYwYWMtMTFlYS05NjUwLTY0NWFlZGViMDc2MyIsImV4cCI6MTU5OTQ0MzQ4OH0.DPvQjDD49w2kLWeO4gbMEMo0VyHrgVdUnPPrYyJut8-EajXcmK64VXHQhfE32hHhkFZSW-5OLB5hyJZxvbcn-w"));
             options.setAuthenticationDIDDocument(doc);
             options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);
 
+            Client.setVaultProvider("did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX", "http://localhost:5000");
             client = Client.createInstance(options);
             filesApi = client.getVault("did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX").get().getFiles();
         } catch (Exception e) {

@@ -144,7 +144,7 @@ public class DBTest {
             InsertOptions insertOptions = new InsertOptions();
             insertOptions.bypassDocumentValidation(false).ordered(true);
 
-            database.insertMany("works", nodes, insertOptions, new Callback<InsertResult>() {
+            database.insertMany("works", nodes, /*insertOptions*/null, new Callback<InsertResult>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -206,15 +206,15 @@ public class DBTest {
                     .batchSize(0)
                     .projection(objectMapper.readTree("{\"_id\": false}"));
 
-            database.findMany("works", query, findOptions, new Callback<List<JsonNode>>() {
+            database.findMany("works", query, /*findOptions*/null, new Callback<List<JsonNode>>() {
                 @Override
                 public void onError(HiveException e) {
-
+                    fail();
                 }
 
                 @Override
                 public void onSuccess(List<JsonNode> result) {
-
+                    assertNotNull(result);
                 }
             }).get();
         } catch (Exception e) {
@@ -265,7 +265,7 @@ public class DBTest {
             UpdateOptions updateOptions = new UpdateOptions();
             updateOptions.upsert(true).bypassDocumentValidation(false);
 
-            database.updateMany("works", filter, update, updateOptions, new Callback<UpdateResult>() {
+            database.updateMany("works", filter, update, /*updateOptions*/null, new Callback<UpdateResult>() {
                 @Override
                 public void onError(HiveException e) {
 
