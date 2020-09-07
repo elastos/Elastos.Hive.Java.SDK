@@ -5,12 +5,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * Vault script condition to check if a database query returns results or not.
- * This is a way for example to check is a user is in a group, if a message contains comments, if a user
- * is in a list, etc.
+ * Client side representation of a back-end execution that runs a mongo "delete" query
  */
-public class QueryHasResultsCondition extends Condition {
-	private static final String TYPE = "queryHasResults";
+public class DbDeleteQuery extends Executable {
+	private static final String TYPE = "delete";
 	private Query query;
 
 	@JsonPropertyOrder({"collection", "filter"})
@@ -34,7 +32,7 @@ public class QueryHasResultsCondition extends Condition {
 		}
 	}
 
-    public QueryHasResultsCondition(String name, String collection, JsonNode filter) {
+    public DbDeleteQuery(String name, String collection, JsonNode filter) {
     	super(TYPE, name);
         query = new Query(collection, filter);
     }
