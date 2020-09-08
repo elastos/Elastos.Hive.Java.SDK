@@ -10,6 +10,7 @@ import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
+import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +61,8 @@ public class ScriptClient implements Scripting {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                return true;
+                BaseResponse baseResponse = (BaseResponse) response.body();
+                return null!=baseResponse && baseResponse.get_error()==null;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);
