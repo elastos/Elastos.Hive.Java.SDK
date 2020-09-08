@@ -83,7 +83,7 @@ public interface VaultApi {
     Call<BaseResponse> deleteFile(@Body RequestBody body);
 
     @GET(ConnectConstance.API_PATH + "/files/properties")
-    Call<FileInfo> getProperties(@Query("name") String filename);
+    Call<FileInfo> getProperties(@Query("path") String filename);
 
     //TODO
     // {name="path/of/folder/name"}

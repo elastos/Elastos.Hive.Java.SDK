@@ -1,11 +1,14 @@
 package org.elastos.hive.file;
 
-import java.util.Date;
+import org.elastos.hive.utils.DateUtil;
+import org.elastos.hive.vendor.vault.network.model.BaseResponse;
+
+import java.math.BigDecimal;
 
 /**
  * File information about a remote file or folder.
  */
-public class FileInfo {
+public class FileInfo extends BaseResponse {
 
     /**
 
@@ -18,44 +21,35 @@ public class FileInfo {
         FOLDER
     };
 
-    private Type type;
+    private String type;
 
     private String name;
 
     private long size;
 
-    private Date last_modify;
+    private String last_modify;
 
 
     public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
+        switch (type) {
+            case "file":
+                return Type.FILE;
+            case "folder":
+                return Type.FOLDER;
+        }
+        return null;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public long getSize() {
         return size;
     }
 
-    public void setSize(long size) {
-        this.size = size;
-    }
-
-    public Date getLastModify() {
-        return last_modify;
-    }
-
-    public void setLast_modify(Date last_modify) {
-        this.last_modify = last_modify;
+    public String getLastModify() {
+        long timeStamp = new BigDecimal(last_modify).multiply(new BigDecimal(1000)).longValue();
+        return DateUtil.getCurrentEpochTimeStamp(timeStamp);
     }
 }

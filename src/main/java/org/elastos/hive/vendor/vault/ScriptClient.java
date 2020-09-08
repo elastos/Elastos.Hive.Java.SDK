@@ -52,7 +52,7 @@ public class ScriptClient implements Scripting {
 
                 String json = JsonUtil.getJsonFromObject(map);
 
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response<BaseResponse> response = ConnectionManager.getHiveVaultApi()
                         .registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
                 int responseCode = checkResponseCode(response);
@@ -61,7 +61,7 @@ public class ScriptClient implements Scripting {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                BaseResponse baseResponse = (BaseResponse) response.body();
+                BaseResponse baseResponse = response.body();
                 return null!=baseResponse && baseResponse.get_error()==null;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());

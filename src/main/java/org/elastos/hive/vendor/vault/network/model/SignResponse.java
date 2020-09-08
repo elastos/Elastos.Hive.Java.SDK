@@ -8,8 +8,4 @@ public class SignResponse extends BaseResponse {
     public String getChallenge() {
         return challenge;
     }
-
-    public void setChallenge(String challenge) {
-        this.challenge = challenge;
-    }
 }

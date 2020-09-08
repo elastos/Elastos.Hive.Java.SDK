@@ -12,6 +12,6 @@ public class DateUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "";
+        return null;
     }
 }

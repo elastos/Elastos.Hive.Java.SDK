@@ -63,16 +63,11 @@ public class FileClient implements Files {
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setUseCaches(false);
-                httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
+//                httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
                 httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
                 httpURLConnection.setRequestProperty("Charsert", "UTF-8");
                 httpURLConnection.setRequestProperty("Authorization", "token " + ConnectionManager.getAccessToken());
-                httpURLConnection.setChunkedStreamingMode(4096); //指定流的大小，当内容达到这个值的时候就把流输出
-
-//                String method = httpURLConnection.getRequestMethod();
-//                Map headers = httpURLConnection.getHeaderFields();
-//                String contentType = httpURLConnection.getContentType();
-//                Map properties = httpURLConnection.getRequestProperties();
+                httpURLConnection.setChunkedStreamingMode(0);
 
                 OutputStream outputStream = httpURLConnection.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
@@ -173,7 +168,8 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<Boolean> move(String src, String dst, Callback<Boolean> callback) {
-        return moveImp(src, dst, getCallback(callback));
+        return authHelper.checkValid()
+                .thenCompose(result -> moveImp(src, dst, getCallback(callback)));
     }
 
     private CompletableFuture<Boolean> moveImp(String src, String dst, Callback<Boolean> callback) {
@@ -210,7 +206,8 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<Boolean> copy(String src, String dst, Callback<Boolean> callback) {
-        return copyImp(src, dst, getCallback(callback));
+        return authHelper.checkValid()
+                .thenCompose(result -> copyImp(src, dst, getCallback(callback)));
     }
 
     private CompletableFuture<Boolean> copyImp(String src, String dst, Callback<Boolean> callback) {
@@ -247,7 +244,8 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<String> hash(String remoteFile, Callback<String> callback) {
-        return hashImp(remoteFile, getCallback(callback));
+        return authHelper.checkValid()
+                .thenCompose(result -> hashImp(remoteFile, getCallback(callback)));
     }
 
     private CompletableFuture<String> hashImp(String remoteFile, Callback<String> callback) {
@@ -317,7 +315,8 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<FileInfo> stat(String path, Callback<FileInfo> callback) {
-        return statImp(path, getCallback(callback));
+        return authHelper.checkValid()
+                .thenCompose(result -> statImp(path, getCallback(callback)));
     }
 
     public CompletableFuture<FileInfo> statImp(String path, Callback<FileInfo> callback) {
@@ -332,8 +331,13 @@ public class FileClient implements Files {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                callback.onSuccess(null);
-                return response.body();
+                FileInfo fileInfo = response.body();
+                if(fileInfo==null || fileInfo.get_error()!=null) {
+                    callback.onSuccess(null);
+                    return null;
+                }
+                callback.onSuccess(fileInfo);
+                return fileInfo;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);

@@ -11,8 +11,4 @@ public class FilesResponse extends BaseResponse {
     public List<FileInfo> getFiles() {
         return file_info_list;
     }
-
-    public void setFiles(List<FileInfo> files) {
-        this.file_info_list = files;
-    }
 }

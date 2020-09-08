@@ -8,16 +8,8 @@ public class BaseResponse {
         return _status;
     }
 
-    public void set_status(String _status) {
-        this._status = _status;
-    }
-
     public Error get_error() {
         return _error;
-    }
-
-    public void set_error(Error _error) {
-        this._error = _error;
     }
 
     public static class Error {

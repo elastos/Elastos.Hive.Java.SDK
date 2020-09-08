@@ -6,8 +6,4 @@ public class UploadResponse extends BaseResponse {
     public String getUpload_file_url() {
         return upload_file_url;
     }
-
-    public void setUpload_file_url(String upload_file_url) {
-        this.upload_file_url = upload_file_url;
-    }
 }
