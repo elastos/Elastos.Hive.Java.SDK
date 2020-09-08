@@ -50,29 +50,16 @@ public class FileClient implements Files {
     private CompletableFuture<Writer> uploadImp(String path, Callback<Writer> callback) {
 
         return CompletableFuture.supplyAsync(() -> {
+
             HttpURLConnection httpURLConnection = null;
             try {
-                String url = ConnectionManager.getHivevaultBaseUrl()+ "/api/v1/files/upload/"+ path;
-                URL reslUrl = new URL(url);
-                httpURLConnection = (HttpURLConnection) reslUrl.openConnection();
-
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setConnectTimeout(5000);
-                httpURLConnection.setReadTimeout(5000);
-
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.setDoInput(true);
-                httpURLConnection.setUseCaches(false);
-//                httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
-                httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
-                httpURLConnection.setRequestProperty("Charsert", "UTF-8");
-                httpURLConnection.setRequestProperty("Authorization", "token " + ConnectionManager.getAccessToken());
-                httpURLConnection.setChunkedStreamingMode(0);
-
+                httpURLConnection = ConnectionManager.openURLConnection(path);
                 OutputStream outputStream = httpURLConnection.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
 
                 callback.onSuccess(outputStreamWriter);
+
+                ResponseHelper.readConnection(httpURLConnection);
                 return outputStreamWriter;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -332,7 +319,7 @@ public class FileClient implements Files {
                     throw new HiveException(HiveException.ERROR);
                 }
                 FileInfo fileInfo = response.body();
-                if(fileInfo==null || fileInfo.get_error()!=null) {
+                if (fileInfo == null || fileInfo.get_error() != null) {
                     callback.onSuccess(null);
                     return null;
                 }

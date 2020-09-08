@@ -2,12 +2,12 @@ package org.elastos.hive.vendor.vault.network;
 
 
 import org.elastos.hive.file.FileInfo;
+import org.elastos.hive.vendor.vault.VaultConstance;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.CountDocResponse;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 import org.elastos.hive.vendor.vault.network.model.SignResponse;
-import org.elastos.hive.vendor.vault.network.model.UploadResponse;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -15,101 +15,80 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface VaultApi {
 
-    @POST(ConnectConstance.API_PATH + "/did/sign_in")
+    @POST(VaultConstance.API_PATH + "/did/sign_in")
     Call<SignResponse> signIn(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/did/auth")
+    @POST(VaultConstance.API_PATH + "/did/auth")
     Call<AuthResponse> auth(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/sync/setup/google_drive")
+    @POST(VaultConstance.API_PATH + "/sync/setup/google_drive")
     Call<BaseResponse> googleDrive(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/create_collection")
+    @POST(VaultConstance.API_PATH + "/db/create_collection")
     Call<BaseResponse> createCollection(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/delete_collection")
+    @POST(VaultConstance.API_PATH + "/db/delete_collection")
     Call<BaseResponse> deleteCollection(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/insert_one")
+    @POST(VaultConstance.API_PATH + "/db/insert_one")
     Call<ResponseBody> insertOne(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/insert_many")
+    @POST(VaultConstance.API_PATH + "/db/insert_many")
     Call<ResponseBody> insertMany(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/update_one")
+    @POST(VaultConstance.API_PATH + "/db/update_one")
     Call<ResponseBody> updateOne(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/update_many")
+    @POST(VaultConstance.API_PATH + "/db/update_many")
     Call<ResponseBody> updateMany(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/delete_one")
+    @POST(VaultConstance.API_PATH + "/db/delete_one")
     Call<ResponseBody> deleteOne(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/delete_many")
+    @POST(VaultConstance.API_PATH + "/db/delete_many")
     Call<ResponseBody> deleteMany(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/count_documents")
+    @POST(VaultConstance.API_PATH + "/db/count_documents")
     Call<CountDocResponse> countDocs(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/find_one")
+    @POST(VaultConstance.API_PATH + "/db/find_one")
     Call<ResponseBody> findOne(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/db/find_many")
+    @POST(VaultConstance.API_PATH + "/db/find_many")
     Call<ResponseBody> findMany(@Body RequestBody body);
 
-    //file="path/of/file/name"
-//    @Multipart
-//    @POST(ConnectConstance.API_PATH + "/file/uploader")
-//    Call<BaseResponse> uploader(@Part MultipartBody.Part part);
-
-    @GET(ConnectConstance.API_PATH + "/files/list/folder")
+    @GET(VaultConstance.API_PATH + "/files/list/folder")
     Call<FilesResponse> files(@Query("name") String filename);
 
-    @POST(ConnectConstance.API_PATH + "/files/creator/file")
-    Call<UploadResponse> createFile(@Body RequestBody body);
-
-    @POST("{path}")
-    Call<BaseResponse> uploadFile(@Path("path") String path, @Body RequestBody body);
-
-    @GET(ConnectConstance.API_PATH + "/files/download")
+    @GET(VaultConstance.API_PATH + "/files/download")
     Call<ResponseBody> downloader(@Query("path") String filename);
 
-    @POST(ConnectConstance.API_PATH + "/files/deleter/file")
-    Call<BaseResponse> deleteFile(@Body RequestBody body);
-
-    @GET(ConnectConstance.API_PATH + "/files/properties")
+    @GET(VaultConstance.API_PATH + "/files/properties")
     Call<FileInfo> getProperties(@Query("path") String filename);
 
-    //TODO
-    // {name="path/of/folder/name"}
-    @POST(ConnectConstance.API_PATH + "/files/creator/folder")
-    Call<BaseResponse> createFolder(@Body RequestBody body);
-
-    //{"name": "test.png"}
-    @POST(ConnectConstance.API_PATH + "/files/deleter/folder")
+    @POST(VaultConstance.API_PATH + "/files/deleter/folder")
     Call<BaseResponse> deleteFolder(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/files/mover")
+    @POST(VaultConstance.API_PATH + "/files/mover")
     Call<BaseResponse> move(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/files/copier")
+    @POST(VaultConstance.API_PATH + "/files/copier")
     Call<BaseResponse> copy(@Body RequestBody body);
 
-    @GET(ConnectConstance.API_PATH + "/files/file/hash")
+    @GET(VaultConstance.API_PATH + "/files/file/hash")
     Call<BaseResponse> hash(@Query("name") String filename);
 
-    @POST(ConnectConstance.API_PATH + "/scripting/set_subcondition")
+    @POST(VaultConstance.API_PATH + "/scripting/set_subcondition")
     Call<BaseResponse> registerCondition(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/scripting/set_script")
+    @POST(VaultConstance.API_PATH + "/scripting/set_script")
     Call<BaseResponse> registerScript(@Body RequestBody body);
 
-    @POST(ConnectConstance.API_PATH + "/scripting/run_script")
+    @POST(VaultConstance.API_PATH + "/scripting/run_script")
     Call<ResponseBody> callScript(@Body RequestBody body);
 
 

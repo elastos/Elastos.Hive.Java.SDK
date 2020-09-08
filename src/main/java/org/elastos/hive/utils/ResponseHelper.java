@@ -25,12 +25,14 @@ package org.elastos.hive.utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,5 +118,30 @@ public class ResponseHelper {
         InputStream inputStream = body != null ? body.byteStream() : null;
         if (inputStream == null) return null;
         return new InputStreamReader(inputStream);
+    }
+
+    public static void readConnection(HttpURLConnection httpURLConnection) {
+        try {
+            int code = httpURLConnection.getResponseCode();
+            System.out.println("response code=" + code);
+            String message = httpURLConnection.getResponseMessage();
+            System.out.println("message=" + message);
+
+            String sCurrentLine = "";
+            String result = "";
+            if (code == 200) {
+                java.io.InputStream is = httpURLConnection.getInputStream();
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(is));
+                while ((sCurrentLine = reader.readLine()) != null)
+                    if (sCurrentLine.length() > 0)
+                        result = result + sCurrentLine.trim();
+            } else {
+                result = "error code:" + code;
+            }
+            System.out.println("response content:" + result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -2,6 +2,8 @@ package org.elastos.hive.vendor.vault;
 
 public class VaultConstance {
 
+    public static final String API_PATH = "/api/v1";
+
     static final String CONFIG = "hivesault.json";
 
     static final String AUTH_URI = "https://accounts.google.com/o/oauth2/auth";
@@ -20,14 +22,4 @@ public class VaultConstance {
 
     public static final String MAIN_NET_RESOLVER = "http://api.elastos.io:20606";
 
-    public static final String TEST_NODE_URL = "https://hive.trinity-tech.io";
-
-//    static final String DICT_SCHEMA = "{'KV': {\n" +
-//            "        'type': 'dict',\n" +
-//            "        'schema': {\n" +
-//            "            'key': {'type': 'string'},\n" +
-//            "            'values': {'type': 'string'}\n" +
-//            "        },\n" +
-//            "    }}";
-  
 }

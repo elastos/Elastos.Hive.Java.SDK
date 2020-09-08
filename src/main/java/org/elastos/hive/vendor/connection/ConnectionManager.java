@@ -23,8 +23,13 @@
 package org.elastos.hive.vendor.connection;
 
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
+import org.elastos.hive.vendor.vault.VaultConstance;
 import org.elastos.hive.vendor.vault.network.VaultApi;
 import org.elastos.hive.vendor.vault.network.VaultAuthApi;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class ConnectionManager {
 
@@ -87,6 +92,26 @@ public class ConnectionManager {
 
     public static String getAccessToken() {
         return ConnectionManager.hivevaultConfig.getHeaderConfig().getAuthToken().getAccessToken();
+    }
+
+    public static HttpURLConnection openURLConnection(String path) throws IOException {
+        String url = ConnectionManager.getHivevaultBaseUrl() + VaultConstance.API_PATH +"/files/upload/" + path;
+        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+        httpURLConnection.setRequestMethod("POST");
+        httpURLConnection.setConnectTimeout(5000);
+        httpURLConnection.setReadTimeout(5000);
+
+        httpURLConnection.setDoOutput(true);
+        httpURLConnection.setDoInput(true);
+        httpURLConnection.setUseCaches(false);
+        httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
+        httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
+        httpURLConnection.setRequestProperty("Charset", "UTF-8");
+        httpURLConnection.setRequestProperty("Authorization", "token " + ConnectionManager.getAccessToken());
+
+        httpURLConnection.setChunkedStreamingMode(0);
+
+        return httpURLConnection;
     }
 
 }

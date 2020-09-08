@@ -5,6 +5,7 @@ import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.Files;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.file.FileInfo;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -13,7 +14,11 @@ import org.junit.runners.MethodSorters;
 import java.io.File;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileTest {
@@ -22,16 +27,16 @@ public class FileTest {
 
     private static Client client;
 
-    private String testFile = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
-
     private static Files filesApi;
 
     private static final String folder = "cache/";
-    private static final String remoteFile = folder + "test.txt";
-
     private static String uploadUrl = "test.txt"; ///api/v1/files/uploader/test.txt
 
     private static String cacheFile = "test.txt";
+
+    private static String src = "/src";
+
+    private static String dst = "/dst";
 
     @Test
     public void testUploadFile() {
@@ -39,13 +44,13 @@ public class FileTest {
             filesApi.upload(uploadUrl, new Callback<Writer>() {
                 @Override
                 public void onError(HiveException e) {
-                    e.printStackTrace();
+                    fail();
                 }
 
                 @Override
                 public void onSuccess(Writer result) {
                     try {
-                        result.write("aaaaaaaaaa");
+                        result.write("test remote file12222265464756758867868686868672222222");
                         result.flush();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -64,16 +69,18 @@ public class FileTest {
             filesApi.download(cacheFile, new Callback<Reader>() {
                 @Override
                 public void onError(HiveException e) {
-                    e.printStackTrace();
+                    fail();
                 }
 
                 @Override
                 public void onSuccess(Reader result) {
                     try {
-                        int len = 0;
-                        while ((len = result.read()) != -1) {
-                            System.out.println((char) len);
+                        char[] buffer = new char[1];
+                        StringBuilder sb = new StringBuilder();
+                        while ( result.read(buffer) != -1) {
+                            sb.append(buffer);
                         }
+                        System.out.println("content:"+sb.toString());
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
@@ -92,32 +99,122 @@ public class FileTest {
 
     @Test
     public void testListFiles() {
+        try {
+            filesApi.list(cacheFile, new Callback<List<FileInfo>>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
 
+                @Override
+                public void onSuccess(List<FileInfo> result) {
+                    assertNotNull(result);
+                    System.out.println("size="+result);
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void testCopyFile() {
+        try {
+            filesApi.copy(src, dst, new Callback<Boolean>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
 
+                @Override
+                public void onSuccess(Boolean result) {
+
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void testMoveFile() {
+        try {
+            filesApi.move(src, dst, new Callback<Boolean>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
 
+                @Override
+                public void onSuccess(Boolean result) {
+
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void testDeleteFile() {
+        try {
+            filesApi.delete(cacheFile, new Callback<Boolean>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
 
+                @Override
+                public void onSuccess(Boolean result) {
+
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void testGetStatus() {
+        try {
+            filesApi.stat(cacheFile, new Callback<FileInfo>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
 
+                @Override
+                public void onSuccess(FileInfo result) {
+                    assertNotNull(result);
+                    System.out.println("name="+result.getName());
+                    System.out.println("type="+result.getType());
+                    System.out.println("size="+result.getSize());
+                    System.out.println("date="+result.getLastModify());
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void testGetHash() {
+        try {
+            filesApi.hash(cacheFile, new Callback<String>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
 
+                @Override
+                public void onSuccess(String result) {
+                    assertNotNull(result);
+                    System.out.println("hash="+result);
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @BeforeClass
