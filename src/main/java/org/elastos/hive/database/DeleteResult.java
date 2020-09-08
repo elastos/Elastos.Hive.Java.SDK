@@ -2,6 +2,6 @@ package org.elastos.hive.database;
 
 public class DeleteResult extends Result {
 	public long deletedCount() {
-		return (long)get("deletedCount");
+		return (long)get("deleted_count");
 	}
 }
