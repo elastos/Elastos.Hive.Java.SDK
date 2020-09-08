@@ -5,8 +5,12 @@ import java.util.List;
 
 public class InsertResult extends Result {
 	public List<String> insertedIds() {
-		String[] ids = (String[])get("insertedIds");
-
-		return Arrays.asList(ids);
+		String[] ids = (String[])get("inserted_ids");
+		if(ids != null) {
+			return Arrays.asList(ids);
+		} else {
+			String id = (String) get("inserted_id");
+			return Arrays.asList(id);
+		}
 	}
 }

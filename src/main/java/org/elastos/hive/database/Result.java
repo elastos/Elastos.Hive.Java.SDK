@@ -14,7 +14,7 @@ public abstract class Result {
         result = mapper.readValue(json, Map.class);
 	}
 
-	public Object get(String name) {
+	protected Object get(String name) {
 		return result.get(name);
 	}
 }
