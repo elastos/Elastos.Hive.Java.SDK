@@ -321,8 +321,7 @@ public class DatabaseClient implements Database {
                     throw new HiveException(HiveException.ERROR);
                 }
 
-                JsonNode jsonNode = ResponseHelper.getVaule(response, JsonNode.class);
-                List<JsonNode> jsonNodes = jsonNode.findValues("items");
+                List<JsonNode> jsonNodes = ResponseHelper.getArray(response, "items");
                 callback.onSuccess(jsonNodes);
                 return jsonNodes;
             } catch (Exception e) {

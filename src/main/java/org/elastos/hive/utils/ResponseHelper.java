@@ -31,6 +31,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -46,6 +48,24 @@ public class ResponseHelper {
             e.printStackTrace();
         }
         return data;
+    }
+
+    public static List<JsonNode> getArray(Response response, String key) {
+        List<JsonNode> rets = new ArrayList<>();
+        rets.clear();
+        try {
+            String json = toString(response);
+            JsonNode arrNode = new ObjectMapper().readTree(json).get(key);
+            if (arrNode.isArray()) {
+                for (JsonNode objNode : arrNode) {
+                    rets.add(objNode);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return rets;
     }
 
     public static <T> T getVaule(String json, Class<T> clz) {
