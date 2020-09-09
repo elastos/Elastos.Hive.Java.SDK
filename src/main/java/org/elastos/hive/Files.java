@@ -18,7 +18,7 @@ public interface Files {
      * @return the new CompletionStage, the result is the Writer interface for
      *      upload the file content if success; null otherwise
      */
-    CompletableFuture<Writer> upload(String path) throws HiveException;
+    <T> CompletableFuture<T> upload(String path, Class<T> resultType) throws HiveException;
 
     /**
      * Initiates an upload sequence by returning a Write object that can be
@@ -31,7 +31,7 @@ public interface Files {
      * @return the new CompletionStage, the result is the Writer interface for
      *      upload the file content if success; null otherwise
      */
-    CompletableFuture<Writer> upload(String path, Callback<Writer> callback) throws HiveException;
+    <T> CompletableFuture<T> upload(String path, Class<T> resultType, Callback<T> callback) throws HiveException;
 
     /**
      * Initiates a download sequence by returning a Reader object that can
@@ -41,7 +41,7 @@ public interface Files {
      * @return the new CompletionStage, the result is the Reader interface for
      *      read the file content if success; null otherwise
      */
-    CompletableFuture<Reader> download(String path) throws HiveException;
+    <T> CompletableFuture<T> download(String path, Class<T> resultType) throws HiveException;
 
     /**
      * Initiates a download sequence by returning a Reader object that can
@@ -53,7 +53,7 @@ public interface Files {
      * @return the new CompletionStage, the result is the Reader interface for
      *      read the file content if success; null otherwise
      */
-    CompletableFuture<Reader> download(String path, Callback<Reader> callback) throws HiveException;
+    <T> CompletableFuture<T> download(String path, Class<T> resultType, Callback<T> callback) throws HiveException;
 
     /**
      * Deletes a file, or a folder. In case the given path is a folder,

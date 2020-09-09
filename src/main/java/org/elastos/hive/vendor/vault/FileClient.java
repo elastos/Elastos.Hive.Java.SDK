@@ -11,12 +11,11 @@ import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.vault.network.VaultApi;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.Writer;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,18 +35,17 @@ public class FileClient implements Files {
     }
 
     @Override
-    public CompletableFuture<Writer> upload(String path) {
-        return upload(path, null);
-
+    public <T> CompletableFuture<T> upload(String path, Class<T> resultType) throws HiveException {
+        return upload(path, resultType, null);
     }
 
     @Override
-    public CompletableFuture<Writer> upload(String path, Callback<Writer> callback) {
+    public <T> CompletableFuture<T> upload(String path, Class<T> resultType, Callback<T> callback) throws HiveException {
         return authHelper.checkValid()
-                .thenCompose(result -> uploadImp(path, callback));
+                .thenCompose(result -> uploadImp(path, resultType, getCallback(callback)));
     }
 
-    private CompletableFuture<Writer> uploadImp(String path, Callback<Writer> callback) {
+    private <T> CompletableFuture<T> uploadImp(String path, Class<T> resultType, Callback<T> callback) {
 
         return CompletableFuture.supplyAsync(() -> {
 
@@ -55,12 +53,17 @@ public class FileClient implements Files {
             try {
                 httpURLConnection = ConnectionManager.openURLConnection(path);
                 OutputStream outputStream = httpURLConnection.getOutputStream();
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
 
-                callback.onSuccess(outputStreamWriter);
-
-                ResponseHelper.readConnection(httpURLConnection);
-                return outputStreamWriter;
+                if(resultType.isAssignableFrom(OutputStream.class)) {
+                    callback.onSuccess((T) outputStream);
+                    ResponseHelper.readConnection(httpURLConnection);
+                    return (T) outputStream;
+                } else {
+                    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
+                    callback.onSuccess((T) outputStreamWriter);
+                    ResponseHelper.readConnection(httpURLConnection);
+                    return (T) outputStreamWriter;
+                }
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -73,17 +76,17 @@ public class FileClient implements Files {
     }
 
     @Override
-    public CompletableFuture<Reader> download(String path) {
-        return download(path, null);
+    public <T> CompletableFuture<T> download(String path, Class<T> resultType) throws HiveException {
+        return download(path, resultType, null);
     }
 
     @Override
-    public CompletableFuture<Reader> download(String path, Callback<Reader> callback) {
+    public <T> CompletableFuture<T> download(String path, Class<T> resultType, Callback<T> callback) throws HiveException {
         return authHelper.checkValid()
-                .thenCompose(result -> downloadImp(path, getCallback(callback)));
+                .thenCompose(result -> downloadImp(path, resultType, getCallback(callback)));
     }
 
-    private CompletableFuture<Reader> downloadImp(String remoteFile, Callback<Reader> callback) {
+    private <T> CompletableFuture<T> downloadImp(String remoteFile, Class<T> resultType, Callback<T> callback) {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -98,9 +101,16 @@ public class FileClient implements Files {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                Reader reader = ResponseHelper.writeToReader(response);
-                callback.onSuccess(reader);
-                return reader;
+
+                if(resultType.isAssignableFrom(Reader.class)) {
+                    Reader reader = ResponseHelper.getToReader(response);
+                    callback.onSuccess((T) reader);
+                    return (T) reader;
+                } else {
+                    InputStream inputStream = ResponseHelper.getInputStream(response);
+                    callback.onSuccess((T) inputStream);
+                    return (T) inputStream;
+                }
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -109,7 +119,6 @@ public class FileClient implements Files {
         });
 
     }
-
 
     @Override
     public CompletableFuture<Boolean> delete(String remoteFile) {

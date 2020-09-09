@@ -113,11 +113,18 @@ public class ResponseHelper {
         return length;
     }
 
-    public static Reader writeToReader(Response response) {
+    public static Reader getToReader(Response response) {
         ResponseBody body = (ResponseBody) response.body();
         InputStream inputStream = body != null ? body.byteStream() : null;
         if (inputStream == null) return null;
         return new InputStreamReader(inputStream);
+    }
+
+    public static InputStream getInputStream(Response response) {
+        ResponseBody body = (ResponseBody) response.body();
+        InputStream inputStream = body != null ? body.byteStream() : null;
+        if (inputStream == null) return null;
+        return inputStream;
     }
 
     public static void readConnection(HttpURLConnection httpURLConnection) {
