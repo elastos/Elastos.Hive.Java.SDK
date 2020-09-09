@@ -58,21 +58,20 @@ public class FileClient implements Files {
 
                 if(resultType.isAssignableFrom(OutputStream.class)) {
                     callback.onSuccess((T) outputStream);
-                    ResponseHelper.readConnection(httpURLConnection);
                     return (T) outputStream;
                 } else {
                     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
                     callback.onSuccess((T) outputStreamWriter);
-                    ResponseHelper.readConnection(httpURLConnection);
                     return (T) outputStreamWriter;
                 }
             } catch (Exception e) {
+                ResponseHelper.readConnection(httpURLConnection);
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
                 throw new CompletionException(exception);
             } finally {
-                if (httpURLConnection != null)
-                    httpURLConnection.disconnect();
+//                if (httpURLConnection != null)
+//                    httpURLConnection.disconnect();
             }
         });
     }
