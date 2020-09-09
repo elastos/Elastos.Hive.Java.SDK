@@ -364,14 +364,19 @@ public class DatabaseClient implements Database {
                     throw new HiveException(HiveException.ERROR);
                 }
                 UpdateResult updateResult = new UpdateResult();
-                updateResult.deserialize(ResponseHelper.toString(response));
+                String ret = ResponseHelper.toString(response);
+                if(ret.contains("_error")) {
+                    HiveException exception = new HiveException(ret);
+                    throw exception;
+                }
+                updateResult.deserialize(ret);
                 callback.onSuccess(updateResult);
                 return updateResult;
             } catch (Exception e) {
-                HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
-                throw new CompletionException(exception);
+                e.printStackTrace();
             }
+
+            return null;
         });
     }
 
