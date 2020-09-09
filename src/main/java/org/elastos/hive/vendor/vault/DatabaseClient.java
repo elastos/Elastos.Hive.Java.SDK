@@ -348,7 +348,8 @@ public class DatabaseClient implements Database {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
                 rootNode.put("collection", collection);
-                if(null!=filter) rootNode.put("update", update);
+                if(null!=filter) rootNode.put("filter", filter);
+                if(null!=update) rootNode.put("update", update);
                 if(null!=options) rootNode.put("options", options.serialize());
 
                 String json = rootNode.toString();
@@ -390,7 +391,8 @@ public class DatabaseClient implements Database {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
                 rootNode.put("collection", collection);
-                if(null!=filter) rootNode.put("update", update);
+                if(null!=filter) rootNode.put("filter", filter);
+                if(null!=update) rootNode.put("update", update);
                 if(null!=options) rootNode.put("options", options.serialize());
 
                 String json = rootNode.toString();

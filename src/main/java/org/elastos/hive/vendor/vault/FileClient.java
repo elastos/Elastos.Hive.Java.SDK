@@ -54,6 +54,8 @@ public class FileClient implements Files {
                 httpURLConnection = ConnectionManager.openURLConnection(path);
                 OutputStream outputStream = httpURLConnection.getOutputStream();
 
+                if(null == outputStream) return null;
+
                 if(resultType.isAssignableFrom(OutputStream.class)) {
                     callback.onSuccess((T) outputStream);
                     ResponseHelper.readConnection(httpURLConnection);
