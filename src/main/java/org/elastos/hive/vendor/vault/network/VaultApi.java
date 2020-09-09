@@ -80,7 +80,7 @@ public interface VaultApi {
     Call<BaseResponse> copy(@Body RequestBody body);
 
     @GET(VaultConstance.API_PATH + "/files/file/hash")
-    Call<BaseResponse> hash(@Query("name") String filename);
+    Call<ResponseBody> hash(@Query("path") String filename);
 
     @POST(VaultConstance.API_PATH + "/scripting/set_subcondition")
     Call<BaseResponse> registerCondition(@Body RequestBody body);

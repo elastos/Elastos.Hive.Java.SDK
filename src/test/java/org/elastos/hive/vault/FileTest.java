@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -74,6 +75,7 @@ public class FileTest {
                         byte[] stream = readImage(testImage);
                         result.write(stream);
                         result.flush();
+                        result.close();
                         assertNotNull(result);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -84,8 +86,6 @@ public class FileTest {
             e.printStackTrace();
         }
     }
-
-
 
     private byte[] readImage(String path) {
         try {
@@ -249,7 +249,16 @@ public class FileTest {
     @Test
     public void testDeleteFile() {
         try {
-            filesApi.delete(cacheFile, new Callback<Boolean>() {
+            filesApi.delete(uploadUrl).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testDeleteFileWithCallback() {
+        try {
+            filesApi.delete(uploadUrl, new Callback<Boolean>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -257,7 +266,7 @@ public class FileTest {
 
                 @Override
                 public void onSuccess(Boolean result) {
-
+                    assertTrue(result);
                 }
             }).get();
         } catch (Exception e) {
@@ -268,7 +277,7 @@ public class FileTest {
     @Test
     public void testGetStatus() {
         try {
-            filesApi.stat(cacheFile, new Callback<FileInfo>() {
+            filesApi.stat(uploadUrl, new Callback<FileInfo>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -291,7 +300,7 @@ public class FileTest {
     @Test
     public void testGetHash() {
         try {
-            filesApi.hash(cacheFile, new Callback<String>() {
+            filesApi.hash(uploadUrl, new Callback<String>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
