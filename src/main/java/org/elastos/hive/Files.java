@@ -10,47 +10,53 @@ import org.elastos.hive.file.FileInfo;
 
 public interface Files {
     /**
-     * Initiates an upload sequence by returning a Write object that can be
+     * Initiates an upload sequence by returning a Write or OutputStream object that can be
      * used to write small file chunks. After writing, flush() must be called
      * to actually send the data remotely.
-     *
      * @param path the path for the remote file
-     * @return the new CompletionStage, the result is the Writer interface for
-     *      upload the file content if success; null otherwise
+     * @param resultType Write or OutputStream class
+     * @param <T> Write, OutputStream
+     * @return the new CompletionStage, the result is the Writer or OutputStream interface for
+     *              upload the file content if success; null otherwise
+     * @throws HiveException
      */
     <T> CompletableFuture<T> upload(String path, Class<T> resultType) throws HiveException;
 
     /**
-     * Initiates an upload sequence by returning a Write object that can be
+     * Initiates an upload sequence by returning a Write or OutputStream object that can be
      * used to write small file chunks. After writing, flush() must be called
      * to actually send the data remotely.
-     *
      * @param path the path for the remote file
+     * @param resultType Write or OutputStream class
      * @param callback the given Callback will be called once the operation
      *         completes, either Writer or null
-     * @return the new CompletionStage, the result is the Writer interface for
-     *      upload the file content if success; null otherwise
+     * @param <T> Write, OutputStream
+     * @return the new CompletionStage, the result is the Writer or OutputStream interface for
+     *              upload the file content if success; null otherwise
+     * @throws HiveException
      */
     <T> CompletableFuture<T> upload(String path, Class<T> resultType, Callback<T> callback) throws HiveException;
 
     /**
-     * Initiates a download sequence by returning a Reader object that can
+     * Initiates a download sequence by returning a Reader or InputStream object that can
      * be used to read the downloaded file in chunks.
      *
      * @param path the path for the remote file
-     * @return the new CompletionStage, the result is the Reader interface for
+     * @param resultType Reader or InputStream class
+     * @return the new CompletionStage, the result is the Reader or InputStream interface for
      *      read the file content if success; null otherwise
      */
     <T> CompletableFuture<T> download(String path, Class<T> resultType) throws HiveException;
 
     /**
-     * Initiates a download sequence by returning a Reader object that can
+     * Initiates a download sequence by returning a Reader or InputStream object that can
      * be used to read the downloaded file in chunks.
      *
      * @param path the path for the remote file
+     * @param resultType Reader or InputStream class
      * @param callback the given Callback will be called once the operation
-     *         completes, either Reader or null
-     * @return the new CompletionStage, the result is the Reader interface for
+     *         completes, either Reader, InputStream or null
+     * @return the new CompletionStage, the result is the Reader or InputStream interface for
      *      read the file content if success; null otherwise
      */
     <T> CompletableFuture<T> download(String path, Class<T> resultType, Callback<T> callback) throws HiveException;
