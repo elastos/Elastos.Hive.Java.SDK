@@ -81,7 +81,7 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<Boolean> deleteCollection(String name) {
-        return deleteCollection(name);
+        return deleteCollection(name, null);
     }
 
     @Override
