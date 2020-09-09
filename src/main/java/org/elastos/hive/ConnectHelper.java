@@ -43,4 +43,6 @@ public interface ConnectHelper {
      * @return Returns `Void` if expired
      */
     CompletableFuture<Void> checkValid(Callback<Void> callback);
+
+    CompletableFuture<Void> connect();
 }

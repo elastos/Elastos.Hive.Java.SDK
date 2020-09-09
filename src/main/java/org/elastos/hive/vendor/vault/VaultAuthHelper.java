@@ -103,7 +103,6 @@ public class VaultAuthHelper implements ConnectHelper {
         return CompletableFuture.runAsync(() -> {
             try {
                 doCheckExpired();
-                callback.onSuccess(null);
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
@@ -112,11 +111,16 @@ public class VaultAuthHelper implements ConnectHelper {
         });
     }
 
+    @Override
+    public CompletableFuture<Void> connect() {
+        return CompletableFuture.runAsync(() -> checkValid());
+    }
+
     private void doCheckExpired() throws Exception {
         connectState.set(false);
         tryRestoreToken();
         if (token == null || token.isExpired()) {
-            signIn(this.authenticationHandler);
+            signIn();
         }
         initConnection();
         connectState.set(true);
@@ -158,9 +162,7 @@ public class VaultAuthHelper implements ConnectHelper {
         connectState.set(true);
     }
 
-    private void signIn(AuthenticationHandler handler) throws Exception {
-
-
+    private void signIn() throws Exception {
         Map map = new HashMap<>();
         JSONObject docJsonObject = new JSONObject(authenticationDIDDocument.toString());
         map.put("document", docJsonObject);
@@ -174,8 +176,8 @@ public class VaultAuthHelper implements ConnectHelper {
             throw new HiveException(signResponse.get_error().getMessage());
         }
         String jwtToken = signResponse.getChallenge();
-        if (null != handler && verifyToken(jwtToken)) {
-            String approveJwtToken = handler.authenticationChallenge(jwtToken).get();
+        if (null != this.authenticationHandler && verifyToken(jwtToken)) {
+            String approveJwtToken = this.authenticationHandler.authenticationChallenge(jwtToken).get();
             nodeAuth(approveJwtToken);
         }
     }
@@ -351,6 +353,34 @@ public class VaultAuthHelper implements ConnectHelper {
                 .build();
         ConnectionManager.resetHiveVaultApi(this.nodeUrl,
                 baseServiceConfig);
+    }
+
+    private String userDid;
+    private String appId;
+    private String appInstanceDid;
+
+    public String getUserDid() {
+        return userDid;
+    }
+
+    public void setUserDid(String userDid) {
+        this.userDid = userDid;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getAppInstanceDid() {
+        return appInstanceDid;
+    }
+
+    public void setAppInstanceDid(String appInstanceDid) {
+        this.appInstanceDid = appInstanceDid;
     }
 
     boolean getConnectState() {

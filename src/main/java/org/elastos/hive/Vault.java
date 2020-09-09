@@ -14,9 +14,11 @@ public class Vault {
 
     private String vaultProvider;
     private String ownerDid;
+    private VaultAuthHelper authHelper;
 
     public Vault(VaultAuthHelper authHelper, String vaultProvider, String ownerDid) {
 
+        this.authHelper = authHelper;
         this.files = new FileClient(authHelper);
         this.database = new DatabaseClient(authHelper);
         this.scripting = new ScriptClient(authHelper);
