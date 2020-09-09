@@ -2,15 +2,15 @@ package org.elastos.hive.database;
 
 public class UpdateResult extends Result {
 	public long matchedCount() {
-		return (long)get("matchedCount");
+		return (int)get("matchedCount");
 	}
 
 	public long modifiedCount() {
-		return (long)get("modifiedCount");
+		return (int)get("modifiedCount");
 	}
 
 	public long upsertedCount() {
-		return (long)get("upsertedCount");
+		return (int)get("upsertedCount");
 	}
 
 	public String upsertedId() {
