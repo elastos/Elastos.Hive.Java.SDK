@@ -70,13 +70,13 @@ public interface VaultApi {
     @GET(VaultConstance.API_PATH + "/files/properties")
     Call<FileInfo> getProperties(@Query("path") String filename);
 
-    @POST(VaultConstance.API_PATH + "/files/deleter/folder")
+    @POST(VaultConstance.API_PATH + "/files/delete")
     Call<BaseResponse> deleteFolder(@Body RequestBody body);
 
-    @POST(VaultConstance.API_PATH + "/files/mover")
+    @POST(VaultConstance.API_PATH + "/files/move")
     Call<BaseResponse> move(@Body RequestBody body);
 
-    @POST(VaultConstance.API_PATH + "/files/copier")
+    @POST(VaultConstance.API_PATH + "/files/copy")
     Call<BaseResponse> copy(@Body RequestBody body);
 
     @GET(VaultConstance.API_PATH + "/files/file/hash")
