@@ -11,10 +11,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,27 +30,69 @@ public class FileTest {
 
     private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
 
-    private String testImage = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/ela.png";
+    private String testSmallImage = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/small.png";
+    private String testBigImage = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/big.png";
 
     private static Client client;
 
     private static Files filesApi;
 
-    private static final String folder = "cache/";
-    private static String uploadUrl = "test.txt"; ///api/v1/files/uploader/test.txt
-
-    private static String cacheFile = "test.txt";
+    private static String uploadUrl = "test.txt";
 
     private static String src = "/src";
 
     private static String dst = "/dst";
 
+    private static String txtTest = "test.txt";
+
+    private static String smallBinTest = "small.png";
+
+    private static String bigBinTest = "big.png";
+
+    @Test
+    public void testUploadText() {
+        try {
+            Writer writer = filesApi.upload(txtTest, Writer.class).get();
+            writer.write("fasjfosjfoajfsdoafjsofjdsaoifjsofjdsofjsdofjdsofjsooifj");
+            writer.close();
+            System.out.println("write success");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testUploadTextWithCallback() {
+        try {
+            filesApi.upload(txtTest, Writer.class, new Callback<Writer>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
+
+                @Override
+                public void onSuccess(Writer result) {
+                    try {
+                        result.write("test remote file435fwjfpwjfwpfjwfjwfjwjfwpfjp");
+                        result.flush();
+                        result.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Test
     public void testUploadBin() {
         try {
-            OutputStream outputStream = filesApi.upload("ela.png", OutputStream.class).get();
-            byte[] stream = readImage(testImage);
+            OutputStream outputStream = filesApi.upload(bigBinTest, OutputStream.class).get();
+            byte[] stream = readImage(testBigImage);
             outputStream.write(stream);
+            outputStream.flush();
             outputStream.close();
             System.out.println("write success");
         } catch (Exception e) {
@@ -63,7 +103,7 @@ public class FileTest {
     @Test
     public void testUploadBinWithCallback() {
         try {
-            filesApi.upload("ela.png", OutputStream.class ,new Callback<OutputStream>() {
+            filesApi.upload(smallBinTest, OutputStream.class ,new Callback<OutputStream>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -72,9 +112,8 @@ public class FileTest {
                 @Override
                 public void onSuccess(OutputStream result) {
                     try {
-                        byte[] stream = readImage(testImage);
+                        byte[] stream = readImage(testBigImage);
                         result.write(stream);
-                        result.flush();
                         result.close();
                         assertNotNull(result);
                     } catch (Exception e) {
@@ -87,34 +126,10 @@ public class FileTest {
         }
     }
 
-    private byte[] readImage(String path) {
-        try {
-            InputStream inputStream = null;
-            try {
-                inputStream = new FileInputStream(path);
-                byte[] buffer = new byte[inputStream.available()];
-                inputStream.read(buffer);
-
-                return buffer;
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @Test
     public void testDownloadBin() {
         try {
-            filesApi.download("ela.png", InputStream.class, new Callback<InputStream>() {
+            filesApi.download(smallBinTest, InputStream.class, new Callback<InputStream>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -131,33 +146,9 @@ public class FileTest {
     }
 
     @Test
-    public void testUploadText() {
-        try {
-            filesApi.upload(uploadUrl, Writer.class, new Callback<Writer>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(Writer result) {
-                    try {
-                        result.write("test remote file435fwjfpwjfwpfjwfjwfjwjfwpfjp");
-                        result.flush();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void testDownloadFile() {
         try {
-            filesApi.download(cacheFile, Reader.class, new Callback<Reader>() {
+            filesApi.download(txtTest, Reader.class, new Callback<Reader>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -191,7 +182,7 @@ public class FileTest {
     @Test
     public void testListFiles() {
         try {
-            filesApi.list(cacheFile, new Callback<List<FileInfo>>() {
+            filesApi.list(txtTest, new Callback<List<FileInfo>>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -300,7 +291,7 @@ public class FileTest {
     @Test
     public void testGetHash() {
         try {
-            filesApi.hash(uploadUrl, new Callback<String>() {
+            filesApi.hash(txtTest, new Callback<String>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -338,5 +329,29 @@ public class FileTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private byte[] readImage(String path) {
+        try {
+            InputStream inputStream = null;
+            try {
+                inputStream = new FileInputStream(path);
+                byte[] buffer = new byte[inputStream.available()];
+                inputStream.read(buffer);
+
+                return buffer;
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
