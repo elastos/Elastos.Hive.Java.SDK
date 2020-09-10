@@ -10,6 +10,7 @@ import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.vault.network.VaultApi;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
+import org.elastos.hive.vendor.vault.network.model.UploadOutputStream;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -52,9 +53,11 @@ public class FileClient implements Files {
             HttpURLConnection httpURLConnection = null;
             try {
                 httpURLConnection = ConnectionManager.openURLConnection(path);
-                OutputStream outputStream = httpURLConnection.getOutputStream();
+                OutputStream rawOutputStream = httpURLConnection.getOutputStream();
 
-                if(null == outputStream) return null;
+                if(null == rawOutputStream) return null;
+
+                UploadOutputStream outputStream = new UploadOutputStream(httpURLConnection, rawOutputStream);
 
                 if(resultType.isAssignableFrom(OutputStream.class)) {
                     callback.onSuccess((T) outputStream);
