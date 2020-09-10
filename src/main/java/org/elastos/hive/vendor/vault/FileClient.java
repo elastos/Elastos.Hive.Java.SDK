@@ -12,7 +12,9 @@ import org.elastos.hive.vendor.vault.network.VaultApi;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 import org.elastos.hive.vendor.vault.network.model.UploadOutputStream;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -72,9 +74,6 @@ public class FileClient implements Files {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 callback.onError(exception);
                 throw new CompletionException(exception);
-            } finally {
-//                if (httpURLConnection != null)
-//                    httpURLConnection.disconnect();
             }
         });
     }

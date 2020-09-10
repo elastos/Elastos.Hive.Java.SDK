@@ -106,7 +106,7 @@ public class ConnectionManager {
         httpURLConnection.setUseCaches(false);
         httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
         httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
-        httpURLConnection.setRequestProperty("Charset", "UTF-8");
+        //httpURLConnection.setRequestProperty("Charset", "UTF-8");
         httpURLConnection.setRequestProperty("Authorization", "token " + ConnectionManager.getAccessToken());
 
         httpURLConnection.setChunkedStreamingMode(0);

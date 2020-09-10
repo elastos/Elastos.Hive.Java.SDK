@@ -1,6 +1,11 @@
 package org.elastos.hive.vendor.vault.network.model;
 
+import org.elastos.hive.utils.ResponseHelper;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
@@ -20,7 +25,7 @@ public class UploadOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] bytes) throws IOException {
-        originalStream.write(bytes, 0, bytes.length);
+        originalStream.write(bytes);
     }
 
     @Override
@@ -35,7 +40,12 @@ public class UploadOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
+        // In order for uploads to complete successfully in chunk mode, we have to read the server response.
+        // This doesn't seem to behave identically on all devices. Some devices work without this. But some devices
+        // don't terminate the api call until the server response is read.
+        //
+        // This close() method on the output stream is the only location where we know user has finished writing his file.
+        ResponseHelper.readConnection(connection);
         originalStream.close();
-        connection.disconnect();
     }
 }

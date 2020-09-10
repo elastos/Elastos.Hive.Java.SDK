@@ -6,6 +6,7 @@
 bin/
 doc/
 build/
+store/
 
 # Test
 .tmp
