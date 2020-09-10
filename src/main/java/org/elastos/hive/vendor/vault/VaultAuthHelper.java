@@ -43,10 +43,18 @@ public class VaultAuthHelper implements ConnectHelper {
     private static final String EXPIRES_AT_KEY = "expires_at";
     private static final String TOKEN_TYPE_KEY = "token_type";
 
+    private static final String USER_DID_KEY = "user_did";
+    private static final String APP_ID_KEY = "app_id";
+    private static final String APP_INSTANCE_DID_KEY = "app_instance_did";
+
     private String redirectUrl;
     private String clientId;
     private String scope;
     private String clientSecret;
+
+    private String userDid;
+    private String appId;
+    private String appInstanceDid;
 
     private String nodeUrl;
 
@@ -244,6 +252,9 @@ public class VaultAuthHelper implements ConnectHelper {
         if(null == access_token) return;
         Claims claims = JwtUtil.getBody(access_token);
         long exp = claims.getExpiration().getTime();
+        this.userDid = (String) claims.get("userDid");
+        this.appId = (String) claims.get("appId");
+        this.appInstanceDid = (String) claims.get("appInstanceDid");
 
         long expiresTime = System.currentTimeMillis() / 1000 + exp/1000;
 
@@ -321,7 +332,12 @@ public class VaultAuthHelper implements ConnectHelper {
             expiresAt = json.getLong(EXPIRES_AT_KEY);
         if (json.has(TOKEN_TYPE_KEY))
             tokenType = json.getString(TOKEN_TYPE_KEY);
-
+        if (json.has(USER_DID_KEY))
+            this.userDid = json.getString(USER_DID_KEY);
+        if (json.has(APP_ID_KEY))
+            this.appId = json.getString(APP_ID_KEY);
+        if (json.has(APP_INSTANCE_DID_KEY))
+            this.appInstanceDid = json.getString(APP_INSTANCE_DID_KEY);
         if (refreshToken != null && accessToken != null && expiresAt > 0 && tokenType != null)
             this.token = new AuthToken(refreshToken, accessToken, expiresAt, tokenType);
     }
@@ -337,6 +353,9 @@ public class VaultAuthHelper implements ConnectHelper {
             json.put(ACCESS_TOKEN_KEY, token.getAccessToken());
             json.put(EXPIRES_AT_KEY, token.getExpiredTime());
             json.put(TOKEN_TYPE_KEY, token.getTokenType());
+            json.put(USER_DID_KEY, this.userDid);
+            json.put(APP_ID_KEY, this.appId);
+            json.put(APP_INSTANCE_DID_KEY, this.appInstanceDid);
 
             persistent.upateContent(json);
         } catch (Exception e) {
@@ -354,10 +373,6 @@ public class VaultAuthHelper implements ConnectHelper {
         ConnectionManager.resetHiveVaultApi(this.nodeUrl,
                 baseServiceConfig);
     }
-
-    private String userDid;
-    private String appId;
-    private String appInstanceDid;
 
     public String getUserDid() {
         return userDid;

@@ -5,6 +5,8 @@ import org.elastos.hive.vendor.vault.FileClient;
 import org.elastos.hive.vendor.vault.ScriptClient;
 import org.elastos.hive.vendor.vault.VaultAuthHelper;
 
+import java.util.concurrent.ExecutionException;
+
 public class Vault {
 
     private Files files;
@@ -16,7 +18,7 @@ public class Vault {
     private String ownerDid;
     private VaultAuthHelper authHelper;
 
-    public Vault(VaultAuthHelper authHelper, String vaultProvider, String ownerDid) {
+    public Vault(VaultAuthHelper authHelper, String vaultProvider, String ownerDid) throws ExecutionException, InterruptedException {
 
         this.authHelper = authHelper;
         this.files = new FileClient(authHelper);
@@ -25,8 +27,9 @@ public class Vault {
 
         this.vaultProvider = vaultProvider;
         this.ownerDid = ownerDid;
-    }
 
+        authHelper.checkValid().get();
+    }
 
     public String getProviderAddress() {
         return this.vaultProvider;
@@ -37,17 +40,15 @@ public class Vault {
     }
 
     public String getAppDid() {
-        // TODO:
-        return null;
+        return this.authHelper.getAppId();
     }
 
     public String getAppInstanceDid() {
-        // TODO:
-        return null;
+        return this.authHelper.getAppInstanceDid();
     }
 
     public String getUserDid() {
-        return null;
+        return this.authHelper.getUserDid();
     }
 
     public Database getDatabase() {

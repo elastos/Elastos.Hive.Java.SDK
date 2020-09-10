@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class Client {
 
@@ -164,7 +165,13 @@ public class Client {
 			Vault vault = null;
 			if(vaultProvider != null) {
 				VaultAuthHelper authHelper = new VaultAuthHelper(vaultProvider, opts.localPath, opts.authenticationDIDDocument, opts.authentcationHandler);
-				vault = new Vault(authHelper, vaultProvider, ownerDid);
+				try {
+					vault = new Vault(authHelper, vaultProvider, ownerDid);
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 
 			return vault;
