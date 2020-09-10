@@ -7,6 +7,7 @@ import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.CountDocResponse;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
+import org.elastos.hive.vendor.vault.network.model.HashResponse;
 import org.elastos.hive.vendor.vault.network.model.SignResponse;
 
 import okhttp3.RequestBody;
@@ -62,7 +63,7 @@ public interface VaultApi {
     Call<ResponseBody> findMany(@Body RequestBody body);
 
     @GET(VaultConstance.API_PATH + "/files/list/folder")
-    Call<FilesResponse> files(@Query("name") String filename);
+    Call<FilesResponse> files(@Query("path") String filename);
 
     @GET(VaultConstance.API_PATH + "/files/download")
     Call<ResponseBody> downloader(@Query("path") String filename);
@@ -80,7 +81,7 @@ public interface VaultApi {
     Call<BaseResponse> copy(@Body RequestBody body);
 
     @GET(VaultConstance.API_PATH + "/files/file/hash")
-    Call<ResponseBody> hash(@Query("path") String filename);
+    Call<HashResponse> hash(@Query("path") String filename);
 
     @POST(VaultConstance.API_PATH + "/scripting/set_subcondition")
     Call<BaseResponse> registerCondition(@Body RequestBody body);

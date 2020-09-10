@@ -28,5 +28,8 @@ public class BaseResponse {
             return message;
         }
 
+        public String toString() {
+            return "{\"code\":"+code+"\",\"message\":\""+message+"\"}";
+        }
     }
 }

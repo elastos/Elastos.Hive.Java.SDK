@@ -10,6 +10,7 @@ import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.vault.network.VaultApi;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
+import org.elastos.hive.vendor.vault.network.model.HashResponse;
 import org.elastos.hive.vendor.vault.network.model.UploadOutputStream;
 
 import java.io.BufferedReader;
@@ -251,7 +252,7 @@ public class FileClient implements Files {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response<HashResponse> response = ConnectionManager.getHiveVaultApi()
                         .hash(remoteFile)
                         .execute();
                 int responseCode = checkResponseCode(response);
@@ -260,7 +261,13 @@ public class FileClient implements Files {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
-                String ret = ResponseHelper.toString(response);
+                String ret;
+                HashResponse hashResponse = response.body();
+                if(null!=hashResponse && hashResponse.get_error()!=null) {
+                    ret = hashResponse.get_error().toString();
+                } else {
+                    ret = response.body().getSHA256();
+                }
                 callback.onSuccess(ret);
                 return ret;
             } catch (Exception e) {
@@ -330,6 +337,17 @@ public class FileClient implements Files {
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
+
+//                String ret;
+//                HashResponse hashResponse = response.body();
+//                if(null!=hashResponse && hashResponse.get_error()!=null) {
+//                    ret = hashResponse.get_error().toString();
+//                } else {
+//                    ret = response.body().getSHA256();
+//                }
+//                callback.onSuccess(ret);
+//                return ret;
+
                 FileInfo fileInfo = response.body();
                 if (fileInfo == null || fileInfo.get_error() != null) {
                     callback.onSuccess(null);

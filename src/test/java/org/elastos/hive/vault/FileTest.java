@@ -11,8 +11,12 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,41 +34,61 @@ public class FileTest {
 
     private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
 
-    private String testSmallImage = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/small.png";
-    private String testBigImage = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/big.png";
+    private String testTextFilePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
+    private String testSmallImagePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/small.png";
+    private String testBigImagePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/big.png";
+
+    private String testCacheTextFilePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/test.txt";
+    private String testCacheSmallImagePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/small.png";
+    private String testCacheBigImagePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/big.png";
+
 
     private static Client client;
 
     private static Files filesApi;
 
-    private static String uploadUrl = "test.txt";
+    private static String rootPath = "hive";
+    private static String dstPath = "backup";
 
-    private static String src = "/src";
+    private static String remoteText = rootPath + File.separator + "test.txt";
 
-    private static String dst = "/dst";
+    private static String remoteSmallBin = rootPath + File.separator + "hive/small.png";
 
-    private static String txtTest = "test.txt";
+    private static String remoteBigBin = rootPath + File.separator + "big.png";
 
-    private static String smallBinTest = "small.png";
+    private static String src = remoteText;
 
-    private static String bigBinTest = "big.png";
+    private static String dst = dstPath + File.separator + "test.txt";
 
     @Test
-    public void testUploadText() {
+    public void testUploadTextNoCallback() {
+        FileReader fileReader = null;
+        Writer writer = null;
         try {
-            Writer writer = filesApi.upload(txtTest, Writer.class).get();
-            writer.write("fasjfosjfoajfsdoafjsofjdsaoifjsofjdsofjsdofjdsofjsooifj");
-            writer.close();
+             writer = filesApi.upload(remoteText, Writer.class).get();
+            fileReader = new FileReader(new File(testTextFilePath));
+
+            char[] buffer = new char[1];
+            while (fileReader.read(buffer) != -1) {
+                writer.write(buffer);
+            }
             System.out.println("write success");
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if(null!=fileReader) fileReader.close();
+                if(null!=writer) writer.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Test
     public void testUploadTextWithCallback() {
         try {
-            filesApi.upload(txtTest, Writer.class, new Callback<Writer>() {
+            filesApi.upload(remoteText, Writer.class, new Callback<Writer>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -75,7 +99,6 @@ public class FileTest {
                     try {
                         result.write("test remote file435fwjfpwjfwpfjwfjwfjwjfwpfjp");
                         result.flush();
-                        result.close();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -89,10 +112,9 @@ public class FileTest {
     @Test
     public void testUploadBin() {
         try {
-            OutputStream outputStream = filesApi.upload(bigBinTest, OutputStream.class).get();
-            byte[] stream = readImage(testBigImage);
-            outputStream.write(stream);
-            outputStream.flush();
+            OutputStream outputStream = filesApi.upload(remoteBigBin, OutputStream.class).get();
+            byte[] bigStream = readImage(testBigImagePath);
+            outputStream.write(bigStream);
             outputStream.close();
             System.out.println("write success");
         } catch (Exception e) {
@@ -101,24 +123,27 @@ public class FileTest {
     }
 
     @Test
-    public void testUploadBinWithCallback() {
+    public void testDownloadFileWNoCallback() {
         try {
-            filesApi.upload(smallBinTest, OutputStream.class ,new Callback<OutputStream>() {
+            Reader reader = filesApi.download(remoteText, Reader.class).get();
+            cacheTextFile(reader, testCacheTextFilePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testDownloadFileWithCallback() {
+        try {
+            filesApi.download(remoteText, Reader.class, new Callback<Reader>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
                 }
 
                 @Override
-                public void onSuccess(OutputStream result) {
-                    try {
-                        byte[] stream = readImage(testBigImage);
-                        result.write(stream);
-                        result.close();
-                        assertNotNull(result);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                public void onSuccess(Reader result) {
+                    cacheTextFile(result, testCacheTextFilePath);
                 }
             }).get();
         } catch (Exception e) {
@@ -129,60 +154,35 @@ public class FileTest {
     @Test
     public void testDownloadBin() {
         try {
-            filesApi.download(smallBinTest, InputStream.class, new Callback<InputStream>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(InputStream result) {
-                    assertNotNull(result);
-                }
-            }).get();
+            InputStream inputStream = filesApi.download(remoteBigBin, InputStream.class).get();
+            cacheBinFile(inputStream, testCacheBigImagePath);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Test
-    public void testDownloadFile() {
+    public void testListFilesNoCallback() {
         try {
-            filesApi.download(txtTest, Reader.class, new Callback<Reader>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(Reader result) {
-                    try {
-                        char[] buffer = new char[1];
-                        StringBuilder sb = new StringBuilder();
-                        while (result.read(buffer) != -1) {
-                            sb.append(buffer);
-                        }
-                        System.out.println("content:" + sb.toString());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            if (null != result) result.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).get();
+            List<FileInfo> result = filesApi.list(rootPath).get();
+            assertNotNull(result);
+            assertTrue(result.size()>0);
+            System.out.println("list size=" + result.size());
+            for(FileInfo fileInfo : result) {
+                System.out.println("type=" + fileInfo.getType());
+                System.out.println("name=" + fileInfo.getName());
+                System.out.println("fileSize=" + fileInfo.getSize());
+                System.out.println("lastModify=" + fileInfo.getLastModify());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Test
-    public void testListFiles() {
+    public void testListFilesWithCallback() {
         try {
-            filesApi.list(txtTest, new Callback<List<FileInfo>>() {
+            filesApi.list(remoteText, new Callback<List<FileInfo>>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -210,7 +210,7 @@ public class FileTest {
 
                 @Override
                 public void onSuccess(Boolean result) {
-
+                    assertTrue(result);
                 }
             }).get();
         } catch (Exception e) {
@@ -240,7 +240,7 @@ public class FileTest {
     @Test
     public void testDeleteFile() {
         try {
-            filesApi.delete(uploadUrl).get();
+            filesApi.delete(dst).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -249,7 +249,7 @@ public class FileTest {
     @Test
     public void testDeleteFileWithCallback() {
         try {
-            filesApi.delete(uploadUrl, new Callback<Boolean>() {
+            filesApi.delete(dst, new Callback<Boolean>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -268,7 +268,7 @@ public class FileTest {
     @Test
     public void testGetStatus() {
         try {
-            filesApi.stat(uploadUrl, new Callback<FileInfo>() {
+            filesApi.stat(dst, new Callback<FileInfo>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -291,7 +291,7 @@ public class FileTest {
     @Test
     public void testGetHash() {
         try {
-            filesApi.hash(txtTest, new Callback<String>() {
+            filesApi.hash(dst, new Callback<String>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -354,5 +354,50 @@ public class FileTest {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void cacheTextFile(Reader reader, String storePath) {
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(new File(storePath));
+            char[] buffer = new char[1];
+            while (reader.read(buffer) != -1) {
+                fileWriter.write(buffer);
+            }
+            fileWriter.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void cacheBinFile(InputStream inputStream, String storePath) {
+        ByteArrayOutputStream outStream = null;
+        try {
+            outStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while( (len=inputStream.read(buffer)) != -1 ) {
+                outStream.write(buffer, 0, len);
+            }
+
+            byte[] data = outStream.toByteArray();
+            File imageFile = new File(storePath);
+            FileOutputStream fileOutStream = new FileOutputStream(imageFile);
+            fileOutStream .write(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                outStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
