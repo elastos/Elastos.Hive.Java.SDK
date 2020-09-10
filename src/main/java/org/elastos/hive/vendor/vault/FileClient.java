@@ -13,9 +13,7 @@ import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 import org.elastos.hive.vendor.vault.network.model.HashResponse;
 import org.elastos.hive.vendor.vault.network.model.UploadOutputStream;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;

@@ -4,12 +4,17 @@ import java.util.Arrays;
 import java.util.List;
 
 public class InsertResult extends Result {
+
+	public boolean acknowledged() {
+		return (boolean) (get("acknowledged")==null?false:get("acknowledged"));
+	}
 	public List<String> insertedIds() {
-		String[] ids = (String[])get("inserted_ids");
+
+		List<String> ids = (List<String>) (get("inserted_ids")==null?null:get("inserted_ids"));
 		if(ids != null) {
-			return Arrays.asList(ids);
+			return ids;
 		} else {
-			String id = (String) get("inserted_id");
+			String id = (String) (get("inserted_id")==null?null:get("inserted_id"));
 			return Arrays.asList(id);
 		}
 	}

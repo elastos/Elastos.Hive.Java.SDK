@@ -12,6 +12,7 @@ import org.elastos.hive.Database;
 import org.elastos.hive.database.Collation;
 import org.elastos.hive.database.Collation.Alternate;
 import org.elastos.hive.database.Collation.CaseFirst;
+import org.elastos.hive.database.CountOptions;
 import org.elastos.hive.database.DeleteOptions;
 import org.elastos.hive.database.DeleteResult;
 import org.elastos.hive.database.FindOptions;
@@ -66,10 +67,22 @@ public class DBTest {
 		System.out.println(fo.serialize());
 	}
 
+	private static final String collectionName = "works";
+
+    @Test
+    public void testCreateColNoCallback() {
+        try {
+            Boolean success = database.createCollection(collectionName, null).get();
+            assertTrue(success);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 	@Test
-    public void testDbCreate() {
+    public void testCreateColWithCallback() {
 	    try {
-            database.createCollection("works", null, new Callback<Boolean>() {
+            database.createCollection(collectionName, null, new Callback<Boolean>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -86,9 +99,9 @@ public class DBTest {
     }
 
     @Test
-    public void deleteCollection() {
+    public void deleteColNoCallback() {
         try {
-            database.deleteCollection("works", new Callback<Boolean>() {
+            database.deleteCollection(collectionName, new Callback<Boolean>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -105,16 +118,50 @@ public class DBTest {
     }
 
     @Test
-    public void testInsertOne() {
+    public void deleteColWithCallback() {
+        try {
+            Boolean success = database.deleteCollection(collectionName).get();
+            assertTrue(success);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testInsertOneNoCallback() {
+        try {
+            ObjectNode docNode = JsonNodeFactory.instance.objectNode();
+            docNode.put("author", "john doe1");
+            docNode.put("title", "Eve for Dummies2");
+
+            InsertOptions insertOptions = new InsertOptions();
+            insertOptions.bypassDocumentValidation(false).ordered(true);
+
+            InsertResult result = database.insertOne(collectionName, docNode, insertOptions).get();
+            assertNotNull(result);
+            System.out.println("acknowledged="+result.acknowledged());
+            List<String> ids = result.insertedIds();
+            assertNotNull(ids);
+            assertTrue(ids.size()>0);
+            for(String id : ids) {
+                System.out.println("id="+id);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testInsertOneWithCallback() {
 	    try {
             ObjectNode docNode = JsonNodeFactory.instance.objectNode();
             docNode.put("author", "john doe1");
             docNode.put("title", "Eve for Dummies2");
 
-//            InsertOptions insertOptions = new InsertOptions();
-//            insertOptions.bypassDocumentValidation(false).ordered(true);
+            InsertOptions insertOptions = new InsertOptions();
+            insertOptions.bypassDocumentValidation(false).ordered(true);
 
-            database.insertOne("works", docNode, /*insertOptions*/null, new Callback<InsertResult>() {
+            database.insertOne(collectionName, docNode, insertOptions, new Callback<InsertResult>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -122,11 +169,13 @@ public class DBTest {
 
                 @Override
                 public void onSuccess(InsertResult result) {
-                    assertNotNull(result);
-                    assertNotNull(result.insertedIds());
-                    System.out.println("id size="+result.insertedIds().size());
-//                    System.out.println("acknowledged="+result.get("acknowledged"));
-//                    System.out.println("inserted_id="+result.get("inserted_id"));
+                    System.out.println("acknowledged="+result.acknowledged());
+                    List<String> ids = result.insertedIds();
+                    assertNotNull(ids);
+                    assertTrue(ids.size()>0);
+                    for(String id : ids) {
+                        System.out.println("id="+id);
+                    }
                 }
             }).get();
         } catch (Exception e) {
@@ -135,7 +184,7 @@ public class DBTest {
     }
 
     @Test
-    public void testInsertMany() {
+    public void testInsertManyNoCallback() {
         try {
             List<JsonNode> nodes = new ArrayList();
             ObjectNode docNode = JsonNodeFactory.instance.objectNode();
@@ -146,7 +195,33 @@ public class DBTest {
             InsertOptions insertOptions = new InsertOptions();
             insertOptions.bypassDocumentValidation(false).ordered(true);
 
-            database.insertMany("works", nodes, /*insertOptions*/null, new Callback<InsertResult>() {
+            InsertResult result = database.insertMany(collectionName, nodes, insertOptions).get();
+            assertNotNull(result);
+            System.out.println("acknowledged="+result.acknowledged());
+            List<String> ids = result.insertedIds();
+            assertNotNull(ids);
+            assertTrue(ids.size()>0);
+            for(String id : ids) {
+                System.out.println("id="+id);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testInsertManyWithCallback() {
+        try {
+            List<JsonNode> nodes = new ArrayList();
+            ObjectNode docNode = JsonNodeFactory.instance.objectNode();
+            docNode.put("author", "john doe1");
+            docNode.put("title", "Eve for Dummies2");
+            nodes.add(docNode);
+
+            InsertOptions insertOptions = new InsertOptions();
+            insertOptions.bypassDocumentValidation(false).ordered(true);
+
+            database.insertMany(collectionName, nodes, insertOptions, new Callback<InsertResult>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -155,8 +230,13 @@ public class DBTest {
                 @Override
                 public void onSuccess(InsertResult result) {
                     assertNotNull(result);
-                    assertNotNull(result.insertedIds());
-                    System.out.println("id size="+result.insertedIds().size());
+                    System.out.println("acknowledged="+result.acknowledged());
+                    List<String> ids = result.insertedIds();
+                    assertNotNull(ids);
+                    assertTrue(ids.size()>0);
+                    for(String id : ids) {
+                        System.out.println("id="+id);
+                    }
                 }
             }).get();
         } catch (Exception e) {
@@ -165,38 +245,7 @@ public class DBTest {
     }
 
     @Test
-    public void testFindOne() {
-	    try {
-            ObjectNode query = JsonNodeFactory.instance.objectNode();
-            query.put("author", "john doe1");
-
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            FindOptions findOptions = new FindOptions();
-            findOptions.skip(0)
-                    .allowPartialResults(false)
-                    .returnKey(false)
-                    .batchSize(0)
-                    .projection(objectMapper.readTree("{\"_id\": false}"));
-
-            database.findOne("works", query, null, new Callback<JsonNode>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(JsonNode result) {
-                    assertNotNull(result);
-                }
-            }).get();
-        } catch (Exception e) {
-	        e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testFindMany() {
+    public void testFindOneNoCallback() {
         try {
             ObjectNode query = JsonNodeFactory.instance.objectNode();
             query.put("author", "john doe1");
@@ -210,7 +259,87 @@ public class DBTest {
                     .batchSize(0)
                     .projection(objectMapper.readTree("{\"_id\": false}"));
 
-            database.findMany("works", query, /*findOptions*/null, new Callback<List<JsonNode>>() {
+            JsonNode result = database.findOne(collectionName, query, findOptions).get();
+            assertNotNull(result);
+            System.out.println("result="+result.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testFindOneWithCallback() {
+	    try {
+            ObjectNode query = JsonNodeFactory.instance.objectNode();
+            query.put("author", "john doe1");
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            FindOptions findOptions = new FindOptions();
+            findOptions.skip(0)
+                    .allowPartialResults(false)
+                    .returnKey(false)
+                    .batchSize(0)
+                    .projection(objectMapper.readTree("{\"_id\": false}"));
+
+            database.findOne(collectionName, query, findOptions, new Callback<JsonNode>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
+
+                @Override
+                public void onSuccess(JsonNode result) {
+                    assertNotNull(result);
+                    assertNotNull(result);
+                    System.out.println("result="+result.toString());
+                }
+            }).get();
+        } catch (Exception e) {
+	        e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testFindManyNoCallback() {
+        try {
+            ObjectNode query = JsonNodeFactory.instance.objectNode();
+            query.put("author", "john doe1");
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            FindOptions findOptions = new FindOptions();
+            findOptions.skip(0)
+                    .allowPartialResults(false)
+                    .returnKey(false)
+                    .batchSize(0)
+                    .projection(objectMapper.readTree("{\"_id\": false}"));
+
+            List<JsonNode> result = database.findMany(collectionName, query, findOptions).get();
+            assertNotNull(result);
+            assertTrue(result.size()>0);
+            System.out.println("result="+result.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testFindManyWithCallback() {
+        try {
+            ObjectNode query = JsonNodeFactory.instance.objectNode();
+            query.put("author", "john doe1");
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            FindOptions findOptions = new FindOptions();
+            findOptions.skip(0)
+                    .allowPartialResults(false)
+                    .returnKey(false)
+                    .batchSize(0)
+                    .projection(objectMapper.readTree("{\"_id\": false}"));
+
+            database.findMany(collectionName, query, findOptions, new Callback<List<JsonNode>>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -219,6 +348,8 @@ public class DBTest {
                 @Override
                 public void onSuccess(List<JsonNode> result) {
                     assertNotNull(result);
+                    assertTrue(result.size()>0);
+                    System.out.println("result="+result.toString());
                 }
             }).get();
         } catch (Exception e) {
@@ -227,7 +358,31 @@ public class DBTest {
     }
 
     @Test
-    public void testUpdateOne() {
+    public void testUpdateOneNoCallback() {
+        try {
+            ObjectNode filter = JsonNodeFactory.instance.objectNode();
+            filter.put("author", "john doe1");
+
+            String updateJson = "{\"$set\":{\"author\":\"john doe1\",\"title\":\"Eve for Dummies2\"}}";
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode update = objectMapper.readTree(updateJson);
+
+            UpdateOptions updateOptions = new UpdateOptions();
+            updateOptions.upsert(true).bypassDocumentValidation(false);
+
+            UpdateResult result = database.updateOne(collectionName, filter, update, updateOptions).get();
+            assertNotNull(result);
+            System.out.println("matchedCount="+result.matchedCount());
+            System.out.println("modifiedCount="+result.modifiedCount());
+            System.out.println("upsertedCount="+result.upsertedCount());
+            System.out.println("upsertedId="+result.upsertedId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testUpdateOneWithCallback() {
 	    try {
             ObjectNode filter = JsonNodeFactory.instance.objectNode();
             filter.put("author", "john doe1");
@@ -239,7 +394,7 @@ public class DBTest {
             UpdateOptions updateOptions = new UpdateOptions();
             updateOptions.upsert(true).bypassDocumentValidation(false);
 
-            database.updateOne("works", filter, update, updateOptions, new Callback<UpdateResult>() {
+            database.updateOne(collectionName, filter, update, updateOptions, new Callback<UpdateResult>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -248,7 +403,10 @@ public class DBTest {
                 @Override
                 public void onSuccess(UpdateResult result) {
                     assertNotNull(result);
+                    System.out.println("matchedCount="+result.matchedCount());
                     System.out.println("modifiedCount="+result.modifiedCount());
+                    System.out.println("upsertedCount="+result.upsertedCount());
+                    System.out.println("upsertedId="+result.upsertedId());
                 }
             }).get();
         } catch (Exception e) {
@@ -257,19 +415,43 @@ public class DBTest {
     }
 
     @Test
-    public void testUpdateMany() {
-	    try {
+    public void testUpdateManyNoCallback() {
+        try {
             ObjectNode filter = JsonNodeFactory.instance.objectNode();
             filter.put("author", "john doe1");
 
-            ObjectNode update = JsonNodeFactory.instance.objectNode();
-            update.put("author", "john doe2");
-            update.put("title", "Eve for Dummies2_1");
+            String updateJson = "{\"$set\":{\"author\":\"john doe1\",\"title\":\"Eve for Dummies2\"}}";
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode update = objectMapper.readTree(updateJson);
 
             UpdateOptions updateOptions = new UpdateOptions();
             updateOptions.upsert(true).bypassDocumentValidation(false);
 
-            database.updateMany("works", filter, update, /*updateOptions*/null, new Callback<UpdateResult>() {
+            UpdateResult result = database.updateMany(collectionName, filter, update, updateOptions).get();
+            assertNotNull(result);
+            System.out.println("matchedCount="+result.matchedCount());
+            System.out.println("modifiedCount="+result.modifiedCount());
+            System.out.println("upsertedCount="+result.upsertedCount());
+            System.out.println("upsertedId="+result.upsertedId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testUpdateManyWithCallback() {
+	    try {
+            ObjectNode filter = JsonNodeFactory.instance.objectNode();
+            filter.put("author", "john doe1");
+
+            String updateJson = "{\"$set\":{\"author\":\"john doe1\",\"title\":\"Eve for Dummies2\"}}";
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode update = objectMapper.readTree(updateJson);
+
+            UpdateOptions updateOptions = new UpdateOptions();
+            updateOptions.upsert(true).bypassDocumentValidation(false);
+
+            database.updateMany(collectionName, filter, update, updateOptions, new Callback<UpdateResult>() {
                 @Override
                 public void onError(HiveException e) {
 
@@ -277,33 +459,11 @@ public class DBTest {
 
                 @Override
                 public void onSuccess(UpdateResult result) {
-
-                }
-            }).get();
-        } catch (Exception e) {
-	        e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testDeleteOne() {
-	    try {
-
-            ObjectNode filter = JsonNodeFactory.instance.objectNode();
-            filter.put("author", "john doe2");
-
-            DeleteOptions deleteOptions = new DeleteOptions();
-
-            database.deleteOne("works", filter, null, new Callback<DeleteResult>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(DeleteResult result) {
                     assertNotNull(result);
-                    System.out.println("deletedCount="+result.deletedCount());
+                    System.out.println("matchedCount="+result.matchedCount());
+                    System.out.println("modifiedCount="+result.modifiedCount());
+                    System.out.println("upsertedCount="+result.upsertedCount());
+                    System.out.println("upsertedId="+result.upsertedId());
                 }
             }).get();
         } catch (Exception e) {
@@ -312,11 +472,29 @@ public class DBTest {
     }
 
     @Test
-    public void countDoc() {
+    public void countDocNoCallback() {
+        try {
+            ObjectNode filter = JsonNodeFactory.instance.objectNode();
+            filter.put("author", "john doe2");
+
+            CountOptions options = new CountOptions();
+            options.limit(1).skip(0).maxTimeMS(1000000000);
+
+            long count = database.countDocuments(collectionName, filter, options).get();
+            System.out.println("count="+count);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void countDocWithCallback() {
 	    try {
             ObjectNode filter = JsonNodeFactory.instance.objectNode();
             filter.put("author", "john doe2");
-            database.countDocuments("works", filter, null, new Callback<Long>() {
+
+
+            database.countDocuments(collectionName, filter, null, new Callback<Long>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
@@ -333,14 +511,69 @@ public class DBTest {
     }
 
     @Test
-    public void testDeleteMany() {
+    public void testDeleteOneNoCallback() {
+        try {
+
+            ObjectNode filter = JsonNodeFactory.instance.objectNode();
+            filter.put("author", "john doe2");
+
+            DeleteOptions deleteOptions = new DeleteOptions();
+
+            DeleteResult deleteResult = database.deleteOne(collectionName, filter, null).get();
+            System.out.println("delete count="+deleteResult.deletedCount());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testDeleteOneWithCallback() {
+        try {
+
+            ObjectNode filter = JsonNodeFactory.instance.objectNode();
+            filter.put("author", "john doe2");
+
+            database.deleteOne(collectionName, filter, null, new Callback<DeleteResult>() {
+                @Override
+                public void onError(HiveException e) {
+                    fail();
+                }
+
+                @Override
+                public void onSuccess(DeleteResult result) {
+                    assertNotNull(result);
+                    System.out.println("delete count="+result.deletedCount());
+                }
+            }).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testDeleteManyNoCallback() {
         try {
             ObjectNode filter = JsonNodeFactory.instance.objectNode();
             filter.put("author", "john doe2");
 
             DeleteOptions deleteOptions = new DeleteOptions();
 
-            database.deleteMany("works", filter, null, new Callback<DeleteResult>() {
+            DeleteResult result = database.deleteMany(collectionName, filter, null).get();
+            System.out.println("delete count="+result.deletedCount());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testDeleteManyWithCallback() {
+        try {
+            ObjectNode filter = JsonNodeFactory.instance.objectNode();
+            filter.put("author", "john doe2");
+
+            DeleteOptions deleteOptions = new DeleteOptions();
+
+            database.deleteMany(collectionName, filter, null, new Callback<DeleteResult>() {
                 @Override
                 public void onError(HiveException e) {
 
@@ -348,7 +581,7 @@ public class DBTest {
 
                 @Override
                 public void onSuccess(DeleteResult result) {
-
+                    System.out.println("delete count="+result.deletedCount());
                 }
             }).get();
         } catch (Exception e) {
