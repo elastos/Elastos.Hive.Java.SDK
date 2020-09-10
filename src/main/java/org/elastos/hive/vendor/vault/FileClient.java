@@ -136,7 +136,7 @@ public class FileClient implements Files {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Map map = new HashMap<>();
-                map.put("name", remoteFile);
+                map.put("path", remoteFile);
                 String json = JsonUtil.getJsonFromObject(map);
 
                 Response response = ConnectionManager.getHiveVaultApi()
