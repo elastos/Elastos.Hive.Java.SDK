@@ -13,7 +13,6 @@ import org.elastos.hive.database.MinKey;
 import org.elastos.hive.database.ObjectId;
 import org.elastos.hive.database.RegularExpression;
 import org.elastos.hive.database.Timestamp;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.scripting.AggregatedExecutable;
 import org.elastos.hive.scripting.AndCondition;
 import org.elastos.hive.scripting.Condition;
@@ -31,7 +30,7 @@ import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ScriptingTest {
     private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
@@ -104,8 +103,9 @@ public class ScriptingTest {
     public void registerScriptWithCondition() {
         try {
             String json = "{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"*caller_did\":\"friends\"}}}";
-            scripting.registerScript("script_condition", null, new RawExecutable(json));
-        } catch (HiveException e) {
+            boolean success = scripting.registerScript("script_condition", null, new RawExecutable(json)).get();
+            assertTrue(success);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -115,6 +115,7 @@ public class ScriptingTest {
         try {
             String ret = scripting.call("script_no_condition", String.class).get();
             assertNotNull(ret);
+            System.out.println("return="+ret);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,7 +123,13 @@ public class ScriptingTest {
 
     public @Test void callScriptWithParams() {
         try {
-//            scripting.call("script_condition", );
+            String param = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"}}";
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode update = objectMapper.readTree(param);
+
+            String ret = scripting.call("script_condition", update, String.class).get();
+            assertNotNull(ret);
+            System.out.println("return="+ret);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -134,12 +141,6 @@ public class ScriptingTest {
             String json = "{\"id\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX\",\"publicKey\":[{\"id\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX#primary\",\"type\":\"ECDSAsecp256r1\",\"controller\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX\",\"publicKeyBase58\":\"xNoB1aRBgZqG3fLMmNzK5wkuNwwDmXDYm44cu2n8siSz\"}],\"authentication\":[\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX#primary\"],\"expires\":\"2025-09-01T20:18:27Z\",\"proof\":{\"type\":\"ECDSAsecp256r1\",\"created\":\"2020-09-02T04:18:27Z\",\"creator\":\"did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX#primary\",\"signatureValue\":\"Gq6ookLCWlfsib3NttV5pR6zXZFk6AHSoauYil-RWTS1Z-4l_u_UFk7gn7TObdHS650dMwcqezHlzLsiFbVOOw\"}}";
             DIDDocument doc = DIDDocument
                     .fromJson(json);
-
-//            DID did = new DID("did:elastos:idfpKJJ1soDxT2GcgCRnDt3cu94ZnGfzNX");
-//            DIDBackend.initialize("http://api.elastos.io:21606", localDataPath);
-//            ResolverCache.reset();
-//            DIDDocument doc = did.resolve();
-//            String json = doc.toString();
 
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
