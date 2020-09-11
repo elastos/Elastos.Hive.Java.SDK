@@ -52,6 +52,7 @@ public class VaultAuthHelper implements ConnectHelper {
     private String scope;
     private String clientSecret;
 
+    private String ownerDid;
     private String userDid;
     private String appId;
     private String appInstanceDid;
@@ -67,9 +68,10 @@ public class VaultAuthHelper implements ConnectHelper {
     private DIDDocument authenticationDIDDocument;
     private AuthenticationHandler authenticationHandler;
 
-    public VaultAuthHelper(String nodeUrl, String storePath, DIDDocument authenticationDIDDocument, AuthenticationHandler handler) {
+    public VaultAuthHelper(String ownerDid, String nodeUrl, String storePath, DIDDocument authenticationDIDDocument, AuthenticationHandler handler) {
         this.authenticationDIDDocument = authenticationDIDDocument;
         this.authenticationHandler = handler;
+        this.ownerDid = ownerDid;
         this.nodeUrl = nodeUrl;
 
         this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
@@ -180,7 +182,7 @@ public class VaultAuthHelper implements ConnectHelper {
                 .signIn(getJsonRequestBoy(json))
                 .execute();
         SignResponse signResponse = (SignResponse) response.body();
-        if (null!=signResponse && signResponse.get_error() != null) {
+        if (null != signResponse && signResponse.get_error() != null) {
             throw new HiveException(signResponse.get_error().getMessage());
         }
         String jwtToken = signResponse.getChallenge();
@@ -200,15 +202,22 @@ public class VaultAuthHelper implements ConnectHelper {
         handleAuthResponse(response);
     }
 
-    //TODO
     private boolean verifyToken(String jwtToken) {
         try {
             Claims claims = JwtUtil.getBody(jwtToken);
             long exp = claims.getExpiration().getTime();
-            String subject = claims.getSubject();
-            String iss = claims.getIssuer();
-            String nonce = (String) claims.get("nonce");
+//            String subject = claims.getSubject();
+//            String iss = claims.getIssuer();
+//            String nonce = (String) claims.get("nonce");
             String aud = claims.getAudience();
+
+            if (null == ownerDid
+                    || null == aud
+                    || !ownerDid.equals(aud))
+                return false;
+
+            if (System.currentTimeMillis() > exp/1000) return false;
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -244,19 +253,19 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private void handleAuthResponse(Response response) throws Exception {
         AuthResponse authResponse = (AuthResponse) response.body();
-        if (null==authResponse || authResponse.get_error()!=null) {
+        if (null == authResponse || authResponse.get_error() != null) {
             throw new HiveException(authResponse.get_error().getMessage());
         }
 
         String access_token = authResponse.getAccess_token();
-        if(null == access_token) return;
+        if (null == access_token) return;
         Claims claims = JwtUtil.getBody(access_token);
         long exp = claims.getExpiration().getTime();
         this.userDid = (String) claims.get("userDid");
         this.appId = (String) claims.get("appId");
         this.appInstanceDid = (String) claims.get("appInstanceDid");
 
-        long expiresTime = System.currentTimeMillis() / 1000 + exp/1000;
+        long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
 
         token = new AuthToken("",
                 access_token,
