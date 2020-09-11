@@ -467,7 +467,7 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options) {
-        return deleteMany(collection, filter, options);
+        return deleteMany(collection, filter, options, null);
     }
 
     @Override
