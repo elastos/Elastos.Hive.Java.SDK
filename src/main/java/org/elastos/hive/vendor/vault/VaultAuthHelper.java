@@ -74,7 +74,7 @@ public class VaultAuthHelper implements ConnectHelper {
         this.ownerDid = ownerDid;
         this.nodeUrl = nodeUrl;
 
-        this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
+        this.persistent = new AuthInfoStoreImpl(ownerDid, nodeUrl, storePath);
 
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
@@ -85,14 +85,14 @@ public class VaultAuthHelper implements ConnectHelper {
         }
     }
 
-    public VaultAuthHelper(String nodeUrl, String storePath, String clientId, String clientSecret, String redirectUrl, String scope) {
+    public VaultAuthHelper(String ownerDid, String nodeUrl, String storePath, String clientId, String clientSecret, String redirectUrl, String scope) {
         this.nodeUrl = nodeUrl;
         this.clientId = clientId;
         this.redirectUrl = redirectUrl;
         this.scope = scope;
         this.clientSecret = clientSecret;
 
-        this.persistent = new AuthInfoStoreImpl(storePath, VaultConstance.CONFIG);
+        this.persistent = new AuthInfoStoreImpl(ownerDid, nodeUrl, storePath);
 
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
@@ -216,7 +216,7 @@ public class VaultAuthHelper implements ConnectHelper {
                     || !ownerDid.equals(aud))
                 return false;
 
-            if (System.currentTimeMillis() > exp/1000) return false;
+            if (System.currentTimeMillis() > exp) return false;
 
         } catch (Exception e) {
             e.printStackTrace();

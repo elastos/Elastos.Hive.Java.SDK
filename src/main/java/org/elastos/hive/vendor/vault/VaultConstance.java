@@ -4,8 +4,6 @@ public class VaultConstance {
 
     public static final String API_PATH = "/api/v1";
 
-    static final String CONFIG = "hivesault.json";
-
     static final String AUTH_URI = "https://accounts.google.com/o/oauth2/auth";
 
     static final String TOKEN_URI = "https://oauth2.googleapis.com";

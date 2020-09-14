@@ -24,6 +24,7 @@ package org.elastos.hive.vendor;
 
 import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.utils.CryptoUtil;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -32,12 +33,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class AuthInfoStoreImpl implements Persistent {
+    private String ownerDid;
+    private String provider;
     private String storePath;
-    private String config;
 
-    public AuthInfoStoreImpl(String storePath, String config) {
+    public AuthInfoStoreImpl(String ownerDid, String provider, String storePath) {
+        this.ownerDid = ownerDid.trim();
+        this.provider = provider.trim();
         this.storePath = storePath;
-        this.config = config;
     }
 
     @Override
@@ -97,7 +100,8 @@ public class AuthInfoStoreImpl implements Persistent {
         File rootDir = new File(tokenPath);
         if (!rootDir.exists())
             rootDir.mkdirs();
-         this.configPath = String.format("%s/%s", tokenPath,config);
+        String fileName = CryptoUtil.getSHA256(this.ownerDid+this.provider);
+         this.configPath = String.format("%s/%s", tokenPath, fileName);
         File config = new File(configPath);
         if (!config.exists())
             config.createNewFile();
