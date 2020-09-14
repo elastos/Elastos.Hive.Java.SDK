@@ -63,7 +63,7 @@ public class DatabaseClient implements Database {
                         .createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -102,7 +102,7 @@ public class DatabaseClient implements Database {
                         .deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -142,7 +142,7 @@ public class DatabaseClient implements Database {
                         .insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -187,7 +187,7 @@ public class DatabaseClient implements Database {
                         .insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -229,7 +229,7 @@ public class DatabaseClient implements Database {
                         .countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -271,7 +271,7 @@ public class DatabaseClient implements Database {
                         .findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -314,7 +314,7 @@ public class DatabaseClient implements Database {
                         .findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -357,7 +357,7 @@ public class DatabaseClient implements Database {
                         .updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -405,7 +405,7 @@ public class DatabaseClient implements Database {
                         .updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -446,7 +446,7 @@ public class DatabaseClient implements Database {
                         .deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -488,7 +488,7 @@ public class DatabaseClient implements Database {
                         .deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -506,18 +506,6 @@ public class DatabaseClient implements Database {
             }
         });
     }
-
-    private int checkResponseCode(Response response) {
-        if (response == null)
-            return -1;
-
-        int code = response.code();
-        if (code < 300 && code >= 200)
-            return 0;
-
-        return code;
-    }
-
 
     private <T> Callback<T> getCallback(Callback<T> callback) {
         return (null == callback ? new NullCallback<T>() : callback);

@@ -97,7 +97,7 @@ public class FileClient implements Files {
                 if (response == null)
                     throw new HiveException(HiveException.ERROR);
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -143,7 +143,7 @@ public class FileClient implements Files {
                 Response response = ConnectionManager.getHiveVaultApi()
                         .deleteFolder(createJsonRequestBody(json))
                         .execute();
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -181,7 +181,7 @@ public class FileClient implements Files {
                 Response response = ConnectionManager.getHiveVaultApi()
                         .move(createJsonRequestBody(json))
                         .execute();
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -219,7 +219,7 @@ public class FileClient implements Files {
                 Response response = ConnectionManager.getHiveVaultApi()
                         .copy(createJsonRequestBody(json))
                         .execute();
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -253,7 +253,7 @@ public class FileClient implements Files {
                 Response<HashResponse> response = ConnectionManager.getHiveVaultApi()
                         .hash(remoteFile)
                         .execute();
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -294,7 +294,7 @@ public class FileClient implements Files {
                 VaultApi api = ConnectionManager.getHiveVaultApi();
                 Response<FilesResponse> response = api.files(folder).execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -329,7 +329,7 @@ public class FileClient implements Files {
                 VaultApi api = ConnectionManager.getHiveVaultApi();
                 Response<FileInfo> response = api.getProperties(path).execute();
 
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -377,18 +377,6 @@ public class FileClient implements Files {
         }
         return response;
     }
-
-    private int checkResponseCode(Response response) {
-        if (response == null)
-            return -1;
-
-        int code = response.code();
-        if (code < 300 && code >= 200)
-            return 0;
-
-        return code;
-    }
-
 
     private <T> Callback<T> getCallback(Callback<T> callback) {
         return (null == callback ? new NullCallback<T>() : callback);

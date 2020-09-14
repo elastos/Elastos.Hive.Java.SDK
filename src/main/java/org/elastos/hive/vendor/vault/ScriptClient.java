@@ -55,7 +55,7 @@ public class ScriptClient implements Scripting {
                 Response<BaseResponse> response = ConnectionManager.getHiveVaultApi()
                         .registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -95,7 +95,7 @@ public class ScriptClient implements Scripting {
                 Response response = ConnectionManager.getHiveVaultApi()
                         .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
-                int responseCode = checkResponseCode(response);
+                int responseCode = ResponseHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
@@ -108,17 +108,6 @@ public class ScriptClient implements Scripting {
                 throw new CompletionException(exception);
             }
         });
-    }
-
-    private int checkResponseCode(Response response) {
-        if (response == null)
-            return -1;
-
-        int code = response.code();
-        if (code < 300 && code >= 200)
-            return 0;
-
-        return code;
     }
 
 }

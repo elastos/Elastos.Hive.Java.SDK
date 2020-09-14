@@ -145,15 +145,15 @@ public interface Files {
      *         completes, either hash or null
      * @return the new CompletionStage, the result is the base64 hash string
      *         if the hash successfully calculated; null otherwise
+     * @throws HiveException
      */
     CompletableFuture<String> hash(String path, Callback<String> callback) throws HiveException;
 
     /**
      * Returns the list of all files in a given folder.
-     *
      * @param path the path for the remote folder
-     * @return the new CompletionStage, the result is List<FileInfo>
-     *         if success; null otherwise
+     * @return the new CompletionStage, the result is List if success; null otherwise
+     * @throws HiveException
      */
     CompletableFuture<List<FileInfo>> list(String path) throws HiveException;
 
@@ -162,8 +162,8 @@ public interface Files {
      *
      * @param path the path for the remote folder
      * @param callback the given Callback will be called once the operation
-     *         completes, either List<FileInfo> or null
-     * @return the new CompletionStage, the result is List<FileInfo>
+     *         completes, either List or null
+     * @return the new CompletionStage, the result is List
      *         if success; null otherwise
      */
     CompletableFuture<List<FileInfo>> list(String path, Callback<List<FileInfo>> callback) throws HiveException;

@@ -151,4 +151,16 @@ public class ResponseHelper {
             e.printStackTrace();
         }
     }
+
+
+    public static int checkResponseCode(Response response) {
+        if (response == null)
+            return -1;
+
+        int code = response.code();
+        if (code < 300 && code >= 200)
+            return 0;
+
+        return code;
+    }
 }
