@@ -122,8 +122,15 @@ public class VaultAuthHelper implements ConnectHelper {
     }
 
     @Override
-    public CompletableFuture<Void> connect() {
-        return CompletableFuture.runAsync(() -> checkValid());
+    public void connect() {
+        try {
+            connectState.set(false);
+            signIn();
+            initConnection();
+            connectState.set(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void doCheckExpired() throws Exception {
@@ -182,8 +189,8 @@ public class VaultAuthHelper implements ConnectHelper {
                 .signIn(getJsonRequestBoy(json))
                 .execute();
         SignResponse signResponse = (SignResponse) response.body();
-        if (null != signResponse && signResponse.get_error() != null) {
-            throw new HiveException(signResponse.get_error().getMessage());
+        if (null == signResponse) {
+            throw new HiveException("Sign in challenge failed");
         }
         String jwtToken = signResponse.getChallenge();
         if (null != this.authenticationHandler && verifyToken(jwtToken)) {
@@ -216,7 +223,8 @@ public class VaultAuthHelper implements ConnectHelper {
                     || !ownerDid.equals(aud))
                 return false;
 
-            if (System.currentTimeMillis() > exp) return false;
+            long currentTime = System.currentTimeMillis();
+            if (currentTime > exp) return false;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -253,8 +261,8 @@ public class VaultAuthHelper implements ConnectHelper {
 
     private void handleAuthResponse(Response response) throws Exception {
         AuthResponse authResponse = (AuthResponse) response.body();
-        if (null == authResponse || authResponse.get_error() != null) {
-            throw new HiveException(authResponse.get_error().getMessage());
+        if (null == authResponse) {
+            throw new HiveException("Authorize failed");
         }
 
         String access_token = authResponse.getAccess_token();
@@ -423,4 +431,18 @@ public class VaultAuthHelper implements ConnectHelper {
         return RequestBody.create(MediaType.parse("Content-Type, application/json"), json);
     }
 
+    public int checkResponseCode(Response response) {
+        if (response == null)
+            return -1;
+
+        int code = response.code();
+        if (code < 300 && code >= 200)
+            return 0;
+
+        if(code == 401) {
+            connect();
+        }
+
+        return code;
+    }
 }

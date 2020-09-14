@@ -1,7 +1,6 @@
 package org.elastos.hive.vendor.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.elastos.hive.Scripting;
 import org.elastos.hive.exception.HiveException;
@@ -55,14 +54,14 @@ public class ScriptClient implements Scripting {
                 Response<BaseResponse> response = ConnectionManager.getHiveVaultApi()
                         .registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
-                int responseCode = ResponseHelper.checkResponseCode(response);
+                int responseCode = authHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {
                     throw new HiveException(HiveException.ERROR);
                 }
                 BaseResponse baseResponse = response.body();
-                return null!=baseResponse && baseResponse.get_error()==null;
+                return null!=baseResponse;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);
@@ -95,7 +94,7 @@ public class ScriptClient implements Scripting {
                 Response response = ConnectionManager.getHiveVaultApi()
                         .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
-                int responseCode = ResponseHelper.checkResponseCode(response);
+                int responseCode = authHelper.checkResponseCode(response);
                 if (responseCode == 404) {
                     throw new HiveException(HiveException.ITEM_NOT_FOUND);
                 } else if (responseCode != 0) {

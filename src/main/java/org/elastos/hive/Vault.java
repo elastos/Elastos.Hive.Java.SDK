@@ -28,7 +28,7 @@ public class Vault {
         this.vaultProvider = vaultProvider;
         this.ownerDid = ownerDid;
 
-        authHelper.checkValid().get();
+        authHelper.connect();
     }
 
     public String getProviderAddress() {
