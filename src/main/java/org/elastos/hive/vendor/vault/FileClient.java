@@ -97,13 +97,7 @@ public class FileClient implements Files {
                 if (response == null)
                     throw new HiveException(HiveException.ERROR);
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-
+                authHelper.checkResponseCode(response);
                 if(resultType.isAssignableFrom(Reader.class)) {
                     Reader reader = ResponseHelper.getToReader(response);
                     callback.onSuccess((T) reader);
@@ -143,12 +137,7 @@ public class FileClient implements Files {
                 Response response = ConnectionManager.getHiveVaultApi()
                         .deleteFolder(createJsonRequestBody(json))
                         .execute();
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
+                authHelper.checkResponseCode(response);
                 callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
@@ -181,12 +170,7 @@ public class FileClient implements Files {
                 Response response = ConnectionManager.getHiveVaultApi()
                         .move(createJsonRequestBody(json))
                         .execute();
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
+                authHelper.checkResponseCode(response);
                 callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
@@ -219,12 +203,7 @@ public class FileClient implements Files {
                 Response response = ConnectionManager.getHiveVaultApi()
                         .copy(createJsonRequestBody(json))
                         .execute();
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
+                authHelper.checkResponseCode(response);
                 callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
@@ -253,12 +232,7 @@ public class FileClient implements Files {
                 Response<HashResponse> response = ConnectionManager.getHiveVaultApi()
                         .hash(remoteFile)
                         .execute();
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
+                authHelper.checkResponseCode(response);
                 String ret = response.body().getSHA256();
                 callback.onSuccess(ret);
                 return ret;
@@ -288,13 +262,7 @@ public class FileClient implements Files {
                 VaultApi api = ConnectionManager.getHiveVaultApi();
                 Response<FilesResponse> response = api.files(folder).execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-
+                authHelper.checkResponseCode(response);
                 List<FileInfo> list = response.body().getFiles();
                 callback.onSuccess(list);
                 return list;
@@ -323,13 +291,7 @@ public class FileClient implements Files {
                 VaultApi api = ConnectionManager.getHiveVaultApi();
                 Response<FileInfo> response = api.getProperties(path).execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-
+                authHelper.checkResponseCode(response);
                 FileInfo fileInfo = response.body();
                 callback.onSuccess(fileInfo);
                 return fileInfo;

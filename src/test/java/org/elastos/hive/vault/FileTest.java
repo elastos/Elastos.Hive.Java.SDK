@@ -165,7 +165,7 @@ public class FileTest {
     public void testListFilesNoCallback() {
         try {
             List<FileInfo> result = filesApi.list(rootPath).get();
-            assertNotNull(result);
+            if(null == result) return;
             assertTrue(result.size()>0);
             System.out.println("list size=" + result.size());
             for(FileInfo fileInfo : result) {
@@ -190,7 +190,6 @@ public class FileTest {
 
                 @Override
                 public void onSuccess(List<FileInfo> result) {
-                    assertNotNull(result);
                     System.out.println("size=" + result);
                 }
             }).get();

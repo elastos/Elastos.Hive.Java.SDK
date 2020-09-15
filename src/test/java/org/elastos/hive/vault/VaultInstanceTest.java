@@ -18,20 +18,7 @@ public class VaultInstanceTest {
     private static Client client;
 
     @Test
-    public void testGetVaultInstance() {
-        try {
-            Vault vault = client.getVault("did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM").get();
-            assertNotNull(vault);
-            System.out.println("appId="+vault.getAppDid());
-            System.out.println("userDid="+vault.getUserDid());
-            System.out.println("appInstanceDid="+vault.getAppInstanceDid());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @BeforeClass
-    public static void setUp() {
+    public void testGetVaultInstance1() {
         try {
             String json = TestConstance.DOC_STR;
             DIDDocument doc = DIDDocument
@@ -46,6 +33,40 @@ public class VaultInstanceTest {
 
             Client.setVaultProvider(TestConstance.OWNERDID, TestConstance.PROVIDER);
             client = Client.createInstance(options);
+
+            Vault vault = client.getVault("did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM").get();
+            assertNotNull(vault);
+            System.out.println("appId="+vault.getAppDid());
+            System.out.println("userDid="+vault.getUserDid());
+            System.out.println("appInstanceDid="+vault.getAppInstanceDid());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testGetVaultInstance2() {
+        try {
+            String json = TestConstance.DOC_STR;
+            DIDDocument doc = DIDDocument
+                    .fromJson(json);
+
+            Client.Options options = new Client.Options();
+            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
+                    -> TestConstance.ACCESS_TOKEN));
+            options.setAuthenticationDIDDocument(doc);
+            options.setDIDResolverUrl("http://api.elastos.io:21606");
+            options.setLocalDataPath(localDataPath);
+
+            Client.setVaultProvider(TestConstance.OWNERDID, TestConstance.PROVIDER1);
+            client = Client.createInstance(options);
+
+            Vault vault = client.getVault("did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM").get();
+            assertNotNull(vault);
+            System.out.println("appId="+vault.getAppDid());
+            System.out.println("userDid="+vault.getUserDid());
+            System.out.println("appInstanceDid="+vault.getAppInstanceDid());
+
         } catch (Exception e) {
             e.printStackTrace();
         }

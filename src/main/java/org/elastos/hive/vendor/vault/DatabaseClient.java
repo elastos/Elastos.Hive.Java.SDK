@@ -63,12 +63,7 @@ public class DatabaseClient implements Database {
                         .createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
+                authHelper.checkResponseCode(response);
                 callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
@@ -102,12 +97,7 @@ public class DatabaseClient implements Database {
                         .deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
+                authHelper.checkResponseCode(response);
                 callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
@@ -142,13 +132,7 @@ public class DatabaseClient implements Database {
                         .insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-
+                authHelper.checkResponseCode(response);
                 InsertResult insertResult = new InsertResult();
                 insertResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(insertResult);
@@ -187,12 +171,7 @@ public class DatabaseClient implements Database {
                         .insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
+                authHelper.checkResponseCode(response);
                 InsertResult insertResult = new InsertResult();
                 insertResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(insertResult);
@@ -229,13 +208,7 @@ public class DatabaseClient implements Database {
                         .countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-
+                authHelper.checkResponseCode(response);
                 long count = response.body().getCount();
                 callback.onSuccess(count);
                 return count;
@@ -271,13 +244,7 @@ public class DatabaseClient implements Database {
                         .findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-
+                authHelper.checkResponseCode(response);
                 JsonNode jsonNode = ResponseHelper.getVaule(response, JsonNode.class);
                 JsonNode item = jsonNode.get("items");
                 callback.onSuccess(item);
@@ -314,13 +281,7 @@ public class DatabaseClient implements Database {
                         .findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-
+                authHelper.checkResponseCode(response);
                 List<JsonNode> jsonNodes = ResponseHelper.getArray(response, "items");
                 callback.onSuccess(jsonNodes);
                 return jsonNodes;
@@ -357,12 +318,7 @@ public class DatabaseClient implements Database {
                         .updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
+                authHelper.checkResponseCode(response);
                 UpdateResult updateResult = new UpdateResult();
                 String ret = ResponseHelper.toString(response);
                 if(ret.contains("_error")) {
@@ -405,12 +361,7 @@ public class DatabaseClient implements Database {
                         .updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
+                authHelper.checkResponseCode(response);
                 UpdateResult updateResult = new UpdateResult();
                 updateResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(updateResult);
@@ -446,13 +397,7 @@ public class DatabaseClient implements Database {
                         .deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-
+                authHelper.checkResponseCode(response);
                 DeleteResult deleteResult = new DeleteResult();
                 deleteResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(deleteResult);
@@ -488,13 +433,7 @@ public class DatabaseClient implements Database {
                         .deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-
+                authHelper.checkResponseCode(response);
                 DeleteResult deleteResult = new DeleteResult();
                 deleteResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(deleteResult);

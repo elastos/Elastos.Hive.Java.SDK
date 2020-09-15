@@ -54,12 +54,7 @@ public class ScriptClient implements Scripting {
                 Response<BaseResponse> response = ConnectionManager.getHiveVaultApi()
                         .registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
+                authHelper.checkResponseCode(response);
                 BaseResponse baseResponse = response.body();
                 return null!=baseResponse;
             } catch (Exception e) {
@@ -94,13 +89,7 @@ public class ScriptClient implements Scripting {
                 Response response = ConnectionManager.getHiveVaultApi()
                         .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
-                int responseCode = authHelper.checkResponseCode(response);
-                if (responseCode == 404) {
-                    throw new HiveException(HiveException.ITEM_NOT_FOUND);
-                } else if (responseCode != 0) {
-                    throw new HiveException(HiveException.ERROR);
-                }
-
+                authHelper.checkResponseCode(response);
                 return ResponseHelper.getVaule(response, clazz);
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());

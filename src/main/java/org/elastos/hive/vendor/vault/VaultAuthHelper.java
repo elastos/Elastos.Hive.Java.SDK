@@ -125,7 +125,10 @@ public class VaultAuthHelper implements ConnectHelper {
     public void connect() {
         try {
             connectState.set(false);
-            signIn();
+            tryRestoreToken();
+            if (token == null || token.isExpired()) {
+                signIn();
+            }
             initConnection();
             connectState.set(true);
         } catch (Exception e) {
@@ -431,18 +434,18 @@ public class VaultAuthHelper implements ConnectHelper {
         return RequestBody.create(MediaType.parse("Content-Type, application/json"), json);
     }
 
-    public int checkResponseCode(Response response) {
+    public void checkResponseCode(Response response) throws HiveException {
         if (response == null)
-            return -1;
+            throw new HiveException("response is null");
 
         int code = response.code();
-        if (code < 300 && code >= 200)
-            return 0;
-
-        if(code == 401) {
-            connect();
+        if (code >= 300 || code<200) {
+            if(code==401) {
+                connect();
+            } else {
+                String message  = response.message();
+                throw new HiveException(message);
+            }
         }
-
-        return code;
     }
 }
