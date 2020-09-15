@@ -165,13 +165,7 @@ public class Client {
 			Vault vault = null;
 			if(vaultProvider != null) {
 				VaultAuthHelper authHelper = new VaultAuthHelper(ownerDid, vaultProvider, opts.localPath, opts.authenticationDIDDocument, opts.authentcationHandler);
-				try {
-					vault = new Vault(authHelper, vaultProvider, ownerDid);
-				} catch (ExecutionException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				vault = new Vault(authHelper, vaultProvider, ownerDid);
 			}
 
 			return vault;

@@ -18,7 +18,7 @@ public class Vault {
     private String ownerDid;
     private VaultAuthHelper authHelper;
 
-    public Vault(VaultAuthHelper authHelper, String vaultProvider, String ownerDid) throws ExecutionException, InterruptedException {
+    public Vault(VaultAuthHelper authHelper, String vaultProvider, String ownerDid) {
 
         this.authHelper = authHelper;
         this.files = new FileClient(authHelper);

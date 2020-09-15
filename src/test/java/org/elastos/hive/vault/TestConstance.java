@@ -8,4 +8,5 @@ public class TestConstance {
     public static final String OWNERDID = "did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM";
 
     public static final String PROVIDER = "http://localhost:5000";
+    public static final String PROVIDER1 = "http://localhost:5001";
 }
