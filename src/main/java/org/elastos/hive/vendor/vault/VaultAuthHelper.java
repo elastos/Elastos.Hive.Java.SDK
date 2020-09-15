@@ -221,9 +221,10 @@ public class VaultAuthHelper implements ConnectHelper {
 //            String nonce = (String) claims.get("nonce");
             String aud = claims.getAudience();
 
-            if (null == ownerDid
+            String did = authenticationDIDDocument.getSubject().toString();
+            if (null == did
                     || null == aud
-                    || !ownerDid.equals(aud))
+                    || !did.equals(aud))
                 return false;
 
             long currentTime = System.currentTimeMillis();
