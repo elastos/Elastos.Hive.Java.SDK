@@ -1,6 +1,6 @@
 package org.elastos.hive.vendor.vault.network.model;
 
-public class AuthResponse extends BaseResponse {
+public class AuthResponse {
 
     private String access_token;
 

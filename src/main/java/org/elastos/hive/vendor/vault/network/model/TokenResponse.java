@@ -1,6 +1,6 @@
 package org.elastos.hive.vendor.vault.network.model;
 
-public class TokenResponse extends BaseResponse {
+public class TokenResponse {
     private String access_token;
     private long expires_in;
     private String scope;

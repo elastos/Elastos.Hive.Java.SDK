@@ -70,7 +70,7 @@ public class ResponseHelper {
         return rets;
     }
 
-    public static <T> T getVaule(String json, Class<T> clz) {
+    public static <T> T getValue(String json, Class<T> clz) {
         if(null==json) return null;
 
         Object obj = null;
@@ -90,9 +90,9 @@ public class ResponseHelper {
         return (T) obj;
     }
 
-    public static <T> T getVaule(Response response, Class<T> clz) throws IOException {
+    public static <T> T getValue(Response response, Class<T> clz) throws IOException {
         String json = toString(response);
-        return getVaule(json, clz);
+        return getValue(json, clz);
     }
 
     public static String toString(Response response) throws IOException {

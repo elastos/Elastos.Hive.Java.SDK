@@ -15,6 +15,6 @@ public interface AuthenticationHandler {
      *   verify jwt (using local app instance did public key provided before)
      *   generate access token
      */
-    public CompletableFuture<String> authenticationChallenge(String jwtToken);
+    CompletableFuture<String> authenticationChallenge(String jwtToken);
 }
 

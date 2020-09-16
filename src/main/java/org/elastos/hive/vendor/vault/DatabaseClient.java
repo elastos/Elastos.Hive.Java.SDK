@@ -245,7 +245,7 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                JsonNode jsonNode = ResponseHelper.getVaule(response, JsonNode.class);
+                JsonNode jsonNode = ResponseHelper.getValue(response, JsonNode.class);
                 JsonNode item = jsonNode.get("items");
                 callback.onSuccess(item);
                 return item;

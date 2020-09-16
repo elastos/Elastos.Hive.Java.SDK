@@ -4,7 +4,6 @@ import org.elastos.did.DIDDocument;
 import org.elastos.hive.Client;
 import org.elastos.hive.Vault;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -36,7 +35,7 @@ public class VaultInstanceTest {
 
             Vault vault = client.getVault("did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM").get();
             assertNotNull(vault);
-            System.out.println("appId="+vault.getAppDid());
+            System.out.println("appId="+vault.getAppId());
             System.out.println("userDid="+vault.getUserDid());
             System.out.println("appInstanceDid="+vault.getAppInstanceDid());
         } catch (Exception e) {
@@ -63,7 +62,7 @@ public class VaultInstanceTest {
 
             Vault vault = client.getVault("did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM").get();
             assertNotNull(vault);
-            System.out.println("appId="+vault.getAppDid());
+            System.out.println("appId="+vault.getAppId());
             System.out.println("userDid="+vault.getUserDid());
             System.out.println("appInstanceDid="+vault.getAppInstanceDid());
 

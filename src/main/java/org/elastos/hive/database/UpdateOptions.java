@@ -7,6 +7,11 @@ public class UpdateOptions extends Options<UpdateOptions> {
 		return setBooleanOption("upsert", value);
 	}
 
+	/**
+	 * If True, allows the write to opt-out of document level validation. Default is False.
+	 * @param value
+	 * @return
+	 */
 	public UpdateOptions bypassDocumentValidation(boolean value) {
 		return setBooleanOption("bypass_document_validation", value);
 	}

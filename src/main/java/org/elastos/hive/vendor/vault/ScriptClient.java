@@ -9,7 +9,6 @@ import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +17,7 @@ import java.util.concurrent.CompletionException;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 public class ScriptClient implements Scripting {
@@ -51,11 +51,11 @@ public class ScriptClient implements Scripting {
 
                 String json = JsonUtil.getJsonFromObject(map);
 
-                Response<BaseResponse> response = ConnectionManager.getHiveVaultApi()
+                Response<ResponseBody> response = ConnectionManager.getHiveVaultApi()
                         .registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
                 authHelper.checkResponseCode(response);
-                BaseResponse baseResponse = response.body();
+                ResponseBody baseResponse = response.body();
                 return null!=baseResponse;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -90,7 +90,7 @@ public class ScriptClient implements Scripting {
                         .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
                 authHelper.checkResponseCode(response);
-                return ResponseHelper.getVaule(response, clazz);
+                return ResponseHelper.getValue(response, clazz);
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);

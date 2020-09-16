@@ -1,14 +1,13 @@
 package org.elastos.hive.file;
 
 import org.elastos.hive.utils.DateUtil;
-import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 
 import java.math.BigDecimal;
 
 /**
  * File information about a remote file or folder.
  */
-public class FileInfo extends BaseResponse {
+public class FileInfo {
 
     /**
 

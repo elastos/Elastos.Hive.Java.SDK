@@ -4,7 +4,7 @@ import org.elastos.hive.file.FileInfo;
 
 import java.util.List;
 
-public class FilesResponse extends BaseResponse {
+public class FilesResponse {
 
     private List<FileInfo> file_info_list;
 

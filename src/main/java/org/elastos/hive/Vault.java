@@ -7,6 +7,11 @@ import org.elastos.hive.vendor.vault.VaultAuthHelper;
 
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Vault class
+ *      Provide basic information of vault.
+ *      Provide file, database, scripting, KeyValues instances
+ */
 public class Vault {
 
     private Files files;
@@ -18,6 +23,16 @@ public class Vault {
     private String ownerDid;
     private VaultAuthHelper authHelper;
 
+    /**
+     * Vault construction method
+     *
+     * @param authHelper
+     *          sign in，authorize and cloud sync helper class instance
+     * @param vaultProvider
+     *          vault server provider address
+     * @param ownerDid
+     *          vault provider did
+     */
     public Vault(VaultAuthHelper authHelper, String vaultProvider, String ownerDid) {
 
         this.authHelper = authHelper;
@@ -31,38 +46,74 @@ public class Vault {
         authHelper.connect();
     }
 
+    /**
+     *  get vault provider address
+     * @return
+     */
     public String getProviderAddress() {
         return this.vaultProvider;
     }
 
+    /**
+     * get vault owner did
+     * @return
+     */
     public String getOwnerDid() {
         return this.ownerDid;
     }
 
-    public String getAppDid() {
+    /**
+     * get application id
+     * @return
+     */
+    public String getAppId() {
         return this.authHelper.getAppId();
     }
 
+    /**
+     * get application did
+     * @return
+     */
     public String getAppInstanceDid() {
         return this.authHelper.getAppInstanceDid();
     }
 
+    /**
+     * get user did
+     * @return
+     */
     public String getUserDid() {
         return this.authHelper.getUserDid();
     }
 
+    /**
+     * get vault's Database instance
+     * @return
+     */
     public Database getDatabase() {
         return this.database;
     }
 
+    /**
+     * get vault's Files instance
+     * @return
+     */
     public Files getFiles() {
         return this.files;
     }
 
+    /**
+     * get vault's KeyValues instance
+     * @return
+     */
     public KeyValues getKeyValues() {
         return this.keyValues;
     }
 
+    /**
+     * get vault's Scripting instance
+     * @return
+     */
     public Scripting getScripting() {
         return this.scripting;
     }

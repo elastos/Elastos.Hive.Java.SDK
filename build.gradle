@@ -64,21 +64,42 @@ task createjavadoc(type: Javadoc) {
     }
     include(
             //org.elastos.hive
-            "**/Client.java",
-            "**/Authenticator.java",
+            "**/Vault.java",
+            "**/AuthenticationHandler.java",
             "**/Callback.java",
-            "**/NullCallback.java",
+            "**/Client.java",
 
-            //org.elastos.hive.onedrive
-            "**/OneDriveOptions.java",
-
-            //org.elastos.hive.ipfs
-            "**/IPFSOptions.java",
-
-            //org.elastos.hive.interfaces
+            //interface
+            "**/Database.java",
             "**/Files.java",
-            "**/IPFS.java",
-            "**/KeyValues.java",
+            "**/Scripting.java",
+
+            //org.elastos.hive.database
+            "**/DeleteOptions.java",
+            "**/DeleteResult.java",
+            "**/FindOptions.java",
+            "**/InsertOptions.java",
+            "**/InsertResult.java",
+            "**/UpdateOptions.java",
+            "**/UpdateResult.java",
+
+            //org.elastos.hive.file
+            "**/FileInfo.java",
+
+            //org.elastos.hive.scripting
+            "**/AggregatedCondition.java",
+            "**/AggregatedExecutable.java",
+            "**/AndCondition.java",
+            "**/Condition.java",
+            "**/DbDeleteQuery.java",
+            "**/DbFindQuery.java",
+            "**/DbInsertQuery.java",
+            "**/DbUpdateQuery.java",
+            "**/Executable.java",
+            "**/OrCondition.java",
+            "**/QueryHasResultsCondition.java",
+            "**/RawCondition.java",
+            "**/RawExecutable.java",
 
             //org.elastos.hive.exception
             "**/HiveException.java",

@@ -4,7 +4,6 @@ package org.elastos.hive.vendor.vault.network;
 import org.elastos.hive.file.FileInfo;
 import org.elastos.hive.vendor.vault.VaultConstance;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
-import org.elastos.hive.vendor.vault.network.model.BaseResponse;
 import org.elastos.hive.vendor.vault.network.model.CountDocResponse;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 import org.elastos.hive.vendor.vault.network.model.HashResponse;
@@ -27,13 +26,13 @@ public interface VaultApi {
     Call<AuthResponse> auth(@Body RequestBody body);
 
     @POST(VaultConstance.API_PATH + "/sync/setup/google_drive")
-    Call<BaseResponse> googleDrive(@Body RequestBody body);
+    Call<ResponseBody> googleDrive(@Body RequestBody body);
 
     @POST(VaultConstance.API_PATH + "/db/create_collection")
-    Call<BaseResponse> createCollection(@Body RequestBody body);
+    Call<ResponseBody> createCollection(@Body RequestBody body);
 
     @POST(VaultConstance.API_PATH + "/db/delete_collection")
-    Call<BaseResponse> deleteCollection(@Body RequestBody body);
+    Call<ResponseBody> deleteCollection(@Body RequestBody body);
 
     @POST(VaultConstance.API_PATH + "/db/insert_one")
     Call<ResponseBody> insertOne(@Body RequestBody body);
@@ -72,22 +71,22 @@ public interface VaultApi {
     Call<FileInfo> getProperties(@Query("path") String filename);
 
     @POST(VaultConstance.API_PATH + "/files/delete")
-    Call<BaseResponse> deleteFolder(@Body RequestBody body);
+    Call<ResponseBody> deleteFolder(@Body RequestBody body);
 
     @POST(VaultConstance.API_PATH + "/files/move")
-    Call<BaseResponse> move(@Body RequestBody body);
+    Call<ResponseBody> move(@Body RequestBody body);
 
     @POST(VaultConstance.API_PATH + "/files/copy")
-    Call<BaseResponse> copy(@Body RequestBody body);
+    Call<ResponseBody> copy(@Body RequestBody body);
 
     @GET(VaultConstance.API_PATH + "/files/file/hash")
     Call<HashResponse> hash(@Query("path") String filename);
 
     @POST(VaultConstance.API_PATH + "/scripting/set_subcondition")
-    Call<BaseResponse> registerCondition(@Body RequestBody body);
+    Call<ResponseBody> registerCondition(@Body RequestBody body);
 
     @POST(VaultConstance.API_PATH + "/scripting/set_script")
-    Call<BaseResponse> registerScript(@Body RequestBody body);
+    Call<ResponseBody> registerScript(@Body RequestBody body);
 
     @POST(VaultConstance.API_PATH + "/scripting/run_script")
     Call<ResponseBody> callScript(@Body RequestBody body);

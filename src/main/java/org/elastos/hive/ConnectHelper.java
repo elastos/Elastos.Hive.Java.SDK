@@ -44,5 +44,8 @@ public interface ConnectHelper {
      */
     CompletableFuture<Void> checkValid(Callback<Void> callback);
 
+    /**
+     * Sign in challenge
+     */
     void connect();
 }
