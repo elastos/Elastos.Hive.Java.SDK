@@ -42,7 +42,6 @@ public class ScriptClient implements Scripting {
     private CompletableFuture<Boolean> registerScriptImp(String name, Condition accessCondition, Executable executable) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-
                 Map map = new HashMap<>();
                 map.put("name", name);
                 if (accessCondition != null)
@@ -55,8 +54,7 @@ public class ScriptClient implements Scripting {
                         .registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
                 authHelper.checkResponseCode(response);
-                ResponseBody baseResponse = response.body();
-                return null!=baseResponse;
+                return true;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
                 throw new CompletionException(exception);
@@ -84,7 +82,6 @@ public class ScriptClient implements Scripting {
                     map.put("params", params);
 
                 String json = JsonUtil.getJsonFromObject(map);
-
 
                 Response response = ConnectionManager.getHiveVaultApi()
                         .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))

@@ -27,12 +27,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.Reader;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ScriptingTest {
+public class ScriptTest {
     private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
 
     private static Scripting scripting;
@@ -93,7 +94,8 @@ public class ScriptingTest {
     public void registerScriptNoCondition() {
         try {
             String json = "{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"*caller_did\":\"friends\"}}}";
-            scripting.registerScript("script_no_condition", new RawExecutable(json)).get();
+            boolean success = scripting.registerScript("script_no_condition", new RawExecutable(json)).get();
+            assertTrue(success);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -114,21 +116,60 @@ public class ScriptingTest {
     public void callScriptNoParams() {
         try {
             String ret = scripting.call("script_no_condition", String.class).get();
-            assertNotNull(ret);
             System.out.println("return="+ret);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public @Test void callScriptWithParams() {
+    @Test
+    public void callScriptStringType() {
+        try {
+            String ret = scripting.call("script_no_condition", String.class).get();
+            System.out.println("return="+ret);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void callScriptByteArrType() {
+        try {
+            byte[] ret = scripting.call("script_no_condition", byte[].class).get();
+            System.out.println("return="+ret);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void callScriptJsonNodeType() {
+        try {
+            JsonNode ret = scripting.call("script_no_condition", JsonNode.class).get();
+            System.out.println("return="+ret);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void callScriptReaderType() {
+        try {
+            Reader ret = scripting.call("script_no_condition", Reader.class).get();
+            System.out.println("return="+ret);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void callScriptWithParams() {
         try {
             String param = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"}}";
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode update = objectMapper.readTree(param);
 
             String ret = scripting.call("script_condition", update, String.class).get();
-            assertNotNull(ret);
             System.out.println("return="+ret);
         } catch (Exception e) {
             e.printStackTrace();
