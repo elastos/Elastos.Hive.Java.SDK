@@ -23,8 +23,8 @@
 package org.elastos.hive.vendor.connection;
 
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
-import org.elastos.hive.vendor.vault.VaultConstance;
-import org.elastos.hive.vendor.vault.network.VaultApi;
+import org.elastos.hive.vendor.vault.Constance;
+import org.elastos.hive.vendor.vault.network.NodeApi;
 import org.elastos.hive.vendor.vault.network.VaultAuthApi;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ import java.net.URL;
 public class ConnectionManager {
 
     private static VaultAuthApi vaultAuthApi;
-    private static VaultApi hivevaultApi;
+    private static NodeApi hivevaultApi;
 
     private static String hivevaultBaseUrl;
     private static String authBaseUrl;
@@ -42,9 +42,9 @@ public class ConnectionManager {
     private static BaseServiceConfig hivevaultConfig = new BaseServiceConfig.Builder().build() ;
     private static BaseServiceConfig authConfig = new BaseServiceConfig.Builder().build();
 
-    public static VaultApi getHiveVaultApi() {
+    public static NodeApi getHiveVaultApi() {
         if(hivevaultApi == null) {
-            hivevaultApi = BaseServiceUtil.createService(VaultApi.class,
+            hivevaultApi = BaseServiceUtil.createService(NodeApi.class,
                     ConnectionManager.hivevaultBaseUrl, ConnectionManager.hivevaultConfig);
         }
         return hivevaultApi;
@@ -95,7 +95,7 @@ public class ConnectionManager {
     }
 
     public static HttpURLConnection openURLConnection(String path) throws IOException {
-        String url = ConnectionManager.getHivevaultBaseUrl() + VaultConstance.API_PATH +"/files/upload/" + path;
+        String url = ConnectionManager.getHivevaultBaseUrl() + Constance.API_PATH +"/files/upload/" + path;
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
         httpURLConnection.setRequestMethod("POST");
         httpURLConnection.setConnectTimeout(5000);

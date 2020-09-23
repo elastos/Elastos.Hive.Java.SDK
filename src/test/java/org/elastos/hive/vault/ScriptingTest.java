@@ -30,10 +30,9 @@ import java.io.File;
 import java.io.Reader;
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class ScriptTest {
+public class ScriptingTest {
     private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
 
     private static Scripting scripting;
@@ -179,20 +178,20 @@ public class ScriptTest {
     @BeforeClass
     public static void setUp() {
         try {
-            String json = TestConstance.DOC_STR;
+            String json = TestData.DOC_STR;
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> TestConstance.ACCESS_TOKEN));
+                    -> TestData.ACCESS_TOKEN));
             options.setAuthenticationDIDDocument(doc);
             options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);
 
-            Client.setVaultProvider(TestConstance.OWNERDID, TestConstance.PROVIDER);
+            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
             client = Client.createInstance(options);
-            scripting = client.getVault(TestConstance.OWNERDID).get().getScripting();
+            scripting = client.getVault(TestData.OWNERDID).get().getScripting();
         } catch (Exception e) {
             e.printStackTrace();
         }

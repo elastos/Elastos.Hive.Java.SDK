@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertNotNull;
 
-public class VaultInstanceTest {
+public class InstanceTest {
     private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
 
     private static Client client;
@@ -19,18 +19,18 @@ public class VaultInstanceTest {
     @Test
     public void testGetVaultInstance1() {
         try {
-            String json = TestConstance.DOC_STR;
+            String json = TestData.DOC_STR;
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> TestConstance.ACCESS_TOKEN));
+                    -> TestData.ACCESS_TOKEN));
             options.setAuthenticationDIDDocument(doc);
             options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);
 
-            Client.setVaultProvider(TestConstance.OWNERDID, TestConstance.PROVIDER);
+            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
             client = Client.createInstance(options);
 
             Vault vault = client.getVault("did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM").get();
@@ -46,18 +46,18 @@ public class VaultInstanceTest {
     @Test
     public void testGetVaultInstance2() {
         try {
-            String json = TestConstance.DOC_STR;
+            String json = TestData.DOC_STR;
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> TestConstance.ACCESS_TOKEN));
+                    -> TestData.ACCESS_TOKEN));
             options.setAuthenticationDIDDocument(doc);
             options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);
 
-            Client.setVaultProvider(TestConstance.OWNERDID, TestConstance.PROVIDER1);
+            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER1);
             client = Client.createInstance(options);
 
             Vault vault = client.getVault("did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM").get();

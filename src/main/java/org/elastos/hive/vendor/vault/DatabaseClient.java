@@ -35,9 +35,9 @@ import retrofit2.Response;
 
 public class DatabaseClient implements Database {
 
-    private VaultAuthHelper authHelper;
+    private AuthHelper authHelper;
 
-    public DatabaseClient(VaultAuthHelper authHelper) {
+    public DatabaseClient(AuthHelper authHelper) {
         this.authHelper = authHelper;
     }
 

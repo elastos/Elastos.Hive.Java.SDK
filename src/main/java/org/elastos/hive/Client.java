@@ -27,14 +27,13 @@ import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDURL;
 import org.elastos.did.backend.ResolverCache;
-import org.elastos.hive.vendor.vault.VaultAuthHelper;
-import org.elastos.hive.vendor.vault.VaultConstance;
+import org.elastos.hive.vendor.vault.AuthHelper;
+import org.elastos.hive.vendor.vault.Constance;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class Client {
 
@@ -164,7 +163,7 @@ public class Client {
 			}
 			Vault vault = null;
 			if(vaultProvider != null) {
-				VaultAuthHelper authHelper = new VaultAuthHelper(ownerDid, vaultProvider, opts.localPath, opts.authenticationDIDDocument, opts.authentcationHandler);
+				AuthHelper authHelper = new AuthHelper(ownerDid, vaultProvider, opts.localPath, opts.authenticationDIDDocument, opts.authentcationHandler);
 				vault = new Vault(authHelper, vaultProvider, ownerDid);
 			}
 
@@ -193,7 +192,7 @@ public class Client {
 		return CompletableFuture.supplyAsync(() -> {
 			String vaultProvider = null;
 			try {
-				DIDBackend.initialize(opts.DIDResolverUrl==null? VaultConstance.MAIN_NET_RESOLVER : opts.DIDResolverUrl, opts.localPath);
+				DIDBackend.initialize(opts.DIDResolverUrl==null? Constance.MAIN_NET_RESOLVER : opts.DIDResolverUrl, opts.localPath);
 				ResolverCache.reset();
 				DID did = new DID(ownerDid);
 				DIDDocument doc = did.resolve();

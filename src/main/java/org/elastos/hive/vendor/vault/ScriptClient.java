@@ -22,9 +22,9 @@ import retrofit2.Response;
 
 public class ScriptClient implements Scripting {
 
-    private VaultAuthHelper authHelper;
+    private AuthHelper authHelper;
 
-    public ScriptClient(VaultAuthHelper authHelper) {
+    public ScriptClient(AuthHelper authHelper) {
         this.authHelper = authHelper;
     }
 

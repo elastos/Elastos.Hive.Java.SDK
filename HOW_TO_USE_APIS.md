@@ -4,9 +4,9 @@ In order to get developers involved to have a brief overview of APIs,  here are 
 
 ### Client
 
-#### 1. Create a Client
+#### 1. Create a Vault
 
-The first API to use Hive SDK is to create a client object to expected hive storage service. For example, the following paragraph is to create to a client to Hive Node:
+The first API to use Hive SDK is to create a vault object to expected hive storage service. For example:
 
 ```Java
             Client.Options options = new Client.Options();
@@ -28,10 +28,10 @@ The first API to use Hive SDK is to create a client object to expected hive stor
 
 #### 1. Get Files API
 
-After you get client instance, you can get files api refer the following example:
+After you get Vault instance, you can get files api refer the following example:
 
 ```java
-Files filesApi = client.getFiles();
+Files filesApi = vault.getFiles();
 ```
 
 
@@ -125,7 +125,7 @@ filesApi.stat(dst).thenAccept(fileInfo -> {
 Get Database api, refer to the following example:
 
 ```java
-Database database = client.getDatabase();
+Database database = vault.getDatabase();
 ```
 
 #### 2. Create Collection
@@ -208,7 +208,7 @@ database.deleteOne(collectionName, filter, deleteOptions).thenAccept(deleteResul
 Get Script api, refer to the following example:
 
 ```java
-Script script = client.getScript();
+Script script = vault.getScript();
 ```
 
 
@@ -223,7 +223,7 @@ script.registerScript("script_name", new RawExecutable(json)).thenAccept(aBoolea
 ```
 
 
-#### 2. Call Script(String/byte[]/JsonNode/Reader)
+#### 3. Call Script(String/byte[]/JsonNode/Reader)
 
 Call Script, refer to the following example:
 

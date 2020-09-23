@@ -8,7 +8,7 @@ import org.elastos.hive.file.FileInfo;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.elastos.hive.vendor.vault.network.VaultApi;
+import org.elastos.hive.vendor.vault.network.NodeApi;
 import org.elastos.hive.vendor.vault.network.model.FilesResponse;
 import org.elastos.hive.vendor.vault.network.model.HashResponse;
 import org.elastos.hive.vendor.vault.network.model.UploadOutputStream;
@@ -30,9 +30,9 @@ import retrofit2.Response;
 
 public class FileClient implements Files {
 
-    private VaultAuthHelper authHelper;
+    private AuthHelper authHelper;
 
-    public FileClient(VaultAuthHelper authHelper) {
+    public FileClient(AuthHelper authHelper) {
         this.authHelper = authHelper;
     }
 
@@ -259,7 +259,7 @@ public class FileClient implements Files {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                VaultApi api = ConnectionManager.getHiveVaultApi();
+                NodeApi api = ConnectionManager.getHiveVaultApi();
                 Response<FilesResponse> response = api.files(folder).execute();
 
                 authHelper.checkResponseCode(response);
@@ -288,7 +288,7 @@ public class FileClient implements Files {
     public CompletableFuture<FileInfo> statImp(String path, Callback<FileInfo> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                VaultApi api = ConnectionManager.getHiveVaultApi();
+                NodeApi api = ConnectionManager.getHiveVaultApi();
                 Response<FileInfo> response = api.getProperties(path).execute();
 
                 authHelper.checkResponseCode(response);

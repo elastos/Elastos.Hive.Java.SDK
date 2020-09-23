@@ -3,9 +3,7 @@ package org.elastos.hive;
 import org.elastos.hive.vendor.vault.DatabaseClient;
 import org.elastos.hive.vendor.vault.FileClient;
 import org.elastos.hive.vendor.vault.ScriptClient;
-import org.elastos.hive.vendor.vault.VaultAuthHelper;
-
-import java.util.concurrent.ExecutionException;
+import org.elastos.hive.vendor.vault.AuthHelper;
 
 /**
  * Vault class
@@ -21,7 +19,7 @@ public class Vault {
 
     private String vaultProvider;
     private String ownerDid;
-    private VaultAuthHelper authHelper;
+    private AuthHelper authHelper;
 
     /**
      * Vault construction method
@@ -33,7 +31,7 @@ public class Vault {
      * @param ownerDid
      *          vault provider did
      */
-    public Vault(VaultAuthHelper authHelper, String vaultProvider, String ownerDid) {
+    public Vault(AuthHelper authHelper, String vaultProvider, String ownerDid) {
 
         this.authHelper = authHelper;
         this.files = new FileClient(authHelper);

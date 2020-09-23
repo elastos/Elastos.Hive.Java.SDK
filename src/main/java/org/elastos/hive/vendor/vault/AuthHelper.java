@@ -35,7 +35,7 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-public class VaultAuthHelper implements ConnectHelper {
+public class AuthHelper implements ConnectHelper {
 
     private static final String CLIENT_ID_KEY = "client_id";
     private static final String ACCESS_TOKEN_KEY = "access_token";
@@ -68,7 +68,7 @@ public class VaultAuthHelper implements ConnectHelper {
     private DIDDocument authenticationDIDDocument;
     private AuthenticationHandler authenticationHandler;
 
-    public VaultAuthHelper(String ownerDid, String nodeUrl, String storePath, DIDDocument authenticationDIDDocument, AuthenticationHandler handler) {
+    public AuthHelper(String ownerDid, String nodeUrl, String storePath, DIDDocument authenticationDIDDocument, AuthenticationHandler handler) {
         this.authenticationDIDDocument = authenticationDIDDocument;
         this.authenticationHandler = handler;
         this.ownerDid = ownerDid;
@@ -79,13 +79,13 @@ public class VaultAuthHelper implements ConnectHelper {
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
             ConnectionManager.resetHiveVaultApi(this.nodeUrl, config);
-            ConnectionManager.resetAuthApi(VaultConstance.TOKEN_URI, config);
+            ConnectionManager.resetAuthApi(Constance.TOKEN_URI, config);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public VaultAuthHelper(String ownerDid, String nodeUrl, String storePath, String clientId, String clientSecret, String redirectUrl, String scope) {
+    public AuthHelper(String ownerDid, String nodeUrl, String storePath, String clientId, String clientSecret, String redirectUrl, String scope) {
         this.nodeUrl = nodeUrl;
         this.clientId = clientId;
         this.redirectUrl = redirectUrl;
@@ -97,7 +97,7 @@ public class VaultAuthHelper implements ConnectHelper {
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
             ConnectionManager.resetHiveVaultApi(nodeUrl, config);
-            ConnectionManager.resetAuthApi(VaultConstance.TOKEN_URI, config);
+            ConnectionManager.resetAuthApi(Constance.TOKEN_URI, config);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -153,7 +153,7 @@ public class VaultAuthHelper implements ConnectHelper {
             refreshToken = token.getRefreshToken();
         Response response = ConnectionManager.getVaultAuthApi()
                 .refreshToken(clientId, clientSecret,
-                        refreshToken, VaultConstance.GRANT_TYPE_REFRESH_TOKEN)
+                        refreshToken, Constance.GRANT_TYPE_REFRESH_TOKEN)
                 .execute();
         handleTokenResponse(response);
     }
@@ -242,7 +242,7 @@ public class VaultAuthHelper implements ConnectHelper {
         String formatCode = authCode.replace("%2F", "/");
         Response response = ConnectionManager.getVaultAuthApi()
                 .getToken(formatCode, clientId, clientSecret,
-                        redirectUrl, VaultConstance.GRANT_TYPE_GET_TOKEN)
+                        redirectUrl, Constance.GRANT_TYPE_GET_TOKEN)
                 .execute();
         handleTokenResponse(response);
         syncGoogleDrive(response);
@@ -294,7 +294,7 @@ public class VaultAuthHelper implements ConnectHelper {
     private String accessAuthCode(Authenticator authenticator) throws Exception {
         Semaphore semph = new Semaphore(1);
 
-        String[] hostAndPort = UrlUtil.decodeHostAndPort(redirectUrl, VaultConstance.DEFAULT_REDIRECT_URL, String.valueOf(VaultConstance.DEFAULT_REDIRECT_PORT));
+        String[] hostAndPort = UrlUtil.decodeHostAndPort(redirectUrl, Constance.DEFAULT_REDIRECT_URL, String.valueOf(Constance.DEFAULT_REDIRECT_PORT));
 
         String host = hostAndPort[0];
         int port = Integer.valueOf(hostAndPort[1]);
@@ -303,7 +303,7 @@ public class VaultAuthHelper implements ConnectHelper {
         server.start();
 
         String url = String.format("%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-                VaultConstance.AUTH_URI,
+                Constance.AUTH_URI,
                 this.clientId,
                 this.scope,
                 this.redirectUrl)
@@ -326,10 +326,10 @@ public class VaultAuthHelper implements ConnectHelper {
         Map map = new HashMap<>();
         map.put("token", tokenResponse.getAccess_token());
         map.put("refresh_token", tokenResponse.getRefresh_token());
-        map.put("token_uri", VaultConstance.TOKEN_URI);
+        map.put("token_uri", Constance.TOKEN_URI);
         map.put("client_id", clientId);
         map.put("client_secret", clientSecret);
-        map.put("scopes", VaultConstance.SCOPES);
+        map.put("scopes", Constance.SCOPES);
         map.put("expiry", DateUtil.getCurrentEpochTimeStamp(expiresTime));
 
         String json = new JSONObject(map).toString();

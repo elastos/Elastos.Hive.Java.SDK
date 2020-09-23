@@ -34,7 +34,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class DBTest {
+public class DatabaseTest {
 
     private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
 
@@ -592,20 +592,20 @@ public class DBTest {
     @BeforeClass
     public static void setUp() {
         try {
-            String json = TestConstance.DOC_STR;
+            String json = TestData.DOC_STR;
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> TestConstance.ACCESS_TOKEN));
+                    -> TestData.ACCESS_TOKEN));
             options.setAuthenticationDIDDocument(doc);
             options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);
 
-            Client.setVaultProvider(TestConstance.OWNERDID, TestConstance.PROVIDER);
+            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
             client = Client.createInstance(options);
-            database = client.getVault(TestConstance.OWNERDID).get().getDatabase();
+            database = client.getVault(TestData.OWNERDID).get().getDatabase();
         } catch (Exception e) {
             e.printStackTrace();
         }

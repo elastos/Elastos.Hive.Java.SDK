@@ -1,6 +1,6 @@
 package org.elastos.hive.vendor.vault;
 
-public class VaultConstance {
+public class Constance {
 
     public static final String API_PATH = "/api/v1";
 

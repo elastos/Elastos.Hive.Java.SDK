@@ -27,16 +27,9 @@ import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.Header;
-import org.elastos.hive.AuthenticationHandler;
-import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.Files;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.file.FileInfo;
 import org.elastos.hive.utils.JwtUtil;
-import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.elastos.hive.vendor.vault.network.VaultApi;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -47,9 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-
-import retrofit2.Response;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
