@@ -201,34 +201,34 @@ database.deleteOne(collectionName, filter, deleteOptions).thenAccept(deleteResul
             });
 ```
 
-### Script
+### Scripting
 
-#### 1. Get Script API
+#### 1. Get Scripting API
 
-Get Script api, refer to the following example:
+Get scripting api, refer to the following example:
 
 ```java
-Script script = vault.getScript();
+Scripting scripting = vault.getScript();
 ```
 
 
-#### 2. Register Script
+#### 2. Register Scripting
 
-Register Script, refer to the following example:
+Register scripting, refer to the following example:
 
 ```java
-script.registerScript("script_name", new RawExecutable(json)).thenAccept(aBoolean -> {
+scripting.registerScript("script_name", new RawExecutable(json)).thenAccept(aBoolean -> {
                 //Do another things.
             });
 ```
 
 
-#### 3. Call Script(String/byte[]/JsonNode/Reader)
+#### 3. Call Scripting(String/byte[]/JsonNode/Reader)
 
-Call Script, refer to the following example:
+Call scripting, refer to the following example:
 
 ```java
-script.call("script_name", String.class).thenAccept(s -> {
+scripting.call("script_name", String.class).thenAccept(s -> {
                 //Do another things.
             });
 ```

@@ -124,8 +124,8 @@ public class DatabaseClient implements Database {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
                 rootNode.put("collection", collection);
-                rootNode.put("document", doc);
-                if(null!=options) rootNode.put("options", JsonUtil.getJsonNode(options.serialize()));
+                rootNode.set("document", doc);
+                if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
@@ -163,8 +163,8 @@ public class DatabaseClient implements Database {
                 ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
                 arrayNode.addAll(docs);
                 rootNode.put("collection", collection);
-                rootNode.put("document", arrayNode);
-                if(null!=options) rootNode.put("options", JsonUtil.getJsonNode(options.serialize()));
+                rootNode.set("document", arrayNode);
+                if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
@@ -200,8 +200,8 @@ public class DatabaseClient implements Database {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
                 rootNode.put("collection", collection);
-                if(null!=query) rootNode.put("filter", query);
-                if(null!=options) rootNode.put("options", JsonUtil.getJsonNode(options.serialize()));
+                if(null!=query) rootNode.set("filter", query);
+                if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
                 Response<CountDocResponse> response = ConnectionManager.getHiveVaultApi()
@@ -236,8 +236,8 @@ public class DatabaseClient implements Database {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
                 rootNode.put("collection", collection);
-                if(null!=query) rootNode.put("filter", query);
-                if(null!=options) rootNode.put("options", JsonUtil.getJsonNode(options.serialize()));
+                if(null!=query) rootNode.set("filter", query);
+                if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
@@ -273,8 +273,8 @@ public class DatabaseClient implements Database {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
                 rootNode.put("collection", collection);
-                if(null!=query) rootNode.put("filter", query);
-                if(null!=options) rootNode.put("options", JsonUtil.getJsonNode(options.serialize()));
+                if(null!=query) rootNode.set("filter", query);
+                if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
@@ -309,9 +309,9 @@ public class DatabaseClient implements Database {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
                 rootNode.put("collection", collection);
-                if(null!=filter) rootNode.put("filter", filter);
-                if(null!=update) rootNode.put("update", update);
-                if(null!=options) rootNode.put("options", JsonUtil.getJsonNode(options.serialize()));
+                if(null!=filter) rootNode.set("filter", filter);
+                if(null!=update) rootNode.set("update", update);
+                if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
@@ -352,9 +352,9 @@ public class DatabaseClient implements Database {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
                 rootNode.put("collection", collection);
-                if(null!=filter) rootNode.put("filter", filter);
-                if(null!=update) rootNode.put("update", update);
-                if(null!=options) rootNode.put("options", JsonUtil.getJsonNode(options.serialize()));
+                if(null!=filter) rootNode.set("filter", filter);
+                if(null!=update) rootNode.set("update", update);
+                if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
@@ -390,7 +390,7 @@ public class DatabaseClient implements Database {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
                 rootNode.put("collection", collection);
-                if(null!=filter) rootNode.put("filter", filter);
+                if(null!=filter) rootNode.set("filter", filter);
 
                 String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
@@ -426,7 +426,7 @@ public class DatabaseClient implements Database {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
                 rootNode.put("collection", collection);
-                if(null!=filter) rootNode.put("filter", filter);
+                if(null!=filter) rootNode.set("filter", filter);
 
                 String json = rootNode.toString();
                 Response response = ConnectionManager.getHiveVaultApi()
