@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -71,6 +72,35 @@ public class ScriptClient implements Scripting {
     public <T> CompletableFuture<T> call(String scriptName, JsonNode params, Class<T> clazz) {
         return authHelper.checkValid()
                 .thenCompose(result -> callImp(scriptName, params, clazz));
+    }
+
+    @Override
+    public CompletableFuture<Void> call(String data, JsonNode params) throws HiveException {
+        return authHelper.checkValid()
+                .thenCompose(result -> fileUploadImp(data, params));
+    }
+
+    private CompletableFuture<Void> fileUploadImp(String file, JsonNode params) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                Map map = new HashMap();
+                String json = JsonUtil.getJsonFromObject(map);
+                RequestBody requestFile =
+                        RequestBody.create(MediaType.parse("multipart/form-data"), file);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("data", file, requestFile);
+
+                RequestBody metadata =
+                        RequestBody.create(
+                                MediaType.parse("multipart/form-data"), json);
+
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .callScript(body, metadata)
+                        .execute();
+                authHelper.checkResponseCode(response);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private <T> CompletableFuture<T> callImp(String scriptName, JsonNode params, Class<T> clazz) {

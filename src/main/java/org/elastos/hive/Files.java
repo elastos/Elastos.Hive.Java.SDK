@@ -1,12 +1,10 @@
 package org.elastos.hive;
 
-import java.io.Reader;
-import java.io.Writer;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.file.FileInfo;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface Files {
     /**
