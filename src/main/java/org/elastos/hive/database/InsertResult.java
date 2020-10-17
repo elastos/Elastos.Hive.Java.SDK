@@ -1,21 +1,38 @@
 package org.elastos.hive.database;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class InsertResult extends Result {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class InsertResult extends Result<InsertResult> {
+	@JsonProperty("acknowledged")
+	private boolean acknowledged;
+	@JsonProperty("inserted_id")
+	@JsonInclude(Include.NON_NULL)
+	private String insertedId;
+	@JsonProperty("inserted_ids")
+	@JsonInclude(Include.NON_NULL)
+	private List<String> insertedIds;
+
+	@JsonCreator
+	protected InsertResult() {}
 
 	public boolean acknowledged() {
-		return (boolean) (get("acknowledged")==null?false:get("acknowledged"));
+		return acknowledged;
 	}
-	public List<String> insertedIds() {
 
-		List<String> ids = (List<String>) (get("inserted_ids")==null?null:get("inserted_ids"));
-		if(ids != null) {
-			return ids;
-		} else {
-			String id = (String) (get("inserted_id")==null?null:get("inserted_id"));
-			return Arrays.asList(id);
-		}
+	public String insertedId() {
+		return insertedId;
+	}
+
+	public List<String> insertedIds() {
+		return insertedIds;
+	}
+
+	public static InsertResult deserialize(String content) {
+		return deserialize(content, InsertResult.class);
 	}
 }

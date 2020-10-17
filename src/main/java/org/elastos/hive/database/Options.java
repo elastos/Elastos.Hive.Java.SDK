@@ -1,59 +1,40 @@
 package org.elastos.hive.database;
 
 import java.io.IOException;
-import java.util.HashMap;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public abstract class Options<T extends Options<T>> extends HashMap<String, Object> {
-	private static final long serialVersionUID = -735828709324637994L;
+public abstract class Options<T extends Options<T>> {
+	protected static ObjectMapper getObjectMapper() {
+		ObjectMapper mapper = new ObjectMapper();
 
-	@SuppressWarnings("unchecked")
-	protected T setStringOption(String name, String value) {
-		put(name, value);
-		return (T)this;
-	}
+		mapper.disable(MapperFeature.AUTO_DETECT_CREATORS,
+				MapperFeature.AUTO_DETECT_FIELDS,
+				MapperFeature.AUTO_DETECT_GETTERS,
+				MapperFeature.AUTO_DETECT_SETTERS,
+				MapperFeature.AUTO_DETECT_IS_GETTERS);
 
-	@SuppressWarnings("unchecked")
-	protected T setNumberOption(String name, int value) {
-		put(name, value);
-		return (T)this;
-	}
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.setSerializationInclusion(Include.NON_NULL);
 
-	@SuppressWarnings("unchecked")
-	protected T setNumberOption(String name, long value) {
-		put(name, value);
-		return (T)this;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected T setBooleanOption(String name, boolean value) {
-		put(name, value);
-		return (T)this;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected T setArrayOption(String name, Object[] value) {
-		put(name, value);
-		return (T)this;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected T setObjectOption(String name, JsonNode value) {
-		put(name, value);
-		return (T)this;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected T setObjectOption(String name, Object value) {
-		put(name, value);
-		return (T)this;
+		return mapper;
 	}
 
 	public String serialize() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
+         return getObjectMapper().writeValueAsString(this);
+	}
 
-        return mapper.writer().writeValueAsString(this);
+	protected static <T extends Options<?>> T deserialize(String content, Class<T> clazz) {
+		ObjectMapper mapper = getObjectMapper();
+
+		try {
+			T o = mapper.readValue(content, clazz);
+			return o;
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Invalid JSON input", e);
+		}
 	}
 }

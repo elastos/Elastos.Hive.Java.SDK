@@ -1,16 +1,22 @@
 package org.elastos.hive.database;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ObjectId {
+	@JsonProperty("$oid")
 	private String id;
 
-	public ObjectId(String id) {
+	@JsonCreator
+	public ObjectId(@JsonProperty(value = "$oid", required = true) String id) {
 		this.id = id;
 	}
 
-	@JsonGetter("$oid")
 	public String getId() {
 		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 }

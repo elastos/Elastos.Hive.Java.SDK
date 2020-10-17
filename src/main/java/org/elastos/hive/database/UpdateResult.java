@@ -1,19 +1,34 @@
 package org.elastos.hive.database;
 
-public class UpdateResult extends Result {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class UpdateResult extends Result<UpdateResult> {
+	@JsonProperty("matched_count")
+	private int matchedCount;
+	@JsonProperty("modified_count")
+	private int modifiedCount;
+	@JsonProperty("upserted_count")
+	private int upsertedCount;
+	@JsonProperty("upserted_id")
+	private String upsertedId;
+
 	public long matchedCount() {
-		return (int) (get("matched_count")==null?0:get("matched_count"));
+		return matchedCount;
 	}
 
 	public long modifiedCount() {
-		return (int) (get("modified_count")==null?0:get("modified_count"));
+		return modifiedCount;
 	}
 
 	public long upsertedCount() {
-		return (int) (get("upserted_count")==null?0:get("upserted_count"));
+		return upsertedCount;
 	}
 
 	public String upsertedId() {
-		return (String) (get("upserted_id")==null?null:get("upserted_id"));
+		return upsertedId;
+	}
+
+	public static UpdateResult deserialize(String content) {
+		return deserialize(content, UpdateResult.class);
 	}
 }

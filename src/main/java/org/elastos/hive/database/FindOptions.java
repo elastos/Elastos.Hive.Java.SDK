@@ -1,78 +1,262 @@
 package org.elastos.hive.database;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FindOptions extends Options<FindOptions> {
-	private static final long serialVersionUID = 953451857979555741L;
+	@JsonProperty("projection")
+	private Map<String, Object> projection;
+	@JsonProperty("skip")
+	private Long skip;
+	@JsonProperty("limit")
+	private Long limit;
+	@JsonProperty("no_cursor_timeout")
+	private Boolean noCursorTimeout;
+	@JsonProperty("sort")
+	@JsonFormat(with = {JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY,
+            JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
+	private List<Index> sort;
+	@JsonProperty("allow_partial_results")
+	private Boolean allowPartialResults;
+	@JsonProperty("batch_size")
+	private Integer batchSize;
+	@JsonProperty("collation")
+	private Collation collation;
+	@JsonProperty("return_key")
+	private Boolean returnKey;
+	@JsonProperty("hint")
+	@JsonFormat(with = {JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY,
+            JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
+	private List<Index> hint;
+	@JsonProperty("max_time_ms")
+	private Integer maxTimeMS;
+	@JsonProperty("min")
+	private Integer min;
+	@JsonProperty("max")
+	private Integer max;
+	@JsonProperty("comment")
+	private String comment;
+	@JsonProperty("allow_disk_use")
+	private Boolean allowDiskUse;
 
 	public FindOptions() {
 	}
 
-	public FindOptions projection(JsonNode value) {
-		return setObjectOption("projection", value);
+	public FindOptions projection(Map<String, Object> value) {
+		if (value == null || value.isEmpty())
+			projection = null;
+		else
+			projection = new HashMap<String, Object>(value);
+
+		return this;
+	}
+
+	public Map<String, Object> projection() {
+		return projection;
 	}
 
 	public FindOptions skip(long value) {
-		return setNumberOption("skip", value);
+		skip = value;
+		return this;
+	}
+
+	public Long skip() {
+		return skip;
 	}
 
 	public FindOptions limit(long value) {
-		return setNumberOption("limit", value);
+		limit = value;
+		return this;
+	}
+
+	public Long limit() {
+		return limit;
 	}
 
 	public FindOptions noCursorTimeout(boolean value) {
-		return setBooleanOption("no_cursor_timeout", value);
+		noCursorTimeout = value;
+		return this;
+	}
+
+	public Boolean noCursorTimeout() {
+		return noCursorTimeout;
 	}
 
 	public FindOptions sort(Index value) {
-		return setObjectOption("sort", value);
+		if (value == null) {
+			sort = null;
+		} else {
+			if (sort == null)
+				sort = new ArrayList<Index>();
+
+			sort.add(value);
+		}
+
+		return this;
+	}
+
+	public FindOptions sort(List<Index> value) {
+		if (value == null || value.isEmpty()) {
+			sort = null;
+		} else {
+			if (sort == null)
+				sort = new ArrayList<Index>();
+
+			sort.addAll(value);
+		}
+
+		return this;
 	}
 
 	public FindOptions sort(Index[] value) {
-		return setArrayOption("sort", value);
+		if (value == null || value.length == 0) {
+			sort = null;
+		} else {
+			if (sort == null)
+				sort = new ArrayList<Index>();
+
+			sort.addAll(Arrays.asList(value));
+		}
+
+		return this;
+	}
+
+	public List<Index> sort() {
+		return sort;
 	}
 
 	public FindOptions allowPartialResults(boolean value) {
-		return setBooleanOption("allow_partial_results", value);
+		allowPartialResults = value;
+		return this;
+	}
+
+	public Boolean allowPartialResults() {
+		return allowPartialResults;
 	}
 
 	public FindOptions batchSize(int value) {
-		return setNumberOption("batch_size", value);
+		batchSize = value;
+		return this;
+	}
+
+	public Integer batchSize() {
+		return batchSize;
 	}
 
 	public FindOptions collation(Collation value) {
-		return setObjectOption("collation", value);
+		collation = value;
+		return this;
+	}
+
+	public Collation collation() {
+		return collation;
 	}
 
 	public FindOptions returnKey(boolean value) {
-		return setBooleanOption("return_key", value);
+		returnKey = value;
+		return this;
+	}
+
+	public Boolean returnKey() {
+		return returnKey;
 	}
 
 	public FindOptions hint(Index value) {
-		return setObjectOption("hint", value);
+		if (value == null) {
+			hint = null;
+		} else {
+			if (hint == null)
+				hint = new ArrayList<Index>();
+
+			hint.add(value);
+		}
+
+		return this;
+	}
+
+	public FindOptions hint(List<Index> value) {
+		if (value == null || value.isEmpty()) {
+			hint = null;
+		} else {
+			if (hint == null)
+				hint = new ArrayList<Index>();
+
+			hint.addAll(value);
+		}
+
+		return this;
 	}
 
 	public FindOptions hint(Index[] value) {
-		return setArrayOption("hint", value);
+		if (value == null || value.length == 0) {
+			hint = null;
+		} else {
+			if (hint == null)
+				hint = new ArrayList<Index>();
+
+			hint.addAll(Arrays.asList(value));
+		}
+
+		return this;
 	}
 
+	public List<Index> hint() {
+		return hint;
+	}
+
+
 	public FindOptions maxTimeMS(int value) {
-		return setNumberOption("max_time_ms", value);
+		maxTimeMS =  value;
+		return this;
+	}
+
+	public Integer maxTimeMS() {
+		return maxTimeMS;
 	}
 
 	public FindOptions min(int value) {
-		return setNumberOption("min", value);
+		min = value;
+		return this;
+	}
+
+	public Integer min() {
+		return min;
 	}
 
 	public FindOptions max(int value) {
-		return setNumberOption("max", value);
+		max = value;
+		return this;
+	}
+
+	public Integer max() {
+		return max;
 	}
 
 	public FindOptions comment(String value) {
-		return setStringOption("comment", value);
+		comment = value;
+		return this;
+	}
+
+	public String comment() {
+		return comment;
 	}
 
 	public FindOptions allowDiskUse(boolean value) {
-		return setBooleanOption("allow_disk_use", value);
+		allowDiskUse = value;
+		return this;
+	}
+
+	public Boolean allowDiskUse() {
+		return allowDiskUse;
+	}
+
+	public static FindOptions deserialize(String content) {
+		return deserialize(content, FindOptions.class);
 	}
 }

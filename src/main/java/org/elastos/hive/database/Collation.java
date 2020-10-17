@@ -1,14 +1,41 @@
 package org.elastos.hive.database;
 
-public class Collation extends Options<Collation> {
-	private static final long serialVersionUID = -5447049098908294821L;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public class Collation {
+	@JsonProperty("locale")
+	private String locale;
+	@JsonProperty("caseLevel")
+	private Boolean caseLevel;
+	@JsonProperty("caseFirst")
+	private CaseFirst caseFirst;
+	@JsonProperty("strength")
+	private Strength strength;
+	@JsonProperty("numericOrdering")
+	private Boolean numericOrdering;
+	@JsonProperty("alternate")
+	private Alternate alternate;
+	@JsonProperty("maxVariable")
+	private MaxVariable maxVariable;
+	@JsonProperty("normalization")
+	private Boolean normalization;
+	@JsonProperty("backwards")
+	private Boolean backwards;
 
 	public enum CaseFirst {
 		UPPER, LOWER, OFF;
 
 		@Override
+		@JsonValue
 		public String toString() {
 			return name().toLowerCase();
+		}
+
+		@JsonCreator
+		public static CaseFirst fromString(String name) {
+			return valueOf(name.toUpperCase());
 		}
 	}
 
@@ -25,17 +52,48 @@ public class Collation extends Options<Collation> {
 			this.value = value;
 		}
 
+		@JsonValue
 		public int value() {
 			return value;
 		}
+
+		@JsonCreator
+		public static Strength fromInt(int i) {
+		    switch (i) {
+		    case 1:
+		    	return PRIMARY;
+
+		    case 2:
+		    	return SECONDARY;
+
+		    case 3:
+		    	return TERTIARY;
+
+		    case 4:
+		    	return QUATERNARY;
+
+		    case 5:
+		    	return IDENTICAL;
+
+		    default:
+		    	throw new IllegalArgumentException("Invalid strength");
+		    }
+		}
+
 	}
 
 	public enum Alternate {
 		NON_IGNORABLE, SHIFTED;
 
 		@Override
+		@JsonValue
 		public String toString() {
 			return name().toLowerCase();
+		}
+
+		@JsonCreator
+		public static Alternate fromString(String name) {
+			return valueOf(name.toUpperCase());
 		}
 	}
 
@@ -43,8 +101,14 @@ public class Collation extends Options<Collation> {
 		PUNCT, SPACE;
 
 		@Override
+		@JsonValue
 		public String toString() {
 			return name().toLowerCase();
+		}
+
+		@JsonCreator
+		public static MaxVariable fromString(String name) {
+			return valueOf(name.toUpperCase());
 		}
 	}
 
@@ -65,38 +129,83 @@ public class Collation extends Options<Collation> {
 	public Collation() {}
 
 	public Collation locale(String value) {
-		return setStringOption("locale", value);
+		locale = value;
+		return this;
+	}
+
+	public String getLocale() {
+		return locale;
 	}
 
 	public Collation caseLevel(boolean value) {
-		return setBooleanOption("caseLevel", value);
+		caseLevel = value;
+		return this;
+	}
+
+	public Boolean getCaseLevel() {
+		return caseLevel;
 	}
 
 	public Collation caseFirst(CaseFirst value) {
-		return setStringOption("caseFirst", value.toString());
+		caseFirst = value;
+		return this;
+	}
+
+	public CaseFirst getCaseFirst() {
+		return caseFirst;
 	}
 
 	public Collation strength(Strength value) {
-		return setNumberOption("strength", value.value());
+		strength = value;
+		return this;
+	}
+
+	public Strength Strength() {
+		return strength;
 	}
 
 	public Collation numericOrdering(boolean value) {
-		return setBooleanOption("numericOrdering", value);
+		numericOrdering = value;
+		return this;
+	}
+
+	public Boolean numericOrdering() {
+		return numericOrdering;
 	}
 
 	public Collation alternate(Alternate value) {
-		return setStringOption("alternate", value.toString());
+		alternate = value;
+		return this;
+	}
+
+	public Alternate alternate() {
+		return alternate;
 	}
 
 	public Collation maxVariable(MaxVariable value) {
-		return setStringOption("maxVariable", value.toString());
+		maxVariable = value;
+		return this;
+	}
+
+	public MaxVariable maxVariable() {
+		return maxVariable;
 	}
 
 	public Collation normalization(boolean value) {
-		return setBooleanOption("normalization", value);
+		normalization = value;
+		return this;
+	}
+
+	public Boolean normalization() {
+		return normalization;
 	}
 
 	public Collation backwards(boolean value) {
-		return setBooleanOption("backwards", value);
+		backwards = value;
+		return this;
+	}
+
+	public Boolean backwards() {
+		return backwards;
 	}
 }

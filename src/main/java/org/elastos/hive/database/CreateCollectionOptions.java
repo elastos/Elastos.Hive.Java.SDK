@@ -1,56 +1,90 @@
 package org.elastos.hive.database;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CreateCollectionOptions extends Options<CreateCollectionOptions> {
-	private static final long serialVersionUID = -2970142120056131337L;
+	@JsonProperty("write_concern")
+	private WriteConcern writeConcern;
+	@JsonProperty("read_concern")
+	private ReadConcern readConcern;
+	@JsonProperty("read_preference")
+	private ReadPreference readPreference;
+	@JsonProperty("capped")
+	private Boolean capped;
+	@JsonProperty("size")
+	private Long size;
+	@JsonProperty("max")
+	private Integer max;
+	@JsonProperty("collation")
+	private Collation collation;
 
 	public CreateCollectionOptions() {
 	}
 
 	public CreateCollectionOptions writeConcern(WriteConcern value) {
-		if (value != null)
-			setObjectOption("write_concern", value);
-		else
-			remove("write_concern");
-
+		writeConcern = value;
 		return this;
+	}
+
+	public WriteConcern writeConcern() {
+		return writeConcern;
 	}
 
 	public CreateCollectionOptions readConcern(ReadConcern value) {
-		if (value != null)
-			setStringOption("read_concern", value.toString());
-		else
-			remove("read_concern");
-
+		readConcern = value;
 		return this;
+	}
+
+	public ReadConcern readConcern() {
+		return readConcern;
 	}
 
 	public CreateCollectionOptions readPreference(ReadPreference value) {
-		if (value != null)
-			setStringOption("read_preference", value.toString());
-		else
-			remove("read_preference");
-
+		readPreference = value;
 		return this;
+	}
+
+	public ReadPreference readPreference() {
+		return readPreference;
 	}
 
 	public CreateCollectionOptions capped(boolean value) {
-		return setBooleanOption("capped", value);
+		capped = value;
+		return this;
+	}
+
+	public Boolean capped() {
+		return capped;
 	}
 
 	public CreateCollectionOptions size(long value) {
-		return setNumberOption("size", value);
+		size = value;
+		return this;
+	}
+
+	public Long size() {
+		return size;
 	}
 
 	public CreateCollectionOptions max(int value) {
-		return setNumberOption("max", value);
+		max = value;
+		return this;
+	}
+
+	public Integer max() {
+		return max;
 	}
 
 	public CreateCollectionOptions collation(Collation value) {
-		if (value != null)
-			setObjectOption("collation", value);
-		else
-			remove("collation");
-
+		collation = value;
 		return this;
+	}
+
+	public Collation collation() {
+		return collation;
+	}
+
+	public static CreateCollectionOptions deserialize(String content) {
+		return deserialize(content, CreateCollectionOptions.class);
 	}
 }

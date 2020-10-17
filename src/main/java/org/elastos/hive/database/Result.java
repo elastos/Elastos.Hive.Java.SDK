@@ -1,20 +1,38 @@
 package org.elastos.hive.database;
 
 import java.io.IOException;
-import java.util.Map;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public abstract class Result {
-	private Map<String, Object> result;
+public abstract class Result<T> {
+	protected static ObjectMapper getObjectMapper() {
+		ObjectMapper mapper = new ObjectMapper();
 
-	@SuppressWarnings("unchecked")
-	public void deserialize(String json) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        result = mapper.readValue(json, Map.class);
+		mapper.disable(MapperFeature.AUTO_DETECT_CREATORS,
+				MapperFeature.AUTO_DETECT_FIELDS,
+				MapperFeature.AUTO_DETECT_GETTERS,
+				MapperFeature.AUTO_DETECT_SETTERS,
+				MapperFeature.AUTO_DETECT_IS_GETTERS);
+
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+		return mapper;
 	}
 
-	protected Object get(String name) {
-		return result.get(name);
+	public String serialize() throws IOException {
+         return getObjectMapper().writeValueAsString(this);
+ 	}
+
+	protected static <T extends Result<?>> T deserialize(String content, Class<T> clazz) {
+		ObjectMapper mapper = getObjectMapper();
+
+		try {
+			T o = mapper.readValue(content, clazz);
+			return o;
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Invalid JSON input");
+		}
 	}
 }

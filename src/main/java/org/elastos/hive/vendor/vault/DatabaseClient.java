@@ -1,9 +1,10 @@
 package org.elastos.hive.vendor.vault;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.Callback;
 import org.elastos.hive.Database;
@@ -23,11 +24,10 @@ import org.elastos.hive.utils.ResponseHelper;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.vault.network.model.CountDocResponse;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -55,7 +55,7 @@ public class DatabaseClient implements Database {
     private CompletableFuture<Boolean> createColImp(String collection, CreateCollectionOptions options, Callback<Boolean> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap<>();
+                Map<String, Object> map = new HashMap<String, Object>();
                 map.put("collection", collection);
                 String json = JsonUtil.getJsonFromObject(map);
 
@@ -133,8 +133,7 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                InsertResult insertResult = new InsertResult();
-                insertResult.deserialize(ResponseHelper.toString(response));
+                InsertResult insertResult = InsertResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(insertResult);
                 return insertResult;
             } catch (Exception e) {
@@ -172,8 +171,7 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                InsertResult insertResult = new InsertResult();
-                insertResult.deserialize(ResponseHelper.toString(response));
+                InsertResult insertResult = InsertResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(insertResult);
                 return insertResult;
             } catch (Exception e) {
