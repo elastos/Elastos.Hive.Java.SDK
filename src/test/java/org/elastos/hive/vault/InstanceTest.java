@@ -17,7 +17,7 @@ public class InstanceTest {
     private static Client client;
 
     @Test
-    public void testGetVaultInstance1() {
+    public void testGetVaultInstance() {
         try {
             String json = TestData.DOC_STR;
             DIDDocument doc = DIDDocument
@@ -33,39 +33,11 @@ public class InstanceTest {
             Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
             client = Client.createInstance(options);
 
-            Vault vault = client.getVault("did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM").get();
+            Vault vault = client.getVault(TestData.OWNERDID).get();
             assertNotNull(vault);
             System.out.println("appId="+vault.getAppId());
             System.out.println("userDid="+vault.getUserDid());
             System.out.println("appInstanceDid="+vault.getAppInstanceDid());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testGetVaultInstance2() {
-        try {
-            String json = TestData.DOC_STR;
-            DIDDocument doc = DIDDocument
-                    .fromJson(json);
-
-            Client.Options options = new Client.Options();
-            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> TestData.ACCESS_TOKEN));
-            options.setAuthenticationDIDDocument(doc);
-            options.setDIDResolverUrl("http://api.elastos.io:21606");
-            options.setLocalDataPath(localDataPath);
-
-            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER1);
-            client = Client.createInstance(options);
-
-            Vault vault = client.getVault("did:elastos:ijUnD4KeRpeBUFmcEDCbhxMTJRzUYCQCZM").get();
-            assertNotNull(vault);
-            System.out.println("appId="+vault.getAppId());
-            System.out.println("userDid="+vault.getUserDid());
-            System.out.println("appInstanceDid="+vault.getAppInstanceDid());
-
         } catch (Exception e) {
             e.printStackTrace();
         }
