@@ -1,6 +1,8 @@
 package org.elastos.hive.vendor.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.elastos.hive.Scripting;
 import org.elastos.hive.exception.HiveException;
@@ -45,9 +47,9 @@ public class ScriptClient implements Scripting {
             try {
                 Map map = new HashMap<>();
                 map.put("name", name);
+                map.put("executable", executable);
                 if (accessCondition != null)
                     map.put("condition", accessCondition);
-                map.put("executable", executable);
 
                 String json = JsonUtil.getJsonFromObject(map);
 
@@ -64,14 +66,75 @@ public class ScriptClient implements Scripting {
     }
 
     @Override
-    public <T> CompletableFuture<T> call(String scriptName, Class<T> clazz) {
-        return this.call(scriptName, null, clazz);
+    public <T> CompletableFuture<T> call(String scriptName, Class<T> clazz) throws HiveException {
+        return authHelper.checkValid()
+                .thenCompose(result -> callImp(scriptName, null, clazz));
     }
 
     @Override
     public <T> CompletableFuture<T> call(String scriptName, JsonNode params, Class<T> clazz) {
         return authHelper.checkValid()
                 .thenCompose(result -> callImp(scriptName, params, clazz));
+    }
+
+    private <T> CompletableFuture<T> callImp(String scriptName, JsonNode params, Class<T> clazz) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Map map = new HashMap<>();
+                map.put("name", scriptName);
+                if (params != null)
+                    map.put("params", params);
+
+                String json = JsonUtil.getJsonFromObject(map);
+
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                        .execute();
+                authHelper.checkResponseCode(response);
+                return ResponseHelper.getValue(response, clazz);
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                throw new CompletionException(exception);
+            }
+        });
+    }
+
+    @Override
+    public <T> CompletableFuture<T> call(String scriptName, String appDid, Class<T> resultType) throws HiveException {
+        return this.call(scriptName, null, appDid, resultType);
+    }
+
+    @Override
+    public <T> CompletableFuture<T> call(String scriptName, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
+        return authHelper.checkValid()
+                .thenCompose(result -> callImpWithContext(scriptName, params, appDid, resultType));
+    }
+
+    private <T> CompletableFuture<T> callImpWithContext(String scriptName, JsonNode params, String appDid, Class<T> clazz) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Map map = new HashMap<>();
+                map.put("name", scriptName);
+                if (params != null)
+                    map.put("params", params);
+
+                ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
+                targetNode.put("target_did", this.authHelper.getOwnerDid());
+                targetNode.put("target_app_did", appDid);
+                map.put("context", targetNode);
+
+                String json = JsonUtil.getJsonFromObject(map);
+
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                        .execute();
+                authHelper.checkResponseCode(response);
+                return ResponseHelper.getValue(response, clazz);
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                throw new CompletionException(exception);
+            }
+        });
     }
 
     @Override
@@ -102,27 +165,4 @@ public class ScriptClient implements Scripting {
             }
         });
     }
-
-    private <T> CompletableFuture<T> callImp(String scriptName, JsonNode params, Class<T> clazz) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                Map map = new HashMap<>();
-                map.put("name", scriptName);
-                if (params != null)
-                    map.put("params", params);
-
-                String json = JsonUtil.getJsonFromObject(map);
-
-                Response response = ConnectionManager.getHiveVaultApi()
-                        .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-                        .execute();
-                authHelper.checkResponseCode(response);
-                return ResponseHelper.getValue(response, clazz);
-            } catch (Exception e) {
-                HiveException exception = new HiveException(e.getLocalizedMessage());
-                throw new CompletionException(exception);
-            }
-        });
-    }
-
 }

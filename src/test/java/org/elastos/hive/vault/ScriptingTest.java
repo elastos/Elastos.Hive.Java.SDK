@@ -24,7 +24,9 @@ import org.elastos.hive.scripting.QueryHasResultsCondition;
 import org.elastos.hive.scripting.RawCondition;
 import org.elastos.hive.scripting.RawExecutable;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.io.File;
 import java.io.Reader;
@@ -32,14 +34,21 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertTrue;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ScriptingTest {
     private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
+
+    private String noConditionName = "get_groups";
+    private String withConditionName = "get_group_messages";
 
     private static Scripting scripting;
     private static Client client;
 
+    private static Scripting scriptingOther;
+    private static Client clientOther;
+
 	@Test
-	public void testCondition() throws Exception {
+	public void test01_condition() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         String json = "{\"name\":\"mkyong\", \"age\":37, \"c\":[\"adc\",\"zfy\",\"aaa\"], \"d\": {\"foo\": 1, \"bar\": 2}}";
 
@@ -67,7 +76,7 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void testExecutable() throws Exception {
+	public void test02_executable() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         String json = "{\"name\":\"mkyong\", \"age\":37, \"c\":[\"adc\",\"zfy\",\"aaa\"], \"d\": {\"foo\": 1, \"bar\": 2}}";
 
@@ -90,10 +99,10 @@ public class ScriptingTest {
 	}
 
 	@Test
-    public void registerScriptNoCondition() {
+    public void test03_registerNoCondition() {
         try {
-            String json = "{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"*caller_did\":\"friends\"}}}";
-            boolean success = scripting.registerScript("script_no_condition", new RawExecutable(json)).get();
+            String executable = "{\"type\":\"find\",\"name\":\"get_groups\",\"output\":true,\"body\":{\"collection\":\"groups\",\"filter\":{\"friends\":\"$caller_did\"},\"options\":{\"projection\":{\"_id\":false,\"name\":true}}}}";
+            boolean success = scripting.registerScript(noConditionName, new RawExecutable(executable)).get();
             assertTrue(success);
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,20 +110,22 @@ public class ScriptingTest {
     }
 
     @Test
-    public void registerScriptWithCondition() {
+    public void test04_registerWithCondition() {
         try {
-            String json = "{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"*caller_did\":\"friends\"}}}";
-            boolean success = scripting.registerScript("script_condition", null, new RawExecutable(json)).get();
+            String executable = "{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"friends\":\"$caller_did\"}}}";
+            String condition = "{\"type\":\"queryHasResults\",\"name\":\"verify_user_permission\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"_id\":\"$params.group_id\",\"friends\":\"$caller_did\"}}}";
+            boolean success = scripting.registerScript(withConditionName, new RawCondition(condition), new RawExecutable(executable)).get();
             assertTrue(success);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+
     @Test
-    public void callScriptNoParams() {
+    public void test05_callStringType() {
         try {
-            String ret = scripting.call("script_no_condition", String.class).get();
+            String ret = scripting.call(noConditionName, String.class).get();
             System.out.println("return="+ret);
         } catch (Exception e) {
             e.printStackTrace();
@@ -122,9 +133,9 @@ public class ScriptingTest {
     }
 
     @Test
-    public void callScriptStringType() {
+    public void test06_callByteArrType() {
         try {
-            String ret = scripting.call("script_no_condition", String.class).get();
+            byte[] ret = scripting.call(noConditionName, byte[].class).get();
             System.out.println("return="+ret);
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,9 +143,9 @@ public class ScriptingTest {
     }
 
     @Test
-    public void callScriptByteArrType() {
+    public void test07_callJsonNodeType() {
         try {
-            byte[] ret = scripting.call("script_no_condition", byte[].class).get();
+            JsonNode ret = scripting.call(noConditionName, JsonNode.class).get();
             System.out.println("return="+ret);
         } catch (Exception e) {
             e.printStackTrace();
@@ -142,9 +153,9 @@ public class ScriptingTest {
     }
 
     @Test
-    public void callScriptJsonNodeType() {
+    public void test08_callReaderType() {
         try {
-            JsonNode ret = scripting.call("script_no_condition", JsonNode.class).get();
+            Reader ret = scripting.call(noConditionName, Reader.class).get();
             System.out.println("return="+ret);
         } catch (Exception e) {
             e.printStackTrace();
@@ -152,46 +163,68 @@ public class ScriptingTest {
     }
 
     @Test
-    public void callScriptReaderType() {
-        try {
-            Reader ret = scripting.call("script_no_condition", Reader.class).get();
-            System.out.println("return="+ret);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void callScriptWithParams() {
+    public void test09_callWithParams() {
         try {
             String param = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"}}";
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode update = objectMapper.readTree(param);
+            JsonNode params = objectMapper.readTree(param);
 
-            String ret = scripting.call("script_condition", update, String.class).get();
+            String ret = scripting.call(withConditionName, params, String.class).get();
             System.out.println("return="+ret);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void test10_callOtherScript() {
+        try {
+            String ret = scripting.call(noConditionName,"appid", String.class).get();
+            System.out.println("return="+ret);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+//    @BeforeClass
+//    public static void setUp() {
+//        try {
+//            String json = TestData.DOC_STR;
+//            DIDDocument doc = DIDDocument
+//                    .fromJson(json);
+//
+//            Client.Options options = new Client.Options();
+//            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
+//                    -> TestData.ACCESS_TOKEN));
+//            options.setAuthenticationDIDDocument(doc);
+//            options.setDIDResolverUrl("http://api.elastos.io:21606");
+//            options.setLocalDataPath(localDataPath);
+//
+//            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
+//            client = Client.createInstance(options);
+//            scripting = client.getVault(TestData.OWNERDID).get().getScripting();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @BeforeClass
     public static void setUp() {
         try {
-            String json = TestData.DOC_STR;
+            String json = TestData.DOC_STR1;
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> TestData.ACCESS_TOKEN));
+                    -> TestData.ACCESS_TOKEN1));
             options.setAuthenticationDIDDocument(doc);
             options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);
 
-            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
+            Client.setVaultProvider(TestData.OWNERDID1, TestData.PROVIDER1);
             client = Client.createInstance(options);
-            scripting = client.getVault(TestData.OWNERDID).get().getScripting();
+            scripting = client.getVault(TestData.OWNERDID1).get().getScripting();
         } catch (Exception e) {
             e.printStackTrace();
         }

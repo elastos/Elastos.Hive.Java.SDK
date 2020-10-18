@@ -30,6 +30,9 @@ public interface Scripting {
     <T> CompletableFuture<T> call(String scriptName, Class<T> resultType) throws HiveException;
     <T> CompletableFuture<T> call(String scriptName, JsonNode params, Class<T> resultType) throws HiveException;
 
+    <T> CompletableFuture<T> call(String scriptName, String appDid, Class<T> resultType) throws HiveException;
+    <T> CompletableFuture<T> call(String scriptName, JsonNode params, String appDid, Class<T> resultType) throws HiveException;
+
     /**
      * Run a script to upload a file.
      * The upload works a bit differently compared to other types of executable queries because you will need to pass the json data

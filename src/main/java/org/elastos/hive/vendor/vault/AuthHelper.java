@@ -273,9 +273,9 @@ public class AuthHelper implements ConnectHelper {
         if (null == access_token) return;
         Claims claims = JwtUtil.getBody(access_token);
         long exp = claims.getExpiration().getTime();
-        this.userDid = (String) claims.get("userDid");
-        this.appId = (String) claims.get("appId");
-        this.appInstanceDid = (String) claims.get("appInstanceDid");
+        setUserDid((String) claims.get("userDid"));
+        setAppId((String) claims.get("appId"));
+        setAppInstanceDid((String) claims.get("appInstanceDid"));
 
         long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
 
@@ -395,8 +395,12 @@ public class AuthHelper implements ConnectHelper {
                 baseServiceConfig);
     }
 
+    public String getOwnerDid() {
+        return this.ownerDid;
+    }
+
     public String getUserDid() {
-        return userDid;
+        return this.userDid;
     }
 
     public void setUserDid(String userDid) {
@@ -404,7 +408,7 @@ public class AuthHelper implements ConnectHelper {
     }
 
     public String getAppId() {
-        return appId;
+        return this.appId;
     }
 
     public void setAppId(String appId) {
@@ -412,7 +416,7 @@ public class AuthHelper implements ConnectHelper {
     }
 
     public String getAppInstanceDid() {
-        return appInstanceDid;
+        return this.appInstanceDid;
     }
 
     public void setAppInstanceDid(String appInstanceDid) {
