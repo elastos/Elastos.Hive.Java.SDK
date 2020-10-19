@@ -38,23 +38,13 @@ import java.util.concurrent.CompletableFuture;
 public class Client {
 
 	private static Options opts;
-
-	private static Map<DID, Vault> vaultCache;
 	private static Map<String , String> providerCache = new HashMap<>();
 
 	public Client(Options options) {
 		this.opts = options;
-//		this.vaultCache = LRUCache.createInstance(16, 32);
 	}
 
 	public static class Options {
-
-//		private String did;
-//		private String clientId;
-//		private String clientSecret;
-//		private String redirectURL;
-//		private String nodeUrl;
-//		private Authenticator authenticator;
 
 		private boolean enableCloudSync;
 
@@ -71,48 +61,6 @@ public class Client {
 
 		private String DIDResolverUrl;
 		private String localPath;
-
-//		public void setDid(String did) {
-//			this.did = did;
-//		}
-//
-//		public String getDid() {return this.did;}
-//
-//		public void setClientId(String clientId) {
-//			this.clientId = clientId;
-//		}
-//
-//		public String clientId() {return this.clientId;}
-//
-//		public void setClientSecret(String clientSecret) {
-//			this.clientSecret = clientSecret;
-//		}
-//
-//		public String clientSecret() {
-//			return this.clientSecret;
-//		}
-//
-//		public void setRedirectURL(String redirectURL) {
-//			this.redirectURL = redirectURL;
-//		}
-//
-//		public String redirectURL() {return this.redirectURL;}
-//
-//		public void setNodeUrl(String url) {
-//			this.nodeUrl = url;
-//		}
-//
-//		public String nodeUrl() {
-//			return nodeUrl;
-//		}
-
-		public void setEnableCloudSync(boolean enable) {
-			this.enableCloudSync = enable;
-		}
-
-		public boolean enableCloudSync() {
-			return this.enableCloudSync;
-		}
 
 		public Options setAuthenticationDIDDocument(DIDDocument document) {
 			this.authenticationDIDDocument = document;
@@ -168,9 +116,6 @@ public class Client {
 			}
 
 			return vault;
-
-//			VaultAuthHelper authHelper = new VaultAuthHelper(vaultProvider, opts.localPath, opts.authentcationHandler);
-//			return new Vault(authHelper, vaultProvider, ownerDid);
 		});
 	}
 

@@ -20,24 +20,39 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.exception;
+package org.elastos.hive;
 
-public class NotImplementedException extends HiveException {
-    private static final long serialVersionUID = -3106736642975911944L;
+public class AuthToken {
+    private final String refreshToken;
+    private final String accessToken;
+    private final long expiresTime;
+    private final String tokenType;
 
-    public NotImplementedException() {
-        super();
+    public AuthToken(String refreshToken, String accessToken, long expiresTime, String tokenType) {
+        this.refreshToken = refreshToken;
+        this.accessToken = accessToken;
+        this.expiresTime = expiresTime;
+        this.tokenType = tokenType;
     }
 
-    public NotImplementedException(String message) {
-        super(message);
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
-    public NotImplementedException(String message, Throwable cause) {
-        super(message, cause);
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public NotImplementedException(Throwable cause) {
-        super(cause);
+    public long getExpiredTime() {
+        return expiresTime;
+    }
+
+    public boolean isExpired() {
+        long currentSeconds = System.currentTimeMillis() / 1000;
+        return currentSeconds >= expiresTime;
+    }
+
+    public String getTokenType() {
+        return tokenType;
     }
 }

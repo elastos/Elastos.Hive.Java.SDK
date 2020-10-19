@@ -8,27 +8,20 @@ import org.elastos.hive.ConnectHelper;
 import org.elastos.hive.NullCallback;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.oauth.AuthServer;
-import org.elastos.hive.oauth.AuthToken;
-import org.elastos.hive.oauth.Authenticator;
-import org.elastos.hive.utils.DateUtil;
+import org.elastos.hive.AuthToken;
 import org.elastos.hive.utils.JwtUtil;
-import org.elastos.hive.utils.UrlUtil;
 import org.elastos.hive.vendor.AuthInfoStoreImpl;
 import org.elastos.hive.vendor.connection.ConnectionManager;
 import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
 import org.elastos.hive.vendor.connection.model.HeaderConfig;
 import org.elastos.hive.vendor.vault.network.model.AuthResponse;
 import org.elastos.hive.vendor.vault.network.model.SignResponse;
-import org.elastos.hive.vendor.vault.network.model.TokenResponse;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import okhttp3.MediaType;
@@ -37,7 +30,6 @@ import retrofit2.Response;
 
 public class AuthHelper implements ConnectHelper {
 
-    private static final String CLIENT_ID_KEY = "client_id";
     private static final String ACCESS_TOKEN_KEY = "access_token";
     private static final String REFRESH_TOKEN_KEY = "refresh_token";
     private static final String EXPIRES_AT_KEY = "expires_at";
@@ -46,11 +38,6 @@ public class AuthHelper implements ConnectHelper {
     private static final String USER_DID_KEY = "user_did";
     private static final String APP_ID_KEY = "app_id";
     private static final String APP_INSTANCE_DID_KEY = "app_instance_did";
-
-    private String redirectUrl;
-    private String clientId;
-    private String scope;
-    private String clientSecret;
 
     private String ownerDid;
     private String userDid;
@@ -61,8 +48,6 @@ public class AuthHelper implements ConnectHelper {
 
     private AuthToken token;
     private AtomicBoolean connectState = new AtomicBoolean(false);
-    private AtomicBoolean syncState = new AtomicBoolean(false);
-    private String accessToken;
     private Persistent persistent;
 
     private DIDDocument authenticationDIDDocument;
@@ -79,24 +64,6 @@ public class AuthHelper implements ConnectHelper {
         try {
             BaseServiceConfig config = new BaseServiceConfig.Builder().build();
             ConnectionManager.resetHiveVaultApi(this.nodeUrl, config);
-            ConnectionManager.resetAuthApi(Constance.TOKEN_URI, config);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public AuthHelper(String ownerDid, String nodeUrl, String storePath, String clientId, String clientSecret, String redirectUrl, String scope) {
-        this.nodeUrl = nodeUrl;
-        this.clientId = clientId;
-        this.redirectUrl = redirectUrl;
-        this.scope = scope;
-        this.clientSecret = clientSecret;
-
-        this.persistent = new AuthInfoStoreImpl(ownerDid, nodeUrl, storePath);
-
-        try {
-            BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-            ConnectionManager.resetHiveVaultApi(nodeUrl, config);
             ConnectionManager.resetAuthApi(Constance.TOKEN_URI, config);
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,42 +113,6 @@ public class AuthHelper implements ConnectHelper {
         connectState.set(true);
     }
 
-
-    private void redeemToken() throws Exception {
-        String refreshToken = "";
-        if (token != null)
-            refreshToken = token.getRefreshToken();
-        Response response = ConnectionManager.getVaultAuthApi()
-                .refreshToken(clientId, clientSecret,
-                        refreshToken, Constance.GRANT_TYPE_REFRESH_TOKEN)
-                .execute();
-        handleTokenResponse(response);
-    }
-
-    private void cloudAccess(Authenticator authenticator) throws Exception {
-        connectState.set(false);
-        tryRestoreToken();
-
-        if (token == null) {
-            nodeAuth("");
-            String authCode = accessAuthCode(authenticator);
-            accessToken(authCode);
-            connectState.set(true);
-            return;
-        }
-
-        long current = System.currentTimeMillis() / 1000;
-        //Check the expire time
-        if (token.getExpiredTime() > current) {
-            initConnection();
-            connectState.set(true);
-            return;
-        }
-
-        redeemToken();
-        connectState.set(true);
-    }
-
     private void signIn() throws Exception {
         Map map = new HashMap<>();
         JSONObject docJsonObject = new JSONObject(authenticationDIDDocument.toString());
@@ -216,9 +147,6 @@ public class AuthHelper implements ConnectHelper {
         try {
             Claims claims = JwtUtil.getBody(jwtToken);
             long exp = claims.getExpiration().getTime();
-//            String subject = claims.getSubject();
-//            String iss = claims.getIssuer();
-//            String nonce = (String) claims.get("nonce");
             String aud = claims.getAudience();
 
             String did = authenticationDIDDocument.getSubject().toString();
@@ -235,32 +163,6 @@ public class AuthHelper implements ConnectHelper {
         }
 
         return true;
-    }
-
-
-    private void accessToken(String authCode) throws Exception {
-        String formatCode = authCode.replace("%2F", "/");
-        Response response = ConnectionManager.getVaultAuthApi()
-                .getToken(formatCode, clientId, clientSecret,
-                        redirectUrl, Constance.GRANT_TYPE_GET_TOKEN)
-                .execute();
-        handleTokenResponse(response);
-        syncGoogleDrive(response);
-    }
-
-    private void handleTokenResponse(Response response) {
-        TokenResponse tokenResponse = (TokenResponse) response.body();
-        long expiresTime = System.currentTimeMillis() / 1000 + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
-
-        token = new AuthToken(tokenResponse != null ? tokenResponse.getRefresh_token() : "",
-                accessToken,
-                expiresTime, tokenResponse != null ? tokenResponse.getToken_type() : "");
-
-        //Store the local data.
-        writebackToken();
-
-        //init connection
-        initConnection();
     }
 
     private void handleAuthResponse(Response response) throws Exception {
@@ -291,52 +193,6 @@ public class AuthHelper implements ConnectHelper {
 
     }
 
-    private String accessAuthCode(Authenticator authenticator) throws Exception {
-        Semaphore semph = new Semaphore(1);
-
-        String[] hostAndPort = UrlUtil.decodeHostAndPort(redirectUrl, Constance.DEFAULT_REDIRECT_URL, String.valueOf(Constance.DEFAULT_REDIRECT_PORT));
-
-        String host = hostAndPort[0];
-        int port = Integer.valueOf(hostAndPort[1]);
-
-        AuthServer server = new AuthServer(semph, host, port);
-        server.start();
-
-        String url = String.format("%s?client_id=%s&scope=%s&response_type=code&redirect_uri=%s",
-                Constance.AUTH_URI,
-                this.clientId,
-                this.scope,
-                this.redirectUrl)
-                .replace(" ", "%20");
-
-        authenticator.requestAuthentication(url);
-        semph.acquire();
-
-        String authCode = server.getAuthCode();
-        server.stop();
-
-        semph.release();
-        connectState.set(true);
-        return authCode;
-    }
-
-    private void syncGoogleDrive(Response response) throws IOException {
-        TokenResponse tokenResponse = (TokenResponse) response.body();
-        long expiresTime = System.currentTimeMillis() + (tokenResponse != null ? tokenResponse.getExpires_in() : 0);
-        Map map = new HashMap<>();
-        map.put("token", tokenResponse.getAccess_token());
-        map.put("refresh_token", tokenResponse.getRefresh_token());
-        map.put("token_uri", Constance.TOKEN_URI);
-        map.put("client_id", clientId);
-        map.put("client_secret", clientSecret);
-        map.put("scopes", Constance.SCOPES);
-        map.put("expiry", DateUtil.getCurrentEpochTimeStamp(expiresTime));
-
-        String json = new JSONObject(map).toString();
-        ConnectionManager.getHiveVaultApi()
-                .googleDrive(getJsonRequestBoy(json))
-                .execute();
-    }
 
     private void tryRestoreToken() throws HiveException {
         JSONObject json = persistent.parseFrom();
@@ -369,7 +225,6 @@ public class AuthHelper implements ConnectHelper {
 
         try {
             JSONObject json = new JSONObject();
-            json.put(CLIENT_ID_KEY, clientId);
             json.put(REFRESH_TOKEN_KEY, token.getRefreshToken());
             json.put(ACCESS_TOKEN_KEY, token.getAccessToken());
             json.put(EXPIRES_AT_KEY, token.getExpiredTime());
@@ -421,18 +276,6 @@ public class AuthHelper implements ConnectHelper {
 
     public void setAppInstanceDid(String appInstanceDid) {
         this.appInstanceDid = appInstanceDid;
-    }
-
-    boolean getConnectState() {
-        return connectState.get();
-    }
-
-    void dissConnect() {
-        connectState.set(false);
-    }
-
-    boolean getSyncState() {
-        return syncState.get();
     }
 
     private RequestBody getJsonRequestBoy(String json) {

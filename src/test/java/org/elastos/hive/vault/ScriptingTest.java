@@ -44,9 +44,6 @@ public class ScriptingTest {
     private static Scripting scripting;
     private static Client client;
 
-    private static Scripting scriptingOther;
-    private static Client clientOther;
-
 	@Test
 	public void test01_condition() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
@@ -186,47 +183,47 @@ public class ScriptingTest {
         }
     }
 
-//    @BeforeClass
-//    public static void setUp() {
-//        try {
-//            String json = TestData.DOC_STR;
-//            DIDDocument doc = DIDDocument
-//                    .fromJson(json);
-//
-//            Client.Options options = new Client.Options();
-//            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-//                    -> TestData.ACCESS_TOKEN));
-//            options.setAuthenticationDIDDocument(doc);
-//            options.setDIDResolverUrl("http://api.elastos.io:21606");
-//            options.setLocalDataPath(localDataPath);
-//
-//            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
-//            client = Client.createInstance(options);
-//            scripting = client.getVault(TestData.OWNERDID).get().getScripting();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     @BeforeClass
     public static void setUp() {
         try {
-            String json = TestData.DOC_STR1;
+            String json = TestData.DOC_STR;
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> TestData.ACCESS_TOKEN1));
+                    -> TestData.ACCESS_TOKEN));
             options.setAuthenticationDIDDocument(doc);
             options.setDIDResolverUrl("http://api.elastos.io:21606");
             options.setLocalDataPath(localDataPath);
 
-            Client.setVaultProvider(TestData.OWNERDID1, TestData.PROVIDER1);
+            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
             client = Client.createInstance(options);
-            scripting = client.getVault(TestData.OWNERDID1).get().getScripting();
+            scripting = client.getVault(TestData.OWNERDID).get().getScripting();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+//    @BeforeClass
+//    public static void setUp() {
+//        try {
+//            String json = TestData.DOC_STR1;
+//            DIDDocument doc = DIDDocument
+//                    .fromJson(json);
+//
+//            Client.Options options = new Client.Options();
+//            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
+//                    -> TestData.ACCESS_TOKEN1));
+//            options.setAuthenticationDIDDocument(doc);
+//            options.setDIDResolverUrl("http://api.elastos.io:21606");
+//            options.setLocalDataPath(localDataPath);
+//
+//            Client.setVaultProvider(TestData.OWNERDID1, TestData.PROVIDER1);
+//            client = Client.createInstance(options);
+//            scripting = client.getVault(TestData.OWNERDID1).get().getScripting();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
