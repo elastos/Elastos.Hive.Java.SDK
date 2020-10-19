@@ -1,4 +1,4 @@
-package org.elastos.hive.vendor.vault;
+package org.elastos.hive.vault;
 
 public class Constance {
 

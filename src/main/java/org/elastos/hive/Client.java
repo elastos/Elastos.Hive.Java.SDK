@@ -27,8 +27,8 @@ import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDURL;
 import org.elastos.did.backend.ResolverCache;
-import org.elastos.hive.vendor.vault.AuthHelper;
-import org.elastos.hive.vendor.vault.Constance;
+import org.elastos.hive.vault.AuthHelper;
+import org.elastos.hive.vault.Constance;
 
 import java.util.HashMap;
 import java.util.List;

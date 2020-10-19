@@ -1,4 +1,4 @@
-package org.elastos.hive.vendor.vault;
+package org.elastos.hive.vault;
 
 import org.elastos.did.DIDDocument;
 import org.elastos.did.jwt.Claims;
@@ -10,12 +10,12 @@ import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.utils.JwtUtil;
-import org.elastos.hive.vendor.AuthInfoStoreImpl;
-import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
-import org.elastos.hive.vendor.connection.model.HeaderConfig;
-import org.elastos.hive.vendor.vault.network.model.AuthResponse;
-import org.elastos.hive.vendor.vault.network.model.SignResponse;
+import org.elastos.hive.AuthInfoStoreImpl;
+import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.connection.model.BaseServiceConfig;
+import org.elastos.hive.connection.model.HeaderConfig;
+import org.elastos.hive.vault.network.model.AuthResponse;
+import org.elastos.hive.vault.network.model.SignResponse;
 import org.json.JSONObject;
 
 import java.util.HashMap;

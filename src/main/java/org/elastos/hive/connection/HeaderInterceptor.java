@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor.connection;
+package org.elastos.hive.connection;
 
-import org.elastos.hive.vendor.connection.model.HeaderConfig;
+import org.elastos.hive.connection.model.HeaderConfig;
 
 import java.io.IOException;
 

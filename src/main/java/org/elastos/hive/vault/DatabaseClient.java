@@ -1,4 +1,4 @@
-package org.elastos.hive.vendor.vault;
+package org.elastos.hive.vault;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,8 +22,8 @@ import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
-import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.elastos.hive.vendor.vault.network.model.CountDocResponse;
+import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.vault.network.model.CountDocResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

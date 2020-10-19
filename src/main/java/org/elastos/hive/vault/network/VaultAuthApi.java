@@ -1,7 +1,7 @@
-package org.elastos.hive.vendor.vault.network;
+package org.elastos.hive.vault.network;
 
 
-import org.elastos.hive.vendor.vault.network.model.TokenResponse;
+import org.elastos.hive.vault.network.model.TokenResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Field;

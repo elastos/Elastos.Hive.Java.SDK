@@ -1,13 +1,13 @@
-package org.elastos.hive.vendor.vault.network;
+package org.elastos.hive.vault.network;
 
 
 import org.elastos.hive.file.FileInfo;
-import org.elastos.hive.vendor.vault.Constance;
-import org.elastos.hive.vendor.vault.network.model.AuthResponse;
-import org.elastos.hive.vendor.vault.network.model.CountDocResponse;
-import org.elastos.hive.vendor.vault.network.model.FilesResponse;
-import org.elastos.hive.vendor.vault.network.model.HashResponse;
-import org.elastos.hive.vendor.vault.network.model.SignResponse;
+import org.elastos.hive.vault.Constance;
+import org.elastos.hive.vault.network.model.AuthResponse;
+import org.elastos.hive.vault.network.model.CountDocResponse;
+import org.elastos.hive.vault.network.model.FilesResponse;
+import org.elastos.hive.vault.network.model.HashResponse;
+import org.elastos.hive.vault.network.model.SignResponse;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;

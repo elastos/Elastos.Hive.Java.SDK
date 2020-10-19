@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor;
+package org.elastos.hive;
 
 import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;

@@ -1,4 +1,4 @@
-package org.elastos.hive.vendor.vault;
+package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -10,7 +10,7 @@ import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
-import org.elastos.hive.vendor.connection.ConnectionManager;
+import org.elastos.hive.connection.ConnectionManager;
 
 import java.util.HashMap;
 import java.util.Map;

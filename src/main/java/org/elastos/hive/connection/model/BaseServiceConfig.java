@@ -20,15 +20,33 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor.vault.network;
+package org.elastos.hive.connection.model;
 
-class ConnectConstance {
-    static final String TOKEN = "token";
+public class BaseServiceConfig {
+    private final HeaderConfig headerConfig;
 
-    static final String CODE = "code";
-    static final String CLIENT_ID = "client_id";
-    static final String CLIENT_SCERET = "client_secret";
-    static final String REDIRECT_URI = "redirect_uri";
-    static final String REFRESH_TOKEN = "refresh_token";
-    static final String GRANT_TYPE = "grant_type";
+    private BaseServiceConfig(Builder builder) {
+        this.headerConfig = builder.headerConfig;
+    }
+
+    public HeaderConfig getHeaderConfig() {
+        return headerConfig;
+    }
+
+    public static final class Builder {
+        HeaderConfig headerConfig;
+
+        public Builder() {
+            this.headerConfig = null;
+        }
+
+        public Builder headerConfig(HeaderConfig headerConfig) {
+            this.headerConfig = headerConfig;
+            return this;
+        }
+
+        public BaseServiceConfig build() {
+            return new BaseServiceConfig(this);
+        }
+    }
 }

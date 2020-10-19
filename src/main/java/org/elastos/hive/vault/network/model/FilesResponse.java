@@ -1,4 +1,4 @@
-package org.elastos.hive.vendor.vault.network.model;
+package org.elastos.hive.vault.network.model;
 
 import org.elastos.hive.file.FileInfo;
 

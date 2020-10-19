@@ -20,33 +20,51 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor.connection.model;
+package org.elastos.hive.connection.model;
 
-public class BaseServiceConfig {
-    private final HeaderConfig headerConfig;
+import org.elastos.hive.AuthToken;
 
-    private BaseServiceConfig(Builder builder) {
-        this.headerConfig = builder.headerConfig;
+public class HeaderConfig {
+    private final AuthToken authToken;
+    private final String contentType;
+    private final String acceptEncoding;
+
+    private HeaderConfig(Builder builder) {
+        this.authToken = builder.authToken;
+        this.contentType = builder.contentType;
+        this.acceptEncoding = builder.acceptEncoding;
     }
 
-    public HeaderConfig getHeaderConfig() {
-        return headerConfig;
+    public AuthToken getAuthToken() {
+        return authToken;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public String getAcceptEncoding() {
+        return acceptEncoding;
     }
 
     public static final class Builder {
-        HeaderConfig headerConfig;
+        AuthToken authToken;
+        String contentType;
+        String acceptEncoding;
 
         public Builder() {
-            this.headerConfig = null;
+            this.authToken = null;
+            this.contentType = null;
+            this.acceptEncoding = null;
         }
 
-        public Builder headerConfig(HeaderConfig headerConfig) {
-            this.headerConfig = headerConfig;
+        public Builder authToken(AuthToken authToken) {
+            this.authToken = authToken;
             return this;
         }
 
-        public BaseServiceConfig build() {
-            return new BaseServiceConfig(this);
+        public HeaderConfig build() {
+            return new HeaderConfig(this);
         }
     }
 }

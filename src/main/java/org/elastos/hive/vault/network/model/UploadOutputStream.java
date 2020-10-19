@@ -1,11 +1,8 @@
-package org.elastos.hive.vendor.vault.network.model;
+package org.elastos.hive.vault.network.model;
 
 import org.elastos.hive.utils.ResponseHelper;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 

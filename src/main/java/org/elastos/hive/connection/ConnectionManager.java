@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor.connection;
+package org.elastos.hive.connection;
 
-import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
-import org.elastos.hive.vendor.vault.Constance;
-import org.elastos.hive.vendor.vault.network.NodeApi;
-import org.elastos.hive.vendor.vault.network.VaultAuthApi;
+import org.elastos.hive.connection.model.BaseServiceConfig;
+import org.elastos.hive.vault.Constance;
+import org.elastos.hive.vault.network.NodeApi;
+import org.elastos.hive.vault.network.VaultAuthApi;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

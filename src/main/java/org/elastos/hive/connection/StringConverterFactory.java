@@ -20,51 +20,33 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor.connection.model;
+package org.elastos.hive.connection;
 
-import org.elastos.hive.AuthToken;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
-public class HeaderConfig {
-    private final AuthToken authToken;
-    private final String contentType;
-    private final String acceptEncoding;
+import okhttp3.ResponseBody;
+import retrofit2.Converter;
+import retrofit2.Retrofit;
 
-    private HeaderConfig(Builder builder) {
-        this.authToken = builder.authToken;
-        this.contentType = builder.contentType;
-        this.acceptEncoding = builder.acceptEncoding;
+public class StringConverterFactory extends Converter.Factory {
+    static StringConverterFactory create() {
+        return new StringConverterFactory();
     }
 
-    public AuthToken getAuthToken() {
-        return authToken;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public String getAcceptEncoding() {
-        return acceptEncoding;
-    }
-
-    public static final class Builder {
-        AuthToken authToken;
-        String contentType;
-        String acceptEncoding;
-
-        public Builder() {
-            this.authToken = null;
-            this.contentType = null;
-            this.acceptEncoding = null;
+    @Override
+    public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
+        if (type == String.class) {
+            return new StringConverter();
         }
+        return super.responseBodyConverter(type, annotations, retrofit);
+    }
 
-        public Builder authToken(AuthToken authToken) {
-            this.authToken = authToken;
-            return this;
-        }
-
-        public HeaderConfig build() {
-            return new HeaderConfig(this);
+    class StringConverter implements Converter<ResponseBody, String> {
+        @Override
+        public String convert(ResponseBody value) throws IOException {
+            return value.string();
         }
     }
 }

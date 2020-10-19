@@ -20,10 +20,10 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor.connection;
+package org.elastos.hive.connection;
 
 import org.elastos.hive.utils.LogUtil;
-import org.elastos.hive.vendor.connection.model.BaseServiceConfig;
+import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;

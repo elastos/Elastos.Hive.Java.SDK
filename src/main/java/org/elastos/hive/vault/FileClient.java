@@ -1,4 +1,4 @@
-package org.elastos.hive.vendor.vault;
+package org.elastos.hive.vault;
 
 import org.elastos.hive.Callback;
 import org.elastos.hive.Files;
@@ -7,11 +7,11 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.file.FileInfo;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
-import org.elastos.hive.vendor.connection.ConnectionManager;
-import org.elastos.hive.vendor.vault.network.NodeApi;
-import org.elastos.hive.vendor.vault.network.model.FilesResponse;
-import org.elastos.hive.vendor.vault.network.model.HashResponse;
-import org.elastos.hive.vendor.vault.network.model.UploadOutputStream;
+import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.vault.network.NodeApi;
+import org.elastos.hive.vault.network.model.FilesResponse;
+import org.elastos.hive.vault.network.model.HashResponse;
+import org.elastos.hive.vault.network.model.UploadOutputStream;
 
 import java.io.InputStream;
 import java.io.OutputStream;

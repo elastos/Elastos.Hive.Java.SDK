@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.elastos.hive.vendor.connection;
+package org.elastos.hive.connection;
 
 import org.elastos.hive.utils.LogUtil;
 
