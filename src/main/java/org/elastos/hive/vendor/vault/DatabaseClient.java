@@ -56,7 +56,7 @@ public class DatabaseClient implements Database {
     private CompletableFuture<Boolean> createColImp(String collection, CreateCollectionOptions options, Callback<Boolean> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("collection", collection);
                 String json = JsonUtil.getJsonFromObject(map);
 
@@ -318,13 +318,12 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                UpdateResult updateResult = new UpdateResult();
                 String ret = ResponseHelper.toString(response);
                 if(ret.contains("_error")) {
                     HiveException exception = new HiveException(ret);
                     throw exception;
                 }
-                updateResult.deserialize(ret);
+                UpdateResult updateResult = UpdateResult.deserialize(ret);
                 callback.onSuccess(updateResult);
                 return updateResult;
             } catch (Exception e) {
@@ -361,8 +360,7 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                UpdateResult updateResult = new UpdateResult();
-                updateResult.deserialize(ResponseHelper.toString(response));
+                UpdateResult updateResult = UpdateResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(updateResult);
                 return updateResult;
             } catch (Exception e) {
@@ -397,8 +395,7 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                DeleteResult deleteResult = new DeleteResult();
-                deleteResult.deserialize(ResponseHelper.toString(response));
+                DeleteResult deleteResult = DeleteResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(deleteResult);
                 return deleteResult;
             } catch (Exception e) {
@@ -433,8 +430,7 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                DeleteResult deleteResult = new DeleteResult();
-                deleteResult.deserialize(ResponseHelper.toString(response));
+                DeleteResult deleteResult = DeleteResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(deleteResult);
                 return deleteResult;
             } catch (Exception e) {
