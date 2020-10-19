@@ -30,7 +30,25 @@ public interface Scripting {
     <T> CompletableFuture<T> call(String scriptName, Class<T> resultType) throws HiveException;
     <T> CompletableFuture<T> call(String scriptName, JsonNode params, Class<T> resultType) throws HiveException;
 
+    /**
+     * Executes a previously registered server side script using Scripting.setScript(). Vault owner or external users are
+     * allowed to call scripts on someone's vault.
+     * @param scriptName the call's script name
+     * @param appDid app did is an optional parameter
+     * @param resultType String, byte[], JsonNode, Reader
+     * @throws HiveException
+     */
     <T> CompletableFuture<T> call(String scriptName, String appDid, Class<T> resultType) throws HiveException;
+
+    /**
+     * Executes a previously registered server side script using Scripting.setScript(). Vault owner or external users are
+     * allowed to call scripts on someone's vault.
+     * @param scriptName the call's script name
+     * @param params Call parameters (params field) are meant to be used by scripts on the server side
+     * @param appDid app did is an optional parameter,
+     * @param resultType String, byte[], JsonNode, Reader
+     * @throws HiveException
+     */
     <T> CompletableFuture<T> call(String scriptName, JsonNode params, String appDid, Class<T> resultType) throws HiveException;
 
     /**

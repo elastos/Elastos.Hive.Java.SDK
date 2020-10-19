@@ -120,7 +120,7 @@ public class ScriptClient implements Scripting {
 
                 ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
                 targetNode.put("target_did", this.authHelper.getOwnerDid());
-                targetNode.put("target_app_did", appDid);
+                if(null!=appDid) targetNode.put("target_app_did", appDid);
                 map.put("context", targetNode);
 
                 String json = JsonUtil.getJsonFromObject(map);
