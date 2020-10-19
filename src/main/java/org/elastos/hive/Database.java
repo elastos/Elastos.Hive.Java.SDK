@@ -8,8 +8,9 @@ import org.elastos.hive.database.CreateCollectionOptions;
 import org.elastos.hive.database.DeleteOptions;
 import org.elastos.hive.database.DeleteResult;
 import org.elastos.hive.database.FindOptions;
+import org.elastos.hive.database.InsertManyResult;
+import org.elastos.hive.database.InsertOneResult;
 import org.elastos.hive.database.InsertOptions;
-import org.elastos.hive.database.InsertResult;
 import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.exception.HiveException;
@@ -61,10 +62,10 @@ public interface Database {
      *            the document does not have an _id field one will be added automatically
      * @param options bypass_document_validation: (optional) If True, allows
      *                the write to opt-out of document level validation. Default is False.{@link InsertOptions}
-     * @return Results returned by InsertResult{@link InsertResult} wrapper
+     * @return Results returned by InsertOneResult{@link InsertOneResult} wrapper
      * @throws HiveException
      */
-    CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options) throws HiveException;
+    CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options) throws HiveException;
 
     /**
      * Insert a new document in a given collection
@@ -74,10 +75,10 @@ public interface Database {
      * @param options bypass_document_validation: (optional) If True, allows
      *                the write to opt-out of document level validation. Default is False.{@link InsertOptions}
      * @param callback the given Callback will be called once the operation completes {@link Callback}
-     * @return Results returned by InsertResult{@link InsertResult} wrapper
+     * @return Results returned by InsertOneResult{@link InsertOneResult} wrapper
      * @throws HiveException
      */
-    CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options, Callback<InsertResult> callback) throws HiveException;
+    CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options, Callback<InsertOneResult> callback) throws HiveException;
 
     /**
      * Insert many new documents in a given collection
@@ -88,10 +89,10 @@ public interface Database {
      *                in the order provided. If an error occurs all remaining inserts are aborted. If False, documents
      *                will be inserted on the server in arbitrary order, possibly in parallel, and all document inserts will be attempted.
      *                bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.{@link InsertOptions}
-     * @return Results returned by InsertResult{@link InsertResult} wrapper
+     * @return Results returned by InsertManyResult{@link InsertManyResult} wrapper
      * @throws HiveException
      */
-    CompletableFuture<InsertResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options) throws HiveException;
+    CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options) throws HiveException;
 
     /**
      * Insert many new documents in a given collection
@@ -103,10 +104,10 @@ public interface Database {
      *                will be inserted on the server in arbitrary order, possibly in parallel, and all document inserts will be attempted.
      *                bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.{@link InsertOptions}
      * @param callback the given Callback will be called once the operation completes {@link Callback}
-     * @return Results returned by InsertResult{@link InsertResult} wrapper
+     * @return Results returned by InsertManyResult{@link InsertManyResult} wrapper
      * @throws HiveException
      */
-    CompletableFuture<InsertResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertResult> callback) throws HiveException;
+    CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertManyResult> callback) throws HiveException;
 
     /**
      * Count documents

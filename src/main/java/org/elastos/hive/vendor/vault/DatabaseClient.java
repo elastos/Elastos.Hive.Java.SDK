@@ -14,8 +14,9 @@ import org.elastos.hive.database.CreateCollectionOptions;
 import org.elastos.hive.database.DeleteOptions;
 import org.elastos.hive.database.DeleteResult;
 import org.elastos.hive.database.FindOptions;
+import org.elastos.hive.database.InsertManyResult;
+import org.elastos.hive.database.InsertOneResult;
 import org.elastos.hive.database.InsertOptions;
-import org.elastos.hive.database.InsertResult;
 import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.exception.HiveException;
@@ -109,17 +110,17 @@ public class DatabaseClient implements Database {
     }
 
     @Override
-    public CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options) {
+    public CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options) {
         return insertOne(collection, doc, options, null);
     }
 
     @Override
-    public CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options, Callback<InsertResult> callback) {
+    public CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options, Callback<InsertOneResult> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> insertOneImp(collection, doc, options, getCallback(callback)));
     }
 
-    private CompletableFuture<InsertResult> insertOneImp(String collection, JsonNode doc, InsertOptions options, Callback<InsertResult> callback) {
+    private CompletableFuture<InsertOneResult> insertOneImp(String collection, JsonNode doc, InsertOptions options, Callback<InsertOneResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -133,7 +134,7 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                InsertResult insertResult = InsertResult.deserialize(ResponseHelper.toString(response));
+                InsertOneResult insertResult = InsertOneResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(insertResult);
                 return insertResult;
             } catch (Exception e) {
@@ -145,17 +146,17 @@ public class DatabaseClient implements Database {
     }
 
     @Override
-    public CompletableFuture<InsertResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options) {
+    public CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options) {
         return insertMany(collection, docs, options, null);
     }
 
     @Override
-    public CompletableFuture<InsertResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertResult> callback) {
+    public CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertManyResult> callback) {
         return authHelper.checkValid()
                 .thenCompose(result -> insertManyImp(collection, docs, options, getCallback(callback)));
     }
 
-    private CompletableFuture<InsertResult> insertManyImp(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertResult> callback) {
+    private CompletableFuture<InsertManyResult> insertManyImp(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertManyResult> callback) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -171,7 +172,7 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                InsertResult insertResult = InsertResult.deserialize(ResponseHelper.toString(response));
+                InsertManyResult insertResult = InsertManyResult.deserialize(ResponseHelper.toString(response));
                 callback.onSuccess(insertResult);
                 return insertResult;
             } catch (Exception e) {

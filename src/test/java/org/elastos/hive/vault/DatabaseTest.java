@@ -1,11 +1,18 @@
 package org.elastos.hive.vault;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.elastos.did.DIDDocument;
 import org.elastos.hive.Callback;
@@ -23,8 +30,9 @@ import org.elastos.hive.database.DeleteOptions;
 import org.elastos.hive.database.DeleteResult;
 import org.elastos.hive.database.FindOptions;
 import org.elastos.hive.database.Index;
+import org.elastos.hive.database.InsertManyResult;
+import org.elastos.hive.database.InsertOneResult;
 import org.elastos.hive.database.InsertOptions;
-import org.elastos.hive.database.InsertResult;
 import org.elastos.hive.database.MaxKey;
 import org.elastos.hive.database.MinKey;
 import org.elastos.hive.database.ObjectId;
@@ -41,21 +49,12 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Logger;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DatabaseTest {
@@ -195,30 +194,26 @@ public class DatabaseTest {
         assertEquals(1000, ds.deletedCount());
 
         json = "{\"acknowledged\":true,\"inserted_id\":\"test_inserted_id\"}";
-        InsertResult ir = InsertResult.deserialize(json);
-        assertTrue(ir.acknowledged());
-        assertEquals("test_inserted_id", ir.insertedId());
-        assertNull(ir.insertedIds());
-        json = ir.serialize();
-        ir = InsertResult.deserialize(json);
-        assertTrue(ir.acknowledged());
-        assertEquals("test_inserted_id", ir.insertedId());
-        assertNull(ir.insertedIds());
+        InsertOneResult ior = InsertOneResult.deserialize(json);
+        assertTrue(ior.acknowledged());
+        assertEquals("test_inserted_id", ior.insertedId());
+        json = ior.serialize();
+        ior = InsertOneResult.deserialize(json);
+        assertTrue(ior.acknowledged());
+        assertEquals("test_inserted_id", ior.insertedId());
 
         json = "{\"acknowledged\":false,\"inserted_ids\":[\"test_inserted_id1\",\"test_inserted_id2\"]}";
-        ir = InsertResult.deserialize(json);
-        assertFalse(ir.acknowledged());
-        List<String> ids = ir.insertedIds();
+        InsertManyResult imr = InsertManyResult.deserialize(json);
+        assertFalse(imr.acknowledged());
+        List<String> ids = imr.insertedIds();
         assertNotNull(ids);
         assertEquals(2, ids.size());
-        assertNull(ir.insertedId());
-        json = ir.serialize();
-        ir = InsertResult.deserialize(json);
-        assertFalse(ir.acknowledged());
-        ids = ir.insertedIds();
+        json = imr.serialize();
+        imr = InsertManyResult.deserialize(json);
+        assertFalse(imr.acknowledged());
+        ids = imr.insertedIds();
         assertNotNull(ids);
         assertEquals(2, ids.size());
-        assertNull(ir.insertedId());
 
         json = "{\"matched_count\":10,\"modified_count\":5,\"upserted_count\":3,\"upserted_id\":\"test_id\"}";
         UpdateResult ur = UpdateResult.deserialize(json);
@@ -296,7 +291,7 @@ public class DatabaseTest {
             InsertOptions insertOptions = new InsertOptions();
             insertOptions.bypassDocumentValidation(false).ordered(true);
 
-            InsertResult result = database.insertOne(collectionName, docNode, insertOptions).get();
+            InsertOneResult result = database.insertOne(collectionName, docNode, insertOptions).get();
             assertNotNull(result);
             System.out.println("acknowledged=" + result.acknowledged());
             String id = result.insertedId();
@@ -322,7 +317,7 @@ public class DatabaseTest {
             InsertOptions insertOptions = new InsertOptions();
             insertOptions.bypassDocumentValidation(false).ordered(true);
 
-            InsertResult result = database.insertMany(collectionName, nodes, insertOptions).get();
+            InsertManyResult result = database.insertMany(collectionName, nodes, insertOptions).get();
             assertNotNull(result);
             System.out.println("acknowledged=" + result.acknowledged());
             List<String> ids = result.insertedIds();
@@ -511,14 +506,14 @@ public class DatabaseTest {
             InsertOptions insertOptions = new InsertOptions();
             insertOptions.bypassDocumentValidation(false).ordered(true);
 
-            database.insertOne(collectionName, docNode, insertOptions, new Callback<InsertResult>() {
+            database.insertOne(collectionName, docNode, insertOptions, new Callback<InsertOneResult>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
                 }
 
                 @Override
-                public void onSuccess(InsertResult result) {
+                public void onSuccess(InsertOneResult result) {
                     System.out.println("acknowledged=" + result.acknowledged());
                     String id = result.insertedId();
                     assertNotNull(id);
@@ -541,14 +536,14 @@ public class DatabaseTest {
             InsertOptions insertOptions = new InsertOptions();
             insertOptions.bypassDocumentValidation(false).ordered(true);
 
-            database.insertMany(collectionName, nodes, insertOptions, new Callback<InsertResult>() {
+            database.insertMany(collectionName, nodes, insertOptions, new Callback<InsertManyResult>() {
                 @Override
                 public void onError(HiveException e) {
                     fail();
                 }
 
                 @Override
-                public void onSuccess(InsertResult result) {
+                public void onSuccess(InsertManyResult result) {
                     assertNotNull(result);
                     System.out.println("acknowledged=" + result.acknowledged());
                     List<String> ids = result.insertedIds();

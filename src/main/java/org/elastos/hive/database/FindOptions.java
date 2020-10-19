@@ -8,6 +8,9 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class FindOptions extends Options<FindOptions> {
 	@JsonProperty("projection")
@@ -55,6 +58,14 @@ public class FindOptions extends Options<FindOptions> {
 			projection = new HashMap<String, Object>(value);
 
 		return this;
+	}
+
+	public FindOptions projection(JsonNode value) {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> p = mapper.convertValue(value,
+        		new TypeReference<Map<String, Object>>() {});
+
+        return projection(p);
 	}
 
 	public Map<String, Object> projection() {
