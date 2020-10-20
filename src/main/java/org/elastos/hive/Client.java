@@ -117,13 +117,10 @@ public class Client {
 	}
 
 	public CompletableFuture<Vault> getVault(String ownerDid) {
-		return CompletableFuture.supplyAsync(() -> {
-			String vaultProvider = null;
-			try {
-				vaultProvider = getVaultProvider(ownerDid).get();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		if (ownerDid == null)
+			throw new IllegalArgumentException("Empty ownerDid");
+
+		return getVaultProvider(ownerDid).thenApply((vaultProvider)-> {
 			Vault vault = null;
 			if(vaultProvider != null) {
 				AuthHelper authHelper = new AuthHelper(ownerDid, vaultProvider, opts.localPath, opts.authenticationDIDDocument, opts.authentcationHandler);
