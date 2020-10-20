@@ -30,7 +30,6 @@ import java.util.concurrent.CompletableFuture;
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
-import org.elastos.did.DIDURL;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.vault.AuthHelper;
@@ -46,7 +45,6 @@ public class Client {
 	}
 
 	public static class Options {
-
 		private boolean enableCloudSync;
 
 		private AuthenticationHandler authentcationHandler;
@@ -150,21 +148,25 @@ public class Client {
 	 * @param ownerDid the owner did for the vault
 	 * @return the vault address in String
 	 */
-	public static CompletableFuture<String> getVaultProvider(String ownerDid) {
+	public CompletableFuture<String> getVaultProvider(String ownerDid) {
 		return CompletableFuture.supplyAsync(() -> {
 			String vaultProvider = null;
 			try {
+				List<DIDDocument.Service> services = null;
 				DID did = new DID(ownerDid);
-				DIDDocument doc = did.resolve();
-				List<DIDDocument.Service> services = (doc==null)?null:doc.selectServices((DIDURL) null, "HiveVault");
-				if(services!=null && services.size()>0) {
+				DIDDocument doc;
+
+				doc = did.resolve();
+				if (doc != null)
+					services = doc.selectServices((String)null, "HiveVault");
+
+				if (services != null && services.size() > 0) {
 					vaultProvider = services.get(0).getServiceEndpoint();
 					providerCache.put(ownerDid, vaultProvider);
-				} else {
-					vaultProvider = (providerCache.get(ownerDid))==null? null:providerCache.get(ownerDid);
-				}
+				} else
+					vaultProvider = providerCache.get(ownerDid);
 			} catch (Exception e) {
-				e.printStackTrace();
+				e.printStackTrace(); // TODO:
 			}
 			return vaultProvider;
 		});
