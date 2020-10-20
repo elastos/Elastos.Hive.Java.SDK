@@ -5,13 +5,16 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.elastos.hive.Scripting;
+import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
-import org.elastos.hive.connection.ConnectionManager;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -120,7 +123,7 @@ public class ScriptClient implements Scripting {
 
                 ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
                 targetNode.put("target_did", this.authHelper.getOwnerDid());
-                if(null!=appDid) targetNode.put("target_app_did", appDid);
+                if (null != appDid) targetNode.put("target_app_did", appDid);
                 map.put("context", targetNode);
 
                 String json = JsonUtil.getJsonFromObject(map);
@@ -138,30 +141,74 @@ public class ScriptClient implements Scripting {
     }
 
     @Override
-    public CompletableFuture<Void> call(String data, JsonNode params) throws HiveException {
+    public <T> CompletableFuture<T> call(String name, JsonNode params, Type type, Class<T> resultType) throws HiveException {
         return authHelper.checkValid()
-                .thenCompose(result -> fileUploadImp(data, params));
+                .thenCompose(result -> {
+                    if (type == Type.UPLOAD) {
+                        return fileUploadImp(name, params, resultType);
+                    } else if (type == Type.DOWNLOAD) {
+                        return fileDownloadImp(name, params, resultType);
+                    } else if (type == Type.PROPERTIES) {
+                        return callImp(name, params, resultType);
+                    }
+                    return null;
+                });
     }
 
-    private CompletableFuture<Void> fileUploadImp(String file, JsonNode params) {
-        return CompletableFuture.runAsync(() -> {
+    private <T> CompletableFuture<T> fileUploadImp(String filePath, JsonNode params, Class<T> resultType) {
+        return CompletableFuture.supplyAsync(() -> {
             try {
-                Map map = new HashMap();
-                String json = JsonUtil.getJsonFromObject(map);
+                String json = params.toString();
+                File file = new File(filePath);
                 RequestBody requestFile =
                         RequestBody.create(MediaType.parse("multipart/form-data"), file);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("data", file, requestFile);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("data", file.getName(), requestFile);
 
                 RequestBody metadata =
                         RequestBody.create(
-                                MediaType.parse("multipart/form-data"), json);
+                                MediaType.parse("application/json"), json);
 
                 Response response = ConnectionManager.getHiveVaultApi()
                         .callScript(body, metadata)
                         .execute();
                 authHelper.checkResponseCode(response);
+                return (T) ResponseHelper.toString(response);
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    private <T> CompletableFuture<T> fileDownloadImp(String scriptName, JsonNode params, Class<T> resultType) {
+
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Map map = new HashMap<>();
+                map.put("name", scriptName);
+                if (params != null)
+                    map.put("params", params);
+
+                String json = JsonUtil.getJsonFromObject(map);
+
+                Response response = ConnectionManager.getHiveVaultApi()
+                        .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+                        .execute();
+
+                if (response == null)
+                    throw new HiveException(HiveException.ERROR);
+
+                authHelper.checkResponseCode(response);
+                if (resultType.isAssignableFrom(Reader.class)) {
+                    Reader reader = ResponseHelper.getToReader(response);
+                    return (T) reader;
+                } else {
+                    InputStream inputStream = ResponseHelper.getInputStream(response);
+                    return (T) inputStream;
+                }
+            } catch (Exception e) {
+                HiveException exception = new HiveException(e.getLocalizedMessage());
+                throw new CompletionException(exception);
             }
         });
     }
