@@ -22,22 +22,23 @@
 
 package org.elastos.hive;
 
-import org.elastos.did.DID;
-import org.elastos.did.DIDBackend;
-import org.elastos.did.DIDDocument;
-import org.elastos.did.DIDURL;
-import org.elastos.did.backend.ResolverCache;
-import org.elastos.hive.vault.AuthHelper;
-import org.elastos.hive.vault.Constance;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.did.DID;
+import org.elastos.did.DIDBackend;
+import org.elastos.did.DIDDocument;
+import org.elastos.did.DIDURL;
+import org.elastos.did.backend.ResolverCache;
+import org.elastos.did.exception.DIDException;
+import org.elastos.hive.vault.AuthHelper;
+import org.elastos.hive.vault.Constance;
+
 public class Client {
 
-	private static Options opts;
+	private Options opts;
 	private static Map<String , String> providerCache = new HashMap<>();
 
 	public Client(Options options) {
@@ -97,6 +98,22 @@ public class Client {
 	}
 
 	public static Client createInstance(Options options) {
+		String resolver;
+
+		if (options == null)
+			throw new IllegalArgumentException();
+
+		if (options.DIDResolverUrl == null)
+			resolver = Constance.MAIN_NET_RESOLVER;
+		else
+			resolver = options.DIDResolverUrl;
+
+		try {
+			DIDBackend.initialize(resolver, options.localPath);
+			ResolverCache.reset();
+		} catch (DIDException e) {
+			e.printStackTrace(); // TODO:
+		}
 
 		return new Client(options);
 	}
@@ -137,8 +154,6 @@ public class Client {
 		return CompletableFuture.supplyAsync(() -> {
 			String vaultProvider = null;
 			try {
-				DIDBackend.initialize(opts.DIDResolverUrl==null? Constance.MAIN_NET_RESOLVER : opts.DIDResolverUrl, opts.localPath);
-				ResolverCache.reset();
 				DID did = new DID(ownerDid);
 				DIDDocument doc = did.resolve();
 				List<DIDDocument.Service> services = (doc==null)?null:doc.selectServices((DIDURL) null, "HiveVault");
