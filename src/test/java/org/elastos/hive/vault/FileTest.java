@@ -11,13 +11,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -113,7 +108,7 @@ public class FileTest {
     public void testUploadBin() {
         try {
             OutputStream outputStream = filesApi.upload(remoteBigBin, OutputStream.class).get();
-            byte[] bigStream = readImage(testBigImagePath);
+            byte[] bigStream = Utils.readImage(testBigImagePath);
             outputStream.write(bigStream);
             outputStream.close();
             System.out.println("write success");
@@ -126,7 +121,7 @@ public class FileTest {
     public void testDownloadFileWNoCallback() {
         try {
             Reader reader = filesApi.download(remoteText, Reader.class).get();
-            cacheTextFile(reader, testCacheTextFilePath);
+            Utils.cacheTextFile(reader, testCacheTextFilePath);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -143,7 +138,7 @@ public class FileTest {
 
                 @Override
                 public void onSuccess(Reader result) {
-                    cacheTextFile(result, testCacheTextFilePath);
+                    Utils.cacheTextFile(result, testCacheTextFilePath);
                 }
             }).get();
         } catch (Exception e) {
@@ -155,7 +150,7 @@ public class FileTest {
     public void testDownloadBin() {
         try {
             InputStream inputStream = filesApi.download(remoteBigBin, InputStream.class).get();
-            cacheBinFile(inputStream, testCacheBigImagePath);
+            Utils.cacheBinFile(inputStream, testCacheBigImagePath);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -326,75 +321,6 @@ public class FileTest {
             filesApi = client.getVault(TestData.OWNERDID).get().getFiles();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private byte[] readImage(String path) {
-        try {
-            InputStream inputStream = null;
-            try {
-                inputStream = new FileInputStream(path);
-                byte[] buffer = new byte[inputStream.available()];
-                inputStream.read(buffer);
-
-                return buffer;
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private void cacheTextFile(Reader reader, String storePath) {
-        FileWriter fileWriter = null;
-        try {
-            fileWriter = new FileWriter(new File(storePath));
-            char[] buffer = new char[1];
-            while (reader.read(buffer) != -1) {
-                fileWriter.write(buffer);
-            }
-            fileWriter.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                fileWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void cacheBinFile(InputStream inputStream, String storePath) {
-        ByteArrayOutputStream outStream = null;
-        try {
-            outStream = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int len = 0;
-            while( (len=inputStream.read(buffer)) != -1 ) {
-                outStream.write(buffer, 0, len);
-            }
-
-            byte[] data = outStream.toByteArray();
-            File imageFile = new File(storePath);
-            FileOutputStream fileOutStream = new FileOutputStream(imageFile);
-            fileOutStream .write(data);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                outStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 }
