@@ -88,22 +88,7 @@ public class AuthHelper implements ConnectHelper {
 		});
 	}
 
-	@Override
-	public void connect() {
-		try {
-			connectState.set(false);
-			tryRestoreToken();
-			if (token == null || token.isExpired()) {
-				signIn();
-			}
-			initConnection();
-			connectState.set(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void doCheckExpired() throws Exception {
+	private void doCheckExpired() throws HiveException {
 		connectState.set(false);
 		tryRestoreToken();
 		if (token == null || token.isExpired()) {
@@ -113,23 +98,27 @@ public class AuthHelper implements ConnectHelper {
 		connectState.set(true);
 	}
 
-	private void signIn() throws Exception {
+	private void signIn() throws HiveException {
 		Map map = new HashMap<>();
 		JSONObject docJsonObject = new JSONObject(authenticationDIDDocument.toString());
 		map.put("document", docJsonObject);
 
-		String json = new JSONObject(map).toString();
-		Response response = ConnectionManager.getHiveVaultApi()
-				.signIn(getJsonRequestBoy(json))
-				.execute();
-		SignResponse signResponse = (SignResponse) response.body();
-		if (null == signResponse) {
-			throw new HiveException("Sign in challenge failed");
-		}
-		String jwtToken = signResponse.getChallenge();
-		if (null != this.authenticationHandler && verifyToken(jwtToken)) {
-			String approveJwtToken = this.authenticationHandler.authenticationChallenge(jwtToken).get();
-			nodeAuth(approveJwtToken);
+		try {
+			String json = new JSONObject(map).toString();
+			Response response = ConnectionManager.getHiveVaultApi()
+					.signIn(getJsonRequestBoy(json))
+					.execute();
+			SignResponse signResponse = (SignResponse) response.body();
+			if (null == signResponse) {
+				throw new HiveException("Sign in challenge failed");
+			}
+			String jwtToken = signResponse.getChallenge();
+			if (null != this.authenticationHandler && verifyToken(jwtToken)) {
+				String approveJwtToken = this.authenticationHandler.authenticationChallenge(jwtToken).get();
+				nodeAuth(approveJwtToken);
+			}
+		} catch (Exception e) {
+			throw new HiveException(e.getMessage());
 		}
 	}
 
@@ -289,7 +278,7 @@ public class AuthHelper implements ConnectHelper {
 		int code = response.code();
 		if (code >= 300 || code<200) {
 			if(code==401) {
-				connect();
+				doCheckExpired();
 			} else {
 				String message  = response.message();
 				throw new HiveException(message);
