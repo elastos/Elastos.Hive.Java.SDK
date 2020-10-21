@@ -32,11 +32,11 @@ import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.vault.AuthHelper;
 import org.elastos.hive.vault.Constance;
 
 public class Client {
-
 	private Options opts;
 	private static Map<String , String> providerCache = new HashMap<>();
 
@@ -46,20 +46,19 @@ public class Client {
 
 	public static class Options {
 		private boolean enableCloudSync;
+		private String didResolverUrl;
+		private String localPath;
 
 		private AuthenticationHandler authentcationHandler;
 		private DIDDocument authenticationDIDDocument;
 
 		public String didResolverUrl() {
-			return DIDResolverUrl;
+			return didResolverUrl;
 		}
 
-		public void setDIDResolverUrl(String DIDResolverUrl) {
-			this.DIDResolverUrl = DIDResolverUrl;
+		public void setDIDResolverUrl(String didResolverUrl) {
+			this.didResolverUrl = didResolverUrl;
 		}
-
-		private String DIDResolverUrl;
-		private String localPath;
 
 		public Options setAuthenticationDIDDocument(DIDDocument document) {
 			this.authenticationDIDDocument = document;
@@ -95,22 +94,23 @@ public class Client {
 
 	}
 
-	public static Client createInstance(Options options) {
+	public static Client createInstance(Options options) throws HiveException {
 		String resolver;
 
 		if (options == null)
 			throw new IllegalArgumentException();
 
-		if (options.DIDResolverUrl == null)
+		if (options.didResolverUrl() == null)
 			resolver = Constance.MAIN_NET_RESOLVER;
 		else
-			resolver = options.DIDResolverUrl;
+			resolver = options.didResolverUrl();
 
 		try {
 			DIDBackend.initialize(resolver, options.localPath);
 			ResolverCache.reset();
 		} catch (DIDException e) {
-			e.printStackTrace(); // TODO:
+			e.printStackTrace();
+			throw new HiveException(e.getMessage());
 		}
 
 		return new Client(options);
@@ -120,11 +120,14 @@ public class Client {
 		if (ownerDid == null)
 			throw new IllegalArgumentException("Empty ownerDid");
 
-		return getVaultProvider(ownerDid).thenApply((vaultProvider)-> {
+		return getVaultProvider(ownerDid).thenApply((provider)-> {
 			Vault vault = null;
-			if(vaultProvider != null) {
-				AuthHelper authHelper = new AuthHelper(ownerDid, vaultProvider, opts.localPath, opts.authenticationDIDDocument, opts.authentcationHandler);
-				vault = new Vault(authHelper, vaultProvider, ownerDid);
+			if(provider != null) {
+				AuthHelper authHelper = new AuthHelper(ownerDid, provider,
+						opts.localPath,
+						opts.authenticationDIDDocument,
+						opts.authentcationHandler);
+				vault = new Vault(authHelper, provider, ownerDid);
 			}
 
 			return vault;
@@ -146,6 +149,9 @@ public class Client {
 	 * @return the vault address in String
 	 */
 	public CompletableFuture<String> getVaultProvider(String ownerDid) {
+		if (ownerDid == null)
+			throw new IllegalArgumentException("Empty ownerDid");
+
 		return CompletableFuture.supplyAsync(() -> {
 			String vaultProvider = null;
 			try {
@@ -162,9 +168,10 @@ public class Client {
 					providerCache.put(ownerDid, vaultProvider);
 				} else
 					vaultProvider = providerCache.get(ownerDid);
-			} catch (Exception e) {
+			} catch (DIDException e) {
 				e.printStackTrace(); // TODO:
 			}
+
 			return vaultProvider;
 		});
 	}
