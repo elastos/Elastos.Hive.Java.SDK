@@ -39,8 +39,6 @@ public class Vault {
 		this.files = new FileClient(authHelper);
 		this.database = new DatabaseClient(authHelper);
 		this.scripting = new ScriptClient(authHelper);
-
-		authHelper.connect();
 	}
 
 	/**
