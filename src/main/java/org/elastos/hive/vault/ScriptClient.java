@@ -71,35 +71,13 @@ public class ScriptClient implements Scripting {
     @Override
     public <T> CompletableFuture<T> call(String scriptName, Class<T> clazz) throws HiveException {
         return authHelper.checkValid()
-                .thenCompose(result -> callImp(scriptName, null, clazz));
+                .thenCompose(result -> callImp(scriptName, null,null, clazz));
     }
 
     @Override
     public <T> CompletableFuture<T> call(String scriptName, JsonNode params, Class<T> clazz) {
         return authHelper.checkValid()
-                .thenCompose(result -> callImp(scriptName, params, clazz));
-    }
-
-    private <T> CompletableFuture<T> callImp(String scriptName, JsonNode params, Class<T> clazz) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                Map map = new HashMap<>();
-                map.put("name", scriptName);
-                if (params != null)
-                    map.put("params", params);
-
-                String json = JsonUtil.getJsonFromObject(map);
-
-                Response response = ConnectionManager.getHiveVaultApi()
-                        .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-                        .execute();
-                authHelper.checkResponseCode(response);
-                return ResponseHelper.getValue(response, clazz);
-            } catch (Exception e) {
-                HiveException exception = new HiveException(e.getLocalizedMessage());
-                throw new CompletionException(exception);
-            }
-        });
+                .thenCompose(result -> callImp(scriptName, params, null, clazz));
     }
 
     @Override
@@ -110,10 +88,10 @@ public class ScriptClient implements Scripting {
     @Override
     public <T> CompletableFuture<T> call(String scriptName, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
         return authHelper.checkValid()
-                .thenCompose(result -> callImpWithContext(scriptName, params, appDid, resultType));
+                .thenCompose(result -> callImp(scriptName, params, appDid, resultType));
     }
 
-    private <T> CompletableFuture<T> callImpWithContext(String scriptName, JsonNode params, String appDid, Class<T> clazz) {
+    private <T> CompletableFuture<T> callImp(String scriptName, JsonNode params, String appDid, Class<T> clazz) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Map map = new HashMap<>();
@@ -122,9 +100,13 @@ public class ScriptClient implements Scripting {
                     map.put("params", params);
 
                 ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
-                targetNode.put("target_did", this.authHelper.getOwnerDid());
-                if (null != appDid) targetNode.put("target_app_did", appDid);
-                map.put("context", targetNode);
+                String ownerDid = this.authHelper.getOwnerDid();
+                if(null != ownerDid) {
+                    targetNode.put("target_did", ownerDid);
+                    if (null != appDid)
+                        targetNode.put("target_app_did", appDid);
+                    map.put("context", targetNode);
+                }
 
                 String json = JsonUtil.getJsonFromObject(map);
 
@@ -149,7 +131,7 @@ public class ScriptClient implements Scripting {
                     } else if (type == Type.DOWNLOAD) {
                         return fileDownloadImp(name, params, resultType);
                     } else if (type == Type.PROPERTIES) {
-                        return callImp(name, params, resultType);
+                        return callImp(name, params, null, resultType);
                     }
                     return null;
                 });
