@@ -22,6 +22,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.vault.network.model.AuthResponse;
 import org.elastos.hive.vault.network.model.SignResponse;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import okhttp3.MediaType;
@@ -83,7 +84,7 @@ public class AuthHelper implements ConnectHelper {
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				callback.onError(exception);
-				throw new CompletionException(exception);
+				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
 	}
@@ -183,37 +184,30 @@ public class AuthHelper implements ConnectHelper {
 	}
 
 
-	private void tryRestoreToken() throws HiveException {
-		JSONObject json = persistent.parseFrom();
-		String refreshToken = null;
-		String accessToken = null;
-		String tokenType = null;
-		long expiresAt = -1;
+	private void tryRestoreToken() {
+		try {
 
-		if (json.has(REFRESH_TOKEN_KEY))
-			refreshToken = json.getString(REFRESH_TOKEN_KEY);
-		if (json.has(ACCESS_TOKEN_KEY))
-			accessToken = json.getString(ACCESS_TOKEN_KEY);
-		if (json.has(EXPIRES_AT_KEY))
-			expiresAt = json.getLong(EXPIRES_AT_KEY);
-		if (json.has(TOKEN_TYPE_KEY))
-			tokenType = json.getString(TOKEN_TYPE_KEY);
-		if (json.has(USER_DID_KEY))
+			JSONObject json = persistent.parseFrom();
+
 			this.userDid = json.getString(USER_DID_KEY);
-		if (json.has(APP_ID_KEY))
 			this.appId = json.getString(APP_ID_KEY);
-		if (json.has(APP_INSTANCE_DID_KEY))
 			this.appInstanceDid = json.getString(APP_INSTANCE_DID_KEY);
-		if (refreshToken != null && accessToken != null && expiresAt > 0 && tokenType != null)
-			this.token = new AuthToken(refreshToken, accessToken, expiresAt, tokenType);
+
+			this.token = new AuthToken(json.getString(REFRESH_TOKEN_KEY),
+					json.getString(ACCESS_TOKEN_KEY),
+					json.getLong(EXPIRES_AT_KEY),
+					json.getString(TOKEN_TYPE_KEY));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (HiveException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void writebackToken() {
-		if (token == null)
-			return;
-
 		try {
 			JSONObject json = new JSONObject();
+
 			json.put(REFRESH_TOKEN_KEY, token.getRefreshToken());
 			json.put(ACCESS_TOKEN_KEY, token.getAccessToken());
 			json.put(EXPIRES_AT_KEY, token.getExpiredTime());
@@ -223,7 +217,9 @@ public class AuthHelper implements ConnectHelper {
 			json.put(APP_INSTANCE_DID_KEY, this.appInstanceDid);
 
 			persistent.upateContent(json);
-		} catch (Exception e) {
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (HiveException e) {
 			e.printStackTrace();
 		}
 	}
