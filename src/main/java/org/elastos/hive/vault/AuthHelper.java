@@ -90,6 +90,13 @@ public class AuthHelper implements ConnectHelper {
 		connectState.set(true);
 	}
 
+	private void retryLogin()  throws HiveException {
+		connectState.set(false);
+		signIn();
+		initConnection();
+		connectState.set(true);
+	}
+
 	private void signIn() throws HiveException {
 		Map map = new HashMap<>();
 		JSONObject docJsonObject = new JSONObject(authenticationDIDDocument.toString());
@@ -265,7 +272,7 @@ public class AuthHelper implements ConnectHelper {
 		int code = response.code();
 		if (code >= 300 || code<200) {
 			if(code==401) {
-				doCheckExpired();
+				retryLogin();
 			} else {
 				String message  = response.message();
 				throw new HiveException(message);
