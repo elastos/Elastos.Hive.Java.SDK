@@ -1,10 +1,8 @@
 package org.elastos.hive.vault;
 
 import org.elastos.did.DIDDocument;
-import org.elastos.hive.Callback;
 import org.elastos.hive.Client;
 import org.elastos.hive.Files;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.file.FileInfo;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -20,9 +18,7 @@ import java.io.Writer;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileTest {
@@ -80,29 +76,6 @@ public class FileTest {
         }
     }
 
-    @Test
-    public void testUploadTextWithCallback() {
-        try {
-            filesApi.upload(remoteText, Writer.class, new Callback<Writer>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(Writer result) {
-                    try {
-                        result.write("test remote file435fwjfpwjfwpfjwfjwfjwjfwpfjp");
-                        result.flush();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @Test
     public void testUploadBin() {
@@ -122,25 +95,6 @@ public class FileTest {
         try {
             Reader reader = filesApi.download(remoteText, Reader.class).get();
             Utils.cacheTextFile(reader, testCacheTextFilePath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testDownloadFileWithCallback() {
-        try {
-            filesApi.download(remoteText, Reader.class, new Callback<Reader>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(Reader result) {
-                    Utils.cacheTextFile(result, testCacheTextFilePath);
-                }
-            }).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -174,62 +128,6 @@ public class FileTest {
         }
     }
 
-    @Test
-    public void testListFilesWithCallback() {
-        try {
-            filesApi.list(remoteText, new Callback<List<FileInfo>>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(List<FileInfo> result) {
-                    System.out.println("size=" + result);
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testCopyFile() {
-        try {
-            filesApi.copy(src, dst, new Callback<Boolean>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(Boolean result) {
-                    assertTrue(result);
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testMoveFile() {
-        try {
-            filesApi.move(src, dst, new Callback<Boolean>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(Boolean result) {
-
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @Test
     public void testDeleteFile() {
@@ -240,67 +138,6 @@ public class FileTest {
         }
     }
 
-    @Test
-    public void testDeleteFileWithCallback() {
-        try {
-            filesApi.delete(dst, new Callback<Boolean>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(Boolean result) {
-                    assertTrue(result);
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testGetStatus() {
-        try {
-            filesApi.stat(dst, new Callback<FileInfo>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(FileInfo result) {
-                    assertNotNull(result);
-                    System.out.println("name=" + result.getName());
-                    System.out.println("type=" + result.getType());
-                    System.out.println("size=" + result.getSize());
-                    System.out.println("date=" + result.getLastModify());
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testGetHash() {
-        try {
-            filesApi.hash(dst, new Callback<String>() {
-                @Override
-                public void onError(HiveException e) {
-                    fail();
-                }
-
-                @Override
-                public void onSuccess(String result) {
-                    assertNotNull(result);
-                    System.out.println("hash=" + result);
-                }
-            }).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @BeforeClass
     public static void setUp() {
