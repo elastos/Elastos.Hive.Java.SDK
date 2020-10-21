@@ -38,16 +38,11 @@ public class FileClient implements Files {
 
     @Override
     public <T> CompletableFuture<T> upload(String path, Class<T> resultType) throws HiveException {
-        return upload(path, resultType, null);
-    }
-
-    @Override
-    public <T> CompletableFuture<T> upload(String path, Class<T> resultType, Callback<T> callback) throws HiveException {
         return authHelper.checkValid()
-                .thenCompose(result -> uploadImp(path, resultType, getCallback(callback)));
+                .thenCompose(result -> uploadImp(path, resultType));
     }
 
-    private <T> CompletableFuture<T> uploadImp(String path, Class<T> resultType, Callback<T> callback) {
+    private <T> CompletableFuture<T> uploadImp(String path, Class<T> resultType) {
 
         return CompletableFuture.supplyAsync(() -> {
 
@@ -61,17 +56,14 @@ public class FileClient implements Files {
                 UploadOutputStream outputStream = new UploadOutputStream(httpURLConnection, rawOutputStream);
 
                 if(resultType.isAssignableFrom(OutputStream.class)) {
-                    callback.onSuccess((T) outputStream);
                     return (T) outputStream;
                 } else {
                     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
-                    callback.onSuccess((T) outputStreamWriter);
                     return (T) outputStreamWriter;
                 }
             } catch (Exception e) {
                 ResponseHelper.readConnection(httpURLConnection);
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -79,16 +71,11 @@ public class FileClient implements Files {
 
     @Override
     public <T> CompletableFuture<T> download(String path, Class<T> resultType) throws HiveException {
-        return download(path, resultType, null);
-    }
-
-    @Override
-    public <T> CompletableFuture<T> download(String path, Class<T> resultType, Callback<T> callback) throws HiveException {
         return authHelper.checkValid()
-                .thenCompose(result -> downloadImp(path, resultType, getCallback(callback)));
+                .thenCompose(result -> downloadImp(path, resultType));
     }
 
-    private <T> CompletableFuture<T> downloadImp(String remoteFile, Class<T> resultType, Callback<T> callback) {
+    private <T> CompletableFuture<T> downloadImp(String remoteFile, Class<T> resultType) {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -100,16 +87,13 @@ public class FileClient implements Files {
                 authHelper.checkResponseCode(response);
                 if(resultType.isAssignableFrom(Reader.class)) {
                     Reader reader = ResponseHelper.getToReader(response);
-                    callback.onSuccess((T) reader);
                     return (T) reader;
                 } else {
                     InputStream inputStream = ResponseHelper.getInputStream(response);
-                    callback.onSuccess((T) inputStream);
                     return (T) inputStream;
                 }
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -118,16 +102,11 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<Boolean> delete(String remoteFile) {
-        return delete(remoteFile, null);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> delete(String remoteFile, Callback<Boolean> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> deleteImp(remoteFile, getCallback(callback)));
+                .thenCompose(result -> deleteImp(remoteFile));
     }
 
-    private CompletableFuture<Boolean> deleteImp(String remoteFile, Callback<Boolean> callback) {
+    private CompletableFuture<Boolean> deleteImp(String remoteFile) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Map map = new HashMap<>();
@@ -138,11 +117,9 @@ public class FileClient implements Files {
                         .deleteFolder(createJsonRequestBody(json))
                         .execute();
                 authHelper.checkResponseCode(response);
-                callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -150,16 +127,11 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<Boolean> move(String src, String dst) {
-        return move(src, dst, null);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> move(String src, String dst, Callback<Boolean> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> moveImp(src, dst, getCallback(callback)));
+                .thenCompose(result -> moveImp(src, dst));
     }
 
-    private CompletableFuture<Boolean> moveImp(String src, String dst, Callback<Boolean> callback) {
+    private CompletableFuture<Boolean> moveImp(String src, String dst) {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -171,11 +143,9 @@ public class FileClient implements Files {
                         .move(createJsonRequestBody(json))
                         .execute();
                 authHelper.checkResponseCode(response);
-                callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -183,16 +153,11 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<Boolean> copy(String src, String dst) {
-        return copy(src, dst, null);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> copy(String src, String dst, Callback<Boolean> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> copyImp(src, dst, getCallback(callback)));
+                .thenCompose(result -> copyImp(src, dst));
     }
 
-    private CompletableFuture<Boolean> copyImp(String src, String dst, Callback<Boolean> callback) {
+    private CompletableFuture<Boolean> copyImp(String src, String dst) {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -204,11 +169,9 @@ public class FileClient implements Files {
                         .copy(createJsonRequestBody(json))
                         .execute();
                 authHelper.checkResponseCode(response);
-                callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -216,16 +179,11 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<String> hash(String remoteFile) {
-        return hash(remoteFile, null);
-    }
-
-    @Override
-    public CompletableFuture<String> hash(String remoteFile, Callback<String> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> hashImp(remoteFile, getCallback(callback)));
+                .thenCompose(result -> hashImp(remoteFile));
     }
 
-    private CompletableFuture<String> hashImp(String remoteFile, Callback<String> callback) {
+    private CompletableFuture<String> hashImp(String remoteFile) {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -234,11 +192,9 @@ public class FileClient implements Files {
                         .execute();
                 authHelper.checkResponseCode(response);
                 String ret = response.body().getSHA256();
-                callback.onSuccess(ret);
                 return ret;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -246,16 +202,11 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<List<FileInfo>> list(String folder) {
-        return list(folder, null);
-    }
-
-    @Override
-    public CompletableFuture<List<FileInfo>> list(String folder, Callback<List<FileInfo>> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> listImp(folder, getCallback(callback)));
+                .thenCompose(result -> listImp(folder));
     }
 
-    private CompletableFuture<List<FileInfo>> listImp(String folder, Callback<List<FileInfo>> callback) {
+    private CompletableFuture<List<FileInfo>> listImp(String folder) {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -264,11 +215,9 @@ public class FileClient implements Files {
 
                 authHelper.checkResponseCode(response);
                 List<FileInfo> list = response.body().getFiles();
-                callback.onSuccess(list);
                 return list;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -276,16 +225,11 @@ public class FileClient implements Files {
 
     @Override
     public CompletableFuture<FileInfo> stat(String path) {
-        return stat(path, null);
-    }
-
-    @Override
-    public CompletableFuture<FileInfo> stat(String path, Callback<FileInfo> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> statImp(path, getCallback(callback)));
+                .thenCompose(result -> statImp(path));
     }
 
-    public CompletableFuture<FileInfo> statImp(String path, Callback<FileInfo> callback) {
+    public CompletableFuture<FileInfo> statImp(String path) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 NodeApi api = ConnectionManager.getHiveVaultApi();
@@ -293,11 +237,9 @@ public class FileClient implements Files {
 
                 authHelper.checkResponseCode(response);
                 FileInfo fileInfo = response.body();
-                callback.onSuccess(fileInfo);
                 return fileInfo;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
