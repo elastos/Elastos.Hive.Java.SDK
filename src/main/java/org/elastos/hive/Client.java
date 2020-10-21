@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
@@ -121,16 +122,11 @@ public class Client {
 			throw new IllegalArgumentException("Empty ownerDid");
 
 		return getVaultProvider(ownerDid).thenApply((provider)-> {
-			Vault vault = null;
-			if(provider != null) {
-				AuthHelper authHelper = new AuthHelper(ownerDid, provider,
-						opts.localPath,
-						opts.authenticationDIDDocument,
-						opts.authentcationHandler);
-				vault = new Vault(authHelper, provider, ownerDid);
-			}
-
-			return vault;
+			AuthHelper authHelper = new AuthHelper(ownerDid, provider,
+					opts.localPath,
+					opts.authenticationDIDDocument,
+					opts.authentcationHandler);
+			return new Vault(authHelper, provider, ownerDid);
 		});
 	}
 
@@ -169,13 +165,13 @@ public class Client {
 				} else
 					vaultProvider = providerCache.get(ownerDid);
 			} catch (DIDException e) {
-				e.printStackTrace(); // TODO:
+				e.printStackTrace();
+				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 
 			return vaultProvider;
 		});
 	}
-
 
 	/**
 	 * Locally maps the given owner DID with the given vault address. This is
