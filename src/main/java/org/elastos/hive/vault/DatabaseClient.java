@@ -43,17 +43,12 @@ public class DatabaseClient implements Database {
     }
 
     @Override
-    public CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options) {
-        return createCollection(name, options, null);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options, Callback<Boolean> callback) {
+    public CompletableFuture<Boolean> createCollection(String name) {
         return authHelper.checkValid()
-                .thenCompose(result -> createColImp(name, options, getCallback(callback)));
+                .thenCompose(result -> createColImp(name));
     }
 
-    private CompletableFuture<Boolean> createColImp(String collection, CreateCollectionOptions options, Callback<Boolean> callback) {
+    private CompletableFuture<Boolean> createColImp(String collection) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Map<String, Object> map = new HashMap<>();
@@ -65,11 +60,9 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -77,16 +70,11 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<Boolean> deleteCollection(String name) {
-        return deleteCollection(name, null);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> deleteCollection(String name, Callback<Boolean> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> deleteColImp(name, getCallback(callback)));
+                .thenCompose(result -> deleteColImp(name));
     }
 
-    private CompletableFuture<Boolean> deleteColImp(String collection, Callback<Boolean> callback) {
+    private CompletableFuture<Boolean> deleteColImp(String collection) {
         return CompletableFuture.supplyAsync(() -> {
             try {
 
@@ -99,11 +87,9 @@ public class DatabaseClient implements Database {
                         .execute();
 
                 authHelper.checkResponseCode(response);
-                callback.onSuccess(true);
                 return true;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -111,16 +97,11 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options) {
-        return insertOne(collection, doc, options, null);
-    }
-
-    @Override
-    public CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options, Callback<InsertOneResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> insertOneImp(collection, doc, options, getCallback(callback)));
+                .thenCompose(result -> insertOneImp(collection, doc, options));
     }
 
-    private CompletableFuture<InsertOneResult> insertOneImp(String collection, JsonNode doc, InsertOptions options, Callback<InsertOneResult> callback) {
+    private CompletableFuture<InsertOneResult> insertOneImp(String collection, JsonNode doc, InsertOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -135,11 +116,9 @@ public class DatabaseClient implements Database {
 
                 authHelper.checkResponseCode(response);
                 InsertOneResult insertResult = InsertOneResult.deserialize(ResponseHelper.toString(response));
-                callback.onSuccess(insertResult);
                 return insertResult;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -147,16 +126,11 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options) {
-        return insertMany(collection, docs, options, null);
-    }
-
-    @Override
-    public CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertManyResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> insertManyImp(collection, docs, options, getCallback(callback)));
+                .thenCompose(result -> insertManyImp(collection, docs, options));
     }
 
-    private CompletableFuture<InsertManyResult> insertManyImp(String collection, List<JsonNode> docs, InsertOptions options, Callback<InsertManyResult> callback) {
+    private CompletableFuture<InsertManyResult> insertManyImp(String collection, List<JsonNode> docs, InsertOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -173,11 +147,9 @@ public class DatabaseClient implements Database {
 
                 authHelper.checkResponseCode(response);
                 InsertManyResult insertResult = InsertManyResult.deserialize(ResponseHelper.toString(response));
-                callback.onSuccess(insertResult);
                 return insertResult;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -185,16 +157,11 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options) {
-        return countDocuments(collection, query, options, null);
-    }
-
-    @Override
-    public CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options, Callback<Long> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> countDocumentsImp(collection, query, options, getCallback(callback)));
+                .thenCompose(result -> countDocumentsImp(collection, query, options));
     }
 
-    private CompletableFuture<Long> countDocumentsImp(String collection, JsonNode query, CountOptions options, Callback<Long> callback) {
+    private CompletableFuture<Long> countDocumentsImp(String collection, JsonNode query, CountOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -209,11 +176,9 @@ public class DatabaseClient implements Database {
 
                 authHelper.checkResponseCode(response);
                 long count = response.body().getCount();
-                callback.onSuccess(count);
                 return count;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -221,16 +186,11 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options) {
-        return findOne(collection, query, options, null);
-    }
-
-    @Override
-    public CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options, Callback<JsonNode> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> findOneImp(collection, query, options, getCallback(callback)));
+                .thenCompose(result -> findOneImp(collection, query, options));
     }
 
-    private CompletableFuture<JsonNode> findOneImp(String collection, JsonNode query, FindOptions options, Callback<JsonNode> callback) {
+    private CompletableFuture<JsonNode> findOneImp(String collection, JsonNode query, FindOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -246,11 +206,9 @@ public class DatabaseClient implements Database {
                 authHelper.checkResponseCode(response);
                 JsonNode jsonNode = ResponseHelper.getValue(response, JsonNode.class);
                 JsonNode item = jsonNode.get("items");
-                callback.onSuccess(item);
                 return item;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -258,16 +216,11 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options) {
-        return findMany(collection, query, options, null);
-    }
-
-    @Override
-    public CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options, Callback<List<JsonNode>> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> findManyImp(collection, query, options, getCallback(callback)));
+                .thenCompose(result -> findManyImp(collection, query, options));
     }
 
-    private CompletableFuture<List<JsonNode>> findManyImp(String collection, JsonNode query, FindOptions options, Callback<List<JsonNode>> callback) {
+    private CompletableFuture<List<JsonNode>> findManyImp(String collection, JsonNode query, FindOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -282,11 +235,9 @@ public class DatabaseClient implements Database {
 
                 authHelper.checkResponseCode(response);
                 List<JsonNode> jsonNodes = ResponseHelper.getArray(response, "items");
-                callback.onSuccess(jsonNodes);
                 return jsonNodes;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -294,16 +245,11 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
-        return updateOne(collection, filter, update, options, null);
-    }
-
-    @Override
-    public CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> updateOneImp(collection, filter, update, options, getCallback(callback)));
+                .thenCompose(result -> updateOneImp(collection, filter, update, options));
     }
 
-    private CompletableFuture<UpdateResult> updateOneImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback) {
+    private CompletableFuture<UpdateResult> updateOneImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -324,7 +270,6 @@ public class DatabaseClient implements Database {
                     throw exception;
                 }
                 UpdateResult updateResult = UpdateResult.deserialize(ret);
-                callback.onSuccess(updateResult);
                 return updateResult;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -336,16 +281,11 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
-        return updateMany(collection, filter, update, options, null);
-    }
-
-    @Override
-    public CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> updateManyImp(collection, filter, update, options, getCallback(callback)));
+                .thenCompose(result -> updateManyImp(collection, filter, update, options));
     }
 
-    private CompletableFuture<UpdateResult> updateManyImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options, Callback<UpdateResult> callback) {
+    private CompletableFuture<UpdateResult> updateManyImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -361,11 +301,9 @@ public class DatabaseClient implements Database {
 
                 authHelper.checkResponseCode(response);
                 UpdateResult updateResult = UpdateResult.deserialize(ResponseHelper.toString(response));
-                callback.onSuccess(updateResult);
                 return updateResult;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -373,16 +311,11 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options) {
-        return deleteOne(collection, filter, options, null);
-    }
-
-    @Override
-    public CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> deleteOneImp(collection, filter, options, getCallback(callback)));
+                .thenCompose(result -> deleteOneImp(collection, filter, options));
     }
 
-    private CompletableFuture<DeleteResult> deleteOneImp(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback) {
+    private CompletableFuture<DeleteResult> deleteOneImp(String collection, JsonNode filter, DeleteOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -396,11 +329,9 @@ public class DatabaseClient implements Database {
 
                 authHelper.checkResponseCode(response);
                 DeleteResult deleteResult = DeleteResult.deserialize(ResponseHelper.toString(response));
-                callback.onSuccess(deleteResult);
                 return deleteResult;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
@@ -408,16 +339,11 @@ public class DatabaseClient implements Database {
 
     @Override
     public CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options) {
-        return deleteMany(collection, filter, options, null);
-    }
-
-    @Override
-    public CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback) {
         return authHelper.checkValid()
-                .thenCompose(result -> deleteManyImp(collection, filter, options, getCallback(callback)));
+                .thenCompose(result -> deleteManyImp(collection, filter, options));
     }
 
-    private CompletableFuture<DeleteResult> deleteManyImp(String collection, JsonNode filter, DeleteOptions options, Callback<DeleteResult> callback) {
+    private CompletableFuture<DeleteResult> deleteManyImp(String collection, JsonNode filter, DeleteOptions options) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
@@ -431,18 +357,11 @@ public class DatabaseClient implements Database {
 
                 authHelper.checkResponseCode(response);
                 DeleteResult deleteResult = DeleteResult.deserialize(ResponseHelper.toString(response));
-                callback.onSuccess(deleteResult);
                 return deleteResult;
             } catch (Exception e) {
                 HiveException exception = new HiveException(e.getLocalizedMessage());
-                callback.onError(exception);
                 throw new CompletionException(exception);
             }
         });
     }
-
-    private <T> Callback<T> getCallback(Callback<T> callback) {
-        return (null == callback ? new NullCallback<T>() : callback);
-    }
-
 }

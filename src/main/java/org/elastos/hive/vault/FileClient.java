@@ -261,8 +261,4 @@ public class FileClient implements Files {
         }
         return response;
     }
-
-    private <T> Callback<T> getCallback(Callback<T> callback) {
-        return (null == callback ? new NullCallback<T>() : callback);
-    }
 }
