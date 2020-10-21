@@ -28,20 +28,10 @@ import java.util.concurrent.CompletableFuture;
  * Provides author-related functionality
  */
 public interface ConnectHelper {
-
-    /**
-     * Check access token isExpired
-     *
-     * @return Returns `Void` if expired
-     */
-    CompletableFuture<Void> checkValid();
-
-    /**
-     * Check access token isExpired
-     *
-     * @param callback Callback checkValid result
-     * @return Returns `Void` if expired
-     */
-    CompletableFuture<Void> checkValid(Callback<Void> callback);
-
+	/**
+	 * Check access token isExpired
+	 *
+	 * @return Returns `Void` if expired
+	 */
+	CompletableFuture<Void> checkValid();
 }

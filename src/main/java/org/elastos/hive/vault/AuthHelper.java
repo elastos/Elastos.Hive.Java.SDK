@@ -11,9 +11,7 @@ import org.elastos.did.jwt.Claims;
 import org.elastos.hive.AuthInfoStoreImpl;
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.AuthenticationHandler;
-import org.elastos.hive.Callback;
 import org.elastos.hive.ConnectHelper;
-import org.elastos.hive.NullCallback;
 import org.elastos.hive.Persistent;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.model.BaseServiceConfig;
@@ -73,17 +71,10 @@ public class AuthHelper implements ConnectHelper {
 
 	@Override
 	public CompletableFuture<Void> checkValid() {
-		return checkValid(new NullCallback<>());
-	}
-
-	@Override
-	public CompletableFuture<Void> checkValid(Callback<Void> callback) {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				doCheckExpired();
 			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				callback.onError(exception);
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
