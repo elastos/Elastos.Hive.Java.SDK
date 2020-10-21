@@ -82,7 +82,7 @@ public class AuthHelper implements ConnectHelper {
 
 	private void doCheckExpired() throws HiveException {
 		connectState.set(false);
-		tryRestoreToken();
+		if(null == token) tryRestoreToken();
 		if (token == null || token.isExpired()) {
 			signIn();
 		}
