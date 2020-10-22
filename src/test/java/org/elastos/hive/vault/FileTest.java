@@ -18,47 +18,48 @@ import java.io.Writer;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileTest {
 
+    private String textLocalPath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
+    private String imgLocalPath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/big.png";
+
+    private String textLocalCachePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/test.txt";
+    private String imgLocalCachePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/big.png";
+
+    private static String remoteFolder = "hive";
+    private static String remoteTextPath = remoteFolder + File.separator + "test.txt";
+    private static String remoteImgPath = remoteFolder + File.separator + "big.png";
+
+    private static String remoteTextBackupPath = "backup" + File.separator + "test.txt";
+    private static String remoteImgBackupPath = "backup" + File.separator + "big.png";
+
     private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
-
-    private String testTextFilePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
-    private String testSmallImagePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/small.png";
-    private String testBigImagePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/big.png";
-
-    private String testCacheTextFilePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/test.txt";
-    private String testCacheSmallImagePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/small.png";
-    private String testCacheBigImagePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/big.png";
-
-
     private static Client client;
-
     private static Files filesApi;
 
-    private static String rootPath = "hive";
-    private static String dstPath = "backup";
-
-    private static String remoteText = rootPath + File.separator + "test.txt";
-
-    private static String remoteSmallBin = rootPath + File.separator + "hive/small.png";
-
-    private static String remoteBigBin = rootPath + File.separator + "big.png";
-
-    private static String src = remoteText;
-
-    private static String dst = dstPath + File.separator + "test.txt";
+    @Test
+    public void test00_clean() {
+        try {
+            filesApi.delete(remoteTextPath).get();
+            filesApi.delete(remoteImgPath).get();
+            filesApi.delete(remoteTextBackupPath).get();
+            filesApi.delete(remoteImgBackupPath).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
-    public void testUploadTextNoCallback() {
+    public void test01_uploadText() {
         FileReader fileReader = null;
         Writer writer = null;
         try {
-             writer = filesApi.upload(remoteText, Writer.class).get();
-            fileReader = new FileReader(new File(testTextFilePath));
-
+             writer = filesApi.upload(remoteTextPath, Writer.class).get();
+            fileReader = new FileReader(new File(textLocalPath));
             char[] buffer = new char[1];
             while (fileReader.read(buffer) != -1) {
                 writer.write(buffer);
@@ -78,10 +79,10 @@ public class FileTest {
 
 
     @Test
-    public void testUploadBin() {
+    public void test02_uploadBin() {
         try {
-            OutputStream outputStream = filesApi.upload(remoteBigBin, OutputStream.class).get();
-            byte[] bigStream = Utils.readImage(testBigImagePath);
+            OutputStream outputStream = filesApi.upload(remoteImgPath, OutputStream.class).get();
+            byte[] bigStream = Utils.readImage(imgLocalPath);
             outputStream.write(bigStream);
             outputStream.close();
             System.out.println("write success");
@@ -91,30 +92,30 @@ public class FileTest {
     }
 
     @Test
-    public void testDownloadFileWNoCallback() {
+    public void test03_downloadText() {
         try {
-            Reader reader = filesApi.download(remoteText, Reader.class).get();
-            Utils.cacheTextFile(reader, testCacheTextFilePath);
+            Reader reader = filesApi.download(remoteTextPath, Reader.class).get();
+            Utils.cacheTextFile(reader, textLocalCachePath);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Test
-    public void testDownloadBin() {
+    public void test04_downloadBin() {
         try {
-            InputStream inputStream = filesApi.download(remoteBigBin, InputStream.class).get();
-            Utils.cacheBinFile(inputStream, testCacheBigImagePath);
+            InputStream inputStream = filesApi.download(remoteImgPath, InputStream.class).get();
+            Utils.cacheBinFile(inputStream, imgLocalCachePath);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Test
-    public void testListFilesNoCallback() {
+    public void test05_list() {
         try {
-            List<FileInfo> result = filesApi.list(rootPath).get();
-            if(null == result) return;
+            List<FileInfo> result = filesApi.list(remoteFolder).get();
+            assertNotNull(result);
             assertTrue(result.size()>0);
             System.out.println("list size=" + result.size());
             for(FileInfo fileInfo : result) {
@@ -128,11 +129,42 @@ public class FileTest {
         }
     }
 
+    @Test
+    public void test06_hash() {
+        try {
+            String hash = filesApi.hash(remoteTextPath).get();
+            assertNotNull(hash);
+            System.out.println("hash=" + hash);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
-    public void testDeleteFile() {
+    public void test07_copy() {
         try {
-            filesApi.delete(dst).get();
+            boolean success = filesApi.copy(remoteTextPath, remoteTextBackupPath).get();
+            assertTrue(success);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void test08_move() {
+        try {
+            boolean success = filesApi.move(remoteImgPath, remoteImgBackupPath).get();
+            assertTrue(success);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void test09_deleteFile() {
+        try {
+            filesApi.delete(remoteTextBackupPath).get();
+            filesApi.delete(remoteImgBackupPath).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
