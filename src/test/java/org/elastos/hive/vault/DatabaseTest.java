@@ -272,7 +272,7 @@ public class DatabaseTest {
     @Test
     public void test04_CreateColNoCallback() {
         try {
-            Boolean success = database.createCollection(collectionName).get();
+            Boolean success = database.createCollection(collectionName, null).get();
             assertTrue(success);
         } catch (Exception e) {
             e.printStackTrace();
