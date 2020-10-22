@@ -1,8 +1,6 @@
 package org.elastos.hive.vault;
 
-import org.elastos.hive.Callback;
 import org.elastos.hive.Files;
-import org.elastos.hive.NullCallback;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.file.FileInfo;
 import org.elastos.hive.utils.JsonUtil;
@@ -37,7 +35,7 @@ public class FileClient implements Files {
     }
 
     @Override
-    public <T> CompletableFuture<T> upload(String path, Class<T> resultType) throws HiveException {
+    public <T> CompletableFuture<T> upload(String path, Class<T> resultType) {
         return authHelper.checkValid()
                 .thenCompose(result -> uploadImp(path, resultType));
     }
@@ -70,7 +68,7 @@ public class FileClient implements Files {
     }
 
     @Override
-    public <T> CompletableFuture<T> download(String path, Class<T> resultType) throws HiveException {
+    public <T> CompletableFuture<T> download(String path, Class<T> resultType) {
         return authHelper.checkValid()
                 .thenCompose(result -> downloadImp(path, resultType));
     }
