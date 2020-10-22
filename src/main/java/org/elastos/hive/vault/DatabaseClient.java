@@ -8,6 +8,7 @@ import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.Database;
 import org.elastos.hive.database.CountOptions;
+import org.elastos.hive.database.CreateCollectionOptions;
 import org.elastos.hive.database.DeleteOptions;
 import org.elastos.hive.database.DeleteResult;
 import org.elastos.hive.database.FindOptions;
@@ -40,7 +41,7 @@ public class DatabaseClient implements Database {
     }
 
     @Override
-    public CompletableFuture<Boolean> createCollection(String name) {
+    public CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options) {
         return authHelper.checkValid()
                 .thenCompose(result -> createColImp(name));
     }

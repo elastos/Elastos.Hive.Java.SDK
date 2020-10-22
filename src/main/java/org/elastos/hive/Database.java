@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.database.CountOptions;
+import org.elastos.hive.database.CreateCollectionOptions;
 import org.elastos.hive.database.DeleteOptions;
 import org.elastos.hive.database.DeleteResult;
 import org.elastos.hive.database.FindOptions;
@@ -24,7 +25,7 @@ public interface Database {
      * @return fail(false) or success(treu)
      * @throws HiveException
      */
-    CompletableFuture<Boolean> createCollection(String name);
+    CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options);
 
 
     /**
