@@ -15,9 +15,9 @@ public interface Scripting {
      * serialized and stored on the hive back-end. Later on, anyone, including the vault owner or external users, can
      * use Scripting.call() to execute one of those scripts and get results/data.
      */
-    CompletableFuture<Boolean> registerScript(String name, Executable executable) throws HiveException;
+    CompletableFuture<Boolean> registerScript(String name, Executable executable);
 
-    CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable) throws HiveException;
+    CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable);
 
     /**
      * Executes a previously registered server side script using Scripting.setScript(). Vault owner or external users are
@@ -29,9 +29,9 @@ public interface Scripting {
      * <p>
      * T: String, byte[], JsonNode, Reader
      */
-    <T> CompletableFuture<T> call(String scriptName, Class<T> resultType) throws HiveException;
+    <T> CompletableFuture<T> call(String scriptName, Class<T> resultType);
 
-    <T> CompletableFuture<T> call(String scriptName, JsonNode params, Class<T> resultType) throws HiveException;
+    <T> CompletableFuture<T> call(String scriptName, JsonNode params, Class<T> resultType);
 
     /**
      * Executes a previously registered server side script using Scripting.setScript(). Vault owner or external users are
@@ -42,7 +42,7 @@ public interface Scripting {
      * @param resultType String, byte[], JsonNode, Reader
      * @throws HiveException
      */
-    <T> CompletableFuture<T> call(String scriptName, String appDid, Class<T> resultType) throws HiveException;
+    <T> CompletableFuture<T> call(String scriptName, String appDid, Class<T> resultType);
 
     /**
      * Executes a previously registered server side script using Scripting.setScript(). Vault owner or external users are
@@ -54,7 +54,7 @@ public interface Scripting {
      * @param resultType String, byte[], JsonNode, Reader
      * @throws HiveException
      */
-    <T> CompletableFuture<T> call(String scriptName, JsonNode params, String appDid, Class<T> resultType) throws HiveException;
+    <T> CompletableFuture<T> call(String scriptName, JsonNode params, String appDid, Class<T> resultType);
 
 
     enum Type {
@@ -74,5 +74,5 @@ public interface Scripting {
      * @return
      * @throws HiveException
      */
-    <T> CompletableFuture<T> call(String name, JsonNode params, Type type, Class<T> resultType) throws HiveException;
+    <T> CompletableFuture<T> call(String name, JsonNode params, Type type, Class<T> resultType);
 }

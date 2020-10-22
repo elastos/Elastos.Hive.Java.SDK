@@ -35,12 +35,12 @@ public class ScriptClient implements Scripting {
     }
 
     @Override
-    public CompletableFuture<Boolean> registerScript(String name, Executable executable) throws HiveException {
+    public CompletableFuture<Boolean> registerScript(String name, Executable executable) {
         return this.registerScript(name, null, executable);
     }
 
     @Override
-    public CompletableFuture<Boolean> registerScript(String name, Condition accessCondition, Executable executable) throws HiveException {
+    public CompletableFuture<Boolean> registerScript(String name, Condition accessCondition, Executable executable) {
         return authHelper.checkValid()
                 .thenCompose(result -> registerScriptImp(name, accessCondition, executable));
     }
@@ -69,7 +69,7 @@ public class ScriptClient implements Scripting {
     }
 
     @Override
-    public <T> CompletableFuture<T> call(String scriptName, Class<T> clazz) throws HiveException {
+    public <T> CompletableFuture<T> call(String scriptName, Class<T> clazz) {
         return authHelper.checkValid()
                 .thenCompose(result -> callImp(scriptName, null,null, clazz));
     }
@@ -81,12 +81,12 @@ public class ScriptClient implements Scripting {
     }
 
     @Override
-    public <T> CompletableFuture<T> call(String scriptName, String appDid, Class<T> resultType) throws HiveException {
+    public <T> CompletableFuture<T> call(String scriptName, String appDid, Class<T> resultType) {
         return this.call(scriptName, null, appDid, resultType);
     }
 
     @Override
-    public <T> CompletableFuture<T> call(String scriptName, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
+    public <T> CompletableFuture<T> call(String scriptName, JsonNode params, String appDid, Class<T> resultType) {
         return authHelper.checkValid()
                 .thenCompose(result -> callImp(scriptName, params, appDid, resultType));
     }
@@ -123,7 +123,7 @@ public class ScriptClient implements Scripting {
     }
 
     @Override
-    public <T> CompletableFuture<T> call(String name, JsonNode params, Type type, Class<T> resultType) throws HiveException {
+    public <T> CompletableFuture<T> call(String name, JsonNode params, Type type, Class<T> resultType) {
         return authHelper.checkValid()
                 .thenCompose(result -> {
                     if (type == Type.UPLOAD) {

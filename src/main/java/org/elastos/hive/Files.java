@@ -18,7 +18,7 @@ public interface Files {
      *              upload the file content if success; null otherwise
      * @throws HiveException
      */
-    <T> CompletableFuture<T> upload(String path, Class<T> resultType) throws HiveException;
+    <T> CompletableFuture<T> upload(String path, Class<T> resultType);
 
     /**
      * Initiates a download sequence by returning a Reader or InputStream object that can
@@ -29,7 +29,7 @@ public interface Files {
      * @return the new CompletionStage, the result is the Reader or InputStream interface for
      *      read the file content if success; null otherwise
      */
-    <T> CompletableFuture<T> download(String path, Class<T> resultType) throws HiveException;
+    <T> CompletableFuture<T> download(String path, Class<T> resultType);
 
     /**
      * Deletes a file, or a folder. In case the given path is a folder,
@@ -39,7 +39,7 @@ public interface Files {
      * @return the new CompletionStage, the result is true if the file or folder
      *         successfully deleted; false otherwise
      */
-    CompletableFuture<Boolean> delete(String path) throws HiveException;
+    CompletableFuture<Boolean> delete(String path);
 
     /**
      * Moves (or renames) a file or a folder.
@@ -49,7 +49,7 @@ public interface Files {
      * @return the new CompletionStage, the result is true if the file or folder
      *         successfully moved; false otherwise
      */
-    CompletableFuture<Boolean> move(String src, String dest) throws HiveException;
+    CompletableFuture<Boolean> move(String src, String dest);
 
     /**
      * Copies a file or a folder (recursively).
@@ -59,7 +59,7 @@ public interface Files {
      * @return the new CompletionStage, the result is true if the file or folder
      *         successfully copied; false otherwise
      */
-    CompletableFuture<Boolean> copy(String src, String dest) throws HiveException;
+    CompletableFuture<Boolean> copy(String src, String dest);
 
     /**
      * Returns the SHA256 hash of the given file.
@@ -68,7 +68,7 @@ public interface Files {
      * @return the new CompletionStage, the result is the base64 hash string
      *         if the hash successfully calculated; null otherwise
      */
-    CompletableFuture<String> hash(String path) throws HiveException;
+    CompletableFuture<String> hash(String path);
 
     /**
      * Returns the list of all files in a given folder.
@@ -76,7 +76,7 @@ public interface Files {
      * @return the new CompletionStage, the result is List if success; null otherwise
      * @throws HiveException
      */
-    CompletableFuture<List<FileInfo>> list(String path) throws HiveException;
+    CompletableFuture<List<FileInfo>> list(String path);
 
     /**
      * Information about the target file or folder.
@@ -85,6 +85,6 @@ public interface Files {
      * @return the new CompletionStage, the result is FileInfo
      *         if success; null otherwise
      */
-    CompletableFuture<FileInfo> stat(String path) throws HiveException;
+    CompletableFuture<FileInfo> stat(String path);
 
 }

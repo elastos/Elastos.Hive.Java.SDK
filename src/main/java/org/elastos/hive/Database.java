@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.database.CountOptions;
-import org.elastos.hive.database.CreateCollectionOptions;
 import org.elastos.hive.database.DeleteOptions;
 import org.elastos.hive.database.DeleteResult;
 import org.elastos.hive.database.FindOptions;
@@ -25,7 +24,7 @@ public interface Database {
      * @return fail(false) or success(treu)
      * @throws HiveException
      */
-    CompletableFuture<Boolean> createCollection(String name) throws HiveException;
+    CompletableFuture<Boolean> createCollection(String name);
 
 
     /**
@@ -34,7 +33,7 @@ public interface Database {
      * @return fail(false) or success(true)
      * @throws HiveException
      */
-    CompletableFuture<Boolean> deleteCollection(String name) throws HiveException;
+    CompletableFuture<Boolean> deleteCollection(String name);
 
 
     /**
@@ -47,7 +46,7 @@ public interface Database {
      * @return Results returned by InsertOneResult{@link InsertOneResult} wrapper
      * @throws HiveException
      */
-    CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options) throws HiveException;
+    CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options);
 
 
     /**
@@ -62,7 +61,7 @@ public interface Database {
      * @return Results returned by InsertManyResult{@link InsertManyResult} wrapper
      * @throws HiveException
      */
-    CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options) throws HiveException;
+    CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options);
 
 
     /**
@@ -77,7 +76,7 @@ public interface Database {
      * @return count size
      * @throws HiveException
      */
-    CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options) throws HiveException;
+    CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options);
 
 
     /**
@@ -88,7 +87,7 @@ public interface Database {
      * @return a JSON object document result
      * @throws HiveException
      */
-    CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options) throws HiveException;
+    CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options);
 
     /**
      * Find many documents
@@ -98,7 +97,7 @@ public interface Database {
      * @return a JsonNode array result of document
      * @throws HiveException
      */
-    CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options) throws HiveException;
+    CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options);
 
 
     /**
@@ -110,7 +109,7 @@ public interface Database {
      * @return Results returned by InsertResult{@link UpdateResult} wrapper
      * @throws HiveException
      */
-    CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options) throws HiveException;
+    CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
 
 
     /**
@@ -122,7 +121,7 @@ public interface Database {
      * @return Results returned by InsertResult{@link UpdateResult} wrapper
      * @throws HiveException
      */
-    CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options) throws HiveException;
+    CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
 
 
     /**
@@ -133,7 +132,7 @@ public interface Database {
      * @return
      * @throws HiveException
      */
-    CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options) throws HiveException;
+    CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options);
 
 
     /**
@@ -144,6 +143,6 @@ public interface Database {
      * @return
      * @throws HiveException
      */
-    CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options) throws HiveException;
+    CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options);
 
 }
