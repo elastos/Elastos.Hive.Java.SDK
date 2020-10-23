@@ -29,9 +29,11 @@ import retrofit2.Response;
 public class ScriptClient implements Scripting {
 
     private AuthHelper authHelper;
+    private ConnectionManager connectionManager;
 
     public ScriptClient(AuthHelper authHelper) {
         this.authHelper = authHelper;
+        this.connectionManager = authHelper.getConnectionManager();
     }
 
     @Override
@@ -56,7 +58,7 @@ public class ScriptClient implements Scripting {
 
                 String json = JsonUtil.getJsonFromObject(map);
 
-                Response<ResponseBody> response = ConnectionManager.getHiveVaultApi()
+                Response<ResponseBody> response = this.connectionManager.getHiveVaultApi()
                         .registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
                 authHelper.checkResponseCode(response);
@@ -110,7 +112,7 @@ public class ScriptClient implements Scripting {
 
                 String json = JsonUtil.getJsonFromObject(map);
 
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
                 authHelper.checkResponseCode(response);
@@ -150,7 +152,7 @@ public class ScriptClient implements Scripting {
                         RequestBody.create(
                                 MediaType.parse("application/json"), json);
 
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .callScript(body, metadata)
                         .execute();
                 authHelper.checkResponseCode(response);
@@ -173,7 +175,7 @@ public class ScriptClient implements Scripting {
 
                 String json = JsonUtil.getJsonFromObject(map);
 
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 

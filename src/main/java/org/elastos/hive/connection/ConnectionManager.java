@@ -25,7 +25,6 @@ package org.elastos.hive.connection;
 import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.vault.Constance;
 import org.elastos.hive.vault.network.NodeApi;
-import org.elastos.hive.vault.network.VaultAuthApi;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -33,69 +32,48 @@ import java.net.URL;
 
 public class ConnectionManager {
 
-    private static VaultAuthApi vaultAuthApi;
-    private static NodeApi hivevaultApi;
+    private NodeApi hivevaultApi;
 
-    private static String hivevaultBaseUrl;
-    private static String authBaseUrl;
+    private String hivevaultBaseUrl;
 
-    private static BaseServiceConfig hivevaultConfig = new BaseServiceConfig.Builder().build() ;
-    private static BaseServiceConfig authConfig = new BaseServiceConfig.Builder().build();
+    private BaseServiceConfig hivevaultConfig = new BaseServiceConfig.Builder().build() ;
 
-    public static NodeApi getHiveVaultApi() {
+    public ConnectionManager(String baseUrl, BaseServiceConfig baseServiceConfig) {
+        resetHiveVaultApi(baseUrl, baseServiceConfig);
+    }
+
+    public NodeApi getHiveVaultApi() {
         if(hivevaultApi == null) {
             hivevaultApi = BaseServiceUtil.createService(NodeApi.class,
-                    ConnectionManager.hivevaultBaseUrl, ConnectionManager.hivevaultConfig);
+                    this.hivevaultBaseUrl, this.hivevaultConfig);
         }
         return hivevaultApi;
     }
 
-    public static void resetAuthApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
-        vaultAuthApi = null;
-        updateAuthConfig(baseServiceConfig);
-        updateAuthBaseUrl(baseUrl);
+    private void updateHiveVaultConfig(BaseServiceConfig hivenvaultConfig) {
+        this.hivevaultConfig = hivenvaultConfig;
     }
 
-    public static VaultAuthApi getVaultAuthApi() {
-        if(vaultAuthApi == null) {
-            vaultAuthApi = BaseServiceUtil.createService(VaultAuthApi.class,
-                    ConnectionManager.authBaseUrl, ConnectionManager.authConfig);
-        }
-        return vaultAuthApi;
+    private void updateHiveVaultBaseUrl(String hivevaultBaseUrl) {
+        this.hivevaultBaseUrl = hivevaultBaseUrl;
     }
 
-    private static void updateHiveVaultConfig(BaseServiceConfig hivenvaultConfig) {
-        ConnectionManager.hivevaultConfig = hivenvaultConfig;
-    }
-
-    private static void updateAuthConfig(BaseServiceConfig authConfig) {
-        ConnectionManager.authConfig = authConfig;
-    }
-
-    private static void updateHiveVaultBaseUrl(String hivevaultBaseUrl) {
-        ConnectionManager.hivevaultBaseUrl = hivevaultBaseUrl;
-    }
-
-    private static void updateAuthBaseUrl(String authBaseUrl) {
-        ConnectionManager.authBaseUrl = authBaseUrl;
-    }
-
-    public static void resetHiveVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
+    public void resetHiveVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
         hivevaultApi = null;
         updateHiveVaultBaseUrl(baseUrl);
         updateHiveVaultConfig(baseServiceConfig);
     }
 
-    public static String getHivevaultBaseUrl() {
-        return ConnectionManager.hivevaultBaseUrl;
+    public String getHivevaultBaseUrl() {
+        return this.hivevaultBaseUrl;
     }
 
-    public static String getAccessToken() {
-        return ConnectionManager.hivevaultConfig.getHeaderConfig().getAuthToken().getAccessToken();
+    public String getAccessToken() {
+        return this.hivevaultConfig.getHeaderConfig().getAuthToken().getAccessToken();
     }
 
-    public static HttpURLConnection openURLConnection(String path) throws IOException {
-        String url = ConnectionManager.getHivevaultBaseUrl() + Constance.API_PATH +"/files/upload/" + path;
+    public HttpURLConnection openURLConnection(String path) throws IOException {
+        String url = this.getHivevaultBaseUrl() + Constance.API_PATH +"/files/upload/" + path;
         HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
         httpURLConnection.setRequestMethod("POST");
         httpURLConnection.setConnectTimeout(5000);
@@ -106,8 +84,7 @@ public class ConnectionManager {
         httpURLConnection.setUseCaches(false);
         httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
         httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
-        //httpURLConnection.setRequestProperty("Charset", "UTF-8");
-        httpURLConnection.setRequestProperty("Authorization", "token " + ConnectionManager.getAccessToken());
+        httpURLConnection.setRequestProperty("Authorization", "token " + this.getAccessToken());
 
         httpURLConnection.setChunkedStreamingMode(0);
 

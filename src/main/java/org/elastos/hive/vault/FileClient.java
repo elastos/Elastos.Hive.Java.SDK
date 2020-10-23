@@ -1,11 +1,11 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.Files;
+import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.file.FileInfo;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.vault.network.NodeApi;
 import org.elastos.hive.vault.network.model.FilesResponse;
 import org.elastos.hive.vault.network.model.HashResponse;
@@ -29,9 +29,11 @@ import retrofit2.Response;
 public class FileClient implements Files {
 
     private AuthHelper authHelper;
+    private ConnectionManager connectionManager;
 
     public FileClient(AuthHelper authHelper) {
         this.authHelper = authHelper;
+        this.connectionManager = authHelper.getConnectionManager();
     }
 
     @Override
@@ -46,7 +48,7 @@ public class FileClient implements Files {
 
             HttpURLConnection httpURLConnection = null;
             try {
-                httpURLConnection = ConnectionManager.openURLConnection(path);
+                httpURLConnection = this.connectionManager.openURLConnection(path);
                 OutputStream rawOutputStream = httpURLConnection.getOutputStream();
 
                 if(null == rawOutputStream) return null;
@@ -111,7 +113,7 @@ public class FileClient implements Files {
                 map.put("path", remoteFile);
                 String json = JsonUtil.getJsonFromObject(map);
 
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .deleteFolder(createJsonRequestBody(json))
                         .execute();
                 authHelper.checkResponseCode(response);
@@ -137,7 +139,7 @@ public class FileClient implements Files {
                 map.put("src_path", src);
                 map.put("dst_path", dst);
                 String json = JsonUtil.getJsonFromObject(map);
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .move(createJsonRequestBody(json))
                         .execute();
                 authHelper.checkResponseCode(response);
@@ -163,7 +165,7 @@ public class FileClient implements Files {
                 map.put("src_path", src);
                 map.put("dst_path", dst);
                 String json = JsonUtil.getJsonFromObject(map);
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .copy(createJsonRequestBody(json))
                         .execute();
                 authHelper.checkResponseCode(response);
@@ -185,7 +187,7 @@ public class FileClient implements Files {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Response<HashResponse> response = ConnectionManager.getHiveVaultApi()
+                Response<HashResponse> response = this.connectionManager.getHiveVaultApi()
                         .hash(remoteFile)
                         .execute();
                 authHelper.checkResponseCode(response);
@@ -208,7 +210,7 @@ public class FileClient implements Files {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-                NodeApi api = ConnectionManager.getHiveVaultApi();
+                NodeApi api = this.connectionManager.getHiveVaultApi();
                 Response<FilesResponse> response = api.files(folder).execute();
 
                 authHelper.checkResponseCode(response);
@@ -230,7 +232,7 @@ public class FileClient implements Files {
     public CompletableFuture<FileInfo> statImp(String path) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                NodeApi api = ConnectionManager.getHiveVaultApi();
+                NodeApi api = this.connectionManager.getHiveVaultApi();
                 Response<FileInfo> response = api.getProperties(path).execute();
 
                 authHelper.checkResponseCode(response);
@@ -250,7 +252,7 @@ public class FileClient implements Files {
     private Response getFileOrBuffer(String destFilePath) throws HiveException {
         Response response;
         try {
-            response = ConnectionManager.getHiveVaultApi()
+            response = this.connectionManager.getHiveVaultApi()
                     .downloader(destFilePath)
                     .execute();
 
