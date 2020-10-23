@@ -23,15 +23,15 @@ public class InstanceTest {
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
+            Client.setResolverURL("http://api.elastos.io:21606");
+            Client.setLocalPath(localDataPath);
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
                     -> TestData.ACCESS_TOKEN));
             options.setAuthenticationDIDDocument(doc);
-            options.setDIDResolverUrl("http://api.elastos.io:21606");
-            options.setLocalDataPath(localDataPath);
 
-            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
             client = Client.createInstance(options);
+            client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
 
             Vault vault = client.getVault(TestData.OWNERDID).get();
             assertNotNull(vault);

@@ -41,9 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 public class PresentationInJWT {
     // DummyAdapter only for demo and testing.
     private static DummyAdapter adapter;
@@ -236,6 +233,8 @@ public class PresentationInJWT {
     public void setUp() {
         try {
 
+            Client.setResolverURL("http://api.elastos.io:21606");
+            Client.setLocalPath(localDataPath);
             Client.Options options = new Client.Options();
 
             initDIDBackend();
@@ -273,11 +272,8 @@ public class PresentationInJWT {
             }));
 
             options.setAuthenticationDIDDocument(doc);
-            options.setDIDResolverUrl("http://api.elastos.io:21606");
-            options.setLocalDataPath(localDataPath);
-
-            Client.setVaultProvider("did:elastos:if4BUSyGPnrCrMmUtBFJrAY3UtXP1UopbM", "http://localhost:5000");
             client = Client.createInstance(options);
+            client.setVaultProvider("did:elastos:if4BUSyGPnrCrMmUtBFJrAY3UtXP1UopbM", "http://localhost:5000");
             filesApi = client.getVault("did:elastos:if4BUSyGPnrCrMmUtBFJrAY3UtXP1UopbM").get().getFiles();
         } catch (Exception e) {
             e.printStackTrace();

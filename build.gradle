@@ -15,7 +15,7 @@ buildscript {
     }
 }
 
-version = '0.1.0'
+version = 'alpha-v2.0.1'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -117,11 +117,11 @@ task createjavadoc(type: Javadoc) {
 javadoc.dependsOn(build)
 
 publish {
-    userOrg = 'elastos'
-    groupId = 'org.elastos'
+    userOrg = 'xidaokun'
+    groupId = 'org.cary'
     artifactId = 'hive'
-    publishVersion = '0.5.0'
-    desc = 'Elastos Hive SDK'
-    repoName = 'Elastos.NET.Hive.Java.SDK'
+    publishVersion = 'alpha-v2.0.1'
+    desc = 'Elastos Hive Test SDK'
+    repoName = 'hive'
     website = 'https://github.com/elastos/Elastos.NET.Hive.Java.SDK'
 }

@@ -41,7 +41,6 @@ import org.elastos.hive.database.Timestamp;
 import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.database.WriteConcern;
-import org.elastos.hive.exception.HiveException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -482,15 +481,15 @@ public class DatabaseTest {
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
+            Client.setResolverURL("http://api.elastos.io:21606");
+            Client.setLocalPath(localDataPath);
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
                     -> TestData.ACCESS_TOKEN));
             options.setAuthenticationDIDDocument(doc);
-            options.setDIDResolverUrl("http://api.elastos.io:21606");
-            options.setLocalDataPath(localDataPath);
 
-            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
             client = Client.createInstance(options);
+            client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
             database = client.getVault(TestData.OWNERDID).get().getDatabase();
         } catch (Exception e) {
             e.printStackTrace();
