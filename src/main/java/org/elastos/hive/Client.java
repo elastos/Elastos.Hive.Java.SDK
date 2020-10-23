@@ -33,32 +33,65 @@ import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
+import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.vault.AuthHelper;
 import org.elastos.hive.vault.Constance;
 
 public class Client {
-	private static String resolverURL;
-	private static String localPath;
+	private static boolean resolverDidSetup;
 
-	private Options opts;
-	private Map<String , String> providerCache = new HashMap<>();
+	private AuthenticationHandler authentcationHandler;
+	private DIDDocument authenticationDIDDocument;
+	private String localDataPath;
+	private Map<String , String> providerCache;
 
-	public Client(Options options) {
-		this.opts = options;
+	private Client(Options options) {
+		this.authenticationDIDDocument = options.authenticationDIDDocument();
+		this.authentcationHandler = options.authentcationHandler;
+		this.localDataPath = options.localDataPath;
+		this.providerCache = new HashMap<>();
+	}
+
+	public static void setupResolver() throws HiveException {
+		setupResolver(null, null);
+	}
+
+	public static void setupResolver(String url, String path) throws HiveException {
+		String resolver = url;
+		String localPath = path;
+
+		if (resolverDidSetup)
+			throw new HiveException("Resolver already setuped");
+
+		if (resolver == null)
+			resolver = Constance.MAIN_NET_RESOLVER;
+		if (localPath == null)
+			localPath = "didCache";
+
+		try {
+			DIDBackend.initialize(resolver, localPath);
+			ResolverCache.reset();
+
+			resolverDidSetup = true;
+		} catch (DIDResolveException e) {
+			e.printStackTrace();
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	public static class Options {
 		private AuthenticationHandler authentcationHandler;
 		private DIDDocument authenticationDIDDocument;
+		private String localDataPath;
 
 		public Options setAuthenticationDIDDocument(DIDDocument document) {
 			this.authenticationDIDDocument = document;
 			return this;
 		}
 
-		public DIDDocument authenticationDIDDocument() {
-			return this.authenticationDIDDocument;
+		protected DIDDocument authenticationDIDDocument() {
+			return authenticationDIDDocument;
 		}
 
 		public Options setAuthenticationHandler(AuthenticationHandler authentcationHandler) {
@@ -66,40 +99,32 @@ public class Client {
 			return this;
 		}
 
-		public AuthenticationHandler authenticationHandler() {
-			return this.authentcationHandler;
+		protected AuthenticationHandler authenticationHandler() {
+			return authentcationHandler;
 		}
 
-
-		protected boolean checkValid(boolean all) {
-			return (!all || authenticationDIDDocument != null)
-					&& (authentcationHandler != null);
+		public Options setLocalDataPath(String path) {
+			this.localDataPath = path;
+			return this;
 		}
 
-	}
+		protected String localDataPath() {
+			return localDataPath;
+		}
 
-	public static void setResolverURL(String url) {
-		resolverURL = url;
-	}
-
-	public static void setLocalPath(String path) {
-		localPath = path;
+		protected boolean checkValid() {
+			return (authenticationDIDDocument != null
+					&& authentcationHandler != null
+					&& localDataPath != null);
+		}
 	}
 
 	public static Client createInstance(Options options) throws HiveException {
-		if (options==null || localPath==null)
+		if (options == null || !options.checkValid())
 			throw new IllegalArgumentException();
 
-		if (resolverURL == null)
-			resolverURL = Constance.MAIN_NET_RESOLVER;
-
-		try {
-			DIDBackend.initialize(resolverURL, localPath);
-			ResolverCache.reset();
-		} catch (DIDException e) {
-			e.printStackTrace();
-			throw new HiveException(e.getMessage());
-		}
+		if (!resolverDidSetup)
+			throw new HiveException("Setup did resolver first");
 
 		return new Client(options);
 	}
@@ -110,9 +135,9 @@ public class Client {
 
 		return getVaultProvider(ownerDid).thenApply((provider)-> {
 			AuthHelper authHelper = new AuthHelper(ownerDid, provider,
-					localPath,
-					opts.authenticationDIDDocument,
-					opts.authentcationHandler);
+					localDataPath,
+					authenticationDIDDocument,
+					authentcationHandler);
 			return new Vault(authHelper, provider, ownerDid);
 		});
 	}
@@ -169,7 +194,9 @@ public class Client {
 	 * @param vaultAddress the given vault address
 	 */
 	public void setVaultProvider(String ownerDid, String vaultAddress) {
-		if(null==ownerDid || vaultAddress==null) return;
+		if (ownerDid == null || vaultAddress == null)
+			throw new IllegalArgumentException();
+
 		providerCache.put(ownerDid, vaultAddress);
 	}
 }
