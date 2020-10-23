@@ -178,8 +178,7 @@ public class FileTest {
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
-            Client.setLocalPath(localDataPath);
-            Client.setResolverURL("http://api.elastos.io:21606");
+            Client.setupResolver("http://api.elastos.io:21606", localDataPath);
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
                     -> TestData.ACCESS_TOKEN));
