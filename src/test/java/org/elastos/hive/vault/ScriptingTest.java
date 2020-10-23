@@ -266,8 +266,7 @@ public class ScriptingTest {
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
-            Client.setResolverURL("http://api.elastos.io:21606");
-            Client.setLocalPath(localDataPath);
+            Client.setupResolver("http://api.elastos.io:21606", localDataPath);
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
                     -> TestData.ACCESS_TOKEN));
