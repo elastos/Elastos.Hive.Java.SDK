@@ -51,6 +51,7 @@ public class AuthHelper implements ConnectHelper {
 
 	private DIDDocument authenticationDIDDocument;
 	private AuthenticationHandler authenticationHandler;
+	private ConnectionManager connectionManager;
 
 	public AuthHelper(String ownerDid, String nodeUrl, String storePath, DIDDocument authenticationDIDDocument, AuthenticationHandler handler) {
 		this.authenticationDIDDocument = authenticationDIDDocument;
@@ -62,11 +63,14 @@ public class AuthHelper implements ConnectHelper {
 
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-			ConnectionManager.resetHiveVaultApi(this.nodeUrl, config);
-			ConnectionManager.resetAuthApi(Constance.TOKEN_URI, config);
+			this.connectionManager = new ConnectionManager(this.nodeUrl, config);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public ConnectionManager getConnectionManager() {
+		return this.connectionManager;
 	}
 
 	@Override
@@ -104,7 +108,7 @@ public class AuthHelper implements ConnectHelper {
 
 		try {
 			String json = new JSONObject(map).toString();
-			Response response = ConnectionManager.getHiveVaultApi()
+			Response response = this.connectionManager.getHiveVaultApi()
 					.signIn(getJsonRequestBoy(json))
 					.execute();
 			SignResponse signResponse = (SignResponse) response.body();
@@ -125,7 +129,7 @@ public class AuthHelper implements ConnectHelper {
 		Map map = new HashMap<>();
 		map.put("jwt", token);
 		String json = new JSONObject(map).toString();
-		Response response = ConnectionManager.getHiveVaultApi()
+		Response response = this.connectionManager.getHiveVaultApi()
 				.auth(getJsonRequestBoy(json))
 				.execute();
 		handleAuthResponse(response);
@@ -229,7 +233,7 @@ public class AuthHelper implements ConnectHelper {
 		BaseServiceConfig baseServiceConfig = new BaseServiceConfig.Builder()
 				.headerConfig(headerConfig)
 				.build();
-		ConnectionManager.resetHiveVaultApi(this.nodeUrl,
+		this.connectionManager.resetHiveVaultApi(this.nodeUrl,
 				baseServiceConfig);
 	}
 
