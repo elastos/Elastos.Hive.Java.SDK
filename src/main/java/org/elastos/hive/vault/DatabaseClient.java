@@ -35,9 +35,11 @@ import retrofit2.Response;
 public class DatabaseClient implements Database {
 
     private AuthHelper authHelper;
+    private ConnectionManager connectionManager;
 
     public DatabaseClient(AuthHelper authHelper) {
         this.authHelper = authHelper;
+        this.connectionManager = authHelper.getConnectionManager();
     }
 
     @Override
@@ -53,7 +55,7 @@ public class DatabaseClient implements Database {
                 map.put("collection", collection);
                 String json = JsonUtil.getJsonFromObject(map);
 
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -80,7 +82,7 @@ public class DatabaseClient implements Database {
                 map.put("collection", collection);
                 String json = JsonUtil.getJsonFromObject(map);
 
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -108,7 +110,7 @@ public class DatabaseClient implements Database {
                 if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -139,7 +141,7 @@ public class DatabaseClient implements Database {
                 if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -168,7 +170,7 @@ public class DatabaseClient implements Database {
                 if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
-                Response<CountDocResponse> response = ConnectionManager.getHiveVaultApi()
+                Response<CountDocResponse> response = this.connectionManager.getHiveVaultApi()
                         .countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -197,7 +199,7 @@ public class DatabaseClient implements Database {
                 if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -227,7 +229,7 @@ public class DatabaseClient implements Database {
                 if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -257,7 +259,7 @@ public class DatabaseClient implements Database {
                 if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -293,7 +295,7 @@ public class DatabaseClient implements Database {
                 if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
                 String json = rootNode.toString();
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -321,7 +323,7 @@ public class DatabaseClient implements Database {
                 if(null!=filter) rootNode.set("filter", filter);
 
                 String json = rootNode.toString();
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
@@ -349,7 +351,7 @@ public class DatabaseClient implements Database {
                 if(null!=filter) rootNode.set("filter", filter);
 
                 String json = rootNode.toString();
-                Response response = ConnectionManager.getHiveVaultApi()
+                Response response = this.connectionManager.getHiveVaultApi()
                         .deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
                         .execute();
 
