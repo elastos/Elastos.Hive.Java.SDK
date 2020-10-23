@@ -38,28 +38,19 @@ import org.elastos.hive.vault.AuthHelper;
 import org.elastos.hive.vault.Constance;
 
 public class Client {
+	private static String resolverURL;
+	private static String localPath;
+
 	private Options opts;
-	private static Map<String , String> providerCache = new HashMap<>();
+	private Map<String , String> providerCache = new HashMap<>();
 
 	public Client(Options options) {
 		this.opts = options;
 	}
 
 	public static class Options {
-		private boolean enableCloudSync;
-		private String didResolverUrl;
-		private String localPath;
-
 		private AuthenticationHandler authentcationHandler;
 		private DIDDocument authenticationDIDDocument;
-
-		public String didResolverUrl() {
-			return didResolverUrl;
-		}
-
-		public void setDIDResolverUrl(String didResolverUrl) {
-			this.didResolverUrl = didResolverUrl;
-		}
 
 		public Options setAuthenticationDIDDocument(DIDDocument document) {
 			this.authenticationDIDDocument = document;
@@ -79,35 +70,31 @@ public class Client {
 			return this.authentcationHandler;
 		}
 
-		public Options setLocalDataPath(String path) {
-			this.localPath = path;
-			return this;
-		}
-
-		public String localDataPath() {
-			return this.localPath;
-		}
 
 		protected boolean checkValid(boolean all) {
-			return (localPath != null) && (!all || authenticationDIDDocument != null)
+			return (!all || authenticationDIDDocument != null)
 					&& (authentcationHandler != null);
 		}
 
 	}
 
-	public static Client createInstance(Options options) throws HiveException {
-		String resolver;
+	public static void setResolverURL(String url) {
+		resolverURL = url;
+	}
 
-		if (options == null)
+	public static void setLocalPath(String path) {
+		localPath = path;
+	}
+
+	public static Client createInstance(Options options) throws HiveException {
+		if (options==null || localPath==null)
 			throw new IllegalArgumentException();
 
-		if (options.didResolverUrl() == null)
-			resolver = Constance.MAIN_NET_RESOLVER;
-		else
-			resolver = options.didResolverUrl();
+		if (resolverURL == null)
+			resolverURL = Constance.MAIN_NET_RESOLVER;
 
 		try {
-			DIDBackend.initialize(resolver, options.localPath);
+			DIDBackend.initialize(resolverURL, localPath);
 			ResolverCache.reset();
 		} catch (DIDException e) {
 			e.printStackTrace();
@@ -123,7 +110,7 @@ public class Client {
 
 		return getVaultProvider(ownerDid).thenApply((provider)-> {
 			AuthHelper authHelper = new AuthHelper(ownerDid, provider,
-					opts.localPath,
+					localPath,
 					opts.authenticationDIDDocument,
 					opts.authentcationHandler);
 			return new Vault(authHelper, provider, ownerDid);
@@ -181,7 +168,7 @@ public class Client {
 	 * @param ownerDid the DID for the vault owner
 	 * @param vaultAddress the given vault address
 	 */
-	public static void setVaultProvider(String ownerDid, String vaultAddress) {
+	public void setVaultProvider(String ownerDid, String vaultAddress) {
 		if(null==ownerDid || vaultAddress==null) return;
 		providerCache.put(ownerDid, vaultAddress);
 	}
