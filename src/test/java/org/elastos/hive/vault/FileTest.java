@@ -178,15 +178,15 @@ public class FileTest {
             DIDDocument doc = DIDDocument
                     .fromJson(json);
 
+            Client.setLocalPath(localDataPath);
+            Client.setResolverURL("http://api.elastos.io:21606");
             Client.Options options = new Client.Options();
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
                     -> TestData.ACCESS_TOKEN));
             options.setAuthenticationDIDDocument(doc);
-            options.setDIDResolverUrl("http://api.elastos.io:21606");
-            options.setLocalDataPath(localDataPath);
 
-            Client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
             client = Client.createInstance(options);
+            client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
             filesApi = client.getVault(TestData.OWNERDID).get().getFiles();
         } catch (Exception e) {
             e.printStackTrace();
