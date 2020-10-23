@@ -1,5 +1,6 @@
 package org.elastos.hive.vault;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -86,7 +87,7 @@ public class AuthHelper implements ConnectHelper {
 
 	private void doCheckExpired() throws HiveException {
 		connectState.set(false);
-		if(null == token) tryRestoreToken();
+		tryRestoreToken();
 		if (token == null || token.isExpired()) {
 			signIn();
 		}
@@ -94,27 +95,23 @@ public class AuthHelper implements ConnectHelper {
 		connectState.set(true);
 	}
 
-	private void retryLogin()  throws HiveException {
-		connectState.set(false);
-		signIn();
-		initConnection();
-		connectState.set(true);
-	}
-
 	private void signIn() throws HiveException {
-		Map map = new HashMap<>();
-		JSONObject docJsonObject = new JSONObject(authenticationDIDDocument.toString());
-		map.put("document", docJsonObject);
+		Map<String, Object> map = new HashMap<>();
+		JSONObject docJson;
+
+		docJson = new JSONObject(authenticationDIDDocument.toString());
+		map.put("document", docJson);
 
 		try {
 			String json = new JSONObject(map).toString();
-			Response response = this.connectionManager.getHiveVaultApi()
+			Response<SignResponse> response = ConnectionManager.getHiveVaultApi()
 					.signIn(getJsonRequestBoy(json))
 					.execute();
-			SignResponse signResponse = (SignResponse) response.body();
-			if (null == signResponse) {
+			SignResponse signResponse = response.body();
+			if (null == signResponse)
 				throw new HiveException("Sign in challenge failed");
-			}
+
+
 			String jwtToken = signResponse.getChallenge();
 			if (null != this.authenticationHandler && verifyToken(jwtToken)) {
 				String approveJwtToken = this.authenticationHandler.authenticationChallenge(jwtToken).get();
@@ -125,68 +122,57 @@ public class AuthHelper implements ConnectHelper {
 		}
 	}
 
-	private void nodeAuth(String token) throws Exception {
-		Map map = new HashMap<>();
+	private void nodeAuth(String token) throws HiveException {
+		Map<String, Object> map = new HashMap<>();
 		map.put("jwt", token);
-		String json = new JSONObject(map).toString();
-		Response response = this.connectionManager.getHiveVaultApi()
-				.auth(getJsonRequestBoy(json))
-				.execute();
-		handleAuthResponse(response);
-	}
 
-	private boolean verifyToken(String jwtToken) {
 		try {
-			Claims claims = JwtUtil.getBody(jwtToken);
-			long exp = claims.getExpiration().getTime();
-			String aud = claims.getAudience();
+			String json = new JSONObject(map).toString();
+			Response<AuthResponse> response;
 
-			String did = authenticationDIDDocument.getSubject().toString();
-			if (null == did
-					|| null == aud
-					|| !did.equals(aud))
-				return false;
+			response = ConnectionManager.getHiveVaultApi()
+					.auth(getJsonRequestBoy(json))
+					.execute();
 
-			long currentTime = System.currentTimeMillis();
-			if (currentTime > exp) return false;
+			AuthResponse authResponse = response.body();
+			if (authResponse == null)
+				throw new HiveException("Authorization failed");
 
-		} catch (Exception e) {
+			String accessToken = authResponse.getAccess_token();
+			if (accessToken == null)
+				throw new HiveException("No access token found");
+
+			Claims claims = JwtUtil.getBody(accessToken);
+			setUserDid(claims.get("userDid").toString())
+			.setAppId(claims.get("appId").toString())
+			.setAppInstanceDid(claims.get("appInstanceDid").toString());
+
+			long expireTime = claims.getExpiration().getTime();
+			long expireAt = System.currentTimeMillis() / 1000 + expireTime / 1000;
+
+			this.token = new AuthToken(null, accessToken, expireAt, "token");
+			writebackToken();
+			initConnection();
+		} catch (IOException e) {
 			e.printStackTrace();
+			throw new HiveException(e.getMessage());
 		}
-
-		return true;
 	}
 
-	private void handleAuthResponse(Response response) throws Exception {
-		AuthResponse authResponse = (AuthResponse) response.body();
-		if (null == authResponse) {
-			throw new HiveException("Authorize failed");
-		}
+	private boolean verifyToken(String token) {
+		Claims claims = JwtUtil.getBody(token);
+		long expiresAt = claims.getExpiration().getTime();
+		String audience = claims.getAudience();
 
-		String access_token = authResponse.getAccess_token();
-		if (null == access_token) return;
-		Claims claims = JwtUtil.getBody(access_token);
-		long exp = claims.getExpiration().getTime();
-		setUserDid((String) claims.get("userDid"));
-		setAppId((String) claims.get("appId"));
-		setAppInstanceDid((String) claims.get("appInstanceDid"));
-
-		long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
-
-		token = new AuthToken("",
-				access_token,
-				expiresTime, "token");
-
-		//Store the local data.
-		writebackToken();
-
-		//init connection
-		initConnection();
-
+		return (audience != null &&
+				authenticationDIDDocument.getSubject().toString().equals(audience) &&
+				System.currentTimeMillis() < expiresAt);
 	}
-
 
 	private void tryRestoreToken() {
+		if (token != null)
+			return;
+
 		try {
 
 			JSONObject json = persistent.parseFrom();
@@ -245,24 +231,27 @@ public class AuthHelper implements ConnectHelper {
 		return this.userDid;
 	}
 
-	public void setUserDid(String userDid) {
+	public AuthHelper setUserDid(String userDid) {
 		this.userDid = userDid;
+		return this;
 	}
 
 	public String getAppId() {
 		return this.appId;
 	}
 
-	public void setAppId(String appId) {
+	private AuthHelper setAppId(String appId) {
 		this.appId = appId;
+		return this;
 	}
 
 	public String getAppInstanceDid() {
 		return this.appInstanceDid;
 	}
 
-	public void setAppInstanceDid(String appInstanceDid) {
+	private AuthHelper setAppInstanceDid(String appInstanceDid) {
 		this.appInstanceDid = appInstanceDid;
+		return this;
 	}
 
 	private RequestBody getJsonRequestBoy(String json) {
@@ -276,7 +265,7 @@ public class AuthHelper implements ConnectHelper {
 		int code = response.code();
 		if (code >= 300 || code<200) {
 			if(code==401) {
-				retryLogin();
+				doCheckExpired();
 			} else {
 				String message  = response.message();
 				throw new HiveException(message);
