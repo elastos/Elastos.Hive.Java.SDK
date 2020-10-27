@@ -2,6 +2,7 @@ package org.elastos.hive.vault;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -16,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import org.elastos.did.DIDDocument;
 import org.elastos.hive.Client;
 import org.elastos.hive.Database;
+import org.elastos.hive.Vault;
 import org.elastos.hive.database.Collation;
 import org.elastos.hive.database.Collation.Alternate;
 import org.elastos.hive.database.Collation.CaseFirst;
@@ -274,7 +276,7 @@ public class DatabaseTest {
             Boolean success = database.createCollection(collectionName, null).get();
             assertTrue(success);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -294,7 +296,7 @@ public class DatabaseTest {
             String id = result.insertedId();
             assertNotNull(id);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -324,7 +326,7 @@ public class DatabaseTest {
                 System.out.println("id=" + id);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -345,7 +347,7 @@ public class DatabaseTest {
             assertNotNull(result);
             System.out.println("result=" + result.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -366,7 +368,7 @@ public class DatabaseTest {
             assertNotNull(result);
             System.out.println("result=" + result.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -382,7 +384,7 @@ public class DatabaseTest {
             long count = database.countDocuments(collectionName, filter, options).get();
             System.out.println("count=" + count);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -406,7 +408,7 @@ public class DatabaseTest {
             System.out.println("upsertedCount=" + result.upsertedCount());
             System.out.println("upsertedId=" + result.upsertedId());
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -430,7 +432,7 @@ public class DatabaseTest {
             System.out.println("upsertedCount=" + result.upsertedCount());
             System.out.println("upsertedId=" + result.upsertedId());
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -445,7 +447,7 @@ public class DatabaseTest {
             DeleteResult deleteResult = database.deleteOne(collectionName, filter, null).get();
             System.out.println("delete count=" + deleteResult.deletedCount());
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -460,7 +462,7 @@ public class DatabaseTest {
             DeleteResult result = database.deleteMany(collectionName, filter, null).get();
             System.out.println("delete count=" + result.deletedCount());
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -470,28 +472,13 @@ public class DatabaseTest {
             Boolean success = database.deleteCollection(collectionName).get();
             assertTrue(success);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
     @BeforeClass
     public static void setUp() {
-        try {
-            String json = TestData.DOC_STR;
-            DIDDocument doc = DIDDocument
-                    .fromJson(json);
-
-            Client.setupResolver("http://api.elastos.io:21606", localDataPath);
-            Client.Options options = new Client.Options();
-            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> TestData.ACCESS_TOKEN));
-            options.setAuthenticationDIDDocument(doc);
-
-            client = Client.createInstance(options);
-            client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
-            database = client.getVault(TestData.OWNERDID).get().getDatabase();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Vault vault = TestFactory.createFactory().getVault();
+        database = vault.getDatabase();
     }
 }
