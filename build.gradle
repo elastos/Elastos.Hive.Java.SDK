@@ -116,6 +116,15 @@ task createjavadoc(type: Javadoc) {
 
 javadoc.dependsOn(build)
 
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        outputs.upToDateWhen {false}
+        showStandardStreams = true
+    }
+}
+
 publish {
     userOrg = 'elastos'
     groupId = 'org.elastos'
