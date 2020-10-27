@@ -29,8 +29,10 @@ import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.Header;
 import org.elastos.hive.Client;
 import org.elastos.hive.Files;
+import org.elastos.hive.Vault;
 import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.vault.TestData;
+import org.elastos.hive.vault.TestFactory;
 import org.junit.Test;
 
 import java.io.File;
@@ -230,49 +232,50 @@ public class PresentationInJWT {
         DIDBackend.initialize(adapter, cacheDir);
     }
 
-    @Test
-    public void setUp() {
+    DIDApp didapp = null;
+    DApp testapp = null;
+    String docStr = null;
+    DIDDocument doc = null;
+    public PresentationInJWT init() {
         try {
             initDIDBackend();
-            DIDApp didapp = new DIDApp("didapp", "clever bless future fuel obvious black subject cake art pyramid member clump");
-            DApp testapp = new DApp("testapp", "amount material swim purse swallow gate pride series cannon patient dentist person");
+            didapp = new DIDApp("didapp", "clever bless future fuel obvious black subject cake art pyramid member clump");
+            testapp = new DApp("testapp", "amount material swim purse swallow gate pride series cannon patient dentist person");
 
             //SignIn
-            DIDDocument doc = testapp.getDocument();
-            String docStr = doc.toJson(true, true);
-            System.out.println(docStr);
-
-            Client.setupResolver("http://api.elastos.io:21606", null);
-            Client.Options options = new Client.Options();
-            options.setLocalDataPath(localDataPath);
-            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(() -> {
-                try {
-                    Claims claims = JwtUtil.getBody(jwtToken);
-                    String iss = claims.getIssuer();
-                    String nonce = (String) claims.get("nonce");
-
-                    VerifiableCredential vc = didapp.issueDiplomaFor(testapp);
-
-                    VerifiablePresentation vp = testapp.createPresentation(vc, iss, nonce);
-
-//                    vp.isValid();
-                    String token = testapp.createToken(vp, iss);
-
-                    return token;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                return null;
-            }));
-            options.setAuthenticationDIDDocument(doc);
-
-            client = Client.createInstance(options);
-            client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
-            filesApi = client.getVault(TestData.OWNERDID).get().getFiles();
-            filesApi.hash("hive").get();
+            doc = testapp.getDocument();
+            docStr = doc.toJson(true, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return this;
     }
+
+    public String getDocStr() {
+        return docStr;
+    }
+
+    public DIDDocument getDoc() {
+        return doc;
+    }
+
+    public String getAuthToken(String jwtToken) {
+        try {
+            Claims claims = JwtUtil.getBody(jwtToken);
+            String iss = claims.getIssuer();
+            String nonce = (String) claims.get("nonce");
+
+            VerifiableCredential vc = didapp.issueDiplomaFor(testapp);
+
+            VerifiablePresentation vp = testapp.createPresentation(vc, iss, nonce);
+
+            String token = testapp.createToken(vp, iss);
+            return token;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

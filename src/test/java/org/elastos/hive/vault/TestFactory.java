@@ -1,6 +1,6 @@
 package org.elastos.hive.vault;
 
-import org.elastos.did.DIDDocument;
+import org.elastos.did.PresentationInJWT;
 import org.elastos.hive.Client;
 import org.elastos.hive.Vault;
 
@@ -14,15 +14,13 @@ public class TestFactory {
 
 	public void setUp() {
 		try {
+			PresentationInJWT presentationInJWT = new PresentationInJWT().init();
 			Client.setupResolver(TestData.RESOLVER_URL, null);
 			Client.Options options = new Client.Options();
 			options.setLocalDataPath(localDataPath);
 			options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-					-> TestData.ACCESS_TOKEN));
-			String json = TestData.DOC_STR;
-			DIDDocument doc = DIDDocument
-					.fromJson(json);
-			options.setAuthenticationDIDDocument(doc);
+					-> presentationInJWT.getAuthToken(jwtToken)));
+			options.setAuthenticationDIDDocument(presentationInJWT.getDoc());
 
 			Client client = Client.createInstance(options);
 			client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
