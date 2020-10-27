@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elastos.did.DIDDocument;
 import org.elastos.hive.Client;
 import org.elastos.hive.Scripting;
+import org.elastos.hive.Vault;
 import org.elastos.hive.database.Date;
 import org.elastos.hive.database.MaxKey;
 import org.elastos.hive.database.MinKey;
@@ -34,11 +35,10 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ScriptingTest {
-    private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
-
     private String testTextFilePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
     private String testCacheTextFilePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/script/test.txt";
 
@@ -73,7 +73,7 @@ public class ScriptingTest {
         OrCondition cond = new OrCondition("root");
         cond.append(orCond).append(cond5).append(andCond);
 
-        System.out.println(cond.serialize());
+//        System.out.println(cond.serialize());
     }
 
     @Test
@@ -91,12 +91,12 @@ public class ScriptingTest {
         AggregatedExecutable ae = new AggregatedExecutable("ae");
         ae.append(exec1).append(exec2).append(exec3);
 
-        System.out.println(ae.serialize());
+//        System.out.println(ae.serialize());
 
         AggregatedExecutable ae2 = new AggregatedExecutable("ae2");
         ae2.append(exec1).append(exec2).append(ae).append(exec3);
 
-        System.out.println(ae2.serialize());
+//        System.out.println(ae2.serialize());
     }
 
     @Test
@@ -106,7 +106,7 @@ public class ScriptingTest {
             boolean success = scripting.registerScript(noConditionName, new RawExecutable(executable)).get();
             assertTrue(success);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -118,7 +118,7 @@ public class ScriptingTest {
             boolean success = scripting.registerScript(withConditionName, new RawCondition(condition), new RawExecutable(executable)).get();
             assertTrue(success);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -129,7 +129,7 @@ public class ScriptingTest {
             String ret = scripting.call(noConditionName, String.class).get();
             System.out.println("return=" + ret);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -139,7 +139,7 @@ public class ScriptingTest {
             byte[] ret = scripting.call(noConditionName, byte[].class).get();
             System.out.println("return=" + ret);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -149,7 +149,7 @@ public class ScriptingTest {
             JsonNode ret = scripting.call(noConditionName, JsonNode.class).get();
             System.out.println("return=" + ret);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -159,7 +159,7 @@ public class ScriptingTest {
             Reader ret = scripting.call(noConditionName, Reader.class).get();
             System.out.println("return=" + ret);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -173,7 +173,7 @@ public class ScriptingTest {
             String ret = scripting.call(withConditionName, params, String.class).get();
             System.out.println("return=" + ret);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -183,7 +183,7 @@ public class ScriptingTest {
             String ret = scripting.call(noConditionName, "appid", String.class).get();
             System.out.println("return=" + ret);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -194,7 +194,7 @@ public class ScriptingTest {
             boolean success = scripting.registerScript("upload_file", new RawExecutable(executable)).get();
             assertTrue(success);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -207,7 +207,7 @@ public class ScriptingTest {
             String ret = scripting.call(testTextFilePath, params, Scripting.Type.UPLOAD, String.class).get();
             assertNotNull(ret);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -218,7 +218,7 @@ public class ScriptingTest {
             boolean success = scripting.registerScript("download_file", new RawExecutable(executable)).get();
             assertTrue(success);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -231,7 +231,7 @@ public class ScriptingTest {
             Reader reader = scripting.call("download_file", params, Scripting.Type.DOWNLOAD, Reader.class).get();
             Utils.cacheTextFile(reader, testCacheTextFilePath);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -242,7 +242,7 @@ public class ScriptingTest {
             boolean success = scripting.registerScript("get_file_info", new RawExecutable(executable)).get();
             assertTrue(success);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -255,29 +255,14 @@ public class ScriptingTest {
             String ret = scripting.call("get_file_info", params, Scripting.Type.PROPERTIES, String.class).get();
             assertNotNull(ret);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
     @BeforeClass
     public static void setUp() {
-        try {
-            String json = TestData.DOC_STR;
-            DIDDocument doc = DIDDocument
-                    .fromJson(json);
-
-            Client.setupResolver("http://api.elastos.io:21606", localDataPath);
-            Client.Options options = new Client.Options();
-            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> TestData.ACCESS_TOKEN));
-            options.setAuthenticationDIDDocument(doc);
-
-            client = Client.createInstance(options);
-            client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
-            scripting = client.getVault(TestData.OWNERDID).get().getScripting();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Vault vault = TestFactory.createFactory().getVault();
+        scripting = vault.getScripting();
     }
 
 //    @BeforeClass
@@ -298,7 +283,7 @@ public class ScriptingTest {
 //            client = Client.createInstance(options);
 //            scripting = client.getVault(TestData.OWNERDID1).get().getScripting();
 //        } catch (Exception e) {
-//            e.printStackTrace();
+//            fail();
 //        }
 //    }
 }

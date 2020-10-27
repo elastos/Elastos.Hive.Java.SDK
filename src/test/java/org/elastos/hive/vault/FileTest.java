@@ -1,8 +1,7 @@
 package org.elastos.hive.vault;
 
-import org.elastos.did.DIDDocument;
-import org.elastos.hive.Client;
 import org.elastos.hive.Files;
+import org.elastos.hive.Vault;
 import org.elastos.hive.file.FileInfo;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -16,10 +15,10 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileTest {
@@ -37,8 +36,6 @@ public class FileTest {
     private static String remoteTextBackupPath = "backup" + File.separator + "test.txt";
     private static String remoteImgBackupPath = "backup" + File.separator + "big.png";
 
-    private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
-    private static Client client;
     private static Files filesApi;
 
     @Test
@@ -50,6 +47,7 @@ public class FileTest {
             filesApi.delete(remoteImgBackupPath).get();
         } catch (Exception e) {
             e.printStackTrace();
+            fail();
         }
     }
 
@@ -58,7 +56,10 @@ public class FileTest {
         FileReader fileReader = null;
         Writer writer = null;
         try {
-             writer = filesApi.upload(remoteTextPath, Writer.class).get();
+            writer = filesApi.upload(remoteTextPath, Writer.class).exceptionally(e -> {
+                System.out.println(e.getMessage());
+                return null;
+            }).get();
             fileReader = new FileReader(new File(textLocalPath));
             char[] buffer = new char[1];
             while (fileReader.read(buffer) != -1) {
@@ -66,13 +67,13 @@ public class FileTest {
             }
             System.out.println("write success");
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         } finally {
             try {
                 if(null!=fileReader) fileReader.close();
                 if(null!=writer) writer.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                fail();
             }
         }
     }
@@ -87,7 +88,7 @@ public class FileTest {
             outputStream.close();
             System.out.println("write success");
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -97,7 +98,7 @@ public class FileTest {
             Reader reader = filesApi.download(remoteTextPath, Reader.class).get();
             Utils.cacheTextFile(reader, textLocalCachePath);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -107,7 +108,7 @@ public class FileTest {
             InputStream inputStream = filesApi.download(remoteImgPath, InputStream.class).get();
             Utils.cacheBinFile(inputStream, imgLocalCachePath);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -125,7 +126,7 @@ public class FileTest {
                 System.out.println("lastModify=" + fileInfo.getLastModify());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -136,7 +137,7 @@ public class FileTest {
             assertNotNull(hash);
             System.out.println("hash=" + hash);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -146,7 +147,7 @@ public class FileTest {
             boolean success = filesApi.copy(remoteTextPath, remoteTextBackupPath).get();
             assertTrue(success);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -156,7 +157,7 @@ public class FileTest {
             boolean success = filesApi.move(remoteImgPath, remoteImgBackupPath).get();
             assertTrue(success);
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
@@ -166,29 +167,14 @@ public class FileTest {
             filesApi.delete(remoteTextBackupPath).get();
             filesApi.delete(remoteImgBackupPath).get();
         } catch (Exception e) {
-            e.printStackTrace();
+            fail();
         }
     }
 
 
     @BeforeClass
     public static void setUp() {
-        try {
-            String json = TestData.DOC_STR;
-            DIDDocument doc = DIDDocument
-                    .fromJson(json);
-
-            Client.setupResolver("http://api.elastos.io:21606", localDataPath);
-            Client.Options options = new Client.Options();
-            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-                    -> TestData.ACCESS_TOKEN));
-            options.setAuthenticationDIDDocument(doc);
-
-            client = Client.createInstance(options);
-            client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
-            filesApi = client.getVault(TestData.OWNERDID).get().getFiles();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Vault vault = TestFactory.createFactory().getVault();
+        filesApi = vault.getFiles();
     }
 }
