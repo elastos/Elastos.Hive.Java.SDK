@@ -30,6 +30,7 @@ import org.elastos.did.jwt.Header;
 import org.elastos.hive.Client;
 import org.elastos.hive.Files;
 import org.elastos.hive.utils.JwtUtil;
+import org.elastos.hive.vault.TestData;
 import org.junit.Test;
 
 import java.io.File;
@@ -79,10 +80,10 @@ public class PresentationInJWT {
 //			Mnemonic mg = Mnemonic.getInstance();
 //			String mnemonic = mg.generate();
 
-            System.out.format("[%s] Please write down your mnemonic and passwords:%n", name);
-            System.out.println("  Mnemonic: " + mnemonic);
-            System.out.println("  Mnemonic passphrase: " + passphrase);
-            System.out.println("  Store password: " + storepass);
+//            System.out.format("[%s] Please write down your mnemonic and passwords:%n", name);
+//            System.out.println("  Mnemonic: " + mnemonic);
+//            System.out.println("  Mnemonic passphrase: " + passphrase);
+//            System.out.println("  Store password: " + storepass);
 
             // Initialize the root identity.
             store.initPrivateIdentity(null, mnemonic, passphrase, storepass);
@@ -144,7 +145,7 @@ public class PresentationInJWT {
 
         public VerifiableCredential issueDiplomaFor(DApp dapp) throws DIDException {
             Map<String, String> subject = new HashMap<String, String>();
-            subject.put("'appDid'", dapp.appId);
+            subject.put("appDid", dapp.appId);
 
             Calendar exp = Calendar.getInstance();
             exp.add(Calendar.YEAR, 5);
@@ -232,11 +233,6 @@ public class PresentationInJWT {
     @Test
     public void setUp() {
         try {
-
-            Client.setResolverURL("http://api.elastos.io:21606");
-            Client.setLocalPath(localDataPath);
-            Client.Options options = new Client.Options();
-
             initDIDBackend();
             DIDApp didapp = new DIDApp("didapp", "clever bless future fuel obvious black subject cake art pyramid member clump");
             DApp testapp = new DApp("testapp", "amount material swim purse swallow gate pride series cannon patient dentist person");
@@ -246,15 +242,14 @@ public class PresentationInJWT {
             String docStr = doc.toJson(true, true);
             System.out.println(docStr);
 
+            Client.setupResolver("http://api.elastos.io:21606", null);
+            Client.Options options = new Client.Options();
+            options.setLocalDataPath(localDataPath);
             options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(() -> {
                 try {
                     Claims claims = JwtUtil.getBody(jwtToken);
-                    long exp = claims.getExpiration().getTime();
-                    String subject = claims.getSubject();
                     String iss = claims.getIssuer();
                     String nonce = (String) claims.get("nonce");
-                    String aud = claims.getAudience();
-
 
                     VerifiableCredential vc = didapp.issueDiplomaFor(testapp);
 
@@ -270,11 +265,12 @@ public class PresentationInJWT {
 
                 return null;
             }));
-
             options.setAuthenticationDIDDocument(doc);
+
             client = Client.createInstance(options);
-            client.setVaultProvider("did:elastos:if4BUSyGPnrCrMmUtBFJrAY3UtXP1UopbM", "http://localhost:5000");
-            filesApi = client.getVault("did:elastos:if4BUSyGPnrCrMmUtBFJrAY3UtXP1UopbM").get().getFiles();
+            client.setVaultProvider(TestData.OWNERDID, TestData.PROVIDER);
+            filesApi = client.getVault(TestData.OWNERDID).get().getFiles();
+            filesApi.hash("hive").get();
         } catch (Exception e) {
             e.printStackTrace();
         }
