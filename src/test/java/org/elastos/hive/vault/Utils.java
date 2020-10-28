@@ -10,6 +10,15 @@ import java.io.InputStream;
 import java.io.Reader;
 
 public class Utils {
+
+    public static boolean deleteFile(String path) {
+        File file = new File(path);
+        if(file.exists()) {
+            return file.delete();
+        }
+        return false;
+    }
+
     public static byte[] readImage(String path) {
         try {
             InputStream inputStream = null;
