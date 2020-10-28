@@ -26,8 +26,8 @@ public class FileTest {
     private String textLocalPath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
     private String imgLocalPath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/big.png";
 
-    private String textLocalCachePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/test.txt";
-    private String imgLocalCachePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/big.png";
+    private String textLocalCachePath = System.getProperty("user.dir") + File.separator + "store/cache/test.txt";
+    private String imgLocalCachePath = System.getProperty("user.dir") + File.separator + "store/cache/big.png";
 
     private static String remoteFolder = "hive";
     private static String remoteTextPath = remoteFolder + File.separator + "test.txt";
@@ -41,6 +41,8 @@ public class FileTest {
     @Test
     public void test00_clean() {
         try {
+            Utils.deleteFile(textLocalCachePath);
+            Utils.deleteFile(imgLocalCachePath);
             filesApi.delete(remoteTextPath).get();
             filesApi.delete(remoteImgPath).get();
             filesApi.delete(remoteTextBackupPath).get();

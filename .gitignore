@@ -7,7 +7,7 @@ bin/
 doc/
 build/
 store/
-didCache
+didCache/
 
 # Test
 .tmp
