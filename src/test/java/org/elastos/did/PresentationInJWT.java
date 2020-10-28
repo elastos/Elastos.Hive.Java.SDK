@@ -47,14 +47,9 @@ import java.util.concurrent.CompletableFuture;
 public class PresentationInJWT {
     // DummyAdapter only for demo and testing.
     private static DummyAdapter adapter;
-    private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
-    private static Files filesApi;
-
-    private static Client client;
-
     public static class Entity {
         // Mnemonic passphrase and the store password should set by the end user.
-        private final static String passphrase = "mypassphrase";
+        private final static String passphrase = "password";
         protected final static String storepass = "password";
 
         private String name;
@@ -239,8 +234,8 @@ public class PresentationInJWT {
     public PresentationInJWT init() {
         try {
             initDIDBackend();
-            didapp = new DIDApp("didapp", "clever bless future fuel obvious black subject cake art pyramid member clump");
-            testapp = new DApp("testapp", "amount material swim purse swallow gate pride series cannon patient dentist person");
+            didapp = new DIDApp("didapp", "provide zero slab drink patient tape private paddle unaware catch virtual stone");
+            testapp = new DApp("testapp", "polar degree weapon crouch alarm scorpion between stand glow round catalog marine");
 
             //SignIn
             doc = testapp.getDocument();
