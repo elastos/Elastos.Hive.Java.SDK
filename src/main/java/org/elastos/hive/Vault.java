@@ -3,6 +3,7 @@ package org.elastos.hive;
 import org.elastos.hive.vault.AuthHelper;
 import org.elastos.hive.vault.DatabaseClient;
 import org.elastos.hive.vault.FileClient;
+import org.elastos.hive.vault.PaymentClient;
 import org.elastos.hive.vault.ScriptClient;
 
 /**
@@ -16,6 +17,7 @@ public class Vault {
 	private Database database;
 	private Scripting scripting;
 	private KeyValues keyValues;
+	private Payment payment;
 
 	private String vaultProvider;
 	private String ownerDid;
@@ -39,6 +41,7 @@ public class Vault {
 		this.files = new FileClient(authHelper);
 		this.database = new DatabaseClient(authHelper);
 		this.scripting = new ScriptClient(authHelper);
+		this.payment = new PaymentClient(authHelper);
 	}
 
 	/**
@@ -111,5 +114,13 @@ public class Vault {
 	 */
 	public Scripting getScripting() {
 		return this.scripting;
+	}
+
+	/**
+	 * Get interface as Payment instance
+	 * @return interface instance of Payment
+	 */
+	public Payment getPayment() {
+		return this.payment;
 	}
 }

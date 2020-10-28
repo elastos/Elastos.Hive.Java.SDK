@@ -2,12 +2,17 @@ package org.elastos.hive.vault.network;
 
 
 import org.elastos.hive.file.FileInfo;
+import org.elastos.hive.payment.ServiceInfo;
+import org.elastos.hive.payment.order.OrderInfo;
+import org.elastos.hive.payment.pkg.PackageInfo;
 import org.elastos.hive.vault.Constance;
 import org.elastos.hive.vault.network.model.AuthResponse;
 import org.elastos.hive.vault.network.model.CountDocResponse;
 import org.elastos.hive.vault.network.model.FilesResponse;
 import org.elastos.hive.vault.network.model.HashResponse;
 import org.elastos.hive.vault.network.model.SignResponse;
+
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -97,4 +102,25 @@ public interface NodeApi {
     @Multipart
     @POST(Constance.API_PATH + "/scripting/run_script")
     Call<ResponseBody> callScript(@Part MultipartBody.Part file, @Part("metadata") RequestBody metadata);
+
+    @GET(Constance.API_PATH + "/payment/vault_package_info")
+    Call<PackageInfo> getPackageInfo();
+
+    @POST(Constance.API_PATH + "/payment/free_trial")
+    Call<ResponseBody> freeTrial();
+
+    @POST(Constance.API_PATH + "/payment/create_vault_package_order")
+    Call<ResponseBody> createOrder(@Body RequestBody body);
+
+    @POST(Constance.API_PATH + "/payment/pay_vault_package_order")
+    Call<ResponseBody> pay(@Body RequestBody body);
+
+    @GET(Constance.API_PATH + "/payment/vault_package_order")
+    Call<OrderInfo> getOrderInfo(@Query("order_id") String orderId);
+
+    @GET(Constance.API_PATH + "/payment/vault_package_order_list")
+    Call<List<OrderInfo>> getOrderInfos();
+
+    @GET(Constance.API_PATH + "/service/vault")
+    Call<ServiceInfo> getServiceInfo();
 }
