@@ -3,9 +3,8 @@ package org.elastos.hive.vault;
 import org.elastos.hive.Payment;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.payment.ServiceInfo;
-import org.elastos.hive.payment.order.Order;
-import org.elastos.hive.payment.pkg.PricingPlan;
+import org.elastos.hive.payment.Order;
+import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.utils.JsonUtil;
 
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import java.util.concurrent.CompletionException;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 public class PaymentClient implements Payment {
@@ -28,27 +28,16 @@ public class PaymentClient implements Payment {
 		this.connectionManager = authHelper.getConnectionManager();
 	}
 
-
 	@Override
-	public CompletableFuture<PricingPlan> getAllPricingPlans() {
+	public CompletableFuture<List<PricingPlan>> getAllPricingPlans() {
 		return authHelper.checkValid()
 				.thenCompose(result -> getAllPricingPlansImp());
 	}
 
-	@Override
-	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<PricingPlan> getUsingPricePlan() {
-		return null;
-	}
-
-	private CompletableFuture<PricingPlan> getAllPricingPlansImp() {
+	private CompletableFuture<List<PricingPlan>> getAllPricingPlansImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PricingPlan> response = this.connectionManager.getHiveVaultApi()
+				Response<List<PricingPlan>> response = this.connectionManager.getHiveVaultApi()
 						.getPackageInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -61,6 +50,11 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
+	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
+		return null;
+	}
+
+	@Override
 	public CompletableFuture<Boolean> useTrial() {
 		return authHelper.checkValid()
 				.thenCompose(result -> useTrialImp());
@@ -69,8 +63,8 @@ public class PaymentClient implements Payment {
 	private CompletableFuture<Boolean> useTrialImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PricingPlan> response = this.connectionManager.getHiveVaultApi()
-						.getPackageInfo()
+				Response<ResponseBody> response = this.connectionManager.getHiveVaultApi()
+						.freeTrial()
 						.execute();
 				authHelper.checkResponseCode(response);
 				return true;
@@ -91,11 +85,11 @@ public class PaymentClient implements Payment {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("package_name", packageName);
 				map.put("price_name", priceName);
 				String json = JsonUtil.getJsonFromObject(map);
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response<ResponseBody> response = this.connectionManager.getHiveVaultApi()
 						.createOrder(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -117,11 +111,11 @@ public class PaymentClient implements Payment {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("order_id", orderId);
 				map.put("pay_txids", txids);
 				String json = JsonUtil.getJsonFromObject(map);
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response<ResponseBody> response = this.connectionManager.getHiveVaultApi()
 						.pay(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -176,15 +170,15 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<ServiceInfo> serviceInfo() {
+	public CompletableFuture<PricingPlan> getUsingPricePlan() {
 		return authHelper.checkValid()
-				.thenCompose(result -> serviceInfoImp());
+				.thenCompose(result -> getUsingPricePlanImp());
 	}
 
-	private CompletableFuture<ServiceInfo> serviceInfoImp() {
+	private CompletableFuture<PricingPlan> getUsingPricePlanImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<ServiceInfo> response = this.connectionManager.getHiveVaultApi()
+				Response<PricingPlan> response = this.connectionManager.getHiveVaultApi()
 						.getServiceInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
