@@ -191,6 +191,8 @@ public class AuthHelper implements ConnectHelper {
 
 			JSONObject json = persistent.parseFrom();
 
+			if(!json.has(ACCESS_TOKEN_KEY)) return;
+
 			this.userDid = json.getString(USER_DID_KEY);
 			this.appId = json.getString(APP_ID_KEY);
 			this.appInstanceDid = json.getString(APP_INSTANCE_DID_KEY);
