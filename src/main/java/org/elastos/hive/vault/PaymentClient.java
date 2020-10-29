@@ -4,8 +4,8 @@ import org.elastos.hive.Payment;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.ServiceInfo;
-import org.elastos.hive.payment.order.OrderInfo;
-import org.elastos.hive.payment.pkg.PackageInfo;
+import org.elastos.hive.payment.order.Order;
+import org.elastos.hive.payment.pkg.PricingPlan;
 import org.elastos.hive.utils.JsonUtil;
 
 import java.util.HashMap;
@@ -30,15 +30,15 @@ public class PaymentClient implements Payment {
 
 
 	@Override
-	public CompletableFuture<PackageInfo> packageInfo() {
+	public CompletableFuture<PricingPlan> getAllPricingPlans() {
 		return authHelper.checkValid()
 				.thenCompose(result -> packageInfoImp());
 	}
 
-	private CompletableFuture<PackageInfo> packageInfoImp() {
+	private CompletableFuture<PricingPlan> packageInfoImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PackageInfo> response = this.connectionManager.getHiveVaultApi()
+				Response<PricingPlan> response = this.connectionManager.getHiveVaultApi()
 						.getPackageInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -51,7 +51,7 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> freeTrial() {
+	public CompletableFuture<Boolean> useTrial() {
 		return authHelper.checkValid()
 				.thenCompose(result -> freeTrialImp());
 	}
@@ -59,7 +59,7 @@ public class PaymentClient implements Payment {
 	private CompletableFuture<Boolean> freeTrialImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PackageInfo> response = this.connectionManager.getHiveVaultApi()
+				Response<PricingPlan> response = this.connectionManager.getHiveVaultApi()
 						.getPackageInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -72,7 +72,7 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> createOrder(String packageName, String priceName) {
+	public CompletableFuture<Boolean> placeOrder(String packageName, String priceName) {
 		return authHelper.checkValid()
 				.thenCompose(result -> createOrderImp(packageName, priceName));
 	}
@@ -98,7 +98,7 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> pay(String orderId, List<String> txids) {
+	public CompletableFuture<Boolean> payOrder(String orderId, List<String> txids) {
 		return authHelper.checkValid()
 				.thenCompose(result -> payImp(orderId, txids));
 	}
@@ -124,15 +124,15 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<OrderInfo> orderInfo(String orderId) {
+	public CompletableFuture<Order> getOrder(String orderId) {
 		return authHelper.checkValid()
 				.thenCompose(result -> orderInfoImp(orderId));
 	}
 
-	private CompletableFuture<OrderInfo> orderInfoImp(String orderId) {
+	private CompletableFuture<Order> orderInfoImp(String orderId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<OrderInfo> response = this.connectionManager.getHiveVaultApi()
+				Response<Order> response = this.connectionManager.getHiveVaultApi()
 						.getOrderInfo(orderId)
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -145,15 +145,15 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<List<OrderInfo>> orderList() {
+	public CompletableFuture<List<Order>> getAllOrders() {
 		return authHelper.checkValid()
 				.thenCompose(result -> orderInfosImp());
 	}
 
-	private CompletableFuture<List<OrderInfo>> orderInfosImp() {
+	private CompletableFuture<List<Order>> orderInfosImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<List<OrderInfo>> response = this.connectionManager.getHiveVaultApi()
+				Response<List<Order>> response = this.connectionManager.getHiveVaultApi()
 						.getOrderInfos()
 						.execute();
 				authHelper.checkResponseCode(response);
