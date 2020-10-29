@@ -32,10 +32,20 @@ public class PaymentClient implements Payment {
 	@Override
 	public CompletableFuture<PricingPlan> getAllPricingPlans() {
 		return authHelper.checkValid()
-				.thenCompose(result -> packageInfoImp());
+				.thenCompose(result -> getAllPricingPlansImp());
 	}
 
-	private CompletableFuture<PricingPlan> packageInfoImp() {
+	@Override
+	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<PricingPlan> getUsingPricePlan() {
+		return null;
+	}
+
+	private CompletableFuture<PricingPlan> getAllPricingPlansImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Response<PricingPlan> response = this.connectionManager.getHiveVaultApi()
@@ -53,10 +63,10 @@ public class PaymentClient implements Payment {
 	@Override
 	public CompletableFuture<Boolean> useTrial() {
 		return authHelper.checkValid()
-				.thenCompose(result -> freeTrialImp());
+				.thenCompose(result -> useTrialImp());
 	}
 
-	private CompletableFuture<Boolean> freeTrialImp() {
+	private CompletableFuture<Boolean> useTrialImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Response<PricingPlan> response = this.connectionManager.getHiveVaultApi()
@@ -74,10 +84,10 @@ public class PaymentClient implements Payment {
 	@Override
 	public CompletableFuture<Boolean> placeOrder(String packageName, String priceName) {
 		return authHelper.checkValid()
-				.thenCompose(result -> createOrderImp(packageName, priceName));
+				.thenCompose(result -> placeOrderImp(packageName, priceName));
 	}
 
-	private CompletableFuture<Boolean> createOrderImp(String packageName, String priceName) {
+	private CompletableFuture<Boolean> placeOrderImp(String packageName, String priceName) {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
@@ -100,10 +110,10 @@ public class PaymentClient implements Payment {
 	@Override
 	public CompletableFuture<Boolean> payOrder(String orderId, List<String> txids) {
 		return authHelper.checkValid()
-				.thenCompose(result -> payImp(orderId, txids));
+				.thenCompose(result -> payOrderImp(orderId, txids));
 	}
 
-	private CompletableFuture<Boolean> payImp(String orderId, List<String> txids) {
+	private CompletableFuture<Boolean> payOrderImp(String orderId, List<String> txids) {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
@@ -126,10 +136,10 @@ public class PaymentClient implements Payment {
 	@Override
 	public CompletableFuture<Order> getOrder(String orderId) {
 		return authHelper.checkValid()
-				.thenCompose(result -> orderInfoImp(orderId));
+				.thenCompose(result -> getOrderImp(orderId));
 	}
 
-	private CompletableFuture<Order> orderInfoImp(String orderId) {
+	private CompletableFuture<Order> getOrderImp(String orderId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Response<Order> response = this.connectionManager.getHiveVaultApi()
@@ -147,10 +157,10 @@ public class PaymentClient implements Payment {
 	@Override
 	public CompletableFuture<List<Order>> getAllOrders() {
 		return authHelper.checkValid()
-				.thenCompose(result -> orderInfosImp());
+				.thenCompose(result -> getAllOrdersImp());
 	}
 
-	private CompletableFuture<List<Order>> orderInfosImp() {
+	private CompletableFuture<List<Order>> getAllOrdersImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Response<List<Order>> response = this.connectionManager.getHiveVaultApi()
