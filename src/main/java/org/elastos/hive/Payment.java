@@ -9,20 +9,22 @@ import java.util.concurrent.CompletableFuture;
 public interface Payment {
 
 	/**
-	 * get vault packages's informations
-	 * @return
+	 * get vault's pricing plan informations
+	 * @return PricingPlan list
+	 * @see org.elastos.hive.payment.PricingPlan
 	 */
 	CompletableFuture<List<PricingPlan>> getAllPricingPlans();
 
 	/**
-	 * get vault package's information by plan name
-	 * @param planName
-	 * @return
+	 * get vault pricing plan information by plan name
+	 * @param planName plan name
+	 * @return the instance of PricingPlan
+	 * @see org.elastos.hive.payment.PricingPlan
 	 */
 	CompletableFuture<PricingPlan> getPricingPlan(String planName);
 
 	/**
-	 * create a package order
+	 * create a order of pricing plan
 	 * @param packageName
 	 * @param priceName
 	 * @return
@@ -30,7 +32,7 @@ public interface Payment {
 	CompletableFuture<Boolean> placeOrder(String packageName, String priceName);
 
 	/**
-	 * Pay vault service package order
+	 * pay for  pricing plan order
 	 * @param orderId
 	 * @param txids
 	 * @return
@@ -57,7 +59,7 @@ public interface Payment {
 	CompletableFuture<List<Order>> getAllOrders();
 
 	/**
-	 * Get user vault service info
+	 * Get using price plan
 	 * @return
 	 */
 	CompletableFuture<PricingPlan> getUsingPricePlan();
