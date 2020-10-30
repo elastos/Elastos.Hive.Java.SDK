@@ -70,13 +70,13 @@ task createjavadoc(type: Javadoc) {
             //org.elastos.hive
             "**/Vault.java",
             "**/AuthenticationHandler.java",
-            "**/Callback.java",
             "**/Client.java",
 
             //interface
             "**/Database.java",
             "**/Files.java",
             "**/Scripting.java",
+            "**/Payment.java",
 
             //org.elastos.hive.database
             "**/DeleteOptions.java",
@@ -105,9 +105,13 @@ task createjavadoc(type: Javadoc) {
             "**/RawCondition.java",
             "**/RawExecutable.java",
 
+            //org.elastos.hive.payment
+            "**/Order",
+            "**/OrderState",
+            "**/PricingPlan",
+
             //org.elastos.hive.exception
             "**/HiveException.java",
-            "**/NotImplementedException.java",
     )
     source = sourceSets.main.java.srcDirs
     destinationDir = file("doc/")

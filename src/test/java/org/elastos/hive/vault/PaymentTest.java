@@ -22,7 +22,6 @@ public class PaymentTest {
 	private static final String priceName = "priceName";
 	private static final String orderId = "orderId";
 
-	@Test
 	public void test00_getPricingPlans() {
 		try {
 			List<PricingPlan> pricingPlans = paymentApi.getAllPricingPlans().get();
