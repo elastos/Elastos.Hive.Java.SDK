@@ -51,10 +51,23 @@ public class Client {
 		this.cachedProviders = new HashMap<>();
 	}
 
+	/**
+	 * Constructor without parameters
+	 * resolver url and cache path use default value,
+	 * resolver url default value: http://api.elastos.io:20606
+	 * cache path default value: new java.io.File("didCache")
+	 * @throws HiveException
+	 */
 	public static void setupResolver() throws HiveException {
 		setupResolver(null, null);
 	}
 
+	/**
+	 * set resolver url and did cache path
+	 * @param url resolver url
+	 * @param path did cache path
+	 * @throws HiveException
+	 */
 	public static void setupResolver(String url, String path) throws HiveException {
 		String resolver = url;
 		String localPath = path;
@@ -78,6 +91,10 @@ public class Client {
 		}
 	}
 
+	/**
+	 * authentication options, include:
+	 * 	AuthenticationHandler, DIDDocument, data cache path
+	 */
 	public static class Options {
 		private AuthenticationHandler authentcationHandler;
 		private DIDDocument authenticationDIDDocument;
@@ -117,6 +134,13 @@ public class Client {
 		}
 	}
 
+	/**
+	 * get Client instance
+	 * @param options authentication options
+	 * @see Options
+	 * @return
+	 * @throws HiveException
+	 */
 	public static Client createInstance(Options options) throws HiveException {
 		if (options == null || !options.checkValid())
 			throw new IllegalArgumentException();
@@ -127,6 +151,11 @@ public class Client {
 		return new Client(options);
 	}
 
+	/**
+	 *
+	 * @param ownerDid
+	 * @return
+	 */
 	public CompletableFuture<Vault> getVault(String ownerDid) {
 		if (ownerDid == null)
 			throw new IllegalArgumentException("Empty ownerDid");
