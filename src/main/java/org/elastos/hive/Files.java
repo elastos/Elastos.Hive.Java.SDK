@@ -1,6 +1,5 @@
 package org.elastos.hive;
 
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.file.FileInfo;
 
 import java.util.List;
@@ -16,7 +15,6 @@ public interface Files {
      * @param <T> Write, OutputStream
      * @return the new CompletionStage, the result is the Writer or OutputStream interface for
      *              upload the file content if success; null otherwise
-     * @throws HiveException
      */
     <T> CompletableFuture<T> upload(String path, Class<T> resultType);
 
@@ -74,7 +72,6 @@ public interface Files {
      * Returns the list of all files in a given folder.
      * @param path the path for the remote folder
      * @return the new CompletionStage, the result is List if success; null otherwise
-     * @throws HiveException
      */
     CompletableFuture<List<FileInfo>> list(String path);
 
