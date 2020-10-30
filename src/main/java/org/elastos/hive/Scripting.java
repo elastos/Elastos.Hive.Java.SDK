@@ -2,7 +2,6 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.Executable;
 
@@ -40,7 +39,6 @@ public interface Scripting {
      * @param scriptName the call's script name
      * @param appDid     app did is an optional parameter
      * @param resultType String, byte[], JsonNode, Reader
-     * @throws HiveException
      */
     <T> CompletableFuture<T> call(String scriptName, String appDid, Class<T> resultType);
 
@@ -52,7 +50,6 @@ public interface Scripting {
      * @param params     Call parameters (params field) are meant to be used by scripts on the server side
      * @param appDid     app did is an optional parameter,
      * @param resultType String, byte[], JsonNode, Reader
-     * @throws HiveException
      */
     <T> CompletableFuture<T> call(String scriptName, JsonNode params, String appDid, Class<T> resultType);
 
@@ -72,7 +69,6 @@ public interface Scripting {
      * @param resultType upload(String, byte[], JsonNode, Reader), download(Reader or InputStream), hash/properties(String, byte[], JsonNode, Reader)
      * @param <T>        upload(String, byte[], JsonNode, Reader), download(Reader or InputStream), hash/properties(String, byte[], JsonNode, Reader)
      * @return
-     * @throws HiveException
      */
     <T> CompletableFuture<T> call(String name, JsonNode params, Type type, Class<T> resultType);
 }
