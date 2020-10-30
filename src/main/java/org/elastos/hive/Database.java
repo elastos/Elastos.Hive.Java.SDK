@@ -13,7 +13,6 @@ import org.elastos.hive.database.InsertOneResult;
 import org.elastos.hive.database.InsertOptions;
 import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
-import org.elastos.hive.exception.HiveException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -23,7 +22,6 @@ public interface Database {
      * Lets the vault owner create a collection on database.
      * @param name the collection name
      * @return fail(false) or success(treu)
-     * @throws HiveException
      */
     CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options);
 
@@ -32,7 +30,6 @@ public interface Database {
      * Lets the vault owner delete a collection on database according to collection name.
      * @param name the collection name
      * @return fail(false) or success(true)
-     * @throws HiveException
      */
     CompletableFuture<Boolean> deleteCollection(String name);
 
@@ -45,7 +42,6 @@ public interface Database {
      * @param options bypass_document_validation: (optional) If True, allows
      *                the write to opt-out of document level validation. Default is False.{@link InsertOptions}
      * @return Results returned by InsertOneResult{@link InsertOneResult} wrapper
-     * @throws HiveException
      */
     CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options);
 
@@ -60,7 +56,6 @@ public interface Database {
      *                will be inserted on the server in arbitrary order, possibly in parallel, and all document inserts will be attempted.
      *                bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.{@link InsertOptions}
      * @return Results returned by InsertManyResult{@link InsertManyResult} wrapper
-     * @throws HiveException
      */
     CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options);
 
@@ -75,7 +70,6 @@ public interface Database {
      *              maxTimeMS (int): The maximum amount of time to allow this operation to run, in milliseconds.
      *              {@link CountOptions}
      * @return count size
-     * @throws HiveException
      */
     CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options);
 
@@ -86,7 +80,6 @@ public interface Database {
      * @param query optional, a JSON object specifying elements which must be present for a document to be included in the result set
      * @param options optional,refer to {@link FindOptions}
      * @return a JSON object document result
-     * @throws HiveException
      */
     CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options);
 
@@ -96,7 +89,6 @@ public interface Database {
      * @param query optional, a JSON object specifying elements which must be present for a document to be included in the result set
      * @param options optional,refer to {@link FindOptions}
      * @return a JsonNode array result of document
-     * @throws HiveException
      */
     CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options);
 
@@ -108,7 +100,6 @@ public interface Database {
      * @param update The modifications to apply.
      * @param options optional, refer to {@link UpdateOptions}
      * @return Results returned by InsertResult{@link UpdateResult} wrapper
-     * @throws HiveException
      */
     CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
 
@@ -120,7 +111,6 @@ public interface Database {
      * @param update The modifications to apply.
      * @param options optional, refer to {@link UpdateOptions}
      * @return Results returned by InsertResult{@link UpdateResult} wrapper
-     * @throws HiveException
      */
     CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
 
@@ -131,7 +121,6 @@ public interface Database {
      * @param filter A query that matches the document to delete.
      * @param options
      * @return
-     * @throws HiveException
      */
     CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options);
 
@@ -142,7 +131,6 @@ public interface Database {
      * @param filter A query that matches the document to delete.
      * @param options
      * @return
-     * @throws HiveException
      */
     CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options);
 
