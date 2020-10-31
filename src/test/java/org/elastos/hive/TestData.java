@@ -1,4 +1,4 @@
-package org.elastos.hive.vault;
+package org.elastos.hive;
 
 public class TestData {
     //    public static final String RESOLVER_URL = "http://api.elastos.io:21606"; //Test Net

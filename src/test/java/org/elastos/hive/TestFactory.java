@@ -1,4 +1,4 @@
-package org.elastos.hive.vault;
+package org.elastos.hive;
 
 import org.elastos.did.PresentationInJWT;
 import org.elastos.hive.Client;
