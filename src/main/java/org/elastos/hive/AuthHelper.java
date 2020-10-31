@@ -97,16 +97,16 @@ class AuthHelper implements ConnectHelper {
 	}
 
 	private void signIn() throws HiveException {
-		Map map = new HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 		JSONObject docJsonObject = new JSONObject(authenticationDIDDocument.toString());
 		map.put("document", docJsonObject);
 
 		try {
 			String json = new JSONObject(map).toString();
-			Response response = this.connectionManager.getVaultApi()
+			Response<SignResponse> response = this.connectionManager.getVaultApi()
 					.signIn(getJsonRequestBoy(json))
 					.execute();
-			SignResponse signResponse = (SignResponse) response.body();
+			SignResponse signResponse = response.body();
 			if (null == signResponse) {
 				throw new HiveException("Sign in challenge failed");
 			}
@@ -121,10 +121,10 @@ class AuthHelper implements ConnectHelper {
 	}
 
 	private void nodeAuth(String token) throws Exception {
-		Map map = new HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("jwt", token);
 		String json = new JSONObject(map).toString();
-		Response response = this.connectionManager.getVaultApi()
+		Response<AuthResponse> response = this.connectionManager.getVaultApi()
 				.auth(getJsonRequestBoy(json))
 				.execute();
 		handleAuthResponse(response);
