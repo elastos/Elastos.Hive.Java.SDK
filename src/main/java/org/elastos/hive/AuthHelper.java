@@ -1,4 +1,4 @@
-package org.elastos.hive.vault;
+package org.elastos.hive;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,18 +8,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.elastos.did.DIDDocument;
 import org.elastos.did.jwt.Claims;
-import org.elastos.hive.AuthInfoStoreImpl;
-import org.elastos.hive.AuthToken;
-import org.elastos.hive.AuthenticationHandler;
-import org.elastos.hive.ConnectHelper;
-import org.elastos.hive.Persistent;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.connection.model.HeaderConfig;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.network.model.AuthResponse;
+import org.elastos.hive.network.model.SignResponse;
 import org.elastos.hive.utils.JwtUtil;
-import org.elastos.hive.vault.network.model.AuthResponse;
-import org.elastos.hive.vault.network.model.SignResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 

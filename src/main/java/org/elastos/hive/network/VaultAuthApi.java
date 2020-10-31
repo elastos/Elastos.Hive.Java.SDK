@@ -1,7 +1,6 @@
-package org.elastos.hive.vault.network;
+package org.elastos.hive.network;
 
-
-import org.elastos.hive.vault.network.model.TokenResponse;
+import org.elastos.hive.network.model.TokenResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -11,20 +10,20 @@ import retrofit2.http.POST;
 
 public interface VaultAuthApi {
 
-    @FormUrlEncoded
-    @POST(ConnectConstance.TOKEN)
-//    @Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
-    Call<TokenResponse> getToken(@Field(ConnectConstance.CODE) String code,
-                                 @Field(ConnectConstance.CLIENT_ID) String clientId,
-                                 @Field(ConnectConstance.CLIENT_SCERET) String clientSecret,
-                                 @Field(ConnectConstance.REDIRECT_URI) String redirectUrl,
-                                 @Field(ConnectConstance.GRANT_TYPE) String grantType);
+	@FormUrlEncoded
+	@POST(ConnectConstance.TOKEN)
+	//    @Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
+	Call<TokenResponse> getToken(@Field(ConnectConstance.CODE) String code,
+			@Field(ConnectConstance.CLIENT_ID) String clientId,
+			@Field(ConnectConstance.CLIENT_SCERET) String clientSecret,
+			@Field(ConnectConstance.REDIRECT_URI) String redirectUrl,
+			@Field(ConnectConstance.GRANT_TYPE) String grantType);
 
-    @FormUrlEncoded
-    @POST(ConnectConstance.TOKEN)
-    @Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
-    Call<TokenResponse> refreshToken(@Field(ConnectConstance.CLIENT_ID) String clientId,
-                                     @Field(ConnectConstance.CLIENT_SCERET) String clientSceret,
-                                     @Field(ConnectConstance.REFRESH_TOKEN) String refreshToken,
-                                     @Field(ConnectConstance.GRANT_TYPE) String grantType);
+	@FormUrlEncoded
+	@POST(ConnectConstance.TOKEN)
+	@Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
+	Call<TokenResponse> refreshToken(@Field(ConnectConstance.CLIENT_ID) String clientId,
+			@Field(ConnectConstance.CLIENT_SCERET) String clientSceret,
+			@Field(ConnectConstance.REFRESH_TOKEN) String refreshToken,
+			@Field(ConnectConstance.GRANT_TYPE) String grantType);
 }
