@@ -44,13 +44,14 @@ public class Client {
 	private AuthenticationHandler authentcationHandler;
 	private DIDDocument authenticationDIDDocument;
 	private String localDataPath;
-	private Map<String , String> providerCache;
+	private Map<String , String> cachedProviders;
 
 	private Client(Options options) {
 		this.authenticationDIDDocument = options.authenticationDIDDocument();
 		this.authentcationHandler = options.authentcationHandler;
 		this.localDataPath = options.localDataPath;
-		this.providerCache = new HashMap<>();
+
+		this.cachedProviders = new HashMap<>();
 	}
 
 	public static void setupResolver() throws HiveException {
@@ -173,9 +174,9 @@ public class Client {
 
 				if (services != null && services.size() > 0) {
 					vaultProvider = services.get(0).getServiceEndpoint();
-					providerCache.put(ownerDid, vaultProvider);
+					cachedProviders.put(ownerDid, vaultProvider);
 				} else
-					vaultProvider = providerCache.get(ownerDid);
+					vaultProvider = cachedProviders.get(ownerDid);
 			} catch (DIDException e) {
 				e.printStackTrace();
 				throw new CompletionException(new HiveException(e.getMessage()));
@@ -197,6 +198,6 @@ public class Client {
 		if (ownerDid == null || vaultAddress == null)
 			throw new IllegalArgumentException();
 
-		providerCache.put(ownerDid, vaultAddress);
+		cachedProviders.put(ownerDid, vaultAddress);
 	}
 }
