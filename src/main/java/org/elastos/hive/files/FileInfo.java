@@ -1,4 +1,4 @@
-package org.elastos.hive.file;
+package org.elastos.hive.files;
 
 import java.math.BigDecimal;
 

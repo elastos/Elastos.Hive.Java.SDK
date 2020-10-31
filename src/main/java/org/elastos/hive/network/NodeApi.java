@@ -2,7 +2,7 @@ package org.elastos.hive.network;
 
 
 import org.elastos.hive.Constance;
-import org.elastos.hive.file.FileInfo;
+import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.network.model.AuthResponse;
 import org.elastos.hive.network.model.CountDocResponse;
 import org.elastos.hive.network.model.FilesResponse;

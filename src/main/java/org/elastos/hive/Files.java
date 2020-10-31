@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.file.FileInfo;
+import org.elastos.hive.files.FileInfo;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
