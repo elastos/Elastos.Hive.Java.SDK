@@ -24,15 +24,14 @@ public abstract class Options<T extends Options<T>> {
 	}
 
 	public String serialize() throws IOException {
-         return getObjectMapper().writeValueAsString(this);
+		return getObjectMapper().writeValueAsString(this);
 	}
 
 	protected static <T extends Options<?>> T deserialize(String content, Class<T> clazz) {
 		ObjectMapper mapper = getObjectMapper();
 
 		try {
-			T o = mapper.readValue(content, clazz);
-			return o;
+			return mapper.readValue(content, clazz);
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Invalid JSON input", e);
 		}
