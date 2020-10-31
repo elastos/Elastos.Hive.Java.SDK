@@ -26,7 +26,7 @@ import org.elastos.hive.exception.HiveException;
 import org.json.JSONObject;
 
 public interface Persistent {
-    JSONObject parseFrom() throws HiveException;
+	JSONObject parseFrom() throws HiveException;
 
-    void upateContent(JSONObject conetnt) throws HiveException;
+	void upateContent(JSONObject conetnt) throws HiveException;
 }

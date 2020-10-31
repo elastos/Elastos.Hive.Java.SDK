@@ -11,7 +11,6 @@ import org.elastos.hive.vault.ScriptClient;
  *      Provide interface instances of file, database, KeyValue and scripting.
  */
 public class Vault {
-
 	private Files files;
 	private Database database;
 	private Scripting scripting;
@@ -21,17 +20,7 @@ public class Vault {
 	private String ownerDid;
 	private AuthHelper authHelper;
 
-	/**
-	 * Vault constructor
-	 *
-	 * @param authHelper
-	 *          sign in，authorize and cloud sync helper class instance
-	 * @param vaultProvider
-	 *          vault server provider address
-	 * @param ownerDid
-	 *          vault provider did
-	 */
-	public Vault(AuthHelper authHelper, String vaultProvider, String ownerDid) {
+	Vault(AuthHelper authHelper, String vaultProvider, String ownerDid) {
 		this.authHelper = authHelper;
 		this.vaultProvider = vaultProvider;
 		this.ownerDid = ownerDid;
