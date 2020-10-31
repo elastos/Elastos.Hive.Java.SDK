@@ -23,7 +23,7 @@ public class FindOptions extends Options<FindOptions> {
 	private Boolean noCursorTimeout;
 	@JsonProperty("sort")
 	@JsonFormat(with = {JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY,
-            JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
+			JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
 	private List<Index> sort;
 	@JsonProperty("allow_partial_results")
 	private Boolean allowPartialResults;
@@ -35,7 +35,7 @@ public class FindOptions extends Options<FindOptions> {
 	private Boolean returnKey;
 	@JsonProperty("hint")
 	@JsonFormat(with = {JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY,
-            JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
+			JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
 	private List<Index> hint;
 	@JsonProperty("max_time_ms")
 	private Integer maxTimeMS;
@@ -52,20 +52,21 @@ public class FindOptions extends Options<FindOptions> {
 	}
 
 	public FindOptions projection(Map<String, Object> value) {
-		if (value == null || value.isEmpty())
+		if (value == null || value.isEmpty()) {
 			projection = null;
-		else
-			projection = new HashMap<String, Object>(value);
+			return this;
+		}
 
+		projection = new HashMap<String, Object>(value);
 		return this;
 	}
 
 	public FindOptions projection(JsonNode value) {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> p = mapper.convertValue(value,
-        		new TypeReference<Map<String, Object>>() {});
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> p = mapper.convertValue(value,
+				new TypeReference<Map<String, Object>>() {});
 
-        return projection(p);
+		return projection(p);
 	}
 
 	public Map<String, Object> projection() {
@@ -102,39 +103,40 @@ public class FindOptions extends Options<FindOptions> {
 	public FindOptions sort(Index value) {
 		if (value == null) {
 			sort = null;
-		} else {
-			if (sort == null)
-				sort = new ArrayList<Index>();
-
-			sort.add(value);
+			return this;
 		}
 
+		if (sort == null)
+			sort = new ArrayList<Index>();
+
+		sort.add(value);
 		return this;
 	}
 
 	public FindOptions sort(List<Index> value) {
 		if (value == null || value.isEmpty()) {
 			sort = null;
-		} else {
-			if (sort == null)
-				sort = new ArrayList<Index>();
+			return this;
 
-			sort.addAll(value);
 		}
 
+		if (sort == null)
+			sort = new ArrayList<Index>();
+
+		sort.addAll(value);
 		return this;
 	}
 
 	public FindOptions sort(Index[] value) {
 		if (value == null || value.length == 0) {
 			sort = null;
-		} else {
-			if (sort == null)
-				sort = new ArrayList<Index>();
-
-			sort.addAll(Arrays.asList(value));
+			return this;
 		}
 
+		if (sort == null)
+			sort = new ArrayList<Index>();
+
+		sort.addAll(Arrays.asList(value));
 		return this;
 	}
 
@@ -181,39 +183,38 @@ public class FindOptions extends Options<FindOptions> {
 	public FindOptions hint(Index value) {
 		if (value == null) {
 			hint = null;
-		} else {
-			if (hint == null)
-				hint = new ArrayList<Index>();
-
-			hint.add(value);
+			return this;
 		}
+		if (hint == null)
+			hint = new ArrayList<Index>();
 
+		hint.add(value);
 		return this;
 	}
 
 	public FindOptions hint(List<Index> value) {
 		if (value == null || value.isEmpty()) {
 			hint = null;
-		} else {
-			if (hint == null)
-				hint = new ArrayList<Index>();
-
-			hint.addAll(value);
+			return this;
 		}
 
+		if (hint == null)
+			hint = new ArrayList<Index>();
+
+		hint.addAll(value);
 		return this;
 	}
 
 	public FindOptions hint(Index[] value) {
 		if (value == null || value.length == 0) {
 			hint = null;
-		} else {
-			if (hint == null)
-				hint = new ArrayList<Index>();
-
-			hint.addAll(Arrays.asList(value));
+			return this;
 		}
 
+		if (hint == null)
+			hint = new ArrayList<Index>();
+
+		hint.addAll(Arrays.asList(value));
 		return this;
 	}
 
