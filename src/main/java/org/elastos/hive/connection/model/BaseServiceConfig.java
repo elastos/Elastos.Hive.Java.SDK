@@ -23,30 +23,30 @@
 package org.elastos.hive.connection.model;
 
 public class BaseServiceConfig {
-    private final HeaderConfig headerConfig;
+	private final HeaderConfig headerConfig;
 
-    private BaseServiceConfig(Builder builder) {
-        this.headerConfig = builder.headerConfig;
-    }
+	private BaseServiceConfig(Builder builder) {
+		this.headerConfig = builder.headerConfig;
+	}
 
-    public HeaderConfig getHeaderConfig() {
-        return headerConfig;
-    }
+	public HeaderConfig getHeaderConfig() {
+		return headerConfig;
+	}
 
-    public static final class Builder {
-        HeaderConfig headerConfig;
+	public static final class Builder {
+		HeaderConfig headerConfig;
 
-        public Builder() {
-            this.headerConfig = null;
-        }
+		public Builder() {
+			this.headerConfig = null;
+		}
 
-        public Builder headerConfig(HeaderConfig headerConfig) {
-            this.headerConfig = headerConfig;
-            return this;
-        }
+		public Builder headerConfig(HeaderConfig headerConfig) {
+			this.headerConfig = headerConfig;
+			return this;
+		}
 
-        public BaseServiceConfig build() {
-            return new BaseServiceConfig(this);
-        }
-    }
+		public BaseServiceConfig build() {
+			return new BaseServiceConfig(this);
+		}
+	}
 }
