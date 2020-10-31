@@ -82,8 +82,9 @@ class FilesClient implements Files {
 	private <T> CompletableFuture<T> downloadImp(String remoteFile, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response response = getFileOrBuffer(remoteFile);
-
+				Response response = this.connectionManager.getHiveVaultApi()
+						.downloader(remoteFile)
+						.execute();
 				if (response == null)
 					throw new HiveException(HiveException.ERROR);
 
@@ -255,18 +256,5 @@ class FilesClient implements Files {
 
 	private RequestBody createJsonRequestBody(String json) {
 		return RequestBody.create(MediaType.parse("Content-Type, application/json"), json);
-	}
-
-	private Response getFileOrBuffer(String destFilePath) throws HiveException {
-		Response response;
-		try {
-			response = this.connectionManager.getHiveVaultApi()
-					.downloader(destFilePath)
-					.execute();
-
-		} catch (Exception ex) {
-			throw new HiveException(ex.getMessage());
-		}
-		return response;
 	}
 }
