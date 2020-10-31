@@ -13,7 +13,7 @@ import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.file.FileInfo;
+import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.network.NodeApi;
 import org.elastos.hive.network.model.FilesResponse;
 import org.elastos.hive.network.model.HashResponse;

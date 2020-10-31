@@ -2,7 +2,7 @@ package org.elastos.hive.network.model;
 
 import java.util.List;
 
-import org.elastos.hive.file.FileInfo;
+import org.elastos.hive.files.FileInfo;
 
 public class FilesResponse {
 	private List<FileInfo> file_info_list;
