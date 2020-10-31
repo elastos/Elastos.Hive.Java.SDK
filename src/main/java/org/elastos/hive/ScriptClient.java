@@ -25,12 +25,11 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-public class ScriptClient implements Scripting {
-
+class ScriptClient implements Scripting {
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
 
-	public ScriptClient(AuthHelper authHelper) {
+	ScriptClient(AuthHelper authHelper) {
 		this.authHelper = authHelper;
 		this.connectionManager = authHelper.getConnectionManager();
 	}
@@ -49,7 +48,7 @@ public class ScriptClient implements Scripting {
 	private CompletableFuture<Boolean> registerScriptImp(String name, Condition accessCondition, Executable executable) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("name", name);
 				map.put("executable", executable);
 				if (accessCondition != null)
@@ -95,7 +94,7 @@ public class ScriptClient implements Scripting {
 	private <T> CompletableFuture<T> callImp(String scriptName, JsonNode params, String appDid, Class<T> clazz) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("name", scriptName);
 				if (params != null)
 					map.put("params", params);
@@ -167,7 +166,7 @@ public class ScriptClient implements Scripting {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("name", scriptName);
 				if (params != null)
 					map.put("params", params);
