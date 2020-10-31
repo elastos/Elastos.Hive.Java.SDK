@@ -41,28 +41,30 @@ class FilesClient implements Files {
 	}
 
 	private <T> CompletableFuture<T> uploadImp(String path, Class<T> resultType) {
-
 		return CompletableFuture.supplyAsync(() -> {
-
-			HttpURLConnection httpURLConnection = null;
+			HttpURLConnection connection = null;
 			try {
-				httpURLConnection = this.connectionManager.openURLConnection(path);
-				OutputStream rawOutputStream = httpURLConnection.getOutputStream();
+				connection = this.connectionManager.openURLConnection(path);
+				OutputStream outputStream = connection.getOutputStream();
 
-				if(null == rawOutputStream) return null;
-
-				UploadOutputStream outputStream = new UploadOutputStream(httpURLConnection, rawOutputStream);
-
-				if(resultType.isAssignableFrom(OutputStream.class)) {
-					return (T) outputStream;
-				} else {
-					OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
-					return (T) outputStreamWriter;
+				if (outputStream == null) {
+					HiveException e = new HiveException("Connection failure");
+					throw new CompletionException(e);
 				}
+
+				if(resultType.isAssignableFrom(OutputStream.class))
+					return resultType.cast(new UploadOutputStream(connection, outputStream));
+
+				if (resultType.isAssignableFrom(OutputStreamWriter.class))
+					return resultType.cast(new OutputStreamWriter(outputStream));
+
+				HiveException e = new HiveException("Not supported result type");
+				throw new CompletionException(e);
+
 			} catch (Exception e) {
-				ResponseHelper.readConnection(httpURLConnection);
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				ResponseHelper.readConnection(connection);
+				HiveException ex = new HiveException(e.getLocalizedMessage());
+				throw new CompletionException(ex);
 			}
 		});
 	}
