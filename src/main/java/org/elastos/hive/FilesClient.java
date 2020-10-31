@@ -25,12 +25,12 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-class FileClient implements Files {
+class FilesClient implements Files {
 
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
 
-	public FileClient(AuthHelper authHelper) {
+	FilesClient(AuthHelper authHelper) {
 		this.authHelper = authHelper;
 		this.connectionManager = authHelper.getConnectionManager();
 	}
@@ -108,7 +108,7 @@ class FileClient implements Files {
 	private CompletableFuture<Boolean> deleteImp(String remoteFile) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("path", remoteFile);
 				String json = JsonUtil.getJsonFromObject(map);
 
@@ -134,7 +134,7 @@ class FileClient implements Files {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("src_path", src);
 				map.put("dst_path", dst);
 				String json = JsonUtil.getJsonFromObject(map);
@@ -160,7 +160,7 @@ class FileClient implements Files {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("src_path", src);
 				map.put("dst_path", dst);
 				String json = JsonUtil.getJsonFromObject(map);

@@ -20,7 +20,7 @@ public class Vault {
 		this.vaultProvider = vaultProvider;
 		this.ownerDid = ownerDid;
 
-		this.files = new FileClient(authHelper);
+		this.files = new FilesClient(authHelper);
 		this.database = new DatabaseClient(authHelper);
 		this.scripting = new ScriptClient(authHelper);
 	}

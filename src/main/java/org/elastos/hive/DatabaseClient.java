@@ -31,12 +31,11 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-public class DatabaseClient implements Database {
-
+class DatabaseClient implements Database {
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
 
-	public DatabaseClient(AuthHelper authHelper) {
+	DatabaseClient(AuthHelper authHelper) {
 		this.authHelper = authHelper;
 		this.connectionManager = authHelper.getConnectionManager();
 	}
@@ -77,7 +76,7 @@ public class DatabaseClient implements Database {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("collection", collection);
 				String json = JsonUtil.getJsonFromObject(map);
 

@@ -27,7 +27,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Provides author-related functionality
  */
-public interface ConnectHelper {
+interface ConnectHelper {
 	/**
 	 * Check access token isExpired
 	 *
