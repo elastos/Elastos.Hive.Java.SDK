@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package org.elastos.hive;
 
 import java.util.HashMap;
@@ -35,8 +34,6 @@ import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.vault.AuthHelper;
-import org.elastos.hive.vault.Constance;
 
 public class Client {
 	private static boolean resolverDidSetup;

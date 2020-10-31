@@ -1,11 +1,9 @@
-package org.elastos.hive.vault.network.model;
+package org.elastos.hive.network.model;
 
 public class SignResponse {
+	private String challenge;
 
-    private String challenge;
-
-
-    public String getChallenge() {
-        return challenge;
-    }
+	public String getChallenge() {
+		return challenge;
+	}
 }

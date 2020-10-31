@@ -1,9 +1,9 @@
-package org.elastos.hive.vault.network.model;
+package org.elastos.hive.network.model;
 
 public class HashResponse {
-    private String SHA256;
+	private String SHA256;
 
-    public String getSHA256() {
-        return SHA256;
-    }
+	public String getSHA256() {
+		return SHA256;
+	}
 }

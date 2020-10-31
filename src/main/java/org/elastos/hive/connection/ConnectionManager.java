@@ -22,75 +22,75 @@
 
 package org.elastos.hive.connection;
 
-import org.elastos.hive.connection.model.BaseServiceConfig;
-import org.elastos.hive.vault.Constance;
-import org.elastos.hive.vault.network.NodeApi;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.elastos.hive.Constance;
+import org.elastos.hive.connection.model.BaseServiceConfig;
+import org.elastos.hive.network.NodeApi;
+
 public class ConnectionManager {
 
-    private NodeApi hivevaultApi;
+	private NodeApi hivevaultApi;
 
-    private String hivevaultBaseUrl;
+	private String hivevaultBaseUrl;
 
-    private BaseServiceConfig hivevaultConfig = new BaseServiceConfig.Builder().build() ;
+	private BaseServiceConfig hivevaultConfig = new BaseServiceConfig.Builder().build() ;
 
-    public ConnectionManager(String baseUrl, BaseServiceConfig baseServiceConfig) {
-        resetHiveVaultApi(baseUrl, baseServiceConfig);
-    }
+	public ConnectionManager(String baseUrl, BaseServiceConfig baseServiceConfig) {
+		resetHiveVaultApi(baseUrl, baseServiceConfig);
+	}
 
-    public NodeApi getHiveVaultApi() {
-        if(hivevaultApi == null) {
-            hivevaultApi = BaseServiceUtil.createService(NodeApi.class,
-                    this.hivevaultBaseUrl, this.hivevaultConfig);
-        }
-        return hivevaultApi;
-    }
+	public NodeApi getHiveVaultApi() {
+		if(hivevaultApi == null) {
+			hivevaultApi = BaseServiceUtil.createService(NodeApi.class,
+					this.hivevaultBaseUrl, this.hivevaultConfig);
+		}
+		return hivevaultApi;
+	}
 
-    private void updateHiveVaultConfig(BaseServiceConfig hivenvaultConfig) {
-        this.hivevaultConfig = hivenvaultConfig;
-    }
+	private void updateHiveVaultConfig(BaseServiceConfig hivenvaultConfig) {
+		this.hivevaultConfig = hivenvaultConfig;
+	}
 
-    private void updateHiveVaultBaseUrl(String hivevaultBaseUrl) {
-        this.hivevaultBaseUrl = hivevaultBaseUrl;
-    }
+	private void updateHiveVaultBaseUrl(String hivevaultBaseUrl) {
+		this.hivevaultBaseUrl = hivevaultBaseUrl;
+	}
 
-    public void resetHiveVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
-        hivevaultApi = null;
-        updateHiveVaultBaseUrl(baseUrl);
-        updateHiveVaultConfig(baseServiceConfig);
-    }
+	public void resetHiveVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
+		hivevaultApi = null;
+		updateHiveVaultBaseUrl(baseUrl);
+		updateHiveVaultConfig(baseServiceConfig);
+	}
 
-    public String getHivevaultBaseUrl() {
-        return this.hivevaultBaseUrl;
-    }
+	public String getHivevaultBaseUrl() {
+		return this.hivevaultBaseUrl;
+	}
 
-    public String getAccessToken() {
-        return this.hivevaultConfig.getHeaderConfig().getAuthToken().getAccessToken();
-    }
+	public String getAccessToken() {
+		return this.hivevaultConfig.getHeaderConfig().getAuthToken().getAccessToken();
+	}
 
-    public HttpURLConnection openURLConnection(String path) throws IOException {
-        String url = this.getHivevaultBaseUrl() + Constance.API_PATH +"/files/upload/" + path;
-        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
-        httpURLConnection.setRequestMethod("POST");
-        httpURLConnection.setRequestProperty("User-Agent",
-                "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
-        httpURLConnection.setConnectTimeout(5000);
-        httpURLConnection.setReadTimeout(5000);
+	public HttpURLConnection openURLConnection(String path) throws IOException {
+		String url = this.getHivevaultBaseUrl() + Constance.API_PATH +"/files/upload/" + path;
+		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+		httpURLConnection.setRequestMethod("POST");
+		httpURLConnection.setRequestProperty("User-Agent",
+				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+		httpURLConnection.setConnectTimeout(5000);
+		httpURLConnection.setReadTimeout(5000);
 
-        httpURLConnection.setDoOutput(true);
-        httpURLConnection.setDoInput(true);
-        httpURLConnection.setUseCaches(false);
-        httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
-        httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
-        httpURLConnection.setRequestProperty("Authorization", "token " + this.getAccessToken());
+		httpURLConnection.setDoOutput(true);
+		httpURLConnection.setDoInput(true);
+		httpURLConnection.setUseCaches(false);
+		httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
+		httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
+		httpURLConnection.setRequestProperty("Authorization", "token " + this.getAccessToken());
 
-        httpURLConnection.setChunkedStreamingMode(0);
+		httpURLConnection.setChunkedStreamingMode(0);
 
-        return httpURLConnection;
-    }
+		return httpURLConnection;
+	}
 
 }

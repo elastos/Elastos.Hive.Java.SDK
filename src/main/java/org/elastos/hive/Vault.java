@@ -1,10 +1,5 @@
 package org.elastos.hive;
 
-import org.elastos.hive.vault.AuthHelper;
-import org.elastos.hive.vault.DatabaseClient;
-import org.elastos.hive.vault.FileClient;
-import org.elastos.hive.vault.ScriptClient;
-
 /**
  * Vault class
  *      Provide basic information of vault.
