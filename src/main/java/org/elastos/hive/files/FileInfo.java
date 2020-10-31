@@ -21,7 +21,7 @@ public class FileInfo {
 	private String type;
 	private String name;
 	private long size;
-	private String lastModified;
+	private String last_modify;
 
 	public Type getType() {
 		switch (type) {
@@ -42,7 +42,7 @@ public class FileInfo {
 	}
 
 	public String getLastModified() {
-		long timeStamp = new BigDecimal(lastModified).multiply(new BigDecimal(1000)).longValue();
+		long timeStamp = new BigDecimal(last_modify).multiply(new BigDecimal(1000)).longValue();
 		return DateUtil.getCurrentEpochTimeStamp(timeStamp);
 	}
 }
