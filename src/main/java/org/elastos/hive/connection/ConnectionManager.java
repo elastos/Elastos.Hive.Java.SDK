@@ -32,48 +32,46 @@ import org.elastos.hive.network.NodeApi;
 
 public class ConnectionManager {
 
-	private NodeApi hivevaultApi;
-
-	private String hivevaultBaseUrl;
-
-	private BaseServiceConfig hivevaultConfig = new BaseServiceConfig.Builder().build() ;
+	private NodeApi vaultAPI;
+	private String vaultBaseUrl;
+	private BaseServiceConfig vaultConfig = new BaseServiceConfig.Builder().build() ;
 
 	public ConnectionManager(String baseUrl, BaseServiceConfig baseServiceConfig) {
-		resetHiveVaultApi(baseUrl, baseServiceConfig);
+		resetVaultApi(baseUrl, baseServiceConfig);
 	}
 
-	public NodeApi getHiveVaultApi() {
-		if(hivevaultApi == null) {
-			hivevaultApi = BaseServiceUtil.createService(NodeApi.class,
-					this.hivevaultBaseUrl, this.hivevaultConfig);
-		}
-		return hivevaultApi;
+	public NodeApi getVaultApi() {
+		if (vaultAPI == null)
+			vaultAPI = BaseServiceUtil.createService(NodeApi.class,
+					this.vaultBaseUrl, this.vaultConfig);
+
+		return vaultAPI;
 	}
 
-	private void updateHiveVaultConfig(BaseServiceConfig hivenvaultConfig) {
-		this.hivevaultConfig = hivenvaultConfig;
+	private void updateVaultConfig(BaseServiceConfig vaultConfig) {
+		this.vaultConfig = vaultConfig;
 	}
 
-	private void updateHiveVaultBaseUrl(String hivevaultBaseUrl) {
-		this.hivevaultBaseUrl = hivevaultBaseUrl;
+	private void updateVaultBaseUrl(String vaultBaseUrl) {
+		this.vaultBaseUrl = vaultBaseUrl;
 	}
 
-	public void resetHiveVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
-		hivevaultApi = null;
-		updateHiveVaultBaseUrl(baseUrl);
-		updateHiveVaultConfig(baseServiceConfig);
+	public void resetVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
+		vaultAPI = null;
+		updateVaultBaseUrl(baseUrl);
+		updateVaultConfig(baseServiceConfig);
 	}
 
-	public String getHivevaultBaseUrl() {
-		return this.hivevaultBaseUrl;
+	public String getVaultBaseUrl() {
+		return this.vaultBaseUrl;
 	}
 
 	public String getAccessToken() {
-		return this.hivevaultConfig.getHeaderConfig().getAuthToken().getAccessToken();
+		return this.vaultConfig.getHeaderConfig().getAuthToken().getAccessToken();
 	}
 
 	public HttpURLConnection openURLConnection(String path) throws IOException {
-		String url = this.getHivevaultBaseUrl() + Constance.API_PATH +"/files/upload/" + path;
+		String url = this.getVaultBaseUrl() + Constance.API_PATH +"/files/upload/" + path;
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setRequestProperty("User-Agent",

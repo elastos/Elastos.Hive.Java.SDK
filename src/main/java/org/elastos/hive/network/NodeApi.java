@@ -1,6 +1,5 @@
 package org.elastos.hive.network;
 
-
 import org.elastos.hive.Constance;
 import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.network.model.AuthResponse;
@@ -21,7 +20,6 @@ import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface NodeApi {
-
 	@POST(Constance.API_PATH + "/did/sign_in")
 	Call<SignResponse> signIn(@Body RequestBody body);
 

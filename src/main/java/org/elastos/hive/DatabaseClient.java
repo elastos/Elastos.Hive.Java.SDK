@@ -53,7 +53,7 @@ class DatabaseClient implements Database {
 				map.put("collection", collection);
 				String json = JsonUtil.getJsonFromObject(map);
 
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -80,7 +80,7 @@ class DatabaseClient implements Database {
 				map.put("collection", collection);
 				String json = JsonUtil.getJsonFromObject(map);
 
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -108,7 +108,7 @@ class DatabaseClient implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -139,7 +139,7 @@ class DatabaseClient implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -168,7 +168,7 @@ class DatabaseClient implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
 				String json = rootNode.toString();
-				Response<CountDocResponse> response = this.connectionManager.getHiveVaultApi()
+				Response<CountDocResponse> response = this.connectionManager.getVaultApi()
 						.countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -197,7 +197,7 @@ class DatabaseClient implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -227,7 +227,7 @@ class DatabaseClient implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -257,7 +257,7 @@ class DatabaseClient implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -293,7 +293,7 @@ class DatabaseClient implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -321,7 +321,7 @@ class DatabaseClient implements Database {
 				if(null!=filter) rootNode.set("filter", filter);
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -349,7 +349,7 @@ class DatabaseClient implements Database {
 				if(null!=filter) rootNode.set("filter", filter);
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 

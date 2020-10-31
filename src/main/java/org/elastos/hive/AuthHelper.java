@@ -103,7 +103,7 @@ class AuthHelper implements ConnectHelper {
 
 		try {
 			String json = new JSONObject(map).toString();
-			Response response = this.connectionManager.getHiveVaultApi()
+			Response response = this.connectionManager.getVaultApi()
 					.signIn(getJsonRequestBoy(json))
 					.execute();
 			SignResponse signResponse = (SignResponse) response.body();
@@ -124,7 +124,7 @@ class AuthHelper implements ConnectHelper {
 		Map map = new HashMap<>();
 		map.put("jwt", token);
 		String json = new JSONObject(map).toString();
-		Response response = this.connectionManager.getHiveVaultApi()
+		Response response = this.connectionManager.getVaultApi()
 				.auth(getJsonRequestBoy(json))
 				.execute();
 		handleAuthResponse(response);
@@ -230,7 +230,7 @@ class AuthHelper implements ConnectHelper {
 		BaseServiceConfig baseServiceConfig = new BaseServiceConfig.Builder()
 				.headerConfig(headerConfig)
 				.build();
-		this.connectionManager.resetHiveVaultApi(this.nodeUrl,
+		this.connectionManager.resetVaultApi(this.nodeUrl,
 				baseServiceConfig);
 	}
 
