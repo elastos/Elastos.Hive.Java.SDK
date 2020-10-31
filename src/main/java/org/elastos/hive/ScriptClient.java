@@ -56,7 +56,7 @@ class ScriptClient implements Scripting {
 
 				String json = JsonUtil.getJsonFromObject(map);
 
-				Response<ResponseBody> response = this.connectionManager.getHiveVaultApi()
+				Response<ResponseBody> response = this.connectionManager.getVaultApi()
 						.registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -110,7 +110,7 @@ class ScriptClient implements Scripting {
 
 				String json = JsonUtil.getJsonFromObject(map);
 
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -150,7 +150,7 @@ class ScriptClient implements Scripting {
 						RequestBody.create(
 								MediaType.parse("application/json"), json);
 
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.callScript(body, metadata)
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -173,7 +173,7 @@ class ScriptClient implements Scripting {
 
 				String json = JsonUtil.getJsonFromObject(map);
 
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 

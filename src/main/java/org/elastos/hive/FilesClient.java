@@ -82,7 +82,7 @@ class FilesClient implements Files {
 	private <T> CompletableFuture<T> downloadImp(String remoteFile, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.downloader(remoteFile)
 						.execute();
 				if (response == null)
@@ -122,7 +122,7 @@ class FilesClient implements Files {
 				map.put("path", remoteFile);
 				String json = JsonUtil.getJsonFromObject(map);
 
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.deleteFolder(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -148,7 +148,7 @@ class FilesClient implements Files {
 				map.put("src_path", src);
 				map.put("dst_path", dst);
 				String json = JsonUtil.getJsonFromObject(map);
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.move(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -174,7 +174,7 @@ class FilesClient implements Files {
 				map.put("src_path", src);
 				map.put("dst_path", dst);
 				String json = JsonUtil.getJsonFromObject(map);
-				Response response = this.connectionManager.getHiveVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.copy(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -196,7 +196,7 @@ class FilesClient implements Files {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<HashResponse> response = this.connectionManager.getHiveVaultApi()
+				Response<HashResponse> response = this.connectionManager.getVaultApi()
 						.hash(remoteFile)
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -219,7 +219,7 @@ class FilesClient implements Files {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				NodeApi api = this.connectionManager.getHiveVaultApi();
+				NodeApi api = this.connectionManager.getVaultApi();
 				Response<FilesResponse> response = api.files(folder).execute();
 
 				authHelper.checkResponseCode(response);
@@ -241,7 +241,7 @@ class FilesClient implements Files {
 	public CompletableFuture<FileInfo> statImp(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				NodeApi api = this.connectionManager.getHiveVaultApi();
+				NodeApi api = this.connectionManager.getVaultApi();
 				Response<FileInfo> response = api.getProperties(path).execute();
 
 				authHelper.checkResponseCode(response);
