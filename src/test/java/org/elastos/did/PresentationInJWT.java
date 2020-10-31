@@ -29,10 +29,10 @@ import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.Header;
 import org.elastos.hive.Client;
 import org.elastos.hive.Files;
+import org.elastos.hive.TestData;
+import org.elastos.hive.TestFactory;
 import org.elastos.hive.Vault;
 import org.elastos.hive.utils.JwtUtil;
-import org.elastos.hive.vault.TestData;
-import org.elastos.hive.vault.TestFactory;
 import org.junit.Test;
 
 import java.io.File;

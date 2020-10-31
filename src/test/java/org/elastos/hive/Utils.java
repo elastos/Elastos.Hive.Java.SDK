@@ -1,4 +1,4 @@
-package org.elastos.hive.vault;
+package org.elastos.hive;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

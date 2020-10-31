@@ -1,4 +1,4 @@
-package org.elastos.hive.vault;
+package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

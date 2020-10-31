@@ -1,4 +1,4 @@
-package org.elastos.hive.vault;
+package org.elastos.hive;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
