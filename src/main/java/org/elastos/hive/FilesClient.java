@@ -26,7 +26,6 @@ import okhttp3.RequestBody;
 import retrofit2.Response;
 
 class FilesClient implements Files {
-
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
 
