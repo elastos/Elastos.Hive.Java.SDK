@@ -59,27 +59,26 @@ public class Collation {
 
 		@JsonCreator
 		public static Strength fromInt(int i) {
-		    switch (i) {
-		    case 1:
-		    	return PRIMARY;
+			switch (i) {
+			case 1:
+				return PRIMARY;
 
-		    case 2:
-		    	return SECONDARY;
+			case 2:
+				return SECONDARY;
 
-		    case 3:
-		    	return TERTIARY;
+			case 3:
+				return TERTIARY;
 
-		    case 4:
-		    	return QUATERNARY;
+			case 4:
+				return QUATERNARY;
 
-		    case 5:
-		    	return IDENTICAL;
+			case 5:
+				return IDENTICAL;
 
-		    default:
-		    	throw new IllegalArgumentException("Invalid strength");
-		    }
+			default:
+				throw new IllegalArgumentException("Invalid strength");
+			}
 		}
-
 	}
 
 	public enum Alternate {
