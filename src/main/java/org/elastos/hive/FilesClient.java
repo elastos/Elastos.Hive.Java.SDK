@@ -52,11 +52,15 @@ class FilesClient implements Files {
 					throw new CompletionException(e);
 				}
 
-				if(resultType.isAssignableFrom(OutputStream.class))
-					return resultType.cast(new UploadOutputStream(connection, outputStream));
+				if(resultType.isAssignableFrom(OutputStream.class)) {
+					UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
+					return resultType.cast(uploader);
+				}
 
-				if (resultType.isAssignableFrom(OutputStreamWriter.class))
-					return resultType.cast(new OutputStreamWriter(outputStream));
+				if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
+					OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+					return resultType.cast(writer);
+				}
 
 				HiveException e = new HiveException("Not supported result type");
 				throw new CompletionException(e);
@@ -76,7 +80,6 @@ class FilesClient implements Files {
 	}
 
 	private <T> CompletableFuture<T> downloadImp(String remoteFile, Class<T> resultType) {
-
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Response response = getFileOrBuffer(remoteFile);
@@ -85,19 +88,24 @@ class FilesClient implements Files {
 					throw new HiveException(HiveException.ERROR);
 
 				authHelper.checkResponseCode(response);
+
 				if(resultType.isAssignableFrom(Reader.class)) {
 					Reader reader = ResponseHelper.getToReader(response);
-					return (T) reader;
-				} else {
-					InputStream inputStream = ResponseHelper.getInputStream(response);
-					return (T) inputStream;
+					return resultType.cast(reader);
 				}
+				if (resultType.isAssignableFrom(InputStream.class)){
+					InputStream inputStream = ResponseHelper.getInputStream(response);
+					return resultType.cast(inputStream);
+				}
+
+				HiveException e = new HiveException("Not supported result type");
+				throw new CompletionException(e);
+
 			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				HiveException ex = new HiveException(e.getLocalizedMessage());
+				throw new CompletionException(ex);
 			}
 		});
-
 	}
 
 	@Override
