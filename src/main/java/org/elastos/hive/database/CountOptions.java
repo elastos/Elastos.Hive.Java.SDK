@@ -18,7 +18,7 @@ public class CountOptions extends Options<CountOptions> {
 	private Collation collation;
 	@JsonProperty("hint")
 	@JsonFormat(with = {JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY,
-            JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
+			JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
 	private List<Index> hint;
 
 	public CountOptions(long skip, long limit) {
@@ -68,39 +68,39 @@ public class CountOptions extends Options<CountOptions> {
 	public CountOptions hint(Index value) {
 		if (value == null) {
 			hint = null;
-		} else {
-			if (hint == null)
-				hint = new ArrayList<Index>();
-
-			hint.add(value);
+			return this;
 		}
 
+		if (hint == null)
+			hint = new ArrayList<Index>();
+
+		hint.add(value);
 		return this;
 	}
 
 	public CountOptions hint(List<Index> value) {
 		if (value == null || value.isEmpty()) {
 			hint = null;
-		} else {
-			if (hint == null)
-				hint = new ArrayList<Index>();
-
-			hint.addAll(value);
+			return this;
 		}
 
+		if (hint == null)
+			hint = new ArrayList<Index>();
+
+		hint.addAll(value);
 		return this;
 	}
 
 	public CountOptions hint(Index[] value) {
 		if (value == null || value.length == 0) {
 			hint = null;
-		} else {
-			if (hint == null)
-				hint = new ArrayList<Index>();
-
-			hint.addAll(Arrays.asList(value));
+			return this;
 		}
 
+		if (hint == null)
+			hint = new ArrayList<Index>();
+
+		hint.addAll(Arrays.asList(value));
 		return this;
 	}
 
