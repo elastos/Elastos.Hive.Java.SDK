@@ -22,7 +22,7 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-public class AuthHelper implements ConnectHelper {
+class AuthHelper implements ConnectHelper {
 
 	private static final String ACCESS_TOKEN_KEY = "access_token";
 	private static final String REFRESH_TOKEN_KEY = "refresh_token";
