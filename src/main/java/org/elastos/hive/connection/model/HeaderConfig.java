@@ -25,46 +25,46 @@ package org.elastos.hive.connection.model;
 import org.elastos.hive.AuthToken;
 
 public class HeaderConfig {
-    private final AuthToken authToken;
-    private final String contentType;
-    private final String acceptEncoding;
+	private final AuthToken authToken;
+	private final String contentType;
+	private final String acceptEncoding;
 
-    private HeaderConfig(Builder builder) {
-        this.authToken = builder.authToken;
-        this.contentType = builder.contentType;
-        this.acceptEncoding = builder.acceptEncoding;
-    }
+	private HeaderConfig(Builder builder) {
+		this.authToken = builder.authToken;
+		this.contentType = builder.contentType;
+		this.acceptEncoding = builder.acceptEncoding;
+	}
 
-    public AuthToken getAuthToken() {
-        return authToken;
-    }
+	public AuthToken getAuthToken() {
+		return authToken;
+	}
 
-    public String getContentType() {
-        return contentType;
-    }
+	public String getContentType() {
+		return contentType;
+	}
 
-    public String getAcceptEncoding() {
-        return acceptEncoding;
-    }
+	public String getAcceptEncoding() {
+		return acceptEncoding;
+	}
 
-    public static final class Builder {
-        AuthToken authToken;
-        String contentType;
-        String acceptEncoding;
+	public static final class Builder {
+		AuthToken authToken;
+		String contentType;
+		String acceptEncoding;
 
-        public Builder() {
-            this.authToken = null;
-            this.contentType = null;
-            this.acceptEncoding = null;
-        }
+		public Builder() {
+			this.authToken = null;
+			this.contentType = null;
+			this.acceptEncoding = null;
+		}
 
-        public Builder authToken(AuthToken authToken) {
-            this.authToken = authToken;
-            return this;
-        }
+		public Builder authToken(AuthToken authToken) {
+			this.authToken = authToken;
+			return this;
+		}
 
-        public HeaderConfig build() {
-            return new HeaderConfig(this);
-        }
-    }
+		public HeaderConfig build() {
+			return new HeaderConfig(this);
+		}
+	}
 }
