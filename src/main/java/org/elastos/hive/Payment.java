@@ -1,8 +1,8 @@
 package org.elastos.hive;
 
 import org.elastos.hive.payment.ServiceInfo;
-import org.elastos.hive.payment.order.OrderInfo;
-import org.elastos.hive.payment.pkg.PackageInfo;
+import org.elastos.hive.payment.order.Order;
+import org.elastos.hive.payment.pkg.PricingPlan;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -10,16 +10,19 @@ import java.util.concurrent.CompletableFuture;
 public interface Payment {
 
 	/**
-	 * get vault package information
+	 * get vault packages's informations
 	 * @return
 	 */
-	CompletableFuture<PackageInfo> packageInfo();
+	CompletableFuture<PricingPlan> getAllPricingPlans();
 
 	/**
-	 * start vault service free trial
+	 * get vault package's information by plan name
+	 * @param planName
 	 * @return
 	 */
-	CompletableFuture<Boolean> freeTrial();
+	CompletableFuture<PricingPlan> getPricingPlan(String planName);
+
+	CompletableFuture<PricingPlan> getUsingPricePlan();
 
 	/**
 	 * create a package order
@@ -27,7 +30,7 @@ public interface Payment {
 	 * @param priceName
 	 * @return
 	 */
-	CompletableFuture<Boolean> createOrder(String packageName, String priceName);
+	CompletableFuture<Boolean> placeOrder(String packageName, String priceName);
 
 	/**
 	 * Pay vault service package order
@@ -35,20 +38,26 @@ public interface Payment {
 	 * @param txids
 	 * @return
 	 */
-	CompletableFuture<Boolean> pay(String orderId, List<String> txids);
+	CompletableFuture<Boolean> payOrder(String orderId, List<String> txids);
+
+	/**
+	 * start vault service free trial
+	 * @return
+	 */
+	CompletableFuture<Boolean> useTrial();
 
 	/**
 	 * Get order information of vault service purchase
 	 * @param orderId
 	 * @return
 	 */
-	CompletableFuture<OrderInfo> orderInfo(String orderId);
+	CompletableFuture<Order> getOrder(String orderId);
 
 	/**
 	 * Get user order information list of vault service purchase
 	 * @return
 	 */
-	CompletableFuture<List<OrderInfo>> orderList();
+	CompletableFuture<List<Order>> getAllOrders();
 
 	/**
 	 * Get user vault service info

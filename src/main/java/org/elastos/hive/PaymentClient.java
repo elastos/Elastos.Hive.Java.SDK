@@ -3,8 +3,8 @@ package org.elastos.hive;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.ServiceInfo;
-import org.elastos.hive.payment.order.OrderInfo;
-import org.elastos.hive.payment.pkg.PackageInfo;
+import org.elastos.hive.payment.order.Order;
+import org.elastos.hive.payment.pkg.PricingPlan;
 import org.elastos.hive.utils.JsonUtil;
 
 import java.util.HashMap;
@@ -29,15 +29,15 @@ public class PaymentClient implements Payment {
 
 
 	@Override
-	public CompletableFuture<PackageInfo> packageInfo() {
+	public CompletableFuture<PricingPlan> packageInfo() {
 		return authHelper.checkValid()
 				.thenCompose(result -> packageInfoImp());
 	}
 
-	private CompletableFuture<PackageInfo> packageInfoImp() {
+	private CompletableFuture<PricingPlan> packageInfoImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PackageInfo> response = this.connectionManager.getVaultApi()
+				Response<PricingPlan> response = this.connectionManager.getVaultApi()
 						.getPackageInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -58,7 +58,7 @@ public class PaymentClient implements Payment {
 	private CompletableFuture<Boolean> freeTrialImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PackageInfo> response = this.connectionManager.getVaultApi()
+				Response<PricingPlan> response = this.connectionManager.getVaultApi()
 						.getPackageInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -123,15 +123,15 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<OrderInfo> orderInfo(String orderId) {
+	public CompletableFuture<Order> orderInfo(String orderId) {
 		return authHelper.checkValid()
 				.thenCompose(result -> orderInfoImp(orderId));
 	}
 
-	private CompletableFuture<OrderInfo> orderInfoImp(String orderId) {
+	private CompletableFuture<Order> orderInfoImp(String orderId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<OrderInfo> response = this.connectionManager.getVaultApi()
+				Response<Order> response = this.connectionManager.getVaultApi()
 						.getOrderInfo(orderId)
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -144,15 +144,15 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<List<OrderInfo>> orderList() {
+	public CompletableFuture<List<Order>> orderList() {
 		return authHelper.checkValid()
 				.thenCompose(result -> orderInfosImp());
 	}
 
-	private CompletableFuture<List<OrderInfo>> orderInfosImp() {
+	private CompletableFuture<List<Order>> orderInfosImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<List<OrderInfo>> response = this.connectionManager.getVaultApi()
+				Response<List<Order>> response = this.connectionManager.getVaultApi()
 						.getOrderInfos()
 						.execute();
 				authHelper.checkResponseCode(response);

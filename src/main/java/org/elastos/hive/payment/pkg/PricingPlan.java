@@ -6,7 +6,7 @@ import org.elastos.hive.database.Result;
 
 import java.util.List;
 
-public class PackageInfo extends Result<PackageInfo> {
+public class PricingPlan extends Result<PricingPlan> {
 	@JsonProperty("Trial")
 	private Trial trial;
 	@JsonProperty("vaultPackages")
@@ -26,7 +26,7 @@ public class PackageInfo extends Result<PackageInfo> {
 		return paySetting;
 	}
 
-	public static PackageInfo deserialize(String content) {
-		return deserialize(content, PackageInfo.class);
+	public static PricingPlan deserialize(String content) {
+		return deserialize(content, PricingPlan.class);
 	}
 }

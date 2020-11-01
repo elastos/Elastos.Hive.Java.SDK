@@ -6,7 +6,7 @@ import org.elastos.hive.database.Result;
 
 import java.util.List;
 
-public class OrderInfo extends Result<OrderInfo> {
+public class Order extends Result<Order> {
 	@JsonProperty("order_id")
 	private String orderId;
 	@JsonProperty("did")
@@ -56,7 +56,7 @@ public class OrderInfo extends Result<OrderInfo> {
 		return finishTime;
 	}
 
-	public static OrderInfo deserialize(String content) {
-		return deserialize(content, OrderInfo.class);
+	public static Order deserialize(String content) {
+		return deserialize(content, Order.class);
 	}
 }
