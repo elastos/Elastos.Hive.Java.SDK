@@ -14,6 +14,7 @@ import java.util.concurrent.CompletionException;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 public class PaymentClient implements Payment {
@@ -28,7 +29,7 @@ public class PaymentClient implements Payment {
 
 
 	@Override
-	public CompletableFuture<PricingPlan> getAllPricingPlans() {
+	public CompletableFuture<List<PricingPlan>> getAllPricingPlans() {
 		return authHelper.checkValid()
 				.thenCompose(result -> getAllPricingPlansImp());
 	}
@@ -43,10 +44,10 @@ public class PaymentClient implements Payment {
 		return null;
 	}
 
-	private CompletableFuture<PricingPlan> getAllPricingPlansImp() {
+	private CompletableFuture<List<PricingPlan>> getAllPricingPlansImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PricingPlan> response = this.connectionManager.getVaultApi()
+				Response<List<PricingPlan>> response = this.connectionManager.getVaultApi()
 						.getPackageInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -67,8 +68,8 @@ public class PaymentClient implements Payment {
 	private CompletableFuture<Boolean> useTrialImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PricingPlan> response = this.connectionManager.getVaultApi()
-						.getPackageInfo()
+				Response<ResponseBody> response = this.connectionManager.getVaultApi()
+						.freeTrial()
 						.execute();
 				authHelper.checkResponseCode(response);
 				return true;
@@ -89,11 +90,11 @@ public class PaymentClient implements Payment {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("package_name", packageName);
 				map.put("price_name", priceName);
 				String json = JsonUtil.serialize(map);
-				Response response = this.connectionManager.getVaultApi()
+				Response<ResponseBody> response = this.connectionManager.getVaultApi()
 						.createOrder(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -115,11 +116,11 @@ public class PaymentClient implements Payment {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Map map = new HashMap<>();
+				Map<String, Object> map = new HashMap<>();
 				map.put("order_id", orderId);
 				map.put("pay_txids", txids);
 				String json = JsonUtil.serialize(map);
-				Response response = this.connectionManager.getVaultApi()
+				Response<ResponseBody> response = this.connectionManager.getVaultApi()
 						.pay(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
