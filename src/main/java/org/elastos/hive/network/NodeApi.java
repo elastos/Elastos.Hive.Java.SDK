@@ -98,7 +98,7 @@ public interface NodeApi {
 
 
 	@GET(Constance.API_PATH + "/payment/vault_package_info")
-	Call<PricingPlan> getPackageInfo();
+	Call<List<PricingPlan>> getPackageInfo();
 
 	@POST(Constance.API_PATH + "/payment/free_trial")
 	Call<ResponseBody> freeTrial();

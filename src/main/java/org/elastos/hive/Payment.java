@@ -12,7 +12,7 @@ public interface Payment {
 	 * get vault packages's informations
 	 * @return
 	 */
-	CompletableFuture<PricingPlan> getAllPricingPlans();
+	CompletableFuture<List<PricingPlan>> getAllPricingPlans();
 
 	/**
 	 * get vault package's information by plan name
