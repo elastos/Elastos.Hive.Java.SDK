@@ -23,6 +23,7 @@ import org.elastos.hive.utils.ResponseHelper;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 class FilesClient implements Files {
@@ -82,7 +83,9 @@ class FilesClient implements Files {
 	private <T> CompletableFuture<T> downloadImp(String remoteFile, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response response = this.connectionManager.getVaultApi()
+				Response<ResponseBody> response;
+
+				response = this.connectionManager.getVaultApi()
 						.downloader(remoteFile)
 						.execute();
 				if (response == null)
@@ -120,9 +123,11 @@ class FilesClient implements Files {
 			try {
 				Map<String, Object> map = new HashMap<>();
 				map.put("path", remoteFile);
-				String json = JsonUtil.getJsonFromObject(map);
 
-				Response response = this.connectionManager.getVaultApi()
+				String json = JsonUtil.serialize(map);
+				Response<ResponseBody> response;
+
+				response = this.connectionManager.getVaultApi()
 						.deleteFolder(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -147,8 +152,11 @@ class FilesClient implements Files {
 				Map<String, Object> map = new HashMap<>();
 				map.put("src_path", src);
 				map.put("dst_path", dst);
-				String json = JsonUtil.getJsonFromObject(map);
-				Response response = this.connectionManager.getVaultApi()
+
+				String json = JsonUtil.serialize(map);
+				Response<ResponseBody> response;
+
+				response = this.connectionManager.getVaultApi()
 						.move(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -173,8 +181,11 @@ class FilesClient implements Files {
 				Map<String, Object> map = new HashMap<>();
 				map.put("src_path", src);
 				map.put("dst_path", dst);
-				String json = JsonUtil.getJsonFromObject(map);
-				Response response = this.connectionManager.getVaultApi()
+
+				String json = JsonUtil.serialize(map);
+				Response<ResponseBody> response;
+
+				response = this.connectionManager.getVaultApi()
 						.copy(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);

@@ -40,30 +40,32 @@ class ScriptClient implements Scripting {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> registerScript(String name, Condition accessCondition, Executable executable) {
+	public CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable) {
 		return authHelper.checkValid()
-				.thenCompose(result -> registerScriptImp(name, accessCondition, executable));
+				.thenCompose(result -> registerScriptImp(name, condition, executable));
 	}
 
-	private CompletableFuture<Boolean> registerScriptImp(String name, Condition accessCondition, Executable executable) {
+	private CompletableFuture<Boolean> registerScriptImp(String name, Condition condition, Executable executable) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Map<String, Object> map = new HashMap<>();
+
 				map.put("name", name);
 				map.put("executable", executable);
-				if (accessCondition != null)
-					map.put("condition", accessCondition);
+				if (condition != null)
+					map.put("condition", condition);
 
-				String json = JsonUtil.getJsonFromObject(map);
+				String json = JsonUtil.serialize(map);
+				Response<ResponseBody> response;
 
-				Response<ResponseBody> response = this.connectionManager.getVaultApi()
+				response = this.connectionManager.getVaultApi()
 						.registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
+
 				authHelper.checkResponseCode(response);
 				return true;
 			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
 	}
@@ -108,9 +110,10 @@ class ScriptClient implements Scripting {
 					map.put("context", targetNode);
 				}
 
-				String json = JsonUtil.getJsonFromObject(map);
+				String json = JsonUtil.serialize(map);
+				Response<ResponseBody> response;
 
-				Response response = this.connectionManager.getVaultApi()
+				response = this.connectionManager.getVaultApi()
 						.callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -150,11 +153,11 @@ class ScriptClient implements Scripting {
 						RequestBody.create(
 								MediaType.parse("application/json"), json);
 
-				Response response = this.connectionManager.getVaultApi()
+				Response<ResponseBody> response = this.connectionManager.getVaultApi()
 						.callScript(body, metadata)
 						.execute();
 				authHelper.checkResponseCode(response);
-				return (T) ResponseHelper.toString(response);
+				return resultType.cast(ResponseHelper.toString(response));
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new CompletionException(e);
@@ -167,13 +170,15 @@ class ScriptClient implements Scripting {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Map<String, Object> map = new HashMap<>();
+
 				map.put("name", scriptName);
 				if (params != null)
 					map.put("params", params);
 
-				String json = JsonUtil.getJsonFromObject(map);
+				String json = JsonUtil.serialize(map);
+				Response<ResponseBody> response;
 
-				Response response = this.connectionManager.getVaultApi()
+				response = this.connectionManager.getVaultApi()
 						.callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -183,14 +188,18 @@ class ScriptClient implements Scripting {
 				authHelper.checkResponseCode(response);
 				if (resultType.isAssignableFrom(Reader.class)) {
 					Reader reader = ResponseHelper.getToReader(response);
-					return (T) reader;
-				} else {
-					InputStream inputStream = ResponseHelper.getInputStream(response);
-					return (T) inputStream;
+					return resultType.cast(reader);
 				}
+				if (resultType.isAssignableFrom(InputStream.class)) {
+					InputStream inputStream = ResponseHelper.getInputStream(response);
+					return resultType.cast(inputStream);
+				}
+
+				HiveException e = new HiveException("No support result Type");
+				throw new CompletionException(e);
 			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				HiveException ex = new HiveException(e.getLocalizedMessage());
+				throw new CompletionException(ex);
 			}
 		});
 	}
