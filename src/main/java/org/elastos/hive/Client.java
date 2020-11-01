@@ -63,27 +63,23 @@ public class Client {
 	}
 
 	/**
-	 * set resolver url and did cache path
-	 * @param url resolver url
-	 * @param path did cache path
-	 * @throws HiveException
+	 * Recommendation for cache dir:
+	 * - Laptop/standard Java
+	 *   System.getProperty("user.home") + "/.cache.did.elastos"
+	 * - Android Java
+	 *   Context.getFilesDir() + "/.cache.did.elastos"
+	 *
+	 * @param resolver the DIDResolver object
+	 * @param cacheDir the cache path name
 	 */
-	public static void setupResolver(String url, String path) throws HiveException {
-		String resolver = url;
-		String localPath = path;
-
+	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
+		if (cacheDir == null || resolver == null)
+			throw new IllegalArgumentException();
 		if (resolverDidSetup)
 			throw new HiveException("Resolver already setuped");
-
-		if (resolver == null)
-			resolver = Constance.MAIN_NET_RESOLVER;
-		if (localPath == null)
-			localPath = "didCache";
-
 		try {
-			DIDBackend.initialize(resolver, localPath);
+			DIDBackend.initialize(resolver, cacheDir);
 			ResolverCache.reset();
-
 			resolverDidSetup = true;
 		} catch (DIDResolveException e) {
 			e.printStackTrace();
