@@ -10,6 +10,7 @@ public class Vault {
 	private Database database;
 	private Scripting scripting;
 	private KeyValues keyValues;
+	private Payment payment;
 
 	private String vaultProvider;
 	private String ownerDid;
@@ -23,6 +24,7 @@ public class Vault {
 		this.files = new FilesClient(authHelper);
 		this.database = new DatabaseClient(authHelper);
 		this.scripting = new ScriptingClient(authHelper);
+		this.payment = new PaymentClient(authHelper);
 	}
 
 	/**
@@ -95,5 +97,13 @@ public class Vault {
 	 */
 	public Scripting getScripting() {
 		return this.scripting;
+	}
+
+	/**
+	 * Get interface as Payment instance
+	 * @return interface instance of Payment
+	 */
+	public Payment getPayment() {
+		return this.payment;
 	}
 }
