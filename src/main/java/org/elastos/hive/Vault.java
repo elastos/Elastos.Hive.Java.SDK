@@ -22,7 +22,7 @@ public class Vault {
 
 		this.files = new FilesClient(authHelper);
 		this.database = new DatabaseClient(authHelper);
-		this.scripting = new ScriptClient(authHelper);
+		this.scripting = new ScriptingClient(authHelper);
 	}
 
 	/**

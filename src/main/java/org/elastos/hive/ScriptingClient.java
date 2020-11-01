@@ -25,11 +25,11 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-class ScriptClient implements Scripting {
+class ScriptingClient implements Scripting {
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
 
-	ScriptClient(AuthHelper authHelper) {
+	ScriptingClient(AuthHelper authHelper) {
 		this.authHelper = authHelper;
 		this.connectionManager = authHelper.getConnectionManager();
 	}
