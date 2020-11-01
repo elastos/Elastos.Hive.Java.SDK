@@ -1,8 +1,7 @@
 package org.elastos.hive;
 
-import org.elastos.hive.payment.ServiceInfo;
-import org.elastos.hive.payment.order.Order;
-import org.elastos.hive.payment.pkg.PricingPlan;
+import org.elastos.hive.payment.Order;
+import org.elastos.hive.payment.PricingPlan;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -63,6 +62,6 @@ public interface Payment {
 	 * Get user vault service info
 	 * @return
 	 */
-	CompletableFuture<ServiceInfo> serviceInfo();
+	CompletableFuture<PricingPlan> serviceInfo();
 
 }
