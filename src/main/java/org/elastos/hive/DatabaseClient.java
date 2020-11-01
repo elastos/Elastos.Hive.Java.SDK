@@ -51,7 +51,7 @@ class DatabaseClient implements Database {
 			try {
 				Map<String, Object> map = new HashMap<>();
 				map.put("collection", collection);
-				String json = JsonUtil.getJsonFromObject(map);
+				String json = JsonUtil.serialize(map);
 
 				Response response = this.connectionManager.getVaultApi()
 						.createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
@@ -78,7 +78,7 @@ class DatabaseClient implements Database {
 
 				Map<String, Object> map = new HashMap<>();
 				map.put("collection", collection);
-				String json = JsonUtil.getJsonFromObject(map);
+				String json = JsonUtil.serialize(map);
 
 				Response response = this.connectionManager.getVaultApi()
 						.deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
@@ -105,7 +105,7 @@ class DatabaseClient implements Database {
 				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
 				rootNode.put("collection", collection);
 				rootNode.set("document", doc);
-				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
+				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
 				Response response = this.connectionManager.getVaultApi()
@@ -136,7 +136,7 @@ class DatabaseClient implements Database {
 				arrayNode.addAll(docs);
 				rootNode.put("collection", collection);
 				rootNode.set("document", arrayNode);
-				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
+				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
 				Response response = this.connectionManager.getVaultApi()
@@ -165,7 +165,7 @@ class DatabaseClient implements Database {
 				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
 				rootNode.put("collection", collection);
 				if(null!=query) rootNode.set("filter", query);
-				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
+				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
 				Response<CountDocResponse> response = this.connectionManager.getVaultApi()
@@ -194,7 +194,7 @@ class DatabaseClient implements Database {
 				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
 				rootNode.put("collection", collection);
 				if(null!=query) rootNode.set("filter", query);
-				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
+				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
 				Response response = this.connectionManager.getVaultApi()
@@ -224,7 +224,7 @@ class DatabaseClient implements Database {
 				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
 				rootNode.put("collection", collection);
 				if(null!=query) rootNode.set("filter", query);
-				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
+				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
 				Response response = this.connectionManager.getVaultApi()
@@ -254,7 +254,7 @@ class DatabaseClient implements Database {
 				rootNode.put("collection", collection);
 				if(null!=filter) rootNode.set("filter", filter);
 				if(null!=update) rootNode.set("update", update);
-				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
+				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
 				Response response = this.connectionManager.getVaultApi()
@@ -290,7 +290,7 @@ class DatabaseClient implements Database {
 				rootNode.put("collection", collection);
 				if(null!=filter) rootNode.set("filter", filter);
 				if(null!=update) rootNode.set("update", update);
-				if(null!=options) rootNode.set("options", JsonUtil.getJsonNode(options.serialize()));
+				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
 				Response response = this.connectionManager.getVaultApi()
