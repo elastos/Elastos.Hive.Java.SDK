@@ -2,9 +2,8 @@ package org.elastos.hive;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.payment.ServiceInfo;
-import org.elastos.hive.payment.order.Order;
-import org.elastos.hive.payment.pkg.PricingPlan;
+import org.elastos.hive.payment.Order;
+import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.utils.JsonUtil;
 
 import java.util.HashMap;
@@ -175,15 +174,15 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<ServiceInfo> serviceInfo() {
+	public CompletableFuture<PricingPlan> serviceInfo() {
 		return authHelper.checkValid()
 				.thenCompose(result -> serviceInfoImp());
 	}
 
-	private CompletableFuture<ServiceInfo> serviceInfoImp() {
+	private CompletableFuture<PricingPlan> serviceInfoImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<ServiceInfo> response = this.connectionManager.getVaultApi()
+				Response<PricingPlan> response = this.connectionManager.getVaultApi()
 						.getServiceInfo()
 						.execute();
 				authHelper.checkResponseCode(response);

@@ -1,4 +1,4 @@
-package org.elastos.hive.payment.order;
+package org.elastos.hive.payment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,7 +14,7 @@ public class Order extends Result<Order> {
 	@JsonProperty("app_id")
 	private String appId;
 	@JsonProperty("package_info")
-	private PackageInfo packageInfo;
+	private PricingPlan packageInfo;
 	@JsonProperty("pay_txids")
 	private List<String> payTxids;
 	@JsonProperty("state")
@@ -36,7 +36,7 @@ public class Order extends Result<Order> {
 		return appId;
 	}
 
-	public PackageInfo packageInfo() {
+	public PricingPlan packageInfo() {
 		return packageInfo;
 	}
 
