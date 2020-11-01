@@ -4,6 +4,10 @@ import org.elastos.hive.Constance;
 import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.files.FilesList;
 
+import org.elastos.hive.payment.ServiceInfo;
+import org.elastos.hive.payment.order.OrderInfo;
+import org.elastos.hive.payment.pkg.PackageInfo;
+
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -98,4 +102,26 @@ public interface NodeApi {
 	@Multipart
 	@POST(Constance.API_PATH + "/scripting/run_script")
 	Call<ResponseBody> callScript(@Part MultipartBody.Part file, @Part("metadata") RequestBody metadata);
+
+
+	@GET(Constance.API_PATH + "/payment/vault_package_info")
+	Call<PackageInfo> getPackageInfo();
+
+	@POST(Constance.API_PATH + "/payment/free_trial")
+	Call<ResponseBody> freeTrial();
+
+	@POST(Constance.API_PATH + "/payment/create_vault_package_order")
+	Call<ResponseBody> createOrder(@Body RequestBody body);
+
+	@POST(Constance.API_PATH + "/payment/pay_vault_package_order")
+	Call<ResponseBody> pay(@Body RequestBody body);
+
+	@GET(Constance.API_PATH + "/payment/vault_package_order")
+	Call<OrderInfo> getOrderInfo(@Query("order_id") String orderId);
+
+	@GET(Constance.API_PATH + "/payment/vault_package_order_list")
+	Call<List<OrderInfo>> getOrderInfos();
+
+	@GET(Constance.API_PATH + "/service/vault")
+	Call<ServiceInfo> getServiceInfo();
 }
