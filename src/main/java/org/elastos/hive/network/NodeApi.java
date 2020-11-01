@@ -5,8 +5,8 @@ import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.files.FilesList;
 
 import org.elastos.hive.payment.ServiceInfo;
-import org.elastos.hive.payment.order.OrderInfo;
-import org.elastos.hive.payment.pkg.PackageInfo;
+import org.elastos.hive.payment.order.Order;
+import org.elastos.hive.payment.pkg.PricingPlan;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -98,7 +98,7 @@ public interface NodeApi {
 
 
 	@GET(Constance.API_PATH + "/payment/vault_package_info")
-	Call<PackageInfo> getPackageInfo();
+	Call<PricingPlan> getPackageInfo();
 
 	@POST(Constance.API_PATH + "/payment/free_trial")
 	Call<ResponseBody> freeTrial();
@@ -110,10 +110,10 @@ public interface NodeApi {
 	Call<ResponseBody> pay(@Body RequestBody body);
 
 	@GET(Constance.API_PATH + "/payment/vault_package_order")
-	Call<OrderInfo> getOrderInfo(@Query("order_id") String orderId);
+	Call<Order> getOrderInfo(@Query("order_id") String orderId);
 
 	@GET(Constance.API_PATH + "/payment/vault_package_order_list")
-	Call<List<OrderInfo>> getOrderInfos();
+	Call<List<Order>> getOrderInfos();
 
 	@GET(Constance.API_PATH + "/service/vault")
 	Call<ServiceInfo> getServiceInfo();
