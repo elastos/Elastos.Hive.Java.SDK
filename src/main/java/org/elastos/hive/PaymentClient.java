@@ -39,11 +39,6 @@ public class PaymentClient implements Payment {
 		return null;
 	}
 
-	@Override
-	public CompletableFuture<PricingPlan> getUsingPricePlan() {
-		return null;
-	}
-
 	private CompletableFuture<List<PricingPlan>> getAllPricingPlansImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
@@ -175,12 +170,12 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<PricingPlan> serviceInfo() {
+	public CompletableFuture<PricingPlan> getUsingPricePlan() {
 		return authHelper.checkValid()
-				.thenCompose(result -> serviceInfoImp());
+				.thenCompose(result -> getUsingPricePlanImp());
 	}
 
-	private CompletableFuture<PricingPlan> serviceInfoImp() {
+	private CompletableFuture<PricingPlan> getUsingPricePlanImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Response<PricingPlan> response = this.connectionManager.getVaultApi()
