@@ -1,8 +1,10 @@
 package org.elastos.hive;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.elastos.hive.files.FileInfo;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.io.File;
 import java.io.FileReader;
@@ -12,20 +14,15 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 
-import org.elastos.hive.Files;
-import org.elastos.hive.Vault;
-import org.elastos.hive.files.FileInfo;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileTest {
 
 	private String textLocalPath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
 	private String imgLocalPath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/big.png";
-
 	private String textLocalCachePath = System.getProperty("user.dir") + File.separator + "store/cache/test.txt";
 	private String imgLocalCachePath = System.getProperty("user.dir") + File.separator + "store/cache/big.png";
 
@@ -34,7 +31,6 @@ public class FileTest {
 	private static String remoteImgPath = remoteFolder + File.separator + "big.png";
 
 	private static String remoteTextBackupPath = "backup" + File.separator + "test.txt";
-	private static String remoteImgBackupPath = "backup" + File.separator + "big.png";
 
 	private static Files filesApi;
 
@@ -43,12 +39,7 @@ public class FileTest {
 		try {
 			Utils.deleteFile(textLocalCachePath);
 			Utils.deleteFile(imgLocalCachePath);
-			filesApi.delete(remoteTextPath).get();
-			filesApi.delete(remoteImgPath).get();
-			filesApi.delete(remoteTextBackupPath).get();
-			filesApi.delete(remoteImgBackupPath).get();
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -72,8 +63,8 @@ public class FileTest {
 			fail();
 		} finally {
 			try {
-				if(null!=fileReader) fileReader.close();
-				if(null!=writer) writer.close();
+				if (null != fileReader) fileReader.close();
+				if (null != writer) writer.close();
 			} catch (Exception e) {
 				fail();
 			}
@@ -119,14 +110,8 @@ public class FileTest {
 		try {
 			List<FileInfo> result = filesApi.list(remoteFolder).get();
 			assertNotNull(result);
-			assertTrue(result.size()>0);
+			assertTrue(result.size() > 0);
 			System.out.println("list size=" + result.size());
-			for(FileInfo fileInfo : result) {
-				System.out.println("type=" + fileInfo.getType());
-				System.out.println("name=" + fileInfo.getName());
-				System.out.println("fileSize=" + fileInfo.getSize());
-				System.out.println("lastModify=" + fileInfo.getLastModified());
-			}
 		} catch (Exception e) {
 			fail();
 		}
@@ -144,30 +129,37 @@ public class FileTest {
 	}
 
 	@Test
-	public void test07_copy() {
+	public void test07_move() {
 		try {
-			boolean success = filesApi.copy(remoteTextPath, remoteTextBackupPath).get();
-			assertTrue(success);
+			filesApi.delete(remoteTextBackupPath).whenComplete((aBoolean, throwable) -> {
+				try {
+					boolean success = filesApi.move(remoteTextPath, remoteTextBackupPath).get();
+					assertTrue(success);
+				} catch (Exception e) {
+					fail();
+				}
+			}).get();
 		} catch (Exception e) {
 			fail();
 		}
 	}
 
 	@Test
-	public void test08_move() {
+	public void test08_copy() {
 		try {
-			boolean success = filesApi.move(remoteImgPath, remoteImgBackupPath).get();
+			boolean success = filesApi.copy(remoteTextBackupPath, remoteTextPath).get();
 			assertTrue(success);
 		} catch (Exception e) {
 			fail();
 		}
 	}
+
 
 	@Test
 	public void test09_deleteFile() {
 		try {
+			filesApi.delete(remoteTextPath).get();
 			filesApi.delete(remoteTextBackupPath).get();
-			filesApi.delete(remoteImgBackupPath).get();
 		} catch (Exception e) {
 			fail();
 		}
