@@ -1,7 +1,7 @@
 Elastos Hive Java SDK
 ===================
 
-[![Build Status](https://travis-ci.com/elastos/Elastos.NET.Hive.Java.SDK.svg?)](https://travis-ci.com/elastos/Elastos.NET.Hive.Java.SDK)
+[![Build Status](https://travis-ci.com/elastos/Elastos.NET.Hive.Java.SDK.svg?branch=master)](https://travis-ci.com/elastos/Elastos.NET.Hive.Java.SDK)
 
 ## Summary
 
