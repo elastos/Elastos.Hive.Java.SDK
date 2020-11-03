@@ -16,10 +16,17 @@ public class DbFindQuery extends Executable {
 	public static class Query {
 		private String collection;
 		private JsonNode filter;
+		private JsonNode options;
 
 		public Query(String collection, JsonNode query) {
 			this.collection = collection;
 			this.filter = query;
+		}
+
+		public Query(String collection, JsonNode query, JsonNode options) {
+			this.collection = collection;
+			this.filter = query;
+			this.options = options;
 		}
 
 		@JsonGetter("collection")
@@ -31,12 +38,22 @@ public class DbFindQuery extends Executable {
 		public JsonNode getFilter() {
 			return filter;
 		}
+
+		@JsonGetter("options")
+		public JsonNode getOptions() {
+			return options;
+		}
 	}
 
     public DbFindQuery(String name, String collection, JsonNode filter) {
     	super(TYPE, name);
         query = new Query(collection, filter);
     }
+
+    public DbFindQuery(String name, String collection, JsonNode filter, JsonNode options) {
+		super(TYPE, name);
+		query = new Query(collection, filter, options);
+	}
 
 	@Override
 	public Query getBody() {
