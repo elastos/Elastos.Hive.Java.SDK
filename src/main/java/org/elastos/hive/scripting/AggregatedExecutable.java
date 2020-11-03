@@ -15,7 +15,7 @@ public class AggregatedExecutable extends Executable {
     public AggregatedExecutable(String name, Executable[] executables) {
     	super(TYPE, name);
 
-        this.executables = new ArrayList<Executable>();
+        this.executables = new ArrayList<>();
         if (executables != null && executables.length > 0)
         	this.executables.addAll(Arrays.asList(executables));
     }
