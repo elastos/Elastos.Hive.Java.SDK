@@ -4,10 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.elastos.did.DIDDocument;
-import org.elastos.hive.Client;
-import org.elastos.hive.Scripting;
-import org.elastos.hive.Vault;
 import org.elastos.hive.database.Date;
 import org.elastos.hive.database.MaxKey;
 import org.elastos.hive.database.MinKey;
@@ -20,18 +16,21 @@ import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.DbFindQuery;
 import org.elastos.hive.scripting.DbInsertQuery;
 import org.elastos.hive.scripting.Executable;
+import org.elastos.hive.scripting.FileDownload;
+import org.elastos.hive.scripting.FileHash;
+import org.elastos.hive.scripting.FileProperties;
+import org.elastos.hive.scripting.FileUpload;
 import org.elastos.hive.scripting.OrCondition;
 import org.elastos.hive.scripting.QueryHasResultsCondition;
 import org.elastos.hive.scripting.RawCondition;
 import org.elastos.hive.scripting.RawExecutable;
+import org.elastos.hive.utils.JsonUtil;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.File;
 import java.io.Reader;
-import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -46,7 +45,6 @@ public class ScriptingTest {
     private String withConditionName = "get_group_messages";
 
     private static Scripting scripting;
-    private static Client client;
 
     @Test
     public void test01_condition() throws Exception {
@@ -102,8 +100,10 @@ public class ScriptingTest {
     @Test
     public void test03_registerNoCondition() {
         try {
-            String executable = "{\"type\":\"find\",\"name\":\"get_groups\",\"output\":true,\"body\":{\"collection\":\"groups\",\"filter\":{\"friends\":\"$caller_did\"},\"options\":{\"projection\":{\"_id\":false,\"name\":true}}}}";
-            boolean success = scripting.registerScript(noConditionName, new RawExecutable(executable)).get();
+            JsonNode filter = JsonUtil.deserialize("{\"friends\":\"$caller_did\"}");
+            JsonNode options = JsonUtil.deserialize("{\"projection\":{\"_id\":false,\"name\":true}}");
+            Executable executable = new DbFindQuery("get_groups", "groups", filter, options);
+            boolean success = scripting.registerScript(noConditionName, executable).get();
             assertTrue(success);
         } catch (Exception e) {
             fail();
@@ -113,9 +113,10 @@ public class ScriptingTest {
     @Test
     public void test04_registerWithCondition() {
         try {
-            String executable = "{\"type\":\"find\",\"name\":\"get_groups\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"friends\":\"$caller_did\"}}}";
-            String condition = "{\"type\":\"queryHasResults\",\"name\":\"verify_user_permission\",\"body\":{\"collection\":\"test_group\",\"filter\":{\"_id\":\"$params.group_id\",\"friends\":\"$caller_did\"}}}";
-            boolean success = scripting.registerScript(withConditionName, new RawCondition(condition), new RawExecutable(executable)).get();
+            JsonNode filter = JsonUtil.deserialize("{\"_id\":\"$params.group_id\",\"friends\":\"$caller_did\"}");
+            Executable executable = new DbFindQuery("get_groups", "test_group", filter);
+            Condition condition = new QueryHasResultsCondition("verify_user_permission", "test_group", filter);
+            boolean success = scripting.registerScript(withConditionName, condition, executable).get();
             assertTrue(success);
         } catch (Exception e) {
             fail();
@@ -191,8 +192,8 @@ public class ScriptingTest {
     @Test
     public void test11_setUploadScript() {
         try {
-            String executable = "{\"type\":\"fileUpload\",\"name\":\"upload_file\",\"output\":true,\"body\":{\"path\":\"$params.path\"}}";
-            boolean success = scripting.registerScript("upload_file", new RawExecutable(executable)).get();
+            Executable executable = new FileUpload("upload_file", "$params.path", true);
+            boolean success = scripting.registerScript("upload_file", executable).get();
             assertTrue(success);
         } catch (Exception e) {
             fail();
@@ -215,8 +216,8 @@ public class ScriptingTest {
     @Test
     public void test13_setDownloadScript() {
         try {
-            String executable = "{\"type\":\"fileDownload\",\"name\":\"download_file\",\"output\":true,\"body\":{\"path\":\"$params.path\"}}";
-            boolean success = scripting.registerScript("download_file", new RawExecutable(executable)).get();
+            Executable executable = new FileDownload("download_file", "$params.path", true);
+            boolean success = scripting.registerScript("download_file", executable).get();
             assertTrue(success);
         } catch (Exception e) {
             fail();
@@ -226,9 +227,8 @@ public class ScriptingTest {
     @Test
     public void test14_downloadFile() {
         try {
-            String executable = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode params = objectMapper.readTree(executable);
+            String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
+            JsonNode params = JsonUtil.deserialize(path);
             Reader reader = scripting.call("download_file", params, Scripting.Type.DOWNLOAD, Reader.class).get();
             Utils.cacheTextFile(reader, testCacheTextFilePath);
         } catch (Exception e) {
@@ -239,8 +239,11 @@ public class ScriptingTest {
     @Test
     public void test15_setInfoScript() {
         try {
-            String executable = "{\"type\":\"aggregated\",\"name\":\"file_properties_and_hash\",\"body\":[{\"type\":\"fileProperties\",\"name\":\"file_properties\",\"output\":true,\"body\":{\"path\":\"$params.path\"}},{\"type\":\"fileHash\",\"name\":\"file_hash\",\"output\":true,\"body\":{\"path\":\"$params.path\"}}]}";
-            boolean success = scripting.registerScript("get_file_info", new RawExecutable(executable)).get();
+            FileHash fileHash = new FileHash("file_hash", "$params.path");
+            FileProperties fileProperties = new FileProperties("file_properties", "$params.path");
+            AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{fileHash, fileProperties});
+
+            boolean success = scripting.registerScript("get_file_info", executable).get();
             assertTrue(success);
         } catch (Exception e) {
             fail();
