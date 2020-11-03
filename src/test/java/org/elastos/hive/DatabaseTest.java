@@ -6,18 +6,12 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
-import org.elastos.did.DIDDocument;
-import org.elastos.hive.Client;
-import org.elastos.hive.Database;
-import org.elastos.hive.Vault;
 import org.elastos.hive.database.Collation;
 import org.elastos.hive.database.Collation.Alternate;
 import org.elastos.hive.database.Collation.CaseFirst;
@@ -57,18 +51,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DatabaseTest {
-
-    private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
-
-    private static Database database;
-    private static Client client;
-
-    private static Map<String, Object> jsonToMap(String json) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> p = mapper.readValue(json, new TypeReference<Map<String, Object>>() {
-        });
-        return p;
-    }
 
     @Test
     public void test01_DbOptions() throws Exception {
@@ -476,9 +458,18 @@ public class DatabaseTest {
         }
     }
 
+    private static Database database;
+
+    private static Map<String, Object> jsonToMap(String json) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> p = mapper.readValue(json, new TypeReference<Map<String, Object>>() {
+        });
+        return p;
+    }
+
     @BeforeClass
     public static void setUp() {
-        Vault vault = TestFactory.createFactory().getVault();
+        Vault vault = ClientFactory.createFactory().getVault();
         database = vault.getDatabase();
     }
 }

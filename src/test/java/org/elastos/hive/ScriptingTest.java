@@ -38,13 +38,6 @@ import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ScriptingTest {
-    private String testTextFilePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
-    private String testCacheTextFilePath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/cache/script/test.txt";
-
-    private String noConditionName = "get_groups";
-    private String withConditionName = "get_group_messages";
-
-    private static Scripting scripting;
 
     @Test
     public void test01_condition() throws Exception {
@@ -71,7 +64,6 @@ public class ScriptingTest {
         OrCondition cond = new OrCondition("root");
         cond.append(orCond).append(cond5).append(andCond);
 
-//        System.out.println(cond.serialize());
     }
 
     @Test
@@ -166,20 +158,6 @@ public class ScriptingTest {
 
     //TODO CU-4ttmvx Test case: add test cases to fully verify supplementary functions
 //    @Test
-//    public void test09_callWithParams() {
-//        try {
-//            String param = "{\"group_id\":{\"$oid\":\"5f98e2a22c0b7f0520f29cbe\"}}";
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            JsonNode params = objectMapper.readTree(param);
-//
-//            String ret = scripting.call(withConditionName, params, String.class).get();
-//            System.out.println("return=" + ret);
-//        } catch (Exception e) {
-//            fail();
-//        }
-//    }
-//
-//    @Test
 //    public void test10_callOtherScript() {
 //        try {
 //            String ret = scripting.call(noConditionName, "appid", String.class).get();
@@ -265,29 +243,21 @@ public class ScriptingTest {
 
     @BeforeClass
     public static void setUp() {
-        Vault vault = TestFactory.createFactory().getVault();
+        Vault vault = ClientFactory.createFactory().getVault();
         scripting = vault.getScripting();
     }
 
-//    @BeforeClass
-//    public static void setUp() {
-//        try {
-//            String json = TestData.DOC_STR1;
-//            DIDDocument doc = DIDDocument
-//                    .fromJson(json);
-//
-//            Client.Options options = new Client.Options();
-//            options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-//                    -> TestData.ACCESS_TOKEN1));
-//            options.setAuthenticationDIDDocument(doc);
-//            options.setDIDResolverUrl("http://api.elastos.io:21606");
-//            options.setLocalDataPath(localDataPath);
-//
-//            Client.setVaultProvider(TestData.OWNERDID1, TestData.PROVIDER1);
-//            client = Client.createInstance(options);
-//            scripting = client.getVault(TestData.OWNERDID1).get().getScripting();
-//        } catch (Exception e) {
-//            fail();
-//        }
-//    }
+    private final String testTextFilePath;
+    private final String testCacheTextFilePath;
+
+    private String noConditionName = "get_groups";
+    private String withConditionName = "get_group_messages";
+
+    private static Scripting scripting;
+
+    public ScriptingTest() {
+        String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
+        testTextFilePath = localRootPath +"test.txt";
+        testCacheTextFilePath = localRootPath + "cache/script/test.txt";
+    }
 }

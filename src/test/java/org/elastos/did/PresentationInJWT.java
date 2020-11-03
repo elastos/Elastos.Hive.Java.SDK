@@ -27,13 +27,7 @@ import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.Header;
-import org.elastos.hive.Client;
-import org.elastos.hive.Files;
-import org.elastos.hive.TestData;
-import org.elastos.hive.TestFactory;
-import org.elastos.hive.Vault;
 import org.elastos.hive.utils.JwtUtil;
-import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,13 +36,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 public class PresentationInJWT {
-    // DummyAdapter only for demo and testing.
     private static DummyAdapter adapter;
     public static class Entity {
-        // Mnemonic passphrase and the store password should set by the end user.
         private final static String passphrase = "password";
         protected final static String storepass = "password";
 
@@ -66,38 +57,22 @@ public class PresentationInJWT {
         protected void initPrivateIdentity(String mnemonic) throws DIDException {
             final String storePath = System.getProperty("user.dir") + File.separator + "store" + File.separator + name;
 
-            // Create a fake adapter, just print the tx payload to console.
             store = DIDStore.open("filesystem", storePath, adapter);
 
-            // Check the store whether contains the root private identity.
             if (store.containsPrivateIdentity())
                 return; // Already exists
 
-            // Create a mnemonic use default language(English).
-//			Mnemonic mg = Mnemonic.getInstance();
-//			String mnemonic = mg.generate();
-
-//            System.out.format("[%s] Please write down your mnemonic and passwords:%n", name);
-//            System.out.println("  Mnemonic: " + mnemonic);
-//            System.out.println("  Mnemonic passphrase: " + passphrase);
-//            System.out.println("  Store password: " + storepass);
-
-            // Initialize the root identity.
             store.initPrivateIdentity(null, mnemonic, passphrase, storepass);
         }
 
         protected void initDid() throws DIDException {
-            // Check the DID store already contains owner's DID(with private key).
             List<DID> dids = store.listDids(DIDStore.DID_HAS_PRIVATEKEY);
             if (dids.size() > 0) {
                 for (DID did : dids) {
                     if (did.getMetadata().getAlias().equals("me")) {
-                        // Already create my DID.
                         System.out.format("[%s] My DID: %s%n", name, did);
                         this.did = did;
 
-                        // This only for dummy backend.
-                        // normally don't need this on ID sidechain.
                         store.publishDid(did, storepass);
                         return;
                     }
@@ -216,14 +191,10 @@ public class PresentationInJWT {
 
     }
 
-    static void initDIDBackend() throws DIDException {
-        // Get DID resolve cache dir.
+    static void initDIDBackend() {
         final String cacheDir = System.getProperty("user.dir") + File.separator + "store" + File.separator + "cache";
 
-        // Dummy adapter for easy to use
         adapter = new DummyAdapter();
-
-        // Initializa the DID backend globally.
         DIDBackend.initialize(adapter, cacheDir);
     }
 
@@ -237,7 +208,6 @@ public class PresentationInJWT {
             didapp = new DIDApp("didapp", "provide zero slab drink patient tape private paddle unaware catch virtual stone");
             testapp = new DApp("testapp", "polar degree weapon crouch alarm scorpion between stand glow round catalog marine");
 
-            //SignIn
             doc = testapp.getDocument();
             docStr = doc.toJson(true, true);
         } catch (Exception e) {
