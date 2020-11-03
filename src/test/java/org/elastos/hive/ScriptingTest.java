@@ -16,10 +16,10 @@ import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.DbFindQuery;
 import org.elastos.hive.scripting.DbInsertQuery;
 import org.elastos.hive.scripting.Executable;
-import org.elastos.hive.scripting.FileDownload;
-import org.elastos.hive.scripting.FileHash;
-import org.elastos.hive.scripting.FileProperties;
-import org.elastos.hive.scripting.FileUpload;
+import org.elastos.hive.scripting.DownloadExecutable;
+import org.elastos.hive.scripting.HashExecutable;
+import org.elastos.hive.scripting.PropertiesExecutable;
+import org.elastos.hive.scripting.UploadExecutable;
 import org.elastos.hive.scripting.OrCondition;
 import org.elastos.hive.scripting.QueryHasResultsCondition;
 import org.elastos.hive.scripting.RawCondition;
@@ -192,7 +192,7 @@ public class ScriptingTest {
     @Test
     public void test11_setUploadScript() {
         try {
-            Executable executable = new FileUpload("upload_file", "$params.path", true);
+            Executable executable = new UploadExecutable("upload_file", "$params.path", true);
             boolean success = scripting.registerScript("upload_file", executable).get();
             assertTrue(success);
         } catch (Exception e) {
@@ -216,7 +216,7 @@ public class ScriptingTest {
     @Test
     public void test13_setDownloadScript() {
         try {
-            Executable executable = new FileDownload("download_file", "$params.path", true);
+            Executable executable = new DownloadExecutable("download_file", "$params.path", true);
             boolean success = scripting.registerScript("download_file", executable).get();
             assertTrue(success);
         } catch (Exception e) {
@@ -239,9 +239,9 @@ public class ScriptingTest {
     @Test
     public void test15_setInfoScript() {
         try {
-            FileHash fileHash = new FileHash("file_hash", "$params.path");
-            FileProperties fileProperties = new FileProperties("file_properties", "$params.path");
-            AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{fileHash, fileProperties});
+            HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
+            PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
+            AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
 
             boolean success = scripting.registerScript("get_file_info", executable).get();
             assertTrue(success);
