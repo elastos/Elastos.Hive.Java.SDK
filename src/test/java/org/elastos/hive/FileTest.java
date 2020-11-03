@@ -21,19 +21,6 @@ import static org.junit.Assert.fail;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FileTest {
 
-	private String textLocalPath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/test.txt";
-	private String imgLocalPath = System.getProperty("user.dir") + "/src/resources/org/elastos/hive/big.png";
-	private String textLocalCachePath = System.getProperty("user.dir") + File.separator + "store/cache/test.txt";
-	private String imgLocalCachePath = System.getProperty("user.dir") + File.separator + "store/cache/big.png";
-
-	private static String remoteFolder = "hive";
-	private static String remoteTextPath = remoteFolder + File.separator + "test.txt";
-	private static String remoteImgPath = remoteFolder + File.separator + "big.png";
-
-	private static String remoteTextBackupPath = "backup" + File.separator + "test.txt";
-
-	private static Files filesApi;
-
 	@Test
 	public void test00_clean() {
 		try {
@@ -108,7 +95,7 @@ public class FileTest {
 	@Test
 	public void test05_list() {
 		try {
-			List<FileInfo> result = filesApi.list(remoteFolder).get();
+			List<FileInfo> result = filesApi.list(remoteRootPath).get();
 			assertNotNull(result);
 			assertTrue(result.size() > 0);
 			System.out.println("list size=" + result.size());
@@ -168,7 +155,32 @@ public class FileTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = TestFactory.createFactory().getVault();
+		Vault vault = ClientFactory.createFactory().getVault();
 		filesApi = vault.getFiles();
+	}
+
+	private final String textLocalPath;
+	private final String imgLocalPath;
+	private final String textLocalCachePath;
+	private final String imgLocalCachePath;
+
+	private final String remoteRootPath;
+	private final String remoteTextPath;
+	private final String remoteImgPath;
+	private final String remoteTextBackupPath;
+
+	private static Files filesApi;
+
+	public FileTest() {
+		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
+		textLocalPath = localRootPath +"test.txt";
+		imgLocalPath = localRootPath +"big.png";
+		textLocalCachePath = localRootPath + "cache/file/test.txt";
+		imgLocalCachePath = localRootPath + "cache/file/big.png";
+
+		remoteRootPath = "hive";
+		remoteTextPath = remoteRootPath + File.separator + "test.txt";
+		remoteImgPath = remoteRootPath + File.separator + "big.png";
+		remoteTextBackupPath = "backup" + File.separator + "test.txt";
 	}
 }

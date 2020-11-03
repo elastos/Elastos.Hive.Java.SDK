@@ -5,7 +5,7 @@ import org.elastos.did.PresentationInJWT;
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
-public class TestFactory {
+public class ClientFactory {
 
 	private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
 	private static final String didCachePath = "didCache";
@@ -30,15 +30,15 @@ public class TestFactory {
 		}
 	}
 
-	private static TestFactory mInstance;
+	private static ClientFactory mInstance;
 
-	private TestFactory() {
+	private ClientFactory() {
 		setUp();
 	}
 
-	public static TestFactory createFactory() {
+	public static ClientFactory createFactory() {
 		if (null == mInstance) {
-			mInstance = new TestFactory();
+			mInstance = new ClientFactory();
 		}
 		return mInstance;
 	}
