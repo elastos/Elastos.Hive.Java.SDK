@@ -22,7 +22,6 @@
 
 package org.elastos.hive;
 
-import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.utils.CryptoUtil;
 import org.json.JSONObject;
@@ -37,14 +36,12 @@ public class AuthInfoStoreImpl implements Persistent {
     private String provider;
     private String storePath;
 
-    public AuthInfoStoreImpl(String ownerDid, String provider, String storePath) {
-        this.ownerDid = ownerDid.trim();
-        this.provider = provider.trim();
+    public AuthInfoStoreImpl(String storePath) {
         this.storePath = storePath;
     }
 
     @Override
-    public JSONObject parseFrom() throws HiveException {
+    public JSONObject parseFrom(String ownerDid, String provider, String userDid) throws HiveException {
         FileReader reader = null;
         try {
             initialize();
@@ -75,7 +72,7 @@ public class AuthInfoStoreImpl implements Persistent {
     }
 
     @Override
-    public void upateContent(JSONObject conetnt) throws HiveException {
+    public void upateContent(JSONObject conetnt, String ownerDid, String provider, String userDid) throws HiveException {
         FileWriter fileWriter = null;
         try {
             initialize();
