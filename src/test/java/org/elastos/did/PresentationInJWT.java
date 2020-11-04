@@ -31,7 +31,6 @@ import java.io.File;
 public class PresentationInJWT {
 	DIDApp userDidApp = null;
 	DApp appInstanceDidApp = null;
-	String docStr = null;
 	DIDDocument doc = null;
 
 	private static DummyAdapter adapter;
@@ -51,7 +50,6 @@ public class PresentationInJWT {
 			appInstanceDidApp = new DApp(appInstanceDidOpt.name, appInstanceDidOpt.mnemonic, adapter, appInstanceDidOpt.phrasepass, appInstanceDidOpt.storepass);
 
 			doc = appInstanceDidApp.getDocument();
-			docStr = doc.toJson(true, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -59,17 +57,11 @@ public class PresentationInJWT {
 		return this;
 	}
 
-	public String getDocStr() {
-		return docStr;
-	}
-
 	public DIDDocument getDoc() {
 		return doc;
 	}
 
 	public String getAuthToken(String jwtToken) {
-
-//		appDID appInstanceDID
 		try {
 			Claims claims = JwtUtil.getBody(jwtToken);
 			String iss = claims.getIssuer();
