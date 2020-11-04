@@ -6,22 +6,20 @@ import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 public class UserFactory {
-
-	private static final String localDataPath = System.getProperty("user.dir") + File.separator + "store";
 	private static final String didCachePath = "didCache";
 	private Vault vault;
 	private static boolean resolverDidSetup = false;
 
 
-	public void setUp(PresentationInJWT.Options didappOpt, PresentationInJWT.Options dappOpt) {
+	private void setUp(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, String tokenCachePath) {
 		try {
-			PresentationInJWT presentationInJWT = new PresentationInJWT().init(didappOpt, dappOpt);
+			PresentationInJWT presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
 			if(!resolverDidSetup) {
 				Client.setupResolver(TestData.RESOLVER_URL, didCachePath);
 				resolverDidSetup = true;
 			}
 			Client.Options options = new Client.Options();
-			options.setLocalDataPath(localDataPath);
+			options.setLocalDataPath(tokenCachePath);
 			options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
 					-> presentationInJWT.getAuthToken(jwtToken)));
 			options.setAuthenticationDIDDocument(presentationInJWT.getDoc());
@@ -36,42 +34,44 @@ public class UserFactory {
 	}
 
 
-	private UserFactory(PresentationInJWT.Options didappOpt, PresentationInJWT.Options dappOpt) {
-		setUp(didappOpt, dappOpt);
+	private UserFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, String tokenCachePath) {
+		setUp(userDidOpt, appInstanceDidOpt, tokenCachePath);
 	}
 
-	public static UserFactory createFactory(PresentationInJWT.Options didappOpt, PresentationInJWT.Options dappOpt) {
-		return new UserFactory(didappOpt, dappOpt);
+	public static UserFactory createFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, String tokenCachePath) {
+		return new UserFactory(userDidOpt, appInstanceDidOpt, tokenCachePath);
 	}
 
 	public static UserFactory createUser1() {
-		PresentationInJWT.Options didappOpt = PresentationInJWT.Options.create()
-				.setName(TestData.didapp1_name)
-				.setMnemonic(TestData.didapp1_mn)
-				.setPhrasepass(TestData.didapp1_phrasepass)
-				.setStorepass(TestData.didapp1_storepass);
+		final String user1 = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user1";
+		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
+				.setName(TestData.userDid1_name)
+				.setMnemonic(TestData.userDid1_mn)
+				.setPhrasepass(TestData.userDid1_phrasepass)
+				.setStorepass(TestData.userDid1_storepass);
 
-		PresentationInJWT.Options dappOpt = PresentationInJWT.Options.create()
-				.setName(TestData.dapp1_name)
-				.setMnemonic(TestData.dapp1_mn)
-				.setPhrasepass(TestData.dapp1_phrasepass)
-				.setStorepass(TestData.dapp1_storepass);
-		return new UserFactory(didappOpt, dappOpt);
+		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
+				.setName(TestData.appInstance1_name)
+				.setMnemonic(TestData.appInstance1_mn)
+				.setPhrasepass(TestData.appInstance1_phrasepass)
+				.setStorepass(TestData.appInstance1_storepass);
+		return new UserFactory(userDidOpt, appInstanceDidOpt, user1);
 	}
 
 	public static UserFactory createUser2() {
-		PresentationInJWT.Options didappOpt = PresentationInJWT.Options.create()
-				.setName(TestData.didapp2_name)
-				.setMnemonic(TestData.didapp2_mn)
-				.setPhrasepass(TestData.didapp2_phrasepass)
-				.setStorepass(TestData.didapp2_storepass);
+		final String user2 = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user2";
+		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
+				.setName(TestData.userDid2_name)
+				.setMnemonic(TestData.userDid2_mn)
+				.setPhrasepass(TestData.userDid2_phrasepass)
+				.setStorepass(TestData.userDid2_storepass);
 
-		PresentationInJWT.Options dappOpt = PresentationInJWT.Options.create()
-				.setName(TestData.dapp2_name)
-				.setMnemonic(TestData.dapp2_mn)
-				.setPhrasepass(TestData.dapp2_phrasepass)
-				.setStorepass(TestData.dapp2_storepass);
-		return new UserFactory(didappOpt, dappOpt);
+		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
+				.setName(TestData.appInstance2_name)
+				.setMnemonic(TestData.appInstance2_mn)
+				.setPhrasepass(TestData.appInstance2_phrasepass)
+				.setStorepass(TestData.appInstance2_storepass);
+		return new UserFactory(userDidOpt, appInstanceDidOpt, user2);
 	}
 
 	public Vault getVault() {
