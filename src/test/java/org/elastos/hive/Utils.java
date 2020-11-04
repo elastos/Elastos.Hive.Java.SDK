@@ -43,10 +43,12 @@ public class Utils {
         return null;
     }
 
-    public static void cacheTextFile(Reader reader, String storePath) {
+    public static void cacheTextFile(Reader reader, String path) {
         FileWriter fileWriter = null;
         try {
-            fileWriter = new FileWriter(new File(storePath));
+            File file = new File(path);
+            if(!file.exists()) file.createNewFile();
+            fileWriter = new FileWriter(file);
             char[] buffer = new char[1];
             while (reader.read(buffer) != -1) {
                 fileWriter.write(buffer);
