@@ -54,7 +54,7 @@ class AuthHelper implements ConnectHelper {
 		this.ownerDid = ownerDid;
 		this.nodeUrl = nodeUrl;
 
-		this.persistent = new AuthInfoStoreImpl(ownerDid, nodeUrl, storePath);
+		this.persistent = new AuthInfoStoreImpl(storePath);
 
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
@@ -184,7 +184,7 @@ class AuthHelper implements ConnectHelper {
 	private void tryRestoreToken() {
 		try {
 
-			JSONObject json = persistent.parseFrom();
+			JSONObject json = persistent.parseFrom(this.ownerDid, this.nodeUrl, this.userDid);
 
 			if(!json.has(ACCESS_TOKEN_KEY)) return;
 
@@ -215,7 +215,7 @@ class AuthHelper implements ConnectHelper {
 			json.put(APP_ID_KEY, this.appId);
 			json.put(APP_INSTANCE_DID_KEY, this.appInstanceDid);
 
-			persistent.upateContent(json);
+			persistent.upateContent(json, this.ownerDid, this.nodeUrl, this.userDid);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} catch (HiveException e) {
