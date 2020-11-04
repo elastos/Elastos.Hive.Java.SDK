@@ -29,10 +29,10 @@ import org.elastos.hive.utils.JwtUtil;
 import java.io.File;
 
 public class PresentationInJWT {
-    DIDApp didapp = null;
-    DApp testapp = null;
-    String docStr = null;
-    DIDDocument doc = null;
+	DIDApp didapp = null;
+	DApp dapp = null;
+	String docStr = null;
+	DIDDocument doc = null;
 
 	private static DummyAdapter adapter;
 
@@ -43,13 +43,16 @@ public class PresentationInJWT {
 		DIDBackend.initialize(adapter, cacheDir);
 	}
 
-	public PresentationInJWT init() {
+	public PresentationInJWT init(Options didappOpt, Options dappOpt) {
 		try {
 			initDIDBackend();
-			didapp = new DIDApp("didapp", "provide zero slab drink patient tape private paddle unaware catch virtual stone", adapter, "password", "password");
-			testapp = new DApp("testapp", "polar degree weapon crouch alarm scorpion between stand glow round catalog marine", adapter, "password", "password");
+//			didapp = new DIDApp("didapp", "provide zero slab drink patient tape private paddle unaware catch virtual stone", adapter, "password", "password");
+//			testapp = new DApp("testapp", "polar degree weapon crouch alarm scorpion between stand glow round catalog marine", adapter, "password", "password");
 
-			doc = testapp.getDocument();
+			didapp = new DIDApp("didapp", "provide zero slab drink patient tape private paddle unaware catch virtual stone", adapter, "password", "password");
+			dapp = new DApp("testapp", "polar degree weapon crouch alarm scorpion between stand glow round catalog marine", adapter, "password", "password");
+
+			doc = dapp.getDocument();
 			docStr = doc.toJson(true, true);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -72,16 +75,63 @@ public class PresentationInJWT {
 			String iss = claims.getIssuer();
 			String nonce = (String) claims.get("nonce");
 
-			VerifiableCredential vc = didapp.issueDiplomaFor(testapp);
+			VerifiableCredential vc = didapp.issueDiplomaFor(dapp);
 
-			VerifiablePresentation vp = testapp.createPresentation(vc, iss, nonce);
+			VerifiablePresentation vp = dapp.createPresentation(vc, iss, nonce);
 
-			String token = testapp.createToken(vp, iss);
+			String token = dapp.createToken(vp, iss);
 			return token;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static class Options {
+		private String name;
+		private String mnemonic;
+		private String phrasepass;
+		private String storepass;
+
+		public static Options create() {
+			return new Options();
+		}
+
+		public Options setName(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Options setMnemonic(String mnemonic) {
+			this.mnemonic = mnemonic;
+			return this;
+		}
+
+		public Options setPhrasepass(String phrasepass) {
+			this.phrasepass = phrasepass;
+			return this;
+		}
+
+		public Options setStorepass(String storepass) {
+			this.storepass = storepass;
+			return this;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getMnemonic() {
+			return mnemonic;
+		}
+
+		public String getPhrasepass() {
+			return phrasepass;
+		}
+
+		public String getStorepass() {
+			return storepass;
+		}
 	}
 
 }
