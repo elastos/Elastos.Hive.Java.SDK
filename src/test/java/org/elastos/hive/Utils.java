@@ -76,8 +76,9 @@ public class Utils {
             }
 
             byte[] data = outStream.toByteArray();
-            File imageFile = new File(storePath);
-            FileOutputStream fileOutStream = new FileOutputStream(imageFile);
+            File file = new File(storePath);
+            if(!file.exists()) file.createNewFile();
+            FileOutputStream fileOutStream = new FileOutputStream(file);
             fileOutStream .write(data);
         } catch (Exception e) {
             e.printStackTrace();
