@@ -47,7 +47,7 @@ public class Utils {
         FileWriter fileWriter = null;
         try {
             File file = new File(path);
-            if(!file.exists()) file.createNewFile();
+            if(!file.exists()) file.mkdirs();
             fileWriter = new FileWriter(file);
             char[] buffer = new char[1];
             while (reader.read(buffer) != -1) {
@@ -77,7 +77,7 @@ public class Utils {
 
             byte[] data = outStream.toByteArray();
             File file = new File(storePath);
-            if(!file.exists()) file.createNewFile();
+            if(!file.exists()) file.mkdirs();
             FileOutputStream fileOutStream = new FileOutputStream(file);
             fileOutStream .write(data);
         } catch (Exception e) {
