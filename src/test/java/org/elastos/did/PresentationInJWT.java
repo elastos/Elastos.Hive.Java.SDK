@@ -29,28 +29,28 @@ import org.elastos.hive.utils.JwtUtil;
 import java.io.File;
 
 public class PresentationInJWT {
-	DIDApp didapp = null;
-	DApp dapp = null;
+	DIDApp userDidApp = null;
+	DApp appInstanceDidApp = null;
 	String docStr = null;
 	DIDDocument doc = null;
 
 	private static DummyAdapter adapter;
 
 	private void initDIDBackend() {
-		final String cacheDir = System.getProperty("user.dir") + File.separator + "store" + File.separator + "cache";
+		final String cacheDir = System.getProperty("user.dir") + File.separator + "didCache";
 
 		adapter = new DummyAdapter();
 		DIDBackend.initialize(adapter, cacheDir);
 	}
 
-	public PresentationInJWT init(Options didappOpt, Options dappOpt) {
+	public PresentationInJWT init(Options userDidOpt, Options appInstanceDidOpt) {
 		try {
 			initDIDBackend();
 
-			didapp = new DIDApp(didappOpt.name, didappOpt.mnemonic, adapter, didappOpt.phrasepass, didappOpt.storepass);
-			dapp = new DApp(dappOpt.name, dappOpt.mnemonic, adapter, dappOpt.phrasepass, dappOpt.storepass);
+			userDidApp = new DIDApp(userDidOpt.name, userDidOpt.mnemonic, adapter, userDidOpt.phrasepass, userDidOpt.storepass);
+			appInstanceDidApp = new DApp(appInstanceDidOpt.name, appInstanceDidOpt.mnemonic, adapter, appInstanceDidOpt.phrasepass, appInstanceDidOpt.storepass);
 
-			doc = dapp.getDocument();
+			doc = appInstanceDidApp.getDocument();
 			docStr = doc.toJson(true, true);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -68,16 +68,18 @@ public class PresentationInJWT {
 	}
 
 	public String getAuthToken(String jwtToken) {
+
+//		appDID appInstanceDID
 		try {
 			Claims claims = JwtUtil.getBody(jwtToken);
 			String iss = claims.getIssuer();
 			String nonce = (String) claims.get("nonce");
 
-			VerifiableCredential vc = didapp.issueDiplomaFor(dapp);
+			VerifiableCredential vc = userDidApp.issueDiplomaFor(appInstanceDidApp);
 
-			VerifiablePresentation vp = dapp.createPresentation(vc, iss, nonce);
+			VerifiablePresentation vp = appInstanceDidApp.createPresentation(vc, iss, nonce);
 
-			String token = dapp.createToken(vp, iss);
+			String token = appInstanceDidApp.createToken(vp, iss);
 			return token;
 		} catch (Exception e) {
 			e.printStackTrace();
