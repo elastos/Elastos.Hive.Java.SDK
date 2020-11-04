@@ -156,16 +156,6 @@ public class ScriptingTest {
         }
     }
 
-    //TODO CU-4ttmvx Test case: add test cases to fully verify supplementary functions
-//    @Test
-//    public void test10_callOtherScript() {
-//        try {
-//            String ret = scripting.call(noConditionName, "appid", String.class).get();
-//            System.out.println("return=" + ret);
-//        } catch (Exception e) {
-//            fail();
-//        }
-//    }
 
     @Test
     public void test11_setUploadScript() {
@@ -240,6 +230,7 @@ public class ScriptingTest {
             fail();
         }
     }
+
 
     @BeforeClass
     public static void setUp() {
