@@ -22,6 +22,7 @@
 
 package org.elastos.hive;
 
+import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.utils.CryptoUtil;
 import org.json.JSONObject;
@@ -34,19 +35,16 @@ import java.io.IOException;
 public class AuthInfoStoreImpl implements Persistent {
     private String ownerDid;
     private String provider;
-    private String userDid;
     private String storePath;
 
-    public AuthInfoStoreImpl(String storePath) {
+    public AuthInfoStoreImpl(String ownerDid, String provider, String storePath) {
+        this.ownerDid = ownerDid.trim();
+        this.provider = provider.trim();
         this.storePath = storePath;
     }
 
     @Override
-    public JSONObject parseFrom(String ownerDid, String provider, String userDid) throws HiveException {
-        if(null==ownerDid || provider==null || userDid==null) return new JSONObject();
-        this.ownerDid = ownerDid;
-        this.provider = provider;
-        this.userDid = userDid;
+    public JSONObject parseFrom() throws HiveException {
         FileReader reader = null;
         try {
             initialize();
@@ -77,11 +75,7 @@ public class AuthInfoStoreImpl implements Persistent {
     }
 
     @Override
-    public void upateContent(JSONObject conetnt, String ownerDid, String provider, String userDid) throws HiveException {
-        if(null==ownerDid || provider==null || userDid==null) return;
-        this.ownerDid = ownerDid;
-        this.provider = provider;
-        this.userDid = userDid;
+    public void upateContent(JSONObject conetnt) throws HiveException {
         FileWriter fileWriter = null;
         try {
             initialize();
@@ -102,12 +96,12 @@ public class AuthInfoStoreImpl implements Persistent {
 
     private String configPath;
     private void initialize() throws IOException {
-        String tokenPath = String.format("%s/%s", storePath, "token");
+        String tokenPath = String.format("%s/%s", storePath,"token");
         File rootDir = new File(tokenPath);
         if (!rootDir.exists())
             rootDir.mkdirs();
-        String fileName = CryptoUtil.getSHA256(this.ownerDid+this.provider+this.userDid);
-         this.configPath = String.format("%s/%s", tokenPath, fileName);
+        String fileName = CryptoUtil.getSHA256(this.ownerDid+this.provider);
+        this.configPath = String.format("%s/%s", tokenPath, fileName);
         File config = new File(configPath);
         if (!config.exists())
             config.createNewFile();
