@@ -46,11 +46,9 @@ public class PresentationInJWT {
 	public PresentationInJWT init(Options didappOpt, Options dappOpt) {
 		try {
 			initDIDBackend();
-//			didapp = new DIDApp("didapp", "provide zero slab drink patient tape private paddle unaware catch virtual stone", adapter, "password", "password");
-//			testapp = new DApp("testapp", "polar degree weapon crouch alarm scorpion between stand glow round catalog marine", adapter, "password", "password");
 
-			didapp = new DIDApp("didapp", "provide zero slab drink patient tape private paddle unaware catch virtual stone", adapter, "password", "password");
-			dapp = new DApp("testapp", "polar degree weapon crouch alarm scorpion between stand glow round catalog marine", adapter, "password", "password");
+			didapp = new DIDApp(didappOpt.name, didappOpt.mnemonic, adapter, didappOpt.phrasepass, didappOpt.storepass);
+			dapp = new DApp(dappOpt.name, dappOpt.mnemonic, adapter, dappOpt.phrasepass, dappOpt.storepass);
 
 			doc = dapp.getDocument();
 			docStr = doc.toJson(true, true);
@@ -115,22 +113,6 @@ public class PresentationInJWT {
 		public Options setStorepass(String storepass) {
 			this.storepass = storepass;
 			return this;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public String getMnemonic() {
-			return mnemonic;
-		}
-
-		public String getPhrasepass() {
-			return phrasepass;
-		}
-
-		public String getStorepass() {
-			return storepass;
 		}
 	}
 
