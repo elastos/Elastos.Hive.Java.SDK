@@ -43,11 +43,13 @@ public class Utils {
         return null;
     }
 
-    public static void cacheTextFile(Reader reader, String path) {
+    public static void cacheTextFile(Reader reader, String path, String filename) {
         FileWriter fileWriter = null;
         try {
-            File file = new File(path);
-            if(!file.exists()) file.mkdirs();
+            File dir = new File(path);
+            if(!dir.exists()) dir.mkdirs();
+            File file = new File(dir, filename);
+            if(!file.exists()) file.createNewFile();
             fileWriter = new FileWriter(file);
             char[] buffer = new char[1];
             while (reader.read(buffer) != -1) {
@@ -65,9 +67,13 @@ public class Utils {
         }
     }
 
-    public static void cacheBinFile(InputStream inputStream, String storePath) {
+    public static void cacheBinFile(InputStream inputStream, String path, String filename) {
         ByteArrayOutputStream outStream = null;
         try {
+            File dir = new File(path);
+            if(!dir.exists()) dir.mkdirs();
+            File file = new File(dir, filename);
+            if(!file.exists()) file.createNewFile();
             outStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int len = 0;
@@ -76,8 +82,6 @@ public class Utils {
             }
 
             byte[] data = outStream.toByteArray();
-            File file = new File(storePath);
-            if(!file.exists()) file.mkdirs();
             FileOutputStream fileOutStream = new FileOutputStream(file);
             fileOutStream .write(data);
         } catch (Exception e) {
