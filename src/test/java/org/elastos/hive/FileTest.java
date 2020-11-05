@@ -22,16 +22,6 @@ import static org.junit.Assert.fail;
 public class FileTest {
 
 	@Test
-	public void test00_clean() {
-		try {
-			Utils.deleteFile(textLocalCachePath);
-			Utils.deleteFile(imgLocalCachePath);
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
-	@Test
 	public void test01_uploadText() {
 		FileReader fileReader = null;
 		Writer writer = null;
@@ -76,7 +66,7 @@ public class FileTest {
 	public void test03_downloadText() {
 		try {
 			Reader reader = filesApi.download(remoteTextPath, Reader.class).get();
-			Utils.cacheTextFile(reader, textLocalCachePath);
+			Utils.cacheTextFile(reader, rootLocalCachePath, "test.txt");
 		} catch (Exception e) {
 			fail();
 		}
@@ -86,7 +76,7 @@ public class FileTest {
 	public void test04_downloadBin() {
 		try {
 			InputStream inputStream = filesApi.download(remoteImgPath, InputStream.class).get();
-			Utils.cacheBinFile(inputStream, imgLocalCachePath);
+			Utils.cacheBinFile(inputStream, rootLocalCachePath, "big.png");
 		} catch (Exception e) {
 			fail();
 		}
@@ -161,6 +151,7 @@ public class FileTest {
 
 	private final String textLocalPath;
 	private final String imgLocalPath;
+	private final String rootLocalCachePath;
 	private final String textLocalCachePath;
 	private final String imgLocalCachePath;
 
@@ -175,8 +166,9 @@ public class FileTest {
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
 		textLocalPath = localRootPath +"test.txt";
 		imgLocalPath = localRootPath +"big.png";
-		textLocalCachePath = localRootPath + "cache/file/test.txt";
-		imgLocalCachePath = localRootPath + "cache/file/big.png";
+		rootLocalCachePath = localRootPath + "cache/file/";
+		textLocalCachePath = rootLocalCachePath + "test.txt";
+		imgLocalCachePath = rootLocalCachePath + "/big.png";
 
 		remoteRootPath = "hive";
 		remoteTextPath = remoteRootPath + File.separator + "test.txt";
