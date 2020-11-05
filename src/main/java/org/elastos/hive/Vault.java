@@ -1,5 +1,7 @@
 package org.elastos.hive;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Vault class
  *      Provide basic information of vault.
@@ -11,6 +13,7 @@ public class Vault {
 	private Scripting scripting;
 	private KeyValues keyValues;
 	private Payment payment;
+	private Version version;
 
 	private String vaultProvider;
 	private String ownerDid;
@@ -25,6 +28,15 @@ public class Vault {
 		this.database = new DatabaseClient(authHelper);
 		this.scripting = new ScriptingClient(authHelper);
 		this.payment = new PaymentClient(authHelper);
+		this.version = new Version(authHelper);
+	}
+
+	public CompletableFuture<String> getNodeVersion() {
+		return this.version.getNodeVersion();
+	}
+
+	public CompletableFuture<String> getNodeLastCommitId() {
+		return this.version.getLastCommitId();
 	}
 
 	/**
