@@ -157,6 +157,8 @@ public class Client {
 			throw new IllegalArgumentException("Empty ownerDid");
 
 		return getVaultProvider(ownerDid).thenApply((provider)-> {
+			if(provider==null)
+				throw new IllegalArgumentException("Vault provider is null");
 			AuthHelper authHelper = new AuthHelper(ownerDid, provider,
 					localDataPath,
 					authenticationDIDDocument,
