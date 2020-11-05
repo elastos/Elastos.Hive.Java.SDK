@@ -8,6 +8,7 @@ import org.elastos.hive.network.model.FilesResponse;
 import org.elastos.hive.network.model.HashResponse;
 import org.elastos.hive.network.model.SignResponse;
 
+import jdk.nashorn.internal.objects.annotations.Getter;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -20,6 +21,13 @@ import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface NodeApi {
+
+	@GET(Constance.API_PATH + "/hive/version")
+	Call<ResponseBody> getVersion();
+
+	@GET(Constance.API_PATH + "/hive/commithash")
+	Call<ResponseBody> getCommitId();
+
 	@POST(Constance.API_PATH + "/did/sign_in")
 	Call<SignResponse> signIn(@Body RequestBody body);
 
