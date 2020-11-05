@@ -198,7 +198,7 @@ public class ScriptingTest {
             String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
             JsonNode params = JsonUtil.deserialize(path);
             Reader reader = scripting.call("download_file", params, Scripting.Type.DOWNLOAD, Reader.class).get();
-            Utils.cacheTextFile(reader, testCacheTextFilePath);
+            Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
         } catch (Exception e) {
             fail();
         }
@@ -239,7 +239,7 @@ public class ScriptingTest {
     }
 
     private final String testTextFilePath;
-    private final String testCacheTextFilePath;
+    private final String testLocalCacheRootPath;
 
     private String noConditionName = "get_groups";
     private String withConditionName = "get_group_messages";
@@ -249,6 +249,6 @@ public class ScriptingTest {
     public ScriptingTest() {
         String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
         testTextFilePath = localRootPath +"test.txt";
-        testCacheTextFilePath = localRootPath + "cache/script/test.txt";
+        testLocalCacheRootPath = localRootPath + "cache/script/";
     }
 }
