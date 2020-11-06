@@ -104,9 +104,6 @@ public interface NodeApi {
 	@GET(Constance.API_PATH + "/payment/vault_pricing_plan")
 	Call<PricingPlan> getPricingPlan(@Query("name") String name);
 
-	@GET(Constance.API_PATH + "/payment/version")
-	Call<ResponseBody> getPaymentVersion();
-
 	@POST(Constance.API_PATH + "/service/vault/create")
 	Call<ResponseBody> createFreeVault();
 
@@ -124,4 +121,7 @@ public interface NodeApi {
 
 	@GET(Constance.API_PATH + "/service/vault")
 	Call<UsingPlan> getServiceInfo();
+
+	@GET(Constance.API_PATH + "/payment/version")
+	Call<ResponseBody> getPaymentVersion();
 }
