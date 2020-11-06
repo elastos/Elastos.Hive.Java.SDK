@@ -4,7 +4,6 @@ import org.elastos.hive.Constance;
 import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.database.DocCount;
 import org.elastos.hive.files.FilesList;
-import org.elastos.hive.files.FileHash;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -79,7 +78,7 @@ public interface NodeApi {
 	Call<ResponseBody> copy(@Body RequestBody body);
 
 	@GET(Constance.API_PATH + "/files/file/hash")
-	Call<FileHash> hash(@Query("path") String filename);
+	Call<ResponseBody> hash(@Query("path") String filename);
 
 	@POST(Constance.API_PATH + "/scripting/set_subcondition")
 	Call<ResponseBody> registerCondition(@Body RequestBody body);
