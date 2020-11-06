@@ -7,6 +7,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.OrderList;
 import org.elastos.hive.payment.PricingPlan;
+import org.elastos.hive.payment.UsingPlan;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 
@@ -191,15 +192,15 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<PricingPlan> getUsingPricePlan() {
+	public CompletableFuture<UsingPlan> getUsingPricePlan() {
 		return authHelper.checkValid()
 				.thenCompose(result -> getUsingPricePlanImp());
 	}
 
-	private CompletableFuture<PricingPlan> getUsingPricePlanImp() {
+	private CompletableFuture<UsingPlan> getUsingPricePlanImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PricingPlan> response = this.connectionManager.getVaultApi()
+				Response<UsingPlan> response = this.connectionManager.getVaultApi()
 						.getServiceInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
