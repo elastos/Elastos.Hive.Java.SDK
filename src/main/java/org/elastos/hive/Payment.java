@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
+import org.elastos.hive.payment.UsingPlan;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -61,6 +62,6 @@ public interface Payment {
 	 * Get using price plan
 	 * @return
 	 */
-	CompletableFuture<PricingPlan> getUsingPricePlan();
+	CompletableFuture<UsingPlan> getUsingPricePlan();
 
 }
