@@ -11,14 +11,14 @@ public class PricingPlan extends Result<PricingPlan> {
 	private String name;
 	@JsonProperty("maxStorage")
 	private int maxStorage;
-	@JsonProperty("maxNetworkSpeed")
-	private int maxNetworkSpeed;
-	@JsonProperty("deleteIfUnpaidAfterDays")
-	private int deleteIfUnpaidAfterDays;
-	@JsonProperty("canReadIfUnpaid")
-	private boolean canReadIfUnpaid;
-	@JsonProperty("pricing")
-	private List<Price> pricing;
+	@JsonProperty("serviceDays")
+	private int serviceDays;
+	@JsonProperty("amount")
+	private float amount;
+	@JsonProperty("currency")
+	private boolean currency;
+	@JsonProperty("paymentSettings")
+	private PaymentSettings paymentSettings;
 
 	public String name() {
 		return name;
@@ -28,54 +28,46 @@ public class PricingPlan extends Result<PricingPlan> {
 		return maxStorage;
 	}
 
-	public int maxNetworkSpeed() {
-		return maxNetworkSpeed;
+	public int serviceDays() {
+		return serviceDays;
 	}
 
-	public int deleteIfUnpaidAfterDays() {
-		return deleteIfUnpaidAfterDays;
+	public float amount() {
+		return amount;
 	}
 
-	public boolean canReadIfUnpaid() {
-		return canReadIfUnpaid;
-	}
-
-	public List<Price> pricing() {
-		return pricing;
+	public boolean currency() {
+		return currency;
 	}
 
 	public static PricingPlan deserialize(String content) {
 		return deserialize(content, PricingPlan.class);
 	}
 
-	static class Price extends Result<Price> {
-		@JsonProperty("price_name")
-		private String priceName;
-		@JsonProperty("amount")
-		private float amount;
-		@JsonProperty("serviceDays")
-		private int serviceDays;
-		@JsonProperty("currency")
-		private String currency;
+	public static class PaymentSettings extends Result<PaymentSettings> {
+		@JsonProperty("receivingELAAddress")
+		private String receivingELAAddress;
+		@JsonProperty("wait_payment_timeout")
+		private int waitPaymentTimeout;
+		@JsonProperty("wait_tx_timeout")
+		private int waitTxTimeout;
 
-		public String priceName(){
-			return priceName;
+		public String receivingELAAddress() {
+			return receivingELAAddress;
 		}
 
-		public float amount() {
-			return amount;
+		public int waitPaymentTimeout() {
+			return waitPaymentTimeout;
 		}
 
-		public int serviceDays() {
-			return serviceDays;
+		public int waitTxTimeout() {
+			return waitTxTimeout;
 		}
 
-		public String currency() {
-			return currency;
+		public static PaymentSettings deserialize(String content) {
+			return deserialize(content, PaymentSettings.class);
 		}
 
-		public static Price deserialize(String content) {
-			return deserialize(content, Price.class);
-		}
 	}
+
 }
