@@ -1,5 +1,7 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -13,8 +15,8 @@ import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.connection.model.HeaderConfig;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.model.AuthResponse;
-import org.elastos.hive.network.model.SignResponse;
 import org.elastos.hive.utils.JwtUtil;
+import org.elastos.hive.utils.ResponseHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -103,14 +105,15 @@ class AuthHelper implements ConnectHelper {
 
 		try {
 			String json = new JSONObject(map).toString();
-			Response<SignResponse> response = this.connectionManager.getVaultApi()
+			Response response = this.connectionManager.getVaultApi()
 					.signIn(getJsonRequestBoy(json))
 					.execute();
-			SignResponse signResponse = response.body();
-			if (null == signResponse) {
-				throw new HiveException("Sign in challenge failed");
-			}
-			String jwtToken = signResponse.getChallenge();
+			checkResponseCode(response);
+			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class).get("challenge");
+			if(null == ret)
+				throw new HiveException("Sign in failed");
+
+			String jwtToken = ret.toString();
 			if (null != this.authenticationHandler && verifyToken(jwtToken)) {
 				String approveJwtToken = this.authenticationHandler.authenticationChallenge(jwtToken).get();
 				nodeAuth(approveJwtToken);
@@ -121,6 +124,8 @@ class AuthHelper implements ConnectHelper {
 	}
 
 	private void nodeAuth(String token) throws Exception {
+		if(null == token)
+			throw new HiveException("approve jwt token is null");
 		Map<String, Object> map = new HashMap<>();
 		map.put("jwt", token);
 		String json = new JSONObject(map).toString();
