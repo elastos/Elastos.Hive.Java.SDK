@@ -1,5 +1,7 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -16,7 +18,6 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.network.NodeApi;
 import org.elastos.hive.files.FilesList;
-import org.elastos.hive.files.FileHash;
 import org.elastos.hive.files.UploadOutputStream;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
@@ -207,12 +208,12 @@ class FilesClient implements Files {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<FileHash> response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.hash(remoteFile)
 						.execute();
 				authHelper.checkResponseCode(response);
-				String ret = response.body().getSHA256();
-				return ret;
+				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+				return ret.get("SHA256").toString();
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
