@@ -112,7 +112,7 @@ class AuthHelper implements ConnectHelper {
 			if(null == ret)
 				throw new HiveException("Sign in failed");
 
-			String jwtToken = ret.toString();
+			String jwtToken = ret.textValue();
 			if (null != this.authenticationHandler && verifyToken(jwtToken)) {
 				String approveJwtToken = this.authenticationHandler.authenticationChallenge(jwtToken).get();
 				nodeAuth(approveJwtToken);
@@ -162,7 +162,7 @@ class AuthHelper implements ConnectHelper {
 		if(null == ret)
 			throw new HiveException("Sign in failed");
 
-		String accessToken = ret.toString();
+		String accessToken = ret.textValue();
 		if (null == accessToken) return;
 		Claims claims = JwtUtil.getBody(accessToken);
 		long exp = claims.getExpiration().getTime();
