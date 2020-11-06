@@ -25,11 +25,10 @@ public interface Payment {
 
 	/**
 	 * create a order of pricing plan
-	 * @param packageName
 	 * @param priceName
 	 * @return
 	 */
-	CompletableFuture<Boolean> placeOrder(String packageName, String priceName);
+	CompletableFuture<String> placeOrder(String priceName);
 
 	/**
 	 * pay for  pricing plan order

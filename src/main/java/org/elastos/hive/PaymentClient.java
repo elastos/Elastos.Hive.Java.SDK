@@ -1,10 +1,13 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.utils.JsonUtil;
+import org.elastos.hive.utils.ResponseHelper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +83,7 @@ public class PaymentClient implements Payment {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Response<ResponseBody> response = this.connectionManager.getVaultApi()
-						.freeTrial()
+						.createFreeVault()
 						.execute();
 				authHelper.checkResponseCode(response);
 				return true;
@@ -92,24 +95,25 @@ public class PaymentClient implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> placeOrder(String packageName, String priceName) {
+	public CompletableFuture<String> placeOrder(String priceName) {
 		return authHelper.checkValid()
-				.thenCompose(result -> placeOrderImp(packageName, priceName));
+				.thenCompose(result -> placeOrderImp(priceName));
 	}
 
-	private CompletableFuture<Boolean> placeOrderImp(String packageName, String priceName) {
+	private CompletableFuture<String> placeOrderImp(String priceName) {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Map<String, Object> map = new HashMap<>();
-				map.put("package_name", packageName);
-				map.put("price_name", priceName);
+				map.put("pricing_name", priceName);
 				String json = JsonUtil.serialize(map);
 				Response<ResponseBody> response = this.connectionManager.getVaultApi()
 						.createOrder(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
-				return true;
+				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+				String orderId = ret.get("order_id").toString();
+				return orderId;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
