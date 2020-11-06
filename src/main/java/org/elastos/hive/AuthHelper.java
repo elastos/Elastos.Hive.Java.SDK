@@ -14,7 +14,6 @@ import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.connection.model.HeaderConfig;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.network.model.AuthResponse;
 import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.json.JSONException;
@@ -125,13 +124,14 @@ class AuthHelper implements ConnectHelper {
 
 	private void nodeAuth(String token) throws Exception {
 		if(null == token)
-			throw new HiveException("approve jwt token is null");
+			throw new HiveException("approve jwt is null");
 		Map<String, Object> map = new HashMap<>();
 		map.put("jwt", token);
 		String json = new JSONObject(map).toString();
-		Response<AuthResponse> response = this.connectionManager.getVaultApi()
+		Response response = this.connectionManager.getVaultApi()
 				.auth(getJsonRequestBoy(json))
 				.execute();
+		checkResponseCode(response);
 		handleAuthResponse(response);
 	}
 
@@ -158,14 +158,13 @@ class AuthHelper implements ConnectHelper {
 	}
 
 	private void handleAuthResponse(Response response) throws Exception {
-		AuthResponse authResponse = (AuthResponse) response.body();
-		if (null == authResponse) {
-			throw new HiveException("Authorize failed");
-		}
+		JsonNode ret = ResponseHelper.getValue(response, JsonNode.class).get("access_token");
+		if(null == ret)
+			throw new HiveException("Sign in failed");
 
-		String access_token = authResponse.getAccess_token();
-		if (null == access_token) return;
-		Claims claims = JwtUtil.getBody(access_token);
+		String accessToken = ret.toString();
+		if (null == accessToken) return;
+		Claims claims = JwtUtil.getBody(accessToken);
 		long exp = claims.getExpiration().getTime();
 		setUserDid((String) claims.get("userDid"));
 		setAppId((String) claims.get("appId"));
@@ -174,7 +173,7 @@ class AuthHelper implements ConnectHelper {
 		long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
 
 		token = new AuthToken("",
-				access_token,
+				accessToken,
 				expiresTime, "token");
 
 		//Store the local data.
