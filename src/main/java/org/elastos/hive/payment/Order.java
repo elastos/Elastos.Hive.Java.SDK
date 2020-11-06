@@ -13,7 +13,7 @@ public class Order extends Result<Order> {
 	private String did;
 	@JsonProperty("app_id")
 	private String appId;
-	@JsonProperty("package_info")
+	@JsonProperty("pricing_info")
 	private PricingPlan packageInfo;
 	@JsonProperty("pay_txids")
 	private List<String> payTxids;

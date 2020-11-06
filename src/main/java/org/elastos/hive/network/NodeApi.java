@@ -6,6 +6,7 @@ import org.elastos.hive.files.FilesList;
 
 import org.elastos.hive.payment.ServiceInfo;
 import org.elastos.hive.payment.Order;
+import org.elastos.hive.payment.OrderList;
 import org.elastos.hive.payment.PricingPlan;
 
 import okhttp3.MultipartBody;
@@ -118,7 +119,7 @@ public interface NodeApi {
 	Call<Order> getOrderInfo(@Query("order_id") String orderId);
 
 	@GET(Constance.API_PATH + "/payment/vault_package_order_list")
-	Call<List<Order>> getOrderInfos();
+	Call<OrderList> getOrderList();
 
 	@GET(Constance.API_PATH + "/service/vault")
 	Call<PricingPlan> getServiceInfo();
