@@ -34,16 +34,32 @@ public class PaymentClient implements Payment {
 				.thenCompose(result -> getAllPricingPlansImp());
 	}
 
-	@Override
-	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-		return null;
-	}
-
 	private CompletableFuture<List<PricingPlan>> getAllPricingPlansImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Response<List<PricingPlan>> response = this.connectionManager.getVaultApi()
 						.getPackageInfo()
+						.execute();
+				authHelper.checkResponseCode(response);
+				return response.body();
+			} catch (Exception e) {
+				HiveException exception = new HiveException(e.getLocalizedMessage());
+				throw new CompletionException(exception);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
+		return authHelper.checkValid()
+				.thenCompose(result -> getPricingPlansImp(planName));
+	}
+
+	private CompletableFuture<PricingPlan> getPricingPlansImp(String planName) {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				Response<PricingPlan> response = this.connectionManager.getVaultApi()
+						.getPricingPlan(planName)
 						.execute();
 				authHelper.checkResponseCode(response);
 				return response.body();

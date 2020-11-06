@@ -96,9 +96,11 @@ public interface NodeApi {
 	@POST(Constance.API_PATH + "/scripting/run_script")
 	Call<ResponseBody> callScript(@Part MultipartBody.Part file, @Part("metadata") RequestBody metadata);
 
-
 	@GET(Constance.API_PATH + "/payment/vault_package_info")
 	Call<List<PricingPlan>> getPackageInfo();
+
+	@GET(Constance.API_PATH + "/payment/vault_pricing_plan")
+	Call<PricingPlan> getPricingPlan(@Query("name") String name);
 
 	@POST(Constance.API_PATH + "/payment/free_trial")
 	Call<ResponseBody> freeTrial();
