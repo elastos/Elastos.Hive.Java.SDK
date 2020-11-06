@@ -2,9 +2,9 @@ package org.elastos.hive.network;
 
 import org.elastos.hive.Constance;
 import org.elastos.hive.files.FileInfo;
-import org.elastos.hive.network.model.CountDocResponse;
-import org.elastos.hive.network.model.FilesResponse;
-import org.elastos.hive.network.model.HashResponse;
+import org.elastos.hive.database.DocCount;
+import org.elastos.hive.files.FilesList;
+import org.elastos.hive.files.FileHash;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -52,7 +52,7 @@ public interface NodeApi {
 	Call<ResponseBody> deleteMany(@Body RequestBody body);
 
 	@POST(Constance.API_PATH + "/db/count_documents")
-	Call<CountDocResponse> countDocs(@Body RequestBody body);
+	Call<DocCount> countDocs(@Body RequestBody body);
 
 	@POST(Constance.API_PATH + "/db/find_one")
 	Call<ResponseBody> findOne(@Body RequestBody body);
@@ -61,7 +61,7 @@ public interface NodeApi {
 	Call<ResponseBody> findMany(@Body RequestBody body);
 
 	@GET(Constance.API_PATH + "/files/list/folder")
-	Call<FilesResponse> files(@Query("path") String filename);
+	Call<FilesList> files(@Query("path") String filename);
 
 	@GET(Constance.API_PATH + "/files/download")
 	Call<ResponseBody> downloader(@Query("path") String filename);
@@ -79,7 +79,7 @@ public interface NodeApi {
 	Call<ResponseBody> copy(@Body RequestBody body);
 
 	@GET(Constance.API_PATH + "/files/file/hash")
-	Call<HashResponse> hash(@Query("path") String filename);
+	Call<FileHash> hash(@Query("path") String filename);
 
 	@POST(Constance.API_PATH + "/scripting/set_subcondition")
 	Call<ResponseBody> registerCondition(@Body RequestBody body);
