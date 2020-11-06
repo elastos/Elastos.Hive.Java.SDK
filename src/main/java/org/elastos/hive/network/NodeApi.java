@@ -2,7 +2,6 @@ package org.elastos.hive.network;
 
 import org.elastos.hive.Constance;
 import org.elastos.hive.files.FileInfo;
-import org.elastos.hive.database.DocCount;
 import org.elastos.hive.files.FilesList;
 
 import okhttp3.MultipartBody;
@@ -51,7 +50,7 @@ public interface NodeApi {
 	Call<ResponseBody> deleteMany(@Body RequestBody body);
 
 	@POST(Constance.API_PATH + "/db/count_documents")
-	Call<DocCount> countDocs(@Body RequestBody body);
+	Call<ResponseBody> countDocs(@Body RequestBody body);
 
 	@POST(Constance.API_PATH + "/db/find_one")
 	Call<ResponseBody> findOne(@Body RequestBody body);
