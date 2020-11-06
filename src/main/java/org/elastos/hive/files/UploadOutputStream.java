@@ -1,4 +1,4 @@
-package org.elastos.hive.network.model;
+package org.elastos.hive.files;
 
 import java.io.IOException;
 import java.io.OutputStream;

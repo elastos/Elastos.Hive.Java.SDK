@@ -15,9 +15,9 @@ import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.network.NodeApi;
-import org.elastos.hive.network.model.FilesResponse;
-import org.elastos.hive.network.model.HashResponse;
-import org.elastos.hive.network.model.UploadOutputStream;
+import org.elastos.hive.files.FilesList;
+import org.elastos.hive.files.FileHash;
+import org.elastos.hive.files.UploadOutputStream;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 
@@ -207,7 +207,7 @@ class FilesClient implements Files {
 
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<HashResponse> response = this.connectionManager.getVaultApi()
+				Response<FileHash> response = this.connectionManager.getVaultApi()
 						.hash(remoteFile)
 						.execute();
 				authHelper.checkResponseCode(response);
@@ -231,7 +231,7 @@ class FilesClient implements Files {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				NodeApi api = this.connectionManager.getVaultApi();
-				Response<FilesResponse> response = api.files(folder).execute();
+				Response<FilesList> response = api.files(folder).execute();
 
 				authHelper.checkResponseCode(response);
 				List<FileInfo> list = response.body().getFiles();

@@ -1,6 +1,6 @@
-package org.elastos.hive.network.model;
+package org.elastos.hive.files;
 
-public class HashResponse {
+public class FileHash {
 	private String SHA256;
 
 	public String getSHA256() {
