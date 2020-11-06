@@ -64,4 +64,9 @@ public interface Payment {
 	 */
 	CompletableFuture<UsingPlan> getUsingPricePlan();
 
+	/**
+	 *
+	 * @return
+	 */
+	CompletableFuture<String> getPaymentVersion();
 }

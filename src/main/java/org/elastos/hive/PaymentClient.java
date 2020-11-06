@@ -197,6 +197,7 @@ public class PaymentClient implements Payment {
 				.thenCompose(result -> getUsingPricePlanImp());
 	}
 
+
 	private CompletableFuture<UsingPlan> getUsingPricePlanImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
@@ -205,6 +206,29 @@ public class PaymentClient implements Payment {
 						.execute();
 				authHelper.checkResponseCode(response);
 				return response.body();
+			} catch (Exception e) {
+				HiveException exception = new HiveException(e.getLocalizedMessage());
+				throw new CompletionException(exception);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<String> getPaymentVersion() {
+		return authHelper.checkValid()
+				.thenCompose(result -> getPaymentVersionImp());
+	}
+
+	private CompletableFuture<String> getPaymentVersionImp() {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				Response response = this.connectionManager.getVaultApi()
+						.getPaymentVersion()
+						.execute();
+				authHelper.checkResponseCode(response);
+				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+				String version = ret.get("version").toString();
+				return version;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
