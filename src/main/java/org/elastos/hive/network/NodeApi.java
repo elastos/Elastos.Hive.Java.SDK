@@ -2,7 +2,6 @@ package org.elastos.hive.network;
 
 import org.elastos.hive.Constance;
 import org.elastos.hive.files.FileInfo;
-import org.elastos.hive.network.model.AuthResponse;
 import org.elastos.hive.network.model.CountDocResponse;
 import org.elastos.hive.network.model.FilesResponse;
 import org.elastos.hive.network.model.HashResponse;
@@ -23,7 +22,7 @@ public interface NodeApi {
 	Call<ResponseBody> signIn(@Body RequestBody body);
 
 	@POST(Constance.API_PATH + "/did/auth")
-	Call<AuthResponse> auth(@Body RequestBody body);
+	Call<ResponseBody> auth(@Body RequestBody body);
 
 	@POST(Constance.API_PATH + "/sync/setup/google_drive")
 	Call<ResponseBody> googleDrive(@Body RequestBody body);
