@@ -18,7 +18,6 @@ import org.elastos.hive.database.InsertOptions;
 import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.database.DocCount;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 
@@ -168,13 +167,14 @@ class DatabaseClient implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
-				Response<DocCount> response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
 				authHelper.checkResponseCode(response);
-				long count = response.body().getCount();
-				return count;
+
+				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+				return ret.get("count").asLong();
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
