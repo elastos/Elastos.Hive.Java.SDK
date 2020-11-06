@@ -40,7 +40,7 @@ public class PaymentTest {
 
 	public void test02_placeOrder() {
 		try {
-			paymentApi.placeOrder(planName, priceName);
+			paymentApi.placeOrder(priceName);
 		} catch (Exception e) {
 			fail();
 		}
