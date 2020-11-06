@@ -6,7 +6,6 @@ import org.elastos.hive.network.model.AuthResponse;
 import org.elastos.hive.network.model.CountDocResponse;
 import org.elastos.hive.network.model.FilesResponse;
 import org.elastos.hive.network.model.HashResponse;
-import org.elastos.hive.network.model.SignResponse;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -21,7 +20,7 @@ import retrofit2.http.Query;
 
 public interface NodeApi {
 	@POST(Constance.API_PATH + "/did/sign_in")
-	Call<SignResponse> signIn(@Body RequestBody body);
+	Call<ResponseBody> signIn(@Body RequestBody body);
 
 	@POST(Constance.API_PATH + "/did/auth")
 	Call<AuthResponse> auth(@Body RequestBody body);
