@@ -133,7 +133,7 @@ publish {
     userOrg = 'elastos'
     groupId = 'org.elastos'
     artifactId = 'hive'
-    publishVersion = '0.5.0'
+    publishVersion = version
     desc = 'Elastos Hive SDK'
     repoName = 'Elastos.NET.Hive.Java.SDK'
     website = 'https://github.com/elastos/Elastos.NET.Hive.Java.SDK'
