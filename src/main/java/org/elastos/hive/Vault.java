@@ -29,10 +29,11 @@ public class Vault {
 		this.scripting = new ScriptingClient(authHelper);
 		this.payment = new PaymentClient(authHelper);
 		this.version = new Version(authHelper);
+		this.version = new VersionClient(authHelper);
 	}
 
 	public CompletableFuture<String> getNodeVersion() {
-		return this.version.getNodeVersion();
+		return this.version.getVersion();
 	}
 
 	public CompletableFuture<String> getNodeLastCommitId() {
