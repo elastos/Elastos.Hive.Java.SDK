@@ -44,8 +44,6 @@ public class Entity {
 				if (did.getMetadata().getAlias().equals("me")) {
 					System.out.format("[%s] My DID: %s%n", name, did);
 					this.did = did;
-
-					store.publishDid(did, storepass);
 					return;
 				}
 			}
@@ -54,7 +52,6 @@ public class Entity {
 		DIDDocument doc = store.newDid("me", storepass);
 		this.did = doc.getSubject();
 		System.out.format("[%s] My new DID created: %s%n", name, did);
-		store.publishDid(did, storepass);
 	}
 
 	protected DIDStore getDIDStore() {
