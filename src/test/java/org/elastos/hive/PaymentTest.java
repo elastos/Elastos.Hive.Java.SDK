@@ -101,7 +101,7 @@ public class PaymentTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = UserFactory.createUser3().getVault();
+		Vault vault = UserFactory.createUser2().getVault();
 		paymentApi = vault.getPayment();
 	}
 }

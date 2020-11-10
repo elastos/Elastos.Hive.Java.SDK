@@ -1,18 +1,18 @@
 package org.elastos.hive;
 
 public class TestData {
-    public static final String OWNERDID = "did:elastos:ioRGDwhAB2v4mc8nNuuu78AXNUvv13fMQQ";
+    public static String OWNERDID = "did:elastos:ioRGDwhAB2v4mc8nNuuu78AXNUvv13fMQQ";
 
         public static final String RESOLVER_URL = "http://api.elastos.io:21606"; //Test Net
 //    public static final String RESOLVER_URL = "http://api.elastos.io:20606"; //Main Net
 
-    //    public static final String PROVIDER = "http://127.0.0.1:5000";
+//        public static final String PROVIDER = "http://127.0.0.1:5000";
 //    public static final String PROVIDER = "https://hive1.trinity-tech.io"; // release
     public static final String PROVIDER = "https://hive.yoopig.com"; // develop
 
     //user1
-    //did:elastos:ioRGDwhAB2v4mc8nNuuu78AXNUvv13fMQQ
     //https://hive1.trinity-tech.io
+    public static final String userDid1 = "did:elastos:ioRGDwhAB2v4mc8nNuuu78AXNUvv13fMQQ";
     public static final String userDid1_name = "didapp";
     public static final String userDid1_mn = "provide zero slab drink patient tape private paddle unaware catch virtual stone";
     public static final String userDid1_phrasepass = "password" ;
@@ -25,8 +25,8 @@ public class TestData {
     public static final String appInstance1_storepass = "password";
 
     //user2
-    //did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL
     //https://hive1.trinity-tech.io
+    public static final String userDid2 = "did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL";
     public static final String userDid2_name = "didapp1";
     public static final String userDid2_mn = "mammal basket grain fish strategy music fault lock flat first casino energy";
     public static final String userDid2_phrasepass = "password" ;
@@ -40,6 +40,7 @@ public class TestData {
 
     //user3
     //[didapp3] My new DID created: did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J
+    public static final String userDid3 = "did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J";
     public static final String userDid3_name = "didapp3";
     public static final String userDid3_mn = "gallery input work twice helmet mesh decline cushion same garbage art bullet";
     public static final String userDid3_phrasepass = "password" ;
@@ -50,4 +51,18 @@ public class TestData {
     public static final String appInstance3_mn = "trend music thumb what erupt near apology exotic surge item field awake";
     public static final String appInstance3_phrasepass = "password" ;
     public static final String appInstance3_storepass = "password";
+
+    //user4
+    //[didapp4] My new DID created: did:elastos:iqk3KLebgiiP46uyoKevYQJB7PZcs2iTLz
+    public static final String userDid4 = "did:elastos:iqk3KLebgiiP46uyoKevYQJB7PZcs2iTLz";
+    public static final String userDid4_name = "didapp4";
+    public static final String userDid4_mn = "exist recycle people endless spin split enact dance weasel abstract idle adult";
+    public static final String userDid4_phrasepass = "password" ;
+    public static final String userDid4_storepass = "password";
+
+    //[testapp4] My new DID created: did:elastos:iZYDUV7GvhYpvPp1aic1peqMVd3raqtHi2
+    public static final String appInstance4_name = "testapp4";
+    public static final String appInstance4_mn = "network check illness dutch police stove other junior arrive sniff engage lamp";
+    public static final String appInstance4_phrasepass = "password" ;
+    public static final String appInstance4_storepass = "password";
 }
