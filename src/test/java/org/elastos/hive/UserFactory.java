@@ -74,6 +74,22 @@ public class UserFactory {
 		return new UserFactory(userDidOpt, appInstanceDidOpt, user2);
 	}
 
+	public static UserFactory createUser3() {
+		final String user3 = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user3";
+		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
+				.setName(TestData.userDid3_name)
+				.setMnemonic(TestData.userDid3_mn)
+				.setPhrasepass(TestData.userDid3_phrasepass)
+				.setStorepass(TestData.userDid3_storepass);
+
+		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
+				.setName(TestData.appInstance3_name)
+				.setMnemonic(TestData.appInstance3_mn)
+				.setPhrasepass(TestData.appInstance3_phrasepass)
+				.setStorepass(TestData.appInstance3_storepass);
+		return new UserFactory(userDidOpt, appInstanceDidOpt, user3);
+	}
+
 	public Vault getVault() {
 		return vault;
 	}
