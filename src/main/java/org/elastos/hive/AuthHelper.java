@@ -107,7 +107,7 @@ class AuthHelper implements ConnectHelper {
 			Response response = this.connectionManager.getVaultApi()
 					.signIn(getJsonRequestBoy(json))
 					.execute();
-			checkResponseCode(response);
+			checkResponse(response);
 			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class).get("challenge");
 			if(null == ret)
 				throw new HiveException("Sign in failed");
@@ -131,7 +131,7 @@ class AuthHelper implements ConnectHelper {
 		Response response = this.connectionManager.getVaultApi()
 				.auth(getJsonRequestBoy(json))
 				.execute();
-		checkResponseCode(response);
+		checkResponse(response);
 		handleAuthResponse(response);
 	}
 
@@ -270,18 +270,26 @@ class AuthHelper implements ConnectHelper {
 		return RequestBody.create(MediaType.parse("Content-Type, application/json"), json);
 	}
 
-	public void checkResponseCode(Response response) throws HiveException {
+	public void checkResponse(Response response) throws HiveException {
 		if (response == null)
 			throw new HiveException("response is null");
 
 		int code = response.code();
 		if (code >= 300 || code<200) {
-			if(code==401) {
-				retryLogin();
-			} else {
-				String message  = response.message();
-				throw new HiveException(message);
-			}
+			String message  = response.message();
+			throw new HiveException(message);
+		}
+	}
+
+	public void checkResponseWithRetry(Response response) throws HiveException {
+		if (response == null)
+			throw new HiveException("response is null");
+
+		int code = response.code();
+		if(code==401) {
+			retryLogin();
+		} else {
+			checkResponse(response);
 		}
 	}
 }
