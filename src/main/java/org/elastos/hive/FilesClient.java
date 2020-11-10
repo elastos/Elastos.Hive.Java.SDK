@@ -92,7 +92,7 @@ class FilesClient implements Files {
 				if (response == null)
 					throw new HiveException(HiveException.ERROR);
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 
 				if(resultType.isAssignableFrom(Reader.class)) {
 					Reader reader = ResponseHelper.getToReader(response);
@@ -131,7 +131,7 @@ class FilesClient implements Files {
 				response = this.connectionManager.getVaultApi()
 						.deleteFolder(createJsonRequestBody(json))
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				return true;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -160,7 +160,7 @@ class FilesClient implements Files {
 				response = this.connectionManager.getVaultApi()
 						.move(createJsonRequestBody(json))
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				return true;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -189,7 +189,7 @@ class FilesClient implements Files {
 				response = this.connectionManager.getVaultApi()
 						.copy(createJsonRequestBody(json))
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				return true;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -211,7 +211,7 @@ class FilesClient implements Files {
 				Response response = this.connectionManager.getVaultApi()
 						.hash(remoteFile)
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 				return ret.get("SHA256").toString();
 			} catch (Exception e) {
@@ -234,7 +234,7 @@ class FilesClient implements Files {
 				NodeApi api = this.connectionManager.getVaultApi();
 				Response<FilesList> response = api.files(folder).execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				List<FileInfo> list = response.body().getFiles();
 				return list;
 			} catch (Exception e) {
@@ -256,7 +256,7 @@ class FilesClient implements Files {
 				NodeApi api = this.connectionManager.getVaultApi();
 				Response<FileInfo> response = api.getProperties(path).execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				FileInfo fileInfo = response.body();
 				return fileInfo;
 			} catch (Exception e) {

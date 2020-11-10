@@ -62,7 +62,7 @@ class ScriptingClient implements Scripting {
 						.registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				return true;
 			} catch (Exception e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
@@ -116,7 +116,7 @@ class ScriptingClient implements Scripting {
 				response = this.connectionManager.getVaultApi()
 						.callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				return ResponseHelper.getValue(response, clazz);
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -156,7 +156,7 @@ class ScriptingClient implements Scripting {
 				Response<ResponseBody> response = this.connectionManager.getVaultApi()
 						.callScript(body, metadata)
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				return resultType.cast(ResponseHelper.toString(response));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -185,7 +185,7 @@ class ScriptingClient implements Scripting {
 				if (response == null)
 					throw new HiveException(HiveException.ERROR);
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				if (resultType.isAssignableFrom(Reader.class)) {
 					Reader reader = ResponseHelper.getToReader(response);
 					return resultType.cast(reader);

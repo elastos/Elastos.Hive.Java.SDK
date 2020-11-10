@@ -56,7 +56,7 @@ class DatabaseClient implements Database {
 						.createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				return true;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -83,7 +83,7 @@ class DatabaseClient implements Database {
 						.deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				return true;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -111,7 +111,7 @@ class DatabaseClient implements Database {
 						.insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				InsertOneResult insertResult = InsertOneResult.deserialize(ResponseHelper.toString(response));
 				return insertResult;
 			} catch (Exception e) {
@@ -142,7 +142,7 @@ class DatabaseClient implements Database {
 						.insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				InsertManyResult insertResult = InsertManyResult.deserialize(ResponseHelper.toString(response));
 				return insertResult;
 			} catch (Exception e) {
@@ -171,7 +171,7 @@ class DatabaseClient implements Database {
 						.countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 
 				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 				return ret.get("count").asLong();
@@ -201,7 +201,7 @@ class DatabaseClient implements Database {
 						.findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				JsonNode jsonNode = ResponseHelper.getValue(response, JsonNode.class);
 				JsonNode item = jsonNode.get("items");
 				return item;
@@ -231,7 +231,7 @@ class DatabaseClient implements Database {
 						.findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				List<JsonNode> jsonNodes = ResponseHelper.getArray(response, "items");
 				return jsonNodes;
 			} catch (Exception e) {
@@ -261,7 +261,7 @@ class DatabaseClient implements Database {
 						.updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				String ret = ResponseHelper.toString(response);
 				if(ret.contains("_error")) {
 					HiveException exception = new HiveException(ret);
@@ -297,7 +297,7 @@ class DatabaseClient implements Database {
 						.updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				UpdateResult updateResult = UpdateResult.deserialize(ResponseHelper.toString(response));
 				return updateResult;
 			} catch (Exception e) {
@@ -325,7 +325,7 @@ class DatabaseClient implements Database {
 						.deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				DeleteResult deleteResult = DeleteResult.deserialize(ResponseHelper.toString(response));
 				return deleteResult;
 			} catch (Exception e) {
@@ -353,7 +353,7 @@ class DatabaseClient implements Database {
 						.deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				DeleteResult deleteResult = DeleteResult.deserialize(ResponseHelper.toString(response));
 				return deleteResult;
 			} catch (Exception e) {
