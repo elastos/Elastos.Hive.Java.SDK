@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -21,7 +22,17 @@ public class PaymentTest {
 	private static final String orderId = "orderId";
 
 	@Test
-	public void test00_getPricingPlans() {
+	public void test00_userTrail() {
+		try {
+			boolean ret = paymentApi.useTrial().get();
+			assertTrue(ret);
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void test01_getPricingPlans() {
 		try {
 			List<PricingPlan> pricingPlans = paymentApi.getAllPricingPlans().get();
 			assertNotNull(pricingPlans);
@@ -30,7 +41,7 @@ public class PaymentTest {
 		}
 	}
 
-	public void test01_getPricingPlan() {
+	public void test02_getPricingPlan() {
 		try {
 			paymentApi.getPricingPlan(planName).get();
 		} catch (Exception e) {
@@ -38,7 +49,7 @@ public class PaymentTest {
 		}
 	}
 
-	public void test02_placeOrder() {
+	public void test03_placeOrder() {
 		try {
 			paymentApi.placeOrder(priceName);
 		} catch (Exception e) {
@@ -46,7 +57,7 @@ public class PaymentTest {
 		}
 	}
 
-	public void test03_payOrder() {
+	public void test04_payOrder() {
 		try {
 			List<String> txids = new ArrayList<>();
 			txids.add("xxxxxxxxxxx");
@@ -56,7 +67,7 @@ public class PaymentTest {
 		}
 	}
 
-	public void test04_useTrial() {
+	public void test05_useTrial() {
 		try {
 			paymentApi.useTrial();
 		} catch (Exception e) {
@@ -64,7 +75,7 @@ public class PaymentTest {
 		}
 	}
 
-	public void test05_getOrder() {
+	public void test06_getOrder() {
 		try {
 			paymentApi.getOrder(orderId);
 		} catch (Exception e) {
@@ -72,7 +83,7 @@ public class PaymentTest {
 		}
 	}
 
-	public void test06_getAllOrders() {
+	public void test07_getAllOrders() {
 		try {
 			paymentApi.getAllOrders();
 		} catch (Exception e) {
@@ -80,7 +91,7 @@ public class PaymentTest {
 		}
 	}
 
-	public void test07_getUsingPricePlan() {
+	public void test08_getUsingPricePlan() {
 		try {
 			paymentApi.getUsingPricePlan();
 		} catch (Exception e) {
@@ -90,7 +101,7 @@ public class PaymentTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = UserFactory.createUser1().getVault();
+		Vault vault = UserFactory.createUser3().getVault();
 		paymentApi = vault.getPayment();
 	}
 }

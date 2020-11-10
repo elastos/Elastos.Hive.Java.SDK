@@ -3,15 +3,16 @@ package org.elastos.hive;
 public class TestData {
     public static final String OWNERDID = "did:elastos:ioRGDwhAB2v4mc8nNuuu78AXNUvv13fMQQ";
 
-    //    public static final String RESOLVER_URL = "http://api.elastos.io:21606"; //Test Net
-    public static final String RESOLVER_URL = "http://api.elastos.io:20606"; //Main Net
+        public static final String RESOLVER_URL = "http://api.elastos.io:21606"; //Test Net
+//    public static final String RESOLVER_URL = "http://api.elastos.io:20606"; //Main Net
 
     //    public static final String PROVIDER = "http://127.0.0.1:5000";
-    public static final String PROVIDER = "https://hive1.trinity-tech.io";
-
+//    public static final String PROVIDER = "https://hive1.trinity-tech.io"; // release
+    public static final String PROVIDER = "https://hive.yoopig.com"; // develop
 
     //user1
     //did:elastos:ioRGDwhAB2v4mc8nNuuu78AXNUvv13fMQQ
+    //https://hive1.trinity-tech.io
     public static final String userDid1_name = "didapp";
     public static final String userDid1_mn = "provide zero slab drink patient tape private paddle unaware catch virtual stone";
     public static final String userDid1_phrasepass = "password" ;
@@ -25,6 +26,7 @@ public class TestData {
 
     //user2
     //did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL
+    //https://hive1.trinity-tech.io
     public static final String userDid2_name = "didapp1";
     public static final String userDid2_mn = "mammal basket grain fish strategy music fault lock flat first casino energy";
     public static final String userDid2_phrasepass = "password" ;
@@ -35,4 +37,17 @@ public class TestData {
     public static final String appInstance2_mn = "venture link adapt field priority extend depart endless right lamp sudden fringe";
     public static final String appInstance2_phrasepass = "password" ;
     public static final String appInstance2_storepass = "password";
+
+    //user3
+    //[didapp3] My new DID created: did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J
+    public static final String userDid3_name = "didapp3";
+    public static final String userDid3_mn = "gallery input work twice helmet mesh decline cushion same garbage art bullet";
+    public static final String userDid3_phrasepass = "password" ;
+    public static final String userDid3_storepass = "password";
+
+    //[testapp3] My new DID created: did:elastos:ihe3tSrTDMMkK1nJX4EsRsuZyYstDZsH46
+    public static final String appInstance3_name = "testapp3";
+    public static final String appInstance3_mn = "trend music thumb what erupt near apology exotic surge item field awake";
+    public static final String appInstance3_phrasepass = "password" ;
+    public static final String appInstance3_storepass = "password";
 }
