@@ -43,6 +43,7 @@ public class UserFactory {
 	}
 
 	public static UserFactory createUser1() {
+		TestData.OWNERDID = TestData.userDid1;
 		final String user1 = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user1";
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
 				.setName(TestData.userDid1_name)
@@ -59,6 +60,7 @@ public class UserFactory {
 	}
 
 	public static UserFactory createUser2() {
+		TestData.OWNERDID = TestData.userDid2;
 		final String user2 = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user2";
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
 				.setName(TestData.userDid2_name)
@@ -75,6 +77,7 @@ public class UserFactory {
 	}
 
 	public static UserFactory createUser3() {
+		TestData.OWNERDID = TestData.userDid3;
 		final String user3 = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user3";
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
 				.setName(TestData.userDid3_name)
