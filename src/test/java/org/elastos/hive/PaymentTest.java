@@ -42,12 +42,14 @@ public class PaymentTest {
 		}).get();
 	}
 
-	public void test02_getPricingPlan() {
-		try {
-			paymentApi.getPricingPlan(planName).get();
-		} catch (Exception e) {
-			fail();
-		}
+	@Test
+	public void test02_getPricingPlan() throws ExecutionException, InterruptedException {
+		paymentApi.getPricingPlan(planName).whenComplete((pricingPlan, throwable) -> {
+			assertNull(throwable);
+			assertNotNull(pricingPlan);
+			assertTrue(planName.equals(pricingPlan.name()));
+		}).get();
+
 	}
 
 	public void test03_placeOrder() {
