@@ -83,6 +83,8 @@ public class ResponseHelper {
                 obj = new ObjectMapper().readTree(json);
             } else if(clz.isAssignableFrom(Reader.class)) {
                 obj = new StringReader(json);
+            } else {
+                obj = new ObjectMapper().readValue(json, clz);
             }
         } catch (Exception e) {
             e.printStackTrace();

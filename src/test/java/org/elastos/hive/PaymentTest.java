@@ -22,7 +22,7 @@ public class PaymentTest {
 	private static Payment paymentApi;
 	private static final String planName = "Free";
 	private static final String priceName = "Rookie";
-	private static final String orderId = "orderId";
+	private static String orderId = "5fab73d41f002debe1cb203a";
 
 	@Test
 	public void test00_userTrail() throws ExecutionException, InterruptedException {
@@ -54,9 +54,10 @@ public class PaymentTest {
 
 	@Test
 	public void test03_placeOrder() throws ExecutionException, InterruptedException {
-		paymentApi.placeOrder(priceName).whenComplete((pricingPlan, throwable) -> {
+		paymentApi.placeOrder(priceName).whenComplete((orderId, throwable) -> {
 			assertNull(throwable);
-			assertNotNull(pricingPlan);
+			assertNotNull(orderId);
+			this.orderId = orderId;
 		}).get();
 	}
 
@@ -70,31 +71,23 @@ public class PaymentTest {
 		}
 	}
 
-	public void test05_useTrial() {
-		try {
-			paymentApi.useTrial();
-		} catch (Exception e) {
-			fail();
-		}
+	@Test
+	public void test05_getOrder() throws ExecutionException, InterruptedException {
+		paymentApi.getOrder(orderId).whenComplete((order, throwable) -> {
+			assertNull(throwable);
+			assertNotNull(order);
+		}).get();
 	}
 
-	public void test06_getOrder() {
-		try {
-			paymentApi.getOrder(orderId);
-		} catch (Exception e) {
-			fail();
-		}
+	@Test
+	public void test06_getAllOrders() throws ExecutionException, InterruptedException {
+		paymentApi.getAllOrders().whenComplete((orders, throwable) -> {
+			assertNull(throwable);
+			assertNotNull(orders);
+		}).get();
 	}
 
-	public void test07_getAllOrders() {
-		try {
-			paymentApi.getAllOrders();
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
-	public void test08_getUsingPricePlan() {
+	public void test07_getUsingPricePlan() {
 		try {
 			paymentApi.getUsingPricePlan();
 		} catch (Exception e) {
