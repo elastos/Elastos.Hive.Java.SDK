@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.Order;
-import org.elastos.hive.payment.OrderList;
 import org.elastos.hive.payment.PackageInfo;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.UsingPlan;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,11 +159,13 @@ public class PaymentClient implements Payment {
 	private CompletableFuture<Order> getOrderImp(String orderId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<Order> response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.getOrderInfo(orderId)
 						.execute();
 				authHelper.checkResponseCode(response);
-				return response.body();
+				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+				String orderInfo = ret.get("order_info").toString();
+				return Order.deserialize(orderInfo);
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
@@ -180,11 +182,14 @@ public class PaymentClient implements Payment {
 	private CompletableFuture<List<Order>> getAllOrdersImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<OrderList> response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.getOrderList()
 						.execute();
 				authHelper.checkResponseCode(response);
-				return response.body().orderInfoList();
+				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+				String orderInfo = ret.get("order_info_list").toString();
+				List<Order> orders = ResponseHelper.getValue(orderInfo, new ArrayList<Order>().getClass());
+				return orders;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
