@@ -118,7 +118,7 @@ public interface NodeApi {
 	Call<ResponseBody> getOrderList();
 
 	@GET(Constance.API_PATH + "/service/vault")
-	Call<UsingPlan> getServiceInfo();
+	Call<ResponseBody> getServiceInfo();
 
 	@GET(Constance.API_PATH + "/payment/version")
 	Call<ResponseBody> getPaymentVersion();

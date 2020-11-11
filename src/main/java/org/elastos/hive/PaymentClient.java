@@ -207,11 +207,13 @@ public class PaymentClient implements Payment {
 	private CompletableFuture<UsingPlan> getUsingPricePlanImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<UsingPlan> response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.getServiceInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
-				return response.body();
+				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+				String info = ret.get("vault_service_info").toString();
+				return UsingPlan.deserialize(info);
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
