@@ -87,12 +87,12 @@ public class PaymentTest {
 		}).get();
 	}
 
-	public void test07_getUsingPricePlan() {
-		try {
-			paymentApi.getUsingPricePlan();
-		} catch (Exception e) {
-			fail();
-		}
+	@Test
+	public void test07_getUsingPricePlan() throws ExecutionException, InterruptedException {
+		paymentApi.getUsingPricePlan().whenComplete((orders, throwable) -> {
+			assertNull(throwable);
+			assertNotNull(orders);
+		}).get();
 	}
 
 	@BeforeClass
