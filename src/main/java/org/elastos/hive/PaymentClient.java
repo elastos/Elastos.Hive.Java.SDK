@@ -6,6 +6,7 @@ import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.OrderList;
+import org.elastos.hive.payment.PackageInfo;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.UsingPlan;
 import org.elastos.hive.utils.JsonUtil;
@@ -42,11 +43,11 @@ public class PaymentClient implements Payment {
 	private CompletableFuture<List<PricingPlan>> getAllPricingPlansImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<List<PricingPlan>> response = this.connectionManager.getVaultApi()
+				Response<PackageInfo> response = this.connectionManager.getVaultApi()
 						.getPackageInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
-				return response.body();
+				return response.body().pricingPlans();
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
