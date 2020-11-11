@@ -34,6 +34,7 @@ import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.ProviderNotSetException;
 
 public class Client {
 	private static boolean resolverDidSetup;
@@ -148,8 +149,8 @@ public class Client {
 	}
 
 	/**
-	 *
-	 * @param ownerDid
+	 * get Vault
+	 * @param ownerDid vault owner did
 	 * @return
 	 */
 	public CompletableFuture<Vault> getVault(String ownerDid) {
@@ -158,7 +159,7 @@ public class Client {
 
 		return getVaultProvider(ownerDid).thenApply((provider)-> {
 			if(provider==null)
-				throw new IllegalArgumentException("Vault provider is null");
+				throw new ProviderNotSetException(ProviderNotSetException.EXCEPTION);
 			AuthHelper authHelper = new AuthHelper(ownerDid, provider,
 					localDataPath,
 					authenticationDIDDocument,
