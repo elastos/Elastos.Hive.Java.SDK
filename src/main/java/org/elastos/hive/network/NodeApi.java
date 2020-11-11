@@ -6,6 +6,7 @@ import org.elastos.hive.files.FilesList;
 
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.OrderList;
+import org.elastos.hive.payment.PackageInfo;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.UsingPlan;
 
@@ -100,7 +101,7 @@ public interface NodeApi {
 	Call<ResponseBody> callScript(@Part MultipartBody.Part file, @Part("metadata") RequestBody metadata);
 
 	@GET(Constance.API_PATH + "/payment/vault_package_info")
-	Call<List<PricingPlan>> getPackageInfo();
+	Call<PackageInfo> getPackageInfo();
 
 	@GET(Constance.API_PATH + "/payment/vault_pricing_plan")
 	Call<PricingPlan> getPricingPlan(@Query("name") String name);

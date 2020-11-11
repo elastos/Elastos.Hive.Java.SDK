@@ -8,8 +8,11 @@ import org.junit.runners.MethodSorters;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.function.BiConsumer;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -17,28 +20,26 @@ import static org.junit.Assert.fail;
 public class PaymentTest {
 
 	private static Payment paymentApi;
-	private static final String planName = "planName";
+	private static final String planName = "Free";
 	private static final String priceName = "priceName";
 	private static final String orderId = "orderId";
 
 	@Test
-	public void test00_userTrail() {
-		try {
-			boolean ret = paymentApi.useTrial().get();
-			assertTrue(ret);
-		} catch (Exception e) {
-			fail();
-		}
+	public void test00_userTrail() throws ExecutionException, InterruptedException {
+		paymentApi.useTrial()
+				.whenComplete((aBoolean, throwable) -> {
+					assertNull(throwable);
+					assertTrue(aBoolean);
+				}).get();
 	}
 
 	@Test
-	public void test01_getPricingPlans() {
-		try {
-			List<PricingPlan> pricingPlans = paymentApi.getAllPricingPlans().get();
+	public void test01_getPricingPlans() throws ExecutionException, InterruptedException {
+		paymentApi.getAllPricingPlans().whenComplete((pricingPlans, throwable) -> {
+			assertNull(throwable);
 			assertNotNull(pricingPlans);
-		} catch (Exception e) {
-			fail();
-		}
+			assertTrue(pricingPlans.size()>0);
+		}).get();
 	}
 
 	public void test02_getPricingPlan() {
