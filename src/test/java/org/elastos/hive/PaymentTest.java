@@ -89,9 +89,17 @@ public class PaymentTest {
 
 	@Test
 	public void test07_getUsingPricePlan() throws ExecutionException, InterruptedException {
-		paymentApi.getUsingPricePlan().whenComplete((orders, throwable) -> {
+		paymentApi.getUsingPricePlan().whenComplete((using, throwable) -> {
 			assertNull(throwable);
-			assertNotNull(orders);
+			assertNotNull(using);
+		}).get();
+	}
+
+	@Test
+	public void test07_getPaymentVersion() throws ExecutionException, InterruptedException {
+		paymentApi.getPaymentVersion().whenComplete((version, throwable) -> {
+			assertNull(throwable);
+			assertNotNull(version);
 		}).get();
 	}
 
