@@ -235,7 +235,7 @@ public class PaymentClient implements Payment {
 						.execute();
 				authHelper.checkResponseCode(response);
 				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-				String version = ret.get("version").toString();
+				String version = ret.get("version").textValue();
 				return version;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
