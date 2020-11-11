@@ -21,7 +21,7 @@ public class PaymentTest {
 
 	private static Payment paymentApi;
 	private static final String planName = "Free";
-	private static final String priceName = "priceName";
+	private static final String priceName = "Rookie";
 	private static final String orderId = "orderId";
 
 	@Test
@@ -52,12 +52,12 @@ public class PaymentTest {
 
 	}
 
-	public void test03_placeOrder() {
-		try {
-			paymentApi.placeOrder(priceName);
-		} catch (Exception e) {
-			fail();
-		}
+	@Test
+	public void test03_placeOrder() throws ExecutionException, InterruptedException {
+		paymentApi.placeOrder(priceName).whenComplete((pricingPlan, throwable) -> {
+			assertNull(throwable);
+			assertNotNull(pricingPlan);
+		}).get();
 	}
 
 	public void test04_payOrder() {
