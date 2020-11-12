@@ -23,8 +23,4 @@ public class PaymentSettings extends Result<PaymentSettings> {
 	public int waitTxTimeout() {
 		return waitTxTimeout;
 	}
-
-	public static PaymentSettings deserialize(String content) {
-		return deserialize(content, PaymentSettings.class);
-	}
 }

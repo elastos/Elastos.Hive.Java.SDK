@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.payment.Order;
+import org.elastos.hive.payment.PricingInfo;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.UsingPlan;
 
@@ -10,11 +11,11 @@ import java.util.concurrent.CompletableFuture;
 public interface Payment {
 
 	/**
-	 * get vault's pricing plan informations
+	 * get vault's payment info
 	 * @return PricingPlan list
 	 * @see org.elastos.hive.payment.PricingPlan
 	 */
-	CompletableFuture<List<PricingPlan>> getAllPricingPlans();
+	CompletableFuture<PricingInfo> getPaymentInfo();
 
 	/**
 	 * get vault pricing plan information by plan name
