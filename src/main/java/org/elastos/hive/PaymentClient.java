@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.Order;
-import org.elastos.hive.payment.PackageInfo;
+import org.elastos.hive.payment.PricingInfo;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.UsingPlan;
 import org.elastos.hive.utils.JsonUtil;
@@ -35,19 +35,20 @@ public class PaymentClient implements Payment {
 
 
 	@Override
-	public CompletableFuture<List<PricingPlan>> getAllPricingPlans() {
+	public CompletableFuture<PricingInfo> getPaymentInfo() {
 		return authHelper.checkValid()
 				.thenCompose(result -> getAllPricingPlansImp());
 	}
 
-	private CompletableFuture<List<PricingPlan>> getAllPricingPlansImp() {
+	private CompletableFuture<PricingInfo> getAllPricingPlansImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PackageInfo> response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.getPackageInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
-				return response.body().pricingPlans();
+				String ret = ResponseHelper.getValue(response, String.class);
+				return PricingInfo.deserialize(ret);
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
@@ -64,11 +65,12 @@ public class PaymentClient implements Payment {
 	private CompletableFuture<PricingPlan> getPricingPlansImp(String planName) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<PricingPlan> response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getVaultApi()
 						.getPricingPlan(planName)
 						.execute();
 				authHelper.checkResponseCode(response);
-				return response.body();
+				String ret = ResponseHelper.getValue(response, String.class);
+				return PricingPlan.deserialize(ret);
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
@@ -115,8 +117,7 @@ public class PaymentClient implements Payment {
 						.execute();
 				authHelper.checkResponseCode(response);
 				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-				String orderId = ret.get("order_id").toString();
-				return orderId;
+				return ret.get("order_id").textValue();
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
@@ -139,7 +140,7 @@ public class PaymentClient implements Payment {
 				map.put("pay_txids", txids);
 				String json = JsonUtil.serialize(map);
 				Response<ResponseBody> response = this.connectionManager.getVaultApi()
-						.pay(createJsonRequestBody(json))
+						.payOrder(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseCode(response);
 				return true;
@@ -211,8 +212,7 @@ public class PaymentClient implements Payment {
 						.getServiceInfo()
 						.execute();
 				authHelper.checkResponseCode(response);
-				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-				String info = ret.get("vault_service_info").toString();
+				String info = ResponseHelper.getValue(response, String.class);
 				return UsingPlan.deserialize(info);
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
