@@ -1,6 +1,5 @@
 package org.elastos.hive;
 
-import org.elastos.hive.payment.PricingPlan;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -9,12 +8,10 @@ import org.junit.runners.MethodSorters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiConsumer;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PaymentTest {
@@ -34,11 +31,10 @@ public class PaymentTest {
 	}
 
 	@Test
-	public void test01_getPricingPlans() throws ExecutionException, InterruptedException {
-		paymentApi.getAllPricingPlans().whenComplete((pricingPlans, throwable) -> {
+	public void test01_getPaymentInfo() throws ExecutionException, InterruptedException {
+		paymentApi.getPaymentInfo().whenComplete((paymentInfo, throwable) -> {
 			assertNull(throwable);
-			assertNotNull(pricingPlans);
-			assertTrue(pricingPlans.size()>0);
+			assertNotNull(paymentInfo);
 		}).get();
 	}
 
@@ -61,14 +57,14 @@ public class PaymentTest {
 		}).get();
 	}
 
-	public void test04_payOrder() {
-		try {
-			List<String> txids = new ArrayList<>();
-			txids.add("xxxxxxxxxxx");
-			paymentApi.payOrder(orderId, txids);
-		} catch (Exception e) {
-			fail();
-		}
+	@Test
+	public void test04_payOrder() throws ExecutionException, InterruptedException {
+		List<String> txids = new ArrayList<>();
+		txids.add("xxxxxxxxxxx");
+		paymentApi.payOrder(orderId, txids).whenComplete((orderId, throwable) -> {
+			assertNull(throwable);
+			assertNotNull(orderId);
+		}).get();
 	}
 
 	@Test
