@@ -19,7 +19,7 @@ public class VersionTest {
 	}
 
 	@Test
-	public void getNodeLastCommitId() {
+	public void getNodeLastCommitId() throws ExecutionException, InterruptedException {
 		vault.getNodeLastCommitId().whenComplete((s, throwable) -> {
 			assertNull(throwable);
 			assertNotNull(s);
