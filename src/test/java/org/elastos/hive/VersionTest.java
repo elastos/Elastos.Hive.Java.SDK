@@ -3,32 +3,29 @@ package org.elastos.hive;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.concurrent.ExecutionException;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 public class VersionTest {
 
 	@Test
-	public void getNodeVersion() {
-		try {
-			vault.getNodeVersion().whenComplete((s, throwable) -> {
-				assertNull(throwable);
-				assertNotNull(s);
-				System.out.println("nodeVersion:"+s);
-			});
-		} catch (Exception e) {
-			fail();
-		}
+	public void getNodeVersion() throws ExecutionException, InterruptedException {
+		vault.getNodeVersion().whenComplete((s, throwable) -> {
+			assertNull(throwable);
+			assertNotNull(s);
+			System.out.println("nodeVersion:"+s);
+		}).get();
 	}
 
 	@Test
-	public void getNodeLastCommitId() {
+	public void getNodeLastCommitId() throws ExecutionException, InterruptedException {
 		vault.getNodeLastCommitId().whenComplete((s, throwable) -> {
 			assertNull(throwable);
 			assertNotNull(s);
 			System.out.println("nodeVersion:"+s);
-		});
+		}).get();
 	}
 
 	@Test
@@ -46,6 +43,6 @@ public class VersionTest {
 	private static Vault vault;
 	@BeforeClass
 	public static void setUp() {
-		vault = UserFactory.createUser1().getVault();
+		vault = UserFactory.createUser2().getVault();
 	}
 }
