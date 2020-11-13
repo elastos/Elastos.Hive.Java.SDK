@@ -46,7 +46,7 @@ public class PaymentClient implements Payment {
 				Response response = this.connectionManager.getVaultApi()
 						.getPackageInfo()
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				String ret = ResponseHelper.getValue(response, String.class);
 				return PricingInfo.deserialize(ret);
 			} catch (Exception e) {
@@ -68,7 +68,7 @@ public class PaymentClient implements Payment {
 				Response response = this.connectionManager.getVaultApi()
 						.getPricingPlan(planName)
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				String ret = ResponseHelper.getValue(response, String.class);
 				return PricingPlan.deserialize(ret);
 			} catch (Exception e) {
@@ -90,7 +90,7 @@ public class PaymentClient implements Payment {
 				Response<ResponseBody> response = this.connectionManager.getVaultApi()
 						.createFreeVault()
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				return true;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -115,7 +115,7 @@ public class PaymentClient implements Payment {
 				Response<ResponseBody> response = this.connectionManager.getVaultApi()
 						.createOrder(createJsonRequestBody(json))
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 				return ret.get("order_id").textValue();
 			} catch (Exception e) {
@@ -142,7 +142,7 @@ public class PaymentClient implements Payment {
 				Response<ResponseBody> response = this.connectionManager.getVaultApi()
 						.payOrder(createJsonRequestBody(json))
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				return true;
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
@@ -163,7 +163,7 @@ public class PaymentClient implements Payment {
 				Response response = this.connectionManager.getVaultApi()
 						.getOrderInfo(orderId)
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 				String orderInfo = ret.get("order_info").toString();
 				return Order.deserialize(orderInfo);
@@ -186,7 +186,7 @@ public class PaymentClient implements Payment {
 				Response response = this.connectionManager.getVaultApi()
 						.getOrderList()
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 				String orderInfo = ret.get("order_info_list").toString();
 				List<Order> orders = ResponseHelper.getValue(orderInfo, new ArrayList<Order>().getClass());
@@ -211,7 +211,7 @@ public class PaymentClient implements Payment {
 				Response response = this.connectionManager.getVaultApi()
 						.getServiceInfo()
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				String info = ResponseHelper.getValue(response, String.class);
 				return UsingPlan.deserialize(info);
 			} catch (Exception e) {
@@ -233,7 +233,7 @@ public class PaymentClient implements Payment {
 				Response response = this.connectionManager.getVaultApi()
 						.getPaymentVersion()
 						.execute();
-				authHelper.checkResponseCode(response);
+				authHelper.checkResponseWithRetry(response);
 				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 				String version = ret.get("version").textValue();
 				return version;
