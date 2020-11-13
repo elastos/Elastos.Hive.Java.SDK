@@ -1,7 +1,5 @@
 package org.elastos.hive;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -16,11 +14,13 @@ import java.util.concurrent.CompletionException;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.files.FileInfo;
-import org.elastos.hive.network.NodeApi;
 import org.elastos.hive.files.FilesList;
 import org.elastos.hive.files.UploadOutputStream;
+import org.elastos.hive.network.NodeApi;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -235,8 +235,7 @@ class FilesClient implements Files {
 				Response<FilesList> response = api.files(folder).execute();
 
 				authHelper.checkResponseWithRetry(response);
-				List<FileInfo> list = response.body().getFiles();
-				return list;
+				return response.body().getFiles();
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
@@ -257,8 +256,7 @@ class FilesClient implements Files {
 				Response<FileInfo> response = api.getProperties(path).execute();
 
 				authHelper.checkResponseWithRetry(response);
-				FileInfo fileInfo = response.body();
-				return fileInfo;
+				return response.body();
 			} catch (Exception e) {
 				HiveException exception = new HiveException(e.getLocalizedMessage());
 				throw new CompletionException(exception);
