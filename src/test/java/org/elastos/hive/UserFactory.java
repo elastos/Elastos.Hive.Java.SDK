@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 public class UserFactory {
 	private static final String didCachePath = "didCache";
 	private Vault vault;
+	private static boolean resolverDidSetup = false;
 
 	private String storePath;
 	private String ownerDid;
@@ -17,7 +18,10 @@ public class UserFactory {
 	private void setUp(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt) {
 		try {
 			PresentationInJWT presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
-			Client.setupResolver(this.resolveUrl, this.didCachePath);
+			if(!resolverDidSetup) {
+				Client.setupResolver(this.resolveUrl, this.didCachePath);
+				resolverDidSetup = true;
+			}
 			Client.Options options = new Client.Options();
 			options.setLocalDataPath(this.storePath);
 			options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
