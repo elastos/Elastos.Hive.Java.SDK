@@ -4,7 +4,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -20,7 +19,7 @@ public class VersionTest {
 	}
 
 	@Test
-	public void getNodeLastCommitId() throws ExecutionException, InterruptedException {
+	public void getNodeLastCommitId() {
 		vault.getNodeLastCommitId().whenComplete((s, throwable) -> {
 			assertNull(throwable);
 			assertNotNull(s);

@@ -28,7 +28,6 @@ public class Vault {
 		this.database = new DatabaseClient(authHelper);
 		this.scripting = new ScriptingClient(authHelper);
 		this.payment = new PaymentClient(authHelper);
-		this.payment = new PaymentClient(authHelper);
 		this.version = new VersionClient(authHelper);
 	}
 
