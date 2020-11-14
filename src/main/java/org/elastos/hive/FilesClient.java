@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -49,25 +50,21 @@ class FilesClient implements Files {
 	}
 
 	private <T> T uploadImpl(String path, Class<T> resultType) throws HiveException {
-		HttpURLConnection connection = null;
 		try {
+			HttpURLConnection connection = null;
 			connection = this.connectionManager.openURLConnection(path);
 			OutputStream outputStream = connection.getOutputStream();
-
-			if (outputStream == null)
-				throw new HiveException("Connection failure");
 
 			if(resultType.isAssignableFrom(OutputStream.class)) {
 				UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
 				return resultType.cast(uploader);
-			}
-			if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
+			} else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
 				OutputStreamWriter writer = new OutputStreamWriter(outputStream);
 				return resultType.cast(writer);
+			} else {
+				throw new HiveException("Not supported result type");
 			}
-
-			throw new HiveException("Not supported result type");
-		} catch (Exception e) {
+		} catch (IOException e) {
 			throw new HiveException(e.getMessage());
 		}
 	}
@@ -125,7 +122,7 @@ class FilesClient implements Files {
 
 	private Boolean deleteImpl(String remoteFile) throws HiveException {
 		try {
-			Map<String, Object> map = new HashMap<>();
+			Map<String, String> map = new HashMap<>();
 			map.put("path", remoteFile);
 
 			String json = JsonUtil.serialize(map);
