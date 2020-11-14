@@ -1,10 +1,7 @@
 package org.elastos.hive;
 
-import org.elastos.hive.files.FileInfo;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileReader;
@@ -12,14 +9,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class FileTest {
+public class FilesTest {
 
 	@Test
 	public void test01_uploadText() {
@@ -84,11 +82,17 @@ public class FileTest {
 
 	@Test
 	public void test05_list() {
+		CompletableFuture<Boolean> future = filesApi.list(remoteRootPath)
+				.handle((result, ex) -> {
+					assertTrue(result.size() > 0);
+					System.out.println("list size=" + result.size());
+					return (ex == null);
+				});
+
 		try {
-			List<FileInfo> result = filesApi.list(remoteRootPath).get();
-			assertNotNull(result);
-			assertTrue(result.size() > 0);
-			System.out.println("list size=" + result.size());
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
 		} catch (Exception e) {
 			fail();
 		}
@@ -96,10 +100,15 @@ public class FileTest {
 
 	@Test
 	public void test06_hash() {
+		CompletableFuture<Boolean> future = filesApi.hash(remoteTextPath)
+				.handle((result, ex) -> {
+					return (ex == null);
+				});
+
 		try {
-			String hash = filesApi.hash(remoteTextPath).get();
-			assertNotNull(hash);
-			System.out.println("hash=" + hash);
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
 		} catch (Exception e) {
 			fail();
 		}
@@ -107,15 +116,16 @@ public class FileTest {
 
 	@Test
 	public void test07_move() {
+		CompletableFuture<Boolean> future = filesApi.delete(remoteTextBackupPath)
+				.thenCompose(result -> filesApi.move(remoteTextPath, remoteTextBackupPath))
+				.handle((result, ex) -> {
+					return (ex == null);
+				});
+
 		try {
-			filesApi.delete(remoteTextBackupPath).whenComplete((aBoolean, throwable) -> {
-				try {
-					boolean success = filesApi.move(remoteTextPath, remoteTextBackupPath).get();
-					assertTrue(success);
-				} catch (Exception e) {
-					fail();
-				}
-			}).get();
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
 		} catch (Exception e) {
 			fail();
 		}
@@ -123,9 +133,15 @@ public class FileTest {
 
 	@Test
 	public void test08_copy() {
+		CompletableFuture<Boolean> future = filesApi.copy(remoteTextBackupPath, remoteTextPath)
+				.handle((result, ex) -> {
+					return (ex == null);
+				});
+
 		try {
-			boolean success = filesApi.copy(remoteTextBackupPath, remoteTextPath).get();
-			assertTrue(success);
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
 		} catch (Exception e) {
 			fail();
 		}
@@ -134,9 +150,16 @@ public class FileTest {
 
 	@Test
 	public void test09_deleteFile() {
+		CompletableFuture<Boolean> future = filesApi.delete(remoteTextPath)
+				.thenCompose(result -> filesApi.delete(remoteTextBackupPath))
+				.handle((result, ex) -> {
+					return (ex == null);
+				});
+
 		try {
-			filesApi.delete(remoteTextPath).get();
-			filesApi.delete(remoteTextBackupPath).get();
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
 		} catch (Exception e) {
 			fail();
 		}
@@ -162,7 +185,7 @@ public class FileTest {
 
 	private static Files filesApi;
 
-	public FileTest() {
+	public FilesTest() {
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
 		textLocalPath = localRootPath +"test.txt";
 		imgLocalPath = localRootPath +"big.png";
