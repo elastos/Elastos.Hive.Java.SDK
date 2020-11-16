@@ -14,12 +14,6 @@ import retrofit2.http.Query;
 
 public interface NodeApi {
 
-	@GET(Constance.API_PATH + "/hive/version")
-	Call<ResponseBody> getVersion();
-
-	@GET(Constance.API_PATH + "/hive/commithash")
-	Call<ResponseBody> getCommitId();
-
 	@POST(Constance.API_PATH + "/scripting/set_subcondition")
 	Call<ResponseBody> registerCondition(@Body RequestBody body);
 

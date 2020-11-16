@@ -24,8 +24,8 @@ class VersionImpl implements Version{
 	public CompletableFuture<String> getVersion() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				NodeApi api = this.connectionManager.getVaultApi();
-				Response<ResponseBody> response = api.getVersion().execute();
+				Response<ResponseBody> response = this.connectionManager.getVersionApi()
+						.getVersion().execute();
 
 				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 				String version = ret.get("version").textValue();
@@ -41,8 +41,8 @@ class VersionImpl implements Version{
 	public CompletableFuture<String> getLastCommitId() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				NodeApi api = this.connectionManager.getVaultApi();
-				Response<ResponseBody> response = api.getCommitId().execute();
+				Response<ResponseBody> response = this.connectionManager.getVersionApi()
+						.getCommitId().execute();
 
 				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 				String commit = ret.get("commit_hash").textValue();
