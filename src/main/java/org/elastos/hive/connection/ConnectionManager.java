@@ -32,6 +32,7 @@ import org.elastos.hive.network.AuthApi;
 import org.elastos.hive.network.DatabaseApi;
 import org.elastos.hive.network.FileApi;
 import org.elastos.hive.network.NodeApi;
+import org.elastos.hive.network.ScriptingApi;
 import org.elastos.hive.network.VersionApi;
 
 public class ConnectionManager {
@@ -40,6 +41,7 @@ public class ConnectionManager {
 	private FileApi fileApi;
 	private DatabaseApi databaseApi;
 	private VersionApi versionApi;
+	private ScriptingApi scriptingApi;
 
 	private NodeApi vaultAPI;
 	private String vaultBaseUrl;
@@ -70,6 +72,13 @@ public class ConnectionManager {
 		return databaseApi;
 	}
 
+	public ScriptingApi getScriptingApi() {
+		if (scriptingApi == null)
+			scriptingApi = BaseServiceUtil.createService(ScriptingApi.class,
+					this.vaultBaseUrl, this.vaultConfig);
+		return scriptingApi;
+	}
+
 	public VersionApi getVersionApi() {
 		if (versionApi == null)
 			versionApi = BaseServiceUtil.createService(VersionApi.class,
@@ -98,6 +107,7 @@ public class ConnectionManager {
 		vaultAPI = null;
 		databaseApi = null;
 		versionApi = null;
+		scriptingApi = null;
 		updateVaultBaseUrl(baseUrl);
 		updateVaultConfig(baseServiceConfig);
 	}
