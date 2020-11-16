@@ -18,8 +18,6 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.files.FilesList;
 import org.elastos.hive.files.UploadOutputStream;
-import org.elastos.hive.network.FileApi;
-import org.elastos.hive.network.NodeApi;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 
