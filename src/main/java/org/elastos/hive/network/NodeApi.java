@@ -23,12 +23,6 @@ public interface NodeApi {
 	@GET(Constance.API_PATH + "/hive/commithash")
 	Call<ResponseBody> getCommitId();
 
-	@POST(Constance.API_PATH + "/did/sign_in")
-	Call<ResponseBody> signIn(@Body RequestBody body);
-
-	@POST(Constance.API_PATH + "/did/auth")
-	Call<ResponseBody> auth(@Body RequestBody body);
-
 	@POST(Constance.API_PATH + "/sync/setup/google_drive")
 	Call<ResponseBody> googleDrive(@Body RequestBody body);
 
