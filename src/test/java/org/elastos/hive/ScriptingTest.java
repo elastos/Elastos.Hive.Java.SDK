@@ -234,7 +234,7 @@ public class ScriptingTest {
 
     @BeforeClass
     public static void setUp() {
-        Vault vault = UserFactory.createUser2().getVault();
+        Vault vault = UserFactory.createUser1().getVault();
         scripting = vault.getScripting();
     }
 
