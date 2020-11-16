@@ -30,11 +30,11 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
 
-class DatabaseClient implements Database {
+class DatabaseImpl implements Database {
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
 
-	DatabaseClient(AuthHelper authHelper) {
+	DatabaseImpl(AuthHelper authHelper) {
 		this.authHelper = authHelper;
 		this.connectionManager = authHelper.getConnectionManager();
 	}

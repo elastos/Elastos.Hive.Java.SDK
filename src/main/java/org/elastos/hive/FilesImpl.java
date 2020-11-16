@@ -28,11 +28,11 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-class FilesClient implements Files {
+class FilesImpl implements Files {
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
 
-	FilesClient(AuthHelper authHelper) {
+	FilesImpl(AuthHelper authHelper) {
 		this.authHelper = authHelper;
 		this.connectionManager = authHelper.getConnectionManager();
 	}
