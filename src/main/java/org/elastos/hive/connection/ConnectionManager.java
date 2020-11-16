@@ -31,7 +31,7 @@ import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.network.AuthApi;
 import org.elastos.hive.network.DatabaseApi;
 import org.elastos.hive.network.FileApi;
-import org.elastos.hive.network.NodeApi;
+import org.elastos.hive.network.PaymentApi;
 import org.elastos.hive.network.ScriptingApi;
 import org.elastos.hive.network.VersionApi;
 
@@ -42,8 +42,8 @@ public class ConnectionManager {
 	private DatabaseApi databaseApi;
 	private VersionApi versionApi;
 	private ScriptingApi scriptingApi;
+	private PaymentApi paymentApi;
 
-	private NodeApi vaultAPI;
 	private String vaultBaseUrl;
 	private BaseServiceConfig vaultConfig = new BaseServiceConfig.Builder().build() ;
 
@@ -86,11 +86,11 @@ public class ConnectionManager {
 		return versionApi;
 	}
 
-	public NodeApi getVaultApi() {
-		if (vaultAPI == null)
-			vaultAPI = BaseServiceUtil.createService(NodeApi.class,
+	public PaymentApi getPaymentApi() {
+		if (paymentApi == null)
+			paymentApi = BaseServiceUtil.createService(PaymentApi.class,
 					this.vaultBaseUrl, this.vaultConfig);
-		return vaultAPI;
+		return paymentApi;
 	}
 
 	private void updateVaultConfig(BaseServiceConfig vaultConfig) {
@@ -104,10 +104,10 @@ public class ConnectionManager {
 	public void resetVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
 		authApi = null;
 		fileApi = null;
-		vaultAPI = null;
 		databaseApi = null;
 		versionApi = null;
 		scriptingApi = null;
+		paymentApi = null;
 		updateVaultBaseUrl(baseUrl);
 		updateVaultConfig(baseServiceConfig);
 	}
