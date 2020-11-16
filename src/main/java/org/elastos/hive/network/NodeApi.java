@@ -1,9 +1,6 @@
 package org.elastos.hive.network;
 
 import org.elastos.hive.Constance;
-import org.elastos.hive.files.FileInfo;
-import org.elastos.hive.files.FilesList;
-
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -22,9 +19,6 @@ public interface NodeApi {
 
 	@GET(Constance.API_PATH + "/hive/commithash")
 	Call<ResponseBody> getCommitId();
-
-	@POST(Constance.API_PATH + "/sync/setup/google_drive")
-	Call<ResponseBody> googleDrive(@Body RequestBody body);
 
 	@POST(Constance.API_PATH + "/db/create_collection")
 	Call<ResponseBody> createCollection(@Body RequestBody body);
@@ -58,27 +52,6 @@ public interface NodeApi {
 
 	@POST(Constance.API_PATH + "/db/find_many")
 	Call<ResponseBody> findMany(@Body RequestBody body);
-
-	@GET(Constance.API_PATH + "/files/list/folder")
-	Call<FilesList> files(@Query("path") String filename);
-
-	@GET(Constance.API_PATH + "/files/download")
-	Call<ResponseBody> downloader(@Query("path") String filename);
-
-	@GET(Constance.API_PATH + "/files/properties")
-	Call<FileInfo> getProperties(@Query("path") String filename);
-
-	@POST(Constance.API_PATH + "/files/delete")
-	Call<ResponseBody> deleteFolder(@Body RequestBody body);
-
-	@POST(Constance.API_PATH + "/files/move")
-	Call<ResponseBody> move(@Body RequestBody body);
-
-	@POST(Constance.API_PATH + "/files/copy")
-	Call<ResponseBody> copy(@Body RequestBody body);
-
-	@GET(Constance.API_PATH + "/files/file/hash")
-	Call<ResponseBody> hash(@Query("path") String filename);
 
 	@POST(Constance.API_PATH + "/scripting/set_subcondition")
 	Call<ResponseBody> registerCondition(@Body RequestBody body);

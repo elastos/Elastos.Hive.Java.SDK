@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,6 +18,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.files.FilesList;
 import org.elastos.hive.files.UploadOutputStream;
+import org.elastos.hive.network.FileApi;
 import org.elastos.hive.network.NodeApi;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
@@ -85,7 +87,7 @@ class FilesImpl implements Files {
 		try {
 			Response<ResponseBody> response;
 
-			response = this.connectionManager.getVaultApi()
+			response = this.connectionManager.getFileApi()
 					.downloader(remoteFile)
 					.execute();
 			if (response == null)
@@ -128,7 +130,7 @@ class FilesImpl implements Files {
 			String json = JsonUtil.serialize(map);
 			Response<ResponseBody> response;
 
-			response = this.connectionManager.getVaultApi()
+			response = this.connectionManager.getFileApi()
 					.deleteFolder(createJsonRequestBody(json))
 					.execute();
 			authHelper.checkResponseWithRetry(response);
@@ -159,7 +161,7 @@ class FilesImpl implements Files {
 			String json = JsonUtil.serialize(map);
 			Response<ResponseBody> response;
 
-			response = this.connectionManager.getVaultApi()
+			response = this.connectionManager.getFileApi()
 					.move(createJsonRequestBody(json))
 					.execute();
 			authHelper.checkResponseWithRetry(response);
@@ -190,7 +192,7 @@ class FilesImpl implements Files {
 			String json = JsonUtil.serialize(map);
 			Response<ResponseBody> response;
 
-			response = this.connectionManager.getVaultApi()
+			response = this.connectionManager.getFileApi()
 					.copy(createJsonRequestBody(json))
 					.execute();
 			authHelper.checkResponseWithRetry(response);
@@ -214,7 +216,7 @@ class FilesImpl implements Files {
 
 	private String hashImp(String remoteFile) throws HiveException {
 		try {
-			Response response = this.connectionManager.getVaultApi()
+			Response response = this.connectionManager.getFileApi()
 					.hash(remoteFile)
 					.execute();
 			authHelper.checkResponseWithRetry(response);
@@ -239,8 +241,8 @@ class FilesImpl implements Files {
 
 	private List<FileInfo> listImpl(String folder) throws HiveException {
 		try {
-			NodeApi api = this.connectionManager.getVaultApi();
-			Response<FilesList> response = api.files(folder).execute();
+			Response<FilesList> response = this.connectionManager.getFileApi()
+					.files(folder).execute();
 
 			authHelper.checkResponseWithRetry(response);
 			return response.body().getFiles();
@@ -263,8 +265,8 @@ class FilesImpl implements Files {
 
 	private FileInfo statImpl(String path) throws HiveException {
 		try {
-			NodeApi api = this.connectionManager.getVaultApi();
-			Response<FileInfo> response = api.getProperties(path).execute();
+			Response<FileInfo> response = this.connectionManager.getFileApi()
+					.getProperties(path).execute();
 
 			authHelper.checkResponseWithRetry(response);
 			return response.body();
