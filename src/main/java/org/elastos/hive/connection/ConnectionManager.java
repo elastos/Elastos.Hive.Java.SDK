@@ -30,6 +30,7 @@ import java.net.URL;
 import org.elastos.hive.Constance;
 import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.network.AuthApi;
+import org.elastos.hive.network.DatabaseApi;
 import org.elastos.hive.network.FileApi;
 import org.elastos.hive.network.NodeApi;
 
@@ -37,6 +38,7 @@ public class ConnectionManager {
 
 	private AuthApi authApi;
 	private FileApi fileApi;
+	private DatabaseApi databaseApi;
 
 	private NodeApi vaultAPI;
 	private String vaultBaseUrl;
@@ -60,6 +62,13 @@ public class ConnectionManager {
 		return fileApi;
 	}
 
+	public DatabaseApi getDatabaseApi() {
+		if (databaseApi == null)
+			databaseApi = BaseServiceUtil.createService(DatabaseApi.class,
+					this.vaultBaseUrl, this.vaultConfig);
+		return databaseApi;
+	}
+
 	public NodeApi getVaultApi() {
 		if (vaultAPI == null)
 			vaultAPI = BaseServiceUtil.createService(NodeApi.class,
@@ -79,6 +88,7 @@ public class ConnectionManager {
 		authApi = null;
 		fileApi = null;
 		vaultAPI = null;
+		databaseApi = null;
 		updateVaultBaseUrl(baseUrl);
 		updateVaultConfig(baseServiceConfig);
 	}
