@@ -104,7 +104,7 @@ class AuthHelper implements ConnectHelper {
 
 		try {
 			String json = new JSONObject(map).toString();
-			Response response = this.connectionManager.getVaultApi()
+			Response response = this.connectionManager.getAuthApi()
 					.signIn(getJsonRequestBoy(json))
 					.execute();
 			checkResponse(response);
@@ -128,7 +128,7 @@ class AuthHelper implements ConnectHelper {
 		Map<String, Object> map = new HashMap<>();
 		map.put("jwt", token);
 		String json = new JSONObject(map).toString();
-		Response response = this.connectionManager.getVaultApi()
+		Response response = this.connectionManager.getAuthApi()
 				.auth(getJsonRequestBoy(json))
 				.execute();
 		checkResponse(response);
