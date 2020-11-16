@@ -2,6 +2,7 @@ package org.elastos.hive.files;
 
 import java.math.BigDecimal;
 
+import org.elastos.hive.exception.UnsupportFileTypeException;
 import org.elastos.hive.utils.DateUtil;
 
 /**
@@ -30,7 +31,7 @@ public class FileInfo {
 		case "folder":
 			return Type.FOLDER;
 		}
-		return null;
+		throw new UnsupportFileTypeException();
 	}
 
 	public String getName() {
