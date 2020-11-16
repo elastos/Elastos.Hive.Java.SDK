@@ -24,11 +24,11 @@ public class Vault {
 		this.vaultProvider = vaultProvider;
 		this.ownerDid = ownerDid;
 
-		this.files = new FilesClient(authHelper);
-		this.database = new DatabaseClient(authHelper);
-		this.scripting = new ScriptingClient(authHelper);
-		this.payment = new PaymentClient(authHelper);
-		this.version = new VersionClient(authHelper);
+		this.files = new FilesImpl(authHelper);
+		this.database = new DatabaseImpl(authHelper);
+		this.scripting = new ScriptingImpl(authHelper);
+		this.payment = new PaymentImpl(authHelper);
+		this.version = new VersionImpl(authHelper);
 	}
 
 	public CompletableFuture<String> getNodeVersion() {

@@ -23,12 +23,12 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-public class PaymentClient implements Payment {
+public class PaymentImpl implements Payment {
 
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
 
-	public PaymentClient(AuthHelper authHelper) {
+	public PaymentImpl(AuthHelper authHelper) {
 		this.authHelper = authHelper;
 		this.connectionManager = authHelper.getConnectionManager();
 	}

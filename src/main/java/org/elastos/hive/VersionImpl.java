@@ -13,10 +13,10 @@ import java.util.concurrent.CompletionException;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-class VersionClient implements Version{
+class VersionImpl implements Version{
 	private ConnectionManager connectionManager;
 
-	VersionClient(AuthHelper authHelper) {
+	VersionImpl(AuthHelper authHelper) {
 		this.connectionManager = authHelper.getConnectionManager();
 	}
 
