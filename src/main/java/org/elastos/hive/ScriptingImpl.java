@@ -63,7 +63,7 @@ class ScriptingImpl implements Scripting {
 			String json = JsonUtil.serialize(map);
 
 			Response<ResponseBody> response;
-			response = this.connectionManager.getVaultApi()
+			response = this.connectionManager.getScriptingApi()
 					.registerScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 					.execute();
 
@@ -120,7 +120,7 @@ class ScriptingImpl implements Scripting {
 			String json = JsonUtil.serialize(map);
 			Response<ResponseBody> response;
 
-			response = this.connectionManager.getVaultApi()
+			response = this.connectionManager.getScriptingApi()
 					.callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 					.execute();
 			authHelper.checkResponseWithRetry(response);
@@ -161,7 +161,7 @@ class ScriptingImpl implements Scripting {
 					RequestBody.create(
 							MediaType.parse("application/json"), json);
 
-			Response<ResponseBody> response = this.connectionManager.getVaultApi()
+			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
 					.callScript(body, metadata)
 					.execute();
 			authHelper.checkResponseWithRetry(response);
@@ -183,7 +183,7 @@ class ScriptingImpl implements Scripting {
 			String json = JsonUtil.serialize(map);
 			Response<ResponseBody> response;
 
-			response = this.connectionManager.getVaultApi()
+			response = this.connectionManager.getScriptingApi()
 					.callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 					.execute();
 
