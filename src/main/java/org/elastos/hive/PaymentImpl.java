@@ -43,7 +43,7 @@ public class PaymentImpl implements Payment {
 	private CompletableFuture<PricingInfo> getAllPricingPlansImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getPaymentApi()
 						.getPackageInfo()
 						.execute();
 				authHelper.checkResponseWithRetry(response);
@@ -65,7 +65,7 @@ public class PaymentImpl implements Payment {
 	private CompletableFuture<PricingPlan> getPricingPlansImp(String planName) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getPaymentApi()
 						.getPricingPlan(planName)
 						.execute();
 				authHelper.checkResponseWithRetry(response);
@@ -87,7 +87,7 @@ public class PaymentImpl implements Payment {
 	private CompletableFuture<Boolean> useTrialImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<ResponseBody> response = this.connectionManager.getVaultApi()
+				Response<ResponseBody> response = this.connectionManager.getPaymentApi()
 						.createFreeVault()
 						.execute();
 				authHelper.checkResponseWithRetry(response);
@@ -112,7 +112,7 @@ public class PaymentImpl implements Payment {
 				Map<String, Object> map = new HashMap<>();
 				map.put("pricing_name", priceName);
 				String json = JsonUtil.serialize(map);
-				Response<ResponseBody> response = this.connectionManager.getVaultApi()
+				Response<ResponseBody> response = this.connectionManager.getPaymentApi()
 						.createOrder(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseWithRetry(response);
@@ -139,7 +139,7 @@ public class PaymentImpl implements Payment {
 				map.put("order_id", orderId);
 				map.put("pay_txids", txids);
 				String json = JsonUtil.serialize(map);
-				Response<ResponseBody> response = this.connectionManager.getVaultApi()
+				Response<ResponseBody> response = this.connectionManager.getPaymentApi()
 						.payOrder(createJsonRequestBody(json))
 						.execute();
 				authHelper.checkResponseWithRetry(response);
@@ -160,7 +160,7 @@ public class PaymentImpl implements Payment {
 	private CompletableFuture<Order> getOrderImp(String orderId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getPaymentApi()
 						.getOrderInfo(orderId)
 						.execute();
 				authHelper.checkResponseWithRetry(response);
@@ -183,7 +183,7 @@ public class PaymentImpl implements Payment {
 	private CompletableFuture<List<Order>> getAllOrdersImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getPaymentApi()
 						.getOrderList()
 						.execute();
 				authHelper.checkResponseWithRetry(response);
@@ -208,7 +208,7 @@ public class PaymentImpl implements Payment {
 	private CompletableFuture<UsingPlan> getUsingPricePlanImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getPaymentApi()
 						.getServiceInfo()
 						.execute();
 				authHelper.checkResponseWithRetry(response);
@@ -230,7 +230,7 @@ public class PaymentImpl implements Payment {
 	private CompletableFuture<String> getPaymentVersionImp() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getPaymentApi()
 						.getPaymentVersion()
 						.execute();
 				authHelper.checkResponseWithRetry(response);
