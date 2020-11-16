@@ -52,7 +52,7 @@ class DatabaseImpl implements Database {
 				map.put("collection", collection);
 				String json = JsonUtil.serialize(map);
 
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -79,7 +79,7 @@ class DatabaseImpl implements Database {
 				map.put("collection", collection);
 				String json = JsonUtil.serialize(map);
 
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -107,7 +107,7 @@ class DatabaseImpl implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -138,7 +138,7 @@ class DatabaseImpl implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -167,7 +167,7 @@ class DatabaseImpl implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -197,7 +197,7 @@ class DatabaseImpl implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -227,7 +227,7 @@ class DatabaseImpl implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -257,7 +257,7 @@ class DatabaseImpl implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -293,7 +293,7 @@ class DatabaseImpl implements Database {
 				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -321,7 +321,7 @@ class DatabaseImpl implements Database {
 				if(null!=filter) rootNode.set("filter", filter);
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
@@ -349,7 +349,7 @@ class DatabaseImpl implements Database {
 				if(null!=filter) rootNode.set("filter", filter);
 
 				String json = rootNode.toString();
-				Response response = this.connectionManager.getVaultApi()
+				Response response = this.connectionManager.getDatabaseApi()
 						.deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 						.execute();
 
