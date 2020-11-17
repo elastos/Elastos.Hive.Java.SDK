@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -31,10 +32,11 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.Reader;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ScriptingTest {
@@ -90,145 +92,121 @@ public class ScriptingTest {
     }
 
     @Test
-    public void test03_registerNoCondition() {
-        try {
-            JsonNode filter = JsonUtil.deserialize("{\"friends\":\"$caller_did\"}");
-            JsonNode options = JsonUtil.deserialize("{\"projection\":{\"_id\":false,\"name\":true}}");
-            Executable executable = new DbFindQuery("get_groups", "groups", filter, options);
-            boolean success = scripting.registerScript(noConditionName, executable).get();
+    public void test03_registerNoCondition() throws ExecutionException, InterruptedException {
+        JsonNode filter = JsonUtil.deserialize("{\"friends\":\"$caller_did\"}");
+        JsonNode options = JsonUtil.deserialize("{\"projection\":{\"_id\":false,\"name\":true}}");
+        Executable executable = new DbFindQuery("get_groups", "groups", filter, options);
+        scripting.registerScript(noConditionName, executable).whenComplete((success, throwable) -> {
+            assertNull(throwable);
             assertTrue(success);
-        } catch (Exception e) {
-            fail();
-        }
+        }).get();
     }
 
     @Test
-    public void test04_registerWithCondition() {
-        try {
-            JsonNode filter = JsonUtil.deserialize("{\"_id\":\"$params.group_id\",\"friends\":\"$caller_did\"}");
-            Executable executable = new DbFindQuery("get_groups", "test_group", filter);
-            Condition condition = new QueryHasResultsCondition("verify_user_permission", "test_group", filter);
-            boolean success = scripting.registerScript(withConditionName, condition, executable).get();
+    public void test04_registerWithCondition() throws ExecutionException, InterruptedException {
+        JsonNode filter = JsonUtil.deserialize("{\"_id\":\"$params.group_id\",\"friends\":\"$caller_did\"}");
+        Executable executable = new DbFindQuery("get_groups", "test_group", filter);
+        Condition condition = new QueryHasResultsCondition("verify_user_permission", "test_group", filter);
+        scripting.registerScript(withConditionName, condition, executable).whenComplete((success, throwable) -> {
+            assertNull(throwable);
             assertTrue(success);
-        } catch (Exception e) {
-            fail();
-        }
+        }).get();
     }
 
 
     @Test
-    public void test05_callStringType() {
-        try {
-            String ret = scripting.call(noConditionName, String.class).get();
-            System.out.println("return=" + ret);
-        } catch (Exception e) {
-            fail();
-        }
+    public void test05_callStringType() throws ExecutionException, InterruptedException {
+        scripting.call(noConditionName, String.class).whenComplete((result, throwable) -> {
+            assertNull(throwable);
+            assertNotNull(result);
+        }).get();
     }
 
     @Test
-    public void test06_callByteArrType() {
-        try {
-            byte[] ret = scripting.call(noConditionName, byte[].class).get();
-            System.out.println("return=" + ret);
-        } catch (Exception e) {
-            fail();
-        }
+    public void test06_callByteArrType() throws ExecutionException, InterruptedException {
+        scripting.call(noConditionName, byte[].class).whenComplete((result, throwable) -> {
+            assertNull(throwable);
+            assertNotNull(result);
+        }).get();
     }
 
     @Test
-    public void test07_callJsonNodeType() {
-        try {
-            JsonNode ret = scripting.call(noConditionName, JsonNode.class).get();
-            System.out.println("return=" + ret);
-        } catch (Exception e) {
-            fail();
-        }
+    public void test07_callJsonNodeType() throws ExecutionException, InterruptedException {
+        scripting.call(noConditionName, JsonNode.class).whenComplete((result, throwable) -> {
+            assertNull(throwable);
+            assertNotNull(result);
+        }).get();
     }
 
     @Test
-    public void test08_callReaderType() {
-        try {
-            Reader ret = scripting.call(noConditionName, Reader.class).get();
-            System.out.println("return=" + ret);
-        } catch (Exception e) {
-            fail();
-        }
+    public void test08_callReaderType() throws ExecutionException, InterruptedException {
+        scripting.call(noConditionName, Reader.class).whenComplete((result, throwable) -> {
+            assertNull(throwable);
+            assertNotNull(result);
+        }).get();
     }
 
 
     @Test
-    public void test11_setUploadScript() {
-        try {
-            Executable executable = new UploadExecutable("upload_file", "$params.path", true);
-            boolean success = scripting.registerScript("upload_file", executable).get();
-            assertTrue(success);
-        } catch (Exception e) {
-            fail();
-        }
+    public void test11_setUploadScript() throws ExecutionException, InterruptedException {
+        Executable executable = new UploadExecutable("upload_file", "$params.path", true);
+        scripting.registerScript("upload_file", executable).whenComplete((result, throwable) -> {
+            assertNull(throwable);
+            assertTrue(result);
+        }).get();
     }
 
     @Test
-    public void test12_uploadFile() {
-        try {
-            String metadata = "{\"name\":\"upload_file\",\"params\":{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}}";
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode params = objectMapper.readTree(metadata);
-            String ret = scripting.call(testTextFilePath, params, Scripting.Type.UPLOAD, String.class).get();
-            assertNotNull(ret);
-        } catch (Exception e) {
-            fail();
-        }
+    public void test12_uploadFile() throws ExecutionException, InterruptedException, JsonProcessingException {
+        String metadata = "{\"name\":\"upload_file\",\"params\":{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode params = objectMapper.readTree(metadata);
+        scripting.call(testTextFilePath, params, Scripting.Type.UPLOAD, String.class).whenComplete((result, throwable) -> {
+            assertNull(throwable);
+            assertNotNull(result);
+        }).get();
     }
 
     @Test
-    public void test13_setDownloadScript() {
-        try {
-            Executable executable = new DownloadExecutable("download_file", "$params.path", true);
-            boolean success = scripting.registerScript("download_file", executable).get();
-            assertTrue(success);
-        } catch (Exception e) {
-            fail();
-        }
+    public void test13_setDownloadScript() throws ExecutionException, InterruptedException {
+        Executable executable = new DownloadExecutable("download_file", "$params.path", true);
+        scripting.registerScript("download_file", executable).whenComplete((result, throwable) -> {
+            assertNull(throwable);
+            assertNotNull(result);
+        }).get();
     }
 
     @Test
-    public void test14_downloadFile() {
-        try {
-            String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
-            JsonNode params = JsonUtil.deserialize(path);
-            Reader reader = scripting.call("download_file", params, Scripting.Type.DOWNLOAD, Reader.class).get();
-            Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
-        } catch (Exception e) {
-            fail();
-        }
+    public void test14_downloadFile() throws ExecutionException, InterruptedException {
+        String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
+        JsonNode params = JsonUtil.deserialize(path);
+        scripting.call("download_file", params, Scripting.Type.DOWNLOAD, Reader.class).whenComplete((result, throwable) -> {
+            assertNull(throwable);
+            assertNotNull(result);
+            Utils.cacheTextFile(result, testLocalCacheRootPath, "test.txt");
+        }).get();
     }
 
     @Test
-    public void test15_setInfoScript() {
-        try {
-            HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
-            PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
-            AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
-
-            boolean success = scripting.registerScript("get_file_info", executable).get();
-            assertTrue(success);
-        } catch (Exception e) {
-            fail();
-        }
+    public void test15_setInfoScript() throws ExecutionException, InterruptedException {
+        HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
+        PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
+        AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
+        scripting.registerScript("get_file_info", executable).whenComplete((result, throwable) -> {
+            assertNull(throwable);
+            assertTrue(result);
+        }).get();
     }
 
     @Test
-    public void test16_getFileInfo() {
-        try {
-            String executable = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode params = objectMapper.readTree(executable);
-            String ret = scripting.call("get_file_info", params, Scripting.Type.PROPERTIES, String.class).get();
-            assertNotNull(ret);
-        } catch (Exception e) {
-            fail();
-        }
+    public void test16_getFileInfo() throws ExecutionException, InterruptedException, JsonProcessingException {
+        String executable = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode params = objectMapper.readTree(executable);
+        scripting.call("get_file_info", params, Scripting.Type.PROPERTIES, String.class).whenComplete((result, throwable) -> {
+            assertNull(throwable);
+            assertNotNull(result);
+        }).get();
     }
 
 
