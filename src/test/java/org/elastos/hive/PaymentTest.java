@@ -48,24 +48,24 @@ public class PaymentTest {
 
 	}
 
-	@Test
-	public void test03_placeOrder() throws ExecutionException, InterruptedException {
-		paymentApi.placeOrder(priceName).whenComplete((orderId, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(orderId);
-			this.orderId = orderId;
-		}).get();
-	}
+//	@Test
+//	public void test03_placeOrder() throws ExecutionException, InterruptedException {
+//		paymentApi.placeOrder(priceName).whenComplete((orderId, throwable) -> {
+//			assertNull(throwable);
+//			assertNotNull(orderId);
+//			this.orderId = orderId;
+//		}).get();
+//	}
 
-	@Test
-	public void test04_payOrder() throws ExecutionException, InterruptedException {
-		List<String> txids = new ArrayList<>();
-		txids.add("xxxxxxxxxxx");
-		paymentApi.payOrder(orderId, txids).whenComplete((orderId, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(orderId);
-		}).get();
-	}
+//	@Test
+//	public void test04_payOrder() throws ExecutionException, InterruptedException {
+//		List<String> txids = new ArrayList<>();
+//		txids.add("xxxxxxxxxxx");
+//		paymentApi.payOrder(orderId, txids).whenComplete((orderId, throwable) -> {
+//			assertNull(throwable);
+//			assertNotNull(orderId);
+//		}).get();
+//	}
 
 	@Test
 	public void test05_getOrder() throws ExecutionException, InterruptedException {

@@ -43,6 +43,6 @@ public class VersionTest {
 	private static Vault vault;
 	@BeforeClass
 	public static void setUp() {
-		vault = UserFactory.createUser1().getVault();
+		vault = UserFactory.createUser2().getVault();
 	}
 }
