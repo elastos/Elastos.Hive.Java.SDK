@@ -41,325 +41,345 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options) {
-		return authHelper.checkValid()
-				.thenCompose(result -> createColImp(name));
-	}
-
-	private CompletableFuture<Boolean> createColImp(String collection) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				Map<String, Object> map = new HashMap<>();
-				map.put("collection", collection);
-				String json = JsonUtil.serialize(map);
-
-				Response response = this.connectionManager.getDatabaseApi()
-						.createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
-
-				authHelper.checkResponseWithRetry(response);
-				return true;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return createColImp(name);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private boolean createColImp(String collection) throws HiveException {
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("collection", collection);
+			String json = JsonUtil.serialize(map);
+
+			Response response = this.connectionManager.getDatabaseApi()
+					.createCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			return true;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<Boolean> deleteCollection(String name) {
-		return authHelper.checkValid()
-				.thenCompose(result -> deleteColImp(name));
-	}
-
-	private CompletableFuture<Boolean> deleteColImp(String collection) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-
-				Map<String, Object> map = new HashMap<>();
-				map.put("collection", collection);
-				String json = JsonUtil.serialize(map);
-
-				Response response = this.connectionManager.getDatabaseApi()
-						.deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
-
-				authHelper.checkResponseWithRetry(response);
-				return true;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return deleteColImp(name);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private boolean deleteColImp(String collection) throws HiveException {
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("collection", collection);
+			String json = JsonUtil.serialize(map);
+
+			Response response = this.connectionManager.getDatabaseApi()
+					.deleteCollection(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			return true;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options) {
-		return authHelper.checkValid()
-				.thenCompose(result -> insertOneImp(collection, doc, options));
-	}
-
-	private CompletableFuture<InsertOneResult> insertOneImp(String collection, JsonNode doc, InsertOptions options) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
-				rootNode.put("collection", collection);
-				rootNode.set("document", doc);
-				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
-
-				String json = rootNode.toString();
-				Response response = this.connectionManager.getDatabaseApi()
-						.insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
-
-				authHelper.checkResponseWithRetry(response);
-				InsertOneResult insertResult = InsertOneResult.deserialize(ResponseHelper.toString(response));
-				return insertResult;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return insertOneImp(collection, doc, options);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private InsertOneResult insertOneImp(String collection, JsonNode doc, InsertOptions options) throws HiveException {
+		try {
+			ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+			rootNode.put("collection", collection);
+			rootNode.set("document", doc);
+			if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
+
+			String json = rootNode.toString();
+			Response response = this.connectionManager.getDatabaseApi()
+					.insertOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			InsertOneResult insertResult = InsertOneResult.deserialize(ResponseHelper.toString(response));
+			return insertResult;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options) {
-		return authHelper.checkValid()
-				.thenCompose(result -> insertManyImp(collection, docs, options));
-	}
-
-	private CompletableFuture<InsertManyResult> insertManyImp(String collection, List<JsonNode> docs, InsertOptions options) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
-				ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
-				arrayNode.addAll(docs);
-				rootNode.put("collection", collection);
-				rootNode.set("document", arrayNode);
-				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
-
-				String json = rootNode.toString();
-				Response response = this.connectionManager.getDatabaseApi()
-						.insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
-
-				authHelper.checkResponseWithRetry(response);
-				InsertManyResult insertResult = InsertManyResult.deserialize(ResponseHelper.toString(response));
-				return insertResult;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return insertManyImp(collection, docs, options);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private InsertManyResult insertManyImp(String collection, List<JsonNode> docs, InsertOptions options) throws HiveException {
+		try {
+			ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+			ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
+			arrayNode.addAll(docs);
+			rootNode.put("collection", collection);
+			rootNode.set("document", arrayNode);
+			if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
+
+			String json = rootNode.toString();
+			Response response = this.connectionManager.getDatabaseApi()
+					.insertMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			InsertManyResult insertResult = InsertManyResult.deserialize(ResponseHelper.toString(response));
+			return insertResult;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options) {
-		return authHelper.checkValid()
-				.thenCompose(result -> countDocumentsImp(collection, query, options));
-	}
-
-	private CompletableFuture<Long> countDocumentsImp(String collection, JsonNode query, CountOptions options) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
-				rootNode.put("collection", collection);
-				if(null!=query) rootNode.set("filter", query);
-				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
-
-				String json = rootNode.toString();
-				Response response = this.connectionManager.getDatabaseApi()
-						.countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
-
-				authHelper.checkResponseWithRetry(response);
-
-				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-				return ret.get("count").asLong();
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return countDocumentsImp(collection, query, options);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private long countDocumentsImp(String collection, JsonNode query, CountOptions options) throws HiveException {
+		try {
+			ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+			rootNode.put("collection", collection);
+			if(null!=query) rootNode.set("filter", query);
+			if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
+
+			String json = rootNode.toString();
+			Response response = this.connectionManager.getDatabaseApi()
+					.countDocs(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+
+			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+			return ret.get("count").asLong();
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options) {
-		return authHelper.checkValid()
-				.thenCompose(result -> findOneImp(collection, query, options));
-	}
-
-	private CompletableFuture<JsonNode> findOneImp(String collection, JsonNode query, FindOptions options) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
-				rootNode.put("collection", collection);
-				if(null!=query) rootNode.set("filter", query);
-				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
-
-				String json = rootNode.toString();
-				Response response = this.connectionManager.getDatabaseApi()
-						.findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
-
-				authHelper.checkResponseWithRetry(response);
-				JsonNode jsonNode = ResponseHelper.getValue(response, JsonNode.class);
-				JsonNode item = jsonNode.get("items");
-				return item;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return findOneImp(collection, query, options);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private JsonNode findOneImp(String collection, JsonNode query, FindOptions options) throws HiveException {
+		try {
+			ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+			rootNode.put("collection", collection);
+			if(null!=query) rootNode.set("filter", query);
+			if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
+
+			String json = rootNode.toString();
+			Response response = this.connectionManager.getDatabaseApi()
+					.findOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			JsonNode jsonNode = ResponseHelper.getValue(response, JsonNode.class);
+			JsonNode item = jsonNode.get("items");
+			return item;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options) {
-		return authHelper.checkValid()
-				.thenCompose(result -> findManyImp(collection, query, options));
-	}
-
-	private CompletableFuture<List<JsonNode>> findManyImp(String collection, JsonNode query, FindOptions options) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
-				rootNode.put("collection", collection);
-				if(null!=query) rootNode.set("filter", query);
-				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
-
-				String json = rootNode.toString();
-				Response response = this.connectionManager.getDatabaseApi()
-						.findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
-
-				authHelper.checkResponseWithRetry(response);
-				List<JsonNode> jsonNodes = ResponseHelper.getArray(response, "items");
-				return jsonNodes;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return findManyImp(collection, query, options);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private List<JsonNode> findManyImp(String collection, JsonNode query, FindOptions options) throws HiveException {
+		try {
+			ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+			rootNode.put("collection", collection);
+			if(null!=query) rootNode.set("filter", query);
+			if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
+
+			String json = rootNode.toString();
+			Response response = this.connectionManager.getDatabaseApi()
+					.findMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			List<JsonNode> jsonNodes = ResponseHelper.getArray(response, "items");
+			return jsonNodes;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
-		return authHelper.checkValid()
-				.thenCompose(result -> updateOneImp(collection, filter, update, options));
+		return authHelper.checkValid().thenApply(aVoid -> {
+			try {
+				return updateOneImp(collection, filter, update, options);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
-	private CompletableFuture<UpdateResult> updateOneImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
-				rootNode.put("collection", collection);
-				if(null!=filter) rootNode.set("filter", filter);
-				if(null!=update) rootNode.set("update", update);
-				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
+	private UpdateResult updateOneImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options) throws HiveException {
+		try {
+			ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+			rootNode.put("collection", collection);
+			if(null!=filter) rootNode.set("filter", filter);
+			if(null!=update) rootNode.set("update", update);
+			if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
 
-				String json = rootNode.toString();
-				Response response = this.connectionManager.getDatabaseApi()
-						.updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
+			String json = rootNode.toString();
+			Response response = this.connectionManager.getDatabaseApi()
+					.updateOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
 
-				authHelper.checkResponseWithRetry(response);
-				String ret = ResponseHelper.toString(response);
-				if(ret.contains("_error")) {
-					HiveException exception = new HiveException(ret);
-					throw exception;
-				}
-				UpdateResult updateResult = UpdateResult.deserialize(ret);
-				return updateResult;
-			} catch (Exception e) {
-				e.printStackTrace();
+			authHelper.checkResponseWithRetry(response);
+			String ret = ResponseHelper.toString(response);
+			if(ret.contains("_error")) {
+				HiveException exception = new HiveException(ret);
+				throw exception;
 			}
-
-			return null;
-		});
+			UpdateResult updateResult = UpdateResult.deserialize(ret);
+			return updateResult;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
-		return authHelper.checkValid()
-				.thenCompose(result -> updateManyImp(collection, filter, update, options));
-	}
-
-	private CompletableFuture<UpdateResult> updateManyImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
-				rootNode.put("collection", collection);
-				if(null!=filter) rootNode.set("filter", filter);
-				if(null!=update) rootNode.set("update", update);
-				if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
-
-				String json = rootNode.toString();
-				Response response = this.connectionManager.getDatabaseApi()
-						.updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
-
-				authHelper.checkResponseWithRetry(response);
-				UpdateResult updateResult = UpdateResult.deserialize(ResponseHelper.toString(response));
-				return updateResult;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return updateManyImp(collection, filter, update, options);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private UpdateResult updateManyImp(String collection, JsonNode filter, JsonNode update, UpdateOptions options) throws HiveException {
+		try {
+			ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+			rootNode.put("collection", collection);
+			if(null!=filter) rootNode.set("filter", filter);
+			if(null!=update) rootNode.set("update", update);
+			if(null!=options) rootNode.set("options", JsonUtil.deserialize(options.serialize()));
+
+			String json = rootNode.toString();
+			Response response = this.connectionManager.getDatabaseApi()
+					.updateMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			UpdateResult updateResult = UpdateResult.deserialize(ResponseHelper.toString(response));
+			return updateResult;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options) {
-		return authHelper.checkValid()
-				.thenCompose(result -> deleteOneImp(collection, filter, options));
-	}
-
-	private CompletableFuture<DeleteResult> deleteOneImp(String collection, JsonNode filter, DeleteOptions options) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
-				rootNode.put("collection", collection);
-				if(null!=filter) rootNode.set("filter", filter);
-
-				String json = rootNode.toString();
-				Response response = this.connectionManager.getDatabaseApi()
-						.deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
-
-				authHelper.checkResponseWithRetry(response);
-				DeleteResult deleteResult = DeleteResult.deserialize(ResponseHelper.toString(response));
-				return deleteResult;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return deleteOneImp(collection, filter, options);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private DeleteResult deleteOneImp(String collection, JsonNode filter, DeleteOptions options) throws HiveException {
+		try {
+			ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+			rootNode.put("collection", collection);
+			if(null!=filter) rootNode.set("filter", filter);
+
+			String json = rootNode.toString();
+			Response response = this.connectionManager.getDatabaseApi()
+					.deleteOne(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			DeleteResult deleteResult = DeleteResult.deserialize(ResponseHelper.toString(response));
+			return deleteResult;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options) {
-		return authHelper.checkValid()
-				.thenCompose(result -> deleteManyImp(collection, filter, options));
-	}
-
-	private CompletableFuture<DeleteResult> deleteManyImp(String collection, JsonNode filter, DeleteOptions options) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
-				rootNode.put("collection", collection);
-				if(null!=filter) rootNode.set("filter", filter);
-
-				String json = rootNode.toString();
-				Response response = this.connectionManager.getDatabaseApi()
-						.deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-						.execute();
-
-				authHelper.checkResponseWithRetry(response);
-				DeleteResult deleteResult = DeleteResult.deserialize(ResponseHelper.toString(response));
-				return deleteResult;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return deleteManyImp(collection, filter, options);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private DeleteResult deleteManyImp(String collection, JsonNode filter, DeleteOptions options) throws HiveException {
+		try {
+			ObjectNode rootNode = JsonNodeFactory.instance.objectNode();
+			rootNode.put("collection", collection);
+			if(null!=filter) rootNode.set("filter", filter);
+
+			String json = rootNode.toString();
+			Response response = this.connectionManager.getDatabaseApi()
+					.deleteMany(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			DeleteResult deleteResult = DeleteResult.deserialize(ResponseHelper.toString(response));
+			return deleteResult;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 }
