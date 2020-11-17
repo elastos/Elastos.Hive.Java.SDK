@@ -427,7 +427,8 @@ public class DatabaseTest {
 	@Test
 	public void test14_deleteColNoCallback() throws ExecutionException, InterruptedException {
         database.deleteCollection(collectionName).whenComplete((result, throwable) -> {
-            assertTrue(result);
+			assertNull(throwable);
+        	assertTrue(result);
         }).get();
 	}
 
