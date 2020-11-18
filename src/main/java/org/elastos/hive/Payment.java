@@ -41,12 +41,6 @@ public interface Payment {
 	CompletableFuture<Boolean> payOrder(String orderId, List<String> txids);
 
 	/**
-	 * start vault service free trial
-	 * @return
-	 */
-	CompletableFuture<Boolean> useTrial();
-
-	/**
 	 * Get order information of vault service purchase
 	 * @param orderId
 	 * @return

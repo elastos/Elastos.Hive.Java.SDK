@@ -79,27 +79,6 @@ public class PaymentImpl implements Payment {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> useTrial() {
-		return authHelper.checkValid()
-				.thenCompose(result -> useTrialImp());
-	}
-
-	private CompletableFuture<Boolean> useTrialImp() {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				Response<ResponseBody> response = this.connectionManager.getPaymentApi()
-						.createFreeVault()
-						.execute();
-				authHelper.checkResponseWithRetry(response);
-				return true;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
-			}
-		});
-	}
-
-	@Override
 	public CompletableFuture<String> placeOrder(String priceName) {
 		return authHelper.checkValid()
 				.thenCompose(result -> placeOrderImp(priceName));
