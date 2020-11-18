@@ -12,7 +12,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
-public interface FileApi {
+public interface FilesApi {
 	@GET(Constance.API_PATH + "/files/list/folder")
 	Call<FilesList> files(@Query("path") String filename);
 
