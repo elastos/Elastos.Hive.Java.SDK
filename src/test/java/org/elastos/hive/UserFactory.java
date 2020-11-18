@@ -4,6 +4,7 @@ import org.elastos.did.PresentationInJWT;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class UserFactory {
 	private static final String didCachePath = "didCache";
@@ -18,7 +19,7 @@ public class UserFactory {
 	private void setUp(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt) {
 		try {
 			PresentationInJWT presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
-			if(!resolverDidSetup) {
+			if (!resolverDidSetup) {
 				Client.setupResolver(this.resolveUrl, this.didCachePath);
 				resolverDidSetup = true;
 			}
@@ -31,13 +32,23 @@ public class UserFactory {
 			Client client = Client.createInstance(options);
 			client.setVaultProvider(this.ownerDid, this.provider);
 
-			vault = client.getVault(this.ownerDid).get();
+			client.createVault(this.ownerDid).whenComplete((ret, throwable) -> {
+				if (throwable == null) {
+					vault = ret;
+				} else {
+					try {
+						vault = client.getVault(ownerDid).get();
+					} catch (Exception e) {
+						throw new CompletionException(e);
+					}
+				}
+			}).get();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private UserFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, String provider, String resolveUrl, String ownerDid,String tokenCachePath) {
+	private UserFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, String provider, String resolveUrl, String ownerDid, String tokenCachePath) {
 		this.provider = provider;
 		this.resolveUrl = resolveUrl;
 		this.ownerDid = ownerDid;
@@ -45,7 +56,7 @@ public class UserFactory {
 		setUp(userDidOpt, appInstanceDidOpt);
 	}
 
-	public static UserFactory createFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, String provider, String resolveUrl, String ownerDid,String tokenCachePath) {
+	public static UserFactory createFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, String provider, String resolveUrl, String ownerDid, String tokenCachePath) {
 		return new UserFactory(userDidOpt, appInstanceDidOpt, provider, resolveUrl, ownerDid, tokenCachePath);
 	}
 
@@ -83,7 +94,7 @@ public class UserFactory {
 		return new UserFactory(userDidOpt, appInstanceDidOpt, TestData.DEVELOP_PROVIDER, TestData.TEST_RESOLVER_URL, TestData.userDid2, user2Path);
 	}
 
-	//测试跨did调用
+	//local 环境
 	public static UserFactory createUser3() {
 		String user3Path = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user3";
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
@@ -97,7 +108,7 @@ public class UserFactory {
 				.setMnemonic(TestData.appInstance3_mn)
 				.setPhrasepass(TestData.appInstance3_phrasepass)
 				.setStorepass(TestData.appInstance3_storepass);
-		return new UserFactory(userDidOpt, appInstanceDidOpt, TestData.RELEASE_PROVIDER, TestData.MAIN_RESOLVER_URL, TestData.userDid2, user3Path);
+		return new UserFactory(userDidOpt, appInstanceDidOpt, TestData.LOCAL_PROVIDER, TestData.MAIN_RESOLVER_URL, TestData.userDid3, user3Path);
 	}
 
 	public Vault getVault() {
