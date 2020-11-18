@@ -1,6 +1,10 @@
 package org.elastos.hive;
 
+import org.elastos.hive.exception.CreateVaultException;
+import org.elastos.hive.exception.HiveException;
+
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Vault class
@@ -117,5 +121,13 @@ public class Vault {
 	 */
 	public Payment getPayment() {
 		return this.payment;
+	}
+
+	/**
+	 * create vault service by free pricing
+	 * @return
+	 */
+	public boolean useTrial() throws ExecutionException, InterruptedException {
+		return payment.useTrial().get();
 	}
 }
