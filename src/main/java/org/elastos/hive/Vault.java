@@ -1,7 +1,5 @@
 package org.elastos.hive;
 
-import org.elastos.hive.exception.CreateVaultException;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.UsingPlan;
 
 import java.util.concurrent.CompletableFuture;
@@ -23,6 +21,7 @@ public class Vault {
 	private String vaultProvider;
 	private String ownerDid;
 	private AuthHelper authHelper;
+	private VaultHelper vaultHelper;
 
 	Vault(AuthHelper authHelper, String vaultProvider, String ownerDid) {
 		this.authHelper = authHelper;
@@ -34,6 +33,7 @@ public class Vault {
 		this.scripting = new ScriptingImpl(authHelper);
 		this.payment = new PaymentImpl(authHelper);
 		this.version = new VersionImpl(authHelper);
+		this.vaultHelper = new VaultHelper(authHelper);
 	}
 
 	public CompletableFuture<String> getNodeVersion() {
@@ -129,7 +129,7 @@ public class Vault {
 	 * @return
 	 */
 	public boolean useTrial() throws ExecutionException, InterruptedException {
-		return payment.useTrial().get();
+		return this.vaultHelper.useTrial().get();
 	}
 
 	/**
@@ -139,6 +139,6 @@ public class Vault {
 	 * @throws InterruptedException
 	 */
 	public UsingPlan getUsingPricePlan() throws ExecutionException, InterruptedException {
-		return payment.getUsingPricePlan().get();
+		return this.payment.getUsingPricePlan().get();
 	}
 }

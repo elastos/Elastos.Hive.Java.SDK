@@ -17,9 +17,6 @@ public interface PaymentApi {
 	@GET(Constance.API_PATH + "/payment/vault_pricing_plan")
 	Call<ResponseBody> getPricingPlan(@Query("name") String name);
 
-	@POST(Constance.API_PATH + "/service/vault/create")
-	Call<ResponseBody> createFreeVault();
-
 	@POST(Constance.API_PATH + "/payment/create_vault_package_order")
 	Call<ResponseBody> createOrder(@Body RequestBody body);
 

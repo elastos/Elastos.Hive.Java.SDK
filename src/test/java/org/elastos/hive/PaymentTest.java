@@ -22,15 +22,6 @@ public class PaymentTest {
 	private static String orderId = "5fab73d41f002debe1cb203a";
 
 	@Test
-	public void test00_userTrail() throws ExecutionException, InterruptedException {
-		paymentApi.useTrial()
-				.whenComplete((aBoolean, throwable) -> {
-					assertNull(throwable);
-					assertTrue(aBoolean);
-				}).get();
-	}
-
-	@Test
 	public void test01_getPaymentInfo() throws ExecutionException, InterruptedException {
 		paymentApi.getPaymentInfo().whenComplete((paymentInfo, throwable) -> {
 			assertNull(throwable);
