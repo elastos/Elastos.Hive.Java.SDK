@@ -12,7 +12,10 @@ public class ScriptingOtherTest {
 	@Test
 	public void test00_callOtherScript() {
 		try {
-			String ret = scripting.call(noConditionName, String.class).get();
+			CallConfig callConfig = new CallConfig.Builder()
+					.setPurpose(CallConfig.Purpose.General)
+					.build();
+			String ret = scripting.callScript(noConditionName, callConfig, String.class).get();
 			System.out.println("return=" + ret);
 		} catch (Exception e) {
 			fail();
