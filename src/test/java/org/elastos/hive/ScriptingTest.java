@@ -170,16 +170,6 @@ public class ScriptingTest {
 
 	@Test
 	public void test12_uploadFile() throws ExecutionException, InterruptedException, JsonProcessingException {
-//        String scriptName = "upload_file";
-//        String metadata = "{\"name\":\"upload_file\",\"params\":{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}}";
-//        String metadata = "{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}";
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        JsonNode params = objectMapper.readTree(metadata);
-//        scripting.callScript(testTextFilePath, params, Scripting.Type.UPLOAD, String.class).whenComplete((result, throwable) -> {
-//            assertNull(throwable);
-//            assertNotNull(result);
-//        }).get();
-
 		String scriptName = "upload_file";
 		String metadata = "{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}";
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -208,14 +198,6 @@ public class ScriptingTest {
 
 	@Test
 	public void test14_downloadFile() throws ExecutionException, InterruptedException {
-//        String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
-//        JsonNode params = JsonUtil.deserialize(path);
-//        scripting.callScript("download_file", params, Scripting.Type.DOWNLOAD, Reader.class).whenComplete((result, throwable) -> {
-//            assertNull(throwable);
-//            assertNotNull(result);
-//            Utils.cacheTextFile(result, testLocalCacheRootPath, "test.txt");
-//        }).get();
-
 		String scriptName = "download_file";
 		String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 		JsonNode params = JsonUtil.deserialize(path);
