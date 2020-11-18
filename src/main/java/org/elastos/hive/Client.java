@@ -21,20 +21,22 @@
  */
 package org.elastos.hive;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
+import org.elastos.hive.exception.CreateVaultException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 
 public class Client {
 	private static boolean resolverDidSetup;
@@ -42,7 +44,7 @@ public class Client {
 	private AuthenticationHandler authentcationHandler;
 	private DIDDocument authenticationDIDDocument;
 	private String localDataPath;
-	private Map<String , String> cachedProviders;
+	private Map<String, String> cachedProviders;
 
 	private Client(Options options) {
 		this.authenticationDIDDocument = options.authenticationDIDDocument();
@@ -57,6 +59,7 @@ public class Client {
 	 * resolver url and cache path use default value,
 	 * resolver url default value: http://api.elastos.io:20606
 	 * cache path default value: new java.io.File("didCache")
+	 *
 	 * @throws HiveException
 	 */
 	public static void setupResolver() throws HiveException {
@@ -66,9 +69,9 @@ public class Client {
 	/**
 	 * Recommendation for cache dir:
 	 * - Laptop/standard Java
-	 *   System.getProperty("user.home") + "/.cache.did.elastos"
+	 * System.getProperty("user.home") + "/.cache.did.elastos"
 	 * - Android Java
-	 *   Context.getFilesDir() + "/.cache.did.elastos"
+	 * Context.getFilesDir() + "/.cache.did.elastos"
 	 *
 	 * @param resolver the DIDResolver object
 	 * @param cacheDir the cache path name
@@ -90,7 +93,7 @@ public class Client {
 
 	/**
 	 * authentication options, include:
-	 * 	AuthenticationHandler, DIDDocument, data cache path
+	 * AuthenticationHandler, DIDDocument, data cache path
 	 */
 	public static class Options {
 		private AuthenticationHandler authentcationHandler;
@@ -133,10 +136,11 @@ public class Client {
 
 	/**
 	 * get Client instance
+	 *
 	 * @param options authentication options
-	 * @see Options
 	 * @return
 	 * @throws HiveException
+	 * @see Options
 	 */
 	public static Client createInstance(Options options) throws HiveException {
 		if (options == null || !options.checkValid())
@@ -150,6 +154,7 @@ public class Client {
 
 	/**
 	 * get Vault
+	 *
 	 * @param ownerDid vault owner did
 	 * @return
 	 */
@@ -157,8 +162,8 @@ public class Client {
 		if (ownerDid == null)
 			throw new IllegalArgumentException("Empty ownerDid");
 
-		return getVaultProvider(ownerDid).thenApply((provider)-> {
-			if(provider==null)
+		return getVaultProvider(ownerDid).thenApply((provider) -> {
+			if (provider == null)
 				throw new ProviderNotSetException(ProviderNotSetException.EXCEPTION);
 			AuthHelper authHelper = new AuthHelper(ownerDid, provider,
 					localDataPath,
@@ -169,13 +174,43 @@ public class Client {
 	}
 
 	/**
+	 * create Vault
+	 *
+	 * @param ownerDid
+	 * @return
+	 */
+	public CompletableFuture<Vault> createVault(String ownerDid) {
+		if (ownerDid == null)
+			throw new IllegalArgumentException("Empty ownerDid");
+
+		return getVaultProvider(ownerDid)
+				.thenApply(provider -> {
+					if (provider == null)
+						throw new ProviderNotSetException(ProviderNotSetException.EXCEPTION);
+					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
+							localDataPath,
+							authenticationDIDDocument,
+							authentcationHandler);
+					return new Vault(authHelper, provider, ownerDid);
+				})
+				.thenApply(vault -> {
+					try {
+						vault.useTrial();
+					} catch (Exception e) {
+						throw new CreateVaultException();
+					}
+					return vault;
+				});
+	}
+
+	/**
 	 * Tries to find a vault address in the public DID document of the given
 	 * user's DID.
-	 *
+	 * <p>
 	 * This API always tries to fetch this information from ID chain first
 	 * (vault address published publicly for this user) and falls back to the
 	 * local DID/Vault mapping if it fails to resolve from chain.
-	 *
+	 * <p>
 	 * After being able to resolve from chain, any previously set local mapping
 	 * is deleted.
 	 *
@@ -195,7 +230,7 @@ public class Client {
 
 				doc = did.resolve();
 				if (doc != null)
-					services = doc.selectServices((String)null, "HiveVault");
+					services = doc.selectServices((String) null, "HiveVault");
 
 				if (services != null && services.size() > 0) {
 					vaultProvider = services.get(0).getServiceEndpoint();
@@ -216,7 +251,7 @@ public class Client {
 	 * useful for example in case a user doesn't publish his vault address on
 	 * the ID chain, and shared it privately.
 	 *
-	 * @param ownerDid the DID for the vault owner
+	 * @param ownerDid     the DID for the vault owner
 	 * @param vaultAddress the given vault address
 	 */
 	public void setVaultProvider(String ownerDid, String vaultAddress) {
