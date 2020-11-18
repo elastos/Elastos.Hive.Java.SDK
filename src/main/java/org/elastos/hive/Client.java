@@ -30,6 +30,7 @@ import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.CreateVaultException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
+import org.elastos.hive.exception.VaultNotFoundException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -162,15 +163,27 @@ public class Client {
 		if (ownerDid == null)
 			throw new IllegalArgumentException("Empty ownerDid");
 
-		return getVaultProvider(ownerDid).thenApply((provider) -> {
-			if (provider == null)
-				throw new ProviderNotSetException(ProviderNotSetException.EXCEPTION);
-			AuthHelper authHelper = new AuthHelper(ownerDid, provider,
-					localDataPath,
-					authenticationDIDDocument,
-					authentcationHandler);
-			return new Vault(authHelper, provider, ownerDid);
-		});
+		return getVaultProvider(ownerDid)
+				.thenApply(provider -> newVault(provider, ownerDid))
+				.thenApply(vault -> {
+					try {
+						if(null == vault.getUsingPricePlan())
+							throw new VaultNotFoundException();
+					} catch (Exception e) {
+						throw new VaultNotFoundException();
+					}
+					return vault;
+				});
+	}
+
+	private Vault newVault(String provider, String ownerDid) {
+		if (provider == null)
+			throw new ProviderNotSetException(ProviderNotSetException.EXCEPTION);
+		AuthHelper authHelper = new AuthHelper(ownerDid, provider,
+				localDataPath,
+				authenticationDIDDocument,
+				authentcationHandler);
+		return new Vault(authHelper, provider, ownerDid);
 	}
 
 	/**
@@ -184,15 +197,7 @@ public class Client {
 			throw new IllegalArgumentException("Empty ownerDid");
 
 		return getVaultProvider(ownerDid)
-				.thenApply(provider -> {
-					if (provider == null)
-						throw new ProviderNotSetException(ProviderNotSetException.EXCEPTION);
-					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
-							localDataPath,
-							authenticationDIDDocument,
-							authentcationHandler);
-					return new Vault(authHelper, provider, ownerDid);
-				})
+				.thenApply(provider -> newVault(provider, ownerDid))
 				.thenApply(vault -> {
 					try {
 						vault.useTrial();

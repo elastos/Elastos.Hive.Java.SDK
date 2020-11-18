@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.CreateVaultException;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.payment.UsingPlan;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -129,5 +130,15 @@ public class Vault {
 	 */
 	public boolean useTrial() throws ExecutionException, InterruptedException {
 		return payment.useTrial().get();
+	}
+
+	/**
+	 * get price plan
+	 * @return
+	 * @throws ExecutionException
+	 * @throws InterruptedException
+	 */
+	public UsingPlan getUsingPricePlan() throws ExecutionException, InterruptedException {
+		return payment.getUsingPricePlan().get();
 	}
 }
