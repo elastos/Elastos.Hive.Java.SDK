@@ -129,22 +129,11 @@ class ScriptingImpl implements Scripting {
 
 	private <T> T uploadFileImpl(String scriptName, CallConfig config, Class<T> resultType) throws HiveException {
 		try {
-			//{\"name\":\"upload_file\",\"params\":{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}}
-
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", scriptName);
 			JsonNode params = config.getParams();
 			if (params != null)
 				map.put("params", params);
-
-//			ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
-//			String ownerDid = this.authHelper.getOwnerDid();
-//			if (null != ownerDid) {
-//				targetNode.put("target_did", ownerDid);
-//				if (null != appDid)
-//					targetNode.put("target_app_did", appDid);
-//				map.put("context", targetNode);
-//			}
 
 			String json = JsonUtil.serialize(map);
 
