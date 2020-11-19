@@ -10,7 +10,7 @@ public class InstanceTest {
     @Test
     public void testGetVaultInstance() {
         try {
-            Vault vault = UserFactory.createUser1().getVault();
+            Vault vault = UserFactory.createUser2().getVault();
             assertNotNull(vault);
         } catch (Exception e) {
             fail();
