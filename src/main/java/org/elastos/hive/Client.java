@@ -170,7 +170,8 @@ public class Client {
 						if(null == vault.getUsingPricePlan())
 							throw new VaultNotFoundException();
 					} catch (Exception e) {
-						throw new VaultNotFoundException();
+						e.printStackTrace();
+						throw new CompletionException(e);
 					}
 					return vault;
 				});
