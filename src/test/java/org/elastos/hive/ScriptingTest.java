@@ -126,47 +126,68 @@ public class ScriptingTest {
 
 
 	@Test
-	public void test05_callScriptStringType() throws ExecutionException, InterruptedException {
+	public void test05_callScriptStringType() {
 		CallConfig callConfig = new CallConfig.Builder()
 				.setPurpose(CallConfig.Purpose.General)
 				.build();
-		scripting.callScript(noConditionName, callConfig, String.class).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, callConfig, String.class)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertNotNull(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test06_callScriptByteArrType() throws ExecutionException, InterruptedException {
+	public void test06_callScriptByteArrType() {
 		CallConfig callConfig = new CallConfig.Builder()
 				.setPurpose(CallConfig.Purpose.General)
 				.build();
-		scripting.callScript(noConditionName, callConfig, byte[].class).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, callConfig, byte[].class)
+				.handle((success, ex) -> (ex == null));
+
+		try {
+			assertNotNull(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test07_callScriptJsonNodeType() throws ExecutionException, InterruptedException {
+	public void test07_callScriptJsonNodeType() {
 		CallConfig callConfig = new CallConfig.Builder()
 				.setPurpose(CallConfig.Purpose.General)
 				.build();
-		scripting.callScript(noConditionName, callConfig, JsonNode.class).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, callConfig, JsonNode.class)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertNotNull(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test08_callScriptReaderType() throws ExecutionException, InterruptedException {
+	public void test08_callScriptReaderType() {
 		CallConfig callConfig = new CallConfig.Builder()
 				.setPurpose(CallConfig.Purpose.General)
 				.build();
-		scripting.callScript(noConditionName, callConfig, Reader.class).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, callConfig, Reader.class)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertNotNull(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 
