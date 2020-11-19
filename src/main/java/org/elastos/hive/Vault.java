@@ -128,7 +128,7 @@ public class Vault {
 	 * create vault service by free pricing
 	 * @return
 	 */
-	public boolean useTrial() throws ExecutionException, InterruptedException {
+	boolean useTrial() throws ExecutionException, InterruptedException {
 		return this.vaultHelper.useTrial().get();
 	}
 
@@ -138,7 +138,7 @@ public class Vault {
 	 * @throws ExecutionException
 	 * @throws InterruptedException
 	 */
-	public UsingPlan getUsingPricePlan() throws ExecutionException, InterruptedException {
+	UsingPlan getUsingPricePlan() throws ExecutionException, InterruptedException {
 		return this.payment.getUsingPricePlan().get();
 	}
 }
