@@ -108,7 +108,7 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test04_registerWithCondition() throws ExecutionException, InterruptedException {
+	public void test04_registerWithCondition() {
 		JsonNode filter = JsonUtil.deserialize("{\"_id\":\"$params.group_id\",\"friends\":\"$callScripter_did\"}");
 		Executable executable = new DbFindQuery("get_groups", "test_group", filter);
 		Condition condition = new QueryHasResultsCondition("verify_user_permission", "test_group", filter);
@@ -192,20 +192,31 @@ public class ScriptingTest {
 
 
 	@Test
-	public void test11_setUploadScript() throws ExecutionException, InterruptedException {
+	public void test11_setUploadScript() {
 		Executable executable = new UploadExecutable("upload_file", "$params.path", true);
-		scripting.registerScript("upload_file", executable).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertTrue(result);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.registerScript("upload_file", executable)
+				.handle((success, ex) -> (ex == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test12_uploadFile() throws ExecutionException, InterruptedException, JsonProcessingException {
+	public void test12_uploadFile() {
 		String scriptName = "upload_file";
 		String metadata = "{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}";
-		ObjectMapper objectMapper = new ObjectMapper();
-		JsonNode params = objectMapper.readTree(metadata);
+		JsonNode params = null;
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			params = objectMapper.readTree(metadata);
+		} catch (Exception e) {
+			fail();
+		}
 
 		CallConfig callConfig = new CallConfig.Builder()
 				.setPurpose(CallConfig.Purpose.Upload)
@@ -213,10 +224,16 @@ public class ScriptingTest {
 				.setFilePath(testTextFilePath)
 				.build();
 
-		scripting.callScript(scriptName, callConfig, String.class).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.callScript(scriptName, callConfig, String.class)
+				.handle((success, ex) -> (ex == null));
+
+		try {
+			assertNotNull(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
