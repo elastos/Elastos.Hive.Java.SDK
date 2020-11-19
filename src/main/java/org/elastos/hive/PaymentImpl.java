@@ -36,191 +36,213 @@ public class PaymentImpl implements Payment {
 
 	@Override
 	public CompletableFuture<PricingInfo> getPaymentInfo() {
-		return authHelper.checkValid()
-				.thenCompose(result -> getAllPricingPlansImp());
-	}
-
-	private CompletableFuture<PricingInfo> getAllPricingPlansImp() {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				Response response = this.connectionManager.getPaymentApi()
-						.getPackageInfo()
-						.execute();
-				authHelper.checkResponseWithRetry(response);
-				String ret = ResponseHelper.getValue(response, String.class);
-				return PricingInfo.deserialize(ret);
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return getAllPricingPlansImp();
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private PricingInfo getAllPricingPlansImp() throws HiveException {
+		try {
+			Response response = this.connectionManager.getPaymentApi()
+					.getPackageInfo()
+					.execute();
+			authHelper.checkResponseWithRetry(response);
+			String ret = ResponseHelper.getValue(response, String.class);
+			return PricingInfo.deserialize(ret);
+		} catch (Exception e) {
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-		return authHelper.checkValid()
-				.thenCompose(result -> getPricingPlansImp(planName));
-	}
-
-	private CompletableFuture<PricingPlan> getPricingPlansImp(String planName) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				Response response = this.connectionManager.getPaymentApi()
-						.getPricingPlan(planName)
-						.execute();
-				authHelper.checkResponseWithRetry(response);
-				String ret = ResponseHelper.getValue(response, String.class);
-				return PricingPlan.deserialize(ret);
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return getPricingPlansImp(planName);
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private PricingPlan getPricingPlansImp(String planName) throws HiveException {
+		try {
+			Response response = this.connectionManager.getPaymentApi()
+					.getPricingPlan(planName)
+					.execute();
+			authHelper.checkResponseWithRetry(response);
+			String ret = ResponseHelper.getValue(response, String.class);
+			return PricingPlan.deserialize(ret);
+		} catch (Exception e) {
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<String> placeOrder(String priceName) {
-		return authHelper.checkValid()
-				.thenCompose(result -> placeOrderImp(priceName));
-	}
-
-	private CompletableFuture<String> placeOrderImp(String priceName) {
-
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				Map<String, Object> map = new HashMap<>();
-				map.put("pricing_name", priceName);
-				String json = JsonUtil.serialize(map);
-				Response<ResponseBody> response = this.connectionManager.getPaymentApi()
-						.createOrder(createJsonRequestBody(json))
-						.execute();
-				authHelper.checkResponseWithRetry(response);
-				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-				return ret.get("order_id").textValue();
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return placeOrderImp(priceName);
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private String placeOrderImp(String priceName) throws HiveException {
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("pricing_name", priceName);
+			String json = JsonUtil.serialize(map);
+			Response<ResponseBody> response = this.connectionManager.getPaymentApi()
+					.createOrder(createJsonRequestBody(json))
+					.execute();
+			authHelper.checkResponseWithRetry(response);
+			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+			return ret.get("order_id").textValue();
+		} catch (Exception e) {
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<Boolean> payOrder(String orderId, List<String> txids) {
-		return authHelper.checkValid()
-				.thenCompose(result -> payOrderImp(orderId, txids));
-	}
-
-	private CompletableFuture<Boolean> payOrderImp(String orderId, List<String> txids) {
-
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				Map<String, Object> map = new HashMap<>();
-				map.put("order_id", orderId);
-				map.put("pay_txids", txids);
-				String json = JsonUtil.serialize(map);
-				Response<ResponseBody> response = this.connectionManager.getPaymentApi()
-						.payOrder(createJsonRequestBody(json))
-						.execute();
-				authHelper.checkResponseWithRetry(response);
-				return true;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return payOrderImp(orderId, txids);
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private boolean payOrderImp(String orderId, List<String> txids) throws HiveException {
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("order_id", orderId);
+			map.put("pay_txids", txids);
+			String json = JsonUtil.serialize(map);
+			Response<ResponseBody> response = this.connectionManager.getPaymentApi()
+					.payOrder(createJsonRequestBody(json))
+					.execute();
+			authHelper.checkResponseWithRetry(response);
+			return true;
+		} catch (Exception e) {
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<Order> getOrder(String orderId) {
-		return authHelper.checkValid()
-				.thenCompose(result -> getOrderImp(orderId));
-	}
-
-	private CompletableFuture<Order> getOrderImp(String orderId) {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				Response response = this.connectionManager.getPaymentApi()
-						.getOrderInfo(orderId)
-						.execute();
-				authHelper.checkResponseWithRetry(response);
-				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-				String orderInfo = ret.get("order_info").toString();
-				return Order.deserialize(orderInfo);
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return getOrderImp(orderId);
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private Order getOrderImp(String orderId) throws HiveException {
+		try {
+			Response response = this.connectionManager.getPaymentApi()
+					.getOrderInfo(orderId)
+					.execute();
+			authHelper.checkResponseWithRetry(response);
+			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+			String orderInfo = ret.get("order_info").toString();
+			return Order.deserialize(orderInfo);
+		} catch (Exception e) {
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<List<Order>> getAllOrders() {
-		return authHelper.checkValid()
-				.thenCompose(result -> getAllOrdersImp());
-	}
-
-	private CompletableFuture<List<Order>> getAllOrdersImp() {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				Response response = this.connectionManager.getPaymentApi()
-						.getOrderList()
-						.execute();
-				authHelper.checkResponseWithRetry(response);
-				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-				String orderInfo = ret.get("order_info_list").toString();
-				List<Order> orders = ResponseHelper.getValue(orderInfo, new ArrayList<Order>().getClass());
-				return orders;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return getAllOrdersImp();
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private List<Order> getAllOrdersImp() throws HiveException {
+		try {
+			Response response = this.connectionManager.getPaymentApi()
+					.getOrderList()
+					.execute();
+			authHelper.checkResponseWithRetry(response);
+			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+			String orderInfo = ret.get("order_info_list").toString();
+			List<Order> orders = ResponseHelper.getValue(orderInfo, new ArrayList<Order>().getClass());
+			return orders;
+		} catch (Exception e) {
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<UsingPlan> getUsingPricePlan() {
-		return authHelper.checkValid()
-				.thenCompose(result -> getUsingPricePlanImp());
+		return authHelper.checkValid().thenApply(aVoid -> {
+			try {
+				return getUsingPricePlanImp();
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
+			}
+		});
 	}
 
 
-	private CompletableFuture<UsingPlan> getUsingPricePlanImp() {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				Response response = this.connectionManager.getPaymentApi()
-						.getServiceInfo()
-						.execute();
-				authHelper.checkResponseWithRetry(response);
-				String info = ResponseHelper.getValue(response, String.class);
-				return UsingPlan.deserialize(info);
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
-			}
-		});
+	private UsingPlan getUsingPricePlanImp() throws HiveException {
+		try {
+			Response response = this.connectionManager.getPaymentApi()
+					.getServiceInfo()
+					.execute();
+			authHelper.checkResponseWithRetry(response);
+			String info = ResponseHelper.getValue(response, String.class);
+			return UsingPlan.deserialize(info);
+		} catch (Exception e) {
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	@Override
 	public CompletableFuture<String> getPaymentVersion() {
-		return authHelper.checkValid()
-				.thenCompose(result -> getPaymentVersionImp());
-	}
-
-	private CompletableFuture<String> getPaymentVersionImp() {
-		return CompletableFuture.supplyAsync(() -> {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				Response response = this.connectionManager.getPaymentApi()
-						.getPaymentVersion()
-						.execute();
-				authHelper.checkResponseWithRetry(response);
-				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-				String version = ret.get("version").textValue();
-				return version;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return getPaymentVersionImp();
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
 			}
 		});
+	}
+
+	private String getPaymentVersionImp() throws HiveException {
+		try {
+			Response response = this.connectionManager.getPaymentApi()
+					.getPaymentVersion()
+					.execute();
+			authHelper.checkResponseWithRetry(response);
+			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+			String version = ret.get("version").textValue();
+			return version;
+		} catch (Exception e) {
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	private RequestBody createJsonRequestBody(String json) {
