@@ -19,7 +19,7 @@ public class PaymentTest {
 	private static Payment paymentApi;
 	private static final String planName = "Free";
 	private static final String priceName = "Rookie";
-	private static String orderId = "5fab73d41f002debe1cb203a";
+	private static String orderId = "5fb5f1be9284ff39688ea77e";
 
 	@Test
 	public void test01_getPaymentInfo() throws ExecutionException, InterruptedException {
@@ -39,14 +39,14 @@ public class PaymentTest {
 
 	}
 
-//	@Test
-//	public void test03_placeOrder() throws ExecutionException, InterruptedException {
-//		paymentApi.placeOrder(priceName).whenComplete((orderId, throwable) -> {
-//			assertNull(throwable);
-//			assertNotNull(orderId);
-//			this.orderId = orderId;
-//		}).get();
-//	}
+	@Test
+	public void test03_placeOrder() throws ExecutionException, InterruptedException {
+		paymentApi.placeOrder(priceName).whenComplete((orderId, throwable) -> {
+			assertNull(throwable);
+			assertNotNull(orderId);
+			this.orderId = orderId;
+		}).get();
+	}
 
 //	@Test
 //	public void test04_payOrder() throws ExecutionException, InterruptedException {
