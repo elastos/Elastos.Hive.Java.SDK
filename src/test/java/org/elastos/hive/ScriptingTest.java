@@ -32,11 +32,13 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.Reader;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ScriptingTest {
@@ -83,23 +85,26 @@ public class ScriptingTest {
 		AggregatedExecutable ae = new AggregatedExecutable("ae");
 		ae.append(exec1).append(exec2).append(exec3);
 
-//        System.out.println(ae.serialize());
-
 		AggregatedExecutable ae2 = new AggregatedExecutable("ae2");
 		ae2.append(exec1).append(exec2).append(ae).append(exec3);
-
-//        System.out.println(ae2.serialize());
 	}
 
 	@Test
-	public void test03_registerNoCondition() throws ExecutionException, InterruptedException {
+	public void test03_registerNoCondition() {
+
 		JsonNode filter = JsonUtil.deserialize("{\"friends\":\"$callScripter_did\"}");
 		JsonNode options = JsonUtil.deserialize("{\"projection\":{\"_id\":false,\"name\":true}}");
 		Executable executable = new DbFindQuery("get_groups", "groups", filter, options);
-		scripting.registerScript(noConditionName, executable).whenComplete((success, throwable) -> {
-			assertNull(throwable);
-			assertTrue(success);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.registerScript(noConditionName, executable)
+				.handle((success, ex) -> (ex == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
@@ -107,10 +112,16 @@ public class ScriptingTest {
 		JsonNode filter = JsonUtil.deserialize("{\"_id\":\"$params.group_id\",\"friends\":\"$callScripter_did\"}");
 		Executable executable = new DbFindQuery("get_groups", "test_group", filter);
 		Condition condition = new QueryHasResultsCondition("verify_user_permission", "test_group", filter);
-		scripting.registerScript(withConditionName, condition, executable).whenComplete((success, throwable) -> {
-			assertNull(throwable);
-			assertTrue(success);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.registerScript(withConditionName, condition, executable)
+				.handle((success, ex) -> (ex == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 
