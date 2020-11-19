@@ -61,7 +61,7 @@ public class UserFactory {
 	}
 
 	//release环境（MainNet + https://hive1.trinity-tech.io + userDid1）
-	public static UserFactory createUser1() {
+	public static UserFactory createUser2() {
 		String user1Path = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user1";
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
 				.setName(TestData.userDid1_name)
@@ -78,7 +78,7 @@ public class UserFactory {
 	}
 
 	//develope 环境
-	public static UserFactory createUser2() {
+	public static UserFactory createUser1() {
 		String user2Path = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user2";
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
 				.setName(TestData.userDid2_name)
