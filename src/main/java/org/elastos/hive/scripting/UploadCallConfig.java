@@ -22,4 +22,8 @@ public class UploadCallConfig<T> extends CallConfig {
 	UploadCallConfig(String appDid, JsonNode params, Class<T> resultType) {
 		super(appDid, params, resultType);
 	}
+
+	public String filePath() {
+		return this.filePath;
+	}
 }
