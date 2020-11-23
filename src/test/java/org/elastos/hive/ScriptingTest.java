@@ -16,15 +16,18 @@ import org.elastos.hive.scripting.AndCondition;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.DbFindQuery;
 import org.elastos.hive.scripting.DbInsertQuery;
-import org.elastos.hive.scripting.Executable;
+import org.elastos.hive.scripting.DownloadCallConfig;
 import org.elastos.hive.scripting.DownloadExecutable;
+import org.elastos.hive.scripting.Executable;
+import org.elastos.hive.scripting.GeneralCallConfig;
 import org.elastos.hive.scripting.HashExecutable;
-import org.elastos.hive.scripting.PropertiesExecutable;
-import org.elastos.hive.scripting.UploadExecutable;
 import org.elastos.hive.scripting.OrCondition;
+import org.elastos.hive.scripting.PropertiesExecutable;
 import org.elastos.hive.scripting.QueryHasResultsCondition;
 import org.elastos.hive.scripting.RawCondition;
 import org.elastos.hive.scripting.RawExecutable;
+import org.elastos.hive.scripting.UploadCallConfig;
+import org.elastos.hive.scripting.UploadExecutable;
 import org.elastos.hive.utils.JsonUtil;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -127,10 +130,7 @@ public class ScriptingTest {
 
 	@Test
 	public void test05_callScriptStringType() {
-		CallConfig callConfig = new CallConfig.Builder()
-				.setPurpose(CallConfig.Purpose.General)
-				.build();
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, callConfig, String.class)
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, String.class)
 				.handle((success, ex) -> (ex == null));
 		try {
 			assertNotNull(future.get());
@@ -143,10 +143,7 @@ public class ScriptingTest {
 
 	@Test
 	public void test06_callScriptByteArrType() {
-		CallConfig callConfig = new CallConfig.Builder()
-				.setPurpose(CallConfig.Purpose.General)
-				.build();
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, callConfig, byte[].class)
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, byte[].class)
 				.handle((success, ex) -> (ex == null));
 
 		try {
@@ -160,10 +157,7 @@ public class ScriptingTest {
 
 	@Test
 	public void test07_callScriptJsonNodeType() {
-		CallConfig callConfig = new CallConfig.Builder()
-				.setPurpose(CallConfig.Purpose.General)
-				.build();
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, callConfig, JsonNode.class)
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, JsonNode.class)
 				.handle((success, ex) -> (ex == null));
 		try {
 			assertNotNull(future.get());
@@ -176,10 +170,7 @@ public class ScriptingTest {
 
 	@Test
 	public void test08_callScriptReaderType() {
-		CallConfig callConfig = new CallConfig.Builder()
-				.setPurpose(CallConfig.Purpose.General)
-				.build();
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, callConfig, Reader.class)
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, Reader.class)
 				.handle((success, ex) -> (ex == null));
 		try {
 			assertNotNull(future.get());
@@ -218,13 +209,8 @@ public class ScriptingTest {
 			fail();
 		}
 
-		CallConfig callConfig = new CallConfig.Builder()
-				.setPurpose(CallConfig.Purpose.Upload)
-				.setParams(params)
-				.setFilePath(testTextFilePath)
-				.build();
-
-		CompletableFuture<Boolean> future = scripting.callScript(scriptName, callConfig, String.class)
+		UploadCallConfig uploadCallConfig = new UploadCallConfig(params, testTextFilePath);
+		CompletableFuture<Boolean> future = scripting.callScript(scriptName, uploadCallConfig, String.class)
 				.handle((success, ex) -> (ex == null));
 
 		try {
@@ -251,12 +237,9 @@ public class ScriptingTest {
 		String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 		JsonNode params = JsonUtil.deserialize(path);
 
-		CallConfig callConfig = new CallConfig.Builder()
-				.setPurpose(CallConfig.Purpose.Download)
-				.setParams(params)
-				.build();
+		DownloadCallConfig downloadCallConfig = new DownloadCallConfig(params);
 
-		scripting.callScript(scriptName, callConfig, Reader.class).whenComplete((result, throwable) -> {
+		scripting.callScript(scriptName, downloadCallConfig, Reader.class).whenComplete((result, throwable) -> {
 			assertNull(throwable);
 			assertNotNull(result);
 			Utils.cacheTextFile(result, testLocalCacheRootPath, "test.txt");
@@ -279,12 +262,9 @@ public class ScriptingTest {
 		String executable = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode params = objectMapper.readTree(executable);
-		CallConfig callConfig = new CallConfig.Builder()
-				.setPurpose(CallConfig.Purpose.General)
-				.setParams(params)
-				.build();
 
-		scripting.callScript("get_file_info", callConfig, String.class).whenComplete((result, throwable) -> {
+		GeneralCallConfig generalCallConfig = new GeneralCallConfig(params);
+		scripting.callScript("get_file_info", generalCallConfig, String.class).whenComplete((result, throwable) -> {
 			assertNull(throwable);
 			assertNotNull(result);
 		}).get();
