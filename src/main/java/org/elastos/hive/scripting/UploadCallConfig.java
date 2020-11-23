@@ -2,10 +2,12 @@ package org.elastos.hive.scripting;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * Scripting file upload call config
+ * @param <T> String, byte[], JsonNode, Reader
+ */
 public class UploadCallConfig<T> extends CallConfig {
 	private String filePath;
-
-
 
 	public UploadCallConfig(JsonNode params, String filePath, Class<T> resultType) {
 		this(null, params, resultType);
