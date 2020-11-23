@@ -5,23 +5,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.elastos.hive.database.Result;
 
 public class UsingPlan extends Result<UsingPlan> {
-
+	@JsonProperty("did")
+	private String did;
 	@JsonProperty("max_storage")
-	private int maxStorage;
+	private long maxStorage;
 	@JsonProperty("file_use_storage")
 	private int fileUseStorage;
 	@JsonProperty("db_use_storage")
-	private int dbUseStorage;
+	private float dbUseStorage;
 	@JsonProperty("modify_time")
-	private long modifyTime;
+	private float modifyTime;
 	@JsonProperty("start_time")
-	private long startTime;
+	private float startTime;
 	@JsonProperty("end_time")
-	private long endTime;
+	private float endTime;
 	@JsonProperty("pricing_using")
 	private String pricingUsing;
 
-	public int maxStorage() {
+	public String did() {
+		return did;
+	}
+
+	public long maxStorage() {
 		return maxStorage;
 	}
 
@@ -29,19 +34,19 @@ public class UsingPlan extends Result<UsingPlan> {
 		return fileUseStorage;
 	}
 
-	public int dbUseStorage() {
+	public float dbUseStorage() {
 		return dbUseStorage;
 	}
 
-	public long modifyTime() {
+	public float modifyTime() {
 		return modifyTime;
 	}
 
-	public long startTime() {
+	public float startTime() {
 		return startTime;
 	}
 
-	public long endTime() {
+	public float endTime() {
 		return endTime;
 	}
 
