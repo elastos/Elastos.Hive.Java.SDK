@@ -4,23 +4,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Scripting file upload call config
- * @param <T> String, byte[], JsonNode, Reader
  */
-public class UploadCallConfig<T> extends CallConfig {
+public class UploadCallConfig extends CallConfig {
 	private String filePath;
 
-	public UploadCallConfig(JsonNode params, String filePath, Class<T> resultType) {
-		this(null, params, resultType);
+	public UploadCallConfig(JsonNode params, String filePath) {
+		this(null, params, filePath);
+	}
+
+	public UploadCallConfig(String appDid, JsonNode params, String filePath) {
+		this(appDid, params);
 		this.filePath = filePath;
 	}
 
-	public UploadCallConfig(String appDid, JsonNode params, String filePath, Class<T> resultType) {
-		this(appDid, params, resultType);
-		this.filePath = filePath;
-	}
-
-	UploadCallConfig(String appDid, JsonNode params, Class<T> resultType) {
-		super(appDid, params, resultType);
+	UploadCallConfig(String appDid, JsonNode params) {
+		super(appDid, params);
 	}
 
 	public String filePath() {

@@ -12,10 +12,9 @@ public class DownloadCallConfig<T> extends CallConfig {
 	 * Construction method
 	 *
 	 * @param params
-	 * @param resultType String, byte[], JsonNode, Reader
 	 */
-	public DownloadCallConfig(JsonNode params, Class<T> resultType) {
-		this(null, params, resultType);
+	public DownloadCallConfig(JsonNode params) {
+		this(null, params);
 	}
 
 	/**
@@ -23,9 +22,8 @@ public class DownloadCallConfig<T> extends CallConfig {
 	 *
 	 * @param appDid
 	 * @param params
-	 * @param resultType String, byte[], JsonNode, Reader
 	 */
-	public DownloadCallConfig(String appDid, JsonNode params, Class<T> resultType) {
-		super(appDid, params, resultType);
+	public DownloadCallConfig(String appDid, JsonNode params) {
+		super(appDid, params);
 	}
 }
