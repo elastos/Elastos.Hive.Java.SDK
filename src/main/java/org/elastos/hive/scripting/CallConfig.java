@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * scripting call config class
  */
-public class CallConfig<T> {
+public class CallConfig {
 
 	/**
 	 * Construction method

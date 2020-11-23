@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Scripting file download call config
- * @param <T> InputStream, Reader
  */
-public class DownloadCallConfig<T> extends CallConfig {
+public class DownloadCallConfig extends CallConfig {
 
 	/**
 	 * Construction method

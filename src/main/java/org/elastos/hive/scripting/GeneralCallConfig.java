@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * Scripting general call config
  */
-public class GeneralCallConfig<T> extends CallConfig {
+public class GeneralCallConfig extends CallConfig {
 
 	public GeneralCallConfig() {
 		this(null, null);
