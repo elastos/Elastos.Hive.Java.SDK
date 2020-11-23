@@ -1,9 +1,5 @@
 package org.elastos.hive;
 
-import com.sun.tools.javah.Gen;
-
-import org.elastos.hive.scripting.CallConfig;
-import org.elastos.hive.scripting.GeneralCallConfig;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
