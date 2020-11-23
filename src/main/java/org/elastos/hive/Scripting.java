@@ -2,10 +2,9 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.hive.scripting.CallConfig;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.Executable;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 public interface Scripting {
 

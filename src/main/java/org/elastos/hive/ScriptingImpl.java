@@ -1,5 +1,20 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.scripting.CallConfig;
+import org.elastos.hive.scripting.Condition;
+import org.elastos.hive.scripting.DownloadCallConfig;
+import org.elastos.hive.scripting.Executable;
+import org.elastos.hive.scripting.GeneralCallConfig;
+import org.elastos.hive.scripting.UploadCallConfig;
+import org.elastos.hive.utils.JsonUtil;
+import org.elastos.hive.utils.ResponseHelper;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,17 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-
-import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.scripting.Condition;
-import org.elastos.hive.scripting.Executable;
-import org.elastos.hive.utils.JsonUtil;
-import org.elastos.hive.utils.ResponseHelper;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -77,14 +81,13 @@ class ScriptingImpl implements Scripting {
 	@Override
 	public <T> CompletableFuture<T> callScript(String name, CallConfig config, Class<T> resultType) {
 		return authHelper.checkValid().thenApply(aVoid -> {
-			CallConfig.Purpose purpose = config.getPurpose();
 			try {
-				if (purpose == CallConfig.Purpose.Upload) {
-					return uploadFileImpl(name, config, resultType);
-				} else if (purpose == CallConfig.Purpose.Download) {
-					return downloadFileImpl(name, config, resultType);
-				} else if (purpose == CallConfig.Purpose.General) {
-					return callScriptImpl(name, config, resultType);
+				if (config instanceof UploadCallConfig) {
+					return uploadFileImpl(name, ((UploadCallConfig) config), resultType);
+				} else if (config instanceof DownloadCallConfig) {
+					return downloadFileImpl(name, ((DownloadCallConfig) config), resultType);
+				} else if (config instanceof GeneralCallConfig) {
+					return callScriptImpl(name, ((GeneralCallConfig) config), resultType);
 				} else if(null == config) {
 					callScriptImpl(name, null, resultType);
 				}
@@ -96,11 +99,11 @@ class ScriptingImpl implements Scripting {
 		});
 	}
 
-	private <T> T callScriptImpl(String scriptName, CallConfig config, Class<T> clazz) throws HiveException {
+	private <T> T callScriptImpl(String scriptName, GeneralCallConfig config, Class<T> clazz) throws HiveException {
 		try {
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", scriptName);
-			JsonNode params = config.getParams();
+			JsonNode params = config.params();
 			if (params != null)
 				map.put("params", params);
 
@@ -108,7 +111,7 @@ class ScriptingImpl implements Scripting {
 			String ownerDid = this.authHelper.getOwnerDid();
 			if (null != ownerDid) {
 				targetNode.put("target_did", ownerDid);
-				String appDid = config.getAppDid();
+				String appDid = config.appDid();
 				if (null != appDid)
 					targetNode.put("target_app_did", appDid);
 				map.put("context", targetNode);
@@ -127,17 +130,17 @@ class ScriptingImpl implements Scripting {
 		}
 	}
 
-	private <T> T uploadFileImpl(String scriptName, CallConfig config, Class<T> resultType) throws HiveException {
+	private <T> T uploadFileImpl(String scriptName, UploadCallConfig config, Class<T> resultType) throws HiveException {
 		try {
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", scriptName);
-			JsonNode params = config.getParams();
+			JsonNode params = config.params();
 			if (params != null)
 				map.put("params", params);
 
 			String json = JsonUtil.serialize(map);
 
-			File file = new File(config.getFilePath());
+			File file = new File(config.filePath());
 			RequestBody requestFile =
 					RequestBody.create(MediaType.parse("multipart/form-data"), file);
 			MultipartBody.Part body = MultipartBody.Part.createFormData("data", file.getName(), requestFile);
@@ -157,11 +160,11 @@ class ScriptingImpl implements Scripting {
 		}
 	}
 
-	private <T> T downloadFileImpl(String scriptName, CallConfig config, Class<T> resultType) throws HiveException {
+	private <T> T downloadFileImpl(String scriptName, DownloadCallConfig config, Class<T> resultType) throws HiveException {
 		try {
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", scriptName);
-			JsonNode params = config.getParams();
+			JsonNode params = config.params();
 			if (params != null)
 				map.put("params", params);
 
