@@ -103,15 +103,17 @@ class ScriptingImpl implements Scripting {
 		try {
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", scriptName);
-			JsonNode params = config.params();
-			if (params != null)
-				map.put("params", params);
+
+			if (null != config) {
+				JsonNode params = config.params();
+				if(params!= null) map.put("params", params);
+			}
 
 			ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
 			String ownerDid = this.authHelper.getOwnerDid();
 			if (null != ownerDid) {
 				targetNode.put("target_did", ownerDid);
-				String appDid = config.appDid();
+				String appDid = (config==null)?null:config.appDid();
 				if (null != appDid)
 					targetNode.put("target_app_did", appDid);
 				map.put("context", targetNode);
