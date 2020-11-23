@@ -124,7 +124,7 @@ class AuthHelper implements ConnectHelper {
 
 	private void nodeAuth(String token) throws Exception {
 		if(null == token)
-			throw new HiveException("approve jwt is null");
+			return;
 		Map<String, Object> map = new HashMap<>();
 		map.put("jwt", token);
 		String json = new JSONObject(map).toString();
