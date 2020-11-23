@@ -28,4 +28,13 @@ public class CallConfig<T> {
 	 */
 	private String appDid;
 	Class<T> resultType;
+
+
+	public String appDid() {
+		return this.appDid;
+	}
+
+	public JsonNode params() {
+		return this.params;
+	}
 }
