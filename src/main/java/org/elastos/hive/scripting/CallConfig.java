@@ -11,9 +11,8 @@ public class CallConfig<T> {
 	 * Construction method
 	 * @param appDid
 	 * @param params
-	 * @param resultType String, byte[], JsonNode, Reader
 	 */
-	public CallConfig(String appDid, JsonNode params, Class<T> resultType) {
+	public CallConfig(String appDid, JsonNode params) {
 
 	}
 
@@ -27,8 +26,6 @@ public class CallConfig<T> {
 	 * used for cross did, optional parameter
 	 */
 	private String appDid;
-	Class<T> resultType;
-
 
 	public String appDid() {
 		return this.appDid;
