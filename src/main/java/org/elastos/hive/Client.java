@@ -32,12 +32,9 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.VaultNotFoundException;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 
 public class Client {
 	private static boolean resolverDidSetup;
@@ -45,14 +42,11 @@ public class Client {
 	private AuthenticationHandler authentcationHandler;
 	private DIDDocument authenticationDIDDocument;
 	private String localDataPath;
-	private Map<String, String> cachedProviders;
 
 	private Client(Options options) {
 		this.authenticationDIDDocument = options.authenticationDIDDocument();
 		this.authentcationHandler = options.authentcationHandler;
 		this.localDataPath = options.localDataPath;
-
-		this.cachedProviders = new HashMap<>();
 	}
 
 	/**
@@ -159,11 +153,11 @@ public class Client {
 	 * @param ownerDid vault owner did
 	 * @return
 	 */
-	public CompletableFuture<Vault> getVault(String ownerDid) {
+	public CompletableFuture<Vault> getVault(String ownerDid, String providerAddress) {
 		if (ownerDid == null)
 			throw new IllegalArgumentException("Empty ownerDid");
 
-		return getVaultProvider(ownerDid)
+		return getVaultProvider(ownerDid, providerAddress)
 				.thenApply(provider -> newVault(provider, ownerDid))
 				.thenApply(vault -> {
 					try {
@@ -193,11 +187,11 @@ public class Client {
 	 * @param ownerDid
 	 * @return
 	 */
-	public CompletableFuture<Vault> createVault(String ownerDid) {
+	public CompletableFuture<Vault> createVault(String ownerDid, String providerAddress) {
 		if (ownerDid == null)
 			throw new IllegalArgumentException("Empty ownerDid");
 
-		return getVaultProvider(ownerDid)
+		return getVaultProvider(ownerDid, providerAddress)
 				.thenApply(provider -> newVault(provider, ownerDid))
 				.thenApply(vault -> {
 					try {
@@ -223,7 +217,7 @@ public class Client {
 	 * @param ownerDid the owner did for the vault
 	 * @return the vault address in String
 	 */
-	public CompletableFuture<String> getVaultProvider(String ownerDid) {
+	public CompletableFuture<String> getVaultProvider(String ownerDid, String providerAddress) {
 		if (ownerDid == null)
 			throw new IllegalArgumentException("Empty ownerDid");
 
@@ -240,9 +234,8 @@ public class Client {
 
 				if (services != null && services.size() > 0) {
 					vaultProvider = services.get(0).getServiceEndpoint();
-					cachedProviders.put(ownerDid, vaultProvider);
 				} else
-					vaultProvider = cachedProviders.get(ownerDid);
+					vaultProvider = providerAddress;
 			} catch (DIDException e) {
 				e.printStackTrace();
 				throw new CompletionException(new HiveException(e.getMessage()));
@@ -250,20 +243,5 @@ public class Client {
 
 			return vaultProvider;
 		});
-	}
-
-	/**
-	 * Locally maps the given owner DID with the given vault address. This is
-	 * useful for example in case a user doesn't publish his vault address on
-	 * the ID chain, and shared it privately.
-	 *
-	 * @param ownerDid     the DID for the vault owner
-	 * @param vaultAddress the given vault address
-	 */
-	public void setVaultProvider(String ownerDid, String vaultAddress) {
-		if (ownerDid == null || vaultAddress == null)
-			throw new IllegalArgumentException();
-
-		cachedProviders.put(ownerDid, vaultAddress);
 	}
 }
