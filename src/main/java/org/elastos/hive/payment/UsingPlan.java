@@ -20,7 +20,7 @@ public class UsingPlan extends Result<UsingPlan> {
 	@JsonProperty("end_time")
 	private float endTime;
 	@JsonProperty("pricing_using")
-	private String pricingUsing;
+	private String name;
 
 	public String did() {
 		return did;
@@ -50,8 +50,8 @@ public class UsingPlan extends Result<UsingPlan> {
 		return endTime;
 	}
 
-	public String pricingUsing() {
-		return pricingUsing;
+	public String name() {
+		return name;
 	}
 
 	public static UsingPlan deserialize(String content) {
