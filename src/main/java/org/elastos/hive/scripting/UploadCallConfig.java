@@ -12,13 +12,9 @@ public class UploadCallConfig extends CallConfig {
 		this(null, params, filePath);
 	}
 
-	public UploadCallConfig(String appDid, JsonNode params, String filePath) {
-		this(appDid, params);
-		this.filePath = filePath;
-	}
-
-	UploadCallConfig(String appDid, JsonNode params) {
+	UploadCallConfig(String appDid, JsonNode params, String filePath) {
 		super(appDid, params);
+		this.filePath = filePath;
 	}
 
 	public String filePath() {

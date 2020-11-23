@@ -13,7 +13,8 @@ public class CallConfig<T> {
 	 * @param params
 	 */
 	public CallConfig(String appDid, JsonNode params) {
-
+		this.appDid = appDid;
+		this.params = params;
 	}
 
 	/**
