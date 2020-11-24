@@ -222,7 +222,9 @@ public class Client {
 			throw new IllegalArgumentException("Empty ownerDid");
 
 		return CompletableFuture.supplyAsync(() -> {
-			String vaultProvider = null;
+			if(null != providerAddress) {
+				return providerAddress;
+			}
 			try {
 				List<DIDDocument.Service> services = null;
 				DID did = new DID(ownerDid);
@@ -233,15 +235,13 @@ public class Client {
 					services = doc.selectServices((String) null, "HiveVault");
 
 				if (services != null && services.size() > 0) {
-					vaultProvider = services.get(0).getServiceEndpoint();
+					return services.get(0).getServiceEndpoint();
 				} else
-					vaultProvider = providerAddress;
+					return providerAddress;
 			} catch (DIDException e) {
 				e.printStackTrace();
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
-
-			return vaultProvider;
 		});
 	}
 }
