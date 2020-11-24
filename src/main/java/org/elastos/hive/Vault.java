@@ -128,7 +128,8 @@ public class Vault {
 		return this.vaultHelper.useTrial().get();
 	}
 
-	UsingPlan getUsingPricePlan() throws ExecutionException, InterruptedException {
-		return this.payment.getUsingPricePlan().get();
+	boolean checkVaultExist() throws ExecutionException, InterruptedException {
+		return this.payment.getUsingPricePlan()
+				.handle((usingPlan, ex) -> (usingPlan!=null && ex==null)).get();
 	}
 }

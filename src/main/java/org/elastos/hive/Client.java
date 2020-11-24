@@ -161,13 +161,15 @@ public class Client {
 				.thenApply(provider -> newVault(provider, ownerDid))
 				.thenApply(vault -> {
 					try {
-						if(null == vault.getUsingPricePlan())
+						boolean exist = vault.checkVaultExist();
+						if (!exist)
 							throw new VaultNotFoundException();
+						else
+							return vault;
 					} catch (Exception e) {
 						e.printStackTrace();
 						throw new CompletionException(e);
 					}
-					return vault;
 				});
 	}
 
@@ -195,9 +197,19 @@ public class Client {
 				.thenApply(provider -> newVault(provider, ownerDid))
 				.thenApply(vault -> {
 					try {
-						vault.useTrial();
+						boolean exist = vault.checkVaultExist();
+						if (!exist) {
+							try {
+								vault.useTrial();
+							} catch (Exception e) {
+								throw new CreateVaultException();
+							}
+						} else {
+							throw new CreateVaultException(CreateVaultException.EXCEPTION);
+						}
 					} catch (Exception e) {
-						throw new CreateVaultException();
+						e.printStackTrace();
+						throw new CompletionException(new HiveException(e.getMessage()));
 					}
 					return vault;
 				});
@@ -222,7 +234,7 @@ public class Client {
 			throw new IllegalArgumentException("Empty ownerDid");
 
 		return CompletableFuture.supplyAsync(() -> {
-			if(null != providerAddress) {
+			if (null != providerAddress) {
 				return providerAddress;
 			}
 			try {
