@@ -212,9 +212,9 @@ public class PaymentImpl implements Payment {
 					.getServiceInfo()
 					.execute();
 			authHelper.checkResponseWithRetry(response);
-			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-			String serviceInfo = ret.get("vault_service_info").toString();
-			return UsingPlan.deserialize(serviceInfo);
+			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class).get("vault_service_info");
+			if(null == ret) return null;
+			return UsingPlan.deserialize(ret.toString());
 		} catch (Exception e) {
 			throw new HiveException(e.getMessage());
 		}
