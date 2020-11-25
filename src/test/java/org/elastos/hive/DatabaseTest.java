@@ -271,7 +271,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test05_InsertOneNoCallback() throws ExecutionException, InterruptedException {
+	public void test05_InsertOneNoCallback() {
 		ObjectNode docNode = JsonNodeFactory.instance.objectNode();
 		docNode.put("author", "john doe1");
 		docNode.put("title", "Eve for Dummies1");
@@ -279,15 +279,20 @@ public class DatabaseTest {
 		InsertOptions insertOptions = new InsertOptions();
 		insertOptions.bypassDocumentValidation(false).ordered(true);
 
-		database.insertOne(collectionName, docNode, insertOptions).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-		}).get();
+		CompletableFuture<Boolean> future =  database.insertOne(collectionName, docNode, insertOptions)
+				.handle((success, ex) -> (ex == null));
 
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test06_InsertManyNoCallback() throws ExecutionException, InterruptedException {
+	public void test06_InsertManyNoCallback() {
 		List<JsonNode> nodes = new ArrayList<JsonNode>();
 		ObjectNode docNode1 = JsonNodeFactory.instance.objectNode();
 		docNode1.put("author", "john doe2");
@@ -301,10 +306,15 @@ public class DatabaseTest {
 		InsertOptions insertOptions = new InsertOptions();
 		insertOptions.bypassDocumentValidation(false).ordered(true);
 
-		database.insertMany(collectionName, nodes, insertOptions).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-		}).get();
+		CompletableFuture<Boolean> future = database.insertMany(collectionName, nodes, insertOptions)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
