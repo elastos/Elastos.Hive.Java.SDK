@@ -14,11 +14,11 @@ public class UsingPlan extends Result<UsingPlan> {
 	@JsonProperty("db_use_storage")
 	private float dbUseStorage;
 	@JsonProperty("modify_time")
-	private float modifyTime;
+	private long modifyTime;
 	@JsonProperty("start_time")
-	private float startTime;
+	private long startTime;
 	@JsonProperty("end_time")
-	private float endTime;
+	private long endTime;
 	@JsonProperty("pricing_using")
 	private String name;
 
