@@ -1,6 +1,8 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
@@ -11,7 +13,6 @@ import org.elastos.hive.payment.UsingPlan;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -186,7 +187,8 @@ public class PaymentImpl implements Payment {
 			authHelper.checkResponseWithRetry(response);
 			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 			String orderInfo = ret.get("order_info_list").toString();
-			List<Order> orders = ResponseHelper.getValue(orderInfo, new ArrayList<Order>().getClass());
+			ObjectMapper mapper = new ObjectMapper();
+			List<Order> orders = mapper.readValue(orderInfo,new TypeReference<List<Order>>(){});
 			return orders;
 		} catch (Exception e) {
 			throw new HiveException(e.getMessage());
