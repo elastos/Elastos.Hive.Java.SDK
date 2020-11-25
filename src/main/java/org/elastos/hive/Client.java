@@ -202,7 +202,8 @@ public class Client {
 							try {
 								vault.useTrial();
 							} catch (Exception e) {
-								throw new CreateVaultException();
+								e.printStackTrace();
+								throw new CompletionException(new HiveException(e.getMessage()));
 							}
 						} else {
 							throw new CreateVaultException(CreateVaultException.EXCEPTION);
