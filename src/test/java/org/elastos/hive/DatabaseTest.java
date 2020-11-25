@@ -1,19 +1,11 @@
 package org.elastos.hive;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.elastos.hive.database.Collation;
 import org.elastos.hive.database.Collation.Alternate;
@@ -45,13 +37,19 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DatabaseTest {
@@ -364,97 +362,127 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test09_countDocNoCallback() throws ExecutionException, InterruptedException {
+	public void test09_countDocNoCallback() {
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe1");
 
 		CountOptions options = new CountOptions();
 		options.limit(1).skip(0).maxTimeMS(1000000000);
 
-		database.countDocuments(collectionName, filter, options).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			System.out.println("count=" + result);
-		}).get();
+		CompletableFuture<Boolean> future = database.countDocuments(collectionName, filter, options)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test10_UpdateOneNoCallback() throws JsonProcessingException, ExecutionException, InterruptedException {
+	public void test10_UpdateOneNoCallback() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe1");
 
         String updateJson = "{\"$set\":{\"author\":\"john doe1\",\"title\":\"Eve for Dummies2\"}}";
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode update = objectMapper.readTree(updateJson);
+		JsonNode update = null;
+        try {
+        	update = objectMapper.readTree(updateJson);
+		} catch (Exception e) {
+        	e.printStackTrace();
+		}
 
         UpdateOptions updateOptions = new UpdateOptions();
         updateOptions.upsert(true).bypassDocumentValidation(false);
 
-        database.updateOne(collectionName, filter, update, updateOptions).whenComplete((result, throwable) -> {
-            assertNull(throwable);
-            assertNotNull(result);
-            System.out.println("matchedCount=" + result.matchedCount());
-            System.out.println("modifiedCount=" + result.modifiedCount());
-            System.out.println("upsertedCount=" + result.upsertedCount());
-            System.out.println("upsertedId=" + result.upsertedId());
-        }).get();
+		CompletableFuture<Boolean> future = database.updateOne(collectionName, filter, update, updateOptions)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test11_UpdateManyNoCallback() throws JsonProcessingException, ExecutionException, InterruptedException {
+	public void test11_UpdateManyNoCallback() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe1");
 
         String updateJson = "{\"$set\":{\"author\":\"john doe1\",\"title\":\"Eve for Dummies2\"}}";
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode update = objectMapper.readTree(updateJson);
+		JsonNode update = null;
+        try {
+        	update = objectMapper.readTree(updateJson);
+		} catch (Exception e) {
+        	e.printStackTrace();
+		}
 
         UpdateOptions updateOptions = new UpdateOptions();
         updateOptions.upsert(true).bypassDocumentValidation(false);
 
-        database.updateMany(collectionName, filter, update, updateOptions).whenComplete((result, throwable) -> {
-            assertNull(throwable);
-            assertNotNull(result);
-            System.out.println("matchedCount=" + result.matchedCount());
-            System.out.println("modifiedCount=" + result.modifiedCount());
-            System.out.println("upsertedCount=" + result.upsertedCount());
-            System.out.println("upsertedId=" + result.upsertedId());
-        }).get();
+		CompletableFuture<Boolean> future = database.updateMany(collectionName, filter, update, updateOptions)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test12_DeleteOneNoCallback() throws ExecutionException, InterruptedException {
+	public void test12_DeleteOneNoCallback() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe2");
 
         DeleteOptions deleteOptions = new DeleteOptions();
 
-        database.deleteOne(collectionName, filter, null).whenComplete((result, throwable) -> {
-            assertNull(throwable);
-            assertNotNull(result);
-            System.out.println("delete count=" + result.deletedCount());
-        }).get();
+		CompletableFuture<Boolean> future = database.deleteOne(collectionName, filter, null)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test13_DeleteManyNoCallback() throws ExecutionException, InterruptedException {
+	public void test13_DeleteManyNoCallback() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe2");
 
         DeleteOptions deleteOptions = new DeleteOptions();
 
-        database.deleteMany(collectionName, filter, null).whenComplete((result, throwable) -> {
-            assertNull(throwable);
-            assertNotNull(result);
-            System.out.println("delete count=" + result.deletedCount());
-        }).get();
+		CompletableFuture<Boolean> future = database.deleteMany(collectionName, filter, null)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test14_deleteColNoCallback() throws ExecutionException, InterruptedException {
-        database.deleteCollection(collectionName).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-        	assertTrue(result);
-        }).get();
+	public void test14_deleteColNoCallback() {
+		CompletableFuture<Boolean> future = database.deleteCollection(collectionName)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	private static Database database;
