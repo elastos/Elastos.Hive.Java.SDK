@@ -318,7 +318,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test07_FindOneNoCallback() throws ExecutionException, InterruptedException, IOException {
+	public void test07_FindOneNoCallback() {
 		ObjectNode query = JsonNodeFactory.instance.objectNode();
 		query.put("author", "john doe1");
 
@@ -329,15 +329,19 @@ public class DatabaseTest {
 				.batchSize(0)
 				.projection(jsonToMap("{\"_id\": false}"));
 
-		database.findOne(collectionName, query, findOptions).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-			System.out.println("result=" + result.toString());
-		}).get();
+		CompletableFuture<Boolean> future = database.findOne(collectionName, query, findOptions)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test08_FindManyNoCallback() throws ExecutionException, InterruptedException, IOException {
+	public void test08_FindManyNoCallback() {
 		ObjectNode query = JsonNodeFactory.instance.objectNode();
 		query.put("author", "john doe1");
 
@@ -348,11 +352,15 @@ public class DatabaseTest {
 				.batchSize(0)
 				.projection(jsonToMap("{\"_id\": false}"));
 
-		database.findMany(collectionName, query, findOptions).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-			System.out.println("result=" + result.toString());
-		}).get();
+		CompletableFuture<Boolean> future = database.findMany(collectionName, query, findOptions)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
@@ -451,11 +459,16 @@ public class DatabaseTest {
 
 	private static Database database;
 
-	private static Map<String, Object> jsonToMap(String json) throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> p = mapper.readValue(json, new TypeReference<Map<String, Object>>() {
-		});
-		return p;
+	private static Map<String, Object> jsonToMap(String json) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			Map<String, Object> p = mapper.readValue(json, new TypeReference<Map<String, Object>>() {
+			});
+			return p;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@BeforeClass
