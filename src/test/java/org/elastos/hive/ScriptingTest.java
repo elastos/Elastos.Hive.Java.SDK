@@ -37,6 +37,7 @@ import org.junit.runners.MethodSorters;
 import java.io.Reader;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -261,27 +262,43 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test15_setInfoScript() throws ExecutionException, InterruptedException {
+	public void test15_setInfoScript() {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
 		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
-		scripting.registerScript("get_file_info", executable).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertTrue(result);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.registerScript("get_file_info", executable)
+				.handle((success, ex) -> (ex == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test16_getFileInfo() throws ExecutionException, InterruptedException, JsonProcessingException {
-		String executable = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
-		ObjectMapper objectMapper = new ObjectMapper();
-		JsonNode params = objectMapper.readTree(executable);
+	public void test16_getFileInfo() {
+		JsonNode params = null;
+		try {
+			String executable = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
+			ObjectMapper objectMapper = new ObjectMapper();
+			params = objectMapper.readTree(executable);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		GeneralCallConfig generalCallConfig = new GeneralCallConfig(params);
-		scripting.callScript("get_file_info", generalCallConfig, String.class).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.callScript("get_file_info", generalCallConfig, String.class)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 
