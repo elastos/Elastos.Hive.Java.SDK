@@ -133,7 +133,7 @@ public class ScriptingTest {
 		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, String.class)
 				.handle((success, ex) -> (ex == null));
 		try {
-			assertNotNull(future.get());
+			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
@@ -147,7 +147,7 @@ public class ScriptingTest {
 				.handle((success, ex) -> (ex == null));
 
 		try {
-			assertNotNull(future.get());
+			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
@@ -160,7 +160,7 @@ public class ScriptingTest {
 		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, JsonNode.class)
 				.handle((success, ex) -> (ex == null));
 		try {
-			assertNotNull(future.get());
+			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
@@ -173,14 +173,13 @@ public class ScriptingTest {
 		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, Reader.class)
 				.handle((success, ex) -> (ex == null));
 		try {
-			assertNotNull(future.get());
+			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
 			fail();
 		}
 	}
-
 
 	@Test
 	public void test11_setUploadScript() {
@@ -214,7 +213,7 @@ public class ScriptingTest {
 				.handle((success, ex) -> (ex == null));
 
 		try {
-			assertNotNull(future.get());
+			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
@@ -223,27 +222,42 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test13_setDownloadScript() throws ExecutionException, InterruptedException {
+	public void test13_setDownloadScript() {
 		Executable executable = new DownloadExecutable("download_file", "$params.path", true);
-		scripting.registerScript("download_file", executable).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-		}).get();
+		CompletableFuture<Boolean> future = scripting.registerScript("download_file", executable)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test14_downloadFile() throws ExecutionException, InterruptedException {
+	public void test14_downloadFile() {
 		String scriptName = "download_file";
 		String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 		JsonNode params = JsonUtil.deserialize(path);
 
 		DownloadCallConfig downloadCallConfig = new DownloadCallConfig(params);
 
-		scripting.callScript(scriptName, downloadCallConfig, Reader.class).whenComplete((result, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(result);
-			Utils.cacheTextFile(result, testLocalCacheRootPath, "test.txt");
-		}).get();
+		CompletableFuture<Boolean> future = scripting.callScript(scriptName, downloadCallConfig, Reader.class)
+				.handle((reader, throwable) -> {
+					if(throwable == null) {
+						Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
+					}
+					return throwable==null;
+				});
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
