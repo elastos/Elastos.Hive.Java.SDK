@@ -21,6 +21,8 @@ public class Order extends Result<Order> {
 	private String state;
 	@JsonProperty("creat_time")
 	private long creatTime;
+	@JsonProperty("modify_time")
+	private long modifyTime;
 	@JsonProperty("finish_time")
 	private long finishTime;
 
