@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import org.elastos.hive.database.Collation;
@@ -256,11 +257,17 @@ public class DatabaseTest {
 	private static final String collectionName = "works";
 
 	@Test
-	public void test04_CreateColNoCallback() throws ExecutionException, InterruptedException {
-		database.createCollection(collectionName, null).whenComplete((bol, throwable) -> {
-			assertNull(throwable);
-			assertTrue(bol);
-		}).get();
+	public void test04_CreateColNoCallback() {
+		CompletableFuture<Boolean> future = database.createCollection(collectionName, null)
+				.handle((success, ex) -> (ex == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
