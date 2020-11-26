@@ -157,7 +157,7 @@ public class Client {
 			throw new IllegalArgumentException("Empty ownerDid");
 
 		return getVaultProvider(ownerDid, providerAddress)
-				.thenApply(provider -> newVault(provider, ownerDid))
+				.thenApply(provider -> newVault(ownerDid, provider))
 				.thenApply(vault -> {
 					try {
 						boolean exist = vault.checkVaultExist();
@@ -171,7 +171,7 @@ public class Client {
 				});
 	}
 
-	private Vault newVault(String provider, String ownerDid) {
+	private Vault newVault(String ownerDid, String provider) {
 		if (provider == null)
 			throw new ProviderNotSetException(ProviderNotSetException.EXCEPTION);
 		AuthHelper authHelper = new AuthHelper(ownerDid, provider,
@@ -192,7 +192,7 @@ public class Client {
 			throw new IllegalArgumentException("Empty ownerDid");
 
 		return getVaultProvider(ownerDid, providerAddress)
-				.thenApply(provider -> newVault(provider, ownerDid))
+				.thenApply(provider -> newVault(ownerDid, provider))
 				.thenApply(vault -> {
 					try {
 						boolean exist = vault.checkVaultExist();
