@@ -41,7 +41,6 @@ public class PaymentImpl implements Payment {
 			try {
 				return getAllPricingPlansImp();
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -56,7 +55,7 @@ public class PaymentImpl implements Payment {
 			String ret = ResponseHelper.getValue(response, String.class);
 			return PricingInfo.deserialize(ret);
 		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -66,7 +65,6 @@ public class PaymentImpl implements Payment {
 			try {
 				return getPricingPlansImp(planName);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -81,7 +79,7 @@ public class PaymentImpl implements Payment {
 			String ret = ResponseHelper.getValue(response, String.class);
 			return PricingPlan.deserialize(ret);
 		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -91,7 +89,6 @@ public class PaymentImpl implements Payment {
 			try {
 				return placeOrderImp(priceName);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -109,7 +106,7 @@ public class PaymentImpl implements Payment {
 			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 			return ret.get("order_id").textValue();
 		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -119,7 +116,6 @@ public class PaymentImpl implements Payment {
 			try {
 				return payOrderImp(orderId, txids);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -137,7 +133,7 @@ public class PaymentImpl implements Payment {
 			authHelper.checkResponseWithRetry(response);
 			return true;
 		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -147,7 +143,6 @@ public class PaymentImpl implements Payment {
 			try {
 				return getOrderImp(orderId);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -163,7 +158,7 @@ public class PaymentImpl implements Payment {
 			String orderInfo = ret.get("order_info").toString();
 			return Order.deserialize(orderInfo);
 		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -173,7 +168,6 @@ public class PaymentImpl implements Payment {
 			try {
 				return getAllOrdersImp();
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -191,7 +185,7 @@ public class PaymentImpl implements Payment {
 			List<Order> orders = mapper.readValue(orderInfo,new TypeReference<List<Order>>(){});
 			return orders;
 		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -201,7 +195,6 @@ public class PaymentImpl implements Payment {
 			try {
 				return getUsingPricePlanImp();
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -218,7 +211,7 @@ public class PaymentImpl implements Payment {
 			if(null == ret) return null;
 			return UsingPlan.deserialize(ret.toString());
 		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -228,7 +221,6 @@ public class PaymentImpl implements Payment {
 			try {
 				return getPaymentVersionImp();
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -244,7 +236,7 @@ public class PaymentImpl implements Payment {
 			String version = ret.get("version").textValue();
 			return version;
 		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
