@@ -42,10 +42,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -255,7 +253,7 @@ public class DatabaseTest {
 	private static final String collectionName = "works";
 
 	@Test
-	public void test04_CreateColNoCallback() {
+	public void test04_createCollection() {
 		CompletableFuture<Boolean> future = database.createCollection(collectionName, null)
 				.handle((success, ex) -> (ex == null));
 
@@ -269,7 +267,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test05_InsertOneNoCallback() {
+	public void test05_insertOne() {
 		ObjectNode docNode = JsonNodeFactory.instance.objectNode();
 		docNode.put("author", "john doe1");
 		docNode.put("title", "Eve for Dummies1");
@@ -290,7 +288,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test06_InsertManyNoCallback() {
+	public void test06_insertMany() {
 		List<JsonNode> nodes = new ArrayList<JsonNode>();
 		ObjectNode docNode1 = JsonNodeFactory.instance.objectNode();
 		docNode1.put("author", "john doe2");
@@ -316,7 +314,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test07_FindOneNoCallback() {
+	public void test07_findOne() {
 		ObjectNode query = JsonNodeFactory.instance.objectNode();
 		query.put("author", "john doe1");
 
@@ -339,7 +337,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test08_FindManyNoCallback() {
+	public void test08_findMany() {
 		ObjectNode query = JsonNodeFactory.instance.objectNode();
 		query.put("author", "john doe1");
 
@@ -362,7 +360,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test09_countDocNoCallback() {
+	public void test09_countDoc() {
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe1");
 
@@ -381,7 +379,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test10_UpdateOneNoCallback() {
+	public void test10_updateOne() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe1");
 
@@ -409,7 +407,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test11_UpdateManyNoCallback() {
+	public void test11_updateMany() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe1");
 
@@ -437,7 +435,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test12_DeleteOneNoCallback() {
+	public void test12_deleteOne() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe2");
 
@@ -455,7 +453,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test13_DeleteManyNoCallback() {
+	public void test13_deleteMany() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe2");
 
@@ -473,7 +471,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void test14_deleteColNoCallback() {
+	public void test14_deleteCollection() {
 		CompletableFuture<Boolean> future = database.deleteCollection(collectionName)
 				.handle((success, ex) -> (ex == null));
 		try {
