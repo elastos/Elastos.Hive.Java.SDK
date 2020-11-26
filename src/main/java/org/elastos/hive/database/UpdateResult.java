@@ -2,6 +2,8 @@ package org.elastos.hive.database;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.elastos.hive.Result;
+
 public class UpdateResult extends Result<UpdateResult> {
 	@JsonProperty("matched_count")
 	private int matchedCount;

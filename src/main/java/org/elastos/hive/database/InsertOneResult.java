@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.elastos.hive.Result;
+
 public class InsertOneResult extends Result<InsertOneResult> {
 	@JsonProperty("acknowledged")
 	private boolean acknowledged;
