@@ -2,7 +2,7 @@ package org.elastos.hive.payment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import org.elastos.hive.database.Result;
+import org.elastos.hive.Result;
 
 import java.util.List;
 
