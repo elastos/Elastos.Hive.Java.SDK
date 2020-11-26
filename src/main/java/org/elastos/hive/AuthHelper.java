@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -21,6 +22,7 @@ import org.json.JSONObject;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 class AuthHelper implements ConnectHelper {
@@ -276,7 +278,13 @@ class AuthHelper implements ConnectHelper {
 
 		int code = response.code();
 		if (code >= 300 || code<200) {
-			String message  = response.message();
+			ResponseBody body = (ResponseBody) response.errorBody();
+			String message  = null;
+			try {
+				message = body.string();
+			} catch (IOException e) {
+				throw new CompletionException(e);
+			}
 			throw new HiveException(message);
 		}
 	}
