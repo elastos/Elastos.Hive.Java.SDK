@@ -81,8 +81,7 @@ public class Client {
 			ResolverCache.reset();
 			resolverDidSetup = true;
 		} catch (DIDResolveException e) {
-			e.printStackTrace();
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -167,7 +166,6 @@ public class Client {
 						else
 							return vault;
 					} catch (Exception e) {
-						e.printStackTrace();
 						throw new CompletionException(e);
 					}
 				});
@@ -202,15 +200,13 @@ public class Client {
 							try {
 								vault.useTrial();
 							} catch (Exception e) {
-								e.printStackTrace();
-								throw new CompletionException(new HiveException(e.getMessage()));
+								throw new CompletionException(new HiveException(e.getLocalizedMessage()));
 							}
 						} else {
 							throw new CreateVaultException(CreateVaultException.EXCEPTION);
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
-						throw new CompletionException(new HiveException(e.getMessage()));
+						throw new CompletionException(new HiveException(e.getLocalizedMessage()));
 					}
 					return vault;
 				});
@@ -252,8 +248,7 @@ public class Client {
 				} else
 					return providerAddress;
 			} catch (DIDException e) {
-				e.printStackTrace();
-				throw new CompletionException(new HiveException(e.getMessage()));
+				throw new CompletionException(new HiveException(e.getLocalizedMessage()));
 			}
 		});
 	}

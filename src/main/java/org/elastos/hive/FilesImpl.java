@@ -43,7 +43,6 @@ class FilesImpl implements Files {
 			try {
 				return uploadImpl(path, resultType);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -65,7 +64,7 @@ class FilesImpl implements Files {
 				throw new HiveException("Not supported result type");
 			}
 		} catch (IOException e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -75,7 +74,6 @@ class FilesImpl implements Files {
 			try {
 				return downloadImpl(path, resultType);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -114,7 +112,6 @@ class FilesImpl implements Files {
 			try {
 				return deleteImpl(remoteFile);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -134,7 +131,7 @@ class FilesImpl implements Files {
 			authHelper.checkResponseWithRetry(response);
 			return true;
 		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -144,7 +141,6 @@ class FilesImpl implements Files {
 			try {
 				return moveImpl(source, dest);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -165,7 +161,7 @@ class FilesImpl implements Files {
 			authHelper.checkResponseWithRetry(response);
 			return true;
 		} catch (Exception e) {
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
@@ -175,7 +171,6 @@ class FilesImpl implements Files {
 			try {
 				return copyImpl(source, dest);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -206,7 +201,6 @@ class FilesImpl implements Files {
 			try {
 				return hashImp(remoteFile);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -231,7 +225,6 @@ class FilesImpl implements Files {
 			try {
 				return listImpl(folder);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -255,7 +248,6 @@ class FilesImpl implements Files {
 			try {
 				return statImpl(path);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});

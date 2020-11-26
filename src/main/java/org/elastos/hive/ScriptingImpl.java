@@ -50,7 +50,6 @@ class ScriptingImpl implements Scripting {
 			try {
 				return registerScriptImpl(name, condition, executable);
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -93,7 +92,6 @@ class ScriptingImpl implements Scripting {
 				}
 				return null;
 			} catch (HiveException e) {
-				e.printStackTrace();
 				throw new CompletionException(e);
 			}
 		});
@@ -157,8 +155,7 @@ class ScriptingImpl implements Scripting {
 			authHelper.checkResponseWithRetry(response);
 			return resultType.cast(ResponseHelper.toString(response));
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new HiveException(e.getMessage());
+			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
 
