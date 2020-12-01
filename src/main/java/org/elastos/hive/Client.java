@@ -200,13 +200,13 @@ public class Client {
 							try {
 								vault.useTrial();
 							} catch (Exception e) {
-								throw new CompletionException(new HiveException(e.getLocalizedMessage()));
+								throw new CompletionException(e);
 							}
 						} else {
 							throw new CreateVaultException(CreateVaultException.EXCEPTION);
 						}
 					} catch (Exception e) {
-						throw new CompletionException(new HiveException(e.getLocalizedMessage()));
+						throw new CompletionException(e);
 					}
 					return vault;
 				});
