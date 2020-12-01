@@ -32,3 +32,5 @@ local.properties
 
 # macOS
 *.DS_Store
+
+/src/main/java/org/elastos/hive/SdkVersion.java
