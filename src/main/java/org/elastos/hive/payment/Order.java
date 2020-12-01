@@ -1,11 +1,13 @@
 package org.elastos.hive.payment;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.elastos.hive.Result;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Order extends Result<Order> {
 	@JsonProperty("order_id")
 	private String orderId;
@@ -15,6 +17,8 @@ public class Order extends Result<Order> {
 	private String appId;
 	@JsonProperty("pricing_info")
 	private PricingPlan packageInfo;
+	@JsonProperty("pay_time")
+	private long payTime;
 	@JsonProperty("pay_txids")
 	private List<String> payTxids;
 	@JsonProperty("state")
@@ -40,6 +44,10 @@ public class Order extends Result<Order> {
 
 	public PricingPlan packageInfo() {
 		return packageInfo;
+	}
+
+	public long payTime() {
+		return payTime;
 	}
 
 	public List<String> payTxids() {
