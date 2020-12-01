@@ -1,21 +1,29 @@
 apply plugin: 'java-library'
 apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'org.warship.plugin'
 
 repositories {
     jcenter()
     mavenCentral()
+    maven {
+        url uri("$rootDir/repo")
+    }
 }
 
 buildscript {
     repositories {
+        maven {
+            url uri("$rootDir/repo")
+        }
         jcenter()
     }
     dependencies {
         classpath 'com.novoda:bintray-release:0.9.1'
+        classpath "org.warship.plugin:core:1.0.0"
     }
 }
 
-version = '0.1.0'
+version = 'alpha-v2.0.10'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -130,11 +138,17 @@ test {
 }
 
 publish {
-    userOrg = 'elastos'
-    groupId = 'org.elastos'
+    userOrg = 'xidaokun'
+    groupId = 'org.cary'
     artifactId = 'hive'
     publishVersion = version
-    desc = 'Elastos Hive SDK'
-    repoName = 'Elastos.NET.Hive.Java.SDK'
+    desc = 'Elastos Hive Test SDK'
+    repoName = 'hive'
     website = 'https://github.com/elastos/Elastos.NET.Hive.Java.SDK'
+}
+
+release {
+    publishVersion = version
+    packageName = 'org.elastos.hive'
+    classPath = './src/main/java/org/elastos/hive'
 }
