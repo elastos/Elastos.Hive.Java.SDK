@@ -92,7 +92,7 @@ public class UserFactory {
 		return new UserFactory(userDidOpt, appInstanceDidOpt, TestData.DEVELOP_PROVIDER, TestData.TEST_RESOLVER_URL, TestData.userDid2, user2Path);
 	}
 
-	//local 环境
+	//node 环境
 	public static UserFactory createUser3() {
 		String user3Path = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user3";
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
@@ -107,6 +107,23 @@ public class UserFactory {
 				.setPhrasepass(TestData.appInstance3_phrasepass)
 				.setStorepass(TestData.appInstance3_storepass);
 		return new UserFactory(userDidOpt, appInstanceDidOpt, TestData.LOCAL_PROVIDER, TestData.MAIN_RESOLVER_URL, TestData.userDid3, user3Path);
+	}
+
+	//local 环境
+	public static UserFactory createUser4() {
+		String user3Path = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user4";
+		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
+				.setName(TestData.userDid4_name)
+				.setMnemonic(TestData.userDid4_mn)
+				.setPhrasepass(TestData.userDid4_phrasepass)
+				.setStorepass(TestData.userDid4_storepass);
+
+		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
+				.setName(TestData.appInstance4_name)
+				.setMnemonic(TestData.appInstance4_mn)
+				.setPhrasepass(TestData.appInstance4_phrasepass)
+				.setStorepass(TestData.appInstance4_storepass);
+		return new UserFactory(userDidOpt, appInstanceDidOpt, TestData.LOCAL_PROVIDER, TestData.MAIN_RESOLVER_URL, TestData.userDid4, user3Path);
 	}
 
 	public Vault getVault() {
