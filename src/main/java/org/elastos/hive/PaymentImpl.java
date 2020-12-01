@@ -209,7 +209,7 @@ public class PaymentImpl implements Payment {
 			authHelper.checkResponseWithRetry(response);
 			JsonNode value = ResponseHelper.getValue(response, JsonNode.class);
 			if(null == value) return null;
-			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class).get("vault_service_info");
+			JsonNode ret = value.get("vault_service_info");
 			if(null == ret) return null;
 			return UsingPlan.deserialize(ret.toString());
 		} catch (Exception e) {
