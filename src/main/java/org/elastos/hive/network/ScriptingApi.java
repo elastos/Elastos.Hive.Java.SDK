@@ -25,6 +25,6 @@ public interface ScriptingApi {
 	@POST(Constance.API_PATH + "/scripting/run_script")
 	Call<ResponseBody> callScript(@Body RequestBody body);
 
-	@POST(Constance.API_PATH + "scripting/run_script_download/{transaction_id}")
+	@POST(Constance.API_PATH + "/scripting/run_script_download/{transaction_id}")
 	Call<ResponseBody> callDownload(@Path("transaction_id") String transactionId);
 }
