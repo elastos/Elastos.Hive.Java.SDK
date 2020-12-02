@@ -26,7 +26,7 @@ public interface Scripting {
 	 * @param <T> String, byte[], JsonNode, Reader
 	 * @return
 	 */
-	<T> CompletableFuture<T> call(String name, JsonNode params, String appDid, Class<T> resultType);
+	<T> CompletableFuture<T> callScript(String name, JsonNode params, String appDid, Class<T> resultType);
 
 	/**
 	 * Run a script to upload a file NOTE: The upload works a bit differently compared to other
