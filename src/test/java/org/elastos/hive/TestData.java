@@ -6,7 +6,7 @@ public class TestData {
 
 	public static final String LOCAL_PROVIDER = "http://127.0.0.1:5000";
 	public static final String RELEASE_PROVIDER = "https://hive1.trinity-tech.io"; // release
-	public static final String DEVELOP_PROVIDER = "https://hive.yoopig.com"; // develop
+	public static final String DEVELOP_PROVIDER = "https://hive-testnet1.trinity-tech.io"; // develop
 
 	//user1
 	//https://hive1.trinity-tech.io
