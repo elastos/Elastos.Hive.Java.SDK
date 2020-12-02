@@ -131,7 +131,7 @@ public class ConnectionManager {
 	}
 
 	public HttpURLConnection openURLConnection(String path) throws IOException {
-		String url = this.getVaultBaseUrl() + Constance.API_PATH +"/files/upload/" + path;
+		String url = this.getVaultBaseUrl() + Constance.API_PATH + path;
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setRequestProperty("User-Agent",

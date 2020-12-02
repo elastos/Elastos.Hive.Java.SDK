@@ -51,7 +51,7 @@ class FilesImpl implements Files {
 	private <T> T uploadImpl(String path, Class<T> resultType) throws HiveException {
 		try {
 			HttpURLConnection connection = null;
-			connection = this.connectionManager.openURLConnection(path);
+			connection = this.connectionManager.openURLConnection("/files/upload/" + path);
 			OutputStream outputStream = connection.getOutputStream();
 
 			if(resultType.isAssignableFrom(OutputStream.class)) {
