@@ -201,7 +201,7 @@ public class ScriptingTest {
 			fail();
 		}
 
-		CompletableFuture<Boolean> future = scripting.callScript(scriptName, params, null, String.class)
+		CompletableFuture<Boolean> future = scripting.callToUploadFile(scriptName, params, null, String.class)
 				.handle((success, ex) -> (ex == null));
 
 		try {
@@ -233,7 +233,7 @@ public class ScriptingTest {
 		String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 		JsonNode params = JsonUtil.deserialize(path);
 
-		CompletableFuture<Boolean> future = scripting.callScript(scriptName, params, null, Reader.class)
+		CompletableFuture<Boolean> future = scripting.callToDownloadFile(scriptName, params, null, Reader.class)
 				.handle((reader, throwable) -> {
 					if(throwable == null) {
 						Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
@@ -292,7 +292,7 @@ public class ScriptingTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = UserFactory.createUser2().getVault();
+		Vault vault = UserFactory.createUser4().getVault();
 		scripting = vault.getScripting();
 	}
 
