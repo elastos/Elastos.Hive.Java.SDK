@@ -15,17 +15,14 @@ import org.elastos.hive.scripting.AndCondition;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.DbFindQuery;
 import org.elastos.hive.scripting.DbInsertQuery;
-import org.elastos.hive.scripting.DownloadCallConfig;
 import org.elastos.hive.scripting.DownloadExecutable;
 import org.elastos.hive.scripting.Executable;
-import org.elastos.hive.scripting.GeneralCallConfig;
 import org.elastos.hive.scripting.HashExecutable;
 import org.elastos.hive.scripting.OrCondition;
 import org.elastos.hive.scripting.PropertiesExecutable;
 import org.elastos.hive.scripting.QueryHasResultsCondition;
 import org.elastos.hive.scripting.RawCondition;
 import org.elastos.hive.scripting.RawExecutable;
-import org.elastos.hive.scripting.UploadCallConfig;
 import org.elastos.hive.scripting.UploadExecutable;
 import org.elastos.hive.utils.JsonUtil;
 import org.junit.BeforeClass;
@@ -35,11 +32,7 @@ import org.junit.runners.MethodSorters;
 
 import java.io.Reader;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.function.BiFunction;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -130,7 +123,7 @@ public class ScriptingTest {
 
 	@Test
 	public void test05_callScriptStringType() {
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, String.class)
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, null, String.class)
 				.handle((success, ex) -> (ex == null));
 		try {
 			assertTrue(future.get());
@@ -143,7 +136,7 @@ public class ScriptingTest {
 
 	@Test
 	public void test06_callScriptByteArrType() {
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, byte[].class)
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, null, byte[].class)
 				.handle((success, ex) -> (ex == null));
 
 		try {
@@ -157,7 +150,7 @@ public class ScriptingTest {
 
 	@Test
 	public void test07_callScriptJsonNodeType() {
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, JsonNode.class)
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, null, JsonNode.class)
 				.handle((success, ex) -> (ex == null));
 		try {
 			assertTrue(future.get());
@@ -170,7 +163,7 @@ public class ScriptingTest {
 
 	@Test
 	public void test08_callScriptReaderType() {
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, Reader.class)
+		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, null, Reader.class)
 				.handle((success, ex) -> (ex == null));
 		try {
 			assertTrue(future.get());
@@ -208,8 +201,7 @@ public class ScriptingTest {
 			fail();
 		}
 
-		UploadCallConfig uploadCallConfig = new UploadCallConfig(params, testTextFilePath);
-		CompletableFuture<Boolean> future = scripting.callScript(scriptName, uploadCallConfig, String.class)
+		CompletableFuture<Boolean> future = scripting.callScript(scriptName, params, null, String.class)
 				.handle((success, ex) -> (ex == null));
 
 		try {
@@ -241,9 +233,7 @@ public class ScriptingTest {
 		String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 		JsonNode params = JsonUtil.deserialize(path);
 
-		DownloadCallConfig downloadCallConfig = new DownloadCallConfig(params);
-
-		CompletableFuture<Boolean> future = scripting.callScript(scriptName, downloadCallConfig, Reader.class)
+		CompletableFuture<Boolean> future = scripting.callScript(scriptName, params, null, Reader.class)
 				.handle((reader, throwable) -> {
 					if(throwable == null) {
 						Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
@@ -288,8 +278,7 @@ public class ScriptingTest {
 			e.printStackTrace();
 		}
 
-		GeneralCallConfig generalCallConfig = new GeneralCallConfig(params);
-		CompletableFuture<Boolean> future = scripting.callScript("get_file_info", generalCallConfig, String.class)
+		CompletableFuture<Boolean> future = scripting.callScript("get_file_info", params, null, String.class)
 				.handle((success, ex) -> (ex == null));
 		try {
 			assertTrue(future.get());
