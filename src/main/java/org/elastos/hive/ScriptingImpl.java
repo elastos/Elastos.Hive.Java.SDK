@@ -13,8 +13,10 @@ import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
@@ -152,40 +154,45 @@ class ScriptingImpl implements Scripting {
 
 	@Override
 	public <T> CompletableFuture<T> callToDownloadFile(String name, JsonNode params, String appDid, Class<T> resultType) {
-		return null;
+		return authHelper.checkValid().thenApply(aVoid -> {
+			try {
+				return downloadFileImpl(name, params, appDid, resultType);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
-//	private <T> T downloadFileImpl(String scriptName, DownloadCallConfig config, Class<T> resultType) throws HiveException {
-//		try {
-//			Map<String, Object> map = new HashMap<>();
-//			map.put("name", scriptName);
-//			JsonNode params = config.params();
-//			if (params != null)
-//				map.put("params", params);
-//
-//			String json = JsonUtil.serialize(map);
-//			Response<ResponseBody> response;
-//
-//			response = this.connectionManager.getScriptingApi()
-//					.callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-//					.execute();
-//
-//			if (response == null)
-//				throw new HiveException(HiveException.ERROR);
-//
-//			authHelper.checkResponseWithRetry(response);
-//			if (resultType.isAssignableFrom(Reader.class)) {
-//				Reader reader = ResponseHelper.getToReader(response);
-//				return resultType.cast(reader);
-//			}
-//			if (resultType.isAssignableFrom(InputStream.class)) {
-//				InputStream inputStream = ResponseHelper.getInputStream(response);
-//				return resultType.cast(inputStream);
-//			}
-//
-//			throw new HiveException("No support result Type");
-//		} catch (Exception e) {
-//			throw new HiveException(e.getLocalizedMessage());
-//		}
-//	}
+	private <T> T downloadFileImpl(String name, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
+		try {
+			JsonNode jsonNode = callScriptImpl(name, params, appDid, JsonNode.class);
+			JsonNode downlodFile = jsonNode.get("download_file");
+			if(null != downlodFile) {
+				String transactionId = downlodFile.get("transaction_id").toString();
+				Response<ResponseBody> response;
+
+				response = this.connectionManager.getScriptingApi()
+						.callDownload(transactionId)
+						.execute();
+				if (response == null)
+					throw new HiveException(HiveException.ERROR);
+
+				authHelper.checkResponseWithRetry(response);
+
+				if(resultType.isAssignableFrom(Reader.class)) {
+					Reader reader = ResponseHelper.getToReader(response);
+					return resultType.cast(reader);
+				}
+				if (resultType.isAssignableFrom(InputStream.class)){
+					InputStream inputStream = ResponseHelper.getInputStream(response);
+					return resultType.cast(inputStream);
+				}
+				throw new HiveException("Not supported result type");
+			} else {
+				throw new HiveException("Can not get transaction id");
+			}
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
+	}
 }
