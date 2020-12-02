@@ -30,7 +30,10 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertTrue;
@@ -201,15 +204,28 @@ public class ScriptingTest {
 			fail();
 		}
 
-		CompletableFuture<Boolean> future = scripting.callToUploadFile(scriptName, params, null, String.class)
-				.handle((success, ex) -> (ex == null));
-
+		FileReader fileReader = null;
+		Writer writer = null;
 		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
+			writer = scripting.callToUploadFile(scriptName, params, null, Writer.class).exceptionally(e -> {
+				System.out.println(e.getMessage());
+				return null;
+			}).get();
+			fileReader = new FileReader(new File(textLocalPath));
+			char[] buffer = new char[1];
+			while (fileReader.read(buffer) != -1) {
+				writer.write(buffer);
+			}
+			System.out.println("write success");
 		} catch (Exception e) {
 			fail();
+		} finally {
+			try {
+				if (null != fileReader) fileReader.close();
+				if (null != writer) writer.close();
+			} catch (Exception e) {
+				fail();
+			}
 		}
 	}
 
@@ -296,7 +312,7 @@ public class ScriptingTest {
 		scripting = vault.getScripting();
 	}
 
-	private final String testTextFilePath;
+	private final String textLocalPath;
 	private final String testLocalCacheRootPath;
 
 	private String noConditionName = "get_groups";
@@ -306,7 +322,7 @@ public class ScriptingTest {
 
 	public ScriptingTest() {
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
-		testTextFilePath = localRootPath + "test.txt";
+		textLocalPath = localRootPath + "test.txt";
 		testLocalCacheRootPath = localRootPath + "cache/script/";
 	}
 }

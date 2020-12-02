@@ -129,7 +129,8 @@ class ScriptingImpl implements Scripting {
 	private <T> T uploadFileImpl(String name, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
 		try {
 			JsonNode jsonNode = callScriptImpl(name, params, appDid, JsonNode.class);
-			String transactionId = jsonNode.get("transaction_id").toString();
+			JsonNode script = jsonNode.get(name);
+			String transactionId = script.get("transaction_id").textValue();
 			if(null != transactionId) {
 				HttpURLConnection connection = this.connectionManager.openURLConnection("/scripting/run_script_upload/" + transactionId);
 				OutputStream outputStream = connection.getOutputStream();
@@ -165,7 +166,8 @@ class ScriptingImpl implements Scripting {
 	private <T> T downloadFileImpl(String name, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
 		try {
 			JsonNode jsonNode = callScriptImpl(name, params, appDid, JsonNode.class);
-			String transactionId = jsonNode.get("transaction_id").toString();
+			JsonNode script = jsonNode.get(name);
+			String transactionId = script.get("transaction_id").textValue();
 			if(null != transactionId) {
 				Response<ResponseBody> response;
 
