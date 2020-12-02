@@ -12,7 +12,7 @@ public class ScriptingOtherTest {
 	@Test
 	public void test00_callOtherScript() {
 		try {
-			String ret = scripting.callScript(noConditionName, null, String.class).get();
+			String ret = scripting.callScript(noConditionName, null, null, String.class).get();
 			System.out.println("return=" + ret);
 		} catch (Exception e) {
 			fail();
