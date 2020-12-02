@@ -10,6 +10,7 @@ import retrofit2.http.Body;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 
 public interface ScriptingApi {
 
@@ -21,8 +22,4 @@ public interface ScriptingApi {
 
 	@POST(Constance.API_PATH + "/scripting/run_script")
 	Call<ResponseBody> callScript(@Body RequestBody body);
-
-	@Multipart
-	@POST(Constance.API_PATH + "/scripting/run_script")
-	Call<ResponseBody> callScript(@Part MultipartBody.Part file, @Part("metadata") RequestBody metadata);
 }

@@ -6,12 +6,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.files.UploadOutputStream;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -111,36 +115,40 @@ class ScriptingImpl implements Scripting {
 
 	@Override
 	public <T> CompletableFuture<T> callToUploadFile(String name, JsonNode params, String appDid, Class<T> resultType) {
-		return null;
+		return authHelper.checkValid().thenApply(aVoid -> {
+			try {
+				return uploadFileImpl(name, params, appDid, resultType);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
-//	private <T> T uploadFileImpl(String name, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
-//		try {
-//			Map<String, Object> map = new HashMap<>();
-//			map.put("name", name);
-//			if (params != null)
-//				map.put("params", params);
-//
-//			String json = JsonUtil.serialize(map);
-//
-//			File file = new File(config.filePath());
-//			RequestBody requestFile =
-//					RequestBody.create(MediaType.parse("multipart/form-data"), file);
-//			MultipartBody.Part body = MultipartBody.Part.createFormData("data", file.getName(), requestFile);
-//
-//			RequestBody metadata =
-//					RequestBody.create(
-//							MediaType.parse("application/json"), json);
-//
-//			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
-//					.callScript(body, metadata)
-//					.execute();
-//			authHelper.checkResponseWithRetry(response);
-//			return resultType.cast(ResponseHelper.toString(response));
-//		} catch (Exception e) {
-//			throw new HiveException(e.getLocalizedMessage());
-//		}
-//	}
+	private <T> T uploadFileImpl(String name, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
+		try {
+			JsonNode jsonNode = callScriptImpl(name, params, appDid, JsonNode.class);
+			JsonNode uplodFile = jsonNode.get("upload_file");
+			if(null != uplodFile) {
+				String transactionId = uplodFile.get("transaction_id").toString();
+				HttpURLConnection connection = this.connectionManager.openURLConnection("/scripting/run_script_upload/" + transactionId);
+				OutputStream outputStream = connection.getOutputStream();
+
+				if(resultType.isAssignableFrom(OutputStream.class)) {
+					UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
+					return resultType.cast(uploader);
+				} else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
+					OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+					return resultType.cast(writer);
+				} else {
+					throw new HiveException("Not supported result type");
+				}
+			} else {
+				throw new HiveException("Can not get transaction id");
+			}
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
+	}
 
 	@Override
 	public <T> CompletableFuture<T> callToDownloadFile(String name, JsonNode params, String appDid, Class<T> resultType) {
