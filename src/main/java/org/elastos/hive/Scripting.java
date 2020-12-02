@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.elastos.hive.scripting.CallConfig;
 import org.elastos.hive.scripting.Condition;
 import org.elastos.hive.scripting.Executable;
 
@@ -23,12 +22,11 @@ public interface Scripting {
 	 * Executes a previously registered server side script using Scripting.setScript(). Vault owner or external users are
 	 *
 	 * @param name       the call's script name
-	 * @see CallConfig
 	 * @param resultType String, byte[], JsonNode, Reader
 	 * @param <T> String, byte[], JsonNode, Reader
 	 * @return
 	 */
-	<T> CompletableFuture<T> call(String name, JsonNode params, Class<T> resultType);
+	<T> CompletableFuture<T> call(String name, JsonNode params, String appDid, Class<T> resultType);
 
 	/**
 	 * Run a script to upload a file NOTE: The upload works a bit differently compared to other
@@ -39,7 +37,7 @@ public interface Scripting {
 	 * @param <T> Write, OutputStream
 	 * @return
 	 */
-	<T> CompletableFuture<T> callToUploadFile(String name, JsonNode params, Class<T> resultType);
+	<T> CompletableFuture<T> callToUploadFile(String name, JsonNode params, String appDid, Class<T> resultType);
 
 	/**
 	 * Run a script to download a file NOTE: The download works a bit differently compared to other
@@ -50,5 +48,5 @@ public interface Scripting {
 	 * @param <T> Reader or InputStream
 	 * @return
 	 */
-	<T> CompletableFuture<T> callToDownloadFile(String name, JsonNode params, Class<T> resultType);
+	<T> CompletableFuture<T> callToDownloadFile(String name, JsonNode params, String appDid, Class<T> resultType);
 }
