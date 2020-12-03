@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.exception.FileNotFoundException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.files.FilesList;
@@ -69,24 +70,20 @@ class FilesImpl implements Files {
 
 	@Override
 	public <T> CompletableFuture<T> download(String path, Class<T> resultType) {
-		return authHelper.checkValid().thenApply(aVoid -> {
-			try {
-				return downloadImpl(path, resultType);
-			} catch (HiveException e) {
-				throw new CompletionException(e);
-			}
-		});
+		return authHelper.checkValid().thenApply(aVoid -> downloadImpl(path, resultType));
 	}
 
-	private <T> T downloadImpl(String remoteFile, Class<T> resultType) throws HiveException {
+	private <T> T downloadImpl(String remoteFile, Class<T> resultType) {
 		try {
 			Response<ResponseBody> response;
 
 			response = this.connectionManager.getFileApi()
 					.downloader(remoteFile)
 					.execute();
-			if (response == null)
-				throw new HiveException(HiveException.ERROR);
+			int code = response.code();
+			if(404 == code) {
+				throw new FileNotFoundException(FileNotFoundException.EXCEPTION);
+			}
 
 			authHelper.checkResponseWithRetry(response);
 
@@ -100,9 +97,13 @@ class FilesImpl implements Files {
 			}
 
 			throw new HiveException("Not supported result type");
-		} catch (Exception e) {
-			throw new HiveException(e.getLocalizedMessage());
+		} catch (HiveException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
+		return null;
 	}
 
 	@Override
