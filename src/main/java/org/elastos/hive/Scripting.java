@@ -30,9 +30,8 @@ public interface Scripting {
 
 	/**
 	 * Run a script to upload a file NOTE: The upload works a bit differently compared to other
-	 * types of executable queries because there are two steps to this executable. First, you run
-	 * the script to get a transaction ID and then secondly, you call a second API endpoint to actually
-	 * upload the file related to that transaction ID
+	 * types of executable queries because there are two steps to this executable. First, register a
+	 * script on the vault, then you call this api to actually upload the file
 	 * @param resultType Write or OutputStream class
 	 * @param <T> Write, OutputStream
 	 * @return
@@ -41,9 +40,8 @@ public interface Scripting {
 
 	/**
 	 * Run a script to download a file NOTE: The download works a bit differently compared to other
-	 * types of executable queries because there are two steps to this executable. First, you run the
-	 * script to get a transaction ID and then secondly, you call a second API endpoint to actually
-	 * download the file related to that transaction ID
+	 * types of executable queries because there are two steps to this executable. First, register a
+	 * script on the vault, then you call this api to actually upload the file
 	 * @param resultType Reader or InputStream class
 	 * @param <T> Reader or InputStream
 	 * @return
