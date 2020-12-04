@@ -3,8 +3,6 @@ package org.elastos.hive;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import org.elastos.hive.payment.UsingPlan;
-
 /**
  * Vault class
  *      Provide basic information of vault.
@@ -131,5 +129,9 @@ public class Vault {
 	boolean checkVaultExist() throws ExecutionException, InterruptedException {
 		return this.payment.getUsingPricePlan()
 				.handle((usingPlan, ex) -> (usingPlan!=null && ex==null)).get();
+	}
+
+	public void revokeAccessToken() {
+		authHelper.removeToken();
 	}
 }

@@ -300,4 +300,8 @@ class AuthHelper implements ConnectHelper {
 			checkResponse(response);
 		}
 	}
+
+	public void removeToken() {
+		persistent.deleteContent();
+	}
 }
