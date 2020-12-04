@@ -7,16 +7,16 @@ import static org.junit.Assert.fail;
 
 public class InstanceTest {
 
+    Vault vault;
+
     @Test
     public void testGetVaultInstance() {
         try {
-            Vault vault = UserFactory.createUser2().getVault();
+            vault = UserFactory.createUser2().getVault();
             assertNotNull(vault);
+            vault.revokeAccessToken();
         } catch (Exception e) {
             fail();
         }
     }
-
-
-
 }

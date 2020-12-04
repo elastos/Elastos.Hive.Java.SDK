@@ -29,4 +29,7 @@ interface Persistent {
 	JSONObject parseFrom() throws HiveException;
 
 	void upateContent(JSONObject conetnt) throws HiveException;
+
+	void deleteContent();
+
 }

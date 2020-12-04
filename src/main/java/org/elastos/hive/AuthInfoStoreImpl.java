@@ -94,6 +94,16 @@ public class AuthInfoStoreImpl implements Persistent {
         }
     }
 
+    @Override
+    public void deleteContent() {
+        String tokenPath = String.format("%s/%s", storePath,"token");
+        String fileName = CryptoUtil.getSHA256(this.ownerDid+this.provider);
+        File file = new File(tokenPath, fileName);
+        if(file.exists()) {
+            file.delete();
+        }
+    }
+
     private String configPath;
     private void initialize() throws IOException {
         String tokenPath = String.format("%s/%s", storePath,"token");
