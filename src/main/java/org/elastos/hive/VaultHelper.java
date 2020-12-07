@@ -1,7 +1,11 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.payment.UsingPlan;
+import org.elastos.hive.utils.ResponseHelper;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -20,22 +24,52 @@ class VaultHelper {
 	}
 
 	public CompletableFuture<Boolean> useTrial() {
-		return authHelper.checkValid()
-				.thenCompose(result -> useTrialImp());
+		return authHelper.checkValid().thenApply(aVoid -> {
+			try {
+				return useTrialImp();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
+
 	}
 
-	private CompletableFuture<Boolean> useTrialImp() {
-		return CompletableFuture.supplyAsync(() -> {
+	private boolean useTrialImp() throws HiveException {
+		try {
+			Response<ResponseBody> response = this.connectionManager.getVaultApi()
+					.createFreeVault()
+					.execute();
+			authHelper.checkResponseWithRetry(response);
+			return true;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
+	}
+
+	public CompletableFuture<Boolean> vaultExist() {
+		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				Response<ResponseBody> response = this.connectionManager.getVaultApi()
-						.createFreeVault()
-						.execute();
-				authHelper.checkResponseWithRetry(response);
-				return true;
-			} catch (Exception e) {
-				HiveException exception = new HiveException(e.getLocalizedMessage());
-				throw new CompletionException(exception);
+				return vaultExistImp();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
+
+	private boolean vaultExistImp() throws HiveException {
+		try {
+			Response response = this.connectionManager.getPaymentApi()
+					.getServiceInfo()
+					.execute();
+			authHelper.checkResponseWithRetry(response);
+			JsonNode value = ResponseHelper.getValue(response, JsonNode.class);
+			if(null == value) return false;
+			JsonNode ret = value.get("vault_service_info");
+			return (null!=ret);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new HiveException(e.getLocalizedMessage());
+		}
+	}
+
 }
