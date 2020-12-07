@@ -30,12 +30,12 @@ public class UserFactory {
 			options.setAuthenticationDIDDocument(presentationInJWT.getDoc());
 
 			Client client = Client.createInstance(options);
-			client.getVault(this.ownerDid, this.provider).whenComplete((ret, throwable) -> {
+			client.createVault(this.ownerDid, this.provider).whenComplete((ret, throwable) -> {
 				if (throwable == null) {
 					vault = ret;
 				} else {
 					try {
-						vault = client.createVault(ownerDid, this.provider).get();
+						vault = client.getVault(ownerDid, this.provider).get();
 					} catch (Exception e) {
 						throw new CompletionException(e);
 					}
