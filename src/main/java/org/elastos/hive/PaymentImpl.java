@@ -217,7 +217,6 @@ public class PaymentImpl implements Payment {
 			if(null == ret) return null;
 			return UsingPlan.deserialize(ret.toString());
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new HiveException(e.getLocalizedMessage());
 		}
 	}

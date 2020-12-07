@@ -127,8 +127,7 @@ public class Vault {
 	}
 
 	boolean checkVaultExist() throws ExecutionException, InterruptedException {
-		return this.payment.getUsingPricePlan()
-				.handle((usingPlan, ex) -> (usingPlan!=null && ex==null)).get();
+		return this.vaultHelper.vaultExist().get();
 	}
 
 	public void revokeAccessToken() {
