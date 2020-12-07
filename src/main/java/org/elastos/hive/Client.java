@@ -157,18 +157,7 @@ public class Client {
 			throw new IllegalArgumentException("Empty ownerDid");
 
 		return getVaultProvider(ownerDid, providerAddress)
-				.thenApply(provider -> newVault(ownerDid, provider))
-				.thenApply(vault -> {
-					try {
-						boolean exist = vault.checkVaultExist();
-						if (!exist)
-							throw new VaultNotFoundException();
-						else
-							return vault;
-					} catch (Exception e) {
-						throw new CompletionException(e);
-					}
-				});
+				.thenApply(provider -> newVault(ownerDid, provider));
 	}
 
 	private Vault newVault(String ownerDid, String provider) {
