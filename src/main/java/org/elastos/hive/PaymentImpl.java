@@ -104,7 +104,9 @@ public class PaymentImpl implements Payment {
 					.execute();
 			authHelper.checkResponseWithRetry(response);
 			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-			return ret.get("order_id").textValue();
+			JsonNode orderId = ret.get("order_id");
+			if(null == orderId) return null;
+			return orderId.textValue();
 		} catch (Exception e) {
 			throw new HiveException(e.getLocalizedMessage());
 		}
@@ -155,8 +157,9 @@ public class PaymentImpl implements Payment {
 					.execute();
 			authHelper.checkResponseWithRetry(response);
 			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-			String orderInfo = ret.get("order_info").toString();
-			return Order.deserialize(orderInfo);
+			JsonNode orderInfo = ret.get("order_info");
+			if(null == orderInfo) return null;
+			return Order.deserialize(orderInfo.toString());
 		} catch (Exception e) {
 			throw new HiveException(e.getLocalizedMessage());
 		}
@@ -180,9 +183,10 @@ public class PaymentImpl implements Payment {
 					.execute();
 			authHelper.checkResponseWithRetry(response);
 			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-			String orderInfo = ret.get("order_info_list").toString();
+			JsonNode orderInfo = ret.get("order_info_list");
+			if(null == orderInfo) return null;
 			ObjectMapper mapper = new ObjectMapper();
-			List<Order> orders = mapper.readValue(orderInfo,new TypeReference<List<Order>>(){});
+			List<Order> orders = mapper.readValue(orderInfo.toString(),new TypeReference<List<Order>>(){});
 			return orders;
 		} catch (Exception e) {
 			throw new HiveException(e.getLocalizedMessage());
@@ -213,6 +217,7 @@ public class PaymentImpl implements Payment {
 			if(null == ret) return null;
 			return UsingPlan.deserialize(ret.toString());
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new HiveException(e.getLocalizedMessage());
 		}
 	}
@@ -235,8 +240,9 @@ public class PaymentImpl implements Payment {
 					.execute();
 			authHelper.checkResponseWithRetry(response);
 			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
-			String version = ret.get("version").textValue();
-			return version;
+			JsonNode version = ret.get("version");
+			if(null == version) return null;
+			return version.textValue();
 		} catch (Exception e) {
 			throw new HiveException(e.getLocalizedMessage());
 		}
