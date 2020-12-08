@@ -204,28 +204,42 @@ public class ScriptingTest {
 			fail();
 		}
 
-		FileReader fileReader = null;
-		Writer writer = null;
+		CompletableFuture<Boolean> future = scripting.callScript(scriptName, params, null, JsonNode.class)
+				.handle((jsonNode, ex) -> {
+					if (ex != null) return false;
+					FileReader fileReader = null;
+					Writer writer = null;
+					try {
+						String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
+						writer = scripting.callToUploadFile(transactionId, Writer.class).exceptionally(e -> {
+							System.out.println(e.getMessage());
+							return null;
+						}).get();
+						fileReader = new FileReader(new File(textLocalPath));
+						char[] buffer = new char[1];
+						while (fileReader.read(buffer) != -1) {
+							writer.write(buffer);
+						}
+						System.out.println("write success");
+					} catch (Exception e) {
+						fail();
+					} finally {
+						try {
+							if (null != fileReader) fileReader.close();
+							if (null != writer) writer.close();
+						} catch (Exception e) {
+							fail();
+						}
+					}
+					return true;
+				});
+
 		try {
-			writer = scripting.callToUploadFile(scriptName, params, null, Writer.class).exceptionally(e -> {
-				System.out.println(e.getMessage());
-				return null;
-			}).get();
-			fileReader = new FileReader(new File(textLocalPath));
-			char[] buffer = new char[1];
-			while (fileReader.read(buffer) != -1) {
-				writer.write(buffer);
-			}
-			System.out.println("write success");
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
 		} catch (Exception e) {
 			fail();
-		} finally {
-			try {
-				if (null != fileReader) fileReader.close();
-				if (null != writer) writer.close();
-			} catch (Exception e) {
-				fail();
-			}
 		}
 	}
 
@@ -249,12 +263,17 @@ public class ScriptingTest {
 		String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 		JsonNode params = JsonUtil.deserialize(path);
 
-		CompletableFuture<Boolean> future = scripting.callToDownloadFile(scriptName, params, null, Reader.class)
-				.handle((reader, throwable) -> {
-					if(throwable == null) {
-						Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
-					}
-					return throwable==null;
+		CompletableFuture<Boolean> future = scripting.callScript(scriptName, params, null, JsonNode.class)
+				.handle((jsonNode, ex) -> {
+					String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
+					scripting.callToDownloadFile(transactionId, Reader.class)
+							.handle((reader, throwable) -> {
+								if (throwable == null) {
+									Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
+								}
+								return throwable == null;
+							});
+					return true;
 				});
 
 		try {
@@ -308,7 +327,7 @@ public class ScriptingTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = UserFactory.createUser2().getVault();
+		Vault vault = UserFactory.createUser4().getVault();
 		scripting = vault.getScripting();
 	}
 
