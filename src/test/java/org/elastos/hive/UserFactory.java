@@ -42,7 +42,7 @@ public class UserFactory {
 				}
 			}).get();
 		} catch (Exception e) {
-			System.out.println("Vault has bean create");
+			System.out.println("Vault has been create");
 		}
 	}
 
