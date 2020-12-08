@@ -117,7 +117,7 @@ class ScriptingImpl implements Scripting {
 	}
 
 	@Override
-	public <T> CompletableFuture<T> callToUploadFile(String transactionId, Class<T> resultType) {
+	public <T> CompletableFuture<T> uploadFile(String transactionId, Class<T> resultType) {
 		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
 				return uploadFileImpl(transactionId, resultType);
@@ -151,7 +151,7 @@ class ScriptingImpl implements Scripting {
 	}
 
 	@Override
-	public <T> CompletableFuture<T> callToDownloadFile(String transactionId, Class<T> resultType) {
+	public <T> CompletableFuture<T> downloadFile(String transactionId, Class<T> resultType) {
 		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
 				return downloadFileImpl(transactionId, resultType);

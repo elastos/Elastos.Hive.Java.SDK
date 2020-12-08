@@ -211,7 +211,7 @@ public class ScriptingTest {
 					Writer writer = null;
 					try {
 						String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
-						writer = scripting.callToUploadFile(transactionId, Writer.class).exceptionally(e -> {
+						writer = scripting.uploadFile(transactionId, Writer.class).exceptionally(e -> {
 							System.out.println(e.getMessage());
 							return null;
 						}).get();
@@ -266,7 +266,7 @@ public class ScriptingTest {
 		CompletableFuture<Boolean> future = scripting.callScript(scriptName, params, null, JsonNode.class)
 				.handle((jsonNode, ex) -> {
 					String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
-					scripting.callToDownloadFile(transactionId, Reader.class)
+					scripting.downloadFile(transactionId, Reader.class)
 							.handle((reader, throwable) -> {
 								if (throwable == null) {
 									Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
