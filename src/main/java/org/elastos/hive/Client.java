@@ -21,6 +21,11 @@
  */
 package org.elastos.hive;
 
+import java.nio.file.ProviderNotFoundException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
@@ -30,11 +35,6 @@ import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.CreateVaultException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
-import org.elastos.hive.exception.VaultNotFoundException;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 public class Client {
 	private static boolean resolverDidSetup;
@@ -75,7 +75,8 @@ public class Client {
 		if (cacheDir == null || resolver == null)
 			throw new IllegalArgumentException();
 		if (resolverDidSetup)
-			throw new HiveException("Resolver already setuped");
+			throw new HiveException("Resolver already setup");
+
 		try {
 			DIDBackend.initialize(resolver, cacheDir);
 			ResolverCache.reset();
@@ -202,40 +203,49 @@ public class Client {
 	}
 
 	/**
-	 * Tries to find a vault address in the public DID document of the given
-	 * user's DID.
-	 * <p>
-	 * This API always tries to fetch this information from ID chain first
-	 * (vault address published publicly for this user) and falls back to the
-	 * local DID/Vault mapping if it fails to resolve from chain.
-	 * <p>
-	 * After being able to resolve from chain, any previously set local mapping
-	 * is deleted.
+	 * Try to acquire provider address for the specific user DID with rules with sequence orders:
+	 *  - Use 'preferedProviderAddress' first when it's being with real value; Otherwise
+	 *  - Resolve DID document according to the ownerDid from DID sidechain,
+	 *    and find if there are more than one "HiveVault" services, then would
+	 *    choose the first one service point as target provider address. Otherwise
+	 *  - It means no service endpoints declared on this DID Document, then would throw the
+	 *    corresponding exception.
 	 *
-	 * @param ownerDid the owner did for the vault
-	 * @return the vault address in String
+	 * @param ownerDid the owner did that want be set provider address;
+	 * @param defaultProviderAddresss the first prority of provider address to
+	 *                 be set for ownerDID.
+	 * @return the provider address
 	 */
-	public CompletableFuture<String> getVaultProvider(String ownerDid, String providerAddress) {
+	public CompletableFuture<String> getVaultProvider(String ownerDid, String preferedProviderAddress) {
 		if (ownerDid == null)
-			throw new IllegalArgumentException("Empty ownerDid");
+			throw new IllegalArgumentException(
+					"Parameters 'ownerDid' and 'defaultProviderAddress' can not be both null");
 
 		return CompletableFuture.supplyAsync(() -> {
-			if (null != providerAddress) {
-				return providerAddress;
-			}
+			/* Directly choose 'defaultProviderValue' as its provider address.
+			 */
+			if (preferedProviderAddress != null)
+				return preferedProviderAddress;
+
 			try {
 				List<DIDDocument.Service> services = null;
 				DID did = new DID(ownerDid);
 				DIDDocument doc;
 
 				doc = did.resolve();
-				if (doc != null)
-					services = doc.selectServices((String) null, "HiveVault");
+				if (doc == null)
+					throw new ProviderNotFoundException(
+							String.format("The DID document %s has not published", ownerDid));
 
-				if (services != null && services.size() > 0) {
-					return services.get(0).getServiceEndpoint();
-				} else
-					return providerAddress;
+				services = doc.selectServices((String) null, "HiveVault");
+				if (services == null || services.size() == 0)
+					throw new ProviderNotFoundException(
+							String.format("No 'HiveVault' services declared on DID document %s", ownerDid));
+
+				/* TODO: should we throw special exception when it has more than one
+				 *       endpoints of service "HiveVault";
+				 */
+				return services.get(0).getServiceEndpoint();
 			} catch (DIDException e) {
 				throw new CompletionException(new HiveException(e.getLocalizedMessage()));
 			}
