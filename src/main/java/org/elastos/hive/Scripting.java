@@ -37,7 +37,7 @@ public interface Scripting {
 	 * @param <T> Write
 	 * @return
 	 */
-	<T> CompletableFuture<T> callToUploadFile(String transactionId, Class<T> resultType);
+	<T> CompletableFuture<T> uploadFile(String transactionId, Class<T> resultType);
 
 	/**
 	 * Run a script to download a file NOTE: The download works a bit differently compared to other
@@ -47,5 +47,5 @@ public interface Scripting {
 	 * @param <T> Reader
 	 * @return
 	 */
-	<T> CompletableFuture<T> callToDownloadFile(String transactionId, Class<T> resultType);
+	<T> CompletableFuture<T> downloadFile(String transactionId, Class<T> resultType);
 }
