@@ -23,10 +23,10 @@ class VaultHelper {
 		this.connectionManager = authHelper.getConnectionManager();
 	}
 
-	public CompletableFuture<Boolean> useTrial() {
+	public CompletableFuture<Boolean> requestToCreateVault() {
 		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				return useTrialImp();
+				return requestToCreateVaultImpl();
 			} catch (HiveException e) {
 				throw new CompletionException(e);
 			}
@@ -34,7 +34,7 @@ class VaultHelper {
 
 	}
 
-	private boolean useTrialImp() throws HiveException {
+	private boolean requestToCreateVaultImpl() throws HiveException {
 		try {
 			Response<ResponseBody> response = this.connectionManager.getVaultApi()
 					.createFreeVault()
@@ -49,14 +49,14 @@ class VaultHelper {
 	public CompletableFuture<Boolean> vaultExist() {
 		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				return vaultExistImp();
+				return vaultExistImpl();
 			} catch (HiveException e) {
 				throw new CompletionException(e);
 			}
 		});
 	}
 
-	private boolean vaultExistImp() throws HiveException {
+	private boolean vaultExistImpl() throws HiveException {
 		try {
 			Response response = this.connectionManager.getPaymentApi()
 					.getServiceInfo()

@@ -16,14 +16,14 @@ public class Vault {
 	private Payment payment;
 	private Version version;
 
-	private String vaultProvider;
+	private String providerAddress;
 	private String ownerDid;
 	private AuthHelper authHelper;
 	private VaultHelper vaultHelper;
 
-	Vault(AuthHelper authHelper, String vaultProvider, String ownerDid) {
+	Vault(AuthHelper authHelper, String providerAddress, String ownerDid) {
 		this.authHelper = authHelper;
-		this.vaultProvider = vaultProvider;
+		this.providerAddress = providerAddress;
 		this.ownerDid = ownerDid;
 
 		this.files = new FilesImpl(authHelper);
@@ -47,7 +47,7 @@ public class Vault {
 	 * @return	the vault provider address.
 	 */
 	public String getProviderAddress() {
-		return this.vaultProvider;
+		return this.providerAddress;
 	}
 
 	/**
@@ -122,8 +122,8 @@ public class Vault {
 		return this.payment;
 	}
 
-	boolean useTrial() throws ExecutionException, InterruptedException {
-		return this.vaultHelper.useTrial().get();
+	boolean requestToCreateVault() throws ExecutionException, InterruptedException {
+		return this.vaultHelper.requestToCreateVault().get();
 	}
 
 	boolean checkVaultExist() throws ExecutionException, InterruptedException {

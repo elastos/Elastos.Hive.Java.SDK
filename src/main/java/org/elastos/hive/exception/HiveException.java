@@ -27,25 +27,25 @@ package org.elastos.hive.exception;
  * If an exception occurs while you are using the hive SDK, throw this HiveException
  */
 public class HiveException extends Exception {
-    private static final long serialVersionUID = 1486850840770311509L;
+	private static final long serialVersionUID = 1486850840770311509L;
 
-    public static final String NO_RPC_NODE_AVAILABLE = "RPC nodes are inValid.";
-    public static final String ITEM_NOT_FOUND = "Item not found.";
-    public static final String ERROR = "Error";
+	public static final String NO_RPC_NODE_AVAILABLE = "RPC nodes are inValid.";
+	public static final String ITEM_NOT_FOUND = "Item not found.";
+	public static final String ERROR = "Error";
 
-    public HiveException() {
-        super();
-    }
+	public HiveException() {
+		super();
+	}
 
-    public HiveException(String message) {
-        super(message);
-    }
+	public HiveException(String message) {
+		super(message);
+	}
 
-    public HiveException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public HiveException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    public HiveException(Throwable cause) {
-        super(cause);
-    }
+	public HiveException(Throwable cause) {
+		super(cause);
+	}
 }

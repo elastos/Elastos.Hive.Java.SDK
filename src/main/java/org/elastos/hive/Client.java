@@ -190,7 +190,7 @@ public class Client {
 					try {
 						if (vault.checkVaultExist())
 							throw new VaultAlreadyExistException("Vault aready existed.");
-						vault.useTrial();
+						vault.requestToCreateVault();
 					} catch (Exception e) {
 						throw new CompletionException(e);
 					}
