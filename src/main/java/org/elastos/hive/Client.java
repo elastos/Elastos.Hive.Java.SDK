@@ -32,9 +32,8 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
-import org.elastos.hive.exception.CreateVaultException;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.ProviderNotSetException;
+import org.elastos.hive.exception.VaultAlreadyExistException;
 
 public class Client {
 	private static boolean resolverDidSetup;
@@ -148,53 +147,50 @@ public class Client {
 	}
 
 	/**
-	 * get Vault
+	 * get Vault instance with specified DID.
+	 * Try to get a vault on target provider address with following steps:
+	 *  - Get the target provider address;
+	 *  - Create a new vaule of local instance..
 	 *
-	 * @param ownerDid vault owner did
-	 * @return
+	 * @param ownerDid  the owner did related to target vault;
+	 * @param preferedProviderrAddress the prefered target provider address.
+	 * @return a new vault instance.
 	 */
-	public CompletableFuture<Vault> getVault(String ownerDid, String providerAddress) {
-		if (ownerDid == null)
-			throw new IllegalArgumentException("Empty ownerDid");
-
-		return getVaultProvider(ownerDid, providerAddress)
-				.thenApply(provider -> newVault(ownerDid, provider));
-	}
-
-	private Vault newVault(String ownerDid, String provider) {
-		if (provider == null)
-			throw new ProviderNotSetException(ProviderNotSetException.EXCEPTION);
-		AuthHelper authHelper = new AuthHelper(ownerDid, provider,
-				localDataPath,
-				authenticationDIDDocument,
-				authentcationHandler);
-		return new Vault(authHelper, provider, ownerDid);
+	public CompletableFuture<Vault> getVault(String ownerDid, String preferedProviderAddress) {
+		return getVaultProvider(ownerDid, preferedProviderAddress)
+				.thenApply(provider -> {
+					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
+							localDataPath,
+							authenticationDIDDocument,
+							authentcationHandler);
+					return new Vault(authHelper, provider, ownerDid);
+				});
 	}
 
 	/**
-	 * create Vault
+	 * Create Vault for user with specified DID.
+	 * Try to create a vault on target provider address with following steps:
+	 *  - Get the target provider address;
+	 *  - Check whether the vault is already existed on target provider, otherwise
+	 *  - Create a new vault on target provider with free pricing plan.
 	 *
-	 * @param ownerDid
-	 * @return
+	 * @param ownerDid  the owner did that want to create a vault;
+	 * @param preferedProviderrAddress the prefered target provider address.
+	 * @return a new created vault for owner did.
 	 */
-	public CompletableFuture<Vault> createVault(String ownerDid, String providerAddress) {
-		if (ownerDid == null)
-			throw new IllegalArgumentException("Empty ownerDid");
+	public CompletableFuture<Vault> createVault(String ownerDid, String preferedProviderAddress) {
+		return getVaultProvider(ownerDid, preferedProviderAddress)
+				.thenApply(provider -> {
+					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
+							localDataPath,
+							authenticationDIDDocument,
+							authentcationHandler);
+					Vault vault = new Vault(authHelper, provider, ownerDid);
 
-		return getVaultProvider(ownerDid, providerAddress)
-				.thenApply(provider -> newVault(ownerDid, provider))
-				.thenApply(vault -> {
 					try {
-						boolean exist = vault.checkVaultExist();
-						if (!exist) {
-							try {
-								vault.useTrial();
-							} catch (Exception e) {
-								throw new CompletionException(e);
-							}
-						} else {
-							throw new CreateVaultException(CreateVaultException.EXCEPTION);
-						}
+						if (vault.checkVaultExist())
+							throw new VaultAlreadyExistException("Vault aready existed.");
+						vault.useTrial();
 					} catch (Exception e) {
 						throw new CompletionException(e);
 					}
@@ -218,11 +214,10 @@ public class Client {
 	 */
 	public CompletableFuture<String> getVaultProvider(String ownerDid, String preferedProviderAddress) {
 		if (ownerDid == null)
-			throw new IllegalArgumentException(
-					"Parameters 'ownerDid' and 'defaultProviderAddress' can not be both null");
+			throw new IllegalArgumentException("Parameters 'ownerDid' can not be null");
 
 		return CompletableFuture.supplyAsync(() -> {
-			/* Directly choose 'defaultProviderValue' as its provider address.
+			/* Directly choose 'preferedProviderAddress' as its provider address.
 			 */
 			if (preferedProviderAddress != null)
 				return preferedProviderAddress;
