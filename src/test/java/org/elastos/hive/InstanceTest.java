@@ -14,7 +14,6 @@ public class InstanceTest {
         try {
             vault = UserFactory.createUser2().getVault();
             assertNotNull(vault);
-            vault.revokeAccessToken();
         } catch (Exception e) {
             fail();
         }
