@@ -32,19 +32,20 @@ public interface Scripting {
 	 * Run a script to upload a file NOTE: The upload works a bit differently compared to other
 	 * types of executable queries because there are two steps to this executable. First, register a
 	 * script on the vault, then you call this api to actually upload the file
-	 * @param resultType Write or OutputStream class
-	 * @param <T> Write, OutputStream
+	 * @param transactionId
+	 * @param resultType Reader or InputStream class
+	 * @param <T> Write
 	 * @return
 	 */
-	<T> CompletableFuture<T> callToUploadFile(String name, JsonNode params, String appDid, Class<T> resultType);
+	<T> CompletableFuture<T> callToUploadFile(String transactionId, Class<T> resultType);
 
 	/**
 	 * Run a script to download a file NOTE: The download works a bit differently compared to other
 	 * types of executable queries because there are two steps to this executable. First, register a
 	 * script on the vault, then you call this api to actually upload the file
 	 * @param resultType Reader or InputStream class
-	 * @param <T> Reader or InputStream
+	 * @param <T> Reader
 	 * @return
 	 */
-	<T> CompletableFuture<T> callToDownloadFile(String name, JsonNode params, String appDid, Class<T> resultType);
+	<T> CompletableFuture<T> callToDownloadFile(String transactionId, Class<T> resultType);
 }
