@@ -117,21 +117,18 @@ class ScriptingImpl implements Scripting {
 	}
 
 	@Override
-	public <T> CompletableFuture<T> callToUploadFile(String name, JsonNode params, String appDid, Class<T> resultType) {
+	public <T> CompletableFuture<T> callToUploadFile(String transactionId, Class<T> resultType) {
 		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				return uploadFileImpl(name, params, appDid, resultType);
+				return uploadFileImpl(transactionId, resultType);
 			} catch (HiveException e) {
 				throw new CompletionException(e);
 			}
 		});
 	}
 
-	private <T> T uploadFileImpl(String name, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
+	private <T> T uploadFileImpl(String transactionId, Class<T> resultType) throws HiveException {
 		try {
-			JsonNode jsonNode = callScriptImpl(name, params, appDid, JsonNode.class);
-			JsonNode script = jsonNode.get(name);
-			String transactionId = script.get("transaction_id").textValue();
 			if(null != transactionId) {
 				HttpURLConnection connection = this.connectionManager.openURLConnection("/scripting/run_script_upload/" + transactionId);
 				OutputStream outputStream = connection.getOutputStream();
@@ -154,21 +151,18 @@ class ScriptingImpl implements Scripting {
 	}
 
 	@Override
-	public <T> CompletableFuture<T> callToDownloadFile(String name, JsonNode params, String appDid, Class<T> resultType) {
+	public <T> CompletableFuture<T> callToDownloadFile(String transactionId, Class<T> resultType) {
 		return authHelper.checkValid().thenApply(aVoid -> {
 			try {
-				return downloadFileImpl(name, params, appDid, resultType);
+				return downloadFileImpl(transactionId, resultType);
 			} catch (HiveException e) {
 				throw new CompletionException(e);
 			}
 		});
 	}
 
-	private <T> T downloadFileImpl(String name, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
+	private <T> T downloadFileImpl(String transactionId, Class<T> resultType) throws HiveException {
 		try {
-			JsonNode jsonNode = callDownloadScriptImpl(name, params, appDid, JsonNode.class);
-			JsonNode script = jsonNode.get(name);
-			String transactionId = script.get("transaction_id").textValue();
 			if(null != transactionId) {
 				Response<ResponseBody> response;
 
