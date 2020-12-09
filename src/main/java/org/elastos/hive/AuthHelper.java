@@ -44,7 +44,6 @@ class AuthHelper implements ConnectHelper {
 	private String nodeUrl;
 
 	private AuthToken token;
-	private AtomicBoolean connectState = new AtomicBoolean(false);
 	private Persistent persistent;
 
 	private DIDDocument authenticationDIDDocument;
@@ -83,20 +82,16 @@ class AuthHelper implements ConnectHelper {
 	}
 
 	private void doCheckExpired() throws HiveException {
-		connectState.set(false);
 		if(null == token) tryRestoreToken();
 		if (token == null || token.isExpired()) {
 			signIn();
 		}
 		initConnection();
-		connectState.set(true);
 	}
 
 	private void retryLogin()  throws HiveException {
-		connectState.set(false);
 		signIn();
 		initConnection();
-		connectState.set(true);
 	}
 
 	private void signIn() throws HiveException {
