@@ -152,12 +152,12 @@ public class Client {
 	 *  - Get the target provider address;
 	 *  - Create a new vaule of local instance..
 	 *
-	 * @param ownerDid  the owner did related to target vault;
-	 * @param preferedProviderrAddress the prefered target provider address.
+	 * @param ownerDid  the owner did related to target vault
+	 * @param preferredProviderAddress the preferred target provider address
 	 * @return a new vault instance.
 	 */
-	public CompletableFuture<Vault> getVault(String ownerDid, String preferedProviderAddress) {
-		return getVaultProvider(ownerDid, preferedProviderAddress)
+	public CompletableFuture<Vault> getVault(String ownerDid, String preferredProviderAddress) {
+		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApply(provider -> {
 					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
 							localDataPath,
@@ -174,12 +174,12 @@ public class Client {
 	 *  - Check whether the vault is already existed on target provider, otherwise
 	 *  - Create a new vault on target provider with free pricing plan.
 	 *
-	 * @param ownerDid  the owner did that want to create a vault;
-	 * @param preferedProviderrAddress the prefered target provider address.
-	 * @return a new created vault for owner did.
+	 * @param ownerDid  the owner did that want to create a vault
+	 * @param preferredProviderAddress the preferred provider address to use
+	 * @return a new created vault for owner did
 	 */
-	public CompletableFuture<Vault> createVault(String ownerDid, String preferedProviderAddress) {
-		return getVaultProvider(ownerDid, preferedProviderAddress)
+	public CompletableFuture<Vault> createVault(String ownerDid, String preferredProviderAddress) {
+		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApply(provider -> {
 					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
 							localDataPath,
@@ -200,27 +200,26 @@ public class Client {
 
 	/**
 	 * Try to acquire provider address for the specific user DID with rules with sequence orders:
-	 *  - Use 'preferedProviderAddress' first when it's being with real value; Otherwise
+	 *  - Use 'preferredProviderAddress' first when it's being with real value; Otherwise
 	 *  - Resolve DID document according to the ownerDid from DID sidechain,
 	 *    and find if there are more than one "HiveVault" services, then would
 	 *    choose the first one service point as target provider address. Otherwise
 	 *  - It means no service endpoints declared on this DID Document, then would throw the
 	 *    corresponding exception.
 	 *
-	 * @param ownerDid the owner did that want be set provider address;
-	 * @param defaultProviderAddresss the first prority of provider address to
-	 *                 be set for ownerDID.
+	 * @param ownerDid the owner did that want be set provider address
+	 * @param preferredProviderAddress the preferred provider address to use
 	 * @return the provider address
 	 */
-	public CompletableFuture<String> getVaultProvider(String ownerDid, String preferedProviderAddress) {
+	public CompletableFuture<String> getVaultProvider(String ownerDid, String preferredProviderAddress) {
 		if (ownerDid == null)
 			throw new IllegalArgumentException("Parameters 'ownerDid' can not be null");
 
 		return CompletableFuture.supplyAsync(() -> {
-			/* Directly choose 'preferedProviderAddress' as its provider address.
+			/* Choose 'preferredProviderAddress' as target provider address if it's with value;
 			 */
-			if (preferedProviderAddress != null)
-				return preferedProviderAddress;
+			if (preferredProviderAddress != null)
+				return preferredProviderAddress;
 
 			try {
 				List<DIDDocument.Service> services = null;
