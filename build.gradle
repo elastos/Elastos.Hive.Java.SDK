@@ -5,9 +5,6 @@ apply plugin: 'org.warship.plugin'
 repositories {
     jcenter()
     mavenCentral()
-    maven {
-        url uri("$rootDir/repo")
-    }
 }
 
 buildscript {
@@ -15,11 +12,12 @@ buildscript {
         maven {
             url uri("$rootDir/repo")
         }
+        mavenCentral()
         jcenter()
     }
     dependencies {
         classpath 'com.novoda:bintray-release:0.9.1'
-        classpath "org.warship.plugin:core:1.0.0"
+        classpath "com.github.xidaokun:core:1.0.2"
     }
 }
 
