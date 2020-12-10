@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-class ConfigHelper {
+public final class ConfigHelper {
 
 	public static Config getConfigInfo(String resourcePath) {
 		InputStream input = ConfigHelper.class.getClassLoader().getResourceAsStream(resourcePath);

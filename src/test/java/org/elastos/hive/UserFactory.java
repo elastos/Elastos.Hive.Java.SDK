@@ -57,8 +57,8 @@ public class UserFactory {
 		return new UserFactory(userDidOpt, appInstanceDidOpt, provider, resolveUrl, ownerDid, tokenCachePath);
 	}
 
-	//release环境（MainNet + https://hive1.trinity-tech.io + userDid1）
-	public static UserFactory createUser2() {
+	//develope 环境
+	public static UserFactory createUser1() {
 		Config config = ConfigHelper.getConfigInfo("user1.conf");
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
 				.setName(config.getUserName())
@@ -74,8 +74,8 @@ public class UserFactory {
 		return new UserFactory(userDidOpt, appInstanceDidOpt, config.getProvider(), config.getResolverUrl(), config.getUserDid(), config.getStorePath());
 	}
 
-	//develope 环境
-	public static UserFactory createUser1() {
+	//release环境（MainNet + https://hive1.trinity-tech.io）
+	public static UserFactory createUser2() {
 		Config config = ConfigHelper.getConfigInfo("user2.conf");
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
 				.setName(config.getUserName())
