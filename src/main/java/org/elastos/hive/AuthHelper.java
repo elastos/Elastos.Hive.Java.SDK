@@ -81,7 +81,7 @@ class AuthHelper implements ConnectHelper {
 		});
 	}
 
-	private void doCheckExpired() throws HiveException {
+	private synchronized void doCheckExpired() throws HiveException {
 		if(null == token) tryRestoreToken();
 		if (token == null || token.isExpired()) {
 			signIn();
@@ -94,7 +94,7 @@ class AuthHelper implements ConnectHelper {
 		initConnection();
 	}
 
-	private synchronized void signIn() throws HiveException {
+	private void signIn() throws HiveException {
 		Map<String, Object> map = new HashMap<>();
 		JSONObject docJsonObject = new JSONObject(authenticationDIDDocument.toString());
 		map.put("document", docJsonObject);
@@ -119,7 +119,7 @@ class AuthHelper implements ConnectHelper {
 		}
 	}
 
-	private synchronized void nodeAuth(String token) throws Exception {
+	private void nodeAuth(String token) throws Exception {
 		if(null == token)
 			return;
 		Map<String, Object> map = new HashMap<>();
@@ -297,6 +297,8 @@ class AuthHelper implements ConnectHelper {
 	}
 
 	public void removeToken() {
+		token = null;
 		persistent.deleteContent();
+
 	}
 }
