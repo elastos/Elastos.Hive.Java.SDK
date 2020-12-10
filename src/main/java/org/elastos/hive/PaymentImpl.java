@@ -37,7 +37,7 @@ public class PaymentImpl implements Payment {
 
 	@Override
 	public CompletableFuture<PricingInfo> getPaymentInfo() {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return getAllPricingPlansImp();
 			} catch (HiveException e) {
@@ -61,7 +61,7 @@ public class PaymentImpl implements Payment {
 
 	@Override
 	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return getPricingPlansImp(planName);
 			} catch (HiveException e) {
@@ -85,7 +85,7 @@ public class PaymentImpl implements Payment {
 
 	@Override
 	public CompletableFuture<String> placeOrder(String priceName) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return placeOrderImp(priceName);
 			} catch (HiveException e) {
@@ -112,7 +112,7 @@ public class PaymentImpl implements Payment {
 
 	@Override
 	public CompletableFuture<Boolean> payOrder(String orderId, List<String> txids) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return payOrderImp(orderId, txids);
 			} catch (HiveException e) {
@@ -139,7 +139,7 @@ public class PaymentImpl implements Payment {
 
 	@Override
 	public CompletableFuture<Order> getOrder(String orderId) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return getOrderImp(orderId);
 			} catch (HiveException e) {
@@ -163,7 +163,7 @@ public class PaymentImpl implements Payment {
 
 	@Override
 	public CompletableFuture<List<Order>> getAllOrders() {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return getAllOrdersImp();
 			} catch (HiveException e) {
@@ -189,7 +189,7 @@ public class PaymentImpl implements Payment {
 
 	@Override
 	public CompletableFuture<UsingPlan> getUsingPricePlan() {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return getUsingPricePlanImp();
 			} catch (HiveException e) {
@@ -217,7 +217,7 @@ public class PaymentImpl implements Payment {
 
 	@Override
 	public CompletableFuture<String> getPaymentVersion() {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return getPaymentVersionImp();
 			} catch (HiveException e) {
