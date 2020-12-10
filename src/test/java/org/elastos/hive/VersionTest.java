@@ -36,7 +36,7 @@ public class VersionTest {
 
 	@Test
 	public void getSdkLastCommitId() {
-		String lastCommit = SdkVersion.getLastCommitId();
+		String lastCommit = SdkVersion.getLatestCommitId();
 		assertNotNull(lastCommit);
 	}
 
