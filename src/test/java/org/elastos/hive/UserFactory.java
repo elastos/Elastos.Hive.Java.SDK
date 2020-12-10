@@ -2,7 +2,6 @@ package org.elastos.hive;
 
 import org.elastos.did.PresentationInJWT;
 
-import java.io.File;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -60,70 +59,70 @@ public class UserFactory {
 
 	//release环境（MainNet + https://hive1.trinity-tech.io + userDid1）
 	public static UserFactory createUser2() {
-		String user1Path = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user1";
+		Config config = ConfigHelper.getConfigInfo("user1.conf");
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-				.setName(TestData.userDid1_name)
-				.setMnemonic(TestData.userDid1_mn)
-				.setPhrasepass(TestData.userDid1_phrasepass)
-				.setStorepass(TestData.userDid1_storepass);
+				.setName(config.getUserName())
+				.setMnemonic(config.getUserMn())
+				.setPhrasepass(config.getUserPhrasepass())
+				.setStorepass(config.getUserStorepass());
 
 		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-				.setName(TestData.appInstance1_name)
-				.setMnemonic(TestData.appInstance1_mn)
-				.setPhrasepass(TestData.appInstance1_phrasepass)
-				.setStorepass(TestData.appInstance1_storepass);
-		return new UserFactory(userDidOpt, appInstanceDidOpt, TestData.RELEASE_PROVIDER, TestData.MAIN_RESOLVER_URL, TestData.userDid1, user1Path);
+				.setName(config.getAppName())
+				.setMnemonic(config.getAppMn())
+				.setPhrasepass(config.getAppPhrasepass())
+				.setStorepass(config.getAppStorePass());
+		return new UserFactory(userDidOpt, appInstanceDidOpt, config.getProvider(), config.getResolverUrl(), config.getUserDid(), config.getStorePath());
 	}
 
 	//develope 环境
 	public static UserFactory createUser1() {
-		String user2Path = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user2";
+		Config config = ConfigHelper.getConfigInfo("user2.conf");
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-				.setName(TestData.userDid2_name)
-				.setMnemonic(TestData.userDid2_mn)
-				.setPhrasepass(TestData.userDid2_phrasepass)
-				.setStorepass(TestData.userDid2_storepass);
+				.setName(config.getUserName())
+				.setMnemonic(config.getUserMn())
+				.setPhrasepass(config.getUserPhrasepass())
+				.setStorepass(config.getUserStorepass());
 
 		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-				.setName(TestData.appInstance2_name)
-				.setMnemonic(TestData.appInstance2_mn)
-				.setPhrasepass(TestData.appInstance2_phrasepass)
-				.setStorepass(TestData.appInstance2_storepass);
-		return new UserFactory(userDidOpt, appInstanceDidOpt, TestData.DEVELOP_PROVIDER, TestData.TEST_RESOLVER_URL, TestData.userDid2, user2Path);
+				.setName(config.getAppName())
+				.setMnemonic(config.getAppMn())
+				.setPhrasepass(config.getAppPhrasepass())
+				.setStorepass(config.getAppStorePass());
+		return new UserFactory(userDidOpt, appInstanceDidOpt, config.getProvider(), config.getResolverUrl(), config.getUserDid(), config.getStorePath());
 	}
 
 	//node 环境
 	public static UserFactory createUser3() {
-		String user3Path = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user3";
+		Config config = ConfigHelper.getConfigInfo("user3.conf");
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-				.setName(TestData.userDid3_name)
-				.setMnemonic(TestData.userDid3_mn)
-				.setPhrasepass(TestData.userDid3_phrasepass)
-				.setStorepass(TestData.userDid3_storepass);
+				.setName(config.getUserName())
+				.setMnemonic(config.getUserMn())
+				.setPhrasepass(config.getUserPhrasepass())
+				.setStorepass(config.getUserStorepass());
 
 		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-				.setName(TestData.appInstance3_name)
-				.setMnemonic(TestData.appInstance3_mn)
-				.setPhrasepass(TestData.appInstance3_phrasepass)
-				.setStorepass(TestData.appInstance3_storepass);
-		return new UserFactory(userDidOpt, appInstanceDidOpt, TestData.LOCAL_PROVIDER, TestData.MAIN_RESOLVER_URL, TestData.userDid3, user3Path);
+				.setName(config.getAppName())
+				.setMnemonic(config.getAppMn())
+				.setPhrasepass(config.getAppPhrasepass())
+				.setStorepass(config.getAppStorePass());
+		return new UserFactory(userDidOpt, appInstanceDidOpt, config.getProvider(), config.getResolverUrl(), config.getUserDid(), config.getStorePath());
 	}
 
 	//local 环境
 	public static UserFactory createUser4() {
-		String user3Path = System.getProperty("user.dir") + File.separator + "store" + File.separator + "user4";
+		Config config = ConfigHelper.getConfigInfo("user4.conf");
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-				.setName(TestData.userDid4_name)
-				.setMnemonic(TestData.userDid4_mn)
-				.setPhrasepass(TestData.userDid4_phrasepass)
-				.setStorepass(TestData.userDid4_storepass);
+				.setName(config.getUserName())
+				.setMnemonic(config.getUserMn())
+				.setPhrasepass(config.getUserPhrasepass())
+				.setStorepass(config.getUserStorepass());
 
 		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-				.setName(TestData.appInstance4_name)
-				.setMnemonic(TestData.appInstance4_mn)
-				.setPhrasepass(TestData.appInstance4_phrasepass)
-				.setStorepass(TestData.appInstance4_storepass);
-		return new UserFactory(userDidOpt, appInstanceDidOpt, TestData.LOCAL_PROVIDER, TestData.MAIN_RESOLVER_URL, TestData.userDid4, user3Path);
+				.setName(config.getAppName())
+				.setMnemonic(config.getAppMn())
+				.setPhrasepass(config.getAppPhrasepass())
+				.setStorepass(config.getAppStorePass());
+		return new UserFactory(userDidOpt, appInstanceDidOpt, config.getProvider(), config.getResolverUrl(), config.getUserDid(), config.getStorePath());
 	}
 
 	public Vault getVault() {
