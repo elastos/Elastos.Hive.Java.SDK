@@ -40,7 +40,7 @@ class FilesImpl implements Files {
 
 	@Override
 	public <T> CompletableFuture<T> upload(String path, Class<T> resultType) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return uploadImpl(path, resultType);
 			} catch (HiveException e) {
@@ -70,7 +70,7 @@ class FilesImpl implements Files {
 
 	@Override
 	public <T> CompletableFuture<T> download(String path, Class<T> resultType) {
-		return authHelper.checkValid().thenApply(aVoid -> downloadImpl(path, resultType));
+		return authHelper.checkValid().thenApplyAsync(aVoid -> downloadImpl(path, resultType));
 	}
 
 	private <T> T downloadImpl(String remoteFile, Class<T> resultType) {
@@ -108,7 +108,7 @@ class FilesImpl implements Files {
 
 	@Override
 	public CompletableFuture<Boolean> delete(String remoteFile) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return deleteImpl(remoteFile);
 			} catch (HiveException e) {
@@ -137,7 +137,7 @@ class FilesImpl implements Files {
 
 	@Override
 	public CompletableFuture<Boolean> move(String source, String dest) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return moveImpl(source, dest);
 			} catch (HiveException e) {
@@ -167,7 +167,7 @@ class FilesImpl implements Files {
 
 	@Override
 	public CompletableFuture<Boolean> copy(String source, String dest) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return copyImpl(source, dest);
 			} catch (HiveException e) {
@@ -197,7 +197,7 @@ class FilesImpl implements Files {
 
 	@Override
 	public CompletableFuture<String> hash(String remoteFile) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return hashImp(remoteFile);
 			} catch (HiveException e) {
@@ -221,7 +221,7 @@ class FilesImpl implements Files {
 
 	@Override
 	public CompletableFuture<List<FileInfo>> list(String folder) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return listImpl(folder);
 			} catch (HiveException e) {
@@ -244,7 +244,7 @@ class FilesImpl implements Files {
 
 	@Override
 	public CompletableFuture<FileInfo> stat(String path) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return statImpl(path);
 			} catch (HiveException e) {

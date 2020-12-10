@@ -41,7 +41,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return createColImp(name);
 			} catch (HiveException e) {
@@ -69,7 +69,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<Boolean> deleteCollection(String name) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return deleteColImp(name);
 			} catch (HiveException e) {
@@ -97,7 +97,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return insertOneImp(collection, doc, options);
 			} catch (HiveException e) {
@@ -128,7 +128,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return insertManyImp(collection, docs, options);
 			} catch (HiveException e) {
@@ -161,7 +161,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return countDocumentsImp(collection, query, options);
 			} catch (HiveException e) {
@@ -193,7 +193,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return findOneImp(collection, query, options);
 			} catch (HiveException e) {
@@ -225,7 +225,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return findManyImp(collection, query, options);
 			} catch (HiveException e) {
@@ -256,7 +256,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return updateOneImp(collection, filter, update, options);
 			} catch (HiveException e) {
@@ -293,7 +293,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return updateManyImp(collection, filter, update, options);
 			} catch (HiveException e) {
@@ -325,7 +325,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return deleteOneImp(collection, filter, options);
 			} catch (HiveException e) {
@@ -355,7 +355,7 @@ class DatabaseImpl implements Database {
 
 	@Override
 	public CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return deleteManyImp(collection, filter, options);
 			} catch (HiveException e) {

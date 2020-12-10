@@ -45,7 +45,7 @@ class ScriptingImpl implements Scripting {
 
 	@Override
 	public CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return registerScriptImpl(name, condition, executable);
 			} catch (HiveException e) {
@@ -78,7 +78,7 @@ class ScriptingImpl implements Scripting {
 
 	@Override
 	public <T> CompletableFuture<T> callScript(String name,  JsonNode params, String appDid, Class<T> resultType) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return callScriptImpl(name, params, appDid, resultType);
 			} catch (HiveException e) {
@@ -118,7 +118,7 @@ class ScriptingImpl implements Scripting {
 
 	@Override
 	public <T> CompletableFuture<T> uploadFile(String transactionId, Class<T> resultType) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return uploadFileImpl(transactionId, resultType);
 			} catch (HiveException e) {
@@ -152,7 +152,7 @@ class ScriptingImpl implements Scripting {
 
 	@Override
 	public <T> CompletableFuture<T> downloadFile(String transactionId, Class<T> resultType) {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return downloadFileImpl(transactionId, resultType);
 			} catch (HiveException e) {
