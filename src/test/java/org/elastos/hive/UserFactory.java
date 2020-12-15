@@ -10,31 +10,57 @@ public class UserFactory {
 	private Vault vault;
 	private static boolean resolverDidSetup = false;
 
-	private String storePath;
-	private String ownerDid;
-	private String resolveUrl;
-	private String provider;
+	static class Options {
+		private String storePath;
+		private String ownerDid;
+		private String resolveUrl;
+		private String provider;
 
-	private void setUp(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt) {
+		public static Options create() {
+			return new Options();
+		}
+
+		public Options storePath(String storePath) {
+			this.storePath = storePath;
+			return this;
+		}
+
+		public Options ownerDid(String ownerDid) {
+			this.ownerDid = ownerDid;
+			return this;
+		}
+
+		public Options resolveUrl(String resolveUrl) {
+			this.resolveUrl = resolveUrl;
+			return this;
+		}
+
+		public Options provider(String provider) {
+			this.provider = provider;
+			return this;
+		}
+	}
+
+	private void setUp(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
 		try {
 			PresentationInJWT presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
 			if (!resolverDidSetup) {
-				Client.setupResolver(this.resolveUrl, this.didCachePath);
+				Client.setupResolver(userFactoryOpt.resolveUrl, this.didCachePath);
 				resolverDidSetup = true;
 			}
 			Client.Options options = new Client.Options();
-			options.setLocalDataPath(this.storePath);
+			options.setLocalDataPath(userFactoryOpt.storePath);
 			options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
 					-> presentationInJWT.getAuthToken(jwtToken)));
 			options.setAuthenticationDIDDocument(presentationInJWT.getDoc());
 
 			Client client = Client.createInstance(options);
-			client.createVault(this.ownerDid, this.provider).whenComplete((ret, throwable) -> {
+			client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).whenComplete((ret, throwable) -> {
 				if (throwable == null) {
 					vault = ret;
 				} else {
 					try {
-						vault = client.getVault(ownerDid, this.provider).get();
+						vault = client.getVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).get();
 					} catch (Exception e) {
 						throw new CompletionException(e);
 					}
@@ -45,84 +71,54 @@ public class UserFactory {
 		}
 	}
 
-	private UserFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, String provider, String resolveUrl, String ownerDid, String tokenCachePath) {
-		this.provider = provider;
-		this.resolveUrl = resolveUrl;
-		this.ownerDid = ownerDid;
-		this.storePath = tokenCachePath;
-		setUp(userDidOpt, appInstanceDidOpt);
+	private UserFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
+		setUp(userDidOpt, appInstanceDidOpt, userFactoryOpt);
 	}
 
-	public static UserFactory createFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, String provider, String resolveUrl, String ownerDid, String tokenCachePath) {
-		return new UserFactory(userDidOpt, appInstanceDidOpt, provider, resolveUrl, ownerDid, tokenCachePath);
+	public static UserFactory createFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
+		return new UserFactory(userDidOpt, appInstanceDidOpt, userFactoryOpt);
+	}
+
+	private static UserFactory initOptions(Config config) {
+		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
+				.setName(config.getUserName())
+				.setMnemonic(config.getUserMn())
+				.setPhrasepass(config.getUserPhrasepass())
+				.setStorepass(config.getUserStorepass());
+
+		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
+				.setName(config.getAppName())
+				.setMnemonic(config.getAppMn())
+				.setPhrasepass(config.getAppPhrasepass())
+				.setStorepass(config.getAppStorePass());
+
+		Options options = Options.create();
+		options.provider(config.getProvider());
+		options.resolveUrl(config.getResolverUrl());
+		options.ownerDid(config.getUserDid());
+		options.storePath(config.getStorePath());
+
+		return new UserFactory(userDidOpt, appInstanceDidOpt, options);
 	}
 
 	//develope 环境
 	public static UserFactory createUser1() {
-		Config config = ConfigHelper.getConfigInfo("user1.conf");
-		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-				.setName(config.getUserName())
-				.setMnemonic(config.getUserMn())
-				.setPhrasepass(config.getUserPhrasepass())
-				.setStorepass(config.getUserStorepass());
-
-		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-				.setName(config.getAppName())
-				.setMnemonic(config.getAppMn())
-				.setPhrasepass(config.getAppPhrasepass())
-				.setStorepass(config.getAppStorePass());
-		return new UserFactory(userDidOpt, appInstanceDidOpt, config.getProvider(), config.getResolverUrl(), config.getUserDid(), config.getStorePath());
+		return initOptions(ConfigHelper.getConfigInfo("user1.conf"));
 	}
 
 	//release环境（MainNet + https://hive1.trinity-tech.io）
 	public static UserFactory createUser2() {
-		Config config = ConfigHelper.getConfigInfo("user2.conf");
-		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-				.setName(config.getUserName())
-				.setMnemonic(config.getUserMn())
-				.setPhrasepass(config.getUserPhrasepass())
-				.setStorepass(config.getUserStorepass());
-
-		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-				.setName(config.getAppName())
-				.setMnemonic(config.getAppMn())
-				.setPhrasepass(config.getAppPhrasepass())
-				.setStorepass(config.getAppStorePass());
-		return new UserFactory(userDidOpt, appInstanceDidOpt, config.getProvider(), config.getResolverUrl(), config.getUserDid(), config.getStorePath());
+		return initOptions(ConfigHelper.getConfigInfo("user2.conf"));
 	}
 
 	//node 环境
 	public static UserFactory createUser3() {
-		Config config = ConfigHelper.getConfigInfo("user3.conf");
-		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-				.setName(config.getUserName())
-				.setMnemonic(config.getUserMn())
-				.setPhrasepass(config.getUserPhrasepass())
-				.setStorepass(config.getUserStorepass());
-
-		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-				.setName(config.getAppName())
-				.setMnemonic(config.getAppMn())
-				.setPhrasepass(config.getAppPhrasepass())
-				.setStorepass(config.getAppStorePass());
-		return new UserFactory(userDidOpt, appInstanceDidOpt, config.getProvider(), config.getResolverUrl(), config.getUserDid(), config.getStorePath());
+		return initOptions(ConfigHelper.getConfigInfo("user3.conf"));
 	}
 
 	//local 环境
 	public static UserFactory createUser4() {
-		Config config = ConfigHelper.getConfigInfo("user4.conf");
-		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-				.setName(config.getUserName())
-				.setMnemonic(config.getUserMn())
-				.setPhrasepass(config.getUserPhrasepass())
-				.setStorepass(config.getUserStorepass());
-
-		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-				.setName(config.getAppName())
-				.setMnemonic(config.getAppMn())
-				.setPhrasepass(config.getAppPhrasepass())
-				.setStorepass(config.getAppStorePass());
-		return new UserFactory(userDidOpt, appInstanceDidOpt, config.getProvider(), config.getResolverUrl(), config.getUserDid(), config.getStorePath());
+		return initOptions(ConfigHelper.getConfigInfo("user4.conf"));
 	}
 
 	public Vault getVault() {
