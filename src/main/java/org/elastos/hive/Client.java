@@ -42,6 +42,7 @@ import org.elastos.hive.exception.VaultAlreadyExistException;
 public class Client {
 	private static boolean resolverDidSetup;
 
+	private AuthenticationShim authenticationShim;
 	private HiveContext context;
 
 	static class AuthenticationShim implements InternalHandler {
@@ -54,6 +55,7 @@ public class Client {
 
 	private Client(HiveContext context) {
 		this.context = context;
+		authenticationShim = new AuthenticationShim();
 	}
 
 	/**
@@ -120,7 +122,7 @@ public class Client {
 					AuthHelper authHelper = new AuthHelper(this.context,
 							ownerDid,
 							provider,
-							new AuthenticationShim());
+							this.authenticationShim);
 					return new Vault(authHelper, provider, ownerDid);
 				});
 	}
@@ -143,7 +145,7 @@ public class Client {
 					AuthHelper authHelper = new AuthHelper(this.context,
 							ownerDid,
 							provider,
-							new AuthenticationShim());
+							this.authenticationShim);
 					return new Vault(authHelper, provider, ownerDid);
 				})
 				.thenComposeAsync(vault -> vault.checkVaultExist())
