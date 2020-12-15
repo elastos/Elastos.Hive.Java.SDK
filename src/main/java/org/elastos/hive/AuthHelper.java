@@ -15,6 +15,7 @@ import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.connection.model.HeaderConfig;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.json.JSONException;
@@ -166,9 +167,10 @@ class AuthHelper implements ConnectHelper {
 		if (null == accessToken) return;
 		Claims claims = JwtUtil.getBody(accessToken);
 		long exp = claims.getExpiration().getTime();
-		setUserDid((String) claims.get("userDid"));
-		setAppId((String) claims.get("appId"));
-		setAppInstanceDid((String) claims.get("appInstanceDid"));
+		JsonNode props = JsonUtil.deserialize(claims.get("props").toString());
+		setUserDid(props.get("userDid").textValue());
+		setAppId(props.get("appDid").textValue());
+		setAppInstanceDid((String) claims.get("aud"));
 
 		long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
 
