@@ -124,12 +124,12 @@ public class Vault {
 
 	CompletableFuture<Vault> requestToCreateVault() {
 		return this.vaultHelper.requestToCreateVault()
-				.thenApply(aBoolean -> aBoolean?Vault.this:null);
+				.thenApplyAsync(aBoolean -> aBoolean?Vault.this:null);
 	}
 
 	CompletableFuture<Vault> checkVaultExist() {
 		return this.vaultHelper.vaultExist()
-				.thenApply(aBoolean -> aBoolean?null:Vault.this);
+				.thenApplyAsync(aBoolean -> aBoolean?null:Vault.this);
 	}
 
 	public void revokeAccessToken() {

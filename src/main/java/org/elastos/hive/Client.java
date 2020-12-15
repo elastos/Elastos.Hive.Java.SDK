@@ -42,23 +42,18 @@ import org.elastos.hive.exception.VaultAlreadyExistException;
 public class Client {
 	private static boolean resolverDidSetup;
 
-	private AuthenticationHandler authentcationHandler;
-	private DIDDocument authenticationDIDDocument;
-	private String localDataPath;
+	private HiveContext context;
 
 	static class AuthenticationShim implements InternalHandler {
 
 		@Override
-		public synchronized CompletableFuture<String> authenticate(AuthenticationHandler handler, String jwtToken) {
-			return handler.authenticationChallenge(jwtToken);
+		public synchronized String authenticate(HiveContext context, String jwtToken) {
+			return context.getAuthorization(jwtToken);
 		}
 	}
 
-
-	private Client(Options options) {
-		this.authenticationDIDDocument = options.authenticationDIDDocument();
-		this.authentcationHandler = options.authentcationHandler;
-		this.localDataPath = options.localDataPath;
+	private Client(HiveContext context) {
+		this.context = context;
 	}
 
 	/**
@@ -98,65 +93,15 @@ public class Client {
 		}
 	}
 
-	/**
-	 * authentication options, include:
-	 * AuthenticationHandler, DIDDocument, data cache path
-	 */
-	public static class Options {
-		private AuthenticationHandler authentcationHandler;
-		private DIDDocument authenticationDIDDocument;
-		private String localDataPath;
 
-		public Options setAuthenticationDIDDocument(DIDDocument document) {
-			this.authenticationDIDDocument = document;
-			return this;
-		}
-
-		protected DIDDocument authenticationDIDDocument() {
-			return authenticationDIDDocument;
-		}
-
-		public Options setAuthenticationHandler(AuthenticationHandler authentcationHandler) {
-			this.authentcationHandler = authentcationHandler;
-			return this;
-		}
-
-		protected AuthenticationHandler authenticationHandler() {
-			return authentcationHandler;
-		}
-
-		public Options setLocalDataPath(String path) {
-			this.localDataPath = path;
-			return this;
-		}
-
-		protected String localDataPath() {
-			return localDataPath;
-		}
-
-		protected boolean checkValid() {
-			return (authenticationDIDDocument != null
-					&& authentcationHandler != null
-					&& localDataPath != null);
-		}
-	}
-
-	/**
-	 * get Client instance
-	 *
-	 * @param options authentication options
-	 * @return
-	 * @throws HiveException
-	 * @see Options
-	 */
-	public static Client createInstance(Options options) throws HiveException {
-		if (options == null || !options.checkValid())
+	public static Client createInstance(HiveContext context) throws HiveException {
+		if (context == null)
 			throw new IllegalArgumentException();
 
 		if (!resolverDidSetup)
 			throw new HiveException("Setup did resolver first");
 
-		return new Client(options);
+		return new Client(context);
 	}
 
 	/**
@@ -172,10 +117,9 @@ public class Client {
 	public CompletableFuture<Vault> getVault(String ownerDid, String preferredProviderAddress) {
 		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApplyAsync(provider -> {
-					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
-							localDataPath,
-							authenticationDIDDocument,
-							authentcationHandler,
+					AuthHelper authHelper = new AuthHelper(this.context,
+							ownerDid,
+							provider,
 							new AuthenticationShim());
 					return new Vault(authHelper, provider, ownerDid);
 				});
@@ -196,10 +140,9 @@ public class Client {
 
 		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApplyAsync(provider -> {
-					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
-							localDataPath,
-							authenticationDIDDocument,
-							authentcationHandler,
+					AuthHelper authHelper = new AuthHelper(this.context,
+							ownerDid,
+							provider,
 							new AuthenticationShim());
 					return new Vault(authHelper, provider, ownerDid);
 				})
@@ -210,7 +153,7 @@ public class Client {
 					}
 					return vault.requestToCreateVault();
 				})
-				.handle((BiFunction<Vault, Throwable, Vault>) (vault, throwable) -> {
+				.handleAsync((BiFunction<Vault, Throwable, Vault>) (vault, throwable) -> {
 					if (null!=throwable) {
 						throw new CreateVaultFailedException(throwable.getLocalizedMessage());
 					}
