@@ -25,6 +25,9 @@ import java.nio.file.ProviderNotFoundException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
@@ -32,6 +35,7 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
+import org.elastos.hive.exception.CreateVaultFailedException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 
@@ -189,6 +193,7 @@ public class Client {
 	 * @return a new created vault for owner did
 	 */
 	public CompletableFuture<Vault> createVault(String ownerDid, String preferredProviderAddress) {
+
 		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApply(provider -> {
 					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
@@ -196,14 +201,21 @@ public class Client {
 							authenticationDIDDocument,
 							authentcationHandler,
 							new AuthenticationShim());
-					Vault vault = new Vault(authHelper, provider, ownerDid);
-
-					try {
-						if (vault.checkVaultExist())
-							throw new VaultAlreadyExistException("Vault aready existed.");
-						vault.requestToCreateVault();
-					} catch (Exception e) {
-						throw new CompletionException(e);
+					return new Vault(authHelper, provider, ownerDid);
+				})
+				.thenCompose(vault -> vault.checkVaultExist())
+				.thenCompose((Function<Vault, CompletionStage<Vault>>) vault -> {
+					if (null == vault) {
+						throw new VaultAlreadyExistException("Vault already existed.");
+					}
+					return vault.requestToCreateVault();
+				})
+				.handle((BiFunction<Vault, Throwable, Vault>) (vault, throwable) -> {
+					if (null!=throwable) {
+						throw new CreateVaultFailedException(throwable.getLocalizedMessage());
+					}
+					if(vault==null) {
+						throw new CreateVaultFailedException(CreateVaultFailedException.EXCEPTION);
 					}
 					return vault;
 				});

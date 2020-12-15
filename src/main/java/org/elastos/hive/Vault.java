@@ -122,12 +122,14 @@ public class Vault {
 		return this.payment;
 	}
 
-	boolean requestToCreateVault() throws ExecutionException, InterruptedException {
-		return this.vaultHelper.requestToCreateVault().get();
+	CompletableFuture<Vault> requestToCreateVault() {
+		return this.vaultHelper.requestToCreateVault()
+				.thenApply(aBoolean -> aBoolean?Vault.this:null);
 	}
 
-	boolean checkVaultExist() throws ExecutionException, InterruptedException {
-		return this.vaultHelper.vaultExist().get();
+	CompletableFuture<Vault> checkVaultExist() {
+		return this.vaultHelper.vaultExist()
+				.thenApply(aBoolean -> aBoolean?null:Vault.this);
 	}
 
 	public void revokeAccessToken() {
