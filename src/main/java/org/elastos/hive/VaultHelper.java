@@ -24,7 +24,7 @@ class VaultHelper {
 	}
 
 	public CompletableFuture<Boolean> requestToCreateVault() {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return requestToCreateVaultImpl();
 			} catch (HiveException e) {
@@ -47,7 +47,7 @@ class VaultHelper {
 	}
 
 	public CompletableFuture<Boolean> vaultExist() {
-		return authHelper.checkValid().thenApply(aVoid -> {
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return vaultExistImpl();
 			} catch (HiveException e) {

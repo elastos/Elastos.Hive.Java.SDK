@@ -171,7 +171,7 @@ public class Client {
 	 */
 	public CompletableFuture<Vault> getVault(String ownerDid, String preferredProviderAddress) {
 		return getVaultProvider(ownerDid, preferredProviderAddress)
-				.thenApply(provider -> {
+				.thenApplyAsync(provider -> {
 					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
 							localDataPath,
 							authenticationDIDDocument,
@@ -195,7 +195,7 @@ public class Client {
 	public CompletableFuture<Vault> createVault(String ownerDid, String preferredProviderAddress) {
 
 		return getVaultProvider(ownerDid, preferredProviderAddress)
-				.thenApply(provider -> {
+				.thenApplyAsync(provider -> {
 					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
 							localDataPath,
 							authenticationDIDDocument,
@@ -203,8 +203,8 @@ public class Client {
 							new AuthenticationShim());
 					return new Vault(authHelper, provider, ownerDid);
 				})
-				.thenCompose(vault -> vault.checkVaultExist())
-				.thenCompose((Function<Vault, CompletionStage<Vault>>) vault -> {
+				.thenComposeAsync(vault -> vault.checkVaultExist())
+				.thenComposeAsync((Function<Vault, CompletionStage<Vault>>) vault -> {
 					if (null == vault) {
 						throw new VaultAlreadyExistException("Vault already existed.");
 					}
