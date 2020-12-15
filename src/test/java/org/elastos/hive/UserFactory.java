@@ -1,8 +1,8 @@
 package org.elastos.hive;
 
+import org.elastos.did.DIDDocument;
 import org.elastos.did.PresentationInJWT;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class UserFactory {
@@ -48,13 +48,23 @@ public class UserFactory {
 				Client.setupResolver(userFactoryOpt.resolveUrl, this.didCachePath);
 				resolverDidSetup = true;
 			}
-			Client.Options options = new Client.Options();
-			options.setLocalDataPath(userFactoryOpt.storePath);
-			options.setAuthenticationHandler(jwtToken -> CompletableFuture.supplyAsync(()
-					-> presentationInJWT.getAuthToken(jwtToken)));
-			options.setAuthenticationDIDDocument(presentationInJWT.getDoc());
 
-			Client client = Client.createInstance(options);
+			Client client = Client.createInstance(new HiveContext() {
+				@Override
+				public String getLocalDataDir() {
+					return userFactoryOpt.storePath;
+				}
+
+				@Override
+				public DIDDocument getAppInstanceDocument() {
+					return presentationInJWT.getDoc();
+				}
+
+				@Override
+				public String getAuthorization(String jwtToken) {
+					return presentationInJWT.getAuthToken(jwtToken);
+				}
+			});
 			client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).whenComplete((ret, throwable) -> {
 				if (throwable == null) {
 					vault = ret;

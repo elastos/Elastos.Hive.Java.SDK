@@ -2,14 +2,6 @@ package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.elastos.did.DIDDocument;
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.model.BaseServiceConfig;
@@ -20,6 +12,12 @@ import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -47,20 +45,16 @@ class AuthHelper implements ConnectHelper {
 	private AuthToken token;
 	private Persistent persistent;
 
-	private DIDDocument authenticationDIDDocument;
-	private AuthenticationHandler authenticationHandler;
-	private Client.AuthenticationShim authenticationShim;
 	private ConnectionManager connectionManager;
+	private HiveContext context;
+	private Client.AuthenticationShim authenticationShim;
 
-	public AuthHelper(String ownerDid, String nodeUrl, String storePath, DIDDocument authenticationDIDDocument
-			, AuthenticationHandler handler, Client.AuthenticationShim shim) {
-		this.authenticationDIDDocument = authenticationDIDDocument;
-		this.authenticationHandler = handler;
-		this.authenticationShim = shim;
+	public AuthHelper(HiveContext context, String ownerDid, String nodeUrl, Client.AuthenticationShim shim) {
 		this.ownerDid = ownerDid;
 		this.nodeUrl = nodeUrl;
-
-		this.persistent = new AuthInfoStoreImpl(ownerDid, nodeUrl, storePath);
+		this.context = context;
+		this.authenticationShim = shim;
+		this.persistent = new AuthInfoStoreImpl(ownerDid, nodeUrl, this.context.getLocalDataDir());
 
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
@@ -100,7 +94,7 @@ class AuthHelper implements ConnectHelper {
 
 	private void signIn() throws HiveException {
 		Map<String, Object> map = new HashMap<>();
-		JSONObject docJsonObject = new JSONObject(authenticationDIDDocument.toString());
+		JSONObject docJsonObject = new JSONObject(this.context.getAppInstanceDocument().toString());
 		map.put("document", docJsonObject);
 
 		try {
@@ -114,8 +108,8 @@ class AuthHelper implements ConnectHelper {
 				throw new HiveException("Sign in failed");
 
 			String jwtToken = ret.textValue();
-			if (null!=authenticationShim && null!=this.authenticationHandler && verifyToken(jwtToken)) {
-				String approveJwtToken = authenticationShim.authenticate(authenticationHandler, jwtToken).get();
+			if (authenticationShim!=null && verifyToken(jwtToken)) {
+				String approveJwtToken = authenticationShim.authenticate(this.context, jwtToken);
 				nodeAuth(approveJwtToken);
 			}
 		} catch (Exception e) {
@@ -142,7 +136,7 @@ class AuthHelper implements ConnectHelper {
 			long exp = claims.getExpiration().getTime();
 			String aud = claims.getAudience();
 
-			String did = authenticationDIDDocument.getSubject().toString();
+			String did = this.context.getAppInstanceDocument().getSubject().toString();
 			if (null == did
 					|| null == aud
 					|| !did.equals(aud))
