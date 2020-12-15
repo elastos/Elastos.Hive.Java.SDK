@@ -93,7 +93,7 @@ class AuthHelper implements ConnectHelper {
 		initConnection();
 	}
 
-	private void retryLogin()  throws HiveException {
+	private synchronized void retryLogin()  throws HiveException {
 		signIn();
 		initConnection();
 	}
