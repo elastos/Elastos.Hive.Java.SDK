@@ -1,6 +1,6 @@
 package org.elastos.hive.exception;
 
-public class VaultAlreadyExistException extends HiveException {
+public class VaultAlreadyExistException extends RuntimeException {
 	private static final long serialVersionUID = 3332367416260335612L;
 
 	public VaultAlreadyExistException() {
