@@ -42,6 +42,15 @@ public class Client {
 	private DIDDocument authenticationDIDDocument;
 	private String localDataPath;
 
+	static class AuthenticationShim implements InternalHandler {
+
+		@Override
+		public synchronized CompletableFuture<String> authenticate(AuthenticationHandler handler, String jwtToken) {
+			return handler.authenticationChallenge(jwtToken);
+		}
+	}
+
+
 	private Client(Options options) {
 		this.authenticationDIDDocument = options.authenticationDIDDocument();
 		this.authentcationHandler = options.authentcationHandler;
@@ -162,7 +171,8 @@ public class Client {
 					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
 							localDataPath,
 							authenticationDIDDocument,
-							authentcationHandler);
+							authentcationHandler,
+							new AuthenticationShim());
 					return new Vault(authHelper, provider, ownerDid);
 				});
 	}
@@ -184,7 +194,8 @@ public class Client {
 					AuthHelper authHelper = new AuthHelper(ownerDid, provider,
 							localDataPath,
 							authenticationDIDDocument,
-							authentcationHandler);
+							authentcationHandler,
+							new AuthenticationShim());
 					Vault vault = new Vault(authHelper, provider, ownerDid);
 
 					try {

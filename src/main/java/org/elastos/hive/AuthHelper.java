@@ -48,11 +48,14 @@ class AuthHelper implements ConnectHelper {
 
 	private DIDDocument authenticationDIDDocument;
 	private AuthenticationHandler authenticationHandler;
+	private Client.AuthenticationShim authenticationShim;
 	private ConnectionManager connectionManager;
 
-	public AuthHelper(String ownerDid, String nodeUrl, String storePath, DIDDocument authenticationDIDDocument, AuthenticationHandler handler) {
+	public AuthHelper(String ownerDid, String nodeUrl, String storePath, DIDDocument authenticationDIDDocument
+			, AuthenticationHandler handler, Client.AuthenticationShim shim) {
 		this.authenticationDIDDocument = authenticationDIDDocument;
 		this.authenticationHandler = handler;
+		this.authenticationShim = shim;
 		this.ownerDid = ownerDid;
 		this.nodeUrl = nodeUrl;
 
@@ -110,8 +113,8 @@ class AuthHelper implements ConnectHelper {
 				throw new HiveException("Sign in failed");
 
 			String jwtToken = ret.textValue();
-			if (null != this.authenticationHandler && verifyToken(jwtToken)) {
-				String approveJwtToken = this.authenticationHandler.authenticationChallenge(jwtToken).get();
+			if (null!=authenticationShim && null!=this.authenticationHandler && verifyToken(jwtToken)) {
+				String approveJwtToken = authenticationShim.authenticate(authenticationHandler, jwtToken).get();
 				nodeAuth(approveJwtToken);
 			}
 		} catch (Exception e) {
