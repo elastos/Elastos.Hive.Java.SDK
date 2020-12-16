@@ -166,15 +166,6 @@ public class Client {
 						throw new VaultAlreadyExistException("Vault already existed.");
 					}
 					return vault.requestToCreateVault();
-				})
-				.handleAsync((BiFunction<Vault, Throwable, Vault>) (vault, throwable) -> {
-					if (null!=throwable) {
-						throw new CreateVaultFailedException(throwable.getLocalizedMessage());
-					}
-					if(vault==null) {
-						throw new CreateVaultFailedException(CreateVaultFailedException.EXCEPTION);
-					}
-					return vault;
 				});
 	}
 
