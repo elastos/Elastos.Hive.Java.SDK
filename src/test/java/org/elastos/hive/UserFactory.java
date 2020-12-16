@@ -3,6 +3,7 @@ package org.elastos.hive;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.PresentationInJWT;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class UserFactory {
@@ -61,8 +62,8 @@ public class UserFactory {
 				}
 
 				@Override
-				public String getAuthorization(String jwtToken) {
-					return presentationInJWT.getAuthToken(jwtToken);
+				public CompletableFuture<String> getAuthorization(String jwtToken) {
+					return CompletableFuture.supplyAsync(() -> presentationInJWT.getAuthToken(jwtToken));
 				}
 			});
 			client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).whenComplete((ret, throwable) -> {

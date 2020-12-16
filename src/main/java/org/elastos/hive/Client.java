@@ -48,7 +48,7 @@ public class Client {
 	static class AuthenticationShim implements InternalHandler {
 
 		@Override
-		public synchronized String authenticate(HiveContext context, String jwtToken) {
+		public synchronized CompletableFuture<String> authenticate(HiveContext context, String jwtToken) {
 			return context.getAuthorization(jwtToken);
 		}
 	}

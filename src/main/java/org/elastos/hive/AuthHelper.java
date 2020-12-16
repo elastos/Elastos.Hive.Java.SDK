@@ -109,7 +109,7 @@ class AuthHelper implements ConnectHelper {
 
 			String jwtToken = ret.textValue();
 			if (authenticationShim!=null && verifyToken(jwtToken)) {
-				String approveJwtToken = authenticationShim.authenticate(this.context, jwtToken);
+				String approveJwtToken = authenticationShim.authenticate(this.context, jwtToken).get();
 				nodeAuth(approveJwtToken);
 			}
 		} catch (Exception e) {
