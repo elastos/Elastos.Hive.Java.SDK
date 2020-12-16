@@ -2,6 +2,8 @@ package org.elastos.hive;
 
 import org.elastos.did.DIDDocument;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface HiveContext {
 	/**
 	 * token cache path
@@ -23,5 +25,5 @@ public interface HiveContext {
 	 *
 	 * @return
 	 */
-	String getAuthorization(String jwtToken);
+	CompletableFuture<String> getAuthorization(String jwtToken);
 }

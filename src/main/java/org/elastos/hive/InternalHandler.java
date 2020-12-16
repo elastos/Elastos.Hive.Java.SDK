@@ -1,6 +1,8 @@
 package org.elastos.hive;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface InternalHandler {
 
-	String authenticate(HiveContext context, String jwtToken);
+	CompletableFuture<String> authenticate(HiveContext context, String jwtToken);
 }
