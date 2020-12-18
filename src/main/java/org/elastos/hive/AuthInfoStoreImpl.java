@@ -31,7 +31,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class AuthInfoStoreImpl implements Persistent {
+class AuthInfoStoreImpl implements Persistent {
     private String ownerDid;
     private String provider;
     private String storePath;
