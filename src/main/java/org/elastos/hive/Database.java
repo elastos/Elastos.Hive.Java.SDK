@@ -40,8 +40,8 @@ public interface Database {
      * @param doc The document to insert. Must be a mutable mapping type. If
      *            the document does not have an _id field one will be added automatically
      * @param options bypass_document_validation: (optional) If True, allows
-     *                the write to opt-out of document level validation. Default is False.{@link InsertOptions}
-     * @return Results returned by InsertOneResult{@link InsertOneResult} wrapper
+     *                the write to opt-out of document level validation. Default is False.
+     * @return Results returned by {@link InsertOneResult} wrapper
      */
     CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options);
 
@@ -54,8 +54,8 @@ public interface Database {
      * @param options ordered (optional): If True (the default) documents will be inserted on the server serially,
      *                in the order provided. If an error occurs all remaining inserts are aborted. If False, documents
      *                will be inserted on the server in arbitrary order, possibly in parallel, and all document inserts will be attempted.
-     *                bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.{@link InsertOptions}
-     * @return Results returned by InsertManyResult{@link InsertManyResult} wrapper
+     *                bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
+     * @return Results returned by {@link InsertManyResult} wrapper
      */
     CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options);
 
@@ -68,7 +68,6 @@ public interface Database {
      *              skip (int): The number of matching documents to skip before returning results.
      *              limit (int): The maximum number of documents to count. Must be a positive integer. If not provided, no limit is imposed.
      *              maxTimeMS (int): The maximum amount of time to allow this operation to run, in milliseconds.
-     *              {@link CountOptions}
      * @return count size
      */
     CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options);
@@ -99,7 +98,7 @@ public interface Database {
      * @param filter A query that matches the document to update.
      * @param update The modifications to apply.
      * @param options optional, refer to {@link UpdateOptions}
-     * @return Results returned by InsertResult{@link UpdateResult} wrapper
+     * @return Results returned by {@link UpdateResult} wrapper
      */
     CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
 
@@ -110,7 +109,7 @@ public interface Database {
      * @param filter A query that matches the document to update.
      * @param update The modifications to apply.
      * @param options optional, refer to {@link UpdateOptions}
-     * @return Results returned by InsertResult{@link UpdateResult} wrapper
+     * @return Results returned by {@link UpdateResult} wrapper
      */
     CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
 

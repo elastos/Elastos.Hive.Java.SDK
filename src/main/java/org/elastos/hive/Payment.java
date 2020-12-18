@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import org.elastos.hive.database.CountOptions;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingInfo;
 import org.elastos.hive.payment.PricingPlan;
@@ -13,7 +14,6 @@ public interface Payment {
 	/**
 	 * get vault's payment info
 	 * @return PricingPlan list
-	 * @see org.elastos.hive.payment.PricingPlan
 	 */
 	CompletableFuture<PricingInfo> getPaymentInfo();
 
@@ -21,7 +21,6 @@ public interface Payment {
 	 * get vault pricing plan information by plan name
 	 * @param planName plan name
 	 * @return the instance of PricingPlan
-	 * @see org.elastos.hive.payment.PricingPlan
 	 */
 	CompletableFuture<PricingPlan> getPricingPlan(String planName);
 
