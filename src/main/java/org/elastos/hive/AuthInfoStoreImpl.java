@@ -22,7 +22,6 @@
 
 package org.elastos.hive;
 
-import org.elastos.hive.Persistent;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.utils.CryptoUtil;
 import org.json.JSONObject;
