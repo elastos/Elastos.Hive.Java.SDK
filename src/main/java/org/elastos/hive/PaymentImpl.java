@@ -24,7 +24,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-public class PaymentImpl implements Payment {
+class PaymentImpl implements Payment {
 
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
