@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.elastos.did.DID;
@@ -35,7 +34,6 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
-import org.elastos.hive.exception.CreateVaultFailedException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 

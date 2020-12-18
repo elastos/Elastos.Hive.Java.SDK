@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.payment.UsingPlan;
 import org.elastos.hive.utils.ResponseHelper;
 
 import java.util.concurrent.CompletableFuture;

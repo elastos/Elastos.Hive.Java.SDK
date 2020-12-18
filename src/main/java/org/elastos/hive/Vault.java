@@ -1,7 +1,6 @@
 package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Vault class
