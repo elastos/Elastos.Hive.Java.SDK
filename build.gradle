@@ -74,15 +74,17 @@ task createjavadoc(type: Javadoc) {
     }
     include(
             //org.elastos.hive
-            "**/Vault.java",
-            "**/AuthenticationHandler.java",
             "**/Client.java",
+            "**/SdkVersion.java",
+            "**/Vault.java",
 
             //interface
             "**/Database.java",
             "**/Files.java",
-            "**/Scripting.java",
+            "**/HiveContext.java",
             "**/Payment.java",
+            "**/Scripting.java",
+            "**/Version.java",
 
             //org.elastos.hive.database
             "**/DeleteOptions.java",
@@ -95,6 +97,7 @@ task createjavadoc(type: Javadoc) {
 
             //org.elastos.hive.file
             "**/FileInfo.java",
+            "**/UploadOutputStream.java",
 
             //org.elastos.hive.scripting
             "**/AggregatedCondition.java",
@@ -105,19 +108,27 @@ task createjavadoc(type: Javadoc) {
             "**/DbFindQuery.java",
             "**/DbInsertQuery.java",
             "**/DbUpdateQuery.java",
+            "**/DownloadExecutable.java",
+            "**/FileExecutable.java",
+            "**/HashExecutable.java",
             "**/Executable.java",
             "**/OrCondition.java",
             "**/QueryHasResultsCondition.java",
             "**/RawCondition.java",
             "**/RawExecutable.java",
+            "**/UploadExecutable.java",
 
             //org.elastos.hive.payment
             "**/Order",
-            "**/OrderState",
+            "**/PricingInfo",
             "**/PricingPlan",
+            "**/UsingPlan",
 
             //org.elastos.hive.exception
             "**/HiveException.java",
+            "**/FileNotFoundException.java",
+            "**/UnsupportFileTypeException.java",
+            "**/VaultAlreadyExistException.java",
     )
     source = sourceSets.main.java.srcDirs
     destinationDir = file("doc/")
