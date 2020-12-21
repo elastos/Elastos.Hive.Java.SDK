@@ -5,8 +5,6 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertNotNull;
@@ -92,7 +90,7 @@ public class PaymentTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = UserFactory.createUser2().getVault();
+		Vault vault = AppInstanceFactory.getUser2().getVault();
 		paymentApi = vault.getPayment();
 	}
 }

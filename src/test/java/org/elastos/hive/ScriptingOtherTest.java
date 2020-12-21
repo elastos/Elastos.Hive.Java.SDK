@@ -23,7 +23,7 @@ public class ScriptingOtherTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = UserFactory.createUser2().getVault();
+		Vault vault = AppInstanceFactory.getUser2().getVault();
 		scripting = vault.getScripting();
 	}
 }

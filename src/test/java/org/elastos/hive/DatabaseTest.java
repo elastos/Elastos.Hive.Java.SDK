@@ -499,7 +499,7 @@ public class DatabaseTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = UserFactory.createUser2().getVault();
+		Vault vault = AppInstanceFactory.getUser2().getVault();
 		database = vault.getDatabase();
 	}
 }
