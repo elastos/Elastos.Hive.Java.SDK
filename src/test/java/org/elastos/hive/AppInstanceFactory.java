@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.did.DIDDocument;
 import org.elastos.did.PresentationInJWT;
+import org.elastos.did.VaultAuthHelper;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -134,5 +135,22 @@ public class AppInstanceFactory {
 
 	public Vault getVault() {
 		return vault;
+	}
+
+	public static Client getClient() {
+		try {
+			Config config = ConfigHelper.getConfigInfo("user2.conf");
+			if (!resolverDidSetup) {
+				Client.setupResolver(config.getResolverUrl(), didCachePath);
+				resolverDidSetup = true;
+			}
+			return VaultAuthHelper.createInstance(config.getUserMn(),
+					config.getAppMn(),
+					config.getStorePath())
+					.getClientWithAuth().join();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
