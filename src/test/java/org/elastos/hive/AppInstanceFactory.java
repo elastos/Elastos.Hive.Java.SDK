@@ -6,7 +6,7 @@ import org.elastos.did.PresentationInJWT;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class UserFactory {
+public class AppInstanceFactory {
 	private static final String didCachePath = "didCache";
 	private Vault vault;
 	private static boolean resolverDidSetup = false;
@@ -82,15 +82,15 @@ public class UserFactory {
 		}
 	}
 
-	private UserFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
+	private AppInstanceFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
 		setUp(userDidOpt, appInstanceDidOpt, userFactoryOpt);
 	}
 
-	public static UserFactory createFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
-		return new UserFactory(userDidOpt, appInstanceDidOpt, userFactoryOpt);
+	public static AppInstanceFactory createFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
+		return new AppInstanceFactory(userDidOpt, appInstanceDidOpt, userFactoryOpt);
 	}
 
-	private static UserFactory initOptions(Config config) {
+	private static AppInstanceFactory initOptions(Config config) {
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
 				.setName(config.getUserName())
 				.setMnemonic(config.getUserMn())
@@ -109,26 +109,26 @@ public class UserFactory {
 		options.ownerDid(config.getUserDid());
 		options.storePath(config.getStorePath());
 
-		return new UserFactory(userDidOpt, appInstanceDidOpt, options);
+		return new AppInstanceFactory(userDidOpt, appInstanceDidOpt, options);
 	}
 
 	//develope 环境
-	public static UserFactory createUser1() {
+	public static AppInstanceFactory getUser1() {
 		return initOptions(ConfigHelper.getConfigInfo("user1.conf"));
 	}
 
 	//release环境（MainNet + https://hive1.trinity-tech.io）
-	public static UserFactory createUser2() {
+	public static AppInstanceFactory getUser2() {
 		return initOptions(ConfigHelper.getConfigInfo("user2.conf"));
 	}
 
 	//node 环境
-	public static UserFactory createUser3() {
+	public static AppInstanceFactory getUser3() {
 		return initOptions(ConfigHelper.getConfigInfo("user3.conf"));
 	}
 
 	//local 环境
-	public static UserFactory createUser4() {
+	public static AppInstanceFactory getUser4() {
 		return initOptions(ConfigHelper.getConfigInfo("user4.conf"));
 	}
 
