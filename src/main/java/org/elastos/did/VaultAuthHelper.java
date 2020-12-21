@@ -10,8 +10,28 @@ import java.util.concurrent.CompletableFuture;
 public final class VaultAuthHelper {
 
 	private PresentationInJWT presentationInJWT;
+	private String localDataDir;
 
-	public String generateMn() {
+	public static VaultAuthHelper createInstance(String userMn, String appMn, String localDataDir) {
+		return new VaultAuthHelper(userMn, appMn, localDataDir);
+	}
+
+	public VaultAuthHelper(String userMn, String appMn, String localDataDir) {
+		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
+				.setName("didapp")
+				.setMnemonic(userMn)
+				.setStorepass("storepass");
+
+		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
+				.setName("testapp")
+				.setMnemonic(appMn)
+				.setStorepass("storepass");
+
+		presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
+		this.localDataDir = localDataDir;
+	}
+
+	public static String generateMn() {
 		Mnemonic mg = Mnemonic.getInstance();
 		try {
 			return mg.generate();
@@ -21,20 +41,9 @@ public final class VaultAuthHelper {
 		return null;
 	}
 
-	public CompletableFuture<Client> getClientWithAuth(String userMn, String appMn, String localDataDir) {
+	public CompletableFuture<Client> getClientWithAuth() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-						.setName("didapp")
-						.setMnemonic(userMn)
-						.setStorepass("storepass");
-
-				PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-						.setName("testapp")
-						.setMnemonic(appMn)
-						.setStorepass("storepass");
-
-				presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
 				return Client.createInstance(new HiveContext() {
 					@Override
 					public String getLocalDataDir() {
