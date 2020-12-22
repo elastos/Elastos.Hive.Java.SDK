@@ -18,12 +18,10 @@ public final class VaultAuthHelper {
 
 	public VaultAuthHelper(String userMn, String appMn, String localDataDir) {
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-				.setName("didapp")
 				.setMnemonic(userMn)
 				.setStorepass("storepass");
 
 		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-				.setName("testapp")
 				.setMnemonic(appMn)
 				.setStorepass("storepass");
 
@@ -31,14 +29,9 @@ public final class VaultAuthHelper {
 		this.localDataDir = localDataDir;
 	}
 
-	public static String generateMn() {
-		Mnemonic mg = Mnemonic.getInstance();
-		try {
-			return mg.generate();
-		} catch (DIDException e) {
-			e.printStackTrace();
-		}
-		return null;
+	public static String generateMnemonic(String language) throws DIDException {
+		Mnemonic mg = Mnemonic.getInstance(language);
+		return mg.generate();
 	}
 
 	public CompletableFuture<Client> getClientWithAuth() {

@@ -26,9 +26,8 @@ import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.utils.JwtUtil;
 
-import java.io.File;
 
-public class PresentationInJWT {
+class PresentationInJWT {
 	DIDApp userDidApp = null;
 	DApp appInstanceDidApp = null;
 	DIDDocument doc = null;
@@ -36,10 +35,7 @@ public class PresentationInJWT {
 	private static DummyAdapter adapter;
 
 	private void initDIDBackend() {
-		final String cacheDir = System.getProperty("user.dir") + File.separator + "didCache";
-
 		adapter = new DummyAdapter();
-		DIDBackend.initialize(adapter, cacheDir);
 	}
 
 	public PresentationInJWT init(Options userDidOpt, Options appInstanceDidOpt) {
