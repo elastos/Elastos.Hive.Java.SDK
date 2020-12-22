@@ -1,4 +1,4 @@
-package org.elastos.did;
+package org.elastos.hive.didhelper;
 
 public class Config {
 	private String userDid;
