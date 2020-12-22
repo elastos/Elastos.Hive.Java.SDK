@@ -12,17 +12,17 @@ public final class VaultAuthHelper {
 	private PresentationInJWT presentationInJWT;
 	private String localDataDir;
 
-	public static VaultAuthHelper createInstance(String userMn, String appMn, String localDataDir) {
-		return new VaultAuthHelper(userMn, appMn, localDataDir);
+	public static VaultAuthHelper createInstance(String userMnemonic, String appMnemonic, String localDataDir) {
+		return new VaultAuthHelper(userMnemonic, appMnemonic, localDataDir);
 	}
 
-	public VaultAuthHelper(String userMn, String appMn, String localDataDir) {
+	public VaultAuthHelper(String userMnemonic, String appMnemonic, String localDataDir) {
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
-				.setMnemonic(userMn)
+				.setMnemonic(userMnemonic)
 				.setStorepass("storepass");
 
 		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
-				.setMnemonic(appMn)
+				.setMnemonic(appMnemonic)
 				.setStorepass("storepass");
 
 		presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
