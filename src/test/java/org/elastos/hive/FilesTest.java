@@ -11,6 +11,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.did.AppInstanceFactory;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

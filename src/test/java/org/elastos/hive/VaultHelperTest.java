@@ -1,5 +1,8 @@
 package org.elastos.hive;
 
+import org.elastos.did.AppInstanceFactory;
+import org.elastos.did.VaultAuthHelper;
+import org.elastos.did.exception.DIDException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,6 +28,16 @@ public class VaultHelperTest {
 			assertTrue(future.isDone());
 		} catch (Exception e) {
 			fail();
+		}
+	}
+
+	@Test
+	public void generateMnemonic() {
+		try {
+			String mn = VaultAuthHelper.generateMnemonic("english");
+			System.out.println(mn);
+		} catch (DIDException e) {
+			e.printStackTrace();
 		}
 	}
 
