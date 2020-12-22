@@ -1,5 +1,8 @@
-package org.elastos.did;
+package org.elastos.hive.didhelper;
 
+import org.elastos.did.DID;
+import org.elastos.did.DIDDocument;
+import org.elastos.did.DIDStore;
 import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 

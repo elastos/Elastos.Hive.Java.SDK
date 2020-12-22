@@ -20,8 +20,11 @@
  * SOFTWARE.
  */
 
-package org.elastos.did;
+package org.elastos.hive.didhelper;
 
+import org.elastos.did.DIDDocument;
+import org.elastos.did.VerifiableCredential;
+import org.elastos.did.VerifiablePresentation;
 import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.utils.JwtUtil;
