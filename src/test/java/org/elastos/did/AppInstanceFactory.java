@@ -1,8 +1,8 @@
-package org.elastos.hive;
+package org.elastos.did;
 
-import org.elastos.did.DIDDocument;
-import org.elastos.did.PresentationInJWT;
-import org.elastos.did.VaultAuthHelper;
+import org.elastos.hive.Client;
+import org.elastos.hive.HiveContext;
+import org.elastos.hive.Vault;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;

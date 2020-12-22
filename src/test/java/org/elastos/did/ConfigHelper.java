@@ -1,4 +1,4 @@
-package org.elastos.hive;
+package org.elastos.did;
 
 import java.io.File;
 import java.io.IOException;

@@ -6,7 +6,7 @@ import org.elastos.did.exception.DIDException;
 import java.io.File;
 import java.util.List;
 
-public class Entity {
+class Entity {
 	private String phrasepass;
 	protected String storepass;
 

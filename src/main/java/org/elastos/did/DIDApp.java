@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DIDApp  extends Entity {
+class DIDApp  extends Entity {
 	private Issuer issuer;
 
 	public DIDApp(String name, String mnemonic, DummyAdapter adapter,  String phrasepass, String storepass) throws DIDException {
