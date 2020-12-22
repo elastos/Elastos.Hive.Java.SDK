@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
-import org.elastos.did.AppInstanceFactory;
-import org.elastos.did.VaultAuthHelper;
+import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.elastos.hive.didhelper.VaultAuthHelper;
 import org.elastos.did.exception.DIDException;
 import org.junit.BeforeClass;
 import org.junit.Test;

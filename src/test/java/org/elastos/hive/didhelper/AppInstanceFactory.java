@@ -1,5 +1,6 @@
-package org.elastos.did;
+package org.elastos.hive.didhelper;
 
+import org.elastos.did.DIDDocument;
 import org.elastos.hive.Client;
 import org.elastos.hive.HiveContext;
 import org.elastos.hive.Vault;

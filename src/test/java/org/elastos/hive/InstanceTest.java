@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-import org.elastos.did.AppInstanceFactory;
+import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;

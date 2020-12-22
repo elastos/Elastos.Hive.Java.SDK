@@ -32,7 +32,7 @@ import org.elastos.hive.database.Timestamp;
 import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.database.WriteConcern;
-import org.elastos.did.AppInstanceFactory;
+import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
