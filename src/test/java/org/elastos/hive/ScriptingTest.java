@@ -10,6 +10,7 @@ import org.elastos.hive.database.MinKey;
 import org.elastos.hive.database.ObjectId;
 import org.elastos.hive.database.RegularExpression;
 import org.elastos.hive.database.Timestamp;
+import org.elastos.did.AppInstanceFactory;
 import org.elastos.hive.scripting.AggregatedExecutable;
 import org.elastos.hive.scripting.AndCondition;
 import org.elastos.hive.scripting.Condition;

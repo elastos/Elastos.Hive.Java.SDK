@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import org.elastos.did.AppInstanceFactory;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
