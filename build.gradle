@@ -1,6 +1,5 @@
 apply plugin: 'java-library'
 apply plugin: 'com.novoda.bintray-release'
-apply plugin: 'org.warship.plugin'
 
 repositories {
     jcenter()
@@ -17,7 +16,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.novoda:bintray-release:0.9.1'
-        classpath "com.github.xidaokun:core:1.0.2"
     }
 }
 
@@ -170,10 +168,4 @@ publish {
     desc = 'Elastos Hive Test SDK'
     repoName = 'hive'
     website = 'https://github.com/elastos/Elastos.NET.Hive.Java.SDK'
-}
-
-release {
-    publishVersion = version
-    packageName = 'org.elastos.hive'
-    classPath = './src/main/java/org/elastos/hive'
 }
