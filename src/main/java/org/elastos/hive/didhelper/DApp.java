@@ -1,5 +1,7 @@
-package org.elastos.did;
+package org.elastos.hive.didhelper;
 
+import org.elastos.did.VerifiableCredential;
+import org.elastos.did.VerifiablePresentation;
 import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Header;
@@ -28,7 +30,7 @@ class DApp extends Entity {
 				.seal(getStorePassword());
 
 		System.out.println("VerifiableCredential:");
-		String vpStr = vp.toJson(true);
+		String vpStr = vp.toString();
 		System.out.println(vpStr);
 
 		return vp;

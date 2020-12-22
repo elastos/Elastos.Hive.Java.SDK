@@ -1,5 +1,7 @@
-package org.elastos.did;
+package org.elastos.hive.didhelper;
 
+import org.elastos.did.DIDDocument;
+import org.elastos.did.Mnemonic;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.Client;
 import org.elastos.hive.HiveContext;
