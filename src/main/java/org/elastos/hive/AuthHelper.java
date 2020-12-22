@@ -54,7 +54,7 @@ class AuthHelper implements ConnectHelper {
 		this.nodeUrl = nodeUrl;
 		this.context = context;
 		this.authenticationShim = shim;
-		this.persistent = new AuthInfoStoreImpl(ownerDid, nodeUrl, this.context.getLocalDataDir());
+		this.persistent = new PersistentImpl(ownerDid, nodeUrl, this.context.getLocalDataDir());
 
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
