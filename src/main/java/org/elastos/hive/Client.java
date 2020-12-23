@@ -41,17 +41,17 @@ public class Client {
 	private static boolean resolverDidSetup;
 
 	private AuthenticationAdapterImpl authenticationAdapterImpl;
-	private HiveContext context;
+	private ApplicationContext context;
 
 	static class AuthenticationAdapterImpl implements AuthenticationAdapter {
 
 		@Override
-		public synchronized CompletableFuture<String> getAuthorization(HiveContext context, String jwtToken) {
+		public synchronized CompletableFuture<String> getAuthorization(ApplicationContext context, String jwtToken) {
 			return context.getAuthorization(jwtToken);
 		}
 	}
 
-	private Client(HiveContext context) {
+	private Client(ApplicationContext context) {
 		if(null == context) {
 			throw new IllegalArgumentException("context should not be null");
 		}
@@ -106,7 +106,7 @@ public class Client {
 	}
 
 
-	public static Client createInstance(HiveContext context) throws HiveException {
+	public static Client createInstance(ApplicationContext context) throws HiveException {
 		if (context == null)
 			throw new IllegalArgumentException();
 
