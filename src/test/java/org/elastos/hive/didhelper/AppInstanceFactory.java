@@ -2,7 +2,7 @@ package org.elastos.hive.didhelper;
 
 import org.elastos.did.DIDDocument;
 import org.elastos.hive.Client;
-import org.elastos.hive.HiveContext;
+import org.elastos.hive.ApplicationContext;
 import org.elastos.hive.Vault;
 
 import java.util.concurrent.CompletableFuture;
@@ -52,7 +52,7 @@ public class AppInstanceFactory {
 				resolverDidSetup = true;
 			}
 
-			Client client = Client.createInstance(new HiveContext() {
+			Client client = Client.createInstance(new ApplicationContext() {
 				@Override
 				public String getLocalDataDir() {
 					return userFactoryOpt.storePath;
