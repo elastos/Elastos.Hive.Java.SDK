@@ -4,7 +4,7 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.Mnemonic;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.Client;
-import org.elastos.hive.HiveContext;
+import org.elastos.hive.ApplicationContext;
 import org.elastos.hive.exception.HiveException;
 
 import java.util.concurrent.CompletableFuture;
@@ -39,7 +39,7 @@ public final class VaultAuthHelper {
 	public CompletableFuture<Client> getClientWithAuth() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return Client.createInstance(new HiveContext() {
+				return Client.createInstance(new ApplicationContext() {
 					@Override
 					public String getLocalDataDir() {
 						return localDataDir;

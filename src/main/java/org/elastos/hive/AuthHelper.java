@@ -46,10 +46,10 @@ class AuthHelper implements ConnectHelper {
 	private Persistent persistent;
 
 	private ConnectionManager connectionManager;
-	private HiveContext context;
+	private ApplicationContext context;
 	private Client.AuthenticationAdapterImpl authenticationAdapterImpl;
 
-	public AuthHelper(HiveContext context, String ownerDid, String nodeUrl, Client.AuthenticationAdapterImpl shim) {
+	public AuthHelper(ApplicationContext context, String ownerDid, String nodeUrl, Client.AuthenticationAdapterImpl shim) {
 		this.ownerDid = ownerDid;
 		this.nodeUrl = nodeUrl;
 		this.context = context;

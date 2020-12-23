@@ -4,7 +4,7 @@ import org.elastos.did.DIDDocument;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface HiveContext {
+public interface ApplicationContext {
 	/**
 	 * token cache path
 	 *
