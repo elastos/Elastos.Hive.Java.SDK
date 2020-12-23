@@ -1,11 +1,14 @@
 package org.elastos.hive;
 
 import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.elastos.hive.payment.Order;
+import org.elastos.hive.payment.PricingPlan;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -17,14 +20,48 @@ import static org.junit.Assert.fail;
 public class PaymentTest {
 
 	private static Payment paymentApi;
-	private static final String planName = "Free";
-	private static final String priceName = "Rookie";
-	private static String orderId = "5fb5f1be9284ff39688ea77e";
+	private String priceName;
 
 	@Test
-	public void test01_getPaymentInfo() {
+	public void test01_getPricingPlanByPlanName() {
 		CompletableFuture<Boolean> future = paymentApi.getPaymentInfo()
-				.handleAsync((pricingInfo, throwable) -> (throwable == null));
+				.thenApplyAsync(pricingInfo -> {
+					try {
+						System.out.print("Test case01 PaymentInfo ==>");
+						System.out.println(pricingInfo.serialize());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					List<PricingPlan> pricePlans = pricingInfo.pricingPlans();
+					if (pricePlans.size() <= 0) {
+						fail();
+						return null;
+					}
+					for (PricingPlan pricingPlan : pricePlans) {
+						if (pricingPlan.amount() > 0) {
+							return pricingPlan;
+						}
+					}
+					return null;
+				})
+				.thenCompose(pricingInfo -> {
+					if (pricingInfo == null) {
+						fail();
+					}
+					String planName = pricingInfo.name();
+					return paymentApi.getPricingPlan(planName);
+				}).handleAsync((pricingPlan, throwable) -> {
+					try {
+						System.out.print("Test case01 PricingPlan ==>");
+						System.out.println(pricingPlan.serialize());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					if (pricingPlan != null) {
+						priceName = pricingPlan.name();
+					}
+					return (throwable == null);
+				});
 
 		try {
 			assertTrue(future.get());
@@ -36,37 +73,30 @@ public class PaymentTest {
 	}
 
 	@Test
-	public void test02_getPricingPlan() {
-		CompletableFuture<Boolean> future = paymentApi.getPricingPlan(planName)
-				.handleAsync((pricingPlan, throwable) -> (throwable == null));
+	public void test02_payOrder() {
+		CompletableFuture<Boolean> future = paymentApi.getAllOrders()
+				.thenApplyAsync(orders -> {
+					for(Order order : orders) {
+						if(order.state().equalsIgnoreCase("wait_tx")) {
+							return order.orderId();
+						}
+					}
+					return null;
+				}).thenComposeAsync(orderId -> {
+					if (null == orderId) {
+						return paymentApi.placeOrder(priceName);
+					}
+					return CompletableFuture.completedFuture(orderId);
+				})
+				.thenComposeAsync(orderId -> {
+					System.out.print("Test case02 orderId ==>");
+					System.out.println(orderId);
 
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
-	@Test
-	public void test03_placeOrder() {
-		CompletableFuture<Boolean> future = paymentApi.placeOrder(priceName)
-				.handleAsync((orderId, throwable) -> (throwable == null));
-
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
-	@Test
-	public void test04_payOrder() {
-		List<String> txids = new ArrayList<>();
-		CompletableFuture<Boolean> future = paymentApi.payOrder(orderId, txids)
+					List<String> txids = new ArrayList<>();
+					//TODO set your paid txId
+					txids.add("you paid txId");
+					return paymentApi.payOrder(orderId, txids);
+				})
 				.handleAsync((aBoolean, throwable) -> (throwable == null));
 
 		try {
@@ -79,35 +109,7 @@ public class PaymentTest {
 	}
 
 	@Test
-	public void test05_getOrder() {
-		CompletableFuture<Boolean> future = paymentApi.getOrder(orderId)
-				.handleAsync((order, throwable) -> (throwable == null));
-
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
-	@Test
-	public void test06_getAllOrders() {
-		CompletableFuture<Boolean> future = paymentApi.getAllOrders()
-				.handleAsync((orders, throwable) -> (throwable == null));
-
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
-	@Test
-	public void test07_getUsingPricePlan() {
+	public void test03_getUsingPricePlan() {
 		CompletableFuture<Boolean> future = paymentApi.getUsingPricePlan()
 				.handleAsync((usingPlan, throwable) -> (throwable == null));
 
@@ -121,7 +123,7 @@ public class PaymentTest {
 	}
 
 	@Test
-	public void test07_getPaymentVersion() {
+	public void test04_getPaymentVersion() {
 		CompletableFuture<Boolean> future = paymentApi.getPaymentVersion()
 				.handleAsync((version, throwable) -> (throwable == null));
 
