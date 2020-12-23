@@ -6,11 +6,12 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PaymentTest {
@@ -21,72 +22,116 @@ public class PaymentTest {
 	private static String orderId = "5fb5f1be9284ff39688ea77e";
 
 	@Test
-	public void test01_getPaymentInfo() throws ExecutionException, InterruptedException {
-		paymentApi.getPaymentInfo().whenComplete((paymentInfo, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(paymentInfo);
-		}).get();
+	public void test01_getPaymentInfo() {
+		CompletableFuture<Boolean> future = paymentApi.getPaymentInfo()
+				.handleAsync((pricingInfo, throwable) -> (throwable == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test02_getPricingPlan() throws ExecutionException, InterruptedException {
-		paymentApi.getPricingPlan(planName).whenComplete((pricingPlan, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(pricingPlan);
-			assertTrue(planName.equals(pricingPlan.name()));
-		}).get();
+	public void test02_getPricingPlan() {
+		CompletableFuture<Boolean> future = paymentApi.getPricingPlan(planName)
+				.handleAsync((pricingPlan, throwable) -> (throwable == null));
 
-	}
-
-//	@Test
-//	public void test03_placeOrder() throws ExecutionException, InterruptedException {
-//		paymentApi.placeOrder(priceName).whenComplete((orderId, throwable) -> {
-//			assertNull(throwable);
-//			assertNotNull(orderId);
-//			this.orderId = orderId;
-//		}).get();
-//	}
-
-//	@Test
-//	public void test04_payOrder() throws ExecutionException, InterruptedException {
-//		List<String> txids = new ArrayList<>();
-//		txids.add("xxxxxxxxxxx");
-//		paymentApi.payOrder(orderId, txids).whenComplete((orderId, throwable) -> {
-//			assertNull(throwable);
-//			assertNotNull(orderId);
-//		}).get();
-//	}
-
-//	@Test
-//	public void test05_getOrder() throws ExecutionException, InterruptedException {
-//		paymentApi.getOrder(orderId).whenComplete((order, throwable) -> {
-//			assertNull(throwable);
-//			assertNotNull(order);
-//		}).get();
-//	}
-
-	@Test
-	public void test06_getAllOrders() throws ExecutionException, InterruptedException {
-		paymentApi.getAllOrders().whenComplete((orders, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(orders);
-		}).get();
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test07_getUsingPricePlan() throws ExecutionException, InterruptedException {
-		paymentApi.getUsingPricePlan().whenComplete((using, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(using);
-		}).get();
+	public void test03_placeOrder() {
+		CompletableFuture<Boolean> future = paymentApi.placeOrder(priceName)
+				.handleAsync((orderId, throwable) -> (throwable == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@Test
-	public void test07_getPaymentVersion() throws ExecutionException, InterruptedException {
-		paymentApi.getPaymentVersion().whenComplete((version, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(version);
-		}).get();
+	public void test04_payOrder() {
+		List<String> txids = new ArrayList<>();
+		CompletableFuture<Boolean> future = paymentApi.payOrder(orderId, txids)
+				.handleAsync((aBoolean, throwable) -> (throwable == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void test05_getOrder() {
+		CompletableFuture<Boolean> future = paymentApi.getOrder(orderId)
+				.handleAsync((order, throwable) -> (throwable == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void test06_getAllOrders() {
+		CompletableFuture<Boolean> future = paymentApi.getAllOrders()
+				.handleAsync((orders, throwable) -> (throwable == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void test07_getUsingPricePlan() {
+		CompletableFuture<Boolean> future = paymentApi.getUsingPricePlan()
+				.handleAsync((usingPlan, throwable) -> (throwable == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void test07_getPaymentVersion() {
+		CompletableFuture<Boolean> future = paymentApi.getPaymentVersion()
+				.handleAsync((version, throwable) -> (throwable == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			fail();
+		}
 	}
 
 	@BeforeClass
