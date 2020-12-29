@@ -26,13 +26,13 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.elastos.hive.Constance;
 import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.network.AuthApi;
 import org.elastos.hive.network.DatabaseApi;
 import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.PaymentApi;
 import org.elastos.hive.network.ScriptingApi;
+import org.elastos.hive.network.UploadApi;
 import org.elastos.hive.network.VaultApi;
 import org.elastos.hive.network.VersionApi;
 
@@ -131,7 +131,7 @@ public class ConnectionManager {
 	}
 
 	public HttpURLConnection openURLConnection(String path) throws IOException {
-		String url = this.getVaultBaseUrl() + Constance.API_PATH + path;
+		String url = this.getVaultBaseUrl() + UploadApi.API_PATH + path;
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setRequestProperty("User-Agent",
