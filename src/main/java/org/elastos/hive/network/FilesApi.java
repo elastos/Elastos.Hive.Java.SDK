@@ -1,6 +1,5 @@
 package org.elastos.hive.network;
 
-import org.elastos.hive.Constance;
 import org.elastos.hive.files.FileInfo;
 import org.elastos.hive.files.FilesList;
 
