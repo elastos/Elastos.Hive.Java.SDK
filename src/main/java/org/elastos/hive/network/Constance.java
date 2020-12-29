@@ -1,6 +1,6 @@
-package org.elastos.hive;
+package org.elastos.hive.network;
 
-public class Constance {
+class Constance {
 
 	public static final String API_PATH = "/api/v1";
 
