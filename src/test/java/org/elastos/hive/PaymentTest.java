@@ -20,7 +20,6 @@ import static org.junit.Assert.fail;
 public class PaymentTest {
 
 	private static Payment paymentApi;
-	private String priceName;
 
 	@Test
 	public void test01_getPricingPlanByPlanName() {
@@ -57,9 +56,6 @@ public class PaymentTest {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					if (pricingPlan != null) {
-						priceName = pricingPlan.name();
-					}
 					return (throwable == null);
 				});
 
@@ -77,14 +73,14 @@ public class PaymentTest {
 		CompletableFuture<Boolean> future = paymentApi.getAllOrders()
 				.thenApplyAsync(orders -> {
 					for(Order order : orders) {
-						if(order.state().equalsIgnoreCase("wait_tx")) {
+						if(order.state().equalsIgnoreCase("wait_pay")) {
 							return order.orderId();
 						}
 					}
 					return null;
 				}).thenComposeAsync(orderId -> {
 					if (null == orderId) {
-						return paymentApi.placeOrder(priceName);
+						return paymentApi.placeOrder("Rookie");
 					}
 					return CompletableFuture.completedFuture(orderId);
 				})
@@ -92,12 +88,11 @@ public class PaymentTest {
 					System.out.print("Test case02 orderId ==>");
 					System.out.println(orderId);
 
-					List<String> txids = new ArrayList<>();
 					//TODO set your paid txId
-					txids.add("you paid txId");
+					List<String> txids = new ArrayList<>();
 					return paymentApi.payOrder(orderId, txids);
 				})
-				.handleAsync((aBoolean, throwable) -> (throwable == null));
+				.handle((aBoolean, throwable) -> (throwable == null));
 
 		try {
 			assertTrue(future.get());
