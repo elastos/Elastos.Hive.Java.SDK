@@ -80,7 +80,7 @@ task createjavadoc(type: Javadoc) {
             //interface
             "**/Database.java",
             "**/Files.java",
-            "**/HiveContext.java",
+            "**/ApplicationContext.java",
             "**/Payment.java",
             "**/Scripting.java",
             "**/Version.java",
