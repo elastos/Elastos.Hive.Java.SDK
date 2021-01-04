@@ -95,7 +95,7 @@ public class ScriptingTest {
 		JsonNode filter = JsonUtil.deserialize("{\"friends\":\"$callScripter_did\"}");
 		JsonNode options = JsonUtil.deserialize("{\"projection\":{\"_id\":false,\"name\":true}}");
 		Executable executable = new DbFindQuery("get_groups", "groups", filter, options);
-		CompletableFuture<Boolean> future = scripting.registerScript(noConditionName, executable)
+		CompletableFuture<Boolean> future = scripting.registerScript(noConditionName, executable, false, false)
 				.handle((success, ex) -> (ex == null));
 
 		try {
@@ -112,7 +112,7 @@ public class ScriptingTest {
 		JsonNode filter = JsonUtil.deserialize("{\"_id\":\"$params.group_id\",\"friends\":\"$callScripter_did\"}");
 		Executable executable = new DbFindQuery("get_groups", "test_group", filter);
 		Condition condition = new QueryHasResultsCondition("verify_user_permission", "test_group", filter);
-		CompletableFuture<Boolean> future = scripting.registerScript(withConditionName, condition, executable)
+		CompletableFuture<Boolean> future = scripting.registerScript(withConditionName, condition, executable, false, false)
 				.handle((success, ex) -> (ex == null));
 
 		try {
@@ -181,7 +181,7 @@ public class ScriptingTest {
 	@Test
 	public void test11_setUploadScript() {
 		Executable executable = new UploadExecutable("upload_file", "$params.path", true);
-		CompletableFuture<Boolean> future = scripting.registerScript("upload_file", executable)
+		CompletableFuture<Boolean> future = scripting.registerScript("upload_file", executable, false, false)
 				.handle((success, ex) -> (ex == null));
 
 		try {
@@ -247,7 +247,7 @@ public class ScriptingTest {
 	@Test
 	public void test13_setDownloadScript() {
 		Executable executable = new DownloadExecutable("download_file", "$params.path", true);
-		CompletableFuture<Boolean> future = scripting.registerScript("download_file", executable)
+		CompletableFuture<Boolean> future = scripting.registerScript("download_file", executable, false, false)
 				.handle((success, ex) -> (ex == null));
 		try {
 			assertTrue(future.get());
@@ -291,7 +291,7 @@ public class ScriptingTest {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
 		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
-		CompletableFuture<Boolean> future = scripting.registerScript("get_file_info", executable)
+		CompletableFuture<Boolean> future = scripting.registerScript("get_file_info", executable, false, false)
 				.handle((success, ex) -> (ex == null));
 
 		try {

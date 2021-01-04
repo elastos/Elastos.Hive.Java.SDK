@@ -39,25 +39,27 @@ class ScriptingImpl implements Scripting {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> registerScript(String name, Executable executable) {
-		return this.registerScript(name, null, executable);
+	public CompletableFuture<Boolean> registerScript(String name, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp) {
+		return this.registerScript(name, null, executable, allowAnonymousUser, allowAnonymousApp);
 	}
 
 	@Override
-	public CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable) {
+	public CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp) {
 		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
-				return registerScriptImpl(name, condition, executable);
+				return registerScriptImpl(name, condition, executable, allowAnonymousUser, allowAnonymousApp);
 			} catch (HiveException e) {
 				throw new CompletionException(e);
 			}
 		});
 	}
 
-	private boolean registerScriptImpl(String name, Condition condition, Executable executable) throws HiveException {
+	private boolean registerScriptImpl(String name, Condition condition, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp) throws HiveException {
 		try {
 			Map<String, Object> map = new HashMap<>();
 			map.put("name", name);
+			map.put("allowAnonymousUser", allowAnonymousUser);
+			map.put("allowAnonymousApp", allowAnonymousApp);
 			map.put("executable", executable);
 			if (condition != null)
 				map.put("condition", condition);

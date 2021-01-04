@@ -14,9 +14,9 @@ public interface Scripting {
 	 * serialized and stored on the hive back-end. Later on, anyone, including the vault owner or external users, can
 	 * use Scripting.call() to execute one of those scripts and get results/data.
 	 */
-	CompletableFuture<Boolean> registerScript(String name, Executable executable);
+	CompletableFuture<Boolean> registerScript(String name, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp);
 
-	CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable);
+	CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp);
 
 	/**
 	 * Executes a previously registered server side script using Scripting.setScript(). Vault owner or external users are
