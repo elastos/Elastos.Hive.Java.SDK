@@ -55,6 +55,11 @@ public class DbFindQuery extends Executable {
 		query = new Query(collection, filter, options);
 	}
 
+	public DbFindQuery(String name, String collection, JsonNode filter, JsonNode options, boolean output) {
+		super(TYPE, name, output);
+		query = new Query(collection, filter, options);
+	}
+
 	@Override
 	public Query getBody() {
 		return query;

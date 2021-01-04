@@ -12,17 +12,21 @@ public class AggregatedExecutable extends Executable {
 
 	private List<Executable> executables;
 
+	public AggregatedExecutable(String name) {
+		this(name, null);
+	}
+
     public AggregatedExecutable(String name, Executable[] executables) {
-    	super(TYPE, name);
-
-        this.executables = new ArrayList<>();
-        if (executables != null && executables.length > 0)
-        	this.executables.addAll(Arrays.asList(executables));
+    	this(name, executables, false);
     }
 
-    public AggregatedExecutable(String name) {
-    	this(name, null);
-    }
+	public AggregatedExecutable(String name, Executable[] executables, boolean output) {
+		super(TYPE, name);
+
+		this.executables = new ArrayList<>();
+		if (executables != null && executables.length > 0)
+			this.executables.addAll(Arrays.asList(executables));
+	}
 
     public AggregatedExecutable append(Executable executable) {
     	if (executable instanceof AggregatedExecutable) {

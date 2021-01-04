@@ -37,6 +37,11 @@ public class DbDeleteQuery extends Executable {
         query = new Query(collection, filter);
     }
 
+	public DbDeleteQuery(String name, String collection, JsonNode filter, boolean output) {
+		super(TYPE, name, output);
+		query = new Query(collection, filter);
+	}
+
 	@Override
 	public Query getBody() {
 		return query;
