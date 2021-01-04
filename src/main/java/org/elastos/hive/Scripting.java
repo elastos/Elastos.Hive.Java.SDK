@@ -33,8 +33,8 @@ public interface Scripting {
 	 * types of executable queries because there are two steps to this executable. First, register a
 	 * script on the vault, then you call this api to actually upload the file
 	 * @param transactionId
-	 * @param resultType Reader or InputStream class
-	 * @param <T> Write
+	 * @param resultType Write, OutputStream
+	 * @param <T> Write, OutputStream
 	 * @return
 	 */
 	<T> CompletableFuture<T> uploadFile(String transactionId, Class<T> resultType);
