@@ -37,6 +37,11 @@ public class DbInsertQuery extends Executable {
         query = new Query(collection, doc);
     }
 
+	public DbInsertQuery(String name, String collection, JsonNode doc, boolean output) {
+		super(TYPE, name, output);
+		query = new Query(collection, doc);
+	}
+
 	@Override
 	public Query getBody() {
 		return query;
