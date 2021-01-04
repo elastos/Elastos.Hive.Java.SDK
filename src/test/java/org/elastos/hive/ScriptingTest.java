@@ -36,8 +36,6 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -94,36 +92,35 @@ public class ScriptingTest {
 	@Test
 	public void test03_registerNoCondition() {
 
-		JsonNode filter = JsonUtil.deserialize("{\"friends\":\"$callScripter_did\"}");
-		JsonNode options = JsonUtil.deserialize("{\"projection\":{\"_id\":false,\"name\":true}}");
-		Executable executable = new DbFindQuery("get_groups", "groups", filter, options);
-		CompletableFuture<Boolean> future = scripting.registerScript(noConditionName, executable, false, false)
-				.handle((success, ex) -> (ex == null));
+		CompletableFuture<Boolean> noConditionFuture;
+		CompletableFuture<Boolean> withConditionFuture;
+
+		{
+			JsonNode filter = JsonUtil.deserialize("{\"friends\":\"$callScripter_did\"}");
+			JsonNode options = JsonUtil.deserialize("{\"projection\":{\"_id\":false,\"name\":true}}");
+			Executable executable = new DbFindQuery("get_groups", "groups", filter, options);
+			noConditionFuture = scripting.registerScript(noConditionName, executable, false, false)
+					.handle((success, ex) -> (ex == null));
+		}
+
+		{
+			JsonNode filter = JsonUtil.deserialize("{\"_id\":\"$params.group_id\",\"friends\":\"$callScripter_did\"}");
+			Executable executable = new DbFindQuery("get_groups", "test_group", filter);
+			Condition condition = new QueryHasResultsCondition("verify_user_permission", "test_group", filter);
+			withConditionFuture = scripting.registerScript(withConditionName, condition, executable, false, false)
+					.handle((success, ex) -> (ex == null));
+		}
+
+		CompletableFuture allFuture = CompletableFuture.allOf(noConditionFuture, withConditionFuture);
 
 		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
+			allFuture.get();
+			assertTrue(allFuture.isCompletedExceptionally() == false);
+			assertTrue(allFuture.isDone());
 		} catch (Exception e) {
 			fail();
 		}
-	}
 
-	@Test
-	public void test04_registerWithCondition() {
-		JsonNode filter = JsonUtil.deserialize("{\"_id\":\"$params.group_id\",\"friends\":\"$callScripter_did\"}");
-		Executable executable = new DbFindQuery("get_groups", "test_group", filter);
-		Condition condition = new QueryHasResultsCondition("verify_user_permission", "test_group", filter);
-		CompletableFuture<Boolean> future = scripting.registerScript(withConditionName, condition, executable, false, false)
-				.handle((success, ex) -> (ex == null));
-
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
 	}
 
 	@Test
