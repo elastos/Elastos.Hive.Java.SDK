@@ -4,10 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.Writer;
+import java.util.concurrent.CompletableFuture;
 
 public class Utils {
 
@@ -41,6 +44,24 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Writer fileWrite(String filePath, Writer writer) throws IOException {
+        FileReader fileReader = null;
+        try {
+            fileReader = new FileReader(new File(filePath));
+            char[] buffer = new char[1];
+            while (fileReader.read(buffer) != -1) {
+                writer.write(buffer);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if(null != fileReader) {
+                fileReader.close();
+            }
+        }
+        return writer;
     }
 
     public static void cacheTextFile(Reader reader, String path, String filename) {
