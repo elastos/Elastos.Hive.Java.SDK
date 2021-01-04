@@ -35,7 +35,7 @@ It is noticed that Java SDK has been designed as a set of asynchronous APIs to i
 The user need to define a class implementing the interface **HiveContext**:
 
 ```java
-public class MockAppContext implements HiveContext {
+public class MockAppContext implements ApplicationContext {
         private DIDDocument appInstanceDoc;
         private String hiveDataDir;
         public MockAppContext(DIDDocument appInstanceDoc, String hiveDataDir) {
