@@ -68,27 +68,24 @@ public class Utils {
     }
 
     public static void cacheBinFile(InputStream inputStream, String path, String filename) {
-        ByteArrayOutputStream outStream = null;
+        FileOutputStream fileOutStream = null;
         try {
             File dir = new File(path);
             if(!dir.exists()) dir.mkdirs();
             File file = new File(dir, filename);
             if(!file.exists()) file.createNewFile();
-            outStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int len = 0;
+            fileOutStream = new FileOutputStream(file);
             while( (len=inputStream.read(buffer)) != -1 ) {
-                outStream.write(buffer, 0, len);
+                fileOutStream .write(buffer, 0, len);
             }
-
-            byte[] data = outStream.toByteArray();
-            FileOutputStream fileOutStream = new FileOutputStream(file);
-            fileOutStream .write(data);
+            fileOutStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                outStream.close();
+                fileOutStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
