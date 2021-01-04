@@ -57,11 +57,11 @@ public class Client {
 		}
 
 		if(null == context.getLocalDataDir()) {
-			throw new IllegalArgumentException("app instance document should not be null");
+			throw new IllegalArgumentException("local data dir should not be null");
 		}
 
 		if(null == context.getAppInstanceDocument()) {
-			throw new IllegalArgumentException("local data dir should not be null");
+			throw new IllegalArgumentException("app instance document should not be null");
 		}
 
 		this.context = context;
