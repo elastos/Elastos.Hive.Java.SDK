@@ -89,7 +89,7 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test03_registerNoCondition() {
+	public void test03_registerScript() {
 
 		CompletableFuture<Boolean> noConditionFuture;
 		CompletableFuture<Boolean> withConditionFuture;
@@ -123,7 +123,7 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test05_callScriptWithType() {
+	public void test04_callScript() {
 		CompletableFuture<Boolean> stringFuture = scripting.callScript(noConditionName, null, null, String.class)
 				.handle((success, ex) -> (ex == null));
 
@@ -148,7 +148,7 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test6_setUploadScript() {
+	public void test5_setUploadFile() {
 		Executable executable = new UploadExecutable("upload_file", "$params.path", true);
 		CompletableFuture<Boolean> future = scripting.registerScript("upload_file", executable, false, false)
 				.thenComposeAsync(aBoolean -> {
@@ -189,7 +189,7 @@ public class ScriptingTest {
 
 
 	@Test
-	public void test8_setDownloadScript() {
+	public void test6_setDownloadFile() {
 		Executable executable = new DownloadExecutable("download_file", "$params.path", true);
 		CompletableFuture<Boolean> downloadFuture = scripting.registerScript("download_file", executable, false, false)
 				.thenComposeAsync(aBoolean -> {
@@ -222,7 +222,7 @@ public class ScriptingTest {
 
 
 	@Test
-	public void test10_setInfoScript() {
+	public void test7_setGetFileInfo() {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
 		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
