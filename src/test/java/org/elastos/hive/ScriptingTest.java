@@ -31,8 +31,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.File;
-import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
@@ -152,57 +151,31 @@ public class ScriptingTest {
 	public void test6_setUploadScript() {
 		Executable executable = new UploadExecutable("upload_file", "$params.path", true);
 		CompletableFuture<Boolean> future = scripting.registerScript("upload_file", executable, false, false)
-				.handle((success, ex) -> (ex == null));
+				.thenComposeAsync(aBoolean -> {
 
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
-	@Test
-	public void test7_uploadFile() {
-		String scriptName = "upload_file";
-		String metadata = "{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}";
-		JsonNode params = null;
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			params = objectMapper.readTree(metadata);
-		} catch (Exception e) {
-			fail();
-		}
-
-		CompletableFuture<Boolean> future = scripting.callScript(scriptName, params, null, JsonNode.class)
-				.handle((jsonNode, ex) -> {
-					if (ex != null) return false;
-					FileReader fileReader = null;
-					Writer writer = null;
+					String scriptName = "upload_file";
+					String metadata = "{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}";
+					JsonNode params = null;
 					try {
-						String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
-						writer = scripting.uploadFile(transactionId, Writer.class).exceptionally(e -> {
-							System.out.println(e.getMessage());
-							return null;
-						}).get();
-						fileReader = new FileReader(new File(textLocalPath));
-						char[] buffer = new char[1];
-						while (fileReader.read(buffer) != -1) {
-							writer.write(buffer);
-						}
-						System.out.println("write success");
+						ObjectMapper objectMapper = new ObjectMapper();
+						params = objectMapper.readTree(metadata);
 					} catch (Exception e) {
 						fail();
-					} finally {
-						try {
-							if (null != fileReader) fileReader.close();
-							if (null != writer) writer.close();
-						} catch (Exception e) {
-							fail();
-						}
 					}
-					return true;
+
+					return scripting.callScript(scriptName, params, null, JsonNode.class)
+							.thenComposeAsync(jsonNode -> {
+								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
+								return scripting.uploadFile(transactionId, Writer.class);
+							}).handle((writer, ex) -> {
+								try {
+									Utils.fileWrite(textLocalPath, writer);
+								} catch (IOException e) {
+									e.printStackTrace();
+									fail();
+								}
+								return ex == null;
+							});
 				});
 
 		try {
@@ -213,6 +186,7 @@ public class ScriptingTest {
 			fail();
 		}
 	}
+
 
 	@Test
 	public void test8_setDownloadScript() {
