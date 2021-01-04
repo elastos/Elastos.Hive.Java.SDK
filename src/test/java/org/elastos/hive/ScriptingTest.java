@@ -124,62 +124,33 @@ public class ScriptingTest {
 		}
 	}
 
-
 	@Test
-	public void test05_callScriptStringType() {
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, null, String.class)
+	public void test05_callScriptWithType() {
+		CompletableFuture<Boolean> stringFuture = scripting.callScript(noConditionName, null, null, String.class)
 				.handle((success, ex) -> (ex == null));
+
+		CompletableFuture<Boolean> byteFuture = scripting.callScript(noConditionName, null, null, byte[].class)
+				.handle((success, ex) -> (ex == null));
+
+		CompletableFuture<Boolean> jsonNodeFuture = scripting.callScript(noConditionName, null, null, JsonNode.class)
+				.handle((success, ex) -> (ex == null));
+
+		CompletableFuture<Boolean> readerFuture = scripting.callScript(noConditionName, null, null, Reader.class)
+				.handle((success, ex) -> (ex == null));
+
+		CompletableFuture allFuture = CompletableFuture.allOf(stringFuture, byteFuture, jsonNodeFuture, readerFuture);
+
 		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
+			allFuture.get();
+			assertTrue(allFuture.isCompletedExceptionally() == false);
+			assertTrue(allFuture.isDone());
 		} catch (Exception e) {
 			fail();
 		}
 	}
 
 	@Test
-	public void test06_callScriptByteArrType() {
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, null, byte[].class)
-				.handle((success, ex) -> (ex == null));
-
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
-	@Test
-	public void test07_callScriptJsonNodeType() {
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, null, JsonNode.class)
-				.handle((success, ex) -> (ex == null));
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
-	@Test
-	public void test08_callScriptReaderType() {
-		CompletableFuture<Boolean> future = scripting.callScript(noConditionName, null, null, Reader.class)
-				.handle((success, ex) -> (ex == null));
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
-	@Test
-	public void test11_setUploadScript() {
+	public void test6_setUploadScript() {
 		Executable executable = new UploadExecutable("upload_file", "$params.path", true);
 		CompletableFuture<Boolean> future = scripting.registerScript("upload_file", executable, false, false)
 				.handle((success, ex) -> (ex == null));
@@ -194,7 +165,7 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test12_uploadFile() {
+	public void test7_uploadFile() {
 		String scriptName = "upload_file";
 		String metadata = "{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}";
 		JsonNode params = null;
@@ -245,7 +216,7 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test13_setDownloadScript() {
+	public void test8_setDownloadScript() {
 		Executable executable = new DownloadExecutable("download_file", "$params.path", true);
 		CompletableFuture<Boolean> future = scripting.registerScript("download_file", executable, false, false)
 				.handle((success, ex) -> (ex == null));
@@ -259,7 +230,7 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test14_downloadFile() {
+	public void test9_downloadFile() {
 		String scriptName = "download_file";
 		String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 		JsonNode params = JsonUtil.deserialize(path);
@@ -287,7 +258,7 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test15_setInfoScript() {
+	public void test10_setInfoScript() {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
 		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
@@ -304,7 +275,7 @@ public class ScriptingTest {
 	}
 
 	@Test
-	public void test16_getFileInfo() {
+	public void test11_getFileInfo() {
 		JsonNode params = null;
 		try {
 			String executable = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
