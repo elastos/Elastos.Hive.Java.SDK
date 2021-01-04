@@ -44,6 +44,11 @@ public class DbUpdateQuery extends Executable {
         query = new Query(collection, filter, update);
     }
 
+	public DbUpdateQuery(String name, String collection, JsonNode filter, JsonNode update, boolean output) {
+		super(TYPE, name, output);
+		query = new Query(collection, filter, update);
+	}
+
 	@Override
 	public Query getBody() {
 		return query;
