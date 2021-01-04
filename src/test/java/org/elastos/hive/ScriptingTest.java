@@ -36,6 +36,8 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -253,40 +255,27 @@ public class ScriptingTest {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
 		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
-		CompletableFuture<Boolean> future = scripting.registerScript("get_file_info", executable, false, false)
-				.handle((success, ex) -> (ex == null));
+		CompletableFuture<Boolean> fileInfoFuture = scripting.registerScript("get_file_info", executable, false, false)
+				.thenComposeAsync(aBoolean -> {
+					JsonNode params = null;
+					try {
+						String executable1 = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
+						ObjectMapper objectMapper = new ObjectMapper();
+						params = objectMapper.readTree(executable1);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					return scripting.callScript("get_file_info", params, null, String.class);
+				}).handle((success, ex) -> (ex == null));
 
 		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
+			assertTrue(fileInfoFuture.get());
+			assertTrue(fileInfoFuture.isCompletedExceptionally() == false);
+			assertTrue(fileInfoFuture.isDone());
 		} catch (Exception e) {
 			fail();
 		}
 	}
-
-	@Test
-	public void test11_getFileInfo() {
-		JsonNode params = null;
-		try {
-			String executable = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
-			ObjectMapper objectMapper = new ObjectMapper();
-			params = objectMapper.readTree(executable);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		CompletableFuture<Boolean> future = scripting.callScript("get_file_info", params, null, String.class)
-				.handle((success, ex) -> (ex == null));
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
-	}
-
 
 	@BeforeClass
 	public static void setUp() {
