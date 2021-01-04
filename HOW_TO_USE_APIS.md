@@ -73,7 +73,7 @@ With **Client**, the next step is to create a specific **vault** instance, and a
 String targetDID = TARGET-USER-DID;
 String targetProvider = "https://hive1.trinity-tech.io"
 
-String CompletableFuture<Files> files =
+CompletableFuture<Files> files =
   					client.getVault(targetDID, targetProvider)
   								.thenApply(vault -> {
                   		System.out.println("Provider address: ", vault.getProviderAddress());
@@ -97,78 +97,190 @@ Payment     payment = vault.getPayment();
 
 
 
-##### 3. Upload and download file in streaming mode
+### Files
 
-With the capibility interface **files**, you can upload the specific file to your vault service, or download one file from the vault service:
-
-Here is the simple snippet sample of uploading image:
-
-```java
-files.upload("sample.png", OutputStream.class)
-     .thenApply(outputStream -> {
-       		try {
-          		byte[] imageData = Utils.readImage("sample.png");
-              outputStream.write(imageData);
-              outputStream.close();
-        	} catch (IOException e) {
-            	e.printStackTrace();
-        	}
-     }).thenRun(() -> {
-  				System.out.println("Sample.png has been uploaded.");
-  				System.out.println("Post processing here.");
-		 });
-}
-
-```
-
-While you can download it with the sample below:
+#### 1. Upload file (Writer/OutputStream)
+If you want to upload file to the backend, you can refer to the following example:
 
 ```java
-files.download("sample.png", InputStream.class)
-		 .thenRun(inputStream -> {
-          try {
-              FileOutputStream outputStream;
-              byte[] buffer = new byte[1024];
-              int len = 0;
-
-              outputStream = new FileOutputStream(new File("sample.png"));
-              while ((len = inputStream.read(buffer)) != -1) {
-                  outputStream.write(buffer, 0, len);
-              }
-              outputStream.close();
-          } catch (Exception e) {
-            	e.printStackTrace();
-          }
-		})
-		.thenRun(() -> {
-      	System.out.println("Sample.png has been downloaded.");
-      	System.out.println("Post processing here");
-    });
-
+filesApi.upload(remoteText, Writer.class).thenAccept(writer -> {
+            //Do another things.
+        });
 ```
 
-#### Creating a specific collection
+#### 2. Download file（Reader/InputStream）
 
-There is a **database** capability interface to the **vault** instance. Here is the sample code to describe how to create a **database** interface instance and use it to access and store the structured-data.
+Get remote file from the backend, you can refer to the following example:
 
 ```java
-CompletableFuture.supplyAsync(() -> {
-  	Database database = vault.getDatabase();
-  	database.createCollection("samples", null);
-  	return database;
-}).thenComposeAsync((database) -> {
-  	ObjectNode node = JsonNodeFactory.instance.objectNode();
-		node.put("foo", "value1");
-		node.put("bar", "value2");
-
-		InsertOptions options = new InsertOptions();
-		options.bypassDocumentValidation(false)
-					 .ordered(true);
-
-  	database.inertOne("samples", node, options);
-}).thenRun(() -> {
-  	System.out.println("Successfull inserted the document.");
-  	System.out.println("Post processing here.");
-});
+filesApi.download(remoteText, Reader.class).thenAccept(reader -> {
+            //Do another things
+        });
 ```
+
+#### 3. Delete file
+
+Delete remote file, you can refer to the following example:
+
+```java
+filesApi.delete(dst).thenAccept(aBoolean -> {
+            //Do another things.
+        });
+```
+
+#### 4. Move files
+
+Move/rename remote file, refer to the following example:
+
+```java
+filesApi.move(src, dst).thenAccept(aBoolean -> {
+            //Do another things.
+        });
+```
+
+
+#### 5. Copy file
+
+Copy remote file, refer to the following example:
+
+```java
+filesApi.copy(src, dst).thenAccept(aBoolean -> {
+            //Do another things.
+        });
+```
+
+
+#### 6. Get file hash
+
+Copy remote file hash, refer to the following example:
+
+```java
+filesApi.hash(dst).thenAccept(s -> {
+            // Do another things.
+        });
+```
+
+
+#### 7. List files
+
+List remote files, refer to the following example:
+
+```java
+filesApi.list(rootPath).thenAccept(fileInfos -> {
+                //Do another things.
+            });
+```
+
+
+#### 8. Get file property
+
+List remote files, refer to the following example:
+
+```java
+filesApi.stat(dst).thenAccept(fileInfo -> {
+                //Do another things.
+            });
+```
+
+### Database
+
+#### 1. Create Collection
+
+Create remote Collection, refer to the following example:
+
+```java
+database.createCollection(collectionName, null).thenAccept(aBoolean -> {
+                //Do another things.
+            });
+```
+
+
+#### 2. Delete Collection
+
+Delete remote Collection, refer to the following example:
+
+```java
+database.deleteCollection(collectionName).thenAccept(aBoolean -> {
+                //Do another things.
+            });
+```
+
+#### 3. Insert(insertOne/insertMany) value
+
+Insert value with doc and option to the backend, refer to the following example:
+
+```java
+database.insertOne(collectionName, docNode, insertOptions).thenAccept(insertResult -> {
+                //Do another things.
+            });
+```
+
+#### 4. Count Documents
+
+Get document counts from the backend, refer to the following example:
+
+```java
+database.countDocuments(collectionName, filter, options).thenAccept(aLong -> {
+                //Do another things.
+            });
+```
+
+
+#### 5. Find(findOne/findMany) Document
+
+Get document from the backend, refer to the following example:
+
+```java
+database.findOne(collectionName, query, findOptions).thenAccept(jsonNode -> {
+                //Do another things.
+            });
+```
+
+
+#### 6. Update(updateOne/updateMany) Document
+
+Update remote document, refer to the following example:
+
+```java
+database.updateOne(collectionName, filter, update, updateOptions).thenAccept(updateResult -> {
+                //Do another things.
+            });
+```
+
+#### 7. Delete(deleteOne/deleteMany) Document
+
+Delete remote document, refer to the following example:
+
+```java
+database.deleteOne(collectionName, filter, deleteOptions).thenAccept(deleteResult -> {
+                //Do another things.
+            });
+```
+
+### Scripting
+
+#### 1. Register Scripting
+
+Register scripting, refer to the following example:
+
+```java
+scripting.registerScript("script_name", new RawExecutable(json)).thenAccept(aBoolean -> {
+                //Do another things.
+            });
+```
+
+
+#### 2. Call Scripting(String/byte[]/JsonNode/Reader)
+
+Call scripting, refer to the following example:
+
+```java
+scripting.call("script_name", String.class).thenAccept(s -> {
+                //Do another things.
+            });
+```
+
+***More guide refer to APIDoc and Sample***
+
+&nbsp;
 
