@@ -218,44 +218,35 @@ public class ScriptingTest {
 	@Test
 	public void test8_setDownloadScript() {
 		Executable executable = new DownloadExecutable("download_file", "$params.path", true);
-		CompletableFuture<Boolean> future = scripting.registerScript("download_file", executable, false, false)
-				.handle((success, ex) -> (ex == null));
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			fail();
-		}
-	}
+		CompletableFuture<Boolean> downloadFuture = scripting.registerScript("download_file", executable, false, false)
+				.thenComposeAsync(aBoolean -> {
+					String scriptName = "download_file";
+					String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
+					JsonNode params = JsonUtil.deserialize(path);
 
-	@Test
-	public void test9_downloadFile() {
-		String scriptName = "download_file";
-		String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
-		JsonNode params = JsonUtil.deserialize(path);
-
-		CompletableFuture<Boolean> future = scripting.callScript(scriptName, params, null, JsonNode.class)
-				.handle((jsonNode, ex) -> {
-					String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
-					scripting.downloadFile(transactionId, Reader.class)
-							.handle((reader, throwable) -> {
-								if (throwable == null) {
-									Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
-								}
-								return throwable == null;
+					return scripting.callScript(scriptName, params, null, JsonNode.class)
+							.handle((jsonNode, ex) -> {
+								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
+								scripting.downloadFile(transactionId, Reader.class)
+										.handle((reader, throwable) -> {
+											if (throwable == null) {
+												Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
+											}
+											return throwable == null;
+										});
+								return true;
 							});
-					return true;
 				});
 
 		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
+			assertTrue(downloadFuture.get());
+			assertTrue(downloadFuture.isCompletedExceptionally() == false);
+			assertTrue(downloadFuture.isDone());
 		} catch (Exception e) {
 			fail();
 		}
 	}
+
 
 	@Test
 	public void test10_setInfoScript() {
