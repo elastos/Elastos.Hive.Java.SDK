@@ -2,7 +2,7 @@ package org.elastos.hive;
 
 public class SdkVersion {
 
-	private static final String SDK_VERSION = "2.0.0";
+	private static final String SDK_VERSION = "2.0.2";
 
 	private static final String LATEST_COMMIT_ID = "788cec9";
 
