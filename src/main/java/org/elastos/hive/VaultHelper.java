@@ -62,7 +62,7 @@ class VaultHelper {
 					.execute();
 			int code = response.code();
 			if(404 == code) {
-				return true;
+				return false;
 			}
 			authHelper.checkResponseWithRetry(response);
 			JsonNode value = ResponseHelper.getValue(response, JsonNode.class);
