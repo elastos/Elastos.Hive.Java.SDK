@@ -61,7 +61,7 @@ class VaultHelper {
 					.getServiceInfo()
 					.execute();
 			int code = response.code();
-			if(404 == code) {
+			if(404 == code) { //vault not exist
 				return false;
 			}
 			authHelper.checkResponseWithRetry(response);
