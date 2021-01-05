@@ -103,9 +103,20 @@ Payment     payment = vault.getPayment();
 If you want to upload file to the backend, you can refer to the following example:
 
 ```java
-filesApi.upload(remoteText, Writer.class).thenAccept(writer -> {
-            //Do another things.
-        });
+files.upload("sample.png", OutputStream.class)
+				.thenApply(outputStream -> {
+					try {
+						byte[] imageData = Utils.readImage("sample.png");
+						outputStream.write(imageData);
+						outputStream.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}).thenRun(() -> {
+			System.out.println("Sample.png has been uploaded.");
+			System.out.println("Post processing here.");
+		});
+}
 ```
 
 #### 2. Download file（Reader/InputStream）
@@ -113,9 +124,26 @@ filesApi.upload(remoteText, Writer.class).thenAccept(writer -> {
 Get remote file from the backend, you can refer to the following example:
 
 ```java
-filesApi.download(remoteText, Reader.class).thenAccept(reader -> {
-            //Do another things
-        });
+files.download("sample.png", InputStream.class)
+				.thenRun(inputStream -> {
+					try {
+						FileOutputStream outputStream;
+						byte[] buffer = new byte[1024];
+						int len = 0;
+
+						outputStream = new FileOutputStream(new File("sample.png"));
+						while ((len = inputStream.read(buffer)) != -1) {
+							outputStream.write(buffer, 0, len);
+						}
+						outputStream.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				})
+				.thenRun(() -> {
+					System.out.println("Sample.png has been downloaded.");
+					System.out.println("Post processing here");
+				});
 ```
 
 #### 3. Delete file
@@ -123,9 +151,10 @@ filesApi.download(remoteText, Reader.class).thenAccept(reader -> {
 Delete remote file, you can refer to the following example:
 
 ```java
-filesApi.delete(dst).thenAccept(aBoolean -> {
-            //Do another things.
-        });
+files.delete("sample.png").thenRun(() -> {
+    System.out.println("Sample.png has been deleted.");
+    System.out.println("Post processing here.");
+});
 ```
 
 #### 4. Move files
@@ -133,9 +162,10 @@ filesApi.delete(dst).thenAccept(aBoolean -> {
 Move/rename remote file, refer to the following example:
 
 ```java
-filesApi.move(src, dst).thenAccept(aBoolean -> {
-            //Do another things.
-        });
+files.move("sample.png", "target/sample.png").thenRun(() -> {
+			System.out.println("Sample.png has been moved.");
+			System.out.println("Post processing here.");
+		});
 ```
 
 
@@ -144,31 +174,32 @@ filesApi.move(src, dst).thenAccept(aBoolean -> {
 Copy remote file, refer to the following example:
 
 ```java
-filesApi.copy(src, dst).thenAccept(aBoolean -> {
-            //Do another things.
-        });
+files.copy("sample.png", "target/sample.png").thenRun(() -> {
+    System.out.println("Sample.png has been copied.");
+    System.out.println("Post processing here.");
+});
 ```
 
 
 #### 6. Get file hash
 
-Copy remote file hash, refer to the following example:
+Get remote file hash, refer to the following example:
 
 ```java
-filesApi.hash(dst).thenAccept(s -> {
-            // Do another things.
-        });
+files.hash("sample.png").thenRun(() -> {
+    System.out.println("Post processing here.");
+});
 ```
 
 
 #### 7. List files
 
-List remote files, refer to the following example:
+List the files in the remote directory, refer to the following example:
 
 ```java
-filesApi.list(rootPath).thenAccept(fileInfos -> {
-                //Do another things.
-            });
+files.list("target").thenRun(() -> {
+			System.out.println("Post processing here.");
+		});
 ```
 
 
@@ -177,9 +208,9 @@ filesApi.list(rootPath).thenAccept(fileInfos -> {
 List remote files, refer to the following example:
 
 ```java
-filesApi.stat(dst).thenAccept(fileInfo -> {
-                //Do another things.
-            });
+filesApi.stat("sample.png").thenRun(() -> {
+    System.out.println("Post processing here.");
+});
 ```
 
 ### Database
