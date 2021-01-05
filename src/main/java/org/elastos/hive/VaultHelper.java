@@ -60,6 +60,10 @@ class VaultHelper {
 			Response response = this.connectionManager.getPaymentApi()
 					.getServiceInfo()
 					.execute();
+			int code = response.code();
+			if(404 == code) { //vault not exist
+				return false;
+			}
 			authHelper.checkResponseWithRetry(response);
 			JsonNode value = ResponseHelper.getValue(response, JsonNode.class);
 			if(null == value) return false;
