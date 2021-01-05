@@ -220,9 +220,10 @@ filesApi.stat("sample.png").thenRun(() -> {
 Create remote Collection, refer to the following example:
 
 ```java
-database.createCollection(collectionName, null).thenAccept(aBoolean -> {
-                //Do another things.
-            });
+database.createCollection("samples", null).thenRun(() -> {
+    System.out.println("Collection has been created.");
+    System.out.println("Post processing here.");
+});
 ```
 
 
@@ -231,9 +232,10 @@ database.createCollection(collectionName, null).thenAccept(aBoolean -> {
 Delete remote Collection, refer to the following example:
 
 ```java
-database.deleteCollection(collectionName).thenAccept(aBoolean -> {
-                //Do another things.
-            });
+database.deleteCollection("samples").thenRun(() -> {
+    System.out.println("Collection has been deleted.");
+    System.out.println("Post processing here.");
+});
 ```
 
 #### 3. Insert(insertOne/insertMany) value
@@ -241,9 +243,17 @@ database.deleteCollection(collectionName).thenAccept(aBoolean -> {
 Insert value with doc and option to the backend, refer to the following example:
 
 ```java
-database.insertOne(collectionName, docNode, insertOptions).thenAccept(insertResult -> {
-                //Do another things.
-            });
+ObjectNode docNode = JsonNodeFactory.instance.objectNode();
+docNode.put("foo", "value1");
+docNode.put("bar", "value2");
+
+InsertOptions insertOptions = new InsertOptions();
+insertOptions.bypassDocumentValidation(false).ordered(true);
+
+database.insertOne("samples", docNode, insertOptions).thenRun(() -> {
+    System.out.println("Successful inserted the document.");
+    System.out.println("Post processing here.");
+});
 ```
 
 #### 4. Count Documents
@@ -251,9 +261,15 @@ database.insertOne(collectionName, docNode, insertOptions).thenAccept(insertResu
 Get document counts from the backend, refer to the following example:
 
 ```java
-database.countDocuments(collectionName, filter, options).thenAccept(aLong -> {
-                //Do another things.
-            });
+ObjectNode filter = JsonNodeFactory.instance.objectNode();
+    filter.put("foo", "value");
+
+    CountOptions options = new CountOptions();
+    options.limit(1).skip(0).maxTimeMS(1000000000);
+
+    database.countDocuments("sample", filter, options).thenRun(() -> {
+        System.out.println("Post processing here.");
+    });
 ```
 
 
@@ -262,9 +278,19 @@ database.countDocuments(collectionName, filter, options).thenAccept(aLong -> {
 Get document from the backend, refer to the following example:
 
 ```java
-database.findOne(collectionName, query, findOptions).thenAccept(jsonNode -> {
-                //Do another things.
-            });
+ObjectNode query = JsonNodeFactory.instance.objectNode();
+query.put("foo", "value1");
+query.put("bar", "value2");
+
+FindOptions findOptions = new FindOptions();
+findOptions.skip(0)
+        .allowPartialResults(false)
+        .returnKey(false)
+        .batchSize(0)
+        .projection(jsonToMap("{\"_id\": false}"));
+
+database.findOne("sample", query, findOptions).thenRun(() ->
+        System.out.println("Post processing here."));
 ```
 
 
@@ -273,9 +299,25 @@ database.findOne(collectionName, query, findOptions).thenAccept(jsonNode -> {
 Update remote document, refer to the following example:
 
 ```java
-database.updateOne(collectionName, filter, update, updateOptions).thenAccept(updateResult -> {
-                //Do another things.
-            });
+ObjectNode filter = JsonNodeFactory.instance.objectNode();
+filter.put("author", "john doe1");
+
+String updateJson = "{\"$set\":{\"foo\":\"value1\",\"bar\":\"value2\"}}";
+ObjectMapper objectMapper = new ObjectMapper();
+JsonNode update = null;
+try {
+    update = objectMapper.readTree(updateJson);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+
+UpdateOptions updateOptions = new UpdateOptions();
+updateOptions.upsert(true).bypassDocumentValidation(false);
+
+database.updateOne("sample", filter, update, updateOptions).thenRun(() -> {
+    System.out.println("Successful inserted the document.");
+    System.out.println("Post processing here.");
+});
 ```
 
 #### 7. Delete(deleteOne/deleteMany) Document
@@ -283,9 +325,13 @@ database.updateOne(collectionName, filter, update, updateOptions).thenAccept(upd
 Delete remote document, refer to the following example:
 
 ```java
-database.deleteOne(collectionName, filter, deleteOptions).thenAccept(deleteResult -> {
-                //Do another things.
-            });
+ObjectNode filter = JsonNodeFactory.instance.objectNode();
+filter.put("foo", "value1");
+
+database.deleteOne("sample", filter, null).thenRun(() -> {
+    System.out.println("Successful deleted the document.");
+    System.out.println("Post processing here.");
+});
 ```
 
 ### Scripting
@@ -295,9 +341,14 @@ database.deleteOne(collectionName, filter, deleteOptions).thenAccept(deleteResul
 Register scripting, refer to the following example:
 
 ```java
-scripting.registerScript("script_name", new RawExecutable(json)).thenAccept(aBoolean -> {
-                //Do another things.
-            });
+JsonNode filter = JsonUtil.deserialize("{\"friends\":\"$callScripter_did\"}");
+JsonNode options = JsonUtil.deserialize("{\"projection\":{\"_id\":false,\"name\":true}}");
+Executable executable = new DbFindQuery("get_groups", "groups", filter, options);
+
+scripting.registerScript("sample", executable, false, false).thenRun(() -> {
+    System.out.println("Successful register the script.");
+    System.out.println("Post processing here.");
+});
 ```
 
 
@@ -306,9 +357,13 @@ scripting.registerScript("script_name", new RawExecutable(json)).thenAccept(aBoo
 Call scripting, refer to the following example:
 
 ```java
-scripting.call("script_name", String.class).thenAccept(s -> {
-                //Do another things.
-            });
+scripting.callScript("sample", null, null, String.class).thenRun(new Runnable() {
+    @Override
+    public void run() {
+        System.out.println("Successful called the script.");
+        System.out.println("Post processing here.");
+    }
+});
 ```
 
 ***More guide refer to APIDoc and Sample***
