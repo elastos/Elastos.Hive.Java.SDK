@@ -31,6 +31,7 @@ public final class ConfigHelper {
 
 		config.setProvider(properties.getProperty("provider"));
 		config.setResolverUrl(properties.getProperty("resolverUrl"));
+		config.setOwnerDid(properties.getProperty("ownerDid"));
 
 		String cache = System.getProperty("user.dir") + File.separator + "store/";
 		config.setStorePath(cache + properties.getProperty("storePath"));
