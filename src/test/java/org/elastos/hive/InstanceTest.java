@@ -16,6 +16,7 @@ public class InstanceTest {
             vault = AppInstanceFactory.getUser2().getVault();
             assertNotNull(vault);
         } catch (Exception e) {
+            e.printStackTrace();
             fail();
         }
     }

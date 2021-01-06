@@ -50,13 +50,16 @@ public class PaymentTest {
 					String planName = pricingInfo.name();
 					return paymentApi.getPricingPlan(planName);
 				}).handleAsync((pricingPlan, throwable) -> {
+					if(throwable != null) {
+						return false;
+					}
 					try {
 						System.out.print("Test case01 PricingPlan ==>");
 						System.out.println(pricingPlan.serialize());
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					return (throwable == null);
+					return true;
 				});
 
 		try {
@@ -64,6 +67,7 @@ public class PaymentTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -99,6 +103,7 @@ public class PaymentTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -113,6 +118,7 @@ public class PaymentTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -127,6 +133,7 @@ public class PaymentTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
