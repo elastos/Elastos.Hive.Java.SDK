@@ -35,6 +35,7 @@ import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 
 public class Client {
@@ -202,7 +203,7 @@ public class Client {
 
 				services = doc.selectServices((String) null, "HiveVault");
 				if (services == null || services.size() == 0)
-					throw new ProviderNotFoundException(
+					throw new ProviderNotSetException(
 							String.format("No 'HiveVault' services declared on DID document %s", ownerDid));
 
 				/* TODO: should we throw special exception when it has more than one
