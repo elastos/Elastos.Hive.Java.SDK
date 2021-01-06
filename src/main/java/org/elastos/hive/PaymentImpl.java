@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.VaultNotFoundException;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingInfo;
 import org.elastos.hive.payment.PricingPlan;
@@ -75,6 +76,10 @@ class PaymentImpl implements Payment {
 			Response response = this.connectionManager.getPaymentApi()
 					.getPricingPlan(planName)
 					.execute();
+			int code = response.code();
+			if(404 == code) {
+				throw new VaultNotFoundException();
+			}
 			authHelper.checkResponseWithRetry(response);
 			String ret = ResponseHelper.getValue(response, String.class);
 			return PricingPlan.deserialize(ret);
