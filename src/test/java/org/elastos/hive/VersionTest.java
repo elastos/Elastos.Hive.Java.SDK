@@ -29,6 +29,12 @@ public class VersionTest {
 		}).get();
 	}
 
+	@Test
+	public void getSdkVersion(){
+		String version = SdkVersion.getVersion();
+		assertNotNull(version);
+	}
+
 	private static Vault vault;
 	@BeforeClass
 	public static void setUp() {
