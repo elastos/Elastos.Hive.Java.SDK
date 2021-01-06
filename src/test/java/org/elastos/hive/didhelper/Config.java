@@ -16,6 +16,15 @@ public class Config {
 
 	private String resolverUrl;
 	private String provider;
+	private String ownerDid;
+
+	public String getOwnerDid() {
+		return ownerDid;
+	}
+
+	public void setOwnerDid(String ownerDid) {
+		this.ownerDid = ownerDid;
+	}
 
 	public String getUserDid() {
 		return userDid;
