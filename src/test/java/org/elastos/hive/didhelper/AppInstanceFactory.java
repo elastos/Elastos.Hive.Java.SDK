@@ -108,7 +108,7 @@ public class AppInstanceFactory {
 		Options options = Options.create();
 		options.provider(config.getProvider());
 		options.resolveUrl(config.getResolverUrl());
-		options.ownerDid(config.getUserDid());
+		options.ownerDid(config.getOwnerDid());
 		options.storePath(config.getStorePath());
 
 		return new AppInstanceFactory(userDidOpt, appInstanceDidOpt, options);
@@ -124,7 +124,7 @@ public class AppInstanceFactory {
 		return initOptions(ConfigHelper.getConfigInfo("user2.conf"));
 	}
 
-	//node 环境
+	//跨did，访问user2, release环境
 	public static AppInstanceFactory getUser3() {
 		return initOptions(ConfigHelper.getConfigInfo("user3.conf"));
 	}
