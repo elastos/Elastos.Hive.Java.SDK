@@ -19,7 +19,7 @@ buildscript {
     }
 }
 
-version = 'alpha-v2.0.10'
+version = 'v2.0.1'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -161,11 +161,11 @@ test {
 }
 
 publish {
-    userOrg = 'xidaokun'
-    groupId = 'org.cary'
+    userOrg = 'elastos'
+    groupId = 'org.elastos'
     artifactId = 'hive'
     publishVersion = version
-    desc = 'Elastos Hive Test SDK'
-    repoName = 'hive'
+    desc = 'Elastos Hive SDK'
+    repoName = 'Elastos.NET.Hive.Java.SDK'
     website = 'https://github.com/elastos/Elastos.NET.Hive.Java.SDK'
 }
