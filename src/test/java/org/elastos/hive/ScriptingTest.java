@@ -143,6 +143,7 @@ public class ScriptingTest {
 			assertTrue(allFuture.isCompletedExceptionally() == false);
 			assertTrue(allFuture.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -183,6 +184,7 @@ public class ScriptingTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -216,6 +218,7 @@ public class ScriptingTest {
 			assertTrue(downloadFuture.isCompletedExceptionally() == false);
 			assertTrue(downloadFuture.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -244,6 +247,7 @@ public class ScriptingTest {
 			assertTrue(fileInfoFuture.isCompletedExceptionally() == false);
 			assertTrue(fileInfoFuture.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}

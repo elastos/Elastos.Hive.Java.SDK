@@ -36,6 +36,7 @@ public class FilesTest {
 			}
 			System.out.println("write success");
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		} finally {
 			try {
@@ -57,6 +58,7 @@ public class FilesTest {
 			outputStream.close();
 			System.out.println("write success");
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -67,6 +69,7 @@ public class FilesTest {
 			Reader reader = filesApi.download(remoteTextPath, Reader.class).get();
 			Utils.cacheTextFile(reader, rootLocalCachePath, "test.txt");
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -77,6 +80,7 @@ public class FilesTest {
 			InputStream inputStream = filesApi.download(remoteImgPath, InputStream.class).get();
 			Utils.cacheBinFile(inputStream, rootLocalCachePath, "big.png");
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -95,6 +99,7 @@ public class FilesTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -111,6 +116,7 @@ public class FilesTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -128,6 +134,7 @@ public class FilesTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -144,6 +151,7 @@ public class FilesTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
@@ -162,6 +170,7 @@ public class FilesTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}
