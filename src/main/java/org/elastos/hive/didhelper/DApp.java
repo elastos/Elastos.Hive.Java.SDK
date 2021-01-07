@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 
 class DApp extends Entity {
 
@@ -32,6 +33,10 @@ class DApp extends Entity {
 		System.out.println("VerifiablePresentation:");
 		String vpStr = vp.toString();
 		System.out.println(vpStr);
+
+		if(!vp.isValid()) {
+			throw new IllegalStateException("Verifiable Presentation is invalid");
+		}
 
 		return vp;
 	}
