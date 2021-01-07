@@ -29,7 +29,7 @@ class DApp extends Entity {
 				.nonce(nonce)
 				.seal(getStorePassword());
 
-		System.out.println("VerifiableCredential:");
+		System.out.println("VerifiablePresentation:");
 		String vpStr = vp.toString();
 		System.out.println(vpStr);
 
