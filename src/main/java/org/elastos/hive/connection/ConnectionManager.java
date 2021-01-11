@@ -28,6 +28,7 @@ import java.net.URL;
 
 import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.network.AuthApi;
+import org.elastos.hive.network.BackupApi;
 import org.elastos.hive.network.DatabaseApi;
 import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.PaymentApi;
@@ -44,6 +45,7 @@ public class ConnectionManager {
 	private VersionApi versionApi;
 	private ScriptingApi scriptingApi;
 	private PaymentApi paymentApi;
+	private BackupApi backupApi;
 	private VaultApi vaultApi;
 
 	private String vaultBaseUrl;
@@ -93,6 +95,13 @@ public class ConnectionManager {
 			paymentApi = BaseServiceUtil.createService(PaymentApi.class,
 					this.vaultBaseUrl, this.vaultConfig);
 		return paymentApi;
+	}
+
+	public BackupApi getBackApi() {
+		if (backupApi == null)
+			backupApi = BaseServiceUtil.createService(BackupApi.class,
+					this.vaultBaseUrl, this.vaultConfig);
+		return backupApi;
 	}
 
 	public VaultApi getVaultApi() {
