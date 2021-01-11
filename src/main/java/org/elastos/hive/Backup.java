@@ -11,7 +11,7 @@ public interface Backup {
 	 * Get backup state
 	 * @return
 	 */
-	CompletableFuture<State> state();
+	CompletableFuture<State> getState();
 
 	/**
 	 * Backup hive vault to other hive node

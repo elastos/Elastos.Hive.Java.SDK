@@ -9,7 +9,7 @@ import retrofit2.http.POST;
 public interface BackupApi {
 
 	@POST(Constance.API_PATH + "/backup/state")
-	Call<ResponseBody> getState(@Body RequestBody body);
+	Call<ResponseBody> getState();
 
 	@POST(Constance.API_PATH + "/backup/save/to/node")
 	Call<ResponseBody> saveToNode(@Body RequestBody body);
