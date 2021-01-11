@@ -22,10 +22,6 @@
 
 package org.elastos.hive.connection;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.network.AuthApi;
 import org.elastos.hive.network.BackupApi;
@@ -33,9 +29,13 @@ import org.elastos.hive.network.DatabaseApi;
 import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.PaymentApi;
 import org.elastos.hive.network.ScriptingApi;
+import org.elastos.hive.network.ServiceApi;
 import org.elastos.hive.network.UploadApi;
-import org.elastos.hive.network.VaultApi;
 import org.elastos.hive.network.VersionApi;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class ConnectionManager {
 
@@ -46,7 +46,7 @@ public class ConnectionManager {
 	private ScriptingApi scriptingApi;
 	private PaymentApi paymentApi;
 	private BackupApi backupApi;
-	private VaultApi vaultApi;
+	private ServiceApi serviceApi;
 
 	private String vaultBaseUrl;
 	private BaseServiceConfig vaultConfig = new BaseServiceConfig.Builder().build() ;
@@ -104,11 +104,11 @@ public class ConnectionManager {
 		return backupApi;
 	}
 
-	public VaultApi getVaultApi() {
-		if (vaultApi == null)
-			vaultApi = BaseServiceUtil.createService(VaultApi.class,
+	public ServiceApi getServiceApi() {
+		if (serviceApi == null)
+			serviceApi = BaseServiceUtil.createService(ServiceApi.class,
 					this.vaultBaseUrl, this.vaultConfig);
-		return vaultApi;
+		return serviceApi;
 	}
 
 	private void updateVaultConfig(BaseServiceConfig vaultConfig) {
@@ -126,7 +126,8 @@ public class ConnectionManager {
 		versionApi = null;
 		scriptingApi = null;
 		paymentApi = null;
-		vaultApi = null;
+		backupApi = null;
+		serviceApi = null;
 		updateVaultBaseUrl(baseUrl);
 		updateVaultConfig(baseServiceConfig);
 	}
