@@ -35,8 +35,8 @@ class VaultHelper {
 
 	private boolean requestToCreateVaultImpl() throws HiveException {
 		try {
-			Response<ResponseBody> response = this.connectionManager.getVaultApi()
-					.createFreeVault()
+			Response<ResponseBody> response = this.connectionManager.getServiceApi()
+					.createVault()
 					.execute();
 			authHelper.checkResponseWithRetry(response);
 			return true;

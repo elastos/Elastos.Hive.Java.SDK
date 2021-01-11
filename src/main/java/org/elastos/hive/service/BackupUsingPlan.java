@@ -19,4 +19,8 @@ public class BackupUsingPlan extends Result<BackupUsingPlan> {
 	private String startTime;
 	@JsonProperty("end_time")
 	private String endTime;
+
+	public static BackupUsingPlan deserialize(String content) {
+		return deserialize(content, BackupUsingPlan.class);
+	}
 }
