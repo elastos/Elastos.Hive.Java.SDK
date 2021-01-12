@@ -115,23 +115,23 @@ public class AppInstanceFactory {
 	}
 
 	//develope 环境
-	public static AppInstanceFactory getUser1() {
-		return initOptions(ConfigHelper.getConfigInfo("user1.conf"));
+	public static AppInstanceFactory initConfig1() {
+		return initOptions(ConfigHelper.getConfigInfo("config1.conf"));
 	}
 
 	//release环境（MainNet + https://hive1.trinity-tech.io）
-	public static AppInstanceFactory getUser2() {
-		return initOptions(ConfigHelper.getConfigInfo("user2.conf"));
+	public static AppInstanceFactory initConfig2() {
+		return initOptions(ConfigHelper.getConfigInfo("config2.conf"));
 	}
 
 	//跨did，访问user2, release环境
-	public static AppInstanceFactory getUser3() {
-		return initOptions(ConfigHelper.getConfigInfo("user3.conf"));
+	public static AppInstanceFactory initConfig3() {
+		return initOptions(ConfigHelper.getConfigInfo("config3.conf"));
 	}
 
 	//local 环境
-	public static AppInstanceFactory getUser4() {
-		return initOptions(ConfigHelper.getConfigInfo("user4.conf"));
+	public static AppInstanceFactory initConfig4() {
+		return initOptions(ConfigHelper.getConfigInfo("config4.conf"));
 	}
 
 	public Vault getVault() {
@@ -140,7 +140,7 @@ public class AppInstanceFactory {
 
 	public static Client getClient() {
 		try {
-			Config config = ConfigHelper.getConfigInfo("user2.conf");
+			Config config = ConfigHelper.getConfigInfo("config2.conf");
 			if (!resolverDidSetup) {
 				Client.setupResolver(config.getResolverUrl(), didCachePath);
 				resolverDidSetup = true;

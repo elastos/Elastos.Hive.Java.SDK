@@ -178,7 +178,7 @@ public class FilesTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = AppInstanceFactory.getUser2().getVault();
+		Vault vault = AppInstanceFactory.initConfig2().getVault();
 		filesApi = vault.getFiles();
 	}
 
