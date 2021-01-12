@@ -74,7 +74,10 @@ public class AppInstanceFactory {
 					return null;
 				}
 			});
-			client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).whenComplete((ret, throwable) -> {
+			CompletableFuture vaultFuture = client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).whenComplete((ret, throwable) -> {
+				if(null != throwable) {
+					System.err.println("Vault already existed");
+				}
 				if (throwable == null) {
 					vault = ret;
 				} else {
@@ -84,7 +87,18 @@ public class AppInstanceFactory {
 						throw new CompletionException(e);
 					}
 				}
-			}).get();
+			});
+
+			CompletableFuture backupVaultFuture = client.createBackupVault(userFactoryOpt.ownerDid, userFactoryOpt.provider)
+					.handleAsync((vault, throwable) -> {
+						if(null != throwable)
+							System.err.println("Backup Vault already existed");
+						return vault;
+					});
+
+
+			vaultFuture.thenComposeAsync((Function) o -> backupVaultFuture).get();
+
 		} catch (Exception e) {
 			System.out.println("Vault has been create");
 		}
@@ -163,7 +177,7 @@ public class AppInstanceFactory {
 		return client;
 	}
 
-	public static Client getClientWithAuth() {
+	public static Client getClientWithEasyAuth() {
 		try {
 			Config config = ConfigHelper.getConfigInfo("Production.conf");
 			if (!resolverDidSetup) {
