@@ -153,9 +153,9 @@ public class Vault {
 						(null==throwable && usingPlan!=null));
 	}
 
-	CompletableFuture<Vault> createBackupVaultOnService() {
+	CompletableFuture<Boolean> createBackupVaultOnService() {
 		return this.serviceManager.createBackupVault()
-				.thenApplyAsync(aBoolean -> aBoolean ? Vault.this : null);
+				.handleAsync((aBoolean, throwable) -> (aBoolean && throwable==null));
 	}
 
 	CompletableFuture<Boolean> checkBackupVaultExist() {

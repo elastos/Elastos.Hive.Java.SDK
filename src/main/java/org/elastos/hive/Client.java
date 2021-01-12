@@ -209,22 +209,15 @@ public class Client {
 		});
 	}
 
-	public CompletableFuture<Vault> createBackupVault(String ownerDid, String preferredProviderAddress) {
-		return getVaultProvider(ownerDid, preferredProviderAddress)
-				.thenApplyAsync(provider -> {
-					AuthHelper authHelper = new AuthHelper(this.context,
-							ownerDid,
-							provider,
-							this.authenticationAdapterImpl);
-					return new Vault(authHelper, provider, ownerDid);
-				})
-				.thenComposeAsync(vault -> vault.checkBackupVaultExist().thenApplyAsync(aBoolean -> {
-					if(aBoolean) {
-						throw new BackupVaultAlreadyExistException("Backup Vault already existed.");
-					} else {
-						vault.createBackupVaultOnService();
-					}
-					return vault;
-				}));
+	public CompletableFuture<Boolean> createBackupVault(Vault vault) {
+		if(null == vault) {
+			throw new IllegalArgumentException("vault can not be null");
+		}
+		return vault.checkBackupVaultExist().thenComposeAsync(aBoolean -> {
+			if(aBoolean) {
+				throw new BackupVaultAlreadyExistException("Backup Vault already existed.");
+			}
+			return vault.createBackupVaultOnService();
+		});
 	}
 }

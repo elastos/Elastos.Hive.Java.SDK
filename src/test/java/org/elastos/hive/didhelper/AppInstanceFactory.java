@@ -7,6 +7,7 @@ import org.elastos.hive.Vault;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
 import static org.junit.Assert.fail;
@@ -76,8 +77,9 @@ public class AppInstanceFactory {
 					return null;
 				}
 			});
-			CompletableFuture vaultFuture = client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).whenComplete((ret, throwable) -> {
-				if(null != throwable) {
+
+			client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).handleAsync((ret, throwable) -> {
+				if (null != throwable) {
 					System.err.println("Vault already existed");
 				}
 				if (throwable == null) {
@@ -89,18 +91,14 @@ public class AppInstanceFactory {
 						throw new CompletionException(e);
 					}
 				}
-			});
-
-			CompletableFuture backupVaultFuture = client.createBackupVault(userFactoryOpt.ownerDid, userFactoryOpt.provider)
-					.handleAsync((vault, throwable) -> {
-						if(null != throwable)
-							System.err.println("Backup Vault already existed");
-						return vault;
-					});
-
-
-			vaultFuture.thenComposeAsync((Function) o -> backupVaultFuture).get();
-
+				return vault;
+			}).thenComposeAsync(vault ->
+					client.createBackupVault(vault)
+							.handleAsync((vault1, throwable) -> {
+								if (null != throwable)
+									System.err.println("Backup Vault already existed");
+								return (throwable == null);
+							})).get();
 		} catch (Exception e) {
 
 		}
