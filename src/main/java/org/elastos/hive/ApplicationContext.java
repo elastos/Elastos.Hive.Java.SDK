@@ -26,4 +26,12 @@ public interface ApplicationContext {
 	 * @return
 	 */
 	CompletableFuture<String> getAuthorization(String jwtToken);
+
+
+	/**
+	 *
+	 * @param jwtToken
+	 * @return
+	 */
+	CompletableFuture<String> getBackupAuthorization(String jwtToken);
 }

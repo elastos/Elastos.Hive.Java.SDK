@@ -15,18 +15,17 @@ public interface Backup {
 
 	/**
 	 * Backup hive vault to other hive node
-	 * @param credential
-	 * @param handler
+	 * @param target
 	 * @return
 	 */
-	CompletableFuture<Boolean> save(String credential, BackupAuthenticationHandler handler);
+	CompletableFuture<Boolean> save(String target);
 
 	/**
 	 * Restore hive vault from other hive node
-	 * @param credential
+	 * @param target
 	 * @return
 	 */
-	CompletableFuture<Boolean> restore(String credential);
+	CompletableFuture<Boolean> restore(String target);
 
 	/**
 	 * Active hive backup data to vault
