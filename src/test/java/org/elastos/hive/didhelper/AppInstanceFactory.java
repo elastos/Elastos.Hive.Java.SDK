@@ -7,6 +7,9 @@ import org.elastos.hive.Vault;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.Function;
+
+import static org.junit.Assert.fail;
 
 public class AppInstanceFactory {
 	private static final String didCachePath = "didCache";
@@ -73,7 +76,10 @@ public class AppInstanceFactory {
 					return null;
 				}
 			});
-			client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).whenComplete((ret, throwable) -> {
+			CompletableFuture vaultFuture = client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).whenComplete((ret, throwable) -> {
+				if(null != throwable) {
+					System.err.println("Vault already existed");
+				}
 				if (throwable == null) {
 					vault = ret;
 				} else {
@@ -83,9 +89,20 @@ public class AppInstanceFactory {
 						throw new CompletionException(e);
 					}
 				}
-			}).get();
+			});
+
+			CompletableFuture backupVaultFuture = client.createBackupVault(userFactoryOpt.ownerDid, userFactoryOpt.provider)
+					.handleAsync((vault, throwable) -> {
+						if(null != throwable)
+							System.err.println("Backup Vault already existed");
+						return vault;
+					});
+
+
+			vaultFuture.thenComposeAsync((Function) o -> backupVaultFuture).get();
+
 		} catch (Exception e) {
-			System.out.println("Vault has been create");
+
 		}
 	}
 
@@ -155,10 +172,10 @@ public class AppInstanceFactory {
 	}
 
 	public Vault getVault() {
-		return vault;
+		return this.vault;
 	}
 
-	public static Client getClient() {
+	public static Client getClientWithEasyAuth() {
 		try {
 			Config config = ConfigHelper.getConfigInfo("Production.conf");
 			if (!resolverDidSetup) {

@@ -154,7 +154,7 @@ public class Vault {
 	}
 
 	CompletableFuture<Vault> createBackupVaultOnService() {
-		return this.serviceManager.createVault()
+		return this.serviceManager.createBackupVault()
 				.thenApplyAsync(aBoolean -> aBoolean ? Vault.this : null);
 	}
 

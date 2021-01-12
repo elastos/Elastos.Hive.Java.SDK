@@ -27,6 +27,7 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
+import org.elastos.hive.exception.BackupVaultAlreadyExistException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
@@ -219,7 +220,7 @@ public class Client {
 				})
 				.thenComposeAsync(vault -> vault.checkBackupVaultExist().thenApplyAsync(aBoolean -> {
 					if(aBoolean) {
-						throw new VaultAlreadyExistException("Vault already existed.");
+						throw new BackupVaultAlreadyExistException("Backup Vault already existed.");
 					} else {
 						vault.createBackupVaultOnService();
 					}
