@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.VaultNotFoundException;
 import org.elastos.hive.payment.UsingPlan;
 import org.elastos.hive.service.BackupUsingPlan;
 import org.elastos.hive.utils.ResponseHelper;
@@ -136,6 +137,10 @@ class ServiceManagerImpl implements ServiceManager {
 			Response response = this.connectionManager.getServiceApi()
 					.getVaultServiceInfo()
 					.execute();
+			int code = response.code();
+			if(404 == code) {
+				throw new VaultNotFoundException();
+			}
 			authHelper.checkResponseWithRetry(response);
 			JsonNode value = ResponseHelper.getValue(response, JsonNode.class);
 			if(null == value) return null;

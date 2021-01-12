@@ -76,10 +76,6 @@ class PaymentImpl implements Payment {
 			Response response = this.connectionManager.getPaymentApi()
 					.getPricingPlan(planName)
 					.execute();
-			int code = response.code();
-			if(404 == code) {
-				throw new VaultNotFoundException();
-			}
 			authHelper.checkResponseWithRetry(response);
 			String ret = ResponseHelper.getValue(response, String.class);
 			return PricingPlan.deserialize(ret);
@@ -209,6 +205,10 @@ class PaymentImpl implements Payment {
 			Response response = this.connectionManager.getPaymentApi()
 					.getServiceInfo()
 					.execute();
+			int code = response.code();
+			if(404 == code) {
+				throw new VaultNotFoundException();
+			}
 			authHelper.checkResponseWithRetry(response);
 			JsonNode value = ResponseHelper.getValue(response, JsonNode.class);
 			if(null == value) return null;

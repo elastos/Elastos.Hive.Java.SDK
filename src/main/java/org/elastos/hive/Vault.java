@@ -20,7 +20,6 @@ public class Vault {
 	private String providerAddress;
 	private String ownerDid;
 	private AuthHelper authHelper;
-	private VaultHelper vaultHelper;
 
 	Vault(AuthHelper authHelper, String providerAddress, String ownerDid) {
 		this.authHelper = authHelper;
@@ -34,7 +33,6 @@ public class Vault {
 		this.backup = new BackupImpl(authHelper);
 		this.serviceManager = new ServiceManagerImpl(authHelper);
 		this.version = new VersionImpl(authHelper);
-		this.vaultHelper = new VaultHelper(authHelper);
 	}
 
 	public CompletableFuture<String> getNodeVersion() {
@@ -142,13 +140,13 @@ public class Vault {
 	}
 
 	CompletableFuture<Vault> requestToCreateVault() {
-		return this.vaultHelper.requestToCreateVault()
+		return this.serviceManager.createVault()
 				.thenApplyAsync(aBoolean -> aBoolean?Vault.this:null);
 	}
 
 	CompletableFuture<Vault> checkVaultExist() {
-		return this.vaultHelper.vaultExist()
-				.thenApplyAsync(aBoolean -> aBoolean?null:Vault.this);
+		return this.serviceManager.getVaultServiceInfo()
+				.thenApplyAsync(usingPlan -> (usingPlan==null)?null:Vault.this);
 	}
 
 	public void revokeAccessToken() {
