@@ -1,6 +1,9 @@
 package org.elastos.hive;
 
+import org.elastos.hive.payment.UsingPlan;
+
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
 /**
  * Vault class
@@ -139,14 +142,25 @@ public class Vault {
 		return this.serviceManager;
 	}
 
-	CompletableFuture<Vault> requestToCreateVault() {
+	CompletableFuture<Vault> createVaultOnService() {
 		return this.serviceManager.createVault()
 				.thenApplyAsync(aBoolean -> aBoolean?Vault.this:null);
 	}
 
-	CompletableFuture<Vault> checkVaultExist() {
+	CompletableFuture<Boolean> checkVaultExist() {
 		return this.serviceManager.getVaultServiceInfo()
-				.thenApplyAsync(usingPlan -> (usingPlan==null)?null:Vault.this);
+				.handleAsync((usingPlan, throwable) ->
+						(null==throwable && usingPlan!=null));
+	}
+
+	CompletableFuture<Vault> createBackupVaultOnService() {
+		return this.serviceManager.createVault()
+				.thenApplyAsync(aBoolean -> aBoolean ? Vault.this : null);
+	}
+
+	CompletableFuture<Boolean> checkBackupVaultExist() {
+		return this.serviceManager.getBackupServiceInfo()
+				.handleAsync((usingPlan, throwable) -> (null==throwable && usingPlan!=null));
 	}
 
 	public void revokeAccessToken() {

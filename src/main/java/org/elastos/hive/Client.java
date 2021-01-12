@@ -38,16 +38,6 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 
-import java.net.URLDecoder;
-import java.nio.file.ProviderNotFoundException;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class Client {
 	private static boolean resolverDidSetup;
 
@@ -219,7 +209,6 @@ public class Client {
 		});
 	}
 
-
 	public CompletableFuture<Vault> createBackupVault(String ownerDid, String preferredProviderAddress) {
 		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApplyAsync(provider -> {
@@ -229,13 +218,14 @@ public class Client {
 							this.authenticationAdapter);
 					return new Vault(authHelper, provider, ownerDid);
 				})
-				.thenComposeAsync(vault -> vault.checkVaultExist())
-				.thenComposeAsync((Function<Vault, CompletionStage<Vault>>) vault -> {
-					if (null == vault) {
+				.thenComposeAsync(vault -> vault.checkBackupVaultExist().thenApplyAsync(aBoolean -> {
+					if(aBoolean) {
 						throw new VaultAlreadyExistException("Vault already existed.");
+					} else {
+						vault.createBackupVaultOnService();
 					}
-					return vault.requestToCreateVault();
-				});
+					return vault;
+				}));
 	}
 
 	public CompletableFuture<Vault> getBackupVault(String ownerDid, String preferredProviderAddress) {

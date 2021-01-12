@@ -38,7 +38,7 @@ class ServiceManagerImpl implements ServiceManager {
 
 	private boolean createVaultImp() throws HiveException {
 		try {
-			Response response = this.connectionManager.getServiceApi()
+			Response response = this.connectionManager.getServiceManagerApi()
 					.createVault()
 					.execute();
 
@@ -62,7 +62,7 @@ class ServiceManagerImpl implements ServiceManager {
 
 	private boolean removeVaultImp() throws HiveException {
 		try {
-			Response response = this.connectionManager.getServiceApi()
+			Response response = this.connectionManager.getServiceManagerApi()
 					.removeVault()
 					.execute();
 
@@ -86,7 +86,7 @@ class ServiceManagerImpl implements ServiceManager {
 
 	private boolean freezeVaultImp() throws HiveException {
 		try {
-			Response response = this.connectionManager.getServiceApi()
+			Response response = this.connectionManager.getServiceManagerApi()
 					.freezeVault()
 					.execute();
 
@@ -110,7 +110,7 @@ class ServiceManagerImpl implements ServiceManager {
 
 	private boolean unfreezeVaultImp() throws HiveException {
 		try {
-			Response response = this.connectionManager.getServiceApi()
+			Response response = this.connectionManager.getServiceManagerApi()
 					.unfreezeVault()
 					.execute();
 
@@ -134,7 +134,7 @@ class ServiceManagerImpl implements ServiceManager {
 
 	private UsingPlan getVaultServiceInfoImpl() throws HiveException {
 		try {
-			Response response = this.connectionManager.getServiceApi()
+			Response response = this.connectionManager.getServiceManagerApi()
 					.getVaultServiceInfo()
 					.execute();
 			int code = response.code();
@@ -165,7 +165,7 @@ class ServiceManagerImpl implements ServiceManager {
 
 	private boolean createBackupVaultImp() throws HiveException {
 		try {
-			Response response = this.connectionManager.getServiceApi()
+			Response response = this.connectionManager.getServiceManagerApi()
 					.createBackupVault()
 					.execute();
 
@@ -189,7 +189,7 @@ class ServiceManagerImpl implements ServiceManager {
 
 	private BackupUsingPlan getBackupServiceInfoImpl() throws HiveException {
 		try {
-			Response response = this.connectionManager.getServiceApi()
+			Response response = this.connectionManager.getServiceManagerApi()
 					.getBackupVaultInfo()
 					.execute();
 			authHelper.checkResponseWithRetry(response);
