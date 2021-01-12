@@ -254,7 +254,7 @@ public class ScriptingTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = AppInstanceFactory.getUser2().getVault();
+		Vault vault = AppInstanceFactory.initConfig2().getVault();
 		scripting = vault.getScripting();
 	}
 

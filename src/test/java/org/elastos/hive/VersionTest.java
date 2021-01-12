@@ -38,6 +38,6 @@ public class VersionTest {
 	private static Vault vault;
 	@BeforeClass
 	public static void setUp() {
-		vault = AppInstanceFactory.getUser2().getVault();
+		vault = AppInstanceFactory.initConfig2().getVault();
 	}
 }
