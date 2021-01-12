@@ -21,13 +21,6 @@
  */
 package org.elastos.hive;
 
-import java.nio.file.ProviderNotFoundException;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
-
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
@@ -37,6 +30,11 @@ import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
+
+import java.nio.file.ProviderNotFoundException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class Client {
 	private static boolean resolverDidSetup;
@@ -152,13 +150,14 @@ public class Client {
 							this.authenticationAdapter);
 					return new Vault(authHelper, provider, ownerDid);
 				})
-				.thenComposeAsync(vault -> vault.checkVaultExist())
-				.thenComposeAsync((Function<Vault, CompletionStage<Vault>>) vault -> {
-					if (null == vault) {
+				.thenComposeAsync(vault -> vault.checkVaultExist().thenApplyAsync(aBoolean -> {
+					if(aBoolean) {
 						throw new VaultAlreadyExistException("Vault already existed.");
+					} else {
+						vault.createVaultOnService();
 					}
-					return vault.requestToCreateVault();
-				});
+					return vault;
+				}));
 	}
 
 	/**
@@ -209,7 +208,6 @@ public class Client {
 		});
 	}
 
-
 	public CompletableFuture<Vault> createBackupVault(String ownerDid, String preferredProviderAddress) {
 		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApplyAsync(provider -> {
@@ -219,24 +217,13 @@ public class Client {
 							this.authenticationAdapterImpl);
 					return new Vault(authHelper, provider, ownerDid);
 				})
-				.thenComposeAsync(vault -> vault.checkVaultExist())
-				.thenComposeAsync((Function<Vault, CompletionStage<Vault>>) vault -> {
-					if (null == vault) {
+				.thenComposeAsync(vault -> vault.checkBackupVaultExist().thenApplyAsync(aBoolean -> {
+					if(aBoolean) {
 						throw new VaultAlreadyExistException("Vault already existed.");
+					} else {
+						vault.createBackupVaultOnService();
 					}
-					return vault.requestToCreateVault();
-				});
+					return vault;
+				}));
 	}
-
-	public CompletableFuture<Vault> getBackupVault(String ownerDid, String preferredProviderAddress) {
-		return getVaultProvider(ownerDid, preferredProviderAddress)
-				.thenApplyAsync(provider -> {
-					AuthHelper authHelper = new AuthHelper(this.context,
-							ownerDid,
-							provider,
-							this.authenticationAdapterImpl);
-					return new Vault(authHelper, provider, ownerDid);
-				});
-	}
-
 }

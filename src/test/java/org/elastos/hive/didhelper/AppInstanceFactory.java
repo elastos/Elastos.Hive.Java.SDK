@@ -67,6 +67,11 @@ public class AppInstanceFactory {
 				public CompletableFuture<String> getAuthorization(String jwtToken) {
 					return CompletableFuture.supplyAsync(() -> presentationInJWT.getAuthToken(jwtToken));
 				}
+
+				@Override
+				public CompletableFuture<String> getBackupAuthorization(String jwtToken) {
+					return null;
+				}
 			});
 			client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).whenComplete((ret, throwable) -> {
 				if (throwable == null) {
