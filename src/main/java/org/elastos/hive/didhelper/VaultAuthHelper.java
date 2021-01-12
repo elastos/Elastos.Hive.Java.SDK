@@ -54,6 +54,11 @@ public final class VaultAuthHelper {
 					public CompletableFuture<String> getAuthorization(String jwtToken) {
 						return generateAuthPresentationJWT(jwtToken);
 					}
+
+					@Override
+					public CompletableFuture<String> getBackupAuthorization(String jwtToken) {
+						return null;
+					}
 				});
 			} catch (HiveException e) {
 				e.printStackTrace();
