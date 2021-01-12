@@ -44,7 +44,7 @@ public class VaultHelperTest {
 	@BeforeClass
 	public static void setUp() {
 		try {
-			Client client = AppInstanceFactory.getClientWithAuth();
+			Client client = AppInstanceFactory.getClientWithEasyAuth();
 			String ownerDid = "did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL";
 			String providerAddress = "https://hive1.trinity-tech.io";
 			client.createVault(ownerDid, providerAddress)
