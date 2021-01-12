@@ -21,6 +21,13 @@
  */
 package org.elastos.hive;
 
+import java.nio.file.ProviderNotFoundException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
+
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
@@ -42,7 +49,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Client {
-
 	private static boolean resolverDidSetup;
 
 	private AuthenticationAdapter authenticationAdapter;
@@ -213,6 +219,36 @@ public class Client {
 		});
 	}
 
+
+	public CompletableFuture<Vault> createBackupVault(String ownerDid, String preferredProviderAddress) {
+		return getVaultProvider(ownerDid, preferredProviderAddress)
+				.thenApplyAsync(provider -> {
+					AuthHelper authHelper = new AuthHelper(this.context,
+							ownerDid,
+							provider,
+							this.authenticationAdapter);
+					return new Vault(authHelper, provider, ownerDid);
+				})
+				.thenComposeAsync(vault -> vault.checkVaultExist())
+				.thenComposeAsync((Function<Vault, CompletionStage<Vault>>) vault -> {
+					if (null == vault) {
+						throw new VaultAlreadyExistException("Vault already existed.");
+					}
+					return vault.requestToCreateVault();
+				});
+	}
+
+	public CompletableFuture<Vault> getBackupVault(String ownerDid, String preferredProviderAddress) {
+		return getVaultProvider(ownerDid, preferredProviderAddress)
+				.thenApplyAsync(provider -> {
+					AuthHelper authHelper = new AuthHelper(this.context,
+							ownerDid,
+							provider,
+							this.authenticationAdapter);
+					return new Vault(authHelper, provider, ownerDid);
+				});
+	}
+
 	/**
 	 * run script by hive url
 	 * @param scriptUrl hive://target_did@target_app_did/script_name?params={key=value}
@@ -301,4 +337,5 @@ public class Client {
 					});
 		}
 	}
+
 }

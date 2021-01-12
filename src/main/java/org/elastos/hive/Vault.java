@@ -13,6 +13,8 @@ public class Vault {
 	private Scripting scripting;
 	private KeyValues keyValues;
 	private Payment payment;
+	private Backup backup;
+	private ServiceManager serviceManager;
 	private Version version;
 
 	private String providerAddress;
@@ -29,6 +31,8 @@ public class Vault {
 		this.database = new DatabaseImpl(authHelper);
 		this.scripting = new ScriptingImpl(authHelper);
 		this.payment = new PaymentImpl(authHelper);
+		this.backup = new BackupImpl(authHelper);
+		this.serviceManager = new ServiceManagerImpl(authHelper);
 		this.version = new VersionImpl(authHelper);
 		this.vaultHelper = new VaultHelper(authHelper);
 	}
@@ -119,6 +123,22 @@ public class Vault {
 	 */
 	public Payment getPayment() {
 		return this.payment;
+	}
+
+	/**
+	 * Get interface as Backup instance
+	 * @return interface instance of Backup
+	 */
+	public Backup getBackup() {
+		return this.backup;
+	}
+
+	/**
+	 * Get interface as ServiceManager instance
+	 * @return interface instance of ServiceManager
+	 */
+	public ServiceManager getServiceManager() {
+		return this.serviceManager;
 	}
 
 	CompletableFuture<Vault> requestToCreateVault() {

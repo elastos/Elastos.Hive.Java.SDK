@@ -59,12 +59,12 @@ class BackupImpl implements Backup {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> save(String credential, BackupAuthenticationHandler handler) {
+	public CompletableFuture<Boolean> save(String target) {
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<Boolean> restore(String credential) {
+	public CompletableFuture<Boolean> restore(String target) {
 		return null;
 	}
 

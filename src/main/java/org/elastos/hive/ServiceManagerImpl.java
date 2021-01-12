@@ -13,13 +13,13 @@ import java.util.concurrent.CompletionException;
 
 import retrofit2.Response;
 
-class ServiceImpl implements Service {
+class ServiceManagerImpl implements ServiceManager {
 
 
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
 
-	ServiceImpl(AuthHelper authHelper) {
+	ServiceManagerImpl(AuthHelper authHelper) {
 		this.authHelper = authHelper;
 		this.connectionManager = authHelper.getConnectionManager();
 	}
