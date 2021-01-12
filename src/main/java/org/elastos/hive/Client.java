@@ -32,7 +32,6 @@ import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ParseHiveUrlException;
 import org.elastos.hive.exception.ProviderNotSetException;
-import org.elastos.hive.exception.VaultAlreadyExistException;
 
 import java.net.URLDecoder;
 import java.nio.file.ProviderNotFoundException;
@@ -45,7 +44,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Client {
-
 	private static boolean resolverDidSetup;
 
 	private AuthenticationAdapter authenticationAdapter;
@@ -63,17 +61,6 @@ public class Client {
 		this.authenticationAdapter = new AuthenticationAdapterImpl();
 	}
 
-	/**
-	 * Constructor without parameters
-	 * resolver url and cache path use default value,
-	 * resolver url default value: http://api.elastos.io:20606
-	 * cache path default value: new java.io.File("didCache")
-	 *
-	 * @throws HiveException
-	 */
-	public static void setupResolver() throws HiveException {
-		setupResolver(null, null);
-	}
 
 	/**
 	 * Recommendation for cache dir:
@@ -103,13 +90,13 @@ public class Client {
 
 	public static Client createInstance(ApplicationContext context) throws HiveException {
 		if (context == null)
-            throw new IllegalArgumentException("Missing Application context");
+			throw new IllegalArgumentException("Missing Application context");
 
-        if (context.getLocalDataDir() == null)
-            throw new IllegalArgumentException("Can not acquire data cache location from Application context");
+		if (context.getLocalDataDir() == null)
+			throw new IllegalArgumentException("Can not acquire data cache location from Application context");
 
-        if (context.getAppInstanceDocument() == null)
-            throw new IllegalArgumentException("Can not acquire App instance document from Application context");
+		if (context.getAppInstanceDocument() == null)
+			throw new IllegalArgumentException("Can not acquire App instance document from Application context");
 
 		if (!resolverDidSetup)
 			throw new HiveException("Setup DID resolver first");
@@ -139,32 +126,50 @@ public class Client {
 	}
 
 	/**
-	 * Create Vault for user with specified DID.
-	 * Try to create a vault on target provider address with following steps:
+	 * get Backup instance with specified DID.
+	 * Try to get a vault on target provider address with following steps:
 	 *  - Get the target provider address;
-	 *  - Check whether the vault is already existed on target provider, otherwise
-	 *  - Create a new vault on target provider with free pricing plan.
+	 *  - Create a new vaule of local instance..
 	 *
-	 * @param ownerDid  the owner did that want to create a vault
-	 * @param preferredProviderAddress the preferred provider address to use
-	 * @return a new created vault for owner did
+	 * @param ownerDid  the owner did related to target vault
+	 * @param providerAddress the preferred target provider address
+	 * @return a new vault instance.
 	 */
-	public CompletableFuture<Vault> createVault(String ownerDid, String preferredProviderAddress) {
+	public CompletableFuture<Backup> getBackup(String ownerDid, String providerAddress) {
 
+		if (ownerDid == null)
+			throw new IllegalArgumentException("Missing ownerDid");
+
+		if (providerAddress == null)
+			throw new IllegalArgumentException("Missing provider address");
+
+		return CompletableFuture.supplyAsync(() -> {
+			AuthHelper authHelper = new AuthHelper(this.context,
+					ownerDid,
+					providerAddress,
+					this.authenticationAdapter);
+			return new Backup(authHelper);
+		});
+	}
+
+	/**
+	 * get Manager instance with specified DID.
+	 * Try to get a vault on target provider address with following steps:
+	 *  - Get the target provider address;
+	 *  - Create a new vaule of local instance..
+	 *
+	 * @param ownerDid  the owner did related to target vault
+	 * @param preferredProviderAddress the preferred target provider address
+	 * @return a new vault instance.
+	 */
+	public CompletableFuture<Management> getManager(String ownerDid, String preferredProviderAddress) {
 		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApplyAsync(provider -> {
 					AuthHelper authHelper = new AuthHelper(this.context,
 							ownerDid,
 							provider,
 							this.authenticationAdapter);
-					return new Vault(authHelper, provider, ownerDid);
-				})
-				.thenComposeAsync(vault -> vault.checkVaultExist())
-				.thenComposeAsync((Function<Vault, CompletionStage<Vault>>) vault -> {
-					if (null == vault) {
-						throw new VaultAlreadyExistException("Vault already existed.");
-					}
-					return vault.requestToCreateVault();
+					return new Management(authHelper, provider, ownerDid);
 				});
 	}
 
@@ -323,4 +328,6 @@ public class Client {
 			return urlInfo;
 		}
 	}
+
+
 }
