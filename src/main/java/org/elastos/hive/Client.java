@@ -208,4 +208,35 @@ public class Client {
 			}
 		});
 	}
+
+
+	public CompletableFuture<Vault> createBackupVault(String ownerDid, String preferredProviderAddress) {
+		return getVaultProvider(ownerDid, preferredProviderAddress)
+				.thenApplyAsync(provider -> {
+					AuthHelper authHelper = new AuthHelper(this.context,
+							ownerDid,
+							provider,
+							this.authenticationAdapterImpl);
+					return new Vault(authHelper, provider, ownerDid);
+				})
+				.thenComposeAsync(vault -> vault.checkVaultExist())
+				.thenComposeAsync((Function<Vault, CompletionStage<Vault>>) vault -> {
+					if (null == vault) {
+						throw new VaultAlreadyExistException("Vault already existed.");
+					}
+					return vault.requestToCreateVault();
+				});
+	}
+
+	public CompletableFuture<Vault> getBackupVault(String ownerDid, String preferredProviderAddress) {
+		return getVaultProvider(ownerDid, preferredProviderAddress)
+				.thenApplyAsync(provider -> {
+					AuthHelper authHelper = new AuthHelper(this.context,
+							ownerDid,
+							provider,
+							this.authenticationAdapterImpl);
+					return new Vault(authHelper, provider, ownerDid);
+				});
+	}
+
 }
