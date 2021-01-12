@@ -7,6 +7,9 @@ import org.elastos.hive.Vault;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.Function;
+
+import static org.junit.Assert.fail;
 
 public class AppInstanceFactory {
 	private static final String didCachePath = "didCache";
@@ -100,7 +103,7 @@ public class AppInstanceFactory {
 			vaultFuture.thenComposeAsync((Function) o -> backupVaultFuture).get();
 
 		} catch (Exception e) {
-			System.out.println("Vault has been create");
+
 		}
 	}
 
@@ -170,11 +173,7 @@ public class AppInstanceFactory {
 	}
 
 	public Vault getVault() {
-		return vault;
-	}
-
-	public Client getClient() {
-		return client;
+		return this.vault;
 	}
 
 	public static Client getClientWithEasyAuth() {

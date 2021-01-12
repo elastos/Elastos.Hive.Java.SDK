@@ -39,6 +39,11 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 
+import java.nio.file.ProviderNotFoundException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+
 public class Client {
 	private static boolean resolverDidSetup;
 
@@ -153,13 +158,14 @@ public class Client {
 							this.authenticationAdapter);
 					return new Vault(authHelper, provider, ownerDid);
 				})
-				.thenComposeAsync(vault -> vault.checkVaultExist())
-				.thenComposeAsync((Function<Vault, CompletionStage<Vault>>) vault -> {
-					if (null == vault) {
+				.thenComposeAsync(vault -> vault.checkVaultExist().thenApplyAsync(aBoolean -> {
+					if(aBoolean) {
 						throw new VaultAlreadyExistException("Vault already existed.");
+					} else {
+						vault.createVaultOnService();
 					}
-					return vault.requestToCreateVault();
-				});
+					return vault;
+				}));
 	}
 
 	/**
