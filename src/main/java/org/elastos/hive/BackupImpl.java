@@ -6,11 +6,19 @@ import org.elastos.hive.backup.State;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportStateTypeException;
+import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.ResponseHelper;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import retrofit2.Response;
 
 class BackupImpl implements Backup {
@@ -60,18 +68,72 @@ class BackupImpl implements Backup {
 
 	@Override
 	public CompletableFuture<Boolean> save(BackupAuthenticationHandler handler) {
-		if(null == handler) {
+		if (null == handler) {
 			throw new IllegalArgumentException("backup authentication handler can not be null");
 		}
 
-//		handler.authorization();
+		return authHelper.checkValid().thenComposeAsync(aVoid ->
+				handler.authorization(authHelper.serviceDid(), authHelper.endPoint())
+						.thenApplyAsync(credential -> {
+							try {
+								return saveImpl(credential);
+							} catch (HiveException e) {
+								e.printStackTrace();
+							}
+							return false;
+						}));
+	}
 
-		return null;
+	private boolean saveImpl(String credential) throws HiveException {
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("backup_credential", credential);
+			String json = JsonUtil.serialize(map);
+
+			Response response = this.connectionManager.getBackApi()
+					.saveToNode(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			return true;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
-	public CompletableFuture<Boolean> restore(String target) {
-		return null;
+	public CompletableFuture<Boolean> restore(BackupAuthenticationHandler handler) {
+		if (null == handler) {
+			throw new IllegalArgumentException("backup authentication handler can not be null");
+		}
+
+		return authHelper.checkValid().thenComposeAsync(aVoid ->
+				handler.authorization(authHelper.serviceDid(), authHelper.endPoint())
+						.thenApplyAsync(credential -> {
+							try {
+								return restoreImpl(credential);
+							} catch (HiveException e) {
+								e.printStackTrace();
+							}
+							return false;
+						}));
+	}
+
+	private boolean restoreImpl(String credential) throws HiveException {
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("backup_credential", credential);
+			String json = JsonUtil.serialize(map);
+
+			Response response = this.connectionManager.getBackApi()
+					.restoreFromNode(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			return true;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
 	}
 
 	@Override
