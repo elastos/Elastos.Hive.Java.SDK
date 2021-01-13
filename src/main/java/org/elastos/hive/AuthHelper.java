@@ -39,6 +39,7 @@ class AuthHelper implements ConnectHelper {
 	private String userDid;
 	private String appId;
 	private String appInstanceDid;
+	private String serviceDid;
 
 	private String endPoint;
 
@@ -160,11 +161,12 @@ class AuthHelper implements ConnectHelper {
 		String accessToken = ret.textValue();
 		if (null == accessToken) return;
 		Claims claims = JwtUtil.getBody(accessToken);
+		serviceDid(claims.getIssuer());
 		long exp = claims.getExpiration().getTime();
 		JsonNode props = JsonUtil.deserialize(claims.get("props").toString());
-		setUserDid(props.get("userDid").textValue());
-		setAppId(props.get("appDid").textValue());
-		setAppInstanceDid((String) claims.get("aud"));
+		userDid(props.get("userDid").textValue());
+		appId(props.get("appDid").textValue());
+		appInstanceDid((String) claims.get("aud"));
 
 		long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
 
@@ -234,31 +236,43 @@ class AuthHelper implements ConnectHelper {
 				baseServiceConfig);
 	}
 
-	public String getOwnerDid() {
+	public String endPoint() {
+		return this.endPoint;
+	}
+
+	public String serviceDid() {
+		return this.serviceDid;
+	}
+
+	public void serviceDid(String serviceDid) {
+		this.serviceDid = serviceDid;
+	}
+
+	public String ownerDid() {
 		return this.ownerDid;
 	}
 
-	public String getUserDid() {
+	public String userDid() {
 		return this.userDid;
 	}
 
-	public void setUserDid(String userDid) {
+	public void userDid(String userDid) {
 		this.userDid = userDid;
 	}
 
-	public String getAppId() {
+	public String appId() {
 		return this.appId;
 	}
 
-	public void setAppId(String appId) {
+	public void appId(String appId) {
 		this.appId = appId;
 	}
 
-	public String getAppInstanceDid() {
+	public String appInstanceDid() {
 		return this.appInstanceDid;
 	}
 
-	public void setAppInstanceDid(String appInstanceDid) {
+	public void appInstanceDid(String appInstanceDid) {
 		this.appInstanceDid = appInstanceDid;
 	}
 

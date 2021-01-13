@@ -67,7 +67,7 @@ public class Vault {
 	 * @return 	the application id.
 	 */
 	public String getAppId() {
-		return this.authHelper.getAppId();
+		return this.authHelper.appId();
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class Vault {
 	 * @return	the application DID.
 	 */
 	public String getAppInstanceDid() {
-		return this.authHelper.getAppInstanceDid();
+		return this.authHelper.appInstanceDid();
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class Vault {
 	 * @return	the user DID.
 	 */
 	public String getUserDid() {
-		return this.authHelper.getUserDid();
+		return this.authHelper.userDid();
 	}
 
 	/**

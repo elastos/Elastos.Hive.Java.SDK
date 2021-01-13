@@ -72,41 +72,41 @@ public class PaymentTest {
 		}
 	}
 
-	@Test
-	public void test02_payOrder() {
-		CompletableFuture<Boolean> future = paymentApi.getAllOrders()
-				.thenApplyAsync(orders -> {
-					for(Order order : orders) {
-						if(order.state().equalsIgnoreCase("wait_pay")) {
-							return order.orderId();
-						}
-					}
-					return null;
-				}).thenComposeAsync(orderId -> {
-					if (null == orderId) {
-						return paymentApi.placeOrder("Rookie");
-					}
-					return CompletableFuture.completedFuture(orderId);
-				})
-				.thenComposeAsync(orderId -> {
-					System.out.print("Test case02 orderId ==>");
-					System.out.println(orderId);
-
-					//TODO set your paid txId
-					List<String> txids = new ArrayList<>();
-					return paymentApi.payOrder(orderId, txids);
-				})
-				.handle((aBoolean, throwable) -> (throwable == null));
-
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
-		}
-	}
+//	@Test
+//	public void test02_payOrder() {
+//		CompletableFuture<Boolean> future = paymentApi.getAllOrders()
+//				.thenApplyAsync(orders -> {
+//					for(Order order : orders) {
+//						if(order.state().equalsIgnoreCase("wait_pay")) {
+//							return order.orderId();
+//						}
+//					}
+//					return null;
+//				}).thenComposeAsync(orderId -> {
+//					if (null == orderId) {
+//						return paymentApi.placeOrder("Rookie");
+//					}
+//					return CompletableFuture.completedFuture(orderId);
+//				})
+//				.thenComposeAsync(orderId -> {
+//					System.out.print("Test case02 orderId ==>");
+//					System.out.println(orderId);
+//
+//					//TODO set your paid txId
+//					List<String> txids = new ArrayList<>();
+//					return paymentApi.payOrder(orderId, txids);
+//				})
+//				.handle((aBoolean, throwable) -> (throwable == null));
+//
+//		try {
+//			assertTrue(future.get());
+//			assertTrue(future.isCompletedExceptionally() == false);
+//			assertTrue(future.isDone());
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			fail();
+//		}
+//	}
 
 	@Test
 	public void test03_getUsingPricePlan() {
