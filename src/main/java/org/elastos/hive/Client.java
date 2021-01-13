@@ -209,13 +209,14 @@ public class Client {
 		});
 	}
 
-	public CompletableFuture<Boolean> createBackupVault(Vault vault) {
+	//TODO 是否需要？入参和返回参数是否合理？
+	public CompletableFuture<Boolean> createBackupService(Vault vault) {
 		if(null == vault) {
 			throw new IllegalArgumentException("vault can not be null");
 		}
 		return vault.checkBackupVaultExist().thenComposeAsync(aBoolean -> {
 			if(aBoolean) {
-				throw new BackupVaultAlreadyExistException("Backup Vault already existed.");
+				throw new BackupVaultAlreadyExistException("Backup service already existed.");
 			}
 			return vault.createBackupVaultOnService();
 		});

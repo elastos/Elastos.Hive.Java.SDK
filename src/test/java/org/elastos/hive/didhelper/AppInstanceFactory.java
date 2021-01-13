@@ -7,10 +7,6 @@ import org.elastos.hive.Vault;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
-
-import static org.junit.Assert.fail;
 
 public class AppInstanceFactory {
 	private static final String didCachePath = "didCache";
@@ -71,11 +67,6 @@ public class AppInstanceFactory {
 				public CompletableFuture<String> getAuthorization(String jwtToken) {
 					return CompletableFuture.supplyAsync(() -> presentationInJWT.getAuthToken(jwtToken));
 				}
-
-				@Override
-				public CompletableFuture<String> getBackupAuthorization(String jwtToken) {
-					return null;
-				}
 			});
 
 			client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).handleAsync((ret, throwable) -> {
@@ -93,7 +84,7 @@ public class AppInstanceFactory {
 				}
 				return vault;
 			}).thenComposeAsync(vault ->
-					client.createBackupVault(vault)
+					client.createBackupService(vault)
 							.handleAsync((vault1, throwable) -> {
 								if (null != throwable)
 									System.err.println("Backup Vault already existed");

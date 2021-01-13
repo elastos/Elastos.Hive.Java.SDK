@@ -40,7 +40,7 @@ class AuthHelper implements ConnectHelper {
 	private String appId;
 	private String appInstanceDid;
 
-	private String nodeUrl;
+	private String endPoint;
 
 	private AuthToken token;
 	private Persistent persistent;
@@ -49,16 +49,16 @@ class AuthHelper implements ConnectHelper {
 	private ApplicationContext context;
 	private AuthenticationAdapter authenticationAdapter;
 
-	public AuthHelper(ApplicationContext context, String ownerDid, String nodeUrl, AuthenticationAdapter adapter) {
+	public AuthHelper(ApplicationContext context, String ownerDid, String endPoint, AuthenticationAdapter adapter) {
 		this.ownerDid = ownerDid;
-		this.nodeUrl = nodeUrl;
+		this.endPoint = endPoint;
 		this.context = context;
 		this.authenticationAdapter = adapter;
-		this.persistent = new PersistentImpl(ownerDid, nodeUrl, this.context.getLocalDataDir());
+		this.persistent = new PersistentImpl(ownerDid, endPoint, this.context.getLocalDataDir());
 
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
-			this.connectionManager = new ConnectionManager(this.nodeUrl, config);
+			this.connectionManager = new ConnectionManager(this.endPoint, config);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -230,7 +230,7 @@ class AuthHelper implements ConnectHelper {
 		BaseServiceConfig baseServiceConfig = new BaseServiceConfig.Builder()
 				.headerConfig(headerConfig)
 				.build();
-		this.connectionManager.resetVaultApi(this.nodeUrl,
+		this.connectionManager.resetVaultApi(this.endPoint,
 				baseServiceConfig);
 	}
 
