@@ -59,7 +59,13 @@ class BackupImpl implements Backup {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> save(String target) {
+	public CompletableFuture<Boolean> save(BackupAuthenticationHandler handler) {
+		if(null == handler) {
+			throw new IllegalArgumentException("backup authentication handler can not be null");
+		}
+
+//		handler.authorization();
+
 		return null;
 	}
 
