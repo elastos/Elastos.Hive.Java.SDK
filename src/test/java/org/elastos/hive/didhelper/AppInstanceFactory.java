@@ -116,22 +116,22 @@ public class AppInstanceFactory {
 
 	//develope 环境
 	public static AppInstanceFactory initConfig1() {
-		return initOptions(ConfigHelper.getConfigInfo("config1.conf"));
+		return initOptions(ConfigHelper.getConfigInfo("Developing.conf"));
 	}
 
 	//release环境（MainNet + https://hive1.trinity-tech.io）
 	public static AppInstanceFactory initConfig2() {
-		return initOptions(ConfigHelper.getConfigInfo("config2.conf"));
+		return initOptions(ConfigHelper.getConfigInfo("Production.conf"));
 	}
 
 	//跨did，访问user2, release环境
 	public static AppInstanceFactory initConfig3() {
-		return initOptions(ConfigHelper.getConfigInfo("config3.conf"));
+		return initOptions(ConfigHelper.getConfigInfo("CrossVault.conf"));
 	}
 
 	//local 环境
 	public static AppInstanceFactory initConfig4() {
-		return initOptions(ConfigHelper.getConfigInfo("config4.conf"));
+		return initOptions(ConfigHelper.getConfigInfo("Testing.conf"));
 	}
 
 	public Vault getVault() {
@@ -140,7 +140,7 @@ public class AppInstanceFactory {
 
 	public static Client getClient() {
 		try {
-			Config config = ConfigHelper.getConfigInfo("config2.conf");
+			Config config = ConfigHelper.getConfigInfo("Production.conf");
 			if (!resolverDidSetup) {
 				Client.setupResolver(config.getResolverUrl(), didCachePath);
 				resolverDidSetup = true;
