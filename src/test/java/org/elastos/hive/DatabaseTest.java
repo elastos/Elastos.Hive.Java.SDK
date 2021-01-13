@@ -263,6 +263,7 @@ public class DatabaseTest {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 	}

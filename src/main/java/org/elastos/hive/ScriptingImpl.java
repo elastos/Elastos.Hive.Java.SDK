@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.function.Supplier;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -98,7 +97,7 @@ class ScriptingImpl implements Scripting {
 			if(params!= null) map.put("params", params);
 
 			ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
-			String ownerDid = this.authHelper.getOwnerDid();
+			String ownerDid = this.authHelper.ownerDid();
 			if (null != ownerDid) {
 				targetNode.put("target_did", ownerDid);
 				if (null != appDid)
@@ -213,6 +212,39 @@ class ScriptingImpl implements Scripting {
 			} else {
 				throw new HiveException("Can not get transaction id");
 			}
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
+	}
+
+	private <T> T callDownloadScriptImpl(String scriptName, JsonNode params, String appDid, Class<T> clazz) throws HiveException {
+		try {
+			Map<String, Object> map = new HashMap<>();
+			map.put("name", scriptName);
+
+			if(params!= null) map.put("params", params);
+
+			ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
+			String ownerDid = this.authHelper.getOwnerDid();
+			if (null != ownerDid) {
+				targetNode.put("target_did", ownerDid);
+				if (null != appDid)
+					targetNode.put("target_app_did", appDid);
+				map.put("context", targetNode);
+			}
+
+			String json = JsonUtil.serialize(map);
+			Response<ResponseBody> response;
+
+			response = this.connectionManager.getScriptingApi()
+					.callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.execute();
+			int code = response.code();
+			if(404 == code) {
+				throw new FileNotFoundException(FileNotFoundException.EXCEPTION);
+			}
+			authHelper.checkResponseWithRetry(response);
+			return ResponseHelper.getValue(response, clazz);
 		} catch (Exception e) {
 			throw new HiveException(e.getLocalizedMessage());
 		}
