@@ -41,11 +41,10 @@ import org.elastos.hive.exception.VaultAlreadyExistException;
 public class Client {
 	private static boolean resolverDidSetup;
 
-	private AuthenticationAdapterImpl authenticationAdapterImpl;
+	private AuthenticationAdapter authenticationAdapter;
 	private ApplicationContext context;
 
-	static class AuthenticationAdapterImpl implements AuthenticationAdapter {
-
+	private static class AuthenticationAdapterImpl implements AuthenticationAdapter {
 		@Override
 		public synchronized CompletableFuture<String> getAuthorization(ApplicationContext context, String jwtToken) {
 			return context.getAuthorization(jwtToken);
@@ -53,20 +52,8 @@ public class Client {
 	}
 
 	private Client(ApplicationContext context) {
-		if(null == context) {
-			throw new IllegalArgumentException("context should not be null");
-		}
-
-		if(null == context.getLocalDataDir()) {
-			throw new IllegalArgumentException("local data dir should not be null");
-		}
-
-		if(null == context.getAppInstanceDocument()) {
-			throw new IllegalArgumentException("app instance document should not be null");
-		}
-
 		this.context = context;
-		authenticationAdapterImpl = new AuthenticationAdapterImpl();
+		this.authenticationAdapter = new AuthenticationAdapterImpl();
 	}
 
 	/**
@@ -95,7 +82,7 @@ public class Client {
 		if (cacheDir == null || resolver == null)
 			throw new IllegalArgumentException();
 		if (resolverDidSetup)
-			throw new HiveException("Resolver already setup");
+			throw new HiveException("Resolver already setup before");
 
 		try {
 			DIDBackend.initialize(resolver, cacheDir);
@@ -109,10 +96,16 @@ public class Client {
 
 	public static Client createInstance(ApplicationContext context) throws HiveException {
 		if (context == null)
-			throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Missing Application context");
+
+        if (context.getLocalDataDir() == null)
+            throw new IllegalArgumentException("Can not acquire data cache location from Application context");
+
+        if (context.getAppInstanceDocument() == null)
+            throw new IllegalArgumentException("Can not acquire App instance document from Application context");
 
 		if (!resolverDidSetup)
-			throw new HiveException("Setup did resolver first");
+			throw new HiveException("Setup DID resolver first");
 
 		return new Client(context);
 	}
@@ -133,7 +126,7 @@ public class Client {
 					AuthHelper authHelper = new AuthHelper(this.context,
 							ownerDid,
 							provider,
-							this.authenticationAdapterImpl);
+							this.authenticationAdapter);
 					return new Vault(authHelper, provider, ownerDid);
 				});
 	}
@@ -156,7 +149,7 @@ public class Client {
 					AuthHelper authHelper = new AuthHelper(this.context,
 							ownerDid,
 							provider,
-							this.authenticationAdapterImpl);
+							this.authenticationAdapter);
 					return new Vault(authHelper, provider, ownerDid);
 				})
 				.thenComposeAsync(vault -> vault.checkVaultExist())
@@ -183,7 +176,7 @@ public class Client {
 	 */
 	public CompletableFuture<String> getVaultProvider(String ownerDid, String preferredProviderAddress) {
 		if (ownerDid == null)
-			throw new IllegalArgumentException("Parameters 'ownerDid' can not be null");
+			throw new IllegalArgumentException("Missing ownerDid to get the provider for");
 
 		return CompletableFuture.supplyAsync(() -> {
 			/* Choose 'preferredProviderAddress' as target provider address if it's with value;
