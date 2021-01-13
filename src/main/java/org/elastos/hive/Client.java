@@ -62,17 +62,6 @@ public class Client {
 		this.authenticationAdapter = new AuthenticationAdapterImpl();
 	}
 
-	/**
-	 * Constructor without parameters
-	 * resolver url and cache path use default value,
-	 * resolver url default value: http://api.elastos.io:20606
-	 * cache path default value: new java.io.File("didCache")
-	 *
-	 * @throws HiveException
-	 */
-	public static void setupResolver() throws HiveException {
-		setupResolver(null, null);
-	}
 
 	/**
 	 * Recommendation for cache dir:
