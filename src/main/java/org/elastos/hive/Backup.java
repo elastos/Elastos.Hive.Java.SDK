@@ -22,10 +22,10 @@ public interface Backup {
 
 	/**
 	 * Restore hive vault from other hive node
-	 * @param target
+	 * @param handler
 	 * @return
 	 */
-	CompletableFuture<Boolean> restore(String target);
+	CompletableFuture<Boolean> restore(BackupAuthenticationHandler handler);
 
 	/**
 	 * Active hive backup data to vault

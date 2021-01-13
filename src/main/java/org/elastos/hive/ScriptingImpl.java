@@ -97,7 +97,7 @@ class ScriptingImpl implements Scripting {
 			if(params!= null) map.put("params", params);
 
 			ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
-			String ownerDid = this.authHelper.getOwnerDid();
+			String ownerDid = this.authHelper.ownerDid();
 			if (null != ownerDid) {
 				targetNode.put("target_did", ownerDid);
 				if (null != appDid)
@@ -201,7 +201,7 @@ class ScriptingImpl implements Scripting {
 			if(params!= null) map.put("params", params);
 
 			ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
-			String ownerDid = this.authHelper.getOwnerDid();
+			String ownerDid = this.authHelper.ownerDid();
 			if (null != ownerDid) {
 				targetNode.put("target_did", ownerDid);
 				if (null != appDid)
