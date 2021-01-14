@@ -20,7 +20,7 @@ public class ScriptingOtherTest {
 	public void test00_callOtherScript() {
 		String scriptName = "get_groups";
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() ->
-				AppInstanceFactory.initConfig2().getVault().getScripting())
+				AppInstanceFactory.initCrossConfig().getVault().getScripting())
 				.thenComposeAsync(scripting ->
 						{
 							JsonNode filter = JsonUtil.deserialize("{\"friends\":\"$callScripter_did\"}");
@@ -29,7 +29,7 @@ public class ScriptingOtherTest {
 							return scripting.registerScript(scriptName, executable, false, false);
 						})
 				.thenApplyAsync(aBoolean ->
-						aBoolean ? AppInstanceFactory.initConfig3().getVault().getScripting() : null)
+						aBoolean ? AppInstanceFactory.initCrossConfig().getVault().getScripting() : null)
 				.thenComposeAsync(scripting ->
 						scripting.callScript(scriptName, null, null, String.class))
 				.handle((BiFunction<String, Throwable, Boolean>) (s, throwable) ->

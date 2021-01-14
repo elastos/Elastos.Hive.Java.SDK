@@ -1,8 +1,8 @@
 package org.elastos.hive.didhelper;
 
 import org.elastos.did.DIDDocument;
-import org.elastos.hive.Client;
 import org.elastos.hive.ApplicationContext;
+import org.elastos.hive.Client;
 import org.elastos.hive.Vault;
 
 import java.util.concurrent.CompletableFuture;
@@ -88,10 +88,6 @@ public class AppInstanceFactory {
 		setUp(userDidOpt, appInstanceDidOpt, userFactoryOpt);
 	}
 
-	public static AppInstanceFactory createFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
-		return new AppInstanceFactory(userDidOpt, appInstanceDidOpt, userFactoryOpt);
-	}
-
 	private static AppInstanceFactory initOptions(Config config) {
 		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
 				.setName(config.getUserName())
@@ -114,24 +110,43 @@ public class AppInstanceFactory {
 		return new AppInstanceFactory(userDidOpt, appInstanceDidOpt, options);
 	}
 
-	//develope 环境
-	public static AppInstanceFactory initConfig1() {
-		return initOptions(ConfigHelper.getConfigInfo("Developing.conf"));
+
+	public static AppInstanceFactory configSelector() {
+		//TODO You can change this value to switch the test environment
+		// default value: Type.PRODUCTION
+		Type select = Type.PRODUCTION;
+		return initConfig(select);
 	}
 
-	//release环境（MainNet + https://hive1.trinity-tech.io）
-	public static AppInstanceFactory initConfig2() {
-		return initOptions(ConfigHelper.getConfigInfo("Production.conf"));
+	public static AppInstanceFactory initCrossConfig() {
+		return initConfig(Type.CROSS);
 	}
 
-	//跨did，访问user2, release环境
-	public static AppInstanceFactory initConfig3() {
-		return initOptions(ConfigHelper.getConfigInfo("CrossVault.conf"));
+	public enum Type {
+		CROSS,
+		DEVELOPING,
+		PRODUCTION,
+		TESTING
 	}
 
-	//local 环境
-	public static AppInstanceFactory initConfig4() {
-		return initOptions(ConfigHelper.getConfigInfo("Testing.conf"));
+	private static AppInstanceFactory initConfig(Type type) {
+		String path = null;
+		switch (type) {
+			case CROSS:
+				path = "CrossVault.conf";
+				break;
+			case DEVELOPING:
+				path = "Developing.conf";
+				break;
+			case PRODUCTION:
+				path = "Production.conf";
+				break;
+			case TESTING:
+				path = "Testing.conf";
+				break;
+		}
+
+		return initOptions(ConfigHelper.getConfigInfo(path));
 	}
 
 	public Vault getVault() {

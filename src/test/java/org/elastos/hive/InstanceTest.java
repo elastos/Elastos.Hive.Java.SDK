@@ -13,7 +13,7 @@ public class InstanceTest {
     @Test
     public void testGetVaultInstance() {
         try {
-            vault = AppInstanceFactory.initConfig2().getVault();
+            vault = AppInstanceFactory.configSelector().getVault();
             assertNotNull(vault);
         } catch (Exception e) {
             e.printStackTrace();
