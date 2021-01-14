@@ -140,7 +140,7 @@ public class PaymentTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = AppInstanceFactory.initConfig2().getVault();
+		Vault vault = AppInstanceFactory.configSelector().getVault();
 		paymentApi = vault.getPayment();
 	}
 }

@@ -510,7 +510,7 @@ public class DatabaseTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = AppInstanceFactory.initConfig2().getVault();
+		Vault vault = AppInstanceFactory.configSelector().getVault();
 		database = vault.getDatabase();
 	}
 }
