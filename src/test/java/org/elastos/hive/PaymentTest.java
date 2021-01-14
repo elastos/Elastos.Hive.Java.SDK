@@ -57,13 +57,13 @@ public class PaymentTest {
 //		}).get();
 //	}
 
-	@Test
-	public void test05_getOrder() throws ExecutionException, InterruptedException {
-		paymentApi.getOrder(orderId).whenComplete((order, throwable) -> {
-			assertNull(throwable);
-			assertNotNull(order);
-		}).get();
-	}
+//	@Test
+//	public void test05_getOrder() throws ExecutionException, InterruptedException {
+//		paymentApi.getOrder(orderId).whenComplete((order, throwable) -> {
+//			assertNull(throwable);
+//			assertNotNull(order);
+//		}).get();
+//	}
 
 	@Test
 	public void test06_getAllOrders() throws ExecutionException, InterruptedException {
