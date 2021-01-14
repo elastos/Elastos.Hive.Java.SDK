@@ -10,7 +10,7 @@ public class UsingPlan extends Result<UsingPlan> {
 	@JsonProperty("max_storage")
 	private long maxStorage;
 	@JsonProperty("file_use_storage")
-	private int fileUseStorage;
+	private long fileUseStorage;
 	@JsonProperty("db_use_storage")
 	private float dbUseStorage;
 	@JsonProperty("modify_time")
@@ -30,7 +30,7 @@ public class UsingPlan extends Result<UsingPlan> {
 		return maxStorage;
 	}
 
-	public int fileUseStorage() {
+	public long fileUseStorage() {
 		return fileUseStorage;
 	}
 
