@@ -16,7 +16,7 @@ public interface ServiceManagerApi {
 	@POST(Constance.API_PATH + "/service/vault/freeze")
 	Call<ResponseBody> freezeVault();
 
-	@POST(Constance.API_PATH + "/service/vault/freeze")
+	@POST(Constance.API_PATH + "/service/vault/unfreeze")
 	Call<ResponseBody> unfreezeVault();
 
 	@GET(Constance.API_PATH + "/service/vault")
