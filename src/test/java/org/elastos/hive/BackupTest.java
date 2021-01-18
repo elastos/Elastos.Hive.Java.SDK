@@ -31,12 +31,8 @@ public class BackupTest {
 
 	@Test
 	public void testSave() {
-		BackupAuthenticationHandler handler = new BackupAuthenticationHandler() {
-			@Override
-			public CompletableFuture<String> authorization(String serviceDid) {
-				return null;
-			}
-		};
+		BackupAuthenticationHandler handler = serviceDid -> CompletableFuture.supplyAsync(() ->
+				factory.getBackupVc(serviceDid));
 		CompletableFuture<Boolean> future = backupApi.save(handler)
 				.handle((success, ex) -> (ex == null));
 
@@ -52,12 +48,8 @@ public class BackupTest {
 
 	@Test
 	public void testRestore() {
-		BackupAuthenticationHandler handler = new BackupAuthenticationHandler() {
-			@Override
-			public CompletableFuture<String> authorization(String serviceDid) {
-				return null;
-			}
-		};
+		BackupAuthenticationHandler handler = serviceDid -> CompletableFuture.supplyAsync(() ->
+				factory.getBackupVc(serviceDid));
 		CompletableFuture<Boolean> future = backupApi.restore(handler)
 				.handle((success, ex) -> (ex == null));
 
@@ -86,9 +78,11 @@ public class BackupTest {
 		}
 	}
 
+	private static AppInstanceFactory factory;
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = AppInstanceFactory.configSelector().getVault();
+		factory = AppInstanceFactory.configSelector();
+		Vault vault = factory.getVault();
 		backupApi = vault.getBackup();
 	}
 
