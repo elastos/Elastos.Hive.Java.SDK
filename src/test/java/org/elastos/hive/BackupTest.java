@@ -33,7 +33,7 @@ public class BackupTest {
 	public void testSave() {
 		BackupAuthenticationHandler handler = new BackupAuthenticationHandler() {
 			@Override
-			public CompletableFuture<String> authorization(String serviceDid, String endPoint) {
+			public CompletableFuture<String> authorization(String serviceDid) {
 				return null;
 			}
 		};
@@ -54,7 +54,7 @@ public class BackupTest {
 	public void testRestore() {
 		BackupAuthenticationHandler handler = new BackupAuthenticationHandler() {
 			@Override
-			public CompletableFuture<String> authorization(String serviceDid, String endPoint) {
+			public CompletableFuture<String> authorization(String serviceDid) {
 				return null;
 			}
 		};
