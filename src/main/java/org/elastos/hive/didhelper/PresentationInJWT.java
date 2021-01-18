@@ -26,6 +26,7 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.VerifiableCredential;
 import org.elastos.did.VerifiablePresentation;
 import org.elastos.did.adapter.DummyAdapter;
+import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.utils.JwtUtil;
 
@@ -75,6 +76,17 @@ class PresentationInJWT {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
+	}
+
+	public String getBackupVc(String sourceDID, String targetHost, String targetDID) {
+		try {
+			VerifiableCredential vc = userDidApp.issueBackupDiplomaFor(sourceDID, targetHost, targetDID);
+			return vc.toString();
+		} catch (DIDException e) {
+			e.printStackTrace();
+		}
+
 		return null;
 	}
 
