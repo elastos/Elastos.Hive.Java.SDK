@@ -19,11 +19,11 @@ public final class VaultAuthHelper {
 	}
 
 	public VaultAuthHelper(String userMnemonic, String appMnemonic, String localDataDir) {
-		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
+		PresentationInJWT.AppOptions userDidOpt = PresentationInJWT.AppOptions.create()
 				.setMnemonic(userMnemonic)
 				.setStorepass("storepass");
 
-		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
+		PresentationInJWT.AppOptions appInstanceDidOpt = PresentationInJWT.AppOptions.create()
 				.setMnemonic(appMnemonic)
 				.setStorepass("storepass");
 

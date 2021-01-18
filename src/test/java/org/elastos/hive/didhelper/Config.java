@@ -12,8 +12,10 @@ public class Config {
 	private String appPhrasepass;
 	private String appStorePass;
 
-	private String storePath;
+	private String targetDID;
+	private String targetHost;
 
+	private String storePath;
 	private String resolverUrl;
 	private String provider;
 	private String ownerDid;
@@ -121,4 +123,21 @@ public class Config {
 	public void setStorePath(String storePath) {
 		this.storePath = storePath;
 	}
+
+	public String targetDID() {
+		return this.targetDID;
+	}
+
+	public void targetDID(String targetDID) {
+		this.targetDID = targetDID;
+	}
+
+	public String targetHost() {
+		return this.targetHost;
+	}
+
+	public void targetHost(String targetHost) {
+		this.targetHost = targetHost;
+	}
+
 }
