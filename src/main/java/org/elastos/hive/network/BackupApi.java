@@ -11,13 +11,13 @@ public interface BackupApi {
 	@POST(Constance.API_PATH + "/backup/state")
 	Call<ResponseBody> getState();
 
-	@POST(Constance.API_PATH + "/backup/save/to/node")
+	@POST(Constance.API_PATH + "/backup/save_to_node")
 	Call<ResponseBody> saveToNode(@Body RequestBody body);
 
-	@POST(Constance.API_PATH + "/backup/restore/from/node")
+	@POST(Constance.API_PATH + "/backup/restore_from_node")
 	Call<ResponseBody> restoreFromNode(@Body RequestBody body);
 
-	@POST(Constance.API_PATH + "/backup/active/to/vault")
+	@POST(Constance.API_PATH + "/backup/activate_to_vault")
 	Call<ResponseBody> activeToVault(@Body RequestBody body);
 
 }
