@@ -1,9 +1,12 @@
 package org.elastos.hive.didhelper;
 
+import org.elastos.did.DID;
 import org.elastos.did.Issuer;
 import org.elastos.did.VerifiableCredential;
 import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
+import org.elastos.did.exception.DIDStoreException;
+import org.elastos.did.exception.MalformedCredentialException;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -32,6 +35,33 @@ class DIDApp  extends Entity {
 				.seal(getStorePassword());
 
 		System.out.println("VerifiableCredential:");
+		String vcStr = vc.toString();
+		System.out.println(vcStr);
+
+		if(!vc.isValid()) {
+			throw new IllegalStateException("Verifiable Credential is invalid");
+		}
+
+		return vc;
+	}
+
+	public VerifiableCredential issueBackupDiplomaFor(String sourceDID, String targetHost, String targetDID) throws DIDException {
+		Map<String, String> subject = new HashMap<String, String>();
+		subject.put("sourceDID", sourceDID);
+		subject.put("targetHost", targetHost);
+		subject.put("targetDID", targetDID);
+
+		Calendar exp = Calendar.getInstance();
+		exp.add(Calendar.YEAR, 5);
+
+		Issuer.CredentialBuilder cb = issuer.issueFor(new DID(sourceDID));
+		VerifiableCredential vc = cb.id("backupId")
+				.type("BackupCredential")
+				.properties(subject)
+				.expirationDate(exp.getTime())
+				.seal(getStorePassword());
+
+		System.out.println("BackupCredential:");
 		String vcStr = vc.toString();
 		System.out.println(vcStr);
 
