@@ -29,12 +29,14 @@ public final class ConfigHelper {
 		config.setAppPhrasepass(properties.getProperty("appPhrasepass"));
 		config.setAppStorePass(properties.getProperty("appStorePass"));
 
-		config.setProvider(properties.getProperty("provider"));
-		config.setResolverUrl(properties.getProperty("resolverUrl"));
-		config.setOwnerDid(properties.getProperty("ownerDid"));
+		config.targetDID(properties.getProperty("targetDID"));
+		config.targetHost(properties.getProperty("targetHost"));
 
 		String cache = System.getProperty("user.dir") + File.separator + "store/";
 		config.setStorePath(cache + properties.getProperty("storePath"));
+		config.setProvider(properties.getProperty("provider"));
+		config.setResolverUrl(properties.getProperty("resolverUrl"));
+		config.setOwnerDid(properties.getProperty("ownerDid"));
 
 		return config;
 	}

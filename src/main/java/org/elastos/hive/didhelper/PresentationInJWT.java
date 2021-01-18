@@ -35,6 +35,7 @@ class PresentationInJWT {
 	DIDApp userDidApp = null;
 	DApp appInstanceDidApp = null;
 	DIDDocument doc = null;
+	BackupOptions backupOptions;
 
 	private static DummyAdapter adapter;
 
@@ -42,8 +43,10 @@ class PresentationInJWT {
 		adapter = new DummyAdapter();
 	}
 
-	public PresentationInJWT init(Options userDidOpt, Options appInstanceDidOpt) {
+	public PresentationInJWT init(AppOptions userDidOpt, AppOptions appInstanceDidOpt, BackupOptions backupOptions) {
 		try {
+			this.backupOptions = backupOptions;
+
 			initDIDBackend();
 
 			userDidApp = new DIDApp(userDidOpt.name, userDidOpt.mnemonic, adapter, userDidOpt.phrasepass, userDidOpt.storepass);
@@ -79,9 +82,10 @@ class PresentationInJWT {
 		return null;
 	}
 
-	public String getBackupVc(String sourceDID, String targetHost, String targetDID) {
+	public String getBackupVc(String sourceDID) {
 		try {
-			VerifiableCredential vc = userDidApp.issueBackupDiplomaFor(sourceDID, targetHost, targetDID);
+			VerifiableCredential vc = userDidApp.issueBackupDiplomaFor(sourceDID,
+					backupOptions.targetHost, backupOptions.targetDID);
 			return vc.toString();
 		} catch (DIDException e) {
 			e.printStackTrace();
@@ -90,32 +94,51 @@ class PresentationInJWT {
 		return null;
 	}
 
-	public static class Options {
+	public static class BackupOptions {
+		private String targetDID;
+		private String targetHost;
+
+		public static BackupOptions create() {
+			return new BackupOptions();
+		}
+
+		public BackupOptions targetDID(String targetDID) {
+			this.targetDID = targetDID;
+			return this;
+		}
+
+		public BackupOptions targetHost(String targetHost) {
+			this.targetHost = targetHost;
+			return this;
+		}
+	}
+
+	public static class AppOptions {
 		private String name;
 		private String mnemonic;
 		private String phrasepass;
 		private String storepass;
 
-		public static Options create() {
-			return new Options();
+		public static AppOptions create() {
+			return new AppOptions();
 		}
 
-		public Options setName(String name) {
+		public AppOptions setName(String name) {
 			this.name = name;
 			return this;
 		}
 
-		public Options setMnemonic(String mnemonic) {
+		public AppOptions setMnemonic(String mnemonic) {
 			this.mnemonic = mnemonic;
 			return this;
 		}
 
-		public Options setPhrasepass(String phrasepass) {
+		public AppOptions setPhrasepass(String phrasepass) {
 			this.phrasepass = phrasepass;
 			return this;
 		}
 
-		public Options setStorepass(String storepass) {
+		public AppOptions setStorepass(String storepass) {
 			this.storepass = storepass;
 			return this;
 		}
