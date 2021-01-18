@@ -7,10 +7,6 @@ import org.elastos.hive.Vault;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
-
-import static org.junit.Assert.fail;
 
 public class AppInstanceFactory {
 	private static final String didCachePath = "didCache";
@@ -18,40 +14,40 @@ public class AppInstanceFactory {
 	private Client client;
 	private static boolean resolverDidSetup = false;
 
-	static class Options {
+	static class ClientOptions {
 		private String storePath;
 		private String ownerDid;
 		private String resolveUrl;
 		private String provider;
 
-		public static Options create() {
-			return new Options();
+		public static ClientOptions create() {
+			return new ClientOptions();
 		}
 
-		public Options storePath(String storePath) {
+		public ClientOptions storePath(String storePath) {
 			this.storePath = storePath;
 			return this;
 		}
 
-		public Options ownerDid(String ownerDid) {
+		public ClientOptions ownerDid(String ownerDid) {
 			this.ownerDid = ownerDid;
 			return this;
 		}
 
-		public Options resolveUrl(String resolveUrl) {
+		public ClientOptions resolveUrl(String resolveUrl) {
 			this.resolveUrl = resolveUrl;
 			return this;
 		}
 
-		public Options provider(String provider) {
+		public ClientOptions provider(String provider) {
 			this.provider = provider;
 			return this;
 		}
 	}
 
-	private void setUp(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
+	private void setUp(PresentationInJWT.AppOptions userDidOpt, PresentationInJWT.AppOptions appInstanceDidOpt, PresentationInJWT.BackupOptions backupOptions, ClientOptions userFactoryOpt) {
 		try {
-			PresentationInJWT presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
+			presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt, backupOptions);
 			if (!resolverDidSetup) {
 				Client.setupResolver(userFactoryOpt.resolveUrl, this.didCachePath);
 				resolverDidSetup = true;
@@ -108,30 +104,34 @@ public class AppInstanceFactory {
 		}
 	}
 
-	private AppInstanceFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
-		setUp(userDidOpt, appInstanceDidOpt, userFactoryOpt);
+	private AppInstanceFactory(PresentationInJWT.AppOptions userDidOpt, PresentationInJWT.AppOptions appInstanceDidOpt, PresentationInJWT.BackupOptions backupOptions, ClientOptions userFactoryOpt) {
+		setUp(userDidOpt, appInstanceDidOpt, backupOptions, userFactoryOpt);
 	}
 
 	private static AppInstanceFactory initOptions(Config config) {
-		PresentationInJWT.Options userDidOpt = PresentationInJWT.Options.create()
+		PresentationInJWT.AppOptions userDidOpt = PresentationInJWT.AppOptions.create()
 				.setName(config.getUserName())
 				.setMnemonic(config.getUserMn())
 				.setPhrasepass(config.getUserPhrasepass())
 				.setStorepass(config.getUserStorepass());
 
-		PresentationInJWT.Options appInstanceDidOpt = PresentationInJWT.Options.create()
+		PresentationInJWT.AppOptions appInstanceDidOpt = PresentationInJWT.AppOptions.create()
 				.setName(config.getAppName())
 				.setMnemonic(config.getAppMn())
 				.setPhrasepass(config.getAppPhrasepass())
 				.setStorepass(config.getAppStorePass());
 
-		Options options = Options.create();
-		options.provider(config.getProvider());
-		options.resolveUrl(config.getResolverUrl());
-		options.ownerDid(config.getOwnerDid());
-		options.storePath(config.getStorePath());
+		PresentationInJWT.BackupOptions backupOptions = PresentationInJWT.BackupOptions.create()
+				.targetDID(config.targetDID())
+				.targetHost(config.targetHost());
 
-		return new AppInstanceFactory(userDidOpt, appInstanceDidOpt, options);
+		ClientOptions clientOptions = ClientOptions.create();
+		clientOptions.provider(config.getProvider());
+		clientOptions.resolveUrl(config.getResolverUrl());
+		clientOptions.ownerDid(config.getOwnerDid());
+		clientOptions.storePath(config.getStorePath());
+
+		return new AppInstanceFactory(userDidOpt, appInstanceDidOpt, backupOptions, clientOptions);
 	}
 
 
@@ -176,6 +176,11 @@ public class AppInstanceFactory {
 	public Vault getVault() {
 		return this.vault;
 	}
+
+	public String getBackupVc(String serviceDID) {
+		return this.presentationInJWT.getBackupVc(serviceDID);
+	}
+
 
 	public static Client getClientWithEasyAuth() {
 		try {
