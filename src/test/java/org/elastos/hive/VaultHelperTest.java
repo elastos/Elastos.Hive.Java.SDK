@@ -8,6 +8,8 @@ import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -47,7 +49,9 @@ public class VaultHelperTest {
 			Client client = AppInstanceFactory.getClientWithEasyAuth();
 			String ownerDid = "did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL";
 			String providerAddress = "https://hive1.trinity-tech.io";
-			client.createVault(ownerDid, providerAddress)
+
+			client.getManager(ownerDid, providerAddress)
+					.thenComposeAsync(manager -> manager.createVault())
 					.whenComplete((vault, throwable) -> {
 						if (throwable == null) {
 							database = vault.getDatabase();
