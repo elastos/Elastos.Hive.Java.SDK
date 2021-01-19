@@ -32,7 +32,7 @@ public final class ConfigHelper {
 		config.targetDID(properties.getProperty("targetDID"));
 		config.targetHost(properties.getProperty("targetHost"));
 
-		String cache = System.getProperty("user.dir") + File.separator + "store/";
+		String cache = System.getProperty("user.dir") + File.separator + "data/store/";
 		config.setStorePath(cache + properties.getProperty("storePath"));
 		config.setProvider(properties.getProperty("provider"));
 		config.setResolverUrl(properties.getProperty("resolverUrl"));
