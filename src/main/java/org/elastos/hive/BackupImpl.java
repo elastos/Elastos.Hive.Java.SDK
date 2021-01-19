@@ -73,7 +73,7 @@ class BackupImpl implements Backup {
 		}
 
 		return authHelper.checkValid().thenComposeAsync(aVoid ->
-				handler.authorization(authHelper.serviceDid(), authHelper.endPoint())
+				handler.authorization(authHelper.serviceDid())
 						.thenApplyAsync(credential -> {
 							try {
 								return saveImpl(credential);
@@ -108,7 +108,7 @@ class BackupImpl implements Backup {
 		}
 
 		return authHelper.checkValid().thenComposeAsync(aVoid ->
-				handler.authorization(authHelper.serviceDid(), authHelper.endPoint())
+				handler.authorization(authHelper.serviceDid())
 						.thenApplyAsync(credential -> {
 							try {
 								return restoreImpl(credential);

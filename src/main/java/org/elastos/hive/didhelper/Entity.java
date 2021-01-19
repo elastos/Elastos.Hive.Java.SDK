@@ -30,7 +30,7 @@ class Entity {
 	}
 
 	protected void initPrivateIdentity(String mnemonic) throws DIDException {
-		final String storePath = System.getProperty("user.dir") + File.separator + "didCache" + File.separator + name;
+		final String storePath = System.getProperty("user.dir") + File.separator + "data/didCache" + File.separator + name;
 
 		store = DIDStore.open("filesystem", storePath, adapter);
 

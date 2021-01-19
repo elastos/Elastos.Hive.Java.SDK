@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class AppInstanceFactory {
-	private static final String didCachePath = "didCache";
+	private static final String didCachePath = "data/didCache";
 	private Vault vault;
 	private Client client;
 	private static boolean resolverDidSetup = false;
