@@ -5,19 +5,17 @@ Elastos Hive Java SDK
 
 ## Summary
 
-Elastos Hive is a basic service infrastructure that provides decentralised data storage capabilities to applications. And Elastos Hive Java SDK provides a set of Java APIs for applications to access/store vault data on Hive backend servers.
+Elastos Hive is an essential service infrastructure as a decentralized network of Hive nodes presenting data storage capabilities to dApps. And the Java SDK provides a group of APIs for Elastos dApps to easily access and store application data to remote Vault services on Hive nodes with the following features:
 
-Elastos Hive currently is under heavy development, and plans to support with the following data objects in the near future:
+- Upload/download files;
+- Structured data object access and store onto MongoDB;
+- Key/Values (Not supported yet);
+- Customized Scripting to select other users to read or contribute the data.
 
-- File storage
-- Database
-- Key-Values
-- Scripting
-
-Anyway, Elastos Hive will keep practising the promise of **users remain in full control of their own data**.
+Elastos Hive will keep the promise that **users remain in full control of their own data** and committing the practice on it.
 
 ## Build from source
-Use the following commands to download and build source code:
+Preparing with the developer tool **git**, and then run the following commands to clone the source:
 
 ```shell
 $ git clone https://github.com/elastos/Elastos.NET.Hive.Java.SDK
@@ -25,38 +23,42 @@ $ cd Elastos.NET.Hive.Java.SDK
 $ open -a Elipse .
 ```
 
-Then use the **Eclipse** to run **build** or **tests** tasks, or try to make build and tests with following samples:
+Then open the **Eclipse** the build the project and run the test cases.  You also can run the instruction commands in the next each sections.
 
-#### 1. Build
-Enter the following command to build project but ignore running tests:
+With the simple command below, build the whole project and run the test cases:
 
+```shell
+$ ./gradlew build 
+```
+
+With the option **-x** , try to build the project without running the test cases.
 ```shell
 $ ./gradlew build -x test
 ```
 
-#### 2. Build & Run test
-Enter the following command to build project and run tests:
-
-```shell
-$ ./gradlew build
-```
-
-#### 3. Run tests
-Enter the following command to run tests:
+Or just directly run the test cases:
 
 ```
 $ ./gradlew test
 ```
 
-#### 3. Build Docs
-Enter the following command to build APIs document:
+## Build API Docs
 
-```
+Run the command below to build the APIs document, the output of documents would be generated at **doc** subdirectory. 
+
+```shell
 $ ./gradlew createjavadoc
+$ ls -a doc
+.	allclasses-noframe.html	help-doc.html org	overview-tree.html	serialized-form.html
+..	constant-values.html	index-all.html overview-frame.html	package-list		stylesheet.css
+allclasses-frame.html	deprecated-list.html index.html overview-summary.html	script.js
 ```
+
+Then open **index.html** with the browser, you can see the whole APIs document there.
 
 ## How to use APIs
-Here is a brief introduction to [APIs](./HOW_TO_USE_APIS.md) usage.
+
+Here is a brief introduction about [How-to use the APIs](./HOW_TO_USE_APIS.md) , please read it carefully and feedback as issues. 
 
 ## Thanks
 Sincerely thanks to all teams and projects that we relies on directly or indirectly.
