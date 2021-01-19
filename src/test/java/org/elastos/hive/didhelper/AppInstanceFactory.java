@@ -2,6 +2,7 @@ package org.elastos.hive.didhelper;
 
 import org.elastos.did.DIDDocument;
 import org.elastos.hive.ApplicationContext;
+import org.elastos.hive.Backup;
 import org.elastos.hive.Client;
 import org.elastos.hive.Vault;
 
@@ -11,6 +12,7 @@ import java.util.concurrent.CompletionException;
 public class AppInstanceFactory {
 	private static final String didCachePath = "data/didCache";
 	private Vault vault;
+	private Backup backup;
 	private PresentationInJWT presentationInJWT;
 	private static boolean resolverDidSetup = false;
 
@@ -70,7 +72,11 @@ public class AppInstanceFactory {
 				}
 			});
 
-			client.createVault(userFactoryOpt.ownerDid, userFactoryOpt.provider).handleAsync((ret, throwable) -> {
+			client.getBackup(userFactoryOpt.ownerDid, userFactoryOpt.provider)
+					.handleAsync((ret, throwable) -> backup = ret).get();
+
+			client.getManager(userFactoryOpt.ownerDid, userFactoryOpt.provider)
+					.thenComposeAsync(manager -> manager.createVault()).handleAsync((ret, throwable) -> {
 				if (null != throwable) {
 					System.err.println("Vault already existed");
 				}
@@ -85,14 +91,14 @@ public class AppInstanceFactory {
 				}
 				return vault;
 			}).thenComposeAsync(vault ->
-					client.createBackupService(vault)
+					client.getManager(userFactoryOpt.ownerDid, userFactoryOpt.provider)
 							.handleAsync((vault1, throwable) -> {
 								if (null != throwable)
 									System.err.println("Backup Vault already existed");
 								return (throwable == null);
 							})).get();
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 
@@ -167,6 +173,10 @@ public class AppInstanceFactory {
 
 	public Vault getVault() {
 		return this.vault;
+	}
+
+	public Backup getBackup() {
+		return this.backup;
 	}
 
 	public String getBackupVc(String serviceDID) {

@@ -27,10 +27,8 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
-import org.elastos.hive.exception.BackupVaultAlreadyExistException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
-import org.elastos.hive.exception.VaultAlreadyExistException;
 
 import java.nio.file.ProviderNotFoundException;
 import java.util.List;
@@ -120,34 +118,45 @@ public class Client {
 	}
 
 	/**
-	 * Create Vault for user with specified DID.
-	 * Try to create a vault on target provider address with following steps:
+	 * get Backup instance with specified DID.
+	 * Try to get a vault on target provider address with following steps:
 	 *  - Get the target provider address;
-	 *  - Check whether the vault is already existed on target provider, otherwise
-	 *  - Create a new vault on target provider with free pricing plan.
+	 *  - Create a new vaule of local instance..
 	 *
-	 * @param ownerDid  the owner did that want to create a vault
-	 * @param preferredProviderAddress the preferred provider address to use
-	 * @return a new created vault for owner did
+	 * @param ownerDid  the owner did related to target vault
+	 * @param preferredProviderAddress the preferred target provider address
+	 * @return a new vault instance.
 	 */
-	public CompletableFuture<Vault> createVault(String ownerDid, String preferredProviderAddress) {
-
+	public CompletableFuture<Backup> getBackup(String ownerDid, String preferredProviderAddress) {
 		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApplyAsync(provider -> {
 					AuthHelper authHelper = new AuthHelper(this.context,
 							ownerDid,
 							provider,
 							this.authenticationAdapter);
-					return new Vault(authHelper, provider, ownerDid);
-				})
-				.thenComposeAsync(vault -> vault.checkVaultExist().thenApplyAsync(aBoolean -> {
-					if(aBoolean) {
-						throw new VaultAlreadyExistException("Vault already existed.");
-					} else {
-						vault.createVaultOnService();
-					}
-					return vault;
-				}));
+					return new Backup(authHelper);
+				});
+	}
+
+	/**
+	 * get Manager instance with specified DID.
+	 * Try to get a vault on target provider address with following steps:
+	 *  - Get the target provider address;
+	 *  - Create a new vaule of local instance..
+	 *
+	 * @param ownerDid  the owner did related to target vault
+	 * @param preferredProviderAddress the preferred target provider address
+	 * @return a new vault instance.
+	 */
+	public CompletableFuture<Manager> getManager(String ownerDid, String preferredProviderAddress) {
+		return getVaultProvider(ownerDid, preferredProviderAddress)
+				.thenApplyAsync(provider -> {
+					AuthHelper authHelper = new AuthHelper(this.context,
+							ownerDid,
+							provider,
+							this.authenticationAdapter);
+					return new Manager(authHelper, provider, ownerDid);
+				});
 	}
 
 	/**
@@ -198,16 +207,4 @@ public class Client {
 		});
 	}
 
-	//TODO 是否需要？入参和返回参数是否合理？
-	public CompletableFuture<Boolean> createBackupService(Vault vault) {
-		if(null == vault) {
-			throw new IllegalArgumentException("vault can not be null");
-		}
-		return vault.checkBackupVaultExist().thenComposeAsync(aBoolean -> {
-			if(aBoolean) {
-				throw new BackupVaultAlreadyExistException("Backup service already existed.");
-			}
-			return vault.createBackupVaultOnService();
-		});
-	}
 }
