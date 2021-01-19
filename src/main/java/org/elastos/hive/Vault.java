@@ -1,9 +1,6 @@
 package org.elastos.hive;
 
-import org.elastos.hive.payment.UsingPlan;
-
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
 
 /**
  * Vault class
@@ -16,8 +13,6 @@ public class Vault {
 	private Scripting scripting;
 	private KeyValues keyValues;
 	private Payment payment;
-	private Backup backup;
-	private ServiceManager serviceManager;
 	private Version version;
 
 	private String providerAddress;
@@ -33,8 +28,6 @@ public class Vault {
 		this.database = new DatabaseImpl(authHelper);
 		this.scripting = new ScriptingImpl(authHelper);
 		this.payment = new PaymentImpl(authHelper);
-		this.backup = new BackupImpl(authHelper);
-		this.serviceManager = new ServiceManagerImpl(authHelper);
 		this.version = new VersionImpl(authHelper);
 	}
 
@@ -130,38 +123,9 @@ public class Vault {
 	 * Get interface as Backup instance
 	 * @return interface instance of Backup
 	 */
-	public Backup getBackup() {
-		return this.backup;
-	}
-
-	/**
-	 * Get interface as ServiceManager instance
-	 * @return interface instance of ServiceManager
-	 */
-	public ServiceManager getServiceManager() {
-		return this.serviceManager;
-	}
-
-	CompletableFuture<Vault> createVaultOnService() {
-		return this.serviceManager.createVault()
-				.thenApplyAsync(aBoolean -> aBoolean?Vault.this:null);
-	}
-
-	CompletableFuture<Boolean> checkVaultExist() {
-		return this.serviceManager.getVaultServiceInfo()
-				.handleAsync((usingPlan, throwable) ->
-						(null==throwable && usingPlan!=null));
-	}
-
-	CompletableFuture<Boolean> createBackupVaultOnService() {
-		return this.serviceManager.createBackupVault()
-				.handleAsync((aBoolean, throwable) -> (aBoolean && throwable==null));
-	}
-
-	CompletableFuture<Boolean> checkBackupVaultExist() {
-		return this.serviceManager.getBackupServiceInfo()
-				.handleAsync((usingPlan, throwable) -> (null==throwable && usingPlan!=null));
-	}
+//	public Backup getBackup() {
+//		return this.backup;
+//	}
 
 	public void revokeAccessToken() {
 		authHelper.removeToken();

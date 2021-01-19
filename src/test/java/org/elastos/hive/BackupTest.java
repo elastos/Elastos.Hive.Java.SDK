@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
@@ -9,10 +10,10 @@ import java.util.concurrent.CompletableFuture;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+@Ignore
 public class BackupTest {
 
 	static Backup backupApi;
-
 
 	@Test
 	public void testGetState() {
@@ -82,8 +83,7 @@ public class BackupTest {
 	@BeforeClass
 	public static void setUp() {
 		factory = AppInstanceFactory.configSelector();
-		Vault vault = factory.getVault();
-		backupApi = vault.getBackup();
+		backupApi = factory.getBackup();
 	}
 
 }
