@@ -151,16 +151,17 @@ public class AppInstanceFactory {
 		return new AppInstanceFactory(userDidOpt, appInstanceDidOpt, backupOptions, clientOptions);
 	}
 
+	//TODO You can change this value to switch the test environment
+	// default value: Type.PRODUCTION
+	private static Type select = Type.PRODUCTION;
+	private static Type cross = Type.CROSS;
 
 	public static AppInstanceFactory configSelector() {
-		//TODO You can change this value to switch the test environment
-		// default value: Type.PRODUCTION
-		Type select = Type.PRODUCTION;
 		return initConfig(select);
 	}
 
 	public static AppInstanceFactory initCrossConfig() {
-		return initConfig(Type.CROSS);
+		return initConfig(cross);
 	}
 
 	public enum Type {
