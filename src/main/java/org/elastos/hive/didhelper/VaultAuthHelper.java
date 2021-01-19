@@ -27,7 +27,11 @@ public final class VaultAuthHelper {
 				.setMnemonic(appMnemonic)
 				.setStorepass("storepass");
 
-		presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
+		PresentationInJWT.BackupOptions backupOptions = PresentationInJWT.BackupOptions.create()
+				.targetHost("https://hive1.trinity-tech.io")
+				.targetDID("did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J");
+
+		presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt, backupOptions);
 		this.localDataDir = localDataDir;
 	}
 
