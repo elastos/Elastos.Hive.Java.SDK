@@ -64,7 +64,7 @@ public class Manager {
 	 * @return
 	 */
 	public CompletableFuture<Backup> createBackup() {
-		return checkVaultExist().thenComposeAsync(aBoolean ->
+		return checkBackupExist().thenComposeAsync(aBoolean ->
 				serviceManager.createBackup()).thenApplyAsync(aBoolean ->
 				aBoolean ? new Backup(this.authHelper) : null);
 	}
@@ -93,7 +93,7 @@ public class Manager {
 						(null == throwable && usingPlan != null));
 	}
 
-	private CompletableFuture<Boolean> checkBackupVaultExist() {
+	private CompletableFuture<Boolean> checkBackupExist() {
 		return this.serviceManager.getBackupServiceInfo()
 				.handleAsync((usingPlan, throwable) -> (null == throwable && usingPlan != null));
 	}
