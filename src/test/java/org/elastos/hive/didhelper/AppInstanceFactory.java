@@ -4,6 +4,7 @@ import org.elastos.did.DIDDocument;
 import org.elastos.hive.ApplicationContext;
 import org.elastos.hive.Backup;
 import org.elastos.hive.Client;
+import org.elastos.hive.Manager;
 import org.elastos.hive.Vault;
 
 import java.util.concurrent.CompletableFuture;
@@ -13,6 +14,7 @@ public class AppInstanceFactory {
 	private static final String didCachePath = "data/didCache";
 	private Vault vault;
 	private Backup backup;
+	private Manager manager;
 	private PresentationInJWT presentationInJWT;
 	private static boolean resolverDidSetup = false;
 
@@ -76,6 +78,9 @@ public class AppInstanceFactory {
 					.handleAsync((ret, throwable) -> backup = ret).get();
 
 			client.getManager(userFactoryOpt.ownerDid, userFactoryOpt.provider)
+					.handleAsync((ret, throwable) -> manager = ret).get();
+
+			client.getManager(userFactoryOpt.ownerDid, userFactoryOpt.provider)
 					.thenComposeAsync(manager -> manager.createVault()).handleAsync((ret, throwable) -> {
 				if (null != throwable) {
 					System.err.println("Vault already existed");
@@ -134,8 +139,8 @@ public class AppInstanceFactory {
 
 	//TODO You can change this value to switch the test environment
 	// default value: Type.PRODUCTION
-	private static Type select = Type.PRODUCTION;
-	private static Type cross = Type.CROSS;
+	private static Type select = Type.DEVELOPING;
+	private static Type cross = Type.DEVELOPING;
 
 	public static AppInstanceFactory configSelector() {
 		return initConfig(select);
@@ -178,6 +183,10 @@ public class AppInstanceFactory {
 
 	public Backup getBackup() {
 		return this.backup;
+	}
+
+	public Manager getManager() {
+		return this.manager;
 	}
 
 	public String getBackupVc(String serviceDID) {
