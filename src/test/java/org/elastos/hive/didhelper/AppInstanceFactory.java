@@ -176,7 +176,7 @@ public class AppInstanceFactory {
 		TESTING
 	}
 
-	private static AppInstanceFactory initConfig(Type type) {
+	private static String getConfigPath(Type type) {
 		String path = null;
 		switch (type) {
 			case CROSS:
@@ -193,6 +193,11 @@ public class AppInstanceFactory {
 				break;
 		}
 
+		return path;
+	}
+
+	private static AppInstanceFactory initConfig(Type type) {
+		String path = getConfigPath(type);
 		return initOptions(ConfigHelper.getConfigInfo(path));
 	}
 
@@ -215,7 +220,9 @@ public class AppInstanceFactory {
 
 	public static Client getClientWithEasyAuth() {
 		try {
-			Config config = ConfigHelper.getConfigInfo("Production.conf");
+
+			String path = getConfigPath(select);
+			Config config = ConfigHelper.getConfigInfo(path);
 			if (!resolverDidSetup) {
 				Client.setupResolver(config.getResolverUrl(), didCachePath);
 				resolverDidSetup = true;
