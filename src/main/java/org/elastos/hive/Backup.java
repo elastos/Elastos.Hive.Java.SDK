@@ -131,7 +131,25 @@ public class Backup {
 	}
 
 	public CompletableFuture<Boolean> active() {
-		return null;
+		return authHelper.checkValid().thenApplyAsync(aVoid -> {
+			try {
+				return activeImpl();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
+	private boolean activeImpl() throws HiveException {
+		try {
+			Response response = this.connectionManager.getBackApi()
+					.activeToVault()
+					.execute();
+
+			authHelper.checkResponseWithRetry(response);
+			return true;
+		} catch (Exception e) {
+			throw new HiveException(e.getLocalizedMessage());
+		}
+	}
 }
