@@ -44,7 +44,7 @@ public interface ServiceManager {
 	 * create free backup vault service
 	 * @return
 	 */
-	CompletableFuture<Boolean> createBackupVault();
+	CompletableFuture<Boolean> createBackup();
 
 
 	/**
