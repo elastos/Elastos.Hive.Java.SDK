@@ -4,16 +4,17 @@ import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.elastos.hive.didhelper.VaultAuthHelper;
 import org.elastos.did.exception.DIDException;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
+
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+@Ignore
 public class VaultHelperTest {
 
 

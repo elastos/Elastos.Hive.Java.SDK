@@ -125,16 +125,16 @@ public class ScriptingTest {
 
 	@Test
 	public void test04_callScript() {
-		CompletableFuture<Boolean> stringFuture = scripting.callScript(noConditionName, null, null, String.class)
+		CompletableFuture<Boolean> stringFuture = scripting.callScript(noConditionName, null, "appId", String.class)
 				.handle((success, ex) -> (ex == null));
 
-		CompletableFuture<Boolean> byteFuture = scripting.callScript(noConditionName, null, null, byte[].class)
+		CompletableFuture<Boolean> byteFuture = scripting.callScript(noConditionName, null, "appId", byte[].class)
 				.handle((success, ex) -> (ex == null));
 
-		CompletableFuture<Boolean> jsonNodeFuture = scripting.callScript(noConditionName, null, null, JsonNode.class)
+		CompletableFuture<Boolean> jsonNodeFuture = scripting.callScript(noConditionName, null, "appId", JsonNode.class)
 				.handle((success, ex) -> (ex == null));
 
-		CompletableFuture<Boolean> readerFuture = scripting.callScript(noConditionName, null, null, Reader.class)
+		CompletableFuture<Boolean> readerFuture = scripting.callScript(noConditionName, null, "appId", Reader.class)
 				.handle((success, ex) -> (ex == null));
 
 		CompletableFuture allFuture = CompletableFuture.allOf(stringFuture, byteFuture, jsonNodeFuture, readerFuture);
@@ -165,7 +165,7 @@ public class ScriptingTest {
 						fail();
 					}
 
-					return scripting.callScript(scriptName, params, null, JsonNode.class)
+					return scripting.callScript(scriptName, params, "appId", JsonNode.class)
 							.thenComposeAsync(jsonNode -> {
 								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
 								return scripting.uploadFile(transactionId, Writer.class);
@@ -202,7 +202,7 @@ public class ScriptingTest {
 					String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 					JsonNode params = JsonUtil.deserialize(path);
 
-					return scripting.callScript(scriptName, params, null, JsonNode.class)
+					return scripting.callScript(scriptName, params, "appId", JsonNode.class)
 							.handle((jsonNode, ex) -> {
 								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
 								scripting.downloadFile(transactionId, Reader.class)
@@ -241,7 +241,7 @@ public class ScriptingTest {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					return scripting.callScript("get_file_info", params, null, String.class);
+					return scripting.callScript("get_file_info", params, "appId", String.class);
 				}).handle((success, ex) -> (ex == null));
 
 		try {
