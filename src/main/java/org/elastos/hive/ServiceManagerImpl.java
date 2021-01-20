@@ -153,7 +153,7 @@ class ServiceManagerImpl implements ServiceManager {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> createBackupVault() {
+	public CompletableFuture<Boolean> createBackup() {
 		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return createBackupVaultImp();

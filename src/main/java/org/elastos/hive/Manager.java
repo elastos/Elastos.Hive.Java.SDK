@@ -22,15 +22,18 @@ public class Manager {
 
 	/**
 	 * create vault
+	 *
 	 * @return
 	 */
 	public CompletableFuture<Vault> createVault() {
-		return this.serviceManager.createVault()
-				.thenApplyAsync(aBoolean -> aBoolean?new Vault(this.authHelper, this.providerAddress, this.ownerDid):null);
+		return checkVaultExist().thenComposeAsync(aBoolean ->
+				serviceManager.createVault()).thenApplyAsync(aBoolean ->
+				aBoolean ? new Vault(this.authHelper, this.providerAddress, this.ownerDid) : null);
 	}
 
 	/**
 	 * destory vault
+	 *
 	 * @return
 	 */
 	public CompletableFuture<Boolean> destroyVault() {
@@ -39,6 +42,7 @@ public class Manager {
 
 	/**
 	 * freeze vault
+	 *
 	 * @return
 	 */
 	public CompletableFuture<Boolean> freezeVault() {
@@ -47,6 +51,7 @@ public class Manager {
 
 	/**
 	 * unfreeze vault
+	 *
 	 * @return
 	 */
 	public CompletableFuture<Boolean> unfreezeVault() {
@@ -55,15 +60,18 @@ public class Manager {
 
 	/**
 	 * create backup
+	 *
 	 * @return
 	 */
-	public CompletableFuture<Boolean> createBackup() {
-		return this.serviceManager.createBackupVault()
-				.handleAsync((aBoolean, throwable) -> (aBoolean && throwable==null));
+	public CompletableFuture<Backup> createBackup() {
+		return checkVaultExist().thenComposeAsync(aBoolean ->
+				serviceManager.createBackup()).thenApplyAsync(aBoolean ->
+				aBoolean ? new Backup(this.authHelper) : null);
 	}
 
 	/**
 	 * get vault service information
+	 *
 	 * @return
 	 */
 	public CompletableFuture<UsingPlan> getVaultServiceInfo() {
@@ -72,22 +80,21 @@ public class Manager {
 
 	/**
 	 * get backup service information
+	 *
 	 * @return
 	 */
 	public CompletableFuture<BackupUsingPlan> getBackupServiceInfo() {
 		return this.serviceManager.getBackupServiceInfo();
 	}
 
-	//TODO 是否保留，待定
-	public CompletableFuture<Boolean> checkVaultExist() {
+	private CompletableFuture<Boolean> checkVaultExist() {
 		return this.serviceManager.getVaultServiceInfo()
 				.handleAsync((usingPlan, throwable) ->
-						(null==throwable && usingPlan!=null));
+						(null == throwable && usingPlan != null));
 	}
 
-	//TODO 是否保留，待定
-	public CompletableFuture<Boolean> checkBackupVaultExist() {
+	private CompletableFuture<Boolean> checkBackupVaultExist() {
 		return this.serviceManager.getBackupServiceInfo()
-				.handleAsync((usingPlan, throwable) -> (null==throwable && usingPlan!=null));
+				.handleAsync((usingPlan, throwable) -> (null == throwable && usingPlan != null));
 	}
 }
