@@ -31,7 +31,7 @@ public class ScriptingOtherTest {
 				.thenApplyAsync(aBoolean ->
 						aBoolean ? AppInstanceFactory.initCrossConfig().getVault().getScripting() : null)
 				.thenComposeAsync(scripting ->
-						scripting.callScript(scriptName, null, null, String.class))
+						scripting.callScript(scriptName, null, "appId", String.class))
 				.handle((BiFunction<String, Throwable, Boolean>) (s, throwable) ->
 						(throwable == null));
 
