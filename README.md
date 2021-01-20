@@ -56,9 +56,32 @@ allclasses-frame.html	deprecated-list.html index.html overview-summary.html	scri
 
 Then open **index.html** with the browser, you can see the whole APIs document there.
 
-## How to use APIs
+## How To Use SDK
 
-Here is a brief introduction about [How-to use the APIs](./HOW_TO_USE_APIS.md) , please read it carefully and feedback as issues. 
+Here are exmaples to integrate this SDK into the projects with **Gradle** or **Maven** build system.
+
+#### 1. Gradle
+
+Just add the following snippet scripts into the dependencies items **build.gradle**:
+
+```groovy
+implementation 'org.elastos:hive:v2.0.0'
+```
+
+#### 2. Maven
+
+Add the following snippet of dependency declaration in their **pom** scripts:
+
+```xml
+<dependency>
+	<groupId>org.elastos</groupId>
+	<artifactId>hive</artifactId>
+	<version>v2.0.0</version>
+	<type>pom</type>
+</dependency>
+```
+
+Here also is a brief guilde document about [How-to use the APIs](./HOW_TO_USE_APIS.md) , please read it carefully and feedback as issues.
 
 ## Thanks
 Sincerely thanks to all teams and projects that we relies on directly or indirectly.
