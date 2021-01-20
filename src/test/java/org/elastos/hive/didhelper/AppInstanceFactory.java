@@ -74,14 +74,29 @@ public class AppInstanceFactory {
 				}
 			});
 
-			client.getBackup(userFactoryOpt.ownerDid, userFactoryOpt.provider)
-					.handleAsync((ret, throwable) -> backup = ret).get();
+			CompletableFuture<Manager> managerFuture = client.getManager(userFactoryOpt.ownerDid, userFactoryOpt.provider)
+					.handleAsync((ret, throwable) -> manager = ret);
 
-			client.getManager(userFactoryOpt.ownerDid, userFactoryOpt.provider)
-					.handleAsync((ret, throwable) -> manager = ret).get();
+			CompletableFuture<Backup> backupFuture = managerFuture.thenComposeAsync(manager ->
+					manager.createBackup())
+					.handleAsync((ret, throwable) -> {
+						if (null != throwable) {
+							System.err.println("Vault already existed");
+						}
+						if (throwable == null) {
+							backup = ret;
+						} else {
+							try {
+								backup = client.getBackup(userFactoryOpt.ownerDid, userFactoryOpt.provider).get();
+							} catch (Exception e) {
+								throw new CompletionException(e);
+							}
+						}
+						return backup;
+					});
 
-			client.getManager(userFactoryOpt.ownerDid, userFactoryOpt.provider)
-					.thenComposeAsync(manager -> manager.createVault()).handleAsync((ret, throwable) -> {
+			CompletableFuture<Vault> vaultFuture = managerFuture.thenComposeAsync(manager ->
+					manager.createVault()).handleAsync((ret, throwable) -> {
 				if (null != throwable) {
 					System.err.println("Vault already existed");
 				}
@@ -95,13 +110,9 @@ public class AppInstanceFactory {
 					}
 				}
 				return vault;
-			}).thenComposeAsync(vault ->
-					client.getManager(userFactoryOpt.ownerDid, userFactoryOpt.provider)
-							.handleAsync((vault1, throwable) -> {
-								if (null != throwable)
-									System.err.println("Backup Vault already existed");
-								return (throwable == null);
-							})).get();
+			});
+
+			CompletableFuture.allOf(managerFuture, backupFuture, vaultFuture).get();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
