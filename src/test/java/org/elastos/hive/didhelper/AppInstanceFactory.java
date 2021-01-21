@@ -210,6 +210,14 @@ public class AppInstanceFactory {
 		return this.presentationInJWT.getBackupVc(serviceDID);
 	}
 
+	public String getTargetHost() {
+		return this.presentationInJWT.getTargetHost();
+	}
+
+	public String getTargetDid() {
+		return this.presentationInJWT.getTargetDid();
+	}
+
 
 	public static Client getClientWithEasyAuth() {
 		try {
