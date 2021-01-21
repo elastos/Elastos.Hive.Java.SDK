@@ -31,12 +31,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-class PersistentImpl implements Persistent {
+class AuthPersistentImpl implements Persistent {
     private String ownerDid;
     private String provider;
     private String storePath;
 
-    public PersistentImpl(String ownerDid, String provider, String storePath) {
+    public AuthPersistentImpl(String ownerDid, String provider, String storePath) {
         this.ownerDid = ownerDid.trim();
         this.provider = provider.trim();
         this.storePath = storePath;

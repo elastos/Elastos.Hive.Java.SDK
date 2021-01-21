@@ -1,5 +1,6 @@
 package org.elastos.hive.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -14,4 +15,17 @@ public class DateUtil {
         }
         return null;
     }
+
+
+    public static long getTime(String date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date time = null;
+        try {
+            time = sdf.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return time.getTime();
+    }
+
 }
