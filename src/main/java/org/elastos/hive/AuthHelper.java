@@ -41,8 +41,9 @@ class AuthHelper implements ConnectHelper {
 	private String appId;
 	private String appInstanceDid;
 	private String serviceDid;
-
 	private String endPoint;
+
+	private String storePath;
 
 	private AuthToken token;
 	private Persistent persistent;
@@ -56,7 +57,8 @@ class AuthHelper implements ConnectHelper {
 		this.endPoint = endPoint;
 		this.context = context;
 		this.authenticationAdapter = adapter;
-		this.persistent = new PersistentImpl(ownerDid, endPoint, this.context.getLocalDataDir());
+		this.storePath = this.context.getLocalDataDir();
+		this.persistent = new AuthPersistentImpl(ownerDid, endPoint, this.storePath);
 
 		try {
 			BaseServiceConfig config = new BaseServiceConfig.Builder().build();
@@ -277,6 +279,10 @@ class AuthHelper implements ConnectHelper {
 
 	public void appInstanceDid(String appInstanceDid) {
 		this.appInstanceDid = appInstanceDid;
+	}
+
+	public String storePath() {
+		return this.storePath;
 	}
 
 	private RequestBody getJsonRequestBoy(String json) {

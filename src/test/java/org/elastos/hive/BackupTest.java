@@ -32,8 +32,24 @@ public class BackupTest {
 
 	@Test
 	public void testSave() {
-		BackupAuthenticationHandler handler = serviceDid -> CompletableFuture.supplyAsync(() ->
-				factory.getBackupVc(serviceDid));
+		BackupAuthenticationHandler handler = new BackupAuthenticationHandler() {
+			@Override
+			public CompletableFuture<String> getAuthorization(String serviceDid) {
+				return CompletableFuture.supplyAsync(() ->
+						factory.getBackupVc(serviceDid));
+			}
+
+			@Override
+			public String getTargetHost() {
+				return factory.getTargetHost();
+			}
+
+			@Override
+			public String getTargetDid() {
+				return factory.getTargetDid();
+			}
+		};
+
 		CompletableFuture<Boolean> future = backupApi.save(handler)
 				.handle((success, ex) -> (ex == null));
 
@@ -49,8 +65,23 @@ public class BackupTest {
 
 	@Test
 	public void testRestore() {
-		BackupAuthenticationHandler handler = serviceDid -> CompletableFuture.supplyAsync(() ->
-				factory.getBackupVc(serviceDid));
+		BackupAuthenticationHandler handler = new BackupAuthenticationHandler() {
+			@Override
+			public CompletableFuture<String> getAuthorization(String serviceDid) {
+				return CompletableFuture.supplyAsync(() ->
+						factory.getBackupVc(serviceDid));
+			}
+
+			@Override
+			public String getTargetHost() {
+				return factory.getTargetHost();
+			}
+
+			@Override
+			public String getTargetDid() {
+				return factory.getTargetDid();
+			}
+		};
 		CompletableFuture<Boolean> future = backupApi.restore(handler)
 				.handle((success, ex) -> (ex == null));
 
@@ -64,20 +95,20 @@ public class BackupTest {
 		}
 	}
 
-	@Test
-	public void testActive() {
-		CompletableFuture<Boolean> future = backupApi.active()
-				.handle((success, ex) -> (ex == null));
-
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
-		}
-	}
+//	@Test
+//	public void testActive() {
+//		CompletableFuture<Boolean> future = backupApi.active()
+//				.handle((success, ex) -> (ex == null));
+//
+//		try {
+//			assertTrue(future.get());
+//			assertTrue(future.isCompletedExceptionally() == false);
+//			assertTrue(future.isDone());
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			fail();
+//		}
+//	}
 
 	private static AppInstanceFactory factory;
 	@BeforeClass

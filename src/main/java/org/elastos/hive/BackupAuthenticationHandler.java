@@ -10,5 +10,17 @@ public interface BackupAuthenticationHandler {
 	 * @param serviceDid source service did
 	 * @return
 	 */
-	CompletableFuture<String> authorization(String serviceDid);
+	CompletableFuture<String> getAuthorization(String serviceDid);
+
+	/**
+	 * backup target host
+	 * @return
+	 */
+	String getTargetHost();
+
+	/**
+	 * backup target did
+	 * @return
+	 */
+	String getTargetDid();
 }

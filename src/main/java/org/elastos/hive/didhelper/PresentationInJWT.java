@@ -32,10 +32,10 @@ import org.elastos.hive.utils.JwtUtil;
 
 
 class PresentationInJWT {
-	DIDApp userDidApp = null;
-	DApp appInstanceDidApp = null;
-	DIDDocument doc = null;
-	BackupOptions backupOptions;
+	private DIDApp userDidApp = null;
+	private DApp appInstanceDidApp = null;
+	private DIDDocument doc = null;
+	private BackupOptions backupOptions;
 
 	private static DummyAdapter adapter;
 
@@ -92,6 +92,14 @@ class PresentationInJWT {
 		}
 
 		return null;
+	}
+
+	public String getTargetHost() {
+		return backupOptions.targetHost;
+	}
+
+	public String getTargetDid() {
+		return backupOptions.targetDID;
 	}
 
 	public static class BackupOptions {
