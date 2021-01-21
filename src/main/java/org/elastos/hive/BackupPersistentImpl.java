@@ -12,11 +12,13 @@ import java.io.IOException;
 public class BackupPersistentImpl implements Persistent {
 	private String targetHost;
 	private String targetDID;
+	private String type;
 	private String storePath;
 
-	public BackupPersistentImpl(String targetHost, String targetDID, String storePath) {
+	public BackupPersistentImpl(String targetHost, String targetDID, String type,String storePath) {
 		this.targetHost = targetHost;
 		this.targetDID = targetDID;
+		this.type = type;
 		this.storePath = storePath;
 	}
 
@@ -74,7 +76,7 @@ public class BackupPersistentImpl implements Persistent {
 	@Override
 	public void deleteContent() {
 		String tokenPath = String.format("%s/%s", storePath,"backup");
-		String fileName = CryptoUtil.getSHA256(this.targetHost+this.targetDID);
+		String fileName = CryptoUtil.getSHA256(this.targetHost+this.targetDID+this.type);
 		File file = new File(tokenPath, fileName);
 		if(file.exists()) {
 			file.delete();
@@ -87,7 +89,7 @@ public class BackupPersistentImpl implements Persistent {
 		File rootDir = new File(tokenPath);
 		if (!rootDir.exists())
 			rootDir.mkdirs();
-		String fileName = CryptoUtil.getSHA256(this.targetHost+this.targetDID);
+		String fileName = CryptoUtil.getSHA256(this.targetHost+this.targetDID+this.type);
 		this.configPath = String.format("%s/%s", tokenPath, fileName);
 		File config = new File(configPath);
 		if (!config.exists())
