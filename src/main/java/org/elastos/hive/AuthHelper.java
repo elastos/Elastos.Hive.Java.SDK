@@ -193,7 +193,7 @@ class AuthHelper implements ConnectHelper {
 
 			this.userDid = json.getString(USER_DID_KEY);
 			this.appId = json.getString(APP_ID_KEY);
-			this.serviceDid = json.getString(serviceDid);
+			this.serviceDid = json.getString(SERVICE_DID);
 			this.appInstanceDid = json.getString(APP_INSTANCE_DID_KEY);
 
 			this.token = new AuthToken(json.getString(REFRESH_TOKEN_KEY),
