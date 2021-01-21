@@ -187,7 +187,7 @@ public class Backup {
 		}
 
 		return authHelper.checkValid().thenComposeAsync(aVoid ->
-				getCredential(handler, "store")).thenApplyAsync(credential -> {
+				getCredential(handler, "restore")).thenApplyAsync(credential -> {
 			try {
 				restoreImpl(credential);
 				return credential;
