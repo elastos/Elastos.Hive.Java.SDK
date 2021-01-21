@@ -29,6 +29,21 @@ public class ManagerTest {
 	}
 
 	@Test
+	public void testCreateBackup() {
+		CompletableFuture<Boolean> future = managerApi.createBackup()
+				.handle((vault, throwable) -> (null == throwable));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
 	public void testDestroyVault() {
 		CompletableFuture<Boolean> future = managerApi.destroyVault()
 				.handle((vault, throwable) -> (null == throwable));

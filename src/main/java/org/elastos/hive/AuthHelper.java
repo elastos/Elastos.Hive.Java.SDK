@@ -31,6 +31,7 @@ class AuthHelper implements ConnectHelper {
 	private static final String EXPIRES_AT_KEY = "expires_at";
 	private static final String TOKEN_TYPE_KEY = "token_type";
 
+	private static final String SERVICE_DID = "service_did";
 	private static final String USER_DID_KEY = "user_did";
 	private static final String APP_ID_KEY = "app_id";
 	private static final String APP_INSTANCE_DID_KEY = "app_instance_did";
@@ -81,7 +82,7 @@ class AuthHelper implements ConnectHelper {
 	}
 
 	private synchronized void doCheckExpired() throws HiveException {
-		if(null == token) tryRestoreToken();
+		if(null == token) restoreToken();
 		if (token == null || token.isExpired()) {
 			signIn();
 		}
@@ -175,7 +176,7 @@ class AuthHelper implements ConnectHelper {
 				expiresTime, "token");
 
 		//Store the local data.
-		writebackToken();
+		writeToken();
 
 		//init connection
 		initConnection();
@@ -183,7 +184,7 @@ class AuthHelper implements ConnectHelper {
 	}
 
 
-	private void tryRestoreToken() {
+	private void restoreToken() {
 		try {
 
 			JSONObject json = persistent.parseFrom();
@@ -192,6 +193,7 @@ class AuthHelper implements ConnectHelper {
 
 			this.userDid = json.getString(USER_DID_KEY);
 			this.appId = json.getString(APP_ID_KEY);
+			this.serviceDid = json.getString(serviceDid);
 			this.appInstanceDid = json.getString(APP_INSTANCE_DID_KEY);
 
 			this.token = new AuthToken(json.getString(REFRESH_TOKEN_KEY),
@@ -205,7 +207,7 @@ class AuthHelper implements ConnectHelper {
 		}
 	}
 
-	private void writebackToken() {
+	private void writeToken() {
 		try {
 			JSONObject json = new JSONObject();
 
@@ -215,6 +217,7 @@ class AuthHelper implements ConnectHelper {
 			json.put(TOKEN_TYPE_KEY, token.getTokenType());
 			json.put(USER_DID_KEY, this.userDid);
 			json.put(APP_ID_KEY, this.appId);
+			json.put(SERVICE_DID, this.serviceDid);
 			json.put(APP_INSTANCE_DID_KEY, this.appInstanceDid);
 
 			persistent.upateContent(json);
