@@ -75,7 +75,7 @@ public class BackupPersistentImpl implements Persistent {
 
 	@Override
 	public void deleteContent() {
-		String tokenPath = String.format("%s/%s", storePath,"backup");
+		String tokenPath = String.format("%s/%s", storePath, "backup");
 		String fileName = CryptoUtil.getSHA256(this.targetHost+this.targetDID+this.type);
 		File file = new File(tokenPath, fileName);
 		if(file.exists()) {
@@ -85,7 +85,7 @@ public class BackupPersistentImpl implements Persistent {
 
 	private String configPath;
 	private void initialize() throws IOException {
-		String tokenPath = String.format("%s/%s", storePath,"token");
+		String tokenPath = String.format("%s/%s", storePath, "backup");
 		File rootDir = new File(tokenPath);
 		if (!rootDir.exists())
 			rootDir.mkdirs();
