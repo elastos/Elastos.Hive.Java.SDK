@@ -2,6 +2,9 @@ package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import org.elastos.did.VerifiableCredential;
+import org.elastos.did.exception.DIDBackendException;
+import org.elastos.did.exception.MalformedCredentialException;
 import org.elastos.hive.backup.State;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
@@ -93,8 +96,21 @@ public class Backup {
 	}
 
 	private boolean checkExpired(String cacheCredential) {
-		BackupCredential backupCredential = BackupCredential.deserialize(cacheCredential);
-		return backupCredential.isExpired();
+		VerifiableCredential vc = null;
+		try {
+			vc = VerifiableCredential.fromJson(cacheCredential);
+		} catch (MalformedCredentialException e) {
+			e.printStackTrace();
+		}
+
+		if(null != vc) {
+			try {
+				return vc.isExpired();
+			} catch (DIDBackendException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
 	}
 
 	private CompletableFuture<String> getCredential(BackupAuthenticationHandler handler, String type) {
