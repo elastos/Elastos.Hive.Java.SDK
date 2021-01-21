@@ -25,6 +25,7 @@ public class Backup {
 	private ConnectionManager connectionManager;
 	private String targetDid;
 	private String targetHost;
+	private String type;
 
 	Backup(AuthHelper authHelper) {
 		this.authHelper = authHelper;
@@ -66,11 +67,12 @@ public class Backup {
 	}
 
 	private static final String CREDENTIAL_KEY = "credential_key";
-	private String restoreCredential(String targetDid, String targetHost) {
-		Persistent persistent = new BackupPersistentImpl(targetHost, targetDid, authHelper.storePath());
+
+	private String restoreCredential() {
+		Persistent persistent = new BackupPersistentImpl(this.targetHost, this.targetDid, this.type, this.authHelper.storePath());
 		try {
 			JSONObject jsonObject = persistent.parseFrom();
-			if(!jsonObject.has(CREDENTIAL_KEY)) return null;
+			if (!jsonObject.has(CREDENTIAL_KEY)) return null;
 
 			return jsonObject.getString(CREDENTIAL_KEY);
 		} catch (HiveException e) {
@@ -79,8 +81,8 @@ public class Backup {
 		return null;
 	}
 
-	private void storeCredential(String credential, String targetDid, String targetHost) {
-		Persistent persistent = new BackupPersistentImpl(targetHost, targetDid, authHelper.storePath());
+	private void storeCredential(String credential) {
+		Persistent persistent = new BackupPersistentImpl(this.targetHost, this.targetDid, this.type, this.authHelper.storePath());
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put(CREDENTIAL_KEY, credential);
 		try {
@@ -95,31 +97,39 @@ public class Backup {
 		return backupCredential.isExpired();
 	}
 
+	private CompletableFuture<String> getCredential(BackupAuthenticationHandler handler, String type) {
+		String exTargetDid = handler.getTargetDid();
+		String exTargetHost = handler.getTargetHost();
+
+		if (null == exTargetDid) {
+			throw new IllegalArgumentException("target did can not be null");
+		}
+
+		if (null == exTargetHost) {
+			throw new IllegalArgumentException("target host can not be null");
+		}
+
+		if (null == type) {
+			new HiveException("Hive internal exception: backup cache type is null").printStackTrace();
+		}
+
+		setTargetDid(exTargetDid);
+		setTargetHost(exTargetHost);
+		setType(type);
+		String cacheCredential = restoreCredential();
+		if (null != cacheCredential && !checkExpired(cacheCredential)) {
+			return CompletableFuture.supplyAsync(() -> cacheCredential);
+		}
+		return handler.getAuthorization(authHelper.serviceDid());
+	}
+
 	public CompletableFuture<Boolean> save(BackupAuthenticationHandler handler) {
 		if (null == handler) {
 			throw new IllegalArgumentException("backup authentication handler can not be null");
 		}
 
-		return authHelper.checkValid().thenComposeAsync(aVoid -> {
-			String exTargetDid = handler.getTargetDid();
-			String exTargetHost = handler.getTargetHost();
-
-			if (null == exTargetDid) {
-				throw new IllegalArgumentException("target did can not be null");
-			}
-
-			if (null == exTargetHost) {
-				throw new IllegalArgumentException("target host can not be null");
-			}
-
-			setTargetDid(targetDid);
-			setTargetHost(targetHost);
-			String cacheCredential = restoreCredential(targetDid, targetHost);
-			if (null != cacheCredential && !checkExpired(cacheCredential)) {
-				return CompletableFuture.supplyAsync(() -> cacheCredential);
-			}
-			return handler.getAuthorization(authHelper.serviceDid());
-		}).thenApplyAsync(credential -> {
+		return authHelper.checkValid().thenComposeAsync(aVoid ->
+				getCredential(handler, "store")).thenApplyAsync(credential -> {
 			try {
 				saveImpl(credential);
 				return credential;
@@ -128,7 +138,7 @@ public class Backup {
 			}
 			return null;
 		}).handleAsync((credential, throwable) -> {
-			if (null != credential) storeCredential(credential, targetDid, targetHost);
+			if (null != credential) storeCredential(credential);
 			return (null != credential && null == throwable);
 		});
 	}
@@ -156,16 +166,23 @@ public class Backup {
 			throw new IllegalArgumentException("backup authentication handler can not be null");
 		}
 
+		if (null == handler) {
+			throw new IllegalArgumentException("backup authentication handler can not be null");
+		}
+
 		return authHelper.checkValid().thenComposeAsync(aVoid ->
-				handler.getAuthorization(authHelper.serviceDid())
-						.thenApplyAsync(credential -> {
-							try {
-								return restoreImpl(credential);
-							} catch (HiveException e) {
-								e.printStackTrace();
-							}
-							return false;
-						}));
+				getCredential(handler, "store")).thenApplyAsync(credential -> {
+			try {
+				restoreImpl(credential);
+				return credential;
+			} catch (HiveException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}).handleAsync((credential, throwable) -> {
+			if (null != credential) storeCredential(credential);
+			return (null != credential && null == throwable);
+		});
 	}
 
 	private boolean restoreImpl(String credential) throws HiveException {
@@ -216,11 +233,7 @@ public class Backup {
 		this.targetHost = targetHost;
 	}
 
-	public String getTargetDid() {
-		return this.targetDid;
-	}
-
-	public String getTargetHost() {
-		return this.targetHost;
+	private void setType(String type) {
+		this.type = type;
 	}
 }
