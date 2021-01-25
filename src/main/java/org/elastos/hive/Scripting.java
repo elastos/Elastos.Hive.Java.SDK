@@ -19,7 +19,7 @@ public interface Scripting {
 	CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp);
 
 	/**
-	 * Executes a previously registered server side script using Scripting.setScript(). Vault owner or external users are
+	 * Executes a previously registered server side script using Scripting.setScript(). Vault owner or external users are allowed to call scripts on someone's vault.
 	 *
 	 * @param name       the call's script name
 	 * @param resultType String, byte[], JsonNode, Reader
@@ -27,6 +27,18 @@ public interface Scripting {
 	 * @return
 	 */
 	<T> CompletableFuture<T> callScript(String name, JsonNode params, String appDid, Class<T> resultType);
+
+
+	/**
+	 * Executes a previously registered server side script with a direct URL where the values can be passed as part of the query. Vault owner or external users are allowed to call scripts on someone's vault.
+	 *
+	 * @param name       the call's script name
+	 * @param resultType String, byte[], JsonNode, Reader, Write, OutputStream, Reader, InputStream
+	 * @param <T> String, byte[], JsonNode, Reader, Write, OutputStream, Reader, InputStream
+	 * @return
+	 */
+	<T> CompletableFuture<T> callScriptUrl(String name, JsonNode params, String appDid, Class<T> resultType);
+
 
 	/**
 	 * Run a script to upload a file NOTE: The upload works a bit differently compared to other
