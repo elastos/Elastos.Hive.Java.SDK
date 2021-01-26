@@ -7,6 +7,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ScriptingApi {
 
@@ -19,9 +20,9 @@ public interface ScriptingApi {
 	@POST(Constance.API_PATH + "/scripting/run_script_download/{transaction_id}")
 	Call<ResponseBody> callDownload(@Path("transaction_id") String transactionId);
 
-	@GET(Constance.API_PATH+"/scripting/run_script_url/{targetDid}@{appDid}}/{scriptName}")
+	@GET(Constance.API_PATH+"/scripting/run_script_url/{targetDid}@{appDid}/{scriptName}")
 	Call<ResponseBody> callScriptUrl(@Path("targetDid") String targetDid,
 									 @Path("appDid") String appDid,
 									 @Path("scriptName") String scriptName,
-									 @Body RequestBody body);
+									 @Query("params") String params);
 }
