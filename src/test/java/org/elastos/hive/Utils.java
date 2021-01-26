@@ -12,6 +12,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
+import static org.junit.Assert.fail;
+
 public class Utils {
 
     public static boolean deleteFile(String path) {
@@ -46,7 +48,7 @@ public class Utils {
         return null;
     }
 
-    public static Writer fileWrite(String filePath, Writer writer) throws IOException {
+    public static Writer fileWrite(String filePath, Writer writer) {
         FileReader fileReader = null;
         try {
             fileReader = new FileReader(new File(filePath));
@@ -57,8 +59,11 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(null != fileReader) {
-                fileReader.close();
+            try {
+                if (null != fileReader) fileReader.close();
+                if (null != writer) writer.close();
+            } catch (Exception e) {
+                fail();
             }
         }
         return writer;
