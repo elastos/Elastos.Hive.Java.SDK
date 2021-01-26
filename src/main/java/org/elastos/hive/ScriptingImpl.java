@@ -135,7 +135,7 @@ class ScriptingImpl implements Scripting {
 			String targetDid = this.authHelper.getOwnerDid();
 			String json = params.toString();
 			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
-					.callScriptUrl(targetDid, appDid, name,RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+					.callScriptUrl(targetDid, appDid, name, json)
 					.execute();
 			authHelper.checkResponseWithRetry(response);
 			return ResponseHelper.getValue(response, resultType);

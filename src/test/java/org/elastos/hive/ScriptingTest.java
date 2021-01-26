@@ -225,7 +225,6 @@ public class ScriptingTest {
 		}
 	}
 
-
 	@Test
 	public void test7_setGetFileInfo() {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
@@ -242,6 +241,34 @@ public class ScriptingTest {
 						e.printStackTrace();
 					}
 					return scripting.callScript("get_file_info", params, null, String.class);
+				}).handle((success, ex) -> (ex == null));
+
+		try {
+			assertTrue(fileInfoFuture.get());
+			assertTrue(fileInfoFuture.isCompletedExceptionally() == false);
+			assertTrue(fileInfoFuture.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test8_callScriptUrl() {
+		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
+		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
+		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
+		CompletableFuture<Boolean> fileInfoFuture = scripting.registerScript("get_file_info", executable, false, false)
+				.thenComposeAsync(aBoolean -> {
+					JsonNode params = null;
+					try {
+						String executable1 = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
+						ObjectMapper objectMapper = new ObjectMapper();
+						params = objectMapper.readTree(executable1);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					return scripting.callScriptUrl("get_file_info", params, "appId", String.class);
 				}).handle((success, ex) -> (ex == null));
 
 		try {
