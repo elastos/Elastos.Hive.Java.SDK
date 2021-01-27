@@ -19,6 +19,6 @@ public interface BackupApi {
 	Call<ResponseBody> restoreFromNode(@Body RequestBody body);
 
 	@POST(Constance.API_PATH + "/backup/activate_to_vault")
-	Call<ResponseBody> activeToVault();
+	Call<ResponseBody> activeToVault(@Body RequestBody body);
 
 }

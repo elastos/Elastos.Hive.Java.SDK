@@ -12,6 +12,7 @@ import java.util.concurrent.CompletionException;
 
 public class AppInstanceFactory {
 	private static final String didCachePath = "data/didCache";
+	private Client client;
 	private Vault vault;
 	private Client client;
 	private Backup backup;
@@ -58,7 +59,7 @@ public class AppInstanceFactory {
 				resolverDidSetup = true;
 			}
 
-			Client client = Client.createInstance(new ApplicationContext() {
+			client = Client.createInstance(new ApplicationContext() {
 				@Override
 				public String getLocalDataDir() {
 					return userFactoryOpt.storePath;
@@ -218,6 +219,9 @@ public class AppInstanceFactory {
 		return this.presentationInJWT.getTargetDid();
 	}
 
+	public Client getClient() {
+		return this.client;
+	}
 
 	public static Client getClientWithEasyAuth() {
 		try {
