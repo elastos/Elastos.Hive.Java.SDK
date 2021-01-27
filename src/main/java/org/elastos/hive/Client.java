@@ -133,18 +133,24 @@ public class Client {
 	 *  - Create a new vaule of local instance..
 	 *
 	 * @param ownerDid  the owner did related to target vault
-	 * @param preferredProviderAddress the preferred target provider address
+	 * @param providerAddress the preferred target provider address
 	 * @return a new vault instance.
 	 */
-	public CompletableFuture<Backup> getBackup(String ownerDid, String preferredProviderAddress) {
-		return getVaultProvider(ownerDid, preferredProviderAddress)
-				.thenApplyAsync(provider -> {
-					AuthHelper authHelper = new AuthHelper(this.context,
-							ownerDid,
-							provider,
-							this.authenticationAdapter);
-					return new Backup(authHelper);
-				});
+	public CompletableFuture<Backup> getBackup(String ownerDid, String providerAddress) {
+
+		if (ownerDid == null)
+			throw new IllegalArgumentException("Missing ownerDid");
+
+		if (providerAddress == null)
+			throw new IllegalArgumentException("Missing provider address");
+
+		return CompletableFuture.supplyAsync(() -> {
+			AuthHelper authHelper = new AuthHelper(this.context,
+					ownerDid,
+					providerAddress,
+					this.authenticationAdapter);
+			return new Backup(authHelper);
+		});
 	}
 
 	/**
@@ -335,3 +341,4 @@ public class Client {
 		}
 	}
 }
+
