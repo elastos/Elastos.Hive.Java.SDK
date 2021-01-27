@@ -5,14 +5,14 @@ import org.elastos.hive.service.BackupUsingPlan;
 
 import java.util.concurrent.CompletableFuture;
 
-public class Manager {
+public class Management {
 	private String providerAddress;
 	private String ownerDid;
 	private AuthHelper authHelper;
 
 	private ServiceManager serviceManager;
 
-	Manager(AuthHelper authHelper, String providerAddress, String ownerDid) {
+	Management(AuthHelper authHelper, String providerAddress, String ownerDid) {
 		this.authHelper = authHelper;
 		this.providerAddress = providerAddress;
 		this.ownerDid = ownerDid;
