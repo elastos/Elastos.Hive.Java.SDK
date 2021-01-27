@@ -4,7 +4,7 @@ import org.elastos.did.DIDDocument;
 import org.elastos.hive.ApplicationContext;
 import org.elastos.hive.Backup;
 import org.elastos.hive.Client;
-import org.elastos.hive.Manager;
+import org.elastos.hive.Management;
 import org.elastos.hive.Vault;
 
 import java.util.concurrent.CompletableFuture;
@@ -16,7 +16,7 @@ public class AppInstanceFactory {
 	private Vault vault;
 	private Client client;
 	private Backup backup;
-	private Manager manager;
+	private Management management;
 	private PresentationInJWT presentationInJWT;
 	private static boolean resolverDidSetup = false;
 
@@ -76,11 +76,11 @@ public class AppInstanceFactory {
 				}
 			});
 
-			CompletableFuture<Manager> managerFuture = client.getManager(userFactoryOpt.ownerDid, userFactoryOpt.provider)
-					.handleAsync((ret, throwable) -> manager = ret);
+			CompletableFuture<Management> managerFuture = client.getManager(userFactoryOpt.ownerDid, userFactoryOpt.provider)
+					.handleAsync((ret, throwable) -> management = ret);
 
-			CompletableFuture<Backup> backupFuture = managerFuture.thenComposeAsync(manager ->
-					manager.createBackup())
+			CompletableFuture<Backup> backupFuture = managerFuture.thenComposeAsync(management ->
+					management.createBackup())
 					.handleAsync((ret, throwable) -> {
 						if (null != throwable) {
 							System.err.println("Vault already existed");
@@ -97,8 +97,8 @@ public class AppInstanceFactory {
 						return backup;
 					});
 
-			CompletableFuture<Vault> vaultFuture = managerFuture.thenComposeAsync(manager ->
-					manager.createVault()).handleAsync((ret, throwable) -> {
+			CompletableFuture<Vault> vaultFuture = managerFuture.thenComposeAsync(management ->
+					management.createVault()).handleAsync((ret, throwable) -> {
 				if (null != throwable) {
 					System.err.println("Vault already existed");
 				}
@@ -203,8 +203,8 @@ public class AppInstanceFactory {
 		return this.backup;
 	}
 
-	public Manager getManager() {
-		return this.manager;
+	public Management getManagement() {
+		return this.management;
 	}
 
 	public String getBackupVc(String serviceDID) {

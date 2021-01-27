@@ -11,11 +11,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Ignore
-public class ManagerTest {
+public class ManagementTest {
 
 	@Test
 	public void testCreateVault() {
-		CompletableFuture<Boolean> future = managerApi.createVault()
+		CompletableFuture<Boolean> future = managementApi.createVault()
 				.handle((vault, throwable) -> (null == throwable));
 
 		try {
@@ -30,7 +30,7 @@ public class ManagerTest {
 
 	@Test
 	public void testCreateBackup() {
-		CompletableFuture<Boolean> future = managerApi.createBackup()
+		CompletableFuture<Boolean> future = managementApi.createBackup()
 				.handle((vault, throwable) -> (null == throwable));
 
 		try {
@@ -45,7 +45,7 @@ public class ManagerTest {
 
 	@Test
 	public void testDestroyVault() {
-		CompletableFuture<Boolean> future = managerApi.destroyVault()
+		CompletableFuture<Boolean> future = managementApi.destroyVault()
 				.handle((vault, throwable) -> (null == throwable));
 
 		try {
@@ -60,7 +60,7 @@ public class ManagerTest {
 
 	@Test
 	public void testFreezeVault() {
-		CompletableFuture<Boolean> future = managerApi.freezeVault()
+		CompletableFuture<Boolean> future = managementApi.freezeVault()
 				.handle((vault, throwable) -> (null == throwable));
 
 		try {
@@ -75,7 +75,7 @@ public class ManagerTest {
 
 	@Test
 	public void testUnfreezeVault() {
-		CompletableFuture<Boolean> future = managerApi.unfreezeVault()
+		CompletableFuture<Boolean> future = managementApi.unfreezeVault()
 				.handle((vault, throwable) -> (null == throwable));
 
 		try {
@@ -90,7 +90,7 @@ public class ManagerTest {
 
 	@Test
 	public void testGetVaultServiceInfo() {
-		CompletableFuture<Boolean> future = managerApi.getVaultServiceInfo()
+		CompletableFuture<Boolean> future = managementApi.getVaultServiceInfo()
 				.handle((vault, throwable) -> (null == throwable));
 
 		try {
@@ -105,7 +105,7 @@ public class ManagerTest {
 
 	@Test
 	public void testGetBackupServiceInfo() {
-		CompletableFuture<Boolean> future = managerApi.getBackupServiceInfo()
+		CompletableFuture<Boolean> future = managementApi.getBackupServiceInfo()
 				.handle((vault, throwable) -> (null == throwable));
 
 		try {
@@ -118,11 +118,11 @@ public class ManagerTest {
 		}
 	}
 
-	private static Manager managerApi;
+	private static Management managementApi;
 
 	@BeforeClass
 	public static void setUp() {
-		managerApi = AppInstanceFactory.configSelector().getManager();
+		managementApi = AppInstanceFactory.configSelector().getManagement();
 	}
 
 }
