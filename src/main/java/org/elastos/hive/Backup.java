@@ -231,7 +231,7 @@ public class Backup {
 	private boolean activeImpl() throws HiveException {
 		try {
 			Response response = this.connectionManager.getBackApi()
-					.activeToVault()
+					.activeToVault(RequestBody.create(MediaType.parse("Content-Type, application/json"), "{}"))
 					.execute();
 
 			authHelper.checkResponseWithRetry(response);

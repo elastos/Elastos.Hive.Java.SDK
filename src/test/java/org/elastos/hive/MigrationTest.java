@@ -36,9 +36,9 @@ public class MigrationTest {
 					};
 					return backupApi.save(handler);
 				}).thenApplyAsync(aBoolean -> {
-					for (; ; ) {
+					for (;;) {
 						try {
-							Thread.sleep(10 * 1000);
+							Thread.sleep(5 * 1000);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -47,8 +47,10 @@ public class MigrationTest {
 							return true;
 						}
 					}
-				}).thenComposeAsync(aBoolean -> backupApi.active())
-				.handleAsync((aBoolean, throwable) -> {
+				}).thenComposeAsync(aBoolean ->
+						client.getBackup(factory.getTargetDid(), factory.getTargetHost())
+								.thenComposeAsync(backup -> backup.active())
+				).handleAsync((aBoolean, throwable) -> {
 					if (null != throwable) {
 						throwable.printStackTrace();
 					}
@@ -70,11 +72,13 @@ public class MigrationTest {
 	private static AppInstanceFactory factory;
 	static Backup backupApi;
 	private static Manager managerApi;
+	private static Client client;
 
 	@BeforeClass
 	public static void setUp() {
 		factory = AppInstanceFactory.configSelector();
 		managerApi = factory.getManager();
 		backupApi = factory.getBackup();
+		client = factory.getClient();
 	}
 }
