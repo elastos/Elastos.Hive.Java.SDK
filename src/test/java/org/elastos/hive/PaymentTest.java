@@ -5,6 +5,7 @@ import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
@@ -72,41 +73,42 @@ public class PaymentTest {
 		}
 	}
 
-//	@Test
-//	public void test02_payOrder() {
-//		CompletableFuture<Boolean> future = paymentApi.getAllOrders()
-//				.thenApplyAsync(orders -> {
-//					for(Order order : orders) {
-//						if(order.state().equalsIgnoreCase("wait_pay")) {
-//							return order.orderId();
-//						}
-//					}
-//					return null;
-//				}).thenComposeAsync(orderId -> {
-//					if (null == orderId) {
-//						return paymentApi.placeOrder("Rookie");
-//					}
-//					return CompletableFuture.completedFuture(orderId);
-//				})
-//				.thenComposeAsync(orderId -> {
-//					System.out.print("Test case02 orderId ==>");
-//					System.out.println(orderId);
-//
-//					//TODO set your paid txId
-//					List<String> txids = new ArrayList<>();
-//					return paymentApi.payOrder(orderId, txids);
-//				})
-//				.handle((aBoolean, throwable) -> (throwable == null));
-//
-//		try {
-//			assertTrue(future.get());
-//			assertTrue(future.isCompletedExceptionally() == false);
-//			assertTrue(future.isDone());
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			fail();
-//		}
-//	}
+	@Test
+	@Ignore
+	public void test02_payOrder() {
+		CompletableFuture<Boolean> future = paymentApi.getAllOrders()
+				.thenApplyAsync(orders -> {
+					for(Order order : orders) {
+						if(order.state().equalsIgnoreCase("wait_pay")) {
+							return order.orderId();
+						}
+					}
+					return null;
+				}).thenComposeAsync(orderId -> {
+					if (null == orderId) {
+						return paymentApi.placeOrder("Rookie");
+					}
+					return CompletableFuture.completedFuture(orderId);
+				})
+				.thenComposeAsync(orderId -> {
+					System.out.print("Test case02 orderId ==>");
+					System.out.println(orderId);
+
+					//TODO set your paid txId
+					List<String> txids = new ArrayList<>();
+					return paymentApi.payOrder(orderId, txids);
+				})
+				.handle((aBoolean, throwable) -> (throwable == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
 
 	@Test
 	public void test03_getUsingPricePlan() {
@@ -140,7 +142,7 @@ public class PaymentTest {
 
 	@BeforeClass
 	public static void setUp() {
-		Vault vault = AppInstanceFactory.configSelector().getVault();
-		paymentApi = vault.getPayment();
+		Management management = AppInstanceFactory.configSelector().getManagement();
+		paymentApi = management.getPayment();
 	}
 }

@@ -12,7 +12,6 @@ public class Vault {
 	private Database database;
 	private Scripting scripting;
 	private KeyValues keyValues;
-	private Payment payment;
 	private Version version;
 
 	private String providerAddress;
@@ -27,7 +26,6 @@ public class Vault {
 		this.files = new FilesImpl(authHelper);
 		this.database = new DatabaseImpl(authHelper);
 		this.scripting = new ScriptingImpl(authHelper);
-		this.payment = new PaymentImpl(authHelper);
 		this.version = new VersionImpl(authHelper);
 	}
 
@@ -110,22 +108,6 @@ public class Vault {
 	public Scripting getScripting() {
 		return this.scripting;
 	}
-
-	/**
-	 * Get interface as Payment instance
-	 * @return interface instance of Payment
-	 */
-	public Payment getPayment() {
-		return this.payment;
-	}
-
-	/**
-	 * Get interface as Backup instance
-	 * @return interface instance of Backup
-	 */
-//	public Backup getBackup() {
-//		return this.backup;
-//	}
 
 	public void revokeAccessToken() {
 		authHelper.removeToken();

@@ -11,6 +11,7 @@ public class Management {
 	private AuthHelper authHelper;
 
 	private ServiceManager serviceManager;
+	private Payment payment;
 
 	Management(AuthHelper authHelper, String providerAddress, String ownerDid) {
 		this.authHelper = authHelper;
@@ -18,6 +19,7 @@ public class Management {
 		this.ownerDid = ownerDid;
 
 		this.serviceManager = new ServiceManagerImpl(authHelper);
+		this.payment = new PaymentImpl(authHelper);
 	}
 
 	/**
@@ -87,14 +89,30 @@ public class Management {
 		return this.serviceManager.getBackupServiceInfo();
 	}
 
-	private CompletableFuture<Boolean> checkVaultExist() {
+	/**
+	 * Check if the vault exists
+	 * @return
+	 */
+	public CompletableFuture<Boolean> checkVaultExist() {
 		return this.serviceManager.getVaultServiceInfo()
 				.handleAsync((usingPlan, throwable) ->
 						(null == throwable && usingPlan != null));
 	}
 
-	private CompletableFuture<Boolean> checkBackupExist() {
+	/**
+	 * Check if the backup exists
+	 * @return
+	 */
+	public CompletableFuture<Boolean> checkBackupExist() {
 		return this.serviceManager.getBackupServiceInfo()
 				.handleAsync((usingPlan, throwable) -> (null == throwable && usingPlan != null));
+	}
+
+	/**
+	 * Get interface as Payment instance
+	 * @return interface instance of Payment
+	 */
+	public Payment getPayment() {
+		return this.payment;
 	}
 }
