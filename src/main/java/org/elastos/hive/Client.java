@@ -163,14 +163,14 @@ public class Client {
 	 * @param preferredProviderAddress the preferred target provider address
 	 * @return a new vault instance.
 	 */
-	public CompletableFuture<Manager> getManager(String ownerDid, String preferredProviderAddress) {
+	public CompletableFuture<Management> getManager(String ownerDid, String preferredProviderAddress) {
 		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApplyAsync(provider -> {
 					AuthHelper authHelper = new AuthHelper(this.context,
 							ownerDid,
 							provider,
 							this.authenticationAdapter);
-					return new Manager(authHelper, provider, ownerDid);
+					return new Management(authHelper, provider, ownerDid);
 				});
 	}
 

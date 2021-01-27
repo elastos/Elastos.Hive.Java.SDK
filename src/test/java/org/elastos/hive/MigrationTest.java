@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 public class MigrationTest {
 	@Test
 	public void testMigration() {
-		CompletableFuture<Boolean> future = managerApi.freezeVault()
+		CompletableFuture<Boolean> future = managementApi.freezeVault()
 				.thenComposeAsync(aBoolean -> {
 					BackupAuthenticationHandler handler = new BackupAuthenticationHandler() {
 						@Override
@@ -71,13 +71,13 @@ public class MigrationTest {
 
 	private static AppInstanceFactory factory;
 	static Backup backupApi;
-	private static Manager managerApi;
+	private static Management managementApi;
 	private static Client client;
 
 	@BeforeClass
 	public static void setUp() {
 		factory = AppInstanceFactory.configSelector();
-		managerApi = factory.getManager();
+		managementApi = factory.getManagement();
 		backupApi = factory.getBackup();
 		client = factory.getClient();
 	}
