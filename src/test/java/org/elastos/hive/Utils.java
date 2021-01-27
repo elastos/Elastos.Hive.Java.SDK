@@ -48,7 +48,7 @@ public class Utils {
         return null;
     }
 
-    public static Writer fileWrite(String filePath, Writer writer) {
+    public static void fileWrite(String filePath, Writer writer) {
         FileReader fileReader = null;
         try {
             fileReader = new FileReader(new File(filePath));
@@ -60,13 +60,11 @@ public class Utils {
             e.printStackTrace();
         } finally {
             try {
-                if (null != fileReader) fileReader.close();
-                if (null != writer) writer.close();
+                fileReader.close();
             } catch (Exception e) {
                 fail();
             }
         }
-        return writer;
     }
 
     public static void cacheTextFile(Reader reader, String path, String filename) {

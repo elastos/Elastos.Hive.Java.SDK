@@ -169,7 +169,14 @@ public class ScriptingTest {
 								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
 								return scripting.uploadFile(transactionId, Writer.class);
 							}).handle((writer, ex) -> {
-								Utils.fileWrite(textLocalPath, writer);
+								if(null != writer) {
+									Utils.fileWrite(textLocalPath, writer);
+									try {
+										writer.close();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+								}
 								return ex == null;
 							});
 				});
