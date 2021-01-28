@@ -120,7 +120,7 @@ class ScriptingImpl implements Scripting {
 	}
 
 	@Override
-	public <T> CompletableFuture<T> callScriptUrl(String name, JsonNode params, String appDid, Class<T> resultType) {
+	public <T> CompletableFuture<T> callScriptUrl(String name, String params, String appDid, Class<T> resultType) {
 		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
 				return callScriptUrlImpl(name, params, appDid, resultType);
@@ -130,12 +130,11 @@ class ScriptingImpl implements Scripting {
 		});
 	}
 
-	private <T> T callScriptUrlImpl(String name, JsonNode params, String appDid, Class<T> resultType) throws HiveException {
+	private <T> T callScriptUrlImpl(String name, String params, String appDid, Class<T> resultType) throws HiveException {
 		try {
 			String targetDid = this.authHelper.getOwnerDid();
-			String json = params.toString();
 			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
-					.callScriptUrl(targetDid, appDid, name, json)
+					.callScriptUrl(targetDid, appDid, name, params)
 					.execute();
 			authHelper.checkResponseWithRetry(response);
 			return ResponseHelper.getValue(response, resultType);

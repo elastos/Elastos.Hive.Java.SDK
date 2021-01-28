@@ -37,7 +37,7 @@ public interface Scripting {
 	 * @param <T> String, byte[], JsonNode, Reader, Write, OutputStream, Reader, InputStream
 	 * @return
 	 */
-	<T> CompletableFuture<T> callScriptUrl(String name, JsonNode params, String appDid, Class<T> resultType);
+	<T> CompletableFuture<T> callScriptUrl(String name, String params, String appDid, Class<T> resultType);
 
 
 	/**

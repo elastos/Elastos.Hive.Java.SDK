@@ -21,13 +21,6 @@
  */
 package org.elastos.hive;
 
-import java.nio.file.ProviderNotFoundException;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
-
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
@@ -38,7 +31,17 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.ProviderNotFoundException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
+
 public class Client {
+
 	private static boolean resolverDidSetup;
 
 	private AuthenticationAdapter authenticationAdapter;
@@ -207,5 +210,92 @@ public class Client {
 				throw new CompletionException(new HiveException(e.getLocalizedMessage()));
 			}
 		});
+	}
+
+	/**
+	 * run script by hive url
+	 * @param scriptUrl hive://target_did@target_app_did/script_name?params={key=value}
+	 * @param resultType
+	 * @param <T>
+	 * @return
+	 */
+	public <T> CompletableFuture<T> callScriptUrl(String scriptUrl, Class<T> resultType) {
+		return parseHiveURL(scriptUrl).thenComposeAsync(hiveURLInfo -> hiveURLInfo.callScript(resultType));
+	}
+
+	/**
+	 * Convenient method that first calls a script by url using callScriptURL(), and expects the
+	 * JSON output to contain a file download information. If this is the case, the file download is
+	 * starting and a file reader is returned.
+	 */
+	public <T> CompletableFuture<T> downloadFileByScriptUrl(String scriptUrl, Class<T> resultType) {
+		return parseHiveURL(scriptUrl).thenComposeAsync(hiveURLInfo -> hiveURLInfo.callScript(resultType));
+	}
+
+	/**
+	 * Parses a Hive standard url into a url info that can later be executed to get the result or the
+	 * target url.
+	 *
+	 * For example, later calling a url such as ...
+	 *      hive://userdid:appdid/getAvatar
+	 *
+	 * ... results in a call to the "getAvatar" script, previously registered by "userdid" on his vault,
+	 * in the "appdid" scope. This is similar to calling:
+	 *      hiveClient.getVault(userdid).getScripting().call("getAvatar");
+	 *
+	 * Usage example (assuming the url is a call to a getAvatar script that contains a FileDownload
+	 * executable named "download"):
+	 *
+	 * - let hiveURLInfo = hiveclient.parseHiveURL(urlstring)
+	 * - let scriptOutput = await hiveURLInfo.callScript();
+	 * - hiveURLInfo.getVault().getScripting().downloadFile(scriptOutput.items["download"].getTransferID())
+	 */
+	public CompletableFuture<HiveURLInfo> parseHiveURL(String scriptUrl) {
+		return CompletableFuture.supplyAsync(() -> new HiveURLInfoImpl(scriptUrl));
+	}
+
+
+	public class HiveURLInfoImpl implements HiveURLInfo {
+
+		private String targetDid;
+		private String appDid;
+		private String scriptName;
+		private String params;
+
+		/**
+		 * HiveURLInfo
+		 * @param scriptUrl
+		 *	hive://target_did@target_app_did/script_name?params={key=value}
+		 */
+		public HiveURLInfoImpl(String scriptUrl) {
+			try {
+				URL url = new URL(scriptUrl);
+				String host = url.getHost();
+				targetDid = host.split("@")[0];
+				appDid = host.split("@")[1];
+				scriptName = url.getPath();
+				params = url.getQuery();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		public <T> CompletableFuture<T> callScript(Class<T> resultType) {
+			return getVault().thenComposeAsync((Function<Vault, CompletionStage<T>>) vault -> vault.getScripting()
+					.callScriptUrl(scriptName, params, appDid, resultType));
+		}
+
+		@Override
+		public CompletableFuture<Vault> getVault() {
+			return getVaultProvider(targetDid, null)
+					.thenApplyAsync(provider -> {
+						AuthHelper authHelper = new AuthHelper(context,
+								targetDid,
+								provider,
+								authenticationAdapter);
+						return new Vault(authHelper, provider, targetDid);
+					});
+		}
 	}
 }
