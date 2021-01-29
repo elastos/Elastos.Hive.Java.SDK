@@ -260,14 +260,7 @@ public class ScriptingTest {
 		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
 		CompletableFuture<Boolean> fileInfoFuture = scripting.registerScript("get_file_info", executable, false, false)
 				.thenComposeAsync(aBoolean -> {
-					JsonNode params = null;
-					try {
-						String executable1 = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
-						ObjectMapper objectMapper = new ObjectMapper();
-						params = objectMapper.readTree(executable1);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					String params = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 					return scripting.callScriptUrl("get_file_info", params, "appId", String.class);
 				}).handle((success, ex) -> (ex == null));
 

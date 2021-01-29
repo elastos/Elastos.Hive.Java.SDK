@@ -11,6 +11,7 @@ import java.util.concurrent.CompletionException;
 public class AppInstanceFactory {
 	private static final String didCachePath = "didCache";
 	private Vault vault;
+	private Client client;
 	private static boolean resolverDidSetup = false;
 
 	static class Options {
@@ -52,7 +53,7 @@ public class AppInstanceFactory {
 				resolverDidSetup = true;
 			}
 
-			Client client = Client.createInstance(new ApplicationContext() {
+			client = Client.createInstance(new ApplicationContext() {
 				@Override
 				public String getLocalDataDir() {
 					return userFactoryOpt.storePath;
@@ -153,7 +154,11 @@ public class AppInstanceFactory {
 		return vault;
 	}
 
-	public static Client getClient() {
+	public Client getClient() {
+		return client;
+	}
+
+	public static Client getClientWithAuth() {
 		try {
 			Config config = ConfigHelper.getConfigInfo("Production.conf");
 			if (!resolverDidSetup) {

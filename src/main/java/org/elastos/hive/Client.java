@@ -31,8 +31,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.ProviderNotFoundException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -255,7 +254,7 @@ public class Client {
 	}
 
 
-	public class HiveURLInfoImpl implements HiveURLInfo {
+	class HiveURLInfoImpl implements HiveURLInfo {
 
 		private String targetDid;
 		private String appDid;
@@ -269,13 +268,13 @@ public class Client {
 		 */
 		public HiveURLInfoImpl(String scriptUrl) {
 			try {
-				URL url = new URL(scriptUrl);
-				String host = url.getHost();
-				targetDid = host.split("@")[0];
-				appDid = host.split("@")[1];
-				scriptName = url.getPath();
-				params = url.getQuery();
-			} catch (MalformedURLException e) {
+				String url = scriptUrl.split("params=")[0];
+				params = scriptUrl.split("params=")[1];
+				URI uri = new URI(url);
+				targetDid = uri.getRawUserInfo();
+				appDid = uri.getHost();
+				scriptName = uri.getRawPath().replace("/", "");
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
