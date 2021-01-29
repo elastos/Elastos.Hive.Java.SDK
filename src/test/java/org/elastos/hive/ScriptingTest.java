@@ -28,6 +28,7 @@ import org.elastos.hive.scripting.UploadExecutable;
 import org.elastos.hive.utils.JsonUtil;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
@@ -254,6 +255,7 @@ public class ScriptingTest {
 	}
 
 	@Test
+	@Ignore
 	public void test8_callScriptUrl() {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
