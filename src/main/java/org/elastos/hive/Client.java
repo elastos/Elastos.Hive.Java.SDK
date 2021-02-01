@@ -28,6 +28,7 @@ import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.ParseHiveUrlException;
 import org.elastos.hive.exception.ProviderNotSetException;
 
 import java.net.URLDecoder;
@@ -284,7 +285,7 @@ public class Client {
 				scriptName = matcher.group(5);
 				params = matcher.group(8);
 			} catch (Exception e) {
-				e.printStackTrace();
+				throw new ParseHiveUrlException(e.getLocalizedMessage());
 			}
 		}
 
