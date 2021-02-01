@@ -31,13 +31,15 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 
-import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.file.ProviderNotFoundException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Client {
 
@@ -268,12 +270,14 @@ public class Client {
 		 */
 		public HiveURLInfoImpl(String scriptUrl) {
 			try {
-				String url = scriptUrl.split("params=")[0];
-				params = scriptUrl.split("params=")[1];
-				URI uri = new URI(url);
-				targetDid = uri.getRawUserInfo();
-				appDid = uri.getHost();
-				scriptName = uri.getRawPath().replace("/", "");
+				String decodeUrl = URLDecoder.decode(scriptUrl, "utf-8");
+				Pattern pattern = Pattern.compile("(\\w+):\\/\\/([^@]+)@([^/ ]*)\\/([^/]*)\\/([^?]*)(\\?)?(params=)?([^=]*)?");
+				Matcher matcher = pattern.matcher(decodeUrl);
+				matcher.find();
+				targetDid = matcher.group(2);
+				appDid = matcher.group(3);
+				scriptName = matcher.group(5);
+				params = matcher.group(8);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

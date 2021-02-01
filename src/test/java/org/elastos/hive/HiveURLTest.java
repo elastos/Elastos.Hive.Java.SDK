@@ -17,7 +17,9 @@ import static org.junit.Assert.fail;
 @Ignore
 public class HiveURLTest {
 
-	private final String scriptUrl = "hive://did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n@appId/get_file_info?params={\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
+//	private final String scriptUrl = "hive://did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n@appId/scripting/get_file_info?params={\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
+
+	private final String scriptUrl = "hive://did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n@appId/scripting/downloadScript?params={'key':'test'}";
 
 	@Test
 	public void testGetHiveURL() {
