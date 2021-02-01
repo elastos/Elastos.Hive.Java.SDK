@@ -267,7 +267,7 @@ public class Client {
 		/**
 		 * HiveURLInfo
 		 * @param scriptUrl
-		 *	hive://target_did@target_app_did/script_name?params={key=value}
+		 *	hive://target_did@target_app_did/scripting/script_name?params={key:value}
 		 */
 		public HiveURLInfoImpl(String scriptUrl) {
 			try {
