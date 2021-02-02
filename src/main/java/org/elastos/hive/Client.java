@@ -21,28 +21,24 @@
  */
 package org.elastos.hive;
 
-import java.nio.file.ProviderNotFoundException;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
-
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
-import org.elastos.hive.exception.BackupVaultAlreadyExistException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
-import org.elastos.hive.exception.VaultAlreadyExistException;
 
+import java.net.URLDecoder;
 import java.nio.file.ProviderNotFoundException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Client {
 	private static boolean resolverDidSetup;
@@ -220,36 +216,6 @@ public class Client {
 				throw new CompletionException(new HiveException(e.getLocalizedMessage()));
 			}
 		});
-	}
-
-	public CompletableFuture<Vault> createBackupVault(String ownerDid, String preferredProviderAddress) {
-		return getVaultProvider(ownerDid, preferredProviderAddress)
-				.thenApplyAsync(provider -> {
-					AuthHelper authHelper = new AuthHelper(this.context,
-							ownerDid,
-							provider,
-							this.authenticationAdapter);
-					return new Vault(authHelper, provider, ownerDid);
-				})
-				.thenComposeAsync(vault -> vault.checkBackupVaultExist().thenApplyAsync(aBoolean -> {
-					if(aBoolean) {
-						throw new BackupVaultAlreadyExistException("Backup Vault already existed.");
-					} else {
-						vault.createBackupVaultOnService();
-					}
-					return vault;
-				}));
-	}
-
-	public CompletableFuture<Vault> getBackupVault(String ownerDid, String preferredProviderAddress) {
-		return getVaultProvider(ownerDid, preferredProviderAddress)
-				.thenApplyAsync(provider -> {
-					AuthHelper authHelper = new AuthHelper(this.context,
-							ownerDid,
-							provider,
-							this.authenticationAdapter);
-					return new Vault(authHelper, provider, ownerDid);
-				});
 	}
 
 	/**

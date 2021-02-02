@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.exception.FileNotFoundException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.files.UploadOutputStream;
 import org.elastos.hive.scripting.Condition;
@@ -131,7 +130,7 @@ class ScriptingImpl implements Scripting {
 
 	private <T> T callScriptUrlImpl(String name, String params, String appDid, Class<T> resultType) throws HiveException {
 		try {
-			String targetDid = this.authHelper.getOwnerDid();
+			String targetDid = this.authHelper.ownerDid();
 			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
 					.callScriptUrl(targetDid, appDid, name, params)
 					.execute();
@@ -212,39 +211,6 @@ class ScriptingImpl implements Scripting {
 			} else {
 				throw new HiveException("Can not get transaction id");
 			}
-		} catch (Exception e) {
-			throw new HiveException(e.getLocalizedMessage());
-		}
-	}
-
-	private <T> T callDownloadScriptImpl(String scriptName, JsonNode params, String appDid, Class<T> clazz) throws HiveException {
-		try {
-			Map<String, Object> map = new HashMap<>();
-			map.put("name", scriptName);
-
-			if(params!= null) map.put("params", params);
-
-			ObjectNode targetNode = JsonNodeFactory.instance.objectNode();
-			String ownerDid = this.authHelper.getOwnerDid();
-			if (null != ownerDid) {
-				targetNode.put("target_did", ownerDid);
-				if (null != appDid)
-					targetNode.put("target_app_did", appDid);
-				map.put("context", targetNode);
-			}
-
-			String json = JsonUtil.serialize(map);
-			Response<ResponseBody> response;
-
-			response = this.connectionManager.getScriptingApi()
-					.callScript(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
-					.execute();
-			int code = response.code();
-			if(404 == code) {
-				throw new FileNotFoundException(FileNotFoundException.EXCEPTION);
-			}
-			authHelper.checkResponseWithRetry(response);
-			return ResponseHelper.getValue(response, clazz);
 		} catch (Exception e) {
 			throw new HiveException(e.getLocalizedMessage());
 		}
