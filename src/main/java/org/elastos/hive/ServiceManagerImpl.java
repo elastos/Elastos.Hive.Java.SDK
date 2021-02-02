@@ -3,12 +3,16 @@ package org.elastos.hive;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.exception.BackupAlreadyExistException;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.VaultAlreadyExistException;
 import org.elastos.hive.exception.VaultNotFoundException;
 import org.elastos.hive.payment.UsingPlan;
 import org.elastos.hive.service.BackupUsingPlan;
+import org.elastos.hive.service.CreateServiceResult;
 import org.elastos.hive.utils.ResponseHelper;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -27,25 +31,21 @@ class ServiceManagerImpl implements ServiceManager {
 
 	@Override
 	public CompletableFuture<Boolean> createVault() {
-		return authHelper.checkValid().thenApplyAsync(aVoid -> {
-			try {
-				return createVaultImp();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
-			}
-		});
+		return authHelper.checkValid().thenApplyAsync(aVoid -> createVaultImp());
 	}
 
-	private boolean createVaultImp() throws HiveException {
+	private boolean createVaultImp() {
 		try {
-			Response response = this.connectionManager.getServiceManagerApi()
+			Response<CreateServiceResult> response = this.connectionManager.getServiceManagerApi()
 					.createVault()
 					.execute();
-
+			if(response.body().existing()) {
+				throw new VaultAlreadyExistException("The vault already exists");
+			}
 			authHelper.checkResponseWithRetry(response);
 			return true;
-		} catch (Exception e) {
-			throw new HiveException(e.getLocalizedMessage());
+		} catch (IOException|HiveException e) {
+			throw new CompletionException(e);
 		}
 	}
 
@@ -154,25 +154,22 @@ class ServiceManagerImpl implements ServiceManager {
 
 	@Override
 	public CompletableFuture<Boolean> createBackup() {
-		return authHelper.checkValid().thenApplyAsync(aVoid -> {
-			try {
-				return createBackupVaultImp();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
-			}
-		});
+		return authHelper.checkValid().thenApplyAsync(aVoid -> createBackupVaultImp());
 	}
 
-	private boolean createBackupVaultImp() throws HiveException {
+	private boolean createBackupVaultImp() {
 		try {
-			Response response = this.connectionManager.getServiceManagerApi()
+			Response<CreateServiceResult> response = this.connectionManager.getServiceManagerApi()
 					.createBackupVault()
 					.execute();
+			if(response.body().existing()) {
+				throw new BackupAlreadyExistException("The backup already exists");
+			}
 
 			authHelper.checkResponseWithRetry(response);
 			return true;
-		} catch (Exception e) {
-			throw new HiveException(e.getLocalizedMessage());
+		} catch (IOException|HiveException e) {
+			throw new CompletionException(e);
 		}
 	}
 
