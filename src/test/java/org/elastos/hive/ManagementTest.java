@@ -16,7 +16,12 @@ public class ManagementTest {
 	@Test
 	public void testCreateVault() {
 		CompletableFuture<Boolean> future = managementApi.createVault()
-				.handle((vault, throwable) -> (null == throwable));
+				.handle((vault, throwable) -> {
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
+					return (null == throwable);
+				});
 
 		try {
 			assertTrue(future.get());
@@ -31,7 +36,12 @@ public class ManagementTest {
 	@Test
 	public void testCreateBackup() {
 		CompletableFuture<Boolean> future = managementApi.createBackup()
-				.handle((vault, throwable) -> (null == throwable));
+				.handle((vault, throwable) -> {
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
+					return (null == throwable);
+				});
 
 		try {
 			assertTrue(future.get());

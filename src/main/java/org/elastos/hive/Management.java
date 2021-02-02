@@ -28,9 +28,9 @@ public class Management {
 	 * @return
 	 */
 	public CompletableFuture<Vault> createVault() {
-		return checkVaultExist().thenComposeAsync(aBoolean ->
-				serviceManager.createVault()).thenApplyAsync(aBoolean ->
+		return serviceManager.createVault().thenApplyAsync(aBoolean ->
 				aBoolean ? new Vault(this.authHelper, this.providerAddress, this.ownerDid) : null);
+
 	}
 
 	/**
@@ -66,9 +66,9 @@ public class Management {
 	 * @return
 	 */
 	public CompletableFuture<Backup> createBackup() {
-		return checkBackupExist().thenComposeAsync(aBoolean ->
-				serviceManager.createBackup()).thenApplyAsync(aBoolean ->
+		return serviceManager.createBackup().thenApplyAsync(aBoolean ->
 				aBoolean ? new Backup(this.authHelper) : null);
+
 	}
 
 	/**
