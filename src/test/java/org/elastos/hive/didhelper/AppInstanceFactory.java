@@ -14,7 +14,6 @@ public class AppInstanceFactory {
 	private static final String didCachePath = "data/didCache";
 	private Client client;
 	private Vault vault;
-	private Client client;
 	private Backup backup;
 	private Management management;
 	private PresentationInJWT presentationInJWT;
