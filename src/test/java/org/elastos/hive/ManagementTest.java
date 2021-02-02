@@ -101,7 +101,12 @@ public class ManagementTest {
 	@Test
 	public void testGetVaultServiceInfo() {
 		CompletableFuture<Boolean> future = managementApi.getVaultServiceInfo()
-				.handle((vault, throwable) -> (null == throwable));
+				.handle((vault, throwable) -> {
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
+					return (null == throwable);
+				});
 
 		try {
 			assertTrue(future.get());
@@ -116,7 +121,12 @@ public class ManagementTest {
 	@Test
 	public void testGetBackupServiceInfo() {
 		CompletableFuture<Boolean> future = managementApi.getBackupServiceInfo()
-				.handle((vault, throwable) -> (null == throwable));
+				.handle((vault, throwable) -> {
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
+					return (null == throwable);
+				});
 
 		try {
 			assertTrue(future.get());
