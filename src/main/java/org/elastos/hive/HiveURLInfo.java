@@ -15,4 +15,6 @@ public interface HiveURLInfo {
 	 * the script call, such as a file download or upload.
 	 */
 	CompletableFuture<Vault> getVault();
+
+	 UrlInfo deserialize(String hiveUrl);
 }
