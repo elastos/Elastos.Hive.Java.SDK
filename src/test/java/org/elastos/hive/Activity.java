@@ -1,11 +1,33 @@
 package org.elastos.hive;
 
-public interface Activity {
+import org.elastos.hive.didhelper.AppInstanceFactory;
 
-	void onCreate(ApplicationContext context);
+public class Activity {
 
-	void onResume(ApplicationContext context);
+	private Database database;
+	private Files files;
+	private Management management;
+	private Payment payment;
+	private Scripting scripting;
+	private Backup backup;
 
-	void onDestroy(ApplicationContext context);
+	protected void onCreate(ApplicationContext context) {
+		Vault vault = AppInstanceFactory.configSelector().getVault();
+		backup = AppInstanceFactory.configSelector().getBackup();
+		database = vault.getDatabase();
+		files = vault.getFiles();
+		scripting = vault.getScripting();
+
+		management = AppInstanceFactory.configSelector().getManagement();
+		payment = management.getPayment();
+	}
+
+	protected void onResume(ApplicationContext context) {
+		new FileController().loadTest(files);
+	}
+
+	protected void onDestroy(ApplicationContext context) {
+
+	}
 
 }
