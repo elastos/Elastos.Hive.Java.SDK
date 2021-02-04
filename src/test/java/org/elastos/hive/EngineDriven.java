@@ -7,8 +7,7 @@ import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
 
-public class TestEntry {
-
+public class EngineDriven {
 
 	private static MockApplication application;
 	private static ApplicationContext applicationContext;
