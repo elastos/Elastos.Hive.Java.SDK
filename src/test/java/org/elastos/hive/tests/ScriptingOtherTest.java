@@ -1,4 +1,4 @@
-package org.elastos.hive;
+package org.elastos.hive.tests;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

@@ -1,4 +1,4 @@
-package org.elastos.hive;
+package org.elastos.hive.controller;
 
 public interface Controller<T> {
 
