@@ -30,9 +30,7 @@ public class Activity {
 	}
 
 	protected void onResume(ApplicationContext context) {
-		for(Controller controller : controllers) {
-			controller.start();
-		}
+
 	}
 
 	protected void onDestroy(ApplicationContext context) {
@@ -42,6 +40,15 @@ public class Activity {
 		scripting = null;
 		management = null;
 		payment = null;
+	}
+
+	protected void start(ApplicationContext context) {
+		onCreate(context);
+		onResume(context);
+		for(Controller controller : controllers) {
+			controller.start();
+		}
+		onDestroy(context);
 	}
 
 	public void registerController(Controller controller) {

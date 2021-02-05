@@ -2,15 +2,18 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.ActivityNotFoundException;
 import org.elastos.hive.exception.ContextNotSetException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Ignore
 public class Application {
 
 	/**
@@ -23,23 +26,25 @@ public class Application {
 	 */
 	protected Type env = Type.PRODUCTION;
 
-	@BeforeClass
-	public void onCreate() {
+
+	public boolean onCreate() {
 		activityCache.clear();
 		if(applicationContext == null) {
 			throw new ContextNotSetException("Application context not set");
 		}
 		//TODO 配置环境：product, develop, testing
+
+		return true;
 	}
 
-	@Test
-	public void onResume() {
+	public boolean onResume() {
 		if(activityCache.isEmpty()) {
 			throw new ActivityNotFoundException("Please start activity in application");
 		}
+
+		return true;
 	}
 
-	@AfterClass
 	public void onDestroy() {
 		activityCache.clear();
 		applicationContext = null;
@@ -50,10 +55,7 @@ public class Application {
 		try {
 			constructor = activityClass.getConstructor();
 			T activity = constructor.newInstance();
-			activity.onCreate(applicationContext);
-			activity.onResume(applicationContext);
-			activity.onDestroy(applicationContext);
-
+			activity.start(applicationContext);
 			activityCache.put(activity.getClass().getSimpleName(), activity);
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
@@ -66,6 +68,15 @@ public class Application {
 		}
 
 	}
+
+	@Test
+	public void engine() {
+		if(onCreate()) {
+			onResume();
+		}
+		onDestroy();
+	}
+
 
 	public enum Type {
 		CROSS,
