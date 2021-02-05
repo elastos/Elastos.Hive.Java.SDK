@@ -16,10 +16,12 @@ import org.elastos.hive.Vault;
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Ignore
 public class FilesTest {
 
 	@Test
