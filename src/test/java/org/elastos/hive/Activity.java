@@ -23,11 +23,15 @@ public class Activity {
 	}
 
 	protected void onResume(ApplicationContext context) {
-		new FileController().loadTest(files);
 	}
 
 	protected void onDestroy(ApplicationContext context) {
-
+		backup = null;
+		database = null;
+		files = null;
+		scripting = null;
+		management = null;
+		payment = null;
 	}
 
 }
