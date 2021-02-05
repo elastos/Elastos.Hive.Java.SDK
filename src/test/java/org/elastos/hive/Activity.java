@@ -8,12 +8,12 @@ import java.util.List;
 
 public class Activity {
 
-	private Database database;
-	private Files files;
-	private Management management;
-	private Payment payment;
-	private Scripting scripting;
-	private Backup backup;
+	protected Database database;
+	protected Files files;
+	protected Management management;
+	protected Payment payment;
+	protected Scripting scripting;
+	protected Backup backup;
 
 	private List<Controller> controllers = new ArrayList<>();
 
@@ -31,7 +31,7 @@ public class Activity {
 
 	protected void onResume(ApplicationContext context) {
 		for(Controller controller : controllers) {
-
+			controller.start();
 		}
 	}
 
@@ -45,7 +45,7 @@ public class Activity {
 	}
 
 	public void registerController(Controller controller) {
-
+		controllers.add(controller);
 	}
 
 }
