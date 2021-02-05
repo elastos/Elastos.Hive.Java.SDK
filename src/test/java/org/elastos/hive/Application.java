@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.ActivityNotFoundException;
 import org.elastos.hive.exception.ContextNotSetException;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -77,6 +78,10 @@ public class Application {
 		onDestroy();
 	}
 
+	@BeforeClass
+	public static void logo() {
+		Logger.hive();
+	}
 
 	public enum Type {
 		CROSS,
