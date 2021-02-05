@@ -46,7 +46,7 @@ public class Activity {
 		onCreate(context);
 		onResume(context);
 		for(Controller controller : controllers) {
-			controller.start();
+			controller.start(controller.getClass().getSimpleName());
 		}
 		onDestroy(context);
 	}
