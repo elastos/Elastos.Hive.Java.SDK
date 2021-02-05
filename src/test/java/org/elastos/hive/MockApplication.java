@@ -10,8 +10,7 @@ import java.util.concurrent.CompletableFuture;
 public class MockApplication extends Application {
 
 	@Override
-	public void onCreate() {
-		super.onCreate();
+	public boolean onCreate() {
 		applicationContext = new ApplicationContext() {
 			@Override
 			public String getLocalDataDir() {
@@ -29,11 +28,12 @@ public class MockApplication extends Application {
 			}
 		};
 		env = Type.PRODUCTION;
+		return super.onCreate();
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
+	public boolean onResume() {
 		startActivity(MainActivity.class);
+		return super.onResume();
 	}
 }
