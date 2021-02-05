@@ -1,5 +1,7 @@
-package org.elastos.hive;
+package org.elastos.hive.tests;
 
+import org.elastos.hive.SdkVersion;
+import org.elastos.hive.Vault;
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;

@@ -1,5 +1,7 @@
-package org.elastos.hive;
+package org.elastos.hive.tests;
 
+import org.elastos.hive.Client;
+import org.elastos.hive.Database;
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.elastos.hive.didhelper.VaultAuthHelper;
 import org.elastos.did.exception.DIDException;
