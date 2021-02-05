@@ -1,22 +1,39 @@
 package org.elastos.hive;
 
+import org.elastos.did.DIDDocument;
+
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Application of simulation upper layer
  */
-public class MockApplication extends Activity {
+public class MockApplication extends Application {
 
 	@Override
-	public void onCreate(ApplicationContext context) {
-		super.onCreate(context);
+	public void onCreate() {
+		super.onCreate();
+		applicationContext = new ApplicationContext() {
+			@Override
+			public String getLocalDataDir() {
+				return null;
+			}
+
+			@Override
+			public DIDDocument getAppInstanceDocument() {
+				return null;
+			}
+
+			@Override
+			public CompletableFuture<String> getAuthorization(String jwtToken) {
+				return null;
+			}
+		};
+		env = Type.PRODUCTION;
 	}
 
 	@Override
-	public void onResume(ApplicationContext context) {
-		super.onResume(context);
-	}
-
-	@Override
-	public void onDestroy(ApplicationContext context) {
-		super.onDestroy(context);
+	public void onResume() {
+		super.onResume();
+		startActivity(MainActivity.class);
 	}
 }
