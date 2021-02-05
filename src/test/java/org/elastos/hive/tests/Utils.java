@@ -1,4 +1,4 @@
-package org.elastos.hive;
+package org.elastos.hive.tests;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
