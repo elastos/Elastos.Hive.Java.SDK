@@ -1,7 +1,16 @@
 package org.elastos.hive.controller;
 
-public interface Controller<T> {
+public abstract class Controller {
 
-	void loadTest(T api);
+	public void start() {
+		setUp();
+		loadTest();
+	}
+
+	protected void setUp() {
+
+	}
+
+	abstract void loadTest();
 
 }

@@ -1,5 +1,7 @@
 package org.elastos.hive;
 
+import org.elastos.hive.controller.FileController;
+
 public class MainActivity extends Activity {
 
 	@Override
@@ -10,8 +12,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume(ApplicationContext context) {
 		super.onResume(context);
-
-
+		registerController(FileController.newInstance(files));
 	}
 
 }
