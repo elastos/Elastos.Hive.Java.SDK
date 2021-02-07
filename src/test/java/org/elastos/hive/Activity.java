@@ -5,6 +5,7 @@ import org.elastos.hive.didhelper.AppInstanceFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class Activity {
 
@@ -53,6 +54,52 @@ public class Activity {
 
 	public void registerController(Controller controller) {
 		controllers.add(controller);
+	}
+
+
+	protected enum NodeType {
+		DEVELOPING,
+		PRODUCTION,
+		LOCAL
+	}
+
+	protected void getNodeConfig(NodeType type) {
+		String fileName = null;
+		switch (type) {
+			case DEVELOPING:
+				fileName = "DevelopingNode.conf";
+				break;
+			case PRODUCTION:
+				fileName = "ProductionNode.conf";
+				break;
+			case LOCAL:
+				fileName = "TestingNode.conf";
+				break;
+			default:
+				throw new IllegalArgumentException("Node type is invalid");
+		}
+		Properties properties = Utils.getProperties(fileName);
+	}
+
+
+	protected enum UserType {
+		MAIN_NET,
+		TEST_NET,
+	}
+
+	protected void getUserConfig(UserType type) {
+		String fileName = null;
+		switch (type) {
+			case MAIN_NET:
+				fileName = "MainNetUser.conf";
+				break;
+			case TEST_NET:
+				fileName = "TestNetUser.conf";
+				break;
+			default:
+				throw new IllegalArgumentException("User type is invalid");
+		}
+		Properties properties = Utils.getProperties(fileName);
 	}
 
 }

@@ -2,7 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.controller.FileController;
 
-public class MainActivity extends Activity {
+public class VaultActivity extends Activity {
 
 	@Override
 	protected void onCreate(ApplicationContext context) {
