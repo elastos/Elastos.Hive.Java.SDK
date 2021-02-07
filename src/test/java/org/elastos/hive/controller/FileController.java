@@ -44,8 +44,8 @@ public class FileController extends Controller {
 	protected void setUp() {
 		super.setUp();
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
-		textLocalPath = localRootPath +"test.txt";
-		imgLocalPath = localRootPath +"big.png";
+		textLocalPath = localRootPath + "local/test.txt";
+		imgLocalPath = localRootPath + "local/big.png";
 		rootLocalCachePath = localRootPath + "cache/file/";
 
 		remoteRootPath = "hive";

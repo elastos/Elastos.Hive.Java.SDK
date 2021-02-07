@@ -118,7 +118,7 @@ public class HiveURLTest {
 		client = AppInstanceFactory.configSelector().getClient();
 		scriptingApi = AppInstanceFactory.configSelector().getVault().getScripting();
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
-		textLocalPath = localRootPath + "test.txt";
+		textLocalPath = localRootPath + "local/test.txt";
 	}
 
 }
