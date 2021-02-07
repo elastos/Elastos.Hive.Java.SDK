@@ -1,4 +1,6 @@
-package org.elastos.hive.tests;
+package org.elastos.hive;
+
+import org.elastos.hive.didhelper.ConfigHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.fail;
@@ -114,5 +117,18 @@ public class Utils {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static Properties getProperties(String fileName) {
+        InputStream input = ConfigHelper.class.getClassLoader().getResourceAsStream(fileName);
+
+        Properties properties = new Properties();
+        try {
+            properties.load(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return properties;
     }
 }

@@ -1,7 +1,7 @@
 package org.elastos.hive.controller;
 
 import org.elastos.hive.Files;
-import org.elastos.hive.tests.Utils;
+import org.elastos.hive.Utils;
 
 import java.io.File;
 import java.io.FileReader;
