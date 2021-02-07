@@ -295,7 +295,7 @@ public class ScriptingTest {
 
 	public ScriptingTest() {
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
-		textLocalPath = localRootPath + "test.txt";
+		textLocalPath = localRootPath + "local/test.txt";
 		testLocalCacheRootPath = localRootPath + "cache/script/";
 	}
 }

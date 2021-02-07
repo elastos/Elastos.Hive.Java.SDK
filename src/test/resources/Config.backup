@@ -1,0 +1,87 @@
+//Product
+userDid = did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL
+userName = productionUser
+userMn = mammal basket grain fish strategy music fault lock flat first casino energy
+userPhrasepass = password
+userStorepass = password
+
+appName = productionApp
+appMn = venture link adapt field priority extend depart endless right lamp sudden fringe
+appPhrasepass = password
+appStorePass = password
+
+ownerDid = did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL
+resolverUrl =  http://api.elastos.io:20606
+provider = https://hive1.trinity-tech.io
+
+targetDID = did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J
+targetHost = https://hive-testnet2.trinity-tech.io
+
+storePath = production
+
+
+//Develop
+userDid = did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n
+userName = developUser
+userMn = social bundle noodle argue pencil file absent acoustic tennis weekend message notice
+userPhrasepass = password
+userStorepass = password
+
+//did:elastos:imMY7uHc5WCDUhWCVaH5MtFFCBMegCaEYH
+appName = developApp
+appMn = wash busy tell relief street maximum dumb fat legend end panic warrior
+appPhrasepass = password
+appStorePass = password
+
+ownerDid = did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n
+resolverUrl =  http://api.elastos.io:21606
+provider = https://hive-testnet1.trinity-tech.io
+
+targetDID = did:elastos:iiTvjocqh7C78KjWyDVk2C2kbueJvkuXTW
+targetHost = https://hive-testnet2.trinity-tech.io
+
+storePath = develop
+
+
+//Local
+userDid = did:elastos:iqk3KLebgiiP46uyoKevYQJB7PZcs2iTLz
+userName = testingUser
+userMn = exist recycle people endless spin split enact dance weasel abstract idle adult
+userPhrasepass = password
+userStorepass = password
+
+appName = testingApp
+appMn = network check illness dutch police stove other junior arrive sniff engage lamp
+appPhrasepass = password
+appStorePass = password
+
+ownerDid = did:elastos:iqk3KLebgiiP46uyoKevYQJB7PZcs2iTLz
+resolverUrl = http://api.elastos.io:20606
+provider = http://127.0.0.1:5000
+
+targetDID = did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J
+targetHost = http://127.0.0.1:5001
+
+storePath = testing
+
+
+//Cross
+userDid = did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J
+userName = crossUser
+userMn = gallery input work twice helmet mesh decline cushion same garbage art bullet
+userPhrasepass = password
+userStorepass = password
+
+appName = crossApp
+appMn = trend music thumb what erupt near apology exotic surge item field awake
+appPhrasepass = password
+appStorePass = password
+
+ownerDid = did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL
+resolverUrl =  http://api.elastos.io:20606
+provider = https://hive1.trinity-tech.io
+
+targetDID = did:elastos:ijYUBb36yCXU6yzhydnkCCAXh7ZRW4X85J
+targetHost = https://hive2.trinity-tech.io
+
+storePath = cross

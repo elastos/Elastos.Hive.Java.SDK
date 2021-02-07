@@ -11,6 +11,7 @@ public class MockApplication extends Application {
 
 	@Override
 	public boolean onCreate() {
+
 		applicationContext = new ApplicationContext() {
 			@Override
 			public String getLocalDataDir() {
