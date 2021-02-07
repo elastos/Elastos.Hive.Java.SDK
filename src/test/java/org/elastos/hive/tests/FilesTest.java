@@ -12,6 +12,7 @@ import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.Files;
+import org.elastos.hive.Utils;
 import org.elastos.hive.Vault;
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.junit.BeforeClass;

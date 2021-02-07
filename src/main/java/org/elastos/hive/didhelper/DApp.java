@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 
-class DApp extends Entity {
+public class DApp extends Entity {
 
 	public String appId = "appId";
 
