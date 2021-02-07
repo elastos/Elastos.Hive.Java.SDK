@@ -201,11 +201,11 @@ public class FilesTest {
 
 	public FilesTest() {
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
-		textLocalPath = localRootPath +"test.txt";
-		imgLocalPath = localRootPath +"big.png";
+		textLocalPath = localRootPath + "local/test.txt";
+		imgLocalPath = localRootPath + "local/big.png";
 		rootLocalCachePath = localRootPath + "cache/file/";
-		textLocalCachePath = rootLocalCachePath + "test.txt";
-		imgLocalCachePath = rootLocalCachePath + "/big.png";
+		textLocalCachePath = rootLocalCachePath + "local/test.txt";
+		imgLocalCachePath = rootLocalCachePath + "/local/big.png";
 
 		remoteRootPath = "hive";
 		remoteTextPath = remoteRootPath + File.separator + "test.txt";

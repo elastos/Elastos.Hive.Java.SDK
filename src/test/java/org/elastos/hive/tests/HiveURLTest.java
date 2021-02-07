@@ -1,11 +1,11 @@
-package org.elastos.hive.tests;
+package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.elastos.hive.Client;
-import org.elastos.hive.Scripting;
-import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.elastos.did.exception.DIDException;
+import org.elastos.hive.config.TestData;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.scripting.DownloadExecutable;
 import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.scripting.UploadExecutable;
@@ -146,9 +146,15 @@ public class HiveURLTest {
 
 	@BeforeClass
 	public static void setUp() {
-		client = AppInstanceFactory.configSelector().getClient();
-		scriptingApi = AppInstanceFactory.configSelector().getVault().getScripting();
-		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
+		try {
+			client = TestData.getInstance().getClient();
+			scriptingApi = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getScripting()).join();
+		} catch (HiveException e) {
+			e.printStackTrace();
+		} catch (DIDException e) {
+			e.printStackTrace();
+		}
+		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
 		textLocalPath = localRootPath + "test.txt";
 		testLocalCacheRootPath = localRootPath + "cache/script/";
 	}
