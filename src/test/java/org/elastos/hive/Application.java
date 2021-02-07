@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.hive.exception.ActivityNotFoundException;
 import org.elastos.hive.exception.ContextNotSetException;
 import org.junit.BeforeClass;
@@ -27,12 +28,15 @@ public class Application {
 	 */
 	protected Type env = Type.PRODUCTION;
 
+	protected static DummyAdapter adapter;
 
 	public boolean onCreate() {
 		activityCache.clear();
 		if(applicationContext == null) {
 			throw new ContextNotSetException("Application context not set");
 		}
+
+		adapter = new DummyAdapter();
 		//TODO 配置环境：product, develop, testing
 
 		return true;

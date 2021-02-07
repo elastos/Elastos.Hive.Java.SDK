@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.elastos.hive.Client;
 import org.elastos.hive.Scripting;
+import org.elastos.hive.Utils;
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.elastos.hive.scripting.AggregatedExecutable;
 import org.elastos.hive.scripting.Executable;
