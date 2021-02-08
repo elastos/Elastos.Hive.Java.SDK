@@ -1,9 +1,12 @@
-package org.elastos.hive;
+package org.elastos.hive.activites;
 
 import org.elastos.did.VerifiableCredential;
 import org.elastos.did.VerifiablePresentation;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
+import org.elastos.hive.Application;
+import org.elastos.hive.ApplicationContext;
+import org.elastos.hive.Utils;
 import org.elastos.hive.controller.Controller;
 import org.elastos.hive.didhelper.DIDApp;
 import org.elastos.hive.utils.JwtUtil;
@@ -53,7 +56,7 @@ public class Activity {
 	protected void onDestroy(Application context) {
 	}
 
-	protected void start(Application context) {
+	public void start(Application context) {
 		onCreate(context);
 		onResume(context);
 		for(Controller controller : controllers) {
@@ -100,11 +103,11 @@ public class Activity {
 
 
 	protected static class NodeConfig {
-		protected String ownerDid;
-		protected String provider;
-		protected String targetDID;
-		protected String targetHost;
-		protected String storePath;
+		public String ownerDid;
+		public String provider;
+		public String targetDID;
+		public String targetHost;
+		public String storePath;
 
 		public static NodeConfig create() {
 			return new NodeConfig();

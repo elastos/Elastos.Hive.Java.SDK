@@ -1,7 +1,8 @@
-package org.elastos.hive;
+package org.elastos.hive.activites;
 
-public class ManagerActivity extends Activity {
+import org.elastos.hive.Application;
 
+public class BackupActivity extends Activity {
 	@Override
 	protected void onCreate(Application context) {
 		super.onCreate(context);
