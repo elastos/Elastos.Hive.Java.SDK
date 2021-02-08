@@ -1,9 +1,12 @@
 package org.elastos.hive;
 
+import org.elastos.did.VerifiableCredential;
+import org.elastos.did.VerifiablePresentation;
 import org.elastos.did.exception.DIDException;
+import org.elastos.did.jwt.Claims;
 import org.elastos.hive.controller.Controller;
-import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.elastos.hive.didhelper.DIDApp;
+import org.elastos.hive.utils.JwtUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,35 +14,36 @@ import java.util.Properties;
 
 public class Activity {
 
-	protected Database database;
-	protected Files files;
-	protected Management management;
-	protected Payment payment;
-	protected Scripting scripting;
-	protected Backup backup;
-
 	private List<Controller> controllers = new ArrayList<>();
 
-	private DIDApp userDidApp = null;
+	protected ApplicationContext applicationContext;
+	protected DIDApp userDid = null;
 
 	protected void onCreate(Application context) {
 		UserConfig userConfig = getUserConfig(UserType.MAIN_NET);
 		try {
-			userDidApp = new DIDApp(userConfig.userName, userConfig.userMn, context.adapter, userConfig.userPhrasePass, userConfig.userStorepass);
+			userDid = new DIDApp(userConfig.userName, userConfig.userMn, context.adapter, userConfig.userPhrasePass, userConfig.userStorepass);
 		} catch (DIDException e) {
 			e.printStackTrace();
 		}
+	}
 
-		controllers.clear();
-		Vault vault = AppInstanceFactory.configSelector().getVault();
-		backup = AppInstanceFactory.configSelector().getBackup();
-		database = vault.getDatabase();
-		files = vault.getFiles();
-		scripting = vault.getScripting();
+	public String userAuthorization(Application context, String jwtToken) {
+		try {
+			Claims claims = JwtUtil.getBody(jwtToken);
+			String iss = claims.getIssuer();
+			String nonce = (String) claims.get("nonce");
 
-		management = AppInstanceFactory.configSelector().getManagement();
-		payment = management.getPayment();
+			VerifiableCredential vc = userDid.issueDiplomaFor(context.appInstanceDid);
 
+			VerifiablePresentation vp = context.appInstanceDid.createPresentation(vc, iss, nonce);
+
+			String token = context.appInstanceDid.createToken(vp, iss);
+			return token;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	protected void onResume(Application context) {
@@ -47,12 +51,6 @@ public class Activity {
 	}
 
 	protected void onDestroy(Application context) {
-		backup = null;
-		database = null;
-		files = null;
-		scripting = null;
-		management = null;
-		payment = null;
 	}
 
 	protected void start(Application context) {
@@ -93,6 +91,7 @@ public class Activity {
 		Properties properties = Utils.getProperties(fileName);
 
 		return NodeConfig.create()
+				.setOwnerDid(properties.getProperty("ownerDid"))
 				.setProvider(properties.getProperty("provider"))
 				.setTargetDID(properties.getProperty("targetDID"))
 				.setTargetHost(properties.getProperty("targetHost"))
@@ -100,14 +99,20 @@ public class Activity {
 	}
 
 
-	private static class NodeConfig {
-		private String provider;
-		private String targetDID;
-		private String targetHost;
-		private String storePath;
+	protected static class NodeConfig {
+		protected String ownerDid;
+		protected String provider;
+		protected String targetDID;
+		protected String targetHost;
+		protected String storePath;
 
 		public static NodeConfig create() {
 			return new NodeConfig();
+		}
+
+		public NodeConfig setOwnerDid(String ownerDid) {
+			this.ownerDid = ownerDid;
+			return this;
 		}
 
 		public NodeConfig setProvider(String provider) {
@@ -142,7 +147,6 @@ public class Activity {
 		private String userMn;
 		private String userPhrasePass;
 		private String userStorepass;
-		private String ownerDid;
 
 		public static UserConfig create() {
 			return new UserConfig();
@@ -172,11 +176,6 @@ public class Activity {
 			this.userStorepass = userStorepass;
 			return this;
 		}
-
-		public UserConfig setOwnerDid(String ownerDid) {
-			this.ownerDid = ownerDid;
-			return this;
-		}
 	}
 
 	protected UserConfig getUserConfig(UserType type) {
@@ -198,8 +197,7 @@ public class Activity {
 				.setUserName(properties.getProperty("userName"))
 				.setUserMn(properties.getProperty("userMn"))
 				.setUserPhrasePass(properties.getProperty("userPhrasePass"))
-				.setUserStorepass(properties.getProperty("userStorepass"))
-				.setOwnerDid(properties.getProperty("ownerDid"));
+				.setUserStorepass(properties.getProperty("userStorepass"));
 	}
 
 }
