@@ -1,8 +1,8 @@
 package org.elastos.hive;
 
 import org.elastos.did.adapter.DummyAdapter;
+import org.elastos.hive.didhelper.DApp;
 import org.elastos.hive.exception.ActivityNotFoundException;
-import org.elastos.hive.exception.ContextNotSetException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
@@ -13,6 +13,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @Ignore
@@ -21,29 +22,17 @@ public class Application {
 	/**
 	 * 设置全局Application Context
 	 */
-	protected ApplicationContext applicationContext;
 	private Map<String, Activity> activityCache = new HashMap<>();
-	/**
-	 * 配置test case运行环境
-	 */
-	protected Type env = Type.PRODUCTION;
-
 	protected DummyAdapter adapter;
+	protected DApp appInstanceDid = null;
 
-	public boolean onCreate() {
-		activityCache.clear();
-		if(applicationContext == null) {
-			throw new ContextNotSetException("Application context not set");
-		}
-
+	public void onCreate() {
 		adapter = new DummyAdapter();
-		//TODO 配置环境：product, develop, testing
-
-		return true;
+		activityCache.clear();
 	}
 
 	public boolean onResume() {
-		if(activityCache.isEmpty()) {
+		if (activityCache.isEmpty()) {
 			throw new ActivityNotFoundException("Please start activity in application");
 		}
 
@@ -52,7 +41,6 @@ public class Application {
 
 	public void onDestroy() {
 		activityCache.clear();
-		applicationContext = null;
 	}
 
 	protected <T extends Activity> void startActivity(Class<T> activityClass) {
@@ -74,24 +62,73 @@ public class Application {
 
 	}
 
+	protected enum NetType {
+		MAIN_NET,
+		TEST_NET,
+	}
+
+	protected static class AppConfig {
+		protected String name;
+		protected String mnemonic;
+		protected String phrasePass;
+		protected String storepass;
+
+		public static AppConfig create() {
+			return new AppConfig();
+		}
+
+		public AppConfig setName(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public AppConfig setMnemonic(String mnemonic) {
+			this.mnemonic = mnemonic;
+			return this;
+		}
+
+		public AppConfig setPhrasePass(String phrasePass) {
+			this.phrasePass = phrasePass;
+			return this;
+		}
+
+		public AppConfig setStorepass(String storepass) {
+			this.storepass = storepass;
+			return this;
+		}
+	}
+
+	protected AppConfig getAppConfig(NetType type) {
+		String fileName;
+		switch (type) {
+			case MAIN_NET:
+				fileName = "MainNetApp.conf";
+				break;
+			case TEST_NET:
+				fileName = "TestNetApp.conf";
+				break;
+			default:
+				throw new IllegalArgumentException("App type is invalid");
+		}
+		Properties properties = Utils.getProperties(fileName);
+
+		return AppConfig.create()
+				.setMnemonic(properties.getProperty("appMn"))
+				.setName(properties.getProperty("appName"))
+				.setPhrasePass(properties.getProperty("appPhrasepass"))
+				.setStorepass(properties.getProperty("appStorePass"));
+	}
+
 	@Test
 	public void engine() {
-		if(onCreate()) {
-			onResume();
-		}
+		onCreate();
+		onResume();
 		onDestroy();
 	}
 
 	@BeforeClass
 	public static void logo() {
 		Logger.hive();
-	}
-
-	public enum Type {
-		CROSS,
-		DEVELOPING,
-		PRODUCTION,
-		TESTING
 	}
 
 }
