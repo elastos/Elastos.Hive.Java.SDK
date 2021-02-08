@@ -14,7 +14,7 @@ public class MockApplication extends Application {
 		super.onCreate();
 		try {
 			//TODO MainNet or testNet can be set here
-			NetType netType = NetType.MAIN_NET;
+			netType = NetType.MAIN_NET;
 			Client.setupResolver((netType == NetType.MAIN_NET)?"http://api.elastos.io:20606":"http://api.elastos.io:21606", "data/didCache");
 
 			AppConfig appConfig = getAppConfig(netType);
@@ -31,6 +31,6 @@ public class MockApplication extends Application {
 	@Override
 	public boolean onResume() {
 		startActivity(VaultActivity.class);
-		return super.onResume();
+		return super.onResume(); //用于check参数
 	}
 }

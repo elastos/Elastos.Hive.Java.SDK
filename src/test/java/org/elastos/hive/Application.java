@@ -3,6 +3,8 @@ package org.elastos.hive;
 import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.hive.didhelper.DApp;
 import org.elastos.hive.exception.ActivityNotFoundException;
+import org.elastos.hive.exception.DAppNullException;
+import org.elastos.hive.exception.DidNetTypeException;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
@@ -24,7 +26,8 @@ public class Application {
 	 */
 	private Map<String, Activity> activityCache = new HashMap<>();
 	protected DummyAdapter adapter;
-	protected DApp appInstanceDid = null;
+	protected DApp appInstanceDid;
+	protected NetType netType;
 
 	public void onCreate() {
 		adapter = new DummyAdapter();
@@ -36,11 +39,21 @@ public class Application {
 			throw new ActivityNotFoundException("Please start activity in application");
 		}
 
+		if(netType == null) {
+			throw new DidNetTypeException("Did net type is invalid");
+		}
+
+		if(appInstanceDid == null) {
+			throw new DAppNullException("DApp should not be null");
+		}
+
 		return true;
 	}
 
 	public void onDestroy() {
 		activityCache.clear();
+		adapter = null;
+		appInstanceDid = null;
 	}
 
 	protected <T extends Activity> void startActivity(Class<T> activityClass) {
