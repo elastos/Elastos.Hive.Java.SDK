@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.did.exception.DIDException;
+import org.elastos.hive.activites.VaultActivity;
 import org.elastos.hive.didhelper.DApp;
 import org.elastos.hive.exception.HiveException;
 

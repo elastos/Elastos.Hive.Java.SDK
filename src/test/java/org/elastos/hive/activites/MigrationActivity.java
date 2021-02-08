@@ -1,4 +1,6 @@
-package org.elastos.hive;
+package org.elastos.hive.activites;
+
+import org.elastos.hive.Application;
 
 public class MigrationActivity extends Activity {
 	@Override
