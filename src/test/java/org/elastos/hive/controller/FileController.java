@@ -40,6 +40,7 @@ public class FileController extends Controller {
 	private String remoteTextPath;
 	private String remoteImgPath;
 	private String remoteTextBackupPath;
+
 	@Override
 	protected void setUp() {
 		super.setUp();
@@ -55,7 +56,7 @@ public class FileController extends Controller {
 	}
 
 	@Override
-	public void loadTest() {
+	public void execute() {
 		test01_uploadText();
 		test02_uploadBin();
 		test03_downloadText();

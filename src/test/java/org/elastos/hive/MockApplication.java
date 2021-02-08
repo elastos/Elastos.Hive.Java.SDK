@@ -6,6 +6,7 @@ import org.elastos.hive.exception.HiveException;
 
 /**
  * Application of simulation upper layer
+ * test入口
  */
 public class MockApplication extends Application {
 

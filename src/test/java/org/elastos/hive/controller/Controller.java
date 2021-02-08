@@ -4,17 +4,23 @@ import org.elastos.hive.Logger;
 
 public abstract class Controller {
 
-	public void start(String simpleName) {
+	public final void start(String simpleName) {
 		Logger.controllerStart(simpleName);
 		setUp();
-		loadTest();
+		execute();
 		Logger.controllerEnd(simpleName);
 	}
 
+	/**
+	 * set up params before execute test case
+	 */
 	protected void setUp() {
 
 	}
 
-	abstract void loadTest();
+	/**
+	 * execute test case
+	 */
+	abstract void execute();
 
 }
