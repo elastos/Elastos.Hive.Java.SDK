@@ -20,7 +20,7 @@ public class Activity {
 	protected DIDApp userDid = null;
 
 	protected void onCreate(Application context) {
-		UserConfig userConfig = getUserConfig(UserType.MAIN_NET);
+		UserConfig userConfig = getUserConfig(Application.NetType.MAIN_NET);
 		try {
 			userDid = new DIDApp(userConfig.userName, userConfig.userMn, context.adapter, userConfig.userPhrasePass, userConfig.userStorepass);
 		} catch (DIDException e) {
@@ -136,11 +136,6 @@ public class Activity {
 		}
 	}
 
-	protected enum UserType {
-		MAIN_NET,
-		TEST_NET,
-	}
-
 	private static class UserConfig {
 		private String userDid;
 		private String userName;
@@ -178,7 +173,7 @@ public class Activity {
 		}
 	}
 
-	protected UserConfig getUserConfig(UserType type) {
+	protected UserConfig getUserConfig(Application.NetType type) {
 		String fileName = null;
 		switch (type) {
 			case MAIN_NET:
