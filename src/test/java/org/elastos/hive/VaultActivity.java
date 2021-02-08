@@ -18,11 +18,12 @@ public class VaultActivity extends Activity {
 		super.onCreate(context);
 
 		//初始化Application Context
+		NodeConfig nodeConfig = getNodeConfig(NodeType.PRODUCTION);
 		try {
 			applicationContext = new ApplicationContext() {
 				@Override
 				public String getLocalDataDir() {
-					return System.getProperty("user.dir") + File.separator + "data/store/";
+					return System.getProperty("user.dir") + File.separator + "data/store/" + File.separator + nodeConfig.storePath;
 				}
 
 				@Override
@@ -42,7 +43,6 @@ public class VaultActivity extends Activity {
 			};
 
 			Client client = Client.createInstance(applicationContext);
-			NodeConfig nodeConfig = getNodeConfig(NodeType.PRODUCTION);
 			vault = client.getVault(nodeConfig.ownerDid, nodeConfig.provider).get();
 		} catch (HiveException e) {
 			e.printStackTrace();
