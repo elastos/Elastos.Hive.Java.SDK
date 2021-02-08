@@ -28,7 +28,7 @@ public class Application {
 	 */
 	protected Type env = Type.PRODUCTION;
 
-	protected static DummyAdapter adapter;
+	protected DummyAdapter adapter;
 
 	public boolean onCreate() {
 		activityCache.clear();
@@ -60,7 +60,7 @@ public class Application {
 		try {
 			constructor = activityClass.getConstructor();
 			T activity = constructor.newInstance();
-			activity.start(applicationContext);
+			activity.start(this);
 			activityCache.put(activity.getClass().getSimpleName(), activity);
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();

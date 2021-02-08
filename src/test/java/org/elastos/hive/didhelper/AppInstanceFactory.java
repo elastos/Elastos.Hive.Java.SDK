@@ -151,8 +151,8 @@ public class AppInstanceFactory {
 
 	//TODO You can change this value to switch the test environment
 	// default value: Type.PRODUCTION
-	private static Type select = Type.TESTING;
-	private static Type cross = Type.TESTING;
+	private static Type select = Type.PRODUCTION;
+	private static Type cross = Type.PRODUCTION;
 
 	public static AppInstanceFactory configSelector() {
 		return initConfig(select);
