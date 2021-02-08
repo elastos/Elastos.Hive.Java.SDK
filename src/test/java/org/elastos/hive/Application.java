@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.did.adapter.DummyAdapter;
+import org.elastos.hive.activites.Activity;
 import org.elastos.hive.didhelper.DApp;
 import org.elastos.hive.exception.ActivityNotFoundException;
 import org.elastos.hive.exception.DAppNullException;
@@ -25,9 +26,9 @@ public class Application {
 	 * 设置全局Application Context
 	 */
 	private Map<String, Activity> activityCache = new HashMap<>();
-	protected DummyAdapter adapter;
-	protected DApp appInstanceDid;
-	protected NetType netType;
+	public DummyAdapter adapter;
+	public DApp appInstanceDid;
+	public NetType netType;
 
 	public void onCreate() {
 		adapter = new DummyAdapter();
@@ -75,7 +76,7 @@ public class Application {
 
 	}
 
-	protected enum NetType {
+	public enum NetType {
 		MAIN_NET,
 		TEST_NET,
 	}

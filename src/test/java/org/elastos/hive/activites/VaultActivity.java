@@ -1,7 +1,11 @@
-package org.elastos.hive;
+package org.elastos.hive.activites;
 
 import org.elastos.did.DIDDocument;
 import org.elastos.did.exception.DIDException;
+import org.elastos.hive.Application;
+import org.elastos.hive.ApplicationContext;
+import org.elastos.hive.Client;
+import org.elastos.hive.Vault;
 import org.elastos.hive.controller.FileController;
 import org.elastos.hive.exception.HiveException;
 
