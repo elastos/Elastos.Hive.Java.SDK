@@ -6,7 +6,9 @@ import org.elastos.hive.Application;
 import org.elastos.hive.ApplicationContext;
 import org.elastos.hive.Client;
 import org.elastos.hive.Vault;
+import org.elastos.hive.controller.DatabaseController;
 import org.elastos.hive.controller.FileController;
+import org.elastos.hive.controller.ScriptController;
 import org.elastos.hive.exception.HiveException;
 
 import java.io.File;
@@ -63,6 +65,8 @@ public class VaultActivity extends Activity {
 	protected void onResume(Application context) {
 		super.onResume(context);
 		registerController(FileController.newInstance(vault.getFiles()));
+		registerController(ScriptController.newInstance(vault.getScripting()));
+		registerController(DatabaseController.newInstance(vault.getDatabase()));
 	}
 
 }
