@@ -56,7 +56,7 @@ public class Activity {
 	protected void onDestroy(Application context) {
 	}
 
-	public void start(Application context) {
+	public final void start(Application context) {
 		onCreate(context);
 		onResume(context);
 		for(Controller controller : controllers) {
