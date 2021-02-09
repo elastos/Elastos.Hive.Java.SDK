@@ -27,7 +27,6 @@ import org.elastos.hive.scripting.RawCondition;
 import org.elastos.hive.scripting.RawExecutable;
 import org.elastos.hive.scripting.UploadExecutable;
 import org.elastos.hive.utils.JsonUtil;
-import org.junit.Ignore;
 
 import java.io.IOException;
 import java.io.Reader;
