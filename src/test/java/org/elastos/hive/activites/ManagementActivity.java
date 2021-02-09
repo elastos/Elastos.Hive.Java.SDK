@@ -3,6 +3,7 @@ package org.elastos.hive.activites;
 import org.elastos.hive.Application;
 import org.elastos.hive.Management;
 import org.elastos.hive.controller.ManagementController;
+import org.elastos.hive.controller.PaymentController;
 
 import java.util.concurrent.ExecutionException;
 
@@ -27,5 +28,6 @@ public class ManagementActivity extends Activity{
 	protected void onResume(Application context) {
 		super.onResume(context);
 		registerController(ManagementController.newInstance(management));
+		registerController(PaymentController.newInstance(management.getPayment()));
 	}
 }
