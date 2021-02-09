@@ -5,6 +5,7 @@ import org.elastos.hive.Vault;
 import org.elastos.hive.controller.DatabaseController;
 import org.elastos.hive.controller.FileController;
 import org.elastos.hive.controller.ScriptController;
+import org.elastos.hive.controller.VersionController;
 
 import java.util.concurrent.ExecutionException;
 
@@ -27,6 +28,7 @@ public class VaultActivity extends Activity {
 	@Override
 	protected void onResume(Application context) {
 		super.onResume(context);
+		registerController(VersionController.newInstance(vault));
 		registerController(FileController.newInstance(vault.getFiles()));
 		registerController(DatabaseController.newInstance(vault.getDatabase()));
 		registerController(ScriptController.newInstance(vault.getScripting()));
