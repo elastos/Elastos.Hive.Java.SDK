@@ -59,7 +59,7 @@ public class Activity {
 
 				@Override
 				public CompletableFuture<String> getAuthorization(String jwtToken) {
-					return CompletableFuture.supplyAsync(()-> userAuthorization(context, jwtToken));
+					return CompletableFuture.supplyAsync(()-> signAuthorization(context, jwtToken));
 				}
 			};
 
@@ -72,7 +72,7 @@ public class Activity {
 		}
 	}
 
-	public String userAuthorization(Application context, String jwtToken) {
+	public String signAuthorization(Application context, String jwtToken) {
 		try {
 			Claims claims = JwtUtil.getBody(jwtToken);
 			String iss = claims.getIssuer();
@@ -87,6 +87,18 @@ public class Activity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
+	}
+
+	public String getBackupVc(String sourceDID) {
+		try {
+			VerifiableCredential vc = userDid.issueBackupDiplomaFor(sourceDID,
+					nodeConfig.targetHost, nodeConfig.targetDID);
+			return vc.toString();
+		} catch (DIDException e) {
+			e.printStackTrace();
+		}
+
 		return null;
 	}
 
