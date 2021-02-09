@@ -32,7 +32,7 @@ public class VaultActivity extends Activity {
 		registerController(FileController.newInstance(vault.getFiles()));
 		registerController(DatabaseController.newInstance(vault.getDatabase()));
 		registerController(ScriptController.newInstance(vault.getScripting()));
-		//TODO waiting for endpoint to link
+		//TODO waiting for endpoint to DID chain
 //		registerController(HiveUrlController.newInstance(client, vault.getScripting()));
 	}
 
