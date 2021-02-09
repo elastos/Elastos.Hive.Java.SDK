@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.did.exception.DIDException;
+import org.elastos.hive.activites.BackupActivity;
 import org.elastos.hive.activites.ManagementActivity;
 import org.elastos.hive.activites.VaultActivity;
 import org.elastos.hive.didhelper.DApp;
@@ -35,6 +36,7 @@ public class MockApplication extends Application {
 	public boolean onResume() {
 		startActivity(ManagementActivity.class);
 		startActivity(VaultActivity.class);
+		startActivity(BackupActivity.class);
 		return super.onResume(); //用于check参数
 	}
 }
