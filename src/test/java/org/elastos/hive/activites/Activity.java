@@ -1,32 +1,73 @@
 package org.elastos.hive.activites;
 
+import org.elastos.did.DIDDocument;
 import org.elastos.did.VerifiableCredential;
 import org.elastos.did.VerifiablePresentation;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.Application;
 import org.elastos.hive.ApplicationContext;
+import org.elastos.hive.Client;
 import org.elastos.hive.Utils;
 import org.elastos.hive.controller.Controller;
 import org.elastos.hive.didhelper.DIDApp;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.utils.JwtUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 
 public class Activity {
 
-	private List<Controller> controllers = new ArrayList<>();
+	private static List<Controller> controllers = new ArrayList<>();
 
-	protected ApplicationContext applicationContext;
-	protected DIDApp userDid = null;
+	protected static ApplicationContext applicationContext;
+	protected static DIDApp userDid = null;
+	protected static Client client;
+	protected static NodeConfig nodeConfig;
+	private static boolean already = false;
 
 	protected void onCreate(Application context) {
-		UserConfig userConfig = getUserConfig(Application.NetType.MAIN_NET);
+
+		if(already) {
+			return;
+		}
+
+		nodeConfig = getNodeConfig(NodeType.LOCAL);
+		UserConfig userConfig = getUserConfig(context.netType);
 		try {
 			userDid = new DIDApp(userConfig.userName, userConfig.userMn, context.adapter, userConfig.userPhrasePass, userConfig.userStorepass);
+			//初始化Application Context
+			applicationContext = new ApplicationContext() {
+				@Override
+				public String getLocalDataDir() {
+					return System.getProperty("user.dir") + File.separator + "data/store/" + File.separator + nodeConfig.storePath;
+				}
+
+				@Override
+				public DIDDocument getAppInstanceDocument() {
+					try {
+						return context.appInstanceDid.getDocument();
+					} catch (DIDException e) {
+						e.printStackTrace();
+					}
+					return null;
+				}
+
+				@Override
+				public CompletableFuture<String> getAuthorization(String jwtToken) {
+					return CompletableFuture.supplyAsync(()-> userAuthorization(context, jwtToken));
+				}
+			};
+
+			client = Client.createInstance(applicationContext);
+			already = true;
 		} catch (DIDException e) {
+			e.printStackTrace();
+		} catch (HiveException e) {
 			e.printStackTrace();
 		}
 	}
@@ -86,7 +127,7 @@ public class Activity {
 				fileName = "ProductionNode.conf";
 				break;
 			case LOCAL:
-				fileName = "TestingNode.conf";
+				fileName = "LocalNode.conf";
 				break;
 			default:
 				throw new IllegalArgumentException("Node type is invalid");
