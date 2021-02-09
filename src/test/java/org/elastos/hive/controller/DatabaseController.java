@@ -29,7 +29,6 @@ import org.elastos.hive.database.Timestamp;
 import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.database.WriteConcern;
-import org.elastos.hive.tests.DatabaseTest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -271,10 +270,10 @@ public class DatabaseController extends Controller {
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(values);
 
-		DatabaseTest.TestDBDataTypes tdt = mapper.readValue(json, DatabaseTest.TestDBDataTypes.class);
+		TestDBDataTypes tdt = mapper.readValue(json, TestDBDataTypes.class);
 		json = mapper.writeValueAsString(tdt);
 
-		DatabaseTest.TestDBDataTypes tdt2 = mapper.readValue(json, DatabaseTest.TestDBDataTypes.class);
+		TestDBDataTypes tdt2 = mapper.readValue(json, TestDBDataTypes.class);
 		String json2 = mapper.writeValueAsString(tdt2);
 		assertEquals(json, json2);
 	}
