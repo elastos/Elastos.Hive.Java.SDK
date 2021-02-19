@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.did.exception.DIDException;
+import org.elastos.hive.activites.Activity;
 import org.elastos.hive.activites.BackupActivity;
 import org.elastos.hive.activites.ManagementActivity;
 import org.elastos.hive.activites.VaultActivity;
@@ -17,6 +18,10 @@ public class MockApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		try {
+			//TODO You can set the node environment here
+			// Will be referenced in the activity
+			nodeType = Activity.NodeType.LOCAL;
+
 			//TODO MainNet or testNet can be set here
 			netType = NetType.MAIN_NET;
 			Client.setupResolver((netType == NetType.MAIN_NET)?"http://api.elastos.io:20606":"http://api.elastos.io:21606", "data/didCache");
