@@ -36,6 +36,7 @@ public class Activity {
 			return;
 		}
 
+		//TODO You can set the node environment here
 		nodeConfig = getNodeConfig(NodeType.LOCAL);
 		UserConfig userConfig = getUserConfig(context.netType);
 		try {
