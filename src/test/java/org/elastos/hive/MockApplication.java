@@ -42,7 +42,7 @@ public class MockApplication extends Application {
 	public boolean onResume() {
 		startActivity(ManagementActivity.class);
 		startActivity(VaultActivity.class);
-//		startActivity(BackupActivity.class);
+		startActivity(BackupActivity.class);
 //		startActivity(MigrationActivity.class);
 		return super.onResume(); //用于check参数
 	}

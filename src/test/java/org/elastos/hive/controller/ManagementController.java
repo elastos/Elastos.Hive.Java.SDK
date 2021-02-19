@@ -3,6 +3,7 @@ package org.elastos.hive.controller;
 import org.elastos.hive.Management;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -35,22 +36,38 @@ public class ManagementController extends Controller {
 	public void createVault() {
 		CompletableFuture<Boolean> future = this.management.createVault()
 				.handle((vault, throwable) -> {
-//					if(throwable != null) {
-//						throwable.printStackTrace();
-//					}
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
 					return (null == throwable);
 				});
+
+		try {
+			future.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	
 	public void createBackup() {
 		CompletableFuture<Boolean> future = this.management.createBackup()
 				.handle((vault, throwable) -> {
-//					if(throwable != null) {
-//						throwable.printStackTrace();
-//					}
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
 					return (null == throwable);
 				});
+
+		try {
+			future.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	
