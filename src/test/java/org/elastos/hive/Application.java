@@ -29,6 +29,7 @@ public class Application {
 	public DummyAdapter adapter;
 	public DApp appInstanceDid;
 	public NetType netType;
+	public Activity.NodeType nodeType;
 
 	public void onCreate() {
 		adapter = new DummyAdapter();
