@@ -40,7 +40,7 @@ public class MockApplication extends Application {
 
 	@Override
 	public boolean onResume() {
-//		startActivity(ManagementActivity.class);
+		startActivity(ManagementActivity.class);
 		startActivity(VaultActivity.class);
 //		startActivity(BackupActivity.class);
 //		startActivity(MigrationActivity.class);

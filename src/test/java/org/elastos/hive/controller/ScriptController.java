@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -138,7 +139,12 @@ public class ScriptController extends Controller {
 			JsonNode options = JsonUtil.deserialize("{\"projection\":{\"_id\":false,\"name\":true}}");
 			Executable executable = new DbFindQuery("get_groups", "groups", filter, options);
 			noConditionFuture = scripting.registerScript(noConditionName, executable, false, false)
-					.handle((success, ex) -> (ex == null));
+					.handle((success, ex) -> {
+						if(ex!=null) {
+							ex.printStackTrace();
+						}
+						return (ex == null);
+					});
 		}
 
 		{
@@ -146,7 +152,12 @@ public class ScriptController extends Controller {
 			Executable executable = new DbFindQuery("get_groups", "test_group", filter);
 			Condition condition = new QueryHasResultsCondition("verify_user_permission", "test_group", filter);
 			withConditionFuture = scripting.registerScript(withConditionName, condition, executable, false, false)
-					.handle((success, ex) -> (ex == null));
+					.handle((success, ex) -> {
+						if(ex!=null) {
+							ex.printStackTrace();
+						}
+						return (ex == null);
+					});
 		}
 
 		CompletableFuture allFuture = CompletableFuture.allOf(noConditionFuture, withConditionFuture);
@@ -164,16 +175,36 @@ public class ScriptController extends Controller {
 	
 	public void callScript() {
 		CompletableFuture<Boolean> stringFuture = scripting.callScript(noConditionName, null, "appId", String.class)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 
 		CompletableFuture<Boolean> byteFuture = scripting.callScript(noConditionName, null, "appId", byte[].class)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 
 		CompletableFuture<Boolean> jsonNodeFuture = scripting.callScript(noConditionName, null, "appId", JsonNode.class)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 
 		CompletableFuture<Boolean> readerFuture = scripting.callScript(noConditionName, null, "appId", Reader.class)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 
 		CompletableFuture allFuture = CompletableFuture.allOf(stringFuture, byteFuture, jsonNodeFuture, readerFuture);
 
@@ -191,6 +222,12 @@ public class ScriptController extends Controller {
 	public void setUploadFile() {
 		Executable executable = new UploadExecutable("upload_file", "$params.path", true);
 		CompletableFuture<Boolean> future = scripting.registerScript("upload_file", executable, false, false)
+				.handleAsync((aBoolean, throwable) -> {
+					if(throwable!=null) {
+						throwable.printStackTrace();
+					}
+					return (aBoolean && throwable==null);
+				})
 				.thenComposeAsync(aBoolean -> {
 
 					String scriptName = "upload_file";
@@ -200,6 +237,7 @@ public class ScriptController extends Controller {
 						ObjectMapper objectMapper = new ObjectMapper();
 						params = objectMapper.readTree(metadata);
 					} catch (Exception e) {
+						e.printStackTrace();
 						fail();
 					}
 
@@ -208,6 +246,9 @@ public class ScriptController extends Controller {
 								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
 								return scripting.uploadFile(transactionId, Writer.class);
 							}).handle((writer, ex) -> {
+								if(ex!=null) {
+									ex.printStackTrace();
+								}
 								if(null != writer) {
 									Utils.fileWrite(textLocalPath, writer);
 									try {
@@ -225,7 +266,6 @@ public class ScriptController extends Controller {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -242,9 +282,16 @@ public class ScriptController extends Controller {
 
 					return scripting.callScript(scriptName, params, "appId", JsonNode.class)
 							.handle((jsonNode, ex) -> {
+								if(ex!=null) {
+									ex.printStackTrace();
+									return false;
+								}
 								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
 								scripting.downloadFile(transactionId, Reader.class)
 										.handle((reader, throwable) -> {
+											if(throwable!=null) {
+												ex.printStackTrace();
+											}
 											if (throwable == null) {
 												Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
 											}
@@ -259,7 +306,6 @@ public class ScriptController extends Controller {
 			assertTrue(downloadFuture.isCompletedExceptionally() == false);
 			assertTrue(downloadFuture.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -280,14 +326,18 @@ public class ScriptController extends Controller {
 						e.printStackTrace();
 					}
 					return scripting.callScript("get_file_info", params, "appId", String.class);
-				}).handle((success, ex) -> (ex == null));
+				}).handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 
 		try {
 			assertTrue(fileInfoFuture.get());
 			assertTrue(fileInfoFuture.isCompletedExceptionally() == false);
 			assertTrue(fileInfoFuture.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}

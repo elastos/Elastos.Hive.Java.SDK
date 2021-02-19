@@ -283,14 +283,18 @@ public class DatabaseController extends Controller {
 	
 	public void createCollection() {
 		CompletableFuture<Boolean> future = database.createCollection(collectionName, null)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -305,14 +309,18 @@ public class DatabaseController extends Controller {
 		insertOptions.bypassDocumentValidation(false).ordered(true);
 
 		CompletableFuture<Boolean> future =  database.insertOne(collectionName, docNode, insertOptions)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -333,13 +341,17 @@ public class DatabaseController extends Controller {
 		insertOptions.bypassDocumentValidation(false).ordered(true);
 
 		CompletableFuture<Boolean> future = database.insertMany(collectionName, nodes, insertOptions)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -357,13 +369,17 @@ public class DatabaseController extends Controller {
 				.projection(jsonToMap("{\"_id\": false}"));
 
 		CompletableFuture<Boolean> future = database.findOne(collectionName, query, findOptions)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -381,13 +397,17 @@ public class DatabaseController extends Controller {
 				.projection(jsonToMap("{\"_id\": false}"));
 
 		CompletableFuture<Boolean> future = database.findMany(collectionName, query, findOptions)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -401,13 +421,17 @@ public class DatabaseController extends Controller {
 		options.limit(1).skip(0).maxTimeMS(1000000000);
 
 		CompletableFuture<Boolean> future = database.countDocuments(collectionName, filter, options)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -430,13 +454,17 @@ public class DatabaseController extends Controller {
 		updateOptions.upsert(true).bypassDocumentValidation(false);
 
 		CompletableFuture<Boolean> future = database.updateOne(collectionName, filter, update, updateOptions)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -459,13 +487,17 @@ public class DatabaseController extends Controller {
 		updateOptions.upsert(true).bypassDocumentValidation(false);
 
 		CompletableFuture<Boolean> future = database.updateMany(collectionName, filter, update, updateOptions)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -478,13 +510,17 @@ public class DatabaseController extends Controller {
 		DeleteOptions deleteOptions = new DeleteOptions();
 
 		CompletableFuture<Boolean> future = database.deleteOne(collectionName, filter, null)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -497,13 +533,17 @@ public class DatabaseController extends Controller {
 		DeleteOptions deleteOptions = new DeleteOptions();
 
 		CompletableFuture<Boolean> future = database.deleteMany(collectionName, filter, null)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -511,13 +551,17 @@ public class DatabaseController extends Controller {
 	
 	public void deleteCollection() {
 		CompletableFuture<Boolean> future = database.deleteCollection(collectionName)
-				.handle((success, ex) -> (ex == null));
+				.handle((success, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
+					return (ex == null);
+				});
 		try {
 			assertTrue(future.get());
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
