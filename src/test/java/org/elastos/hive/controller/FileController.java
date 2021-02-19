@@ -133,6 +133,9 @@ public class FileController extends Controller {
 	public void test05_list() {
 		CompletableFuture<Boolean> future = files.list(remoteRootPath)
 				.handle((result, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
 					assertTrue(result.size() > 0);
 					System.out.println("list size=" + result.size());
 					return (ex == null);
@@ -143,7 +146,6 @@ public class FileController extends Controller {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -151,6 +153,9 @@ public class FileController extends Controller {
 	public void test06_hash() {
 		CompletableFuture<Boolean> future = files.hash(remoteTextPath)
 				.handle((result, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
 					return (ex == null);
 				});
 
@@ -159,7 +164,6 @@ public class FileController extends Controller {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -168,6 +172,9 @@ public class FileController extends Controller {
 		CompletableFuture<Boolean> future = files.delete(remoteTextBackupPath)
 				.thenCompose(result -> files.move(remoteTextPath, remoteTextBackupPath))
 				.handle((result, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
 					return (ex == null);
 				});
 
@@ -176,7 +183,6 @@ public class FileController extends Controller {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -184,6 +190,9 @@ public class FileController extends Controller {
 	public void test08_copy() {
 		CompletableFuture<Boolean> future = files.copy(remoteTextBackupPath, remoteTextPath)
 				.handle((result, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
 					return (ex == null);
 				});
 
@@ -192,7 +201,6 @@ public class FileController extends Controller {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
@@ -202,6 +210,9 @@ public class FileController extends Controller {
 		CompletableFuture<Boolean> future = files.delete(remoteTextPath)
 				.thenCompose(result -> files.delete(remoteTextBackupPath))
 				.handle((result, ex) -> {
+					if(ex!=null) {
+						ex.printStackTrace();
+					}
 					return (ex == null);
 				});
 
@@ -210,7 +221,6 @@ public class FileController extends Controller {
 			assertTrue(future.isCompletedExceptionally() == false);
 			assertTrue(future.isDone());
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail();
 		}
 	}
