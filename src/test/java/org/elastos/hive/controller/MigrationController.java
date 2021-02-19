@@ -76,6 +76,7 @@ public class MigrationController extends Controller {
 					if (null != throwable) {
 						throwable.printStackTrace();
 					}
+					migrationActivity.getManagement().unfreezeVault();
 					return (aBoolean && (null == throwable));
 				});
 
