@@ -36,8 +36,7 @@ public class Activity {
 			return;
 		}
 
-		//TODO You can set the node environment here
-		nodeConfig = getNodeConfig(NodeType.LOCAL);
+		nodeConfig = getNodeConfig(context.nodeType);
 		UserConfig userConfig = getUserConfig(context.netType);
 		try {
 			userDid = new DIDApp(userConfig.userName, userConfig.userMn, context.adapter, userConfig.userPhrasePass, userConfig.userStorepass);
@@ -124,7 +123,7 @@ public class Activity {
 	}
 
 
-	protected enum NodeType {
+	public enum NodeType {
 		DEVELOPING,
 		PRODUCTION,
 		LOCAL
