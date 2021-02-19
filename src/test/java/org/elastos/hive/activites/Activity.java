@@ -39,7 +39,7 @@ public class Activity {
 		nodeConfig = getNodeConfig(context.nodeType);
 		UserConfig userConfig = getUserConfig(context.netType);
 		try {
-			userDid = new DIDApp(userConfig.userName, userConfig.userMn, context.adapter, userConfig.userPhrasePass, userConfig.userStorepass);
+			userDid = new DIDApp(userConfig.userName, userConfig.userMn, context.adapter, userConfig.userPhrasePass, userConfig.userStorePass);
 			//初始化Application Context
 			applicationContext = new ApplicationContext() {
 				@Override
@@ -197,7 +197,7 @@ public class Activity {
 		private String userName;
 		private String userMn;
 		private String userPhrasePass;
-		private String userStorepass;
+		private String userStorePass;
 
 		public static UserConfig create() {
 			return new UserConfig();
@@ -223,8 +223,8 @@ public class Activity {
 			return this;
 		}
 
-		public UserConfig setUserStorepass(String userStorepass) {
-			this.userStorepass = userStorepass;
+		public UserConfig setUserStorePass(String userStorePass) {
+			this.userStorePass = userStorePass;
 			return this;
 		}
 	}
@@ -248,7 +248,7 @@ public class Activity {
 				.setUserName(properties.getProperty("userName"))
 				.setUserMn(properties.getProperty("userMn"))
 				.setUserPhrasePass(properties.getProperty("userPhrasePass"))
-				.setUserStorepass(properties.getProperty("userStorepass"));
+				.setUserStorePass(properties.getProperty("userStorePass"));
 	}
 
 }
