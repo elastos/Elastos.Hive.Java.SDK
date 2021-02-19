@@ -4,6 +4,7 @@ import org.elastos.did.exception.DIDException;
 import org.elastos.hive.activites.Activity;
 import org.elastos.hive.activites.BackupActivity;
 import org.elastos.hive.activites.ManagementActivity;
+import org.elastos.hive.activites.MigrationActivity;
 import org.elastos.hive.activites.VaultActivity;
 import org.elastos.hive.didhelper.DApp;
 import org.elastos.hive.exception.HiveException;
@@ -20,10 +21,10 @@ public class MockApplication extends Application {
 		try {
 			//TODO You can set the node environment here
 			// Will be referenced in the activity
-			nodeType = Activity.NodeType.LOCAL;
+			nodeType = Activity.NodeType.DEVELOPING;
 
 			//TODO MainNet or testNet can be set here
-			netType = NetType.MAIN_NET;
+			netType = NetType.TEST_NET;
 			Client.setupResolver((netType == NetType.MAIN_NET)?"http://api.elastos.io:20606":"http://api.elastos.io:21606", "data/didCache");
 
 			AppConfig appConfig = getAppConfig(netType);
@@ -39,9 +40,10 @@ public class MockApplication extends Application {
 
 	@Override
 	public boolean onResume() {
-		startActivity(ManagementActivity.class);
+//		startActivity(ManagementActivity.class);
 		startActivity(VaultActivity.class);
-		startActivity(BackupActivity.class);
+//		startActivity(BackupActivity.class);
+//		startActivity(MigrationActivity.class);
 		return super.onResume(); //用于check参数
 	}
 }

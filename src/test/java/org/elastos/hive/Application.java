@@ -130,7 +130,7 @@ public class Application {
 		return AppConfig.create()
 				.setMnemonic(properties.getProperty("appMn"))
 				.setName(properties.getProperty("appName"))
-				.setPhrasePass(properties.getProperty("appPhrasepass"))
+				.setPhrasePass(properties.getProperty("appPhrasePass"))
 				.setStorepass(properties.getProperty("appStorePass"));
 	}
 
