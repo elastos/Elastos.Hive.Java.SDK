@@ -3,6 +3,7 @@ package org.elastos.hive.controller;
 import org.elastos.hive.BackupAuthenticationHandler;
 import org.elastos.hive.activites.MigrationActivity;
 import org.elastos.hive.backup.State;
+import org.elastos.hive.exception.CreateTargetVaultException;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -30,14 +31,23 @@ public class MigrationController extends Controller {
 		this.targetDid = targetDid;
 		this.targetHost = targetHost;
 	}
-	
+
 	@Override
 	void execute() {
 		migration();
 	}
 
 	public void migration() {
-		CompletableFuture<Boolean> future = migrationActivity.getManagement().freezeVault()
+		CompletableFuture<Boolean> createFuture = migrationActivity.getClient().getManager(targetDid, targetHost)
+				.thenComposeAsync(management -> management.createVault())
+				.handleAsync((vault, throwable) -> {
+					if (null != throwable) {
+						throwable.printStackTrace();
+					}
+					return (null!=vault && throwable==null);
+				});
+
+		CompletableFuture<Boolean> migrationFuture = migrationActivity.getManagement().freezeVault()
 				.thenComposeAsync(aBoolean -> {
 					BackupAuthenticationHandler handler = new BackupAuthenticationHandler() {
 						@Override
@@ -76,15 +86,20 @@ public class MigrationController extends Controller {
 					if (null != throwable) {
 						throwable.printStackTrace();
 					}
-					migrationActivity.getManagement().unfreezeVault();
 					return (aBoolean && (null == throwable));
-				});
+				}).thenComposeAsync(aBoolean -> migrationActivity.getManagement().unfreezeVault());
 
+		CompletableFuture<Boolean> completableFuture = createFuture.thenComposeAsync(aBoolean -> {
+			if (aBoolean) {
+				return migrationFuture;
+			}
+			throw new CreateTargetVaultException();
+		});
 
 		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
+			assertTrue(completableFuture.get());
+			assertTrue(completableFuture.isCompletedExceptionally() == false);
+			assertTrue(completableFuture.isDone());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
