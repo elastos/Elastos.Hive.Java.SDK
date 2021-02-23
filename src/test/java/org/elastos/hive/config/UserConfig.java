@@ -3,35 +3,35 @@ package org.elastos.hive.config;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserConfig extends Config {
-	@JsonProperty("userDid")
-	private String userDid;
-	@JsonProperty("userName")
-	private String userName;
-	@JsonProperty("userMnemonic")
-	private String userMnemonic;
-	@JsonProperty("userPassPhrase")
-	private String userPassPhrase;
-	@JsonProperty("userStorePass")
-	private String userStorePass;
+	@JsonProperty("did")
+	private String did;
+	@JsonProperty("name")
+	private String name;
+	@JsonProperty("mnemonic")
+	private String mnemonic;
+	@JsonProperty("passPhrase")
+	private String passPhrase;
+	@JsonProperty("storePass")
+	private String storePass;
 
-	public String userDid() {
-		return this.userDid;
+	public String did() {
+		return this.did;
 	}
 
-	public String userName() {
-		return this.userName;
+	public String name() {
+		return this.name;
 	}
 
-	public String userMnemonic() {
-		return this.userMnemonic;
+	public String mnemonic() {
+		return this.mnemonic;
 	}
 
-	public String userPassPhrase() {
-		return this.userPassPhrase;
+	public String passPhrase() {
+		return this.passPhrase;
 	}
 
-	public String userStorePass() {
-		return this.userStorePass;
+	public String storePass() {
+		return this.storePass;
 	}
 
 	public static UserConfig deserialize(String content) {
