@@ -127,6 +127,7 @@ public class Application {
 		}
 		Properties properties = Utils.getProperties(fileName);
 
+
 		return AppConfig.create()
 				.setMnemonic(properties.getProperty("appMn"))
 				.setName(properties.getProperty("appName"))
