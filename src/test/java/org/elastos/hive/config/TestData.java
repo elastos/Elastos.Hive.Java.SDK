@@ -21,7 +21,6 @@ import org.elastos.hive.utils.JwtUtil;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 public class TestData {
 
@@ -143,19 +142,21 @@ public class TestData {
 	}
 
 	public CompletableFuture<Payment> getPayment() {
-		return getManagement().thenApplyAsync(new Function<Management, Payment>() {
-			@Override
-			public Payment apply(Management management) {
-				return management.getPayment();
-			}
-		});
+		return getManagement().thenApplyAsync(management -> management.getPayment());
 	}
 
 	public CompletableFuture<Vault> getVault() {
 		return this.client.getVault(nodeConfig.ownerDid(), nodeConfig.provider());
 	}
 
+	public CompletableFuture<Vault> createTargetVault() {
+		return this.client.getManager(nodeConfig.targetDID(), nodeConfig.targetHost())
+				.thenComposeAsync(management -> management.createVault());
+	}
 
+	public CompletableFuture<Backup> getTargetBackup() {
+		return this.client.getBackup(nodeConfig.targetDID(), nodeConfig.targetHost());
+	}
 
 	public CompletableFuture<Backup> getBackup() {
 		return this.client.getBackup(nodeConfig.ownerDid(), nodeConfig.provider());
