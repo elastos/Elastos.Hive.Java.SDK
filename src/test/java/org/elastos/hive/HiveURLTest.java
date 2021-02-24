@@ -124,7 +124,7 @@ public class HiveURLTest {
 		} catch (DIDException e) {
 			e.printStackTrace();
 		}
-		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
+		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
 		textLocalPath = localRootPath + "test.txt";
 	}
 

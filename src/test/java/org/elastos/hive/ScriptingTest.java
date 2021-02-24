@@ -299,7 +299,7 @@ public class ScriptingTest {
 	private static Scripting scripting;
 
 	public ScriptingTest() {
-		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
+		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
 		textLocalPath = localRootPath + "test.txt";
 		testLocalCacheRootPath = localRootPath + "cache/script/";
 	}

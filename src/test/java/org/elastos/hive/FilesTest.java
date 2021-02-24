@@ -205,7 +205,7 @@ public class FilesTest {
 	private static Files filesApi;
 
 	public FilesTest() {
-		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
+		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
 		textLocalPath = localRootPath +"test.txt";
 		imgLocalPath = localRootPath +"big.png";
 		rootLocalCachePath = localRootPath + "cache/file/";
