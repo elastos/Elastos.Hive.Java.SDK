@@ -2,15 +2,13 @@ package org.elastos.hive.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ClientConfig extends Config {
+public class CrossConfig extends Config {
 	@JsonProperty("application")
 	private ApplicationConfig applicationConfig;
 	@JsonProperty("user")
 	private UserConfig userConfig;
-	@JsonProperty("node")
-	private NodeConfig nodeConfig;
-	@JsonProperty("cross")
-	private CrossConfig crossConfig;
+	@JsonProperty("user")
+	private String crossDid;
 
 	public ApplicationConfig applicationConfig() {
 		return this.applicationConfig;
@@ -20,11 +18,11 @@ public class ClientConfig extends Config {
 		return this.userConfig;
 	}
 
-	public NodeConfig nodeConfig() {
-		return this.nodeConfig;
+	public String crossDid() {
+		return this.crossDid;
 	}
 
-	public static ClientConfig deserialize(String content) {
-		return deserialize(content, ClientConfig.class);
+	public static CrossConfig deserialize(String content) {
+		return deserialize(content, CrossConfig.class);
 	}
 }
