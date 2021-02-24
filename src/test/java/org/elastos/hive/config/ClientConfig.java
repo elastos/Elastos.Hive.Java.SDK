@@ -3,6 +3,8 @@ package org.elastos.hive.config;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ClientConfig extends Config {
+	@JsonProperty("resolverUrl")
+	private String resolverUrl;
 	@JsonProperty("application")
 	private ApplicationConfig applicationConfig;
 	@JsonProperty("user")
@@ -11,6 +13,10 @@ public class ClientConfig extends Config {
 	private NodeConfig nodeConfig;
 	@JsonProperty("cross")
 	private CrossConfig crossConfig;
+
+	public String resolverUrl() {
+		return this.resolverUrl;
+	}
 
 	public ApplicationConfig applicationConfig() {
 		return this.applicationConfig;

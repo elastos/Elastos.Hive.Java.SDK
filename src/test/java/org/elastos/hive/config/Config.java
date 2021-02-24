@@ -31,7 +31,7 @@ public class Config {
 		try {
 			return mapper.readValue(content, clazz);
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Invalid JSON input");
+			throw new IllegalArgumentException(e);
 		}
 	}
 }
