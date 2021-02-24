@@ -30,6 +30,7 @@ public class TestData {
 
 	private Client client;
 
+	private ClientConfig clientConfig;
 	private NodeConfig nodeConfig;
 
 	private ApplicationContext applicationContext;
@@ -48,40 +49,39 @@ public class TestData {
 
 	public void init() throws HiveException, DIDException {
 
-		//TODO MainNet or testNet can be set here
-		NetType netType = NetType.TEST_NET;
-		//TODO You can set the node environment here
-		// Will be referenced in the activity
-		NodeType nodeType = NodeType.DEVELOPING;
-
-		Client.setupResolver((netType == NetType.MAIN_NET) ? "http://api.elastos.io:20606" : "http://api.elastos.io:21606", "data/didCache");
-
-		DummyAdapter adapter = new DummyAdapter();
-		ApplicationConfig applicationConfig = ApplicationConfig.deserialize(Utils.getConfigure((netType == NetType.MAIN_NET) ? "MainNetApp.conf" : "TestNetApp.conf"));
-		appInstanceDid = new DApp(applicationConfig.name(), applicationConfig.mnemonic(), adapter, applicationConfig.passPhrase(), applicationConfig.storepass());
-
-		UserConfig userConfig = UserConfig.deserialize(Utils.getConfigure((netType == NetType.MAIN_NET) ? "MainNetUser.conf" : "TestNetUser.conf"));
-		userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storePass());
-
+		//TODO set environment config
 		String fileName = null;
-		switch (nodeType) {
+		switch (EnvironmentType.DEVELOPING) {
 			case DEVELOPING:
-				fileName = "DevelopingNode.conf";
+				fileName = "Developing.conf";
 				break;
 			case PRODUCTION:
-				fileName = "ProductionNode.conf";
+				fileName = "Production.conf";
 				break;
 			case LOCAL:
-				fileName = "LocalNode.conf";
+				fileName = "Local.conf";
 				break;
 		}
-		nodeConfig = NodeConfig.deserialize(fileName);
+
+		String configJson = Utils.getConfigure(fileName);
+		clientConfig = ClientConfig.deserialize(configJson);
+
+		Client.setupResolver(clientConfig.resolverUrl(), "data/didCache");
+
+		DummyAdapter adapter = new DummyAdapter();
+		ApplicationConfig applicationConfig = clientConfig.applicationConfig();
+		appInstanceDid = new DApp(applicationConfig.name(), applicationConfig.mnemonic(), adapter, applicationConfig.passPhrase(), applicationConfig.storepass());
+
+		UserConfig userConfig = clientConfig.userConfig();
+		userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storePass());
+
+		nodeConfig = clientConfig.nodeConfig();
 
 		//初始化Application Context
 		applicationContext = new ApplicationContext() {
 			@Override
 			public String getLocalDataDir() {
-				return System.getProperty("user.dir") + File.separator + "data/store/" + File.separator + nodeConfig.storePath();
+				return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
 			}
 
 			@Override
@@ -182,14 +182,9 @@ public class TestData {
 		};
 	}
 
-	public enum NodeType {
+	private enum EnvironmentType {
 		DEVELOPING,
 		PRODUCTION,
 		LOCAL
-	}
-
-	public enum NetType {
-		MAIN_NET,
-		TEST_NET,
 	}
 }

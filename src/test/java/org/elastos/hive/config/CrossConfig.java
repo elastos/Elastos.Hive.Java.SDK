@@ -7,7 +7,7 @@ public class CrossConfig extends Config {
 	private ApplicationConfig applicationConfig;
 	@JsonProperty("user")
 	private UserConfig userConfig;
-	@JsonProperty("user")
+	@JsonProperty("crossDid")
 	private String crossDid;
 
 	public ApplicationConfig applicationConfig() {
