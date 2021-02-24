@@ -10,6 +10,7 @@ import org.elastos.hive.ApplicationContext;
 import org.elastos.hive.Backup;
 import org.elastos.hive.BackupAuthenticationHandler;
 import org.elastos.hive.Client;
+import org.elastos.hive.Logger;
 import org.elastos.hive.Management;
 import org.elastos.hive.Payment;
 import org.elastos.hive.Utils;
@@ -35,6 +36,7 @@ public class TestData {
 
 	private ApplicationContext applicationContext;
 
+	private static TestData instance = null;
 	public static TestData getInstance() throws HiveException, DIDException {
 		if(instance == null) {
 			instance = new TestData();
@@ -42,13 +44,12 @@ public class TestData {
 		return instance;
 	}
 
-	private static TestData instance;
 	private TestData() throws HiveException, DIDException {
+		Logger.hive();
 		init();
 	}
 
 	public void init() throws HiveException, DIDException {
-
 		//TODO set environment config
 		String fileName = null;
 		switch (EnvironmentType.DEVELOPING) {
@@ -73,7 +74,7 @@ public class TestData {
 		appInstanceDid = new DApp(applicationConfig.name(), applicationConfig.mnemonic(), adapter, applicationConfig.passPhrase(), applicationConfig.storepass());
 
 		UserConfig userConfig = clientConfig.userConfig();
-		userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storePass());
+		userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storepass());
 
 		nodeConfig = clientConfig.nodeConfig();
 

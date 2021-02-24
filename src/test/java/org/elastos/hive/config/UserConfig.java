@@ -11,8 +11,8 @@ public class UserConfig extends Config {
 	private String mnemonic;
 	@JsonProperty("passPhrase")
 	private String passPhrase;
-	@JsonProperty("storePass")
-	private String storePass;
+	@JsonProperty("storepass")
+	private String storepass;
 
 	public String did() {
 		return this.did;
@@ -30,8 +30,8 @@ public class UserConfig extends Config {
 		return this.passPhrase;
 	}
 
-	public String storePass() {
-		return this.storePass;
+	public String storepass() {
+		return this.storepass;
 	}
 
 	public static UserConfig deserialize(String content) {
