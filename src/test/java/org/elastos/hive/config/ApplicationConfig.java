@@ -2,7 +2,7 @@ package org.elastos.hive.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AppConfig extends Config {
+public class ApplicationConfig extends Config {
 	@JsonProperty("name")
 	private String name;
 	@JsonProperty("mnemonic")
@@ -28,7 +28,7 @@ public class AppConfig extends Config {
 		return this.storepass;
 	}
 
-	public static AppConfig deserialize(String content) {
-		return deserialize(content, AppConfig.class);
+	public static ApplicationConfig deserialize(String content) {
+		return deserialize(content, ApplicationConfig.class);
 	}
 }

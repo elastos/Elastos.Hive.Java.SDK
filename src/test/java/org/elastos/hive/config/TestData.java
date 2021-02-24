@@ -57,8 +57,8 @@ public class TestData {
 		Client.setupResolver((netType == NetType.MAIN_NET) ? "http://api.elastos.io:20606" : "http://api.elastos.io:21606", "data/didCache");
 
 		DummyAdapter adapter = new DummyAdapter();
-		AppConfig appConfig = AppConfig.deserialize(Utils.getConfigure((netType == NetType.MAIN_NET) ? "MainNetApp.conf" : "TestNetApp.conf"));
-		appInstanceDid = new DApp(appConfig.name(), appConfig.mnemonic(), adapter, appConfig.passPhrase(), appConfig.storepass());
+		ApplicationConfig applicationConfig = ApplicationConfig.deserialize(Utils.getConfigure((netType == NetType.MAIN_NET) ? "MainNetApp.conf" : "TestNetApp.conf"));
+		appInstanceDid = new DApp(applicationConfig.name(), applicationConfig.mnemonic(), adapter, applicationConfig.passPhrase(), applicationConfig.storepass());
 
 		UserConfig userConfig = UserConfig.deserialize(Utils.getConfigure((netType == NetType.MAIN_NET) ? "MainNetUser.conf" : "TestNetUser.conf"));
 		userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storePass());
