@@ -7,8 +7,8 @@ public class NodeConfig extends Config {
 	private String ownerDid;
 	@JsonProperty("provider")
 	private String provider;
-	@JsonProperty("targetDID")
-	private String targetDID;
+	@JsonProperty("targetDid")
+	private String targetDid;
 	@JsonProperty("targetHost")
 	private String targetHost;
 	@JsonProperty("storePath")
@@ -22,8 +22,8 @@ public class NodeConfig extends Config {
 		return this.provider;
 	}
 
-	public String targetDID() {
-		return this.targetDID;
+	public String targetDid() {
+		return this.targetDid;
 	}
 
 	public String targetHost() {

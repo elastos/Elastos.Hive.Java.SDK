@@ -124,7 +124,7 @@ public class TestData {
 	public String getBackupVc(String sourceDID) {
 		try {
 			VerifiableCredential vc = userDid.issueBackupDiplomaFor(sourceDID,
-					nodeConfig.targetHost(), nodeConfig.targetDID());
+					nodeConfig.targetHost(), nodeConfig.targetDid());
 			return vc.toString();
 		} catch (DIDException e) {
 			e.printStackTrace();
@@ -150,12 +150,12 @@ public class TestData {
 	}
 
 	public CompletableFuture<Vault> createTargetVault() {
-		return this.client.getManager(nodeConfig.targetDID(), nodeConfig.targetHost())
+		return this.client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost())
 				.thenComposeAsync(management -> management.createVault());
 	}
 
 	public CompletableFuture<Backup> getTargetBackup() {
-		return this.client.getBackup(nodeConfig.targetDID(), nodeConfig.targetHost());
+		return this.client.getBackup(nodeConfig.targetDid(), nodeConfig.targetHost());
 	}
 
 	public CompletableFuture<Backup> getBackup() {
@@ -177,7 +177,7 @@ public class TestData {
 
 			@Override
 			public String getTargetDid() {
-				return nodeConfig.targetDID();
+				return nodeConfig.targetDid();
 			}
 		};
 	}
