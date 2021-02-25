@@ -218,17 +218,17 @@ public class Backup {
 		}
 	}
 
-	public CompletableFuture<Boolean> active() {
+	public CompletableFuture<Boolean> activate() {
 		return authHelper.checkValid().thenApplyAsync(aVoid -> {
 			try {
-				return activeImpl();
+				return activateImpl();
 			} catch (HiveException e) {
 				throw new CompletionException(e);
 			}
 		});
 	}
 
-	private boolean activeImpl() throws HiveException {
+	private boolean activateImpl() throws HiveException {
 		try {
 			Response response = this.connectionManager.getBackApi()
 					.activeToVault(RequestBody.create(MediaType.parse("Content-Type, application/json"), "{}"))
