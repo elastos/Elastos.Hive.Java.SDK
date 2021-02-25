@@ -118,6 +118,20 @@ public class TestData {
 			}
 			return true;
 		}).join();
+
+		client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
+			if(throwable!=null) {
+				throwable.printStackTrace();
+			}
+			return true;
+		}).join();
+
+		client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createBackup()).handleAsync((vault, throwable) -> {
+			if(throwable!=null) {
+				throwable.printStackTrace();
+			}
+			return true;
+		}).join();
 	}
 
 	public String signAuthorization(String jwtToken) {

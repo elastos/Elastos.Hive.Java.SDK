@@ -5,6 +5,7 @@ import org.elastos.hive.backup.State;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.CreateTargetVaultException;
 import org.elastos.hive.exception.HiveException;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -18,14 +19,6 @@ import static org.junit.Assert.fail;
 public class MigrationTest {
 	@Test
 	public void testMigration() {
-		CompletableFuture<Boolean> createFuture = testData.createTargetVault()
-				.handleAsync((vault, throwable) -> {
-					if (null != throwable) {
-						throwable.printStackTrace();
-					}
-					return (null != vault && throwable == null);
-				});
-
 		CompletableFuture<Boolean> migrationFuture = managementApi.freezeVault()
 				.thenComposeAsync(aBoolean ->
 						backupApi.save(testData.getBackupAuthenticationHandler()))
@@ -43,24 +36,12 @@ public class MigrationTest {
 					}
 				}).thenComposeAsync(aBoolean ->
 						targetBackupApi.active()
-				).handleAsync((aBoolean, throwable) -> {
-					if (null != throwable) {
-						throwable.printStackTrace();
-					}
-					return (aBoolean && (null == throwable));
-				}).thenComposeAsync(aBoolean -> managementApi.unfreezeVault());
-
-		CompletableFuture<Boolean> completableFuture = createFuture.thenComposeAsync(aBoolean -> {
-			if (aBoolean) {
-				return migrationFuture;
-			}
-			throw new CreateTargetVaultException();
-		});
+				);
 
 		try {
-			assertTrue(completableFuture.get());
-			assertTrue(completableFuture.isCompletedExceptionally() == false);
-			assertTrue(completableFuture.isDone());
+			assertTrue(migrationFuture.get());
+			assertTrue(migrationFuture.isCompletedExceptionally() == false);
+			assertTrue(migrationFuture.isDone());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
@@ -86,5 +67,18 @@ public class MigrationTest {
 		managementApi = testData.getManagement().join();
 		backupApi = testData.getBackup().join();
 		targetBackupApi = testData.getTargetBackup().join();
+	}
+
+	@AfterClass
+	public static void tearDown() {
+		CompletableFuture<Boolean> future = managementApi.unfreezeVault();
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
 	}
 }
