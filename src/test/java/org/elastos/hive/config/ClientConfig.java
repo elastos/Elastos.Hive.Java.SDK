@@ -30,6 +30,10 @@ public class ClientConfig extends Config {
 		return this.nodeConfig;
 	}
 
+	public CrossConfig crossConfig() {
+		return this.crossConfig;
+	}
+
 	public static ClientConfig deserialize(String content) {
 		return deserialize(content, ClientConfig.class);
 	}
