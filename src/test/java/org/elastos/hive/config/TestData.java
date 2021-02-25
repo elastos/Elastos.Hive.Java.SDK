@@ -104,7 +104,10 @@ public class TestData {
 		};
 
 		client = Client.createInstance(applicationContext);
+		createVaultAndBackup();
+	}
 
+	private void createVaultAndBackup() {
 		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
 			if(throwable!=null) {
 				throwable.printStackTrace();
