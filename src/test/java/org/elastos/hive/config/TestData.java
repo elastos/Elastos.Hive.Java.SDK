@@ -33,6 +33,7 @@ public class TestData {
 
 	private ClientConfig clientConfig;
 	private NodeConfig nodeConfig;
+	private CrossConfig crossConfig;
 
 	private ApplicationContext applicationContext;
 
@@ -77,6 +78,7 @@ public class TestData {
 		userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storepass());
 
 		nodeConfig = clientConfig.nodeConfig();
+		crossConfig = clientConfig.crossConfig();
 
 		//初始化Application Context
 		applicationContext = new ApplicationContext() {
@@ -181,6 +183,75 @@ public class TestData {
 				return nodeConfig.targetDid();
 			}
 		};
+	}
+
+	public CrossData getCrossData() {
+		try {
+			return CrossData.getInstance(crossConfig, nodeConfig);
+		} catch (HiveException e) {
+			e.printStackTrace();
+		} catch (DIDException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static class CrossData extends TestData{
+		private CrossConfig crossConfig;
+		private NodeConfig nodeConfig;
+		private Client client;
+
+		private static CrossData instance = null;
+
+		public static CrossData getInstance(CrossConfig crossConfig, NodeConfig nodeConfig) throws HiveException, DIDException {
+			if(instance == null) {
+				instance = new CrossData(crossConfig, nodeConfig);
+			}
+			return instance;
+		}
+
+		private CrossData(CrossConfig crossConfig, NodeConfig nodeConfig) throws HiveException, DIDException {
+			this.crossConfig = crossConfig;
+			this.nodeConfig = nodeConfig;
+
+			ApplicationConfig applicationConfig = crossConfig.applicationConfig();
+
+			DummyAdapter adapter = new DummyAdapter();
+			DApp appInstanceDid = new DApp(applicationConfig.name(), applicationConfig.mnemonic(), adapter, applicationConfig.passPhrase(), applicationConfig.storepass());
+
+			UserConfig userConfig = crossConfig.userConfig();
+			DIDApp userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storepass());
+
+			//初始化Application Context
+			ApplicationContext applicationContext = new ApplicationContext() {
+				@Override
+				public String getLocalDataDir() {
+					return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
+				}
+
+				@Override
+				public DIDDocument getAppInstanceDocument() {
+					try {
+						return appInstanceDid.getDocument();
+					} catch (DIDException e) {
+						e.printStackTrace();
+					}
+					return null;
+				}
+
+				@Override
+				public CompletableFuture<String> getAuthorization(String jwtToken) {
+					return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
+				}
+			};
+
+			client = Client.createInstance(applicationContext);
+		}
+
+		public CompletableFuture<Vault> getCrossVault() {
+			return this.client.getVault(crossConfig.crossDid(), nodeConfig.provider());
+		}
 	}
 
 	private enum EnvironmentType {
