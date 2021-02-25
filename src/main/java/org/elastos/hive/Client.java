@@ -21,6 +21,8 @@
  */
 package org.elastos.hive;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
@@ -28,6 +30,7 @@ import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.ParseHiveUrlException;
 import org.elastos.hive.exception.ProviderNotSetException;
 
 import java.net.URLDecoder;
@@ -220,7 +223,8 @@ public class Client {
 
 	/**
 	 * run script by hive url
-	 * @param scriptUrl hive://target_did@target_app_did/script_name?params={key=value}
+	 *
+	 * @param scriptUrl  hive://target_did@target_app_did/scripting/script_name?params={key=value}
 	 * @param resultType
 	 * @param <T>
 	 * @return
@@ -235,23 +239,33 @@ public class Client {
 	 * starting and a file reader is returned.
 	 */
 	public <T> CompletableFuture<T> downloadFileByScriptUrl(String scriptUrl, Class<T> resultType) {
-		return parseHiveURL(scriptUrl).thenComposeAsync(hiveURLInfo -> hiveURLInfo.callScript(resultType));
+
+		CompletableFuture<HiveURLInfo> hiveUrlInfo = parseHiveURL(scriptUrl);
+
+		return hiveUrlInfo.thenApplyAsync(hiveURLInfo -> hiveURLInfo.deserialize(scriptUrl).getScriptName())
+				.thenComposeAsync(scriptName ->
+						callScriptUrl(scriptUrl, JsonNode.class)
+								.thenComposeAsync(jsonNode -> CompletableFuture.supplyAsync(() ->
+										jsonNode.get(scriptName).get("transaction_id").textValue())))
+				.thenComposeAsync(txId -> hiveUrlInfo.thenComposeAsync(hiveURLInfo ->
+						hiveURLInfo.getVault())
+						.thenComposeAsync(vault -> vault.getScripting().downloadFile(txId, resultType)));
 	}
 
 	/**
 	 * Parses a Hive standard url into a url info that can later be executed to get the result or the
 	 * target url.
-	 *
+	 * <p>
 	 * For example, later calling a url such as ...
-	 *      hive://userdid:appdid/getAvatar
-	 *
+	 * hive://userdid:appdid/getAvatar
+	 * <p>
 	 * ... results in a call to the "getAvatar" script, previously registered by "userdid" on his vault,
 	 * in the "appdid" scope. This is similar to calling:
-	 *      hiveClient.getVault(userdid).getScripting().call("getAvatar");
-	 *
+	 * hiveClient.getVault(userdid).getScripting().call("getAvatar");
+	 * <p>
 	 * Usage example (assuming the url is a call to a getAvatar script that contains a FileDownload
 	 * executable named "download"):
-	 *
+	 * <p>
 	 * - let hiveURLInfo = hiveclient.parseHiveURL(urlstring)
 	 * - let scriptOutput = await hiveURLInfo.callScript();
 	 * - hiveURLInfo.getVault().getScripting().downloadFile(scriptOutput.items["download"].getTransferID())
@@ -260,50 +274,58 @@ public class Client {
 		return CompletableFuture.supplyAsync(() -> new HiveURLInfoImpl(scriptUrl));
 	}
 
-
 	class HiveURLInfoImpl implements HiveURLInfo {
 
-		private String targetDid;
-		private String appDid;
-		private String scriptName;
-		private String params;
+		private UrlInfo urlInfo;
 
 		/**
 		 * HiveURLInfo
-		 * @param scriptUrl
-		 *	hive://target_did@target_app_did/script_name?params={key=value}
+		 *
+		 * @param hiveUrl hive://target_did@target_app_did/scripting/script_name?params={key=value}
 		 */
-		public HiveURLInfoImpl(String scriptUrl) {
+		public HiveURLInfoImpl(String hiveUrl) {
 			try {
-				String decodeUrl = URLDecoder.decode(scriptUrl, "utf-8");
-				Pattern pattern = Pattern.compile("(\\w+):\\/\\/([^@]+)@([^/ ]*)\\/([^/]*)\\/([^?]*)(\\?)?(params=)?([^=]*)?");
-				Matcher matcher = pattern.matcher(decodeUrl);
-				matcher.find();
-				targetDid = matcher.group(2);
-				appDid = matcher.group(3);
-				scriptName = matcher.group(5);
-				params = matcher.group(8);
+				urlInfo = deserialize(hiveUrl);
 			} catch (Exception e) {
-				e.printStackTrace();
+				throw new ParseHiveUrlException(e.getLocalizedMessage());
 			}
 		}
 
 		@Override
 		public <T> CompletableFuture<T> callScript(Class<T> resultType) {
 			return getVault().thenComposeAsync((Function<Vault, CompletionStage<T>>) vault -> vault.getScripting()
-					.callScriptUrl(scriptName, params, appDid, resultType));
+					.callScriptUrl(urlInfo.getScriptName(), urlInfo.getParams(), urlInfo.getAppDid(), resultType));
 		}
 
 		@Override
 		public CompletableFuture<Vault> getVault() {
-			return getVaultProvider(targetDid, null)
+			return getVaultProvider(urlInfo.getTargetDid(), null)
 					.thenApplyAsync(provider -> {
 						AuthHelper authHelper = new AuthHelper(context,
-								targetDid,
+								urlInfo.getTargetDid(),
 								provider,
 								authenticationAdapter);
-						return new Vault(authHelper, provider, targetDid);
+						return new Vault(authHelper, provider, urlInfo.getTargetDid());
 					});
+		}
+
+		@Override
+		public UrlInfo deserialize(String hiveUrl) {
+			if(urlInfo != null) return urlInfo;
+			try {
+				urlInfo = new UrlInfo();
+				String decodeUrl = URLDecoder.decode(hiveUrl, "utf-8");
+				Pattern pattern = Pattern.compile("(\\w+):\\/\\/([^@]+)@([^/ ]*)\\/([^/]*)\\/([^?]*)(\\?)?(params=)?([^=]*)?");
+				Matcher matcher = pattern.matcher(decodeUrl);
+				matcher.find();
+				urlInfo.setTargetDid(matcher.group(2));
+				urlInfo.setAppDid(matcher.group(3));
+				urlInfo.setScriptName(matcher.group(5));
+				urlInfo.setParams(matcher.group(8));
+			} catch (Exception e) {
+				throw new ParseHiveUrlException(e.getLocalizedMessage());
+			}
+			return urlInfo;
 		}
 	}
 

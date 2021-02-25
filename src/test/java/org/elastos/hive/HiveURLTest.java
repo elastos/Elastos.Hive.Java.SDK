@@ -8,14 +8,13 @@ import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.scripting.AggregatedExecutable;
 import org.elastos.hive.scripting.Executable;
-import org.elastos.hive.scripting.HashExecutable;
-import org.elastos.hive.scripting.PropertiesExecutable;
 import org.elastos.hive.scripting.UploadExecutable;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,13 +24,11 @@ import static org.junit.Assert.fail;
 @Ignore
 public class HiveURLTest {
 
-	private final String scriptUrl = "hive://did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n@appId/scripting/get_file_info?params={\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
-
-//	private final String scriptUrl = "hive://did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n@appId/scripting/downloadScript?params={'key':'test'}";
+	private final String downloadUrl = "hive://did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n@appId/scripting/download_file?params={\"path\":\"test.txt\"}";
 
 	@Test
 	public void testGetHiveURL() {
-		CompletableFuture<Boolean> future = client.parseHiveURL(scriptUrl)
+		CompletableFuture<Boolean> future = client.parseHiveURL(downloadUrl)
 				.handleAsync((hiveURLInfo, throwable) -> (null != hiveURLInfo && throwable == null));
 
 		try {
@@ -50,7 +47,7 @@ public class HiveURLTest {
 				.thenComposeAsync(aBoolean -> {
 
 					String scriptName = "upload_file";
-					String metadata = "{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}";
+					String metadata = "{\"path\":\"test.txt\"}";
 					JsonNode params = null;
 					try {
 						ObjectMapper objectMapper = new ObjectMapper();
@@ -64,7 +61,7 @@ public class HiveURLTest {
 								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
 								return scriptingApi.uploadFile(transactionId, Writer.class);
 							}).handle((writer, ex) -> {
-								if(null != writer) {
+								if (null != writer) {
 									Utils.fileWrite(textLocalPath, writer);
 									try {
 										writer.close();
@@ -88,21 +85,54 @@ public class HiveURLTest {
 
 	@Test
 	public void testCallScriptUrl() {
-
-		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
-		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
-		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
-		CompletableFuture<Boolean> fileInfoFuture = scriptingApi.registerScript("get_file_info", executable, false, false)
-				.thenComposeAsync(aBoolean -> client.callScriptUrl(scriptUrl, String.class))
-				.handle((success, ex) -> {
-					if(ex != null) ex.printStackTrace();
-					return (ex == null);
+		Executable executable = new DownloadExecutable("download_file", "$params.path", true);
+		CompletableFuture<Boolean> downloadFuture = scriptingApi.registerScript("download_file", executable, false, false)
+				.thenComposeAsync(aBoolean -> {
+					String scriptName = "download_file";
+					return client.callScriptUrl(downloadUrl, JsonNode.class)
+							.handle((jsonNode, ex) -> {
+								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
+								System.out.println("transactionId:" + transactionId);
+								return (ex == null);
+							});
 				});
 
 		try {
-			assertTrue(fileInfoFuture.get());
-			assertTrue(fileInfoFuture.isCompletedExceptionally() == false);
-			assertTrue(fileInfoFuture.isDone());
+			assertTrue(downloadFuture.get());
+			assertTrue(downloadFuture.isCompletedExceptionally() == false);
+			assertTrue(downloadFuture.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void testDownloadFile() {
+		Executable executable = new DownloadExecutable("download_file", "$params.path", true);
+		CompletableFuture<Boolean> downloadFuture = scriptingApi.registerScript("download_file", executable, false, false)
+				.thenComposeAsync(aBoolean -> client.downloadFileByScriptUrl(downloadUrl, Reader.class).handle((reader, throwable) -> {
+					if (throwable == null) {
+						Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
+					} else {
+						throwable.printStackTrace();
+					}
+					return throwable == null;
+				}));
+
+		try {
+			assertTrue(downloadFuture.get());
+			assertTrue(downloadFuture.isCompletedExceptionally() == false);
+			assertTrue(downloadFuture.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+
+		try {
+			assertTrue(downloadFuture.get());
+			assertTrue(downloadFuture.isCompletedExceptionally() == false);
+			assertTrue(downloadFuture.isDone());
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
@@ -112,6 +142,7 @@ public class HiveURLTest {
 	private static Client client;
 	private static Scripting scriptingApi;
 	private static String textLocalPath;
+	private static String testLocalCacheRootPath;
 
 	@BeforeClass
 	public static void setUp() {
@@ -126,6 +157,7 @@ public class HiveURLTest {
 		}
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
 		textLocalPath = localRootPath + "test.txt";
+		testLocalCacheRootPath = localRootPath + "cache/script/";
 	}
 
 }
