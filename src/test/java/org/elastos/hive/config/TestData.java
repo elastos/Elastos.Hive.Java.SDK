@@ -104,6 +104,20 @@ public class TestData {
 		};
 
 		client = Client.createInstance(applicationContext);
+
+		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
+			if(throwable!=null) {
+				throwable.printStackTrace();
+			}
+			return true;
+		}).join();
+
+		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider()).thenComposeAsync(management -> management.createBackup()).handleAsync((backup, throwable) -> {
+			if(throwable!=null) {
+				throwable.printStackTrace();
+			}
+			return true;
+		}).join();
 	}
 
 	public String signAuthorization(String jwtToken) {
