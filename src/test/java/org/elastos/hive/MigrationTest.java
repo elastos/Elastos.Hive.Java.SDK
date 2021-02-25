@@ -3,7 +3,6 @@ package org.elastos.hive;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.backup.State;
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.exception.CreateTargetVaultException;
 import org.elastos.hive.exception.HiveException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -35,7 +34,7 @@ public class MigrationTest {
 						}
 					}
 				}).thenComposeAsync(aBoolean ->
-						targetBackupApi.active()
+						targetBackupApi.activate()
 				);
 
 		try {
