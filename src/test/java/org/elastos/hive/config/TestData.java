@@ -109,30 +109,30 @@ public class TestData {
 
 	private void createVaultAndBackup() {
 		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
-			if(throwable!=null) {
-				throwable.printStackTrace();
-			}
+//			if(throwable!=null) {
+//				throwable.printStackTrace();
+//			}
 			return true;
 		}).join();
 
 		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider()).thenComposeAsync(management -> management.createBackup()).handleAsync((backup, throwable) -> {
-			if(throwable!=null) {
-				throwable.printStackTrace();
-			}
+//			if(throwable!=null) {
+//				throwable.printStackTrace();
+//			}
 			return true;
 		}).join();
 
 		client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
-			if(throwable!=null) {
-				throwable.printStackTrace();
-			}
+//			if(throwable!=null) {
+//				throwable.printStackTrace();
+//			}
 			return true;
 		}).join();
 
 		client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createBackup()).handleAsync((vault, throwable) -> {
-			if(throwable!=null) {
-				throwable.printStackTrace();
-			}
+//			if(throwable!=null) {
+//				throwable.printStackTrace();
+//			}
 			return true;
 		}).join();
 	}
@@ -228,10 +228,12 @@ public class TestData {
 		return null;
 	}
 
-	public static class CrossData extends TestData{
+	public static class CrossData {
 		private CrossConfig crossConfig;
 		private NodeConfig nodeConfig;
 		private Client client;
+		private DApp appInstanceDid;
+		private DIDApp userDid;
 
 		private static CrossData instance = null;
 
@@ -249,10 +251,10 @@ public class TestData {
 			ApplicationConfig applicationConfig = crossConfig.applicationConfig();
 
 			DummyAdapter adapter = new DummyAdapter();
-			DApp appInstanceDid = new DApp(applicationConfig.name(), applicationConfig.mnemonic(), adapter, applicationConfig.passPhrase(), applicationConfig.storepass());
+			appInstanceDid = new DApp(applicationConfig.name(), applicationConfig.mnemonic(), adapter, applicationConfig.passPhrase(), applicationConfig.storepass());
 
 			UserConfig userConfig = crossConfig.userConfig();
-			DIDApp userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storepass());
+			userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storepass());
 
 			//初始化Application Context
 			ApplicationContext applicationContext = new ApplicationContext() {
@@ -282,6 +284,24 @@ public class TestData {
 
 		public CompletableFuture<Vault> getCrossVault() {
 			return this.client.getVault(crossConfig.crossDid(), nodeConfig.provider());
+		}
+
+		public String signAuthorization(String jwtToken) {
+			try {
+				Claims claims = JwtUtil.getBody(jwtToken);
+				String iss = claims.getIssuer();
+				String nonce = (String) claims.get("nonce");
+
+				VerifiableCredential vc = userDid.issueDiplomaFor(appInstanceDid);
+
+				VerifiablePresentation vp = appInstanceDid.createPresentation(vc, iss, nonce);
+
+				String token = appInstanceDid.createToken(vp, iss);
+				return token;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
 		}
 	}
 
