@@ -43,7 +43,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@Ignore
 public class ScriptingTest {
 
 	@Test
@@ -258,7 +257,6 @@ public class ScriptingTest {
 	}
 
 	@Test
-	@Ignore
 	public void test8_callScriptUrl() {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");

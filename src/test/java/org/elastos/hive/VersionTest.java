@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutionException;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-@Ignore
 public class VersionTest {
 
 	@Test
