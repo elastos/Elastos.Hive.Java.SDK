@@ -9,7 +9,7 @@ public interface Version {
 	 *
 	 * @return
 	 */
-	 CompletableFuture<String> getVersionCode();
+	 CompletableFuture<String> getVersionName();
 
 	/**
 	 * Get the last commit ID on the hive node git repository
