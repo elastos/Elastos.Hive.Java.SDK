@@ -12,7 +12,6 @@ public class Vault {
 	private Database database;
 	private Scripting scripting;
 	private KeyValues keyValues;
-	private Version version;
 
 	private String providerAddress;
 	private String ownerDid;
@@ -26,15 +25,6 @@ public class Vault {
 		this.files = new FilesImpl(authHelper);
 		this.database = new DatabaseImpl(authHelper);
 		this.scripting = new ScriptingImpl(authHelper);
-		this.version = new VersionImpl(authHelper);
-	}
-
-	public CompletableFuture<String> getNodeVersion() {
-		return this.version.getVersion();
-	}
-
-	public CompletableFuture<String> getNodeLastCommitId() {
-		return this.version.getLastCommitId();
 	}
 
 	/**

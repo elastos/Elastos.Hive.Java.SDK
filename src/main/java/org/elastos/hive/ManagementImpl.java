@@ -12,6 +12,7 @@ public class ManagementImpl implements Management{
 
 	private ServiceManager serviceManager;
 	private Payment payment;
+	private Version version;
 
 	ManagementImpl(AuthHelper authHelper, String providerAddress, String ownerDid) {
 		this.authHelper = authHelper;
@@ -20,6 +21,7 @@ public class ManagementImpl implements Management{
 
 		this.serviceManager = new ServiceManagerImpl(authHelper);
 		this.payment = new PaymentImpl(authHelper);
+		this.version = new VersionImpl(authHelper);
 	}
 
 	@Override
@@ -77,5 +79,10 @@ public class ManagementImpl implements Management{
 	@Override
 	public Payment getPayment() {
 		return this.payment;
+	}
+
+	@Override
+	public Version getVersion() {
+		return this.version;
 	}
 }

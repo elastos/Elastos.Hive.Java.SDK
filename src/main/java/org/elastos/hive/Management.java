@@ -74,4 +74,10 @@ public interface Management {
 	 */
 	Payment getPayment();
 
+	/**
+	 * Get Node version
+	 * @return
+	 */
+	Version getVersion();
+
 }
