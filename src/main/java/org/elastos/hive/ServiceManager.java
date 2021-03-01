@@ -5,7 +5,7 @@ import org.elastos.hive.service.BackupUsingPlan;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface ServiceManager {
+interface ServiceManager {
 
 	/**
 	 * create free vault service
