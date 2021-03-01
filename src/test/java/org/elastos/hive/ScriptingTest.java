@@ -30,7 +30,6 @@ import org.elastos.hive.scripting.UploadExecutable;
 import org.elastos.hive.utils.JsonUtil;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
