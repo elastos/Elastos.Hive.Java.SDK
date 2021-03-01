@@ -140,6 +140,46 @@ public class ManagementTest {
 		}
 	}
 
+	@Test
+	public void testGetNodeVersion() {
+		CompletableFuture<Boolean> future = managementApi.getVersion().getVersion()
+				.handle((vault, throwable) -> {
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
+					return (null == throwable);
+				});
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void testGetLastCommitId() {
+		CompletableFuture<Boolean> future = managementApi.getVersion().getLastCommitId()
+				.handle((vault, throwable) -> {
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
+					return (null == throwable);
+				});
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
 	private static Management managementApi;
 
 	@BeforeClass
