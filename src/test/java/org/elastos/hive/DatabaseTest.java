@@ -54,7 +54,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@Ignore
 public class DatabaseTest {
 
 	@Test
