@@ -4,7 +4,6 @@ import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.HiveException;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;

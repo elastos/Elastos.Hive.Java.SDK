@@ -9,7 +9,6 @@ import org.elastos.hive.scripting.DbFindQuery;
 import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.utils.JsonUtil;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CompletableFuture;
