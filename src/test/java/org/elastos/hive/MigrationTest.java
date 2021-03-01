@@ -18,7 +18,7 @@ public class MigrationTest {
 	public void testMigration() {
 		CompletableFuture<Boolean> migrationFuture = managementApi.freezeVault()
 				.thenComposeAsync(aBoolean ->
-						backupApi.save(testData.getBackupAuthenticationHandler()))
+						backupApi.store(testData.getBackupAuthenticationHandler()))
 				.thenApplyAsync(aBoolean -> {
 					for (; ; ) {
 						try {
