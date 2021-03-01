@@ -142,7 +142,7 @@ public class ManagementTest {
 
 	@Test
 	public void testGetNodeVersion() {
-		CompletableFuture<Boolean> future = managementApi.getVersion().getVersionCode()
+		CompletableFuture<Boolean> future = managementApi.getVersion().getVersionName()
 				.handle((vault, throwable) -> {
 					if(throwable != null) {
 						throwable.printStackTrace();

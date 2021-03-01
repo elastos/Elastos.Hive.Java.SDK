@@ -20,7 +20,7 @@ class VersionImpl implements Version{
 	}
 
 	@Override
-	public CompletableFuture<String> getVersionCode() {
+	public CompletableFuture<String> getVersionName() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				Response<ResponseBody> response = this.connectionManager.getVersionApi()
