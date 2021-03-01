@@ -169,7 +169,7 @@ public class Client {
 							ownerDid,
 							provider,
 							this.authenticationAdapter);
-					return new Management(authHelper, provider, ownerDid);
+					return new ManagementImpl(authHelper, provider, ownerDid);
 				});
 	}
 

@@ -5,114 +5,73 @@ import org.elastos.hive.service.BackupUsingPlan;
 
 import java.util.concurrent.CompletableFuture;
 
-public class Management {
-	private String providerAddress;
-	private String ownerDid;
-	private AuthHelper authHelper;
-
-	private ServiceManager serviceManager;
-	private Payment payment;
-
-	Management(AuthHelper authHelper, String providerAddress, String ownerDid) {
-		this.authHelper = authHelper;
-		this.providerAddress = providerAddress;
-		this.ownerDid = ownerDid;
-
-		this.serviceManager = new ServiceManagerImpl(authHelper);
-		this.payment = new PaymentImpl(authHelper);
-	}
+public interface Management {
 
 	/**
 	 * create vault
 	 *
 	 * @return
 	 */
-	public CompletableFuture<Vault> createVault() {
-		return serviceManager.createVault().thenApplyAsync(aBoolean ->
-				aBoolean ? new Vault(this.authHelper, this.providerAddress, this.ownerDid) : null);
-
-	}
+	CompletableFuture<Vault> createVault();
 
 	/**
 	 * destory vault
 	 *
 	 * @return
 	 */
-	public CompletableFuture<Boolean> destroyVault() {
-		return this.serviceManager.removeVault();
-	}
+	CompletableFuture<Boolean> destroyVault();
 
 	/**
 	 * freeze vault
 	 *
 	 * @return
 	 */
-	public CompletableFuture<Boolean> freezeVault() {
-		return this.serviceManager.freezeVault();
-	}
+	CompletableFuture<Boolean> freezeVault();
 
 	/**
 	 * unfreeze vault
 	 *
 	 * @return
 	 */
-	public CompletableFuture<Boolean> unfreezeVault() {
-		return this.serviceManager.unfreezeVault();
-	}
+	CompletableFuture<Boolean> unfreezeVault();
 
 	/**
 	 * create backup
 	 *
 	 * @return
 	 */
-	public CompletableFuture<Backup> createBackup() {
-		return serviceManager.createBackup().thenApplyAsync(aBoolean ->
-				aBoolean ? new BackupImpl(this.authHelper) : null);
-
-	}
+	CompletableFuture<Backup> createBackup();
 
 	/**
 	 * get vault service information
 	 *
 	 * @return
 	 */
-	public CompletableFuture<UsingPlan> getVaultServiceInfo() {
-		return this.serviceManager.getVaultServiceInfo();
-	}
+	CompletableFuture<UsingPlan> getVaultServiceInfo();
 
 	/**
 	 * get backup service information
 	 *
 	 * @return
 	 */
-	public CompletableFuture<BackupUsingPlan> getBackupServiceInfo() {
-		return this.serviceManager.getBackupServiceInfo();
-	}
+	CompletableFuture<BackupUsingPlan> getBackupServiceInfo();
 
 	/**
 	 * Check if the vault exists
 	 * @return
 	 */
-	public CompletableFuture<Boolean> checkVaultExist() {
-		return this.serviceManager.getVaultServiceInfo()
-				.handleAsync((usingPlan, throwable) ->
-						(null == throwable && usingPlan != null));
-	}
+	CompletableFuture<Boolean> checkVaultExist();
 
 	/**
 	 * Check if the backup exists
 	 * @return
 	 */
-	public CompletableFuture<Boolean> checkBackupExist() {
-		return this.serviceManager.getBackupServiceInfo()
-				.handleAsync((usingPlan, throwable) -> (null == throwable && usingPlan != null));
-	}
+	CompletableFuture<Boolean> checkBackupExist();
 
 	/**
 	 * Get interface as Payment instance
 	 * @return interface instance of Payment
 	 */
-	public Payment getPayment() {
-		return this.payment;
-	}
+	Payment getPayment();
+
 }
