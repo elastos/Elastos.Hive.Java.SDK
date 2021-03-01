@@ -19,7 +19,7 @@ public interface Backup {
 	 * @param handler BackupAuthenticationHandler
 	 * @return true(success), false(failed)
 	 */
-	CompletableFuture<Boolean> save(BackupAuthenticationHandler handler);
+	CompletableFuture<Boolean> store(BackupAuthenticationHandler handler);
 
 	/**
 	 * Restore hive vault from other hive node
