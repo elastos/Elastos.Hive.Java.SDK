@@ -67,7 +67,7 @@ public class Management {
 	 */
 	public CompletableFuture<Backup> createBackup() {
 		return serviceManager.createBackup().thenApplyAsync(aBoolean ->
-				aBoolean ? new Backup(this.authHelper) : null);
+				aBoolean ? new BackupImpl(this.authHelper) : null);
 
 	}
 

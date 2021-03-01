@@ -148,7 +148,7 @@ public class Client {
 					ownerDid,
 					providerAddress,
 					this.authenticationAdapter);
-			return new Backup(authHelper);
+			return new BackupImpl(authHelper);
 		});
 	}
 
