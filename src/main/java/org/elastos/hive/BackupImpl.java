@@ -5,18 +5,24 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.did.VerifiableCredential;
 import org.elastos.did.exception.DIDBackendException;
 import org.elastos.did.exception.MalformedCredentialException;
+import org.elastos.did.jwt.Claims;
 import org.elastos.hive.backup.State;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportStateTypeException;
 import org.elastos.hive.utils.JsonUtil;
+import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.utils.ResponseHelper;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -30,10 +36,40 @@ public class BackupImpl implements Backup{
 	private String targetHost;
 	private String type;
 
-	BackupImpl(AuthHelper authHelper) {
+	BackupImpl(AuthHelper authHelper,String targetHost) {
 		this.authHelper = authHelper;
 		this.connectionManager = authHelper.getConnectionManager();
+		this.targetHost = targetHost;
 	}
+
+	private CompletableFuture<String> getServiceDid() {
+		if(null != targetDid) {
+			return CompletableFuture.supplyAsync(() -> targetDid);
+		}
+		return CompletableFuture.supplyAsync(() -> {
+			ApplicationContext context = authHelper.getContext();
+			Map<String, Object> map = new HashMap<>();
+			JSONObject docJsonObject = new JSONObject(context.getAppInstanceDocument().toString());
+			map.put("document", docJsonObject);
+
+			String json = new JSONObject(map).toString();
+			Response response = null;
+			try {
+				response = connectionManager.getAuthApi()
+						.signIn(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+						.execute();
+				JsonNode ret = ResponseHelper.getValue(response, JsonNode.class).get("challenge");
+				Claims claims = JwtUtil.getBody(ret.textValue());
+				return claims.getIssuer();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			return null;
+		});
+	}
+
+
 
 	@Override
 	public CompletableFuture<State> getState() {
@@ -115,29 +151,15 @@ public class BackupImpl implements Backup{
 	}
 
 	private CompletableFuture<String> getCredential(BackupAuthenticationHandler handler, String type) {
-		String exTargetDid = handler.getTargetDid();
-		String exTargetHost = handler.getTargetHost();
-
-		if (null == exTargetDid) {
-			throw new IllegalArgumentException("target did can not be null");
-		}
-
-		if (null == exTargetHost) {
-			throw new IllegalArgumentException("target host can not be null");
-		}
-
-		if (null == type) {
-			new HiveException("Hive internal exception: backup cache type is null").printStackTrace();
-		}
-
-		setTargetDid(exTargetDid);
-		setTargetHost(exTargetHost);
-		setType(type);
-		String cacheCredential = restoreCredential();
-		if (null != cacheCredential && !checkExpired(cacheCredential)) {
-			return CompletableFuture.supplyAsync(() -> cacheCredential);
-		}
-		return handler.getAuthorization(authHelper.serviceDid());
+		return getServiceDid().thenComposeAsync(targetDid -> {
+			setTargetDid(targetDid);
+			setType(type);
+			String cacheCredential = restoreCredential();
+			if (null != cacheCredential && !checkExpired(cacheCredential)) {
+				return CompletableFuture.supplyAsync(() -> cacheCredential);
+			}
+			return handler.getAuthorization(authHelper.serviceDid(), targetDid, targetHost);
+		});
 	}
 
 	@Override

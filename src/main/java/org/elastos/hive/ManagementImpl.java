@@ -8,16 +8,18 @@ import java.util.concurrent.CompletableFuture;
 public class ManagementImpl implements Management{
 	private String providerAddress;
 	private String ownerDid;
+	private String targetHost;
 	private AuthHelper authHelper;
 
 	private ServiceManager serviceManager;
 	private Payment payment;
 	private Version version;
 
-	ManagementImpl(AuthHelper authHelper, String providerAddress, String ownerDid) {
+	ManagementImpl(AuthHelper authHelper, String providerAddress, String ownerDid, String targetHost) {
 		this.authHelper = authHelper;
 		this.providerAddress = providerAddress;
 		this.ownerDid = ownerDid;
+		this.targetHost = targetHost;
 
 		this.serviceManager = new ServiceManagerImpl(authHelper);
 		this.payment = new PaymentImpl(authHelper);
@@ -49,7 +51,7 @@ public class ManagementImpl implements Management{
 	@Override
 	public CompletableFuture<Backup> createBackup() {
 		return serviceManager.createBackup().thenApplyAsync(aBoolean ->
-				aBoolean ? new BackupImpl(this.authHelper) : null);
+				aBoolean ? new BackupImpl(this.authHelper, this.targetHost) : null);
 
 	}
 
