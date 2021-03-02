@@ -285,6 +285,10 @@ class AuthHelper implements ConnectHelper {
 		return this.storePath;
 	}
 
+	public ApplicationContext getContext() {
+		return this.context;
+	}
+
 	private RequestBody getJsonRequestBoy(String json) {
 		return RequestBody.create(MediaType.parse("Content-Type, application/json"), json);
 	}

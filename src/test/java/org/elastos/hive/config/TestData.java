@@ -22,6 +22,7 @@ import org.elastos.hive.utils.JwtUtil;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public class TestData {
 
@@ -38,8 +39,9 @@ public class TestData {
 	private ApplicationContext applicationContext;
 
 	private static TestData instance = null;
+
 	public static TestData getInstance() throws HiveException, DIDException {
-		if(instance == null) {
+		if (instance == null) {
 			instance = new TestData();
 		}
 		return instance;
@@ -108,28 +110,28 @@ public class TestData {
 	}
 
 	private void createVaultAndBackup() {
-		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
+		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
 //			if(throwable!=null) {
 //				throwable.printStackTrace();
 //			}
 			return true;
 		}).join();
 
-		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider()).thenComposeAsync(management -> management.createBackup()).handleAsync((backup, throwable) -> {
+		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createBackup()).handleAsync((backup, throwable) -> {
 //			if(throwable!=null) {
 //				throwable.printStackTrace();
 //			}
 			return true;
 		}).join();
 
-		client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
+		client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
 //			if(throwable!=null) {
 //				throwable.printStackTrace();
 //			}
 			return true;
 		}).join();
 
-		client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createBackup()).handleAsync((vault, throwable) -> {
+		client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createBackup()).handleAsync((vault, throwable) -> {
 //			if(throwable!=null) {
 //				throwable.printStackTrace();
 //			}
@@ -155,10 +157,10 @@ public class TestData {
 		return null;
 	}
 
-	public String getBackupVc(String sourceDID) {
+	public String getBackupVc(String sourceDid, String targetDid, String targetHost) {
 		try {
-			VerifiableCredential vc = userDid.issueBackupDiplomaFor(sourceDID,
-					nodeConfig.targetHost(), nodeConfig.targetDid());
+			VerifiableCredential vc = userDid.issueBackupDiplomaFor(sourceDid,
+					targetHost, targetDid);
 			return vc.toString();
 		} catch (DIDException e) {
 			e.printStackTrace();
@@ -172,7 +174,7 @@ public class TestData {
 	}
 
 	public CompletableFuture<Management> getManagement() {
-		return this.client.getManager(nodeConfig.ownerDid(), nodeConfig.provider());
+		return this.client.getManager(nodeConfig.ownerDid(), nodeConfig.provider(), nodeConfig.targetHost());
 	}
 
 	public CompletableFuture<Payment> getPayment() {
@@ -184,36 +186,21 @@ public class TestData {
 	}
 
 	public CompletableFuture<Vault> createTargetVault() {
-		return this.client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost())
+		return this.client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost(), null)
 				.thenComposeAsync(management -> management.createVault());
 	}
 
 	public CompletableFuture<Backup> getTargetBackup() {
-		return this.client.getBackup(nodeConfig.targetDid(), nodeConfig.targetHost());
+		return this.client.getBackup(nodeConfig.targetDid(), nodeConfig.targetHost(), null);
 	}
 
 	public CompletableFuture<Backup> getBackup() {
-		return this.client.getBackup(nodeConfig.ownerDid(), nodeConfig.provider());
+		return this.client.getBackup(nodeConfig.ownerDid(), nodeConfig.provider(), nodeConfig.targetHost());
 	}
 
 	public BackupAuthenticationHandler getBackupAuthenticationHandler() {
-		return new BackupAuthenticationHandler() {
-			@Override
-			public CompletableFuture<String> getAuthorization(String serviceDid) {
-				return CompletableFuture.supplyAsync(() ->
-						getBackupVc(serviceDid));
-			}
-
-			@Override
-			public String getTargetHost() {
-				return nodeConfig.targetHost();
-			}
-
-			@Override
-			public String getTargetDid() {
-				return nodeConfig.targetDid();
-			}
-		};
+		return (sourceDid, targetDid, targetHost) ->
+				CompletableFuture.supplyAsync(() -> getBackupVc(sourceDid, targetDid, targetHost));
 	}
 
 	public CrossData getCrossData() {
@@ -238,7 +225,7 @@ public class TestData {
 		private static CrossData instance = null;
 
 		public static CrossData getInstance(CrossConfig crossConfig, NodeConfig nodeConfig) throws HiveException, DIDException {
-			if(instance == null) {
+			if (instance == null) {
 				instance = new CrossData(crossConfig, nodeConfig);
 			}
 			return instance;

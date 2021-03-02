@@ -133,9 +133,10 @@ public class Client {
 	 *
 	 * @param ownerDid  the owner did related to target vault
 	 * @param providerAddress the preferred target provider address
+	 * @param backupAddress the backup target provider address
 	 * @return a new vault instance.
 	 */
-	public CompletableFuture<Backup> getBackup(String ownerDid, String providerAddress) {
+	public CompletableFuture<Backup> getBackup(String ownerDid, String providerAddress, String backupAddress) {
 
 		if (ownerDid == null)
 			throw new IllegalArgumentException("Missing ownerDid");
@@ -148,7 +149,7 @@ public class Client {
 					ownerDid,
 					providerAddress,
 					this.authenticationAdapter);
-			return new BackupImpl(authHelper);
+			return new BackupImpl(authHelper, backupAddress);
 		});
 	}
 
@@ -162,14 +163,14 @@ public class Client {
 	 * @param preferredProviderAddress the preferred target provider address
 	 * @return a new vault instance.
 	 */
-	public CompletableFuture<Management> getManager(String ownerDid, String preferredProviderAddress) {
+	public CompletableFuture<Management> getManager(String ownerDid, String preferredProviderAddress, String backupAddress) {
 		return getVaultProvider(ownerDid, preferredProviderAddress)
 				.thenApplyAsync(provider -> {
 					AuthHelper authHelper = new AuthHelper(this.context,
 							ownerDid,
 							provider,
 							this.authenticationAdapter);
-					return new ManagementImpl(authHelper, provider, ownerDid);
+					return new ManagementImpl(authHelper, provider, ownerDid, backupAddress);
 				});
 	}
 

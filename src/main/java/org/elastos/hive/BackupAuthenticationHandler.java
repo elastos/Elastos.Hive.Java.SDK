@@ -7,20 +7,11 @@ public interface BackupAuthenticationHandler {
 	/**
 	 * This is the interface to make authorization from users, and it would be
 	 * provided by application.
-	 * @param serviceDid source service did
+	 * @param sourceDid source service did
+	 * @param targetDid backup service did
+	 * @param targetHost backup service did
 	 * @return
 	 */
-	CompletableFuture<String> getAuthorization(String serviceDid);
+	CompletableFuture<String> getAuthorization(String sourceDid, String targetDid, String targetHost);
 
-	/**
-	 * backup target host
-	 * @return
-	 */
-	String getTargetHost();
-
-	/**
-	 * backup target did
-	 * @return
-	 */
-	String getTargetDid();
 }
