@@ -121,7 +121,7 @@ public class Client {
 							ownerDid,
 							provider,
 							this.authenticationAdapter);
-					return new Vault(authHelper, provider, ownerDid);
+					return new VaultImpl(authHelper, provider, ownerDid);
 				});
 	}
 
@@ -306,7 +306,7 @@ public class Client {
 								urlInfo.getTargetDid(),
 								provider,
 								authenticationAdapter);
-						return new Vault(authHelper, provider, urlInfo.getTargetDid());
+						return new VaultImpl(authHelper, provider, urlInfo.getTargetDid());
 					});
 		}
 
