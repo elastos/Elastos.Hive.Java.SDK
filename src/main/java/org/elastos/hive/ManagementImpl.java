@@ -29,7 +29,7 @@ public class ManagementImpl implements Management{
 	@Override
 	public CompletableFuture<Vault> createVault() {
 		return serviceManager.createVault().thenApplyAsync(aBoolean ->
-				aBoolean ? new Vault(this.authHelper, this.providerAddress, this.ownerDid) : null);
+				aBoolean ? new VaultImpl(this.authHelper, this.providerAddress, this.ownerDid) : null);
 
 	}
 

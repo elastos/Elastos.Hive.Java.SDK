@@ -15,6 +15,7 @@ import org.elastos.hive.Management;
 import org.elastos.hive.Payment;
 import org.elastos.hive.Utils;
 import org.elastos.hive.Vault;
+import org.elastos.hive.VaultImpl;
 import org.elastos.hive.didhelper.DApp;
 import org.elastos.hive.didhelper.DIDApp;
 import org.elastos.hive.exception.HiveException;
@@ -22,7 +23,6 @@ import org.elastos.hive.utils.JwtUtil;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 public class TestData {
 
