@@ -2,6 +2,9 @@ package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Version format: Major.Minor.Hotfix
+ */
 public interface Version {
 
 	/**
@@ -9,7 +12,7 @@ public interface Version {
 	 *
 	 * @return
 	 */
-	 CompletableFuture<String> getVersionName();
+	 CompletableFuture<String> getFullName();
 
 	/**
 	 * Get the last commit ID on the hive node git repository
@@ -17,4 +20,29 @@ public interface Version {
 	 * @return
 	 */
 	CompletableFuture<String> getLastCommitId();
+
+	/**
+	 * Major number
+	 * @return
+	 */
+	CompletableFuture<Integer> getMajorNumber();
+
+	/**
+	 * Minor number
+	 * @return
+	 */
+	CompletableFuture<Integer> getMinorNumber();
+
+	/**
+	 * fix number
+	 * @return
+	 */
+	CompletableFuture<Integer> getFixNumber();
+
+	/**
+	 * full number
+	 * @return
+	 */
+	CompletableFuture<Integer> getFullNumber();
+
 }

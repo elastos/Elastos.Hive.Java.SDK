@@ -141,12 +141,97 @@ public class ManagementTest {
 	}
 
 	@Test
-	public void testGetNodeVersion() {
-		CompletableFuture<Boolean> future = managementApi.getVersion().getVersionName()
-				.handle((vault, throwable) -> {
+	public void testGetFullName() {
+		CompletableFuture<Boolean> future = managementApi.getVersion().getFullName()
+				.handle((versionName, throwable) -> {
 					if(throwable != null) {
 						throwable.printStackTrace();
 					}
+					System.out.println("versionName:"+versionName);
+					return (null == throwable);
+				});
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void testGetMajorNumber() {
+		CompletableFuture<Boolean> future = managementApi.getVersion().getMajorNumber()
+				.handle((number, throwable) -> {
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
+					System.out.println("number:"+number);
+					return (null == throwable);
+				});
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void testGetMinorNumber() {
+		CompletableFuture<Boolean> future = managementApi.getVersion().getMinorNumber()
+				.handle((number, throwable) -> {
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
+					System.out.println("number:"+number);
+					return (null == throwable);
+				});
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void testGetFixNumber() {
+		CompletableFuture<Boolean> future = managementApi.getVersion().getFixNumber()
+				.handle((number, throwable) -> {
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
+					System.out.println("number:"+number);
+					return (null == throwable);
+				});
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void testGetFullNumber() {
+		CompletableFuture<Boolean> future = managementApi.getVersion().getFullNumber()
+				.handle((number, throwable) -> {
+					if(throwable != null) {
+						throwable.printStackTrace();
+					}
+					System.out.println("number:"+number);
 					return (null == throwable);
 				});
 

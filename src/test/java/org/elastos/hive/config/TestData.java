@@ -15,7 +15,6 @@ import org.elastos.hive.Management;
 import org.elastos.hive.Payment;
 import org.elastos.hive.Utils;
 import org.elastos.hive.Vault;
-import org.elastos.hive.VaultImpl;
 import org.elastos.hive.didhelper.DApp;
 import org.elastos.hive.didhelper.DIDApp;
 import org.elastos.hive.exception.HiveException;
@@ -185,9 +184,8 @@ public class TestData {
 		return this.client.getVault(nodeConfig.ownerDid(), nodeConfig.provider());
 	}
 
-	public CompletableFuture<Vault> createTargetVault() {
-		return this.client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost(), null)
-				.thenComposeAsync(management -> management.createVault());
+	public CompletableFuture<Vault> getTargetVault() {
+		return client.getVault(nodeConfig.targetDid(), nodeConfig.targetHost());
 	}
 
 	public CompletableFuture<Backup> getTargetBackup() {
