@@ -31,7 +31,7 @@ public class BackupTest {
 	}
 
 	@Test
-	public void testSave() {
+	public void testStore() {
 		CompletableFuture<Boolean> future = backupApi.store(testData.getBackupAuthenticationHandler())
 				.handle((success, ex) -> (ex == null));
 
