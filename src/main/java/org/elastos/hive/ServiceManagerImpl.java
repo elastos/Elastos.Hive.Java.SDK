@@ -8,9 +8,9 @@ import org.elastos.hive.exception.BackupNotFoundException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 import org.elastos.hive.exception.VaultNotFoundException;
-import org.elastos.hive.payment.UsingPlan;
-import org.elastos.hive.service.BackupUsingPlan;
+import org.elastos.hive.service.BackupServiceInfo;
 import org.elastos.hive.service.CreateServiceResult;
+import org.elastos.hive.service.VaultServiceInfo;
 import org.elastos.hive.utils.ResponseHelper;
 
 import java.io.IOException;
@@ -123,11 +123,11 @@ class ServiceManagerImpl implements ServiceManager {
 	}
 
 	@Override
-	public CompletableFuture<UsingPlan> getVaultServiceInfo() {
+	public CompletableFuture<VaultServiceInfo> getVaultServiceInfo() {
 		return authHelper.checkValid().thenApplyAsync(aVoid -> getVaultServiceInfoImpl());
 	}
 
-	private UsingPlan getVaultServiceInfoImpl() {
+	private VaultServiceInfo getVaultServiceInfoImpl() {
 		try {
 			Response response = this.connectionManager.getServiceManagerApi()
 					.getVaultServiceInfo()
@@ -141,7 +141,7 @@ class ServiceManagerImpl implements ServiceManager {
 			if(null == value) return null;
 			JsonNode ret = value.get("vault_service_info");
 			if(null == ret) return null;
-			return UsingPlan.deserialize(ret.toString());
+			return VaultServiceInfo.deserialize(ret.toString());
 		} catch (IOException|HiveException e) {
 			throw new CompletionException(e);
 		}
@@ -169,11 +169,11 @@ class ServiceManagerImpl implements ServiceManager {
 	}
 
 	@Override
-	public CompletableFuture<BackupUsingPlan> getBackupServiceInfo() {
+	public CompletableFuture<BackupServiceInfo> getBackupServiceInfo() {
 		return authHelper.checkValid().thenApplyAsync(aVoid -> getBackupServiceInfoImpl());
 	}
 
-	private BackupUsingPlan getBackupServiceInfoImpl() {
+	private BackupServiceInfo getBackupServiceInfoImpl() {
 		try {
 			Response response = this.connectionManager.getServiceManagerApi()
 					.getBackupVaultInfo()
@@ -187,7 +187,7 @@ class ServiceManagerImpl implements ServiceManager {
 			if(null == value) return null;
 			JsonNode ret = value.get("vault_service_info");
 			if(null == ret) return null;
-			return BackupUsingPlan.deserialize(ret.toString());
+			return BackupServiceInfo.deserialize(ret.toString());
 		} catch (IOException|HiveException e) {
 			throw new CompletionException(e);
 		}

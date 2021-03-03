@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.elastos.hive.Result;
 
-public class BackupUsingPlan extends Result<BackupUsingPlan> {
+public class BackupServiceInfo extends Result<BackupServiceInfo> {
 	@JsonProperty("did")
-	private String did;
+	private String userDid;
 	@JsonProperty("backup_using")
-	private String name;
+	private String pricingName;
 	@JsonProperty("max_storage")
 	private long maxStorage;
 	@JsonProperty("use_storage")
@@ -20,12 +20,12 @@ public class BackupUsingPlan extends Result<BackupUsingPlan> {
 	@JsonProperty("end_time")
 	private String endTime;
 
-	public String did() {
-		return did;
+	public String userDid() {
+		return userDid;
 	}
 
-	public String name() {
-		return name;
+	public String pricingName() {
+		return pricingName;
 	}
 
 	public long maxStorage() {
@@ -44,11 +44,11 @@ public class BackupUsingPlan extends Result<BackupUsingPlan> {
 		return startTime;
 	}
 
-	public String dndTime() {
+	public String endTime() {
 		return endTime;
 	}
 
-	public static BackupUsingPlan deserialize(String content) {
-		return deserialize(content, BackupUsingPlan.class);
+	public static BackupServiceInfo deserialize(String content) {
+		return deserialize(content, BackupServiceInfo.class);
 	}
 }
