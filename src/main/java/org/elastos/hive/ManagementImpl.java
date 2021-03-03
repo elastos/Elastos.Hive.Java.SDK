@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
-import org.elastos.hive.payment.UsingPlan;
-import org.elastos.hive.service.BackupUsingPlan;
+import org.elastos.hive.service.BackupServiceInfo;
+import org.elastos.hive.service.VaultServiceInfo;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -56,12 +56,12 @@ public class ManagementImpl implements Management{
 	}
 
 	@Override
-	public CompletableFuture<UsingPlan> getVaultServiceInfo() {
+	public CompletableFuture<VaultServiceInfo> getVaultServiceInfo() {
 		return this.serviceManager.getVaultServiceInfo();
 	}
 
 	@Override
-	public CompletableFuture<BackupUsingPlan> getBackupServiceInfo() {
+	public CompletableFuture<BackupServiceInfo> getBackupServiceInfo() {
 		return this.serviceManager.getBackupServiceInfo();
 	}
 

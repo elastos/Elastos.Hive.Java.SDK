@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
-import org.elastos.hive.payment.UsingPlan;
-import org.elastos.hive.service.BackupUsingPlan;
+import org.elastos.hive.service.BackupServiceInfo;
+import org.elastos.hive.service.VaultServiceInfo;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -47,14 +47,14 @@ public interface Management {
 	 *
 	 * @return
 	 */
-	CompletableFuture<UsingPlan> getVaultServiceInfo();
+	CompletableFuture<VaultServiceInfo> getVaultServiceInfo();
 
 	/**
 	 * get backup service information
 	 *
 	 * @return
 	 */
-	CompletableFuture<BackupUsingPlan> getBackupServiceInfo();
+	CompletableFuture<BackupServiceInfo> getBackupServiceInfo();
 
 	/**
 	 * Check if the vault exists

@@ -103,7 +103,16 @@ public class ManagementTest {
 	@Test
 	public void testGetVaultServiceInfo() {
 		CompletableFuture<Boolean> future = managementApi.getVaultServiceInfo()
-				.handle((vault, throwable) -> {
+				.handle((serviceInfo, throwable) -> {
+					System.out.println("dbUse:"+serviceInfo.dbUseStorage());
+					System.out.println("userDid:"+serviceInfo.userDid());
+					System.out.println("endTime:"+serviceInfo.endTime());
+					System.out.println("fileUse:"+serviceInfo.fileUseStorage());
+					System.out.println("maxStorage:"+serviceInfo.maxStorage());
+					System.out.println("modifyTime:"+serviceInfo.modifyTime());
+					System.out.println("startTime:"+serviceInfo.startTime());
+					System.out.println("pricingName:"+serviceInfo.pricingName());
+					System.out.println("state:"+serviceInfo.state());
 					if(throwable != null) {
 						throwable.printStackTrace();
 					}
@@ -123,10 +132,16 @@ public class ManagementTest {
 	@Test
 	public void testGetBackupServiceInfo() {
 		CompletableFuture<Boolean> future = managementApi.getBackupServiceInfo()
-				.handle((vault, throwable) -> {
+				.handle((serviceInfo, throwable) -> {
 					if(throwable != null) {
 						throwable.printStackTrace();
 					}
+					System.out.println("userDid:"+serviceInfo.userDid());
+					System.out.println("endTime:"+serviceInfo.endTime());
+					System.out.println("maxStorage:"+serviceInfo.maxStorage());
+					System.out.println("modifyTime:"+serviceInfo.modifyTime());
+					System.out.println("startTime:"+serviceInfo.startTime());
+					System.out.println("pricingName:"+serviceInfo.pricingName());
 					return (null == throwable);
 				});
 
