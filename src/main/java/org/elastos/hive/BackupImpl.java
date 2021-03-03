@@ -8,7 +8,11 @@ import org.elastos.did.exception.MalformedCredentialException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.backup.State;
 import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.exception.BackupNotFoundException;
+import org.elastos.hive.exception.BadRequestException;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.InsufficientStorageException;
+import org.elastos.hive.exception.UnknownException;
 import org.elastos.hive.exception.UnsupportStateTypeException;
 import org.elastos.hive.utils.JsonUtil;
 import org.elastos.hive.utils.JwtUtil;
@@ -20,15 +24,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-public class BackupImpl implements Backup{
+public class BackupImpl implements Backup {
 
 	private AuthHelper authHelper;
 	private ConnectionManager connectionManager;
@@ -36,7 +38,7 @@ public class BackupImpl implements Backup{
 	private String targetHost;
 	private String type;
 
-	BackupImpl(AuthHelper authHelper,String targetHost) {
+	BackupImpl(AuthHelper authHelper, String targetHost) {
 		this.authHelper = authHelper;
 		this.connectionManager = authHelper.getConnectionManager();
 		this.targetHost = targetHost;
@@ -68,7 +70,6 @@ public class BackupImpl implements Backup{
 			return null;
 		});
 	}
-
 
 
 	@Override
@@ -168,22 +169,16 @@ public class BackupImpl implements Backup{
 			throw new IllegalArgumentException("backup authentication handler can not be null");
 		}
 
-		return authHelper.checkValid().thenComposeAsync(aVoid ->
-				getCredential(handler, "store")).thenApplyAsync(credential -> {
-			try {
-				saveImpl(credential);
-				return credential;
-			} catch (HiveException e) {
-				e.printStackTrace();
-			}
-			return null;
+		return authHelper.checkValid().thenComposeAsync(aVoid -> getCredential(handler, "store")).thenApplyAsync(credential -> {
+			storeImpl(credential);
+			return credential;
 		}).handleAsync((credential, throwable) -> {
 			if (null != credential) storeCredential(credential);
 			return (null != credential && null == throwable);
 		});
 	}
 
-	private boolean saveImpl(String credential) throws HiveException {
+	private boolean storeImpl(String credential) {
 		try {
 			Map<String, Object> map = new HashMap<>();
 			map.put("backup_credential", credential);
@@ -192,11 +187,12 @@ public class BackupImpl implements Backup{
 			Response response = this.connectionManager.getBackApi()
 					.saveToNode(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 					.execute();
+			checkErrorCode(response);
 
 			authHelper.checkResponseWithRetry(response);
 			return true;
-		} catch (Exception e) {
-			throw new HiveException(e.getLocalizedMessage());
+		} catch (IOException | HiveException e) {
+			throw new CompletionException(e);
 		}
 	}
 
@@ -210,22 +206,16 @@ public class BackupImpl implements Backup{
 			throw new IllegalArgumentException("backup authentication handler can not be null");
 		}
 
-		return authHelper.checkValid().thenComposeAsync(aVoid ->
-				getCredential(handler, "restore")).thenApplyAsync(credential -> {
-			try {
-				restoreImpl(credential);
-				return credential;
-			} catch (HiveException e) {
-				e.printStackTrace();
-			}
-			return null;
+		return authHelper.checkValid().thenComposeAsync(aVoid -> getCredential(handler, "restore")).thenApplyAsync(credential -> {
+			restoreImpl(credential);
+			return credential;
 		}).handleAsync((credential, throwable) -> {
 			if (null != credential) storeCredential(credential);
 			return (null != credential && null == throwable);
 		});
 	}
 
-	private boolean restoreImpl(String credential) throws HiveException {
+	private boolean restoreImpl(String credential) {
 		try {
 			Map<String, Object> map = new HashMap<>();
 			map.put("backup_credential", credential);
@@ -234,11 +224,12 @@ public class BackupImpl implements Backup{
 			Response response = this.connectionManager.getBackApi()
 					.restoreFromNode(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 					.execute();
+			checkErrorCode(response);
 
 			authHelper.checkResponseWithRetry(response);
 			return true;
-		} catch (Exception e) {
-			throw new HiveException(e.getLocalizedMessage());
+		} catch (IOException | HiveException e) {
+			throw new CompletionException(e);
 		}
 	}
 
@@ -276,5 +267,23 @@ public class BackupImpl implements Backup{
 
 	private void setType(String type) {
 		this.type = type;
+	}
+
+	private void checkErrorCode(Response response) throws IOException {
+		int code = response.code();
+		if (code >= 300 || code < 200) {
+			ResponseBody body = (ResponseBody) response.errorBody();
+			String message = body.string() == null ? "" : body.toString();
+			switch (code) {
+				case ErrorCode.NOT_FOUND:
+					throw new BackupNotFoundException(message);
+				case ErrorCode.BAD_REQUEST:
+					throw new BadRequestException(message);
+				case ErrorCode.INSUFFICIENT_STORAGE:
+					throw new InsufficientStorageException(message);
+				default:
+					throw new UnknownException(message);
+			}
+		}
 	}
 }
