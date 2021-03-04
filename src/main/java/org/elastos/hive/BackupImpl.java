@@ -93,9 +93,13 @@ public class BackupImpl implements Backup {
 
 			JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
 			String type = ret.get("hive_backup_state").asText();
+			String result = ret.get("result").asText();
 			switch (type) {
 				case "stop":
-					return State.STOP;
+					if(null==result || result.equals("failed")) {
+						return State.FAILED;
+					}
+					return State.SUCCESS;
 				case "backup":
 					return State.BACKUP;
 				case "restore":
