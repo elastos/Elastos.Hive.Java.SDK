@@ -88,13 +88,15 @@ public class MigrationTest {
 				.thenApplyAsync(aBoolean -> {
 					for (; ; ) {
 						try {
-							Thread.sleep(5 * 1000);
+							Thread.sleep(20 * 1000);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 						State state = backupApi.getState().join();
-						if (state == State.STOP) {
+						if (state == State.SUCCESS) {
 							return true;
+						} else if(state == State.FAILED) {
+							fail();
 						}
 					}
 				}).thenComposeAsync(aBoolean ->

@@ -2,7 +2,9 @@ package org.elastos.hive.backup;
 
 public enum State {
 
-	STOP,
+	SUCCESS,
+
+	FAILED,
 
 	BACKUP,
 

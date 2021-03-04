@@ -1,7 +1,6 @@
 package org.elastos.hive;
 
 interface  ErrorCode {
-	int SUCCESS = 200;
 	int BAD_REQUEST = 400;
 	int UNAUTHORIZED = 401;
 	int PAYMENT_REQUIRED = 402;
