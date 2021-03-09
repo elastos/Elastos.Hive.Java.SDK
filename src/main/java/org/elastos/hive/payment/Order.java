@@ -1,72 +1,65 @@
 package org.elastos.hive.payment;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class Order {
+	private String orderHash;
+	private String inAppDid;
+	private String subscriberDid;
 
-import org.elastos.hive.Result;
+	private float payAmount;
+	private String payCurrency;    	// ELA in default.
 
-import java.util.List;
+	private String pricingPlan;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Order extends Result<Order> {
-	@JsonProperty("order_id")
-	private String orderId;
-	@JsonProperty("did")
-	private String did;
-	@JsonProperty("app_id")
-	private String appId;
-	@JsonProperty("pricing_info")
-	private PricingPlan packageInfo;
-	@JsonProperty("pay_time")
-	private long payTime;
-	@JsonProperty("pay_txids")
-	private List<String> payTxids;
-	@JsonProperty("state")
-	private String state;
-	@JsonProperty("creat_time")
-	private long creatTime;
-	@JsonProperty("modify_time")
-	private long modifyTime;
-	@JsonProperty("finish_time")
-	private long finishTime;
+	private long createdTime;
+	private long expiredTime;
 
-	public String orderId() {
-		return orderId;
+	private String signature;
+
+	private PaymentStatus status;
+
+	public enum PaymentStatus {
+		Unpaid,
+		Paid,
+		Expired
+	};
+
+	public String getOrderId() {
+		return orderHash;
 	}
 
-	public String did() {
-		return did;
+	public String getInAppDid() {
+		return inAppDid;
 	}
 
-	public String appId() {
-		return appId;
+	public String getSubscriberDid() {
+		return subscriberDid;
 	}
 
-	public PricingPlan packageInfo() {
-		return packageInfo;
+	public float getPayAmount() {
+		return payAmount;
 	}
 
-	public long payTime() {
-		return payTime;
+	public String getPayCurrency() {
+		return payCurrency;
 	}
 
-	public List<String> payTxids() {
-		return payTxids;
+	public long getCreatedTime() {
+		return createdTime;
 	}
 
-	public String state() {
-		return state;
+	public long getExpiredTime() {
+		return expiredTime;
 	}
 
-	public long creatTime() {
-		return creatTime;
+	public String getPricingPlan() {
+		return pricingPlan;
 	}
 
-	public long finishTime() {
-		return finishTime;
+	public String getSignature() {
+		return signature;
 	}
 
-	public static Order deserialize(String content) {
-		return deserialize(content, Order.class);
+	public String getPaymentStatus() {
+		return status.toString();
 	}
 }

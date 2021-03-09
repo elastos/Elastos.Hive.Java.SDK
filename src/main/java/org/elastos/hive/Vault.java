@@ -1,63 +1,53 @@
 package org.elastos.hive;
 
-public interface Vault {
+import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.service.BackupService;
+import org.elastos.hive.service.Database;
+import org.elastos.hive.service.FilesService;
+import org.elastos.hive.service.PubsubService;
+import org.elastos.hive.service.ScriptingService;
+import org.elastos.hive.vault.ServiceBuilder;
 
-	/**
-	 * Get vault provider address
-	 * @return	the vault provider address.
-	 */
-	String getProviderAddress();
+/**
+ * This class explicitly represents the vault service subscribed by "myDid".
+ */
+public class Vault extends ServiceEndpoint {
+	private FilesService 	filesService;
+	private Database	  	database;
+	private ScriptingService scripting;
+	private PubsubService 	pubsubService;
+	private BackupService 	backupService;
 
-	/**
-	 * Get vault owner did
-	 * @return	the vault owner DID.
-	 */
-	String getOwnerDid();
+	public Vault(AppContext context, String myDid) throws HiveException {
+		super(context, null, myDid);
+	}
 
-	/**
-	 * Get application id
-	 * @return 	the application id.
-	 */
-	String getAppId();
+	public Vault(AppContext context, String myDid, String preferredProviderAddress) throws HiveException {
+		super(context, preferredProviderAddress, myDid);
 
-	/**
-	 * Get application did
-	 * @return	the application DID.
-	 */
-	String getAppInstanceDid();
+		this.filesService 	= new ServiceBuilder(this).createFileService();
+		this.database 		= new ServiceBuilder(this).createDatabase();
+		this.pubsubService 	= new ServiceBuilder(this).createPubsubService();
+		this.backupService 	= new ServiceBuilder(this).createBackupService();
+	}
 
-	/**
-	 * Get user did
-	 * @return	the user DID.
-	 */
-	String getUserDid();
+	public FilesService getFilesService() {
+		return this.filesService;
+	}
 
-	/**
-	 * Get the interface as database instance
-	 * @return interface instance of Database.
-	 */
-	Database getDatabase();
+	public Database getDatabase() {
+		return this.database;
+	}
 
-	/**
-	 * Get the interface as Files instance
-	 * @return interface instance of Files.
-	 */
-	Files getFiles();
+	public ScriptingService getScripting() {
+		return this.scripting;
+	}
 
-	/**
-	 * Get interface as KeyValues instance
-	 * @return interface instance of KeyValues
-	 */
-	KeyValues getKeyValues();
+	public PubsubService getPubsubService() {
+		return this.pubsubService;
+	}
 
-	/**
-	 * Get interface as Scripting instance
-	 * @return	interface instance of Scripting
-	 */
-	Scripting getScripting();
-
-	/**
-	 * clear local access token
-	 */
-	void revokeAccessToken();
+	public BackupService getBackupService() {
+		return this.backupService;
+	}
 }
