@@ -1,9 +1,7 @@
 package org.elastos.hive.exception;
 
-public class ProviderNotSetException extends RuntimeException {
-
-	private static final long serialVersionUID = -2957612675751731404L;
-
+public class ProviderNotSetException extends ProviderNotFoundException {
+	private static final long serialVersionUID = -586039279266427101L;
 
 	public ProviderNotSetException() {
 		super();

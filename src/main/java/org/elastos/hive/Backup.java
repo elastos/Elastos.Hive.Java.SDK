@@ -1,39 +1,30 @@
 package org.elastos.hive;
 
-import org.elastos.hive.backup.State;
+import org.elastos.hive.backup.ServiceBuilder;
+import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.service.PromotionService;
 
-import java.util.concurrent.CompletableFuture;
+public class Backup extends ServiceEndpoint {
+	private PromotionService promotionService;
 
-public interface Backup {
+	public Backup(AppContext context, String userDid, String providerAddress) throws HiveException {
+		super(context, providerAddress, userDid, userDid, null);
 
-	/**
-	 * Get backup/restore state
-	 *
-	 * @return  stop, backup, restore
-	 */
-	CompletableFuture<State> getState();
+		this.promotionService = new ServiceBuilder(this).createPromotionService();
+	}
 
-	/**
-	 * Backup hive vault to other hive node
-	 *
-	 * @param handler BackupAuthenticationHandler
-	 * @return true(success), false(failed)
-	 */
-	CompletableFuture<Boolean> store(BackupAuthenticationHandler handler);
+	/*
+	class BackupInfo {
 
-	/**
-	 * Restore hive vault from other hive node
-	 *
-	 * @param handler BackupAuthenticationHandler
-	 * @return  true(success), false(failed)
-	 */
-	CompletableFuture<Boolean> restore(BackupAuthenticationHandler handler);
+	}
 
-	/**
-	 * Active hive backup data to vault
-	 *
-	 * @return true(success), false(failed)
-	 */
-	CompletableFuture<Boolean> activate();
+	public CompletableFuture<BackupInfo> getMetaInfo() {
+		// TODO;
+		return null;
+	}
+	*/
 
+	public PromotionService getPromotionService() {
+		return this.promotionService;
+	}
 }
