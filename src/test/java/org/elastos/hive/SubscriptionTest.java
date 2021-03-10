@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.elastos.did.DIDDocument;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.service.BackupService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,8 +20,7 @@ public class SubscriptionTest {
 			// subscribe vault service;
 			vs = new VaultSubscription(appContext, "your-vault-provider-address", "your-user-did");
 			vs.subscribe("your-pricing-plan")
-				.thenComposeAsync(info -> vs.activate())
-			    .thenComposeAsync(aVoid -> vs.setBackup("your-backup-provider-address"));
+				.thenComposeAsync(info -> vs.activate());
 
 
 			// subscribe backup service;
@@ -28,6 +28,14 @@ public class SubscriptionTest {
 			bs = new BackupSubscription(appContext, "your-backup-provdier-address", "your-user-did");
 			bs.subscribe("your-pricing-plan")
 				.thenComposeAsync(info -> bs.activate());
+
+			Vault vault;
+			vault = new Vault(appContext, "your-vault-provider-address", "your-user-did");
+
+			BackupService service;
+			service = vault.getBackupService();
+			service.setupContext(null);
+
 
 		} catch (HiveException e) {
 			// TODO Auto-generated catch block
