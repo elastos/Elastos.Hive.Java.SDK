@@ -37,7 +37,7 @@ public class VaultSubscription {
 		return render.checkSubscription();
 	}
 
-	public CompletableFuture<List<PricingPlan>> getPringPlanList() {
+	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
 		return render.getPricingPlanList();
 	}
 
@@ -63,6 +63,11 @@ public class VaultSubscription {
 
 	public class VaultInfo {
 		// TODO;
+		private String providerAddress;
+		private String ownerDid;
+		private String appInstanceDid;
+		private String userDid;
+		private String serviceDid;
 	}
 
 	class SubscriptionRender extends ServiceEndpoint implements SubscriptionService, PaymentService {
