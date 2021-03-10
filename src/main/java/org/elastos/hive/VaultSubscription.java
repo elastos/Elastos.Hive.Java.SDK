@@ -18,11 +18,11 @@ public class VaultSubscription {
 	}
 
 	public CompletableFuture<VaultInfo> subscribe(String pricingPlan) {
-		return service.subscribe0(pricingPlan, VaultInfo.class);
+		return service.subscribe(pricingPlan, VaultInfo.class);
 	}
 
 	public CompletableFuture<Void> unsubscribe() {
-		return service.unsbuscribe();
+		return service.unsubscribe();
 	}
 
 	public CompletableFuture<Void> activate() {
@@ -47,13 +47,13 @@ public class VaultSubscription {
 		}
 
 		@Override
-		public <T> CompletableFuture<T> subscribe0(String pricingPlan, Class<T> type) {
+		public <T> CompletableFuture<T> subscribe(String pricingPlan, Class<T> type) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public CompletableFuture<Void> unsbuscribe() {
+		public CompletableFuture<Void> unsubscribe() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -77,7 +77,7 @@ public class VaultSubscription {
 		}
 
 		@Override
-		public CompletableFuture<List<PricingPlan>> getPringPlanList() {
+		public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
 			// TODO Auto-generated method stub
 			return null;
 		}

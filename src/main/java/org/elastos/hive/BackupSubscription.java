@@ -18,11 +18,11 @@ public class BackupSubscription {
 	}
 
 	public CompletableFuture<BackupInfo> subscribe(String pricingPlan) {
-		return service.subscribe0(pricingPlan, BackupInfo.class);
+		return service.subscribe(pricingPlan, BackupInfo.class);
 	}
 
 	public CompletableFuture<Void> unsbuscribe() {
-		return service.unsbuscribe();
+		return service.unSbuscribe();
 	}
 
 	public CompletableFuture<Void> activate() {
@@ -48,13 +48,13 @@ public class BackupSubscription {
 		}
 
 		@Override
-		public <T> CompletableFuture<T> subscribe0(String pricingPlan, Class<T> type) {
+		public <T> CompletableFuture<T> subscribe(String pricingPlan, Class<T> type) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public CompletableFuture<Void> unsbuscribe() {
+		public CompletableFuture<Void> unSbuscribe() {
 			// TODO Auto-generated method stub
 			return null;
 		}
@@ -78,7 +78,7 @@ public class BackupSubscription {
 		}
 
 		@Override
-		public CompletableFuture<List<PricingPlan>> getPringPlanList() {
+		public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
 			// TODO Auto-generated method stub
 			return null;
 		}
