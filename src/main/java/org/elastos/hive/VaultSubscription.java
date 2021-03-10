@@ -11,10 +11,10 @@ import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
 
 public class VaultSubscription {
-	private SubscriptionService service;
+	private SubscriptionRender render;
 
 	public VaultSubscription(AppContext context, String userDid, String providerAddress) throws HiveException {
-		service = new SubscriptionRender(context, userDid, providerAddress);
+		render = new SubscriptionRender(context, userDid, providerAddress);
 	}
 
 	public CompletableFuture<VaultInfo> subscribe(String pricingPlan) {
@@ -26,15 +26,39 @@ public class VaultSubscription {
 	}
 
 	public CompletableFuture<Void> activate() {
-		return service.activate();
+		return render.activate();
 	}
 
 	public CompletableFuture<Void> deactivate() {
-		return service.deactivate();
+		return render.deactivate();
 	}
 
 	public CompletableFuture<VaultInfo> checkSubscription() {
-		return service.checkSubscription();
+		return render.checkSubscription();
+	}
+
+	public CompletableFuture<List<PricingPlan>> getPringPlanList() {
+		return render.getPringPlanList();
+	}
+
+	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
+		return render.getPricingPlan(planName);
+	}
+
+	public CompletableFuture<Order> placeOrder(String planName) {
+		return render.placeOrder(planName);
+	}
+
+	public CompletableFuture<Order> getOrder(String orderId) {
+		return render.getOrder(orderId);
+	}
+
+	public CompletableFuture<Receipt> payOrder(String orderId, String transId) {
+		return render.payOrder(orderId, transId);
+	}
+
+	public CompletableFuture<Receipt> getReceipt(String receiptId) {
+		return render.getReceipt(receiptId);
 	}
 
 	public class VaultInfo {
@@ -48,67 +72,56 @@ public class VaultSubscription {
 
 		@Override
 		public <T> CompletableFuture<T> subscribe(String pricingPlan, Class<T> type) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public CompletableFuture<Void> unsubscribe() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public CompletableFuture<Void> activate() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public CompletableFuture<Void> deactivate() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public <T> CompletableFuture<T> checkSubscription() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public CompletableFuture<Order> placeOrder(String planName) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public CompletableFuture<Order> getOrder(String orderId) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public CompletableFuture<Receipt> payOrder(String orderId, String transId) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
 		public CompletableFuture<Receipt> getReceipt(String receiptId) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 	}
