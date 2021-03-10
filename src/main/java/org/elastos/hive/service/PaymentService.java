@@ -8,16 +8,16 @@ import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
 
 public interface PaymentService {
-	public CompletableFuture<List<PricingPlan>> getPringPlanList();
+	CompletableFuture<List<PricingPlan>> getPricingPlanList();
 
-	public CompletableFuture<PricingPlan> getPricingPlan(String planName);
+	CompletableFuture<PricingPlan> getPricingPlan(String planName);
 
-	public CompletableFuture<Order> placeOrder(String planName);
+	CompletableFuture<Order> placeOrder(String planName);
 
-	public CompletableFuture<Order> getOrder(String orderId);
+	CompletableFuture<Order> getOrder(String orderId);
 
-	public CompletableFuture<Receipt> payOrder(String orderId, String transId);
+	CompletableFuture<Receipt> payOrder(String orderId, String transId);
 
-	public CompletableFuture<Receipt> getReceipt(String receiptId);
+	CompletableFuture<Receipt> getReceipt(String receiptId);
 
 }
