@@ -18,11 +18,11 @@ public class VaultSubscription {
 	}
 
 	public CompletableFuture<VaultInfo> subscribe(String pricingPlan) {
-		return service.subscribe(pricingPlan, VaultInfo.class);
+		return render.subscribe(pricingPlan, VaultInfo.class);
 	}
 
 	public CompletableFuture<Void> unsubscribe() {
-		return service.unsubscribe();
+		return render.unsubscribe();
 	}
 
 	public CompletableFuture<Void> activate() {
@@ -38,7 +38,7 @@ public class VaultSubscription {
 	}
 
 	public CompletableFuture<List<PricingPlan>> getPringPlanList() {
-		return render.getPringPlanList();
+		return render.getPricingPlanList();
 	}
 
 	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {

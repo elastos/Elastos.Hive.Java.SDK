@@ -22,7 +22,7 @@ public class BackupSubscription {
 	}
 
 	public CompletableFuture<Void> unsbuscribe() {
-		return service.unSbuscribe();
+		return service.unsubscribe();
 	}
 
 	public CompletableFuture<Void> activate() {
@@ -54,7 +54,7 @@ public class BackupSubscription {
 		}
 
 		@Override
-		public CompletableFuture<Void> unSbuscribe() {
+		public CompletableFuture<Void> unsubscribe() {
 			// TODO Auto-generated method stub
 			return null;
 		}
