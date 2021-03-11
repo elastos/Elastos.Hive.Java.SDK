@@ -5,7 +5,7 @@ import org.elastos.hive.auth.RemoteResolver;
 import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.model.BaseServiceConfig;
-import org.elastos.hive.storage.AuthPersistence;
+import org.elastos.hive.storage.FileStorage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,7 +18,7 @@ public class AuthHelper {
 	private AuthToken token;
 	private AppContextProvider contextProvider;
 	private ConnectionManager connectionManager;
-	private AuthPersistence persistent;
+	private FileStorage persistent;
 
 	private TokenResolver tokenResolver;
 
