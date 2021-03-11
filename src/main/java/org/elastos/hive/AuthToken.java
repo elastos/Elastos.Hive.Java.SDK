@@ -5,6 +5,12 @@ public class AuthToken {
 	private long expiresTime;
 	private String tokenType;
 
+	public AuthToken(String accessToken, long expiresTime, String tokenType) {
+		this.accessToken = accessToken;
+		this.expiresTime = expiresTime;
+		this.tokenType = tokenType;
+	}
+
 	public String getAccessToken() {
 		return accessToken;
 	}
