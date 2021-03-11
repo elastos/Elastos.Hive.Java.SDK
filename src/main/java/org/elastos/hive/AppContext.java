@@ -53,6 +53,18 @@ public class AppContext {
 		}
 	}
 
+	public AppContextProvider getAppContextProvider() {
+		return this.contextProvider;
+	}
+
+	public String getUserDid() {
+		return this.userDid;
+	}
+
+	public String getProviderAddress() {
+		return this.providerAddress;
+	}
+
 	public static AppContext build(AppContextProvider provider) {
 		if (provider == null)
 			throw new IllegalArgumentException("Missing AppContext provider");
