@@ -13,9 +13,11 @@ import org.elastos.hive.service.SubscriptionService;
 
 public class VaultSubscription {
 	private SubscriptionRender render;
+	private AppContext context;
 
 	public VaultSubscription(AppContext context, String userDid, String providerAddress) throws HiveException {
-		render = new SubscriptionRender(context, userDid, providerAddress);
+		this.context = context;
+		this.render = new SubscriptionRender(context, userDid, providerAddress);
 	}
 
 	public CompletableFuture<VaultInfo> subscribe(String pricingPlan) {
@@ -94,11 +96,11 @@ public class VaultSubscription {
 		public CompletableFuture<Void> activate() {
 			return CompletableFuture.supplyAsync(() -> {
 				System.out.print("Check acess token here, otherwise request the access token");
-				return new AuthHelper().getAuthToken();
+				return context.getAuthenToken();
 			}).thenAcceptAsync(token -> {
 				System.out.print("Call activate API here");
 				activateImpl(token);
-			}).exceptionallyAsync(ex -> {
+			}).exceptionally(ex -> {
 				System.out.print("Handle specific expection here.");
 				return null;
 			});
