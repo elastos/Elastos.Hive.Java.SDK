@@ -1,10 +1,15 @@
 package org.elastos.hive;
 
+import org.elastos.hive.auth.LocalResolver;
+import org.elastos.hive.auth.RemoteResolver;
+import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.storage.AuthPersistence;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static org.junit.Assert.assertNotNull;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -14,6 +19,14 @@ public class AuthHelper {
 	private AppContextProvider contextProvider;
 	private ConnectionManager connectionManager;
 	private AuthPersistence persistent;
+
+	private TokenResolver tokenResolver;
+
+	public AuthHelper() {
+		tokenResolver = new LocalResolver();
+		tokenResolver.setNextResolver(new RemoteResolver());
+		//
+	}
 
 	public AuthHelper(AppContext appContext) {
 		this.contextProvider = appContext.getAppContextProvider();
@@ -84,4 +97,8 @@ public class AuthHelper {
 		}
 	}
 
+
+	public AuthToken getAuthToken() {
+		return tokenResolver.getToken();
+	}
 }
