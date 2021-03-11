@@ -22,16 +22,8 @@
 
 package org.elastos.hive.connection;
 
+import org.elastos.hive.AuthorizationApi;
 import org.elastos.hive.connection.model.BaseServiceConfig;
-import org.elastos.hive.network.AuthApi;
-import org.elastos.hive.network.BackupApi;
-import org.elastos.hive.network.DatabaseApi;
-import org.elastos.hive.network.FilesApi;
-import org.elastos.hive.network.PaymentApi;
-import org.elastos.hive.network.ScriptingApi;
-import org.elastos.hive.network.ServiceManagerApi;
-import org.elastos.hive.network.UploadApi;
-import org.elastos.hive.network.VersionApi;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -39,14 +31,7 @@ import java.net.URL;
 
 public class ConnectionManager {
 
-	private AuthApi authApi;
-	private FilesApi fileApi;
-	private DatabaseApi databaseApi;
-	private VersionApi versionApi;
-	private ScriptingApi scriptingApi;
-	private PaymentApi paymentApi;
-	private BackupApi backupApi;
-	private ServiceManagerApi serviceManagerApi;
+	private AuthorizationApi authApi;
 
 	private String vaultBaseUrl;
 	private BaseServiceConfig vaultConfig = new BaseServiceConfig.Builder().build() ;
@@ -55,61 +40,13 @@ public class ConnectionManager {
 		resetVaultApi(baseUrl, baseServiceConfig);
 	}
 
-	public AuthApi getAuthApi() {
+	public AuthorizationApi getAuthApi() {
 		if (authApi == null)
-			authApi = BaseServiceUtil.createService(AuthApi.class,
+			authApi = BaseServiceUtil.createService(AuthorizationApi.class,
 					this.vaultBaseUrl, this.vaultConfig);
 		return authApi;
 	}
 
-	public FilesApi getFileApi() {
-		if (fileApi == null)
-			fileApi = BaseServiceUtil.createService(FilesApi.class,
-					this.vaultBaseUrl, this.vaultConfig);
-		return fileApi;
-	}
-
-	public DatabaseApi getDatabaseApi() {
-		if (databaseApi == null)
-			databaseApi = BaseServiceUtil.createService(DatabaseApi.class,
-					this.vaultBaseUrl, this.vaultConfig);
-		return databaseApi;
-	}
-
-	public ScriptingApi getScriptingApi() {
-		if (scriptingApi == null)
-			scriptingApi = BaseServiceUtil.createService(ScriptingApi.class,
-					this.vaultBaseUrl, this.vaultConfig);
-		return scriptingApi;
-	}
-
-	public VersionApi getVersionApi() {
-		if (versionApi == null)
-			versionApi = BaseServiceUtil.createService(VersionApi.class,
-					this.vaultBaseUrl, this.vaultConfig);
-		return versionApi;
-	}
-
-	public PaymentApi getPaymentApi() {
-		if (paymentApi == null)
-			paymentApi = BaseServiceUtil.createService(PaymentApi.class,
-					this.vaultBaseUrl, this.vaultConfig);
-		return paymentApi;
-	}
-
-	public BackupApi getBackApi() {
-		if (backupApi == null)
-			backupApi = BaseServiceUtil.createService(BackupApi.class,
-					this.vaultBaseUrl, this.vaultConfig);
-		return backupApi;
-	}
-
-	public ServiceManagerApi getServiceManagerApi() {
-		if (serviceManagerApi == null)
-			serviceManagerApi = BaseServiceUtil.createService(ServiceManagerApi.class,
-					this.vaultBaseUrl, this.vaultConfig);
-		return serviceManagerApi;
-	}
 
 	private void updateVaultConfig(BaseServiceConfig vaultConfig) {
 		this.vaultConfig = vaultConfig;
@@ -121,13 +58,6 @@ public class ConnectionManager {
 
 	public void resetVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
 		authApi = null;
-		fileApi = null;
-		databaseApi = null;
-		versionApi = null;
-		scriptingApi = null;
-		paymentApi = null;
-		backupApi = null;
-		serviceManagerApi = null;
 		updateVaultBaseUrl(baseUrl);
 		updateVaultConfig(baseServiceConfig);
 	}
@@ -141,7 +71,7 @@ public class ConnectionManager {
 	}
 
 	public HttpURLConnection openURLConnection(String path) throws IOException {
-		String url = this.getVaultBaseUrl() + UploadApi.API_PATH + path;
+		String url = this.getVaultBaseUrl() + "/api/v1" + path;
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setRequestProperty("User-Agent",
