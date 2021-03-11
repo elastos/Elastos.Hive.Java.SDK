@@ -62,12 +62,31 @@ public class VaultSubscription {
 	}
 
 	public class VaultInfo {
-		// TODO;
 		private String providerAddress;
 		private String ownerDid;
 		private String appInstanceDid;
 		private String userDid;
 		private String serviceDid;
+
+		public String getProviderAddress() {
+			return providerAddress;
+		}
+
+		public String getOwnerDid() {
+			return ownerDid;
+		}
+
+		public String getAppInstanceDid() {
+			return appInstanceDid;
+		}
+
+		public String getUserDid() {
+			return userDid;
+		}
+
+		public String getServiceDid() {
+			return serviceDid;
+		}
 	}
 
 	class SubscriptionRender extends ServiceEndpoint implements SubscriptionService, PaymentService {
