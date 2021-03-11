@@ -9,6 +9,9 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.did.exception.MalformedDIDException;
+import org.elastos.hive.auth.LocalResolver;
+import org.elastos.hive.auth.RemoteResolver;
+import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotFoundException;
 import org.elastos.hive.exception.ProviderNotSetException;
@@ -29,11 +32,16 @@ public class AppContext {
 	@SuppressWarnings("unused")
 	private String providerAddress;
 
+	private TokenResolver tokenResolver;
+
 	private AppContext(AppContextProvider provider, String userDid) {
 		this(provider, userDid, null);
 	}
 
 	private AppContext(AppContextProvider provider, String userDid, String providerAddress) {
+		this.tokenResolver = new LocalResolver(providerAddress);
+		this.tokenResolver.setNextResolver(new RemoteResolver());
+
 		this.contextProvider = provider;
 	}
 
@@ -123,5 +131,9 @@ public class AppContext {
 				return null;
 			}
 		});
+	}
+
+	AuthToken getAuthenToken() {
+		return tokenResolver.getToken();
 	}
 }
