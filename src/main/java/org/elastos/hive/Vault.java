@@ -22,10 +22,10 @@ public class Vault extends ServiceEndpoint {
 		super(context, null, myDid);
 	}
 
-	public Vault(AppContext context, String myDid, String preferredProviderAddress) throws HiveException {
-		super(context, preferredProviderAddress, myDid);
+	public Vault(AppContext context, String myDid, String providerAddress) throws HiveException {
+		super(context, providerAddress, myDid);
 
-		this.filesService 	= new ServiceBuilder(this).createFileService();
+		this.filesService 	= new ServiceBuilder(this).createFilesService();
 		this.database 		= new ServiceBuilder(this).createDatabase();
 		this.pubsubService 	= new ServiceBuilder(this).createPubsubService();
 		this.backupService 	= new ServiceBuilder(this).createBackupService();

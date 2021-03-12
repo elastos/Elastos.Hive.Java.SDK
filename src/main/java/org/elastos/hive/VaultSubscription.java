@@ -95,8 +95,12 @@ public class VaultSubscription {
 		@Override
 		public CompletableFuture<Void> activate() {
 			return CompletableFuture.supplyAsync(() -> {
-				System.out.print("Check acess token here, otherwise request the access token");
-				return context.getAuthenToken();
+				try {
+					System.out.print("Check acess token here, otherwise request the access token");
+					return context.getAuthenToken();
+				} catch (HiveException e) {
+					return null;
+				}
 			}).thenAcceptAsync(token -> {
 				System.out.print("Call activate API here");
 				activateImpl(token);

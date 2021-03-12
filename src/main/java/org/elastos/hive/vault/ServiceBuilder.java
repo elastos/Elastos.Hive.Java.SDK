@@ -15,7 +15,7 @@ public class ServiceBuilder {
 	}
 
 	public FilesService createFilesService() {
-		return (FilesService) new BackupServiceRender(vault);
+		return new FilesServiceRender(vault);
 	}
 
 	public Database createDatabase() {
@@ -32,10 +32,5 @@ public class ServiceBuilder {
 
 	public BackupService createBackupService() {
 		return new BackupServiceRender(vault);
-	}
-
-	public FilesService createFileService() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
