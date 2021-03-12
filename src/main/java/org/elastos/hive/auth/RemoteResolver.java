@@ -3,6 +3,10 @@ package org.elastos.hive.auth;
 import com.fasterxml.jackson.databind.JsonNode;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import okio.BufferedSink;
+import okio.BufferedSource;
+
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.AppContext;
 import org.elastos.hive.AppContextProvider;
@@ -124,11 +128,144 @@ public class RemoteResolver implements TokenResolver {
 		// Do nothing;
 	}
 
-	private void challengeRequest() {
-		// TODO;
+	class ChallengeRequest extends ResponseBody {
+		String jwtToken;
+
+		@Override
+		public MediaType contentType() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long contentLength() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public BufferedSource source() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
-	private void challengeResponse() {
-		// TODO;
+	class SigninRequestBody extends RequestBody {
+
+		@Override
+		public MediaType contentType() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void writeTo(BufferedSink sink) throws IOException {
+			// TODO Auto-generated method stub
+
+		}
+
+	}
+
+	private String requestSignin() throws HiveException {
+		try {
+			Response<ResponseBody> response = connectionManager.getAuthApi()
+					.signIn(new SigninRequestBody())
+					.execute();
+
+			@SuppressWarnings("null")
+			int code = response.code();
+			switch (code) {
+			case 200:
+				System.out.print("Success");
+				break;
+			case 401:
+				System.out.print("Failed");
+				throw new HiveException("tell the exception message here");
+			}
+
+			ChallengeRequest challenge = (ChallengeRequest) response.body();
+			String jwtToken = challenge.jwtToken;
+
+			if (!verifyToken(jwtToken)) {
+				// TODO;
+			}
+
+			contextProvider.getAuthorization(jwtToken).thenAccept((credential) -> {
+				System.out.print("credential: " + credential);
+			});
+
+		} catch (Exception e){
+
+		}
+		return null;
+	}
+
+	class ChallengeResponseBody extends RequestBody {
+
+		@Override
+		public MediaType contentType() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void writeTo(BufferedSink sink) throws IOException {
+			// TODO Auto-generated method stub
+
+		}
+	}
+
+	class AccessToken extends ResponseBody {
+		private String accessToken;
+
+		@Override
+		public MediaType contentType() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long contentLength() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public BufferedSource source() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
+
+	private String challengeResponse() {
+		try {
+			Response<ResponseBody> response = connectionManager.getAuthApi()
+					.auth(new ChallengeResponseBody())
+					.execute();
+
+			@SuppressWarnings("null")
+			int code = response.code();
+			switch (code) {
+			case 200:
+				System.out.print("Success");
+				break;
+			case 401:
+				System.out.print("Failed");
+				throw new HiveException("tell the exception message here");
+			}
+
+			AccessToken token = (AccessToken) response.body();
+			String accessToken = token.accessToken;
+
+			if (!verifyToken(accessToken)) {
+				System.out.print("invalid token");
+			}
+
+			return accessToken;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
