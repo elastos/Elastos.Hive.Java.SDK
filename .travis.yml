@@ -14,5 +14,5 @@ cache:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
 
-script:
-- ./gradlew build test
+#script:
+#- ./gradlew build test
