@@ -12,6 +12,7 @@ import org.elastos.did.exception.MalformedDIDException;
 import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.RemoteResolver;
 import org.elastos.hive.auth.TokenResolver;
+import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotFoundException;
 import org.elastos.hive.exception.ProviderNotSetException;
@@ -32,17 +33,30 @@ public class AppContext {
 	@SuppressWarnings("unused")
 	private String providerAddress;
 
+	private AuthToken token;
 	private TokenResolver tokenResolver;
+	private ConnectionManager connectionManager;
 
 	private AppContext(AppContextProvider provider, String userDid) {
 		this(provider, userDid, null);
 	}
 
 	private AppContext(AppContextProvider provider, String userDid, String providerAddress) {
-		this.tokenResolver = new LocalResolver(providerAddress);
-		this.tokenResolver.setNextResolver(new RemoteResolver());
-
 		this.contextProvider = provider;
+		this.connectionManager = new ConnectionManager(providerAddress, null);
+		this.tokenResolver = new LocalResolver(providerAddress);
+		this.tokenResolver.setNextResolver(new RemoteResolver(this, connectionManager));
+	}
+
+	/**
+	 * Global check token before every service request.
+	 * @throws HiveException HiveException
+	 */
+	public void checkToken() throws HiveException {
+		if (token == null || token.isExpired()) {
+			token = tokenResolver.getToken();
+			this.connectionManager.refreshToken(token);
+		}
 	}
 
 	public static void setupResover(String resolver, String cacheDir) throws HiveException {
@@ -133,7 +147,7 @@ public class AppContext {
 		});
 	}
 
-	AuthToken getAuthenToken() {
+	AuthToken getAuthenToken() throws HiveException {
 		return tokenResolver.getToken();
 	}
 }
