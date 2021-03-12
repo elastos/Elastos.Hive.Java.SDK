@@ -22,8 +22,10 @@
 
 package org.elastos.hive.connection;
 
+import org.elastos.hive.AuthToken;
 import org.elastos.hive.AuthorizationApi;
 import org.elastos.hive.connection.model.BaseServiceConfig;
+import org.elastos.hive.connection.model.HeaderConfig;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -34,7 +36,7 @@ public class ConnectionManager {
 	private AuthorizationApi authApi;
 
 	private String vaultBaseUrl;
-	private BaseServiceConfig vaultConfig = new BaseServiceConfig.Builder().build() ;
+	private BaseServiceConfig vaultConfig;
 
 	public ConnectionManager(String baseUrl, BaseServiceConfig baseServiceConfig) {
 		resetVaultApi(baseUrl, baseServiceConfig);
@@ -49,7 +51,7 @@ public class ConnectionManager {
 
 
 	private void updateVaultConfig(BaseServiceConfig vaultConfig) {
-		this.vaultConfig = vaultConfig;
+		this.vaultConfig = vaultConfig != null ? vaultConfig : new BaseServiceConfig.Builder().build();
 	}
 
 	private void updateVaultBaseUrl(String vaultBaseUrl) {
@@ -91,4 +93,12 @@ public class ConnectionManager {
 		return httpURLConnection;
 	}
 
+	public void refreshToken(AuthToken token) {
+		HeaderConfig headerConfig = new HeaderConfig.Builder()
+				.authToken(token)
+				.build();
+		this.vaultConfig = new BaseServiceConfig.Builder()
+				.headerConfig(headerConfig)
+				.build();
+	}
 }
