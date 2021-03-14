@@ -21,7 +21,7 @@ public class BackupSubscription {
 		return service.subscribe(pricingPlan, BackupInfo.class);
 	}
 
-	public CompletableFuture<Void> unsbuscribe() {
+	public CompletableFuture<Void> unsubscribe() {
 		return service.unsubscribe();
 	}
 

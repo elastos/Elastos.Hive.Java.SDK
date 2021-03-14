@@ -13,7 +13,7 @@ class ServiceEndpoint {
 
 	// This constructor will be embedded in the following global-grained extends:
 	// - VaultSubscription;
-	// - BackupSubscriiption;
+	// - BackupSubscription;
 	// - Provider;
 	protected ServiceEndpoint(AppContext context, String providerAddress, String userDid) {
 		this(context, providerAddress, userDid, null, null);

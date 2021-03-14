@@ -7,15 +7,15 @@ public interface BackupService {
 
 	}
 
-	public CompletableFuture<Void> setupContext(BackupContext context);
+	CompletableFuture<Void> setupContext(BackupContext context);
 
-	public CompletableFuture<Void> startBackup();
+	CompletableFuture<Void> startBackup();
 
-	public CompletableFuture<Void> stopBackup();
+	CompletableFuture<Void> stopBackup();
 
-	public CompletableFuture<Void> restoreFrom();
+	CompletableFuture<Void> restoreFrom();
 
-	public CompletableFuture<Void> stopRestore();
+	CompletableFuture<Void> stopRestore();
 
-	public CompletableFuture<BackupResult> checkResult();
+	CompletableFuture<BackupResult> checkResult();
 }
