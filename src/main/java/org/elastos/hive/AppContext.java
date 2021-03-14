@@ -59,7 +59,7 @@ public class AppContext {
 		}
 	}
 
-	public static void setupResover(String resolver, String cacheDir) throws HiveException {
+	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
 		if (cacheDir == null || resolver == null)
 			throw new IllegalArgumentException("invalid value for parameter resolver or cacheDir");
 
@@ -124,7 +124,7 @@ public class AppContext {
 				doc = did.resolve();
 				if (doc == null)
 					throw new ProviderNotFoundException(
-							String.format("The DID %s has not published onto sidechain", targetDid));
+							String.format("The DID %s has not published onto sideChain", targetDid));
 
 				services = doc.selectServices((String) null, "HiveVault");
 				if (services == null || services.size() == 0)
