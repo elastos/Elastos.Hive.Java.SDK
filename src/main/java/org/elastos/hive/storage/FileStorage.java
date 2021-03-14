@@ -8,7 +8,7 @@ public class FileStorage implements DataStorage {
 	}
 
 	@Override
-	public String loadSigninCredential() {
+	public String loadSignInCredential() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -32,7 +32,7 @@ public class FileStorage implements DataStorage {
 	}
 
 	@Override
-	public void storeSigninCredential(String credential) {
+	public void storeSignInCredential(String credential) {
 		// TODO Auto-generated method stub
 
 	}
