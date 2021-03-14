@@ -128,7 +128,7 @@ public class RemoteResolver implements TokenResolver {
 		// Do nothing;
 	}
 
-	class ChallengeRequest extends ResponseBody {
+	class ChallengeResponseBody extends ResponseBody {
 		String jwtToken;
 
 		@Override
@@ -151,7 +151,7 @@ public class RemoteResolver implements TokenResolver {
 
 	}
 
-	class SigninRequestBody extends RequestBody {
+	class SignInRequestBody extends RequestBody {
 
 		@Override
 		public MediaType contentType() {
@@ -170,7 +170,7 @@ public class RemoteResolver implements TokenResolver {
 	private String requestSignIn() throws HiveException {
 		try {
 			Response<ResponseBody> response = connectionManager.getAuthApi()
-					.signIn(new SigninRequestBody())
+					.signIn(new SignInRequestBody())
 					.execute();
 
 			@SuppressWarnings("null")
@@ -184,7 +184,7 @@ public class RemoteResolver implements TokenResolver {
 				throw new HiveException("tell the exception message here");
 			}
 
-			ChallengeRequest challenge = (ChallengeRequest) response.body();
+			ChallengeResponseBody challenge = (ChallengeResponseBody) response.body();
 			String jwtToken = challenge.jwtToken;
 
 			if (!verifyToken(jwtToken)) {
@@ -201,7 +201,7 @@ public class RemoteResolver implements TokenResolver {
 		return null;
 	}
 
-	class ChallengeResponseBody extends RequestBody {
+	class ChallengeRequestBody extends RequestBody {
 
 		@Override
 		public MediaType contentType() {
@@ -241,7 +241,7 @@ public class RemoteResolver implements TokenResolver {
 	private String challengeResponse() {
 		try {
 			Response<ResponseBody> response = connectionManager.getAuthApi()
-					.auth(new ChallengeResponseBody())
+					.auth(new ChallengeRequestBody())
 					.execute();
 
 			@SuppressWarnings("null")
