@@ -2,7 +2,7 @@ package org.elastos.hive.service;
 
 public abstract class CloudBackupContext implements BackupContext {
 	@Override
-	public String getParamater(String parameter) {
+	public String getParameter(String parameter) {
 		switch(parameter) {
 		case "clientId":
 			return getClientId();

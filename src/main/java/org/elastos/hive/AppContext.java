@@ -147,7 +147,7 @@ public class AppContext {
 		});
 	}
 
-	AuthToken getAuthenToken() throws HiveException {
+	AuthToken getAuthToken() throws HiveException {
 		return tokenResolver.getToken();
 	}
 }

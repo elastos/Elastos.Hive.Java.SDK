@@ -2,10 +2,10 @@ package org.elastos.hive.service;
 
 public abstract class HiveBackupContext implements BackupContext {
 	@Override
-	public String getParamater(String parameter) {
+	public String getParameter(String parameter) {
 		switch (parameter) {
 		case "targetAddress":
-			return this.getTargetProvderAddress();
+			return this.getTargetProviderAddress();
 
 		case "targetServiceDid":
 			return this.getTargetServiceDid();
@@ -13,6 +13,6 @@ public abstract class HiveBackupContext implements BackupContext {
 		return null;
 	}
 
-	public abstract String getTargetProvderAddress();
+	public abstract String getTargetProviderAddress();
 	public abstract String getTargetServiceDid();
 }

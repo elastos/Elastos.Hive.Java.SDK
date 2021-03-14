@@ -167,7 +167,7 @@ public class RemoteResolver implements TokenResolver {
 
 	}
 
-	private String requestSignin() throws HiveException {
+	private String requestSignIn() throws HiveException {
 		try {
 			Response<ResponseBody> response = connectionManager.getAuthApi()
 					.signIn(new SigninRequestBody())

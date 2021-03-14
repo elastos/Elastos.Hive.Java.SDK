@@ -4,7 +4,7 @@ import org.elastos.hive.Vault;
 import org.elastos.hive.service.BackupService;
 import org.elastos.hive.service.Database;
 import org.elastos.hive.service.FilesService;
-import org.elastos.hive.service.PubsubService;
+import org.elastos.hive.service.PubSubService;
 import org.elastos.hive.service.ScriptingService;
 
 public class ServiceBuilder {
@@ -26,8 +26,8 @@ public class ServiceBuilder {
 		return new ScriptingRender(vault);
 	}
 
-	public PubsubService createPubsubService() {
-		return new PubsubServiceRender(vault);
+	public PubSubService createPubsubService() {
+		return new PubSubServiceRender(vault);
 	}
 
 	public BackupService createBackupService() {

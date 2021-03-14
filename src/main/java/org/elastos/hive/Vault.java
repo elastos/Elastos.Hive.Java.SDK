@@ -4,7 +4,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.BackupService;
 import org.elastos.hive.service.Database;
 import org.elastos.hive.service.FilesService;
-import org.elastos.hive.service.PubsubService;
+import org.elastos.hive.service.PubSubService;
 import org.elastos.hive.service.ScriptingService;
 import org.elastos.hive.vault.ServiceBuilder;
 
@@ -15,7 +15,7 @@ public class Vault extends ServiceEndpoint {
 	private FilesService 	filesService;
 	private Database	  	database;
 	private ScriptingService scripting;
-	private PubsubService 	pubsubService;
+	private PubSubService pubsubService;
 	private BackupService 	backupService;
 
 	public Vault(AppContext context, String myDid) throws HiveException {
@@ -43,7 +43,7 @@ public class Vault extends ServiceEndpoint {
 		return this.scripting;
 	}
 
-	public PubsubService getPubsubService() {
+	public PubSubService getPubSubService() {
 		return this.pubsubService;
 	}
 
