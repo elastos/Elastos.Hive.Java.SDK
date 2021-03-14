@@ -75,6 +75,7 @@ public class VaultSubscription {
 	class SubscriptionRender extends ServiceEndpoint implements SubscriptionService, PaymentService {
 		SubscriptionRender(AppContext context, String userDid, String providerAddress) throws HiveException {
 			super(context, providerAddress, userDid);
+			
 		}
 
 		@Override
