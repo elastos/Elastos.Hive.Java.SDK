@@ -11,9 +11,9 @@ import org.junit.Test;
 
 public class AppContextTest {
 	@Test
-	public void testRetupResover() {
+	public void testSetupResolver() {
 		try {
-			AppContext.setupResover("fake", "fake");
+			AppContext.setupResolver("fake", "fake");
 			assertTrue(true);
 		} catch (HiveException e) {
 			e.printStackTrace();
