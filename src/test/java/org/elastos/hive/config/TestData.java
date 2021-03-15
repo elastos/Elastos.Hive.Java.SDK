@@ -10,10 +10,8 @@ import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.AppContext;
 import org.elastos.hive.AppContextProvider;
-import org.elastos.hive.Backup;
 import org.elastos.hive.Logger;
 import org.elastos.hive.Utils;
-import org.elastos.hive.Vault;
 import org.elastos.hive.did.DApp;
 import org.elastos.hive.did.DIDApp;
 import org.elastos.hive.exception.HiveException;
@@ -27,8 +25,6 @@ public class TestData {
 	private DApp appInstanceDid;
 
 	private DIDApp userDid = null;
-
-	private Client client;
 
 	private ClientConfig clientConfig;
 	private NodeConfig nodeConfig;
@@ -68,7 +64,7 @@ public class TestData {
 		String configJson = Utils.getConfigure(fileName);
 		clientConfig = ClientConfig.deserialize(configJson);
 
-//		Client.setupResolver(clientConfig.resolverUrl(), "data/didCache");
+		AppContext.setupResolver(clientConfig.resolverUrl(), "data/didCache");
 
 		DummyAdapter adapter = new DummyAdapter();
 		ApplicationConfig applicationConfig = clientConfig.applicationConfig();
@@ -80,33 +76,41 @@ public class TestData {
 		nodeConfig = clientConfig.nodeConfig();
 		crossConfig = clientConfig.crossConfig();
 
-		//TODO 初始化Application Context
-//		appContext = new AppContextProvider() {
-//			@Override
-//			public String getLocalDataDir() {
-//				return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
-//			}
-//
-//			@Override
-//			public DIDDocument getAppInstanceDocument() {
-//				try {
-//					return appInstanceDid.getDocument();
-//				} catch (DIDException e) {
-//					e.printStackTrace();
-//				}
-//				return null;
-//			}
-//
-//			@Override
-//			public CompletableFuture<String> getAuthorization(String jwtToken) {
-//				return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
-//			}
-//		};
+		appContext = AppContext.build(new AppContextProvider() {
+			@Override
+			public String getLocalDataDir() {
+				return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
+			}
 
-//		client = Client.createInstance(appContext);
-//		createVaultAndBackup();
+			@Override
+			public DIDDocument getAppInstanceDocument() {
+				try {
+					return appInstanceDid.getDocument();
+				} catch (DIDException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+
+			@Override
+			public CompletableFuture<String> getAuthorization(String jwtToken) {
+				return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
+			}
+		});
+
 	}
 
+	public AppContext getAppContext() {
+		return this.appContext;
+	}
+
+	public String getOwnerDid() {
+		return nodeConfig.ownerDid();
+	}
+
+	public String getProviderAddress() {
+		return nodeConfig.provider();
+	}
 
 	public String signAuthorization(String jwtToken) {
 		try {
@@ -137,11 +141,6 @@ public class TestData {
 
 		return null;
 	}
-
-	public Client getClient() {
-		return this.client;
-	}
-
 
 	public CrossData getCrossData() {
 		try {
@@ -183,30 +182,29 @@ public class TestData {
 			UserConfig userConfig = crossConfig.userConfig();
 			userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storepass());
 
-			//TODO 初始化Application Context
-//			AppContext applicationContext = new AppContext() {
-//				@Override
-//				public String getLocalDataDir() {
-//					return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
-//				}
-//
-//				@Override
-//				public DIDDocument getAppInstanceDocument() {
-//					try {
-//						return appInstanceDid.getDocument();
-//					} catch (DIDException e) {
-//						e.printStackTrace();
-//					}
-//					return null;
-//				}
-//
-//				@Override
-//				public CompletableFuture<String> getAuthorization(String jwtToken) {
-//					return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
-//				}
-//			};
 
-//			client = Client.createInstance(applicationContext);
+			AppContext appContext = AppContext.build(new AppContextProvider() {
+				@Override
+				public String getLocalDataDir() {
+					return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
+				}
+
+				@Override
+				public DIDDocument getAppInstanceDocument() {
+					try {
+						return appInstanceDid.getDocument();
+					} catch (DIDException e) {
+						e.printStackTrace();
+					}
+					return null;
+				}
+
+				@Override
+				public CompletableFuture<String> getAuthorization(String jwtToken) {
+					return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
+				}
+			});
+
 		}
 
 		public String signAuthorization(String jwtToken) {
