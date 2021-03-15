@@ -39,24 +39,11 @@ public class RemoteResolver implements TokenResolver {
 					.signIn(ImmutableMap.of("document", new ObjectMapper().readValue(contextProvider.getAppInstanceDocument().toString(), HashMap.class)))
 					.execute();
 			AuthSignInResponse sp = ResponseBase.validateBody(response);
-			verifyToken(sp.getChallenge());
+			sp.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
 			return contextProvider.getAuthorization(sp.getChallenge()).get();
 		} catch (Exception e) {
 			throw new HiveException(e.getMessage());
 		}
-	}
-
-	private void verifyToken(String jwtToken) throws HiveException {
-		if (jwtToken == null || jwtToken.isEmpty()) throw new HiveException("Failed to get challenge from sign-in.");
-
-		Claims claims = JwtUtil.getBody(jwtToken);
-		long exp = claims.getExpiration().getTime();
-		String aud = claims.getAudience();
-
-		String did = contextProvider.getAppInstanceDocument().getSubject().toString();
-		if (null == did || !did.equals(aud)) throw new HiveException("Failed to get valid challenge from sign-in.");
-
-		if (exp <= System.currentTimeMillis()) throw new HiveException("Failed to get period challenge from sign-in");
 	}
 
 	private AuthToken auth(String token) throws HiveException {

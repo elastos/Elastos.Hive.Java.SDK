@@ -95,19 +95,26 @@ public class ConnectionManager {
 	}
 
 	private static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl, RequestInterceptor requestInterceptor) {
-		OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
+		OkHttpClient.Builder clientBuilder;
+		Retrofit.Builder retrofitBuilder;
+
+		clientBuilder = new OkHttpClient.Builder()
 				.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
 				.readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
-		Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
+		clientBuilder.interceptors().clear();
+
+		retrofitBuilder = new Retrofit.Builder()
 				.baseUrl(baseUrl)
 				.addConverterFactory(StringConverterFactory.create())
 				.addConverterFactory(NobodyConverterFactory.create())
 				.addConverterFactory(GsonConverterFactory.create());
 
-		clientBuilder.interceptors().clear();
-		if (requestInterceptor != null) clientBuilder.interceptors().add(requestInterceptor);
-		if (LogUtil.debug) clientBuilder.interceptors().add(new NetworkLogInterceptor());
+		if (requestInterceptor != null)
+			clientBuilder.interceptors().add(requestInterceptor);
+
+		if (LogUtil.debug)
+			clientBuilder.interceptors().add(new NetworkLogInterceptor());
 
 		return retrofitBuilder.client(clientBuilder.build()).build().create(serviceClass);
 	}
