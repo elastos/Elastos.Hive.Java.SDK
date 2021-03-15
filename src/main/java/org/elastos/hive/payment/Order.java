@@ -1,6 +1,8 @@
 package org.elastos.hive.payment;
 
-public class Order {
+import org.elastos.hive.Result;
+
+public class Order extends Result<Order> {
 	private String orderHash;
 	private String inAppDid;
 	private String subscriberDid;
@@ -62,4 +64,6 @@ public class Order {
 	public String getPaymentStatus() {
 		return status.toString();
 	}
+
+
 }
