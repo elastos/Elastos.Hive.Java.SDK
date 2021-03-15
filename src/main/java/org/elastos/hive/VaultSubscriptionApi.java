@@ -1,12 +1,14 @@
 package org.elastos.hive;
 
+import org.elastos.hive.subscribe.CreateServiceResult;
+
 import retrofit2.Call;
 import retrofit2.http.POST;
 
-interface VaultSubscriptionApi extends BaseApi{
+public interface VaultSubscriptionApi extends BaseApi{
 
 	@POST(API_VERSION + "/service/vault/create")
-	Call<Void> createVault();
+	Call<CreateServiceResult> createVault();
 
 	@POST(API_VERSION + "/service/vault/freeze")
 	Call<Void> freeze();
