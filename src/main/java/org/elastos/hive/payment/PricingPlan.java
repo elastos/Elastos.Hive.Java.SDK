@@ -2,7 +2,9 @@ package org.elastos.hive.payment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class PricingPlan {
+import org.elastos.hive.Result;
+
+public class PricingPlan extends Result<PricingPlan> {
 	private String planName;
 	private int quota;
 	private int serviceDays;

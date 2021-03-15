@@ -233,7 +233,7 @@ public class VaultSubscription {
 							.getPricingPlan(planName)
 							.execute();
 					String ret = ResponseHelper.getValue(response, String.class);
-					return PricingPlan.deserialize(ret);
+					return PricingPlan.deserialize(ret, PricingPlan.class);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
