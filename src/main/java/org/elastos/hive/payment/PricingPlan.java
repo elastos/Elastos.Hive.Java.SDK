@@ -2,41 +2,38 @@ package org.elastos.hive.payment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import org.elastos.hive.Result;
-
-public class PricingPlan extends Result<PricingPlan> {
-	@JsonProperty("name")
-	private String name;
-	@JsonProperty("maxStorage")
-	private int maxStorage;
-	@JsonProperty("serviceDays")
+public class PricingPlan {
+	private String planName;
+	private int quota;
 	private int serviceDays;
-	@JsonProperty("amount")
-	private float amount;
-	@JsonProperty("currency")
+	private float payAmount;
 	private String currency;
 
-	public String name() {
-		return name;
+	@SuppressWarnings("unused")
+	private String description;
+
+	@JsonProperty("planName")
+	public String getPlanName() {
+		return planName;
 	}
 
-	public int maxStorage() {
-		return maxStorage;
+	@JsonProperty("quota")
+	public int getStorageQuota() {
+		return quota;
 	}
 
-	public int serviceDays() {
+	@JsonProperty("serviceDays")
+	public int getServiceDays() {
 		return serviceDays;
 	}
 
-	public float amount() {
-		return amount;
+	@JsonProperty("payAmount")
+	public float getPayAmount() {
+		return payAmount;
 	}
 
-	public String currency() {
+	@JsonProperty("currency")
+	public String getCurrency() {
 		return currency;
-	}
-
-	public static PricingPlan deserialize(String content) {
-		return deserialize(content, PricingPlan.class);
 	}
 }
