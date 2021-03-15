@@ -1,5 +1,7 @@
 package org.elastos.hive;
 
+import org.elastos.did.exception.DIDException;
+import org.elastos.hive.config.TestData;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -97,27 +99,10 @@ public class VaultSubscriptionTest {
 
 	@BeforeClass
 	public static void setup() {
-		AppContext context;
-		context = AppContext.build(new AppContextProvider() {
-			@Override
-			public String getLocalDataDir() {
-				return null;
-			}
-
-			@Override
-			public DIDDocument getAppInstanceDocument() {
-				return null;
-			}
-
-			@Override
-			public CompletableFuture<String> getAuthorization(String jwtToken) {
-				return null;
-			}
-		});
-
 		try {
-			subscription = new VaultSubscription(context, "target-provider-address", "your-user-did");
-		} catch (HiveException e) {
+			TestData testData = TestData.getInstance();
+			subscription = new VaultSubscription(testData.getAppContext(), testData.getOwnerDid(), testData.getProviderAddress());
+		} catch (HiveException | DIDException e) {
 			e.printStackTrace();
 			assertTrue(false);
 		}
