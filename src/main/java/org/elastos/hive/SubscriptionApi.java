@@ -5,7 +5,7 @@ import org.elastos.hive.subscribe.CreateServiceResult;
 import retrofit2.Call;
 import retrofit2.http.POST;
 
-public interface VaultSubscriptionApi extends BaseApi{
+public interface SubscriptionApi extends BaseApi{
 
 	@POST(API_VERSION + "/service/vault/create")
 	Call<CreateServiceResult> createVault();

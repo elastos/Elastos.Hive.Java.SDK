@@ -24,7 +24,8 @@ package org.elastos.hive.connection;
 
 import org.elastos.hive.AuthToken;
 import org.elastos.hive.AuthorizationApi;
-import org.elastos.hive.VaultSubscriptionApi;
+import org.elastos.hive.PaymentApi;
+import org.elastos.hive.SubscriptionApi;
 import org.elastos.hive.connection.model.BaseServiceConfig;
 import org.elastos.hive.connection.model.HeaderConfig;
 
@@ -35,7 +36,8 @@ import java.net.URL;
 public class ConnectionManager {
 
 	private AuthorizationApi authApi;
-	private VaultSubscriptionApi vaultSubscriptionApi;
+	private SubscriptionApi subscriptionApi;
+	private PaymentApi paymentApi;
 
 	private String vaultBaseUrl;
 	private BaseServiceConfig vaultConfig;
@@ -51,11 +53,18 @@ public class ConnectionManager {
 		return authApi;
 	}
 
-	public VaultSubscriptionApi getVaultSubscriptionApi() {
-		if (vaultSubscriptionApi == null)
-			vaultSubscriptionApi = BaseServiceUtil.createService(VaultSubscriptionApi.class,
+	public SubscriptionApi getSubscriptionApi() {
+		if (subscriptionApi == null)
+			subscriptionApi = BaseServiceUtil.createService(SubscriptionApi.class,
 					this.vaultBaseUrl, this.vaultConfig);
-		return vaultSubscriptionApi;
+		return subscriptionApi;
+	}
+
+	public PaymentApi getPaymentApi() {
+		if (paymentApi == null)
+			paymentApi = BaseServiceUtil.createService(PaymentApi.class,
+					this.vaultBaseUrl, this.vaultConfig);
+		return paymentApi;
 	}
 
 	private void updateVaultConfig(BaseServiceConfig vaultConfig) {
