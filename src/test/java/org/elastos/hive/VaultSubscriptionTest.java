@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -20,40 +21,82 @@ public class VaultSubscriptionTest {
 	@Test
 	public void testSubscribe() {
 		try {
-			subscription.subscribe("target-pricing-plan")
-				.whenComplete((result, ex) -> {
-					if (ex != null) {
-						assertTrue(false);
-						ex.printStackTrace();
-					} else {
-						// Checking result value;
-						assertNotNull(result);
-					}
-				}).get();
-		} catch (InterruptedException e1) {
+			subscription.unsubscribe()
+					.whenComplete((result, ex) -> {
+						if (ex != null) {
+							fail();
+							ex.printStackTrace();
+						} else {
+							// Checking result value;
+							assertNotNull(result);
+						}
+					}).get();
+		} catch (InterruptedException|ExecutionException e1) {
 			e1.printStackTrace();
-			assertTrue(false);
-		} catch (ExecutionException e1) {
-			e1.printStackTrace();
-			assertTrue(false);
+			fail();
 		}
 	}
 
 	@Test
 	public void testUnsubscribe() {
+		try {
+			subscription.unsubscribe()
+					.whenComplete((result, ex) -> {
+						if (ex != null) {
+							fail();
+							ex.printStackTrace();
+						} else {
+							// Checking result value;
+							assertNotNull(result);
+						}
+					}).get();
+		} catch (InterruptedException|ExecutionException e1) {
+			e1.printStackTrace();
+			fail();
+		}
 	}
 
 	@Test
 	public void testActivate() {
+		try {
+			subscription.activate()
+					.whenComplete((result, ex) -> {
+						if (ex != null) {
+							fail();
+							ex.printStackTrace();
+						} else {
+							// Checking result value;
+							assertNotNull(result);
+						}
+					}).get();
+		} catch (InterruptedException|ExecutionException e1) {
+			e1.printStackTrace();
+			fail();
+		}
 	}
 
 	@Test
 	public void testDeactivate() {
+		try {
+			subscription.deactivate()
+					.whenComplete((result, ex) -> {
+						if (ex != null) {
+							fail();
+							ex.printStackTrace();
+						} else {
+							// Checking result value;
+							assertNotNull(result);
+						}
+					}).get();
+		} catch (InterruptedException|ExecutionException e1) {
+			e1.printStackTrace();
+			fail();
+		}
 	}
 
 
 	@BeforeClass
-	public void setup() {
+	public static void setup() {
 		AppContext context;
 		context = AppContext.build(new AppContextProvider() {
 			@Override
@@ -79,7 +122,4 @@ public class VaultSubscriptionTest {
 			assertTrue(false);
 		}
 	}
-
-	@AfterClass
-	public void tearDown() {}
 }
