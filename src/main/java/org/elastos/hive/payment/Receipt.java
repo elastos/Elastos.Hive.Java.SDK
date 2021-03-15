@@ -1,6 +1,8 @@
 package org.elastos.hive.payment;
 
-public class Receipt {
+import org.elastos.hive.Result;
+
+public class Receipt extends Result<Receipt> {
 	private String receiptId;
 	private String orderId;
 	private String customerDid;

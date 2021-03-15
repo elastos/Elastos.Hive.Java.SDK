@@ -1,20 +1,32 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 import org.elastos.hive.payment.Order;
+import org.elastos.hive.payment.PricingInfo;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
 import org.elastos.hive.subscribe.CreateServiceResult;
+import org.elastos.hive.utils.JsonUtil;
+import org.elastos.hive.utils.ResponseHelper;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 
 public class VaultSubscription {
@@ -96,10 +108,12 @@ public class VaultSubscription {
 
 	class SubscriptionRender extends ServiceEndpoint implements SubscriptionService, PaymentService {
 		private AppContext appContext;
+		private ConnectionManager connectionManager;
 
 		SubscriptionRender(AppContext context, String userDid, String providerAddress) throws HiveException {
 			super(context, providerAddress, userDid);
 			this.appContext = context;
+			this.connectionManager = appContext.getConnectionManager();
 		}
 
 		@Override
@@ -114,7 +128,7 @@ public class VaultSubscription {
 				VaultInfo vaultInfo = new VaultInfo(null, appContext.getUserDid(), null);
 				Response<CreateServiceResult> response;
 				try {
-					response = appContext.getConnectionManager().getVaultSubscriptionApi().createVault().execute();
+					response = connectionManager.getSubscriptionApi().createVault().execute();
 					if(response.body().existing()) {
 						throw new VaultAlreadyExistException("The vault already exists");
 					}
@@ -130,31 +144,38 @@ public class VaultSubscription {
 			return null;
 		}
 
-		private void activateImpl(AuthToken token) {
-			// TODO;
-		}
-
 		@Override
 		public CompletableFuture<Void> activate() {
-			return CompletableFuture.supplyAsync(() -> {
+			return CompletableFuture.runAsync(() -> {
 				try {
-					System.out.print("Check access token here, otherwise request the access token");
-					return context.getAuthToken();
+					appContext.checkToken();
 				} catch (HiveException e) {
-					return null;
+					throw new CompletionException(e);
 				}
-			}).thenAcceptAsync(token -> {
-				System.out.print("Call activate API here");
-				activateImpl(token);
-			}).exceptionally(ex -> {
-				System.out.print("Handle specific exception here.");
-				return null;
+			}).thenAcceptAsync(aVoid -> {
+				try {
+					connectionManager.getSubscriptionApi().unfreeze().execute();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			});
 		}
 
 		@Override
 		public CompletableFuture<Void> deactivate() {
-			return null;
+			return CompletableFuture.runAsync(() -> {
+				try {
+					appContext.checkToken();
+				} catch (HiveException e) {
+					throw new CompletionException(e);
+				}
+			}).thenAcceptAsync(aVoid -> {
+				try {
+					connectionManager.getSubscriptionApi().freeze().execute();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
 		}
 
 		@Override
@@ -164,27 +185,121 @@ public class VaultSubscription {
 
 		@Override
 		public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
-			return null;
+			return CompletableFuture.runAsync(() -> {
+				try {
+					appContext.checkToken();
+				} catch (HiveException e) {
+					throw new CompletionException(e);
+				}
+			}).thenApplyAsync(aVoid -> {
+				Response response = null;
+				try {
+					response = connectionManager.getPaymentApi()
+							.getPackageInfo()
+							.execute();
+					String ret = ResponseHelper.getValue(response, String.class);
+					return PricingInfo.deserialize(ret).pricingPlans();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			});
 		}
 
 		@Override
 		public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-			return null;
+			return CompletableFuture.runAsync(() -> {
+				try {
+					appContext.checkToken();
+				} catch (HiveException e) {
+					throw new CompletionException(e);
+				}
+			}).thenApplyAsync(aVoid -> {
+				Response response = null;
+				try {
+					response = connectionManager.getPaymentApi()
+							.getPricingPlan(planName)
+							.execute();
+					String ret = ResponseHelper.getValue(response, String.class);
+					return PricingPlan.deserialize(ret);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			});
 		}
 
 		@Override
 		public CompletableFuture<Order> placeOrder(String planName) {
-			return null;
+			return CompletableFuture.runAsync(() -> {
+				try {
+					appContext.checkToken();
+				} catch (HiveException e) {
+					throw new CompletionException(e);
+				}
+			}).thenApplyAsync(aVoid -> {
+				try {
+					Map<String, Object> map = new HashMap<>();
+					map.put("pricing_name", planName);
+					String json = JsonUtil.serialize(map);
+					Response<ResponseBody> response = this.connectionManager.getPaymentApi()
+							.createOrder(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+							.execute();
+					String ret = ResponseHelper.getValue(response, String.class);
+					return Order.deserialize(ret, Order.class);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			});
 		}
 
 		@Override
 		public CompletableFuture<Order> getOrder(String orderId) {
-			return null;
+			return CompletableFuture.runAsync(() -> {
+				try {
+					appContext.checkToken();
+				} catch (HiveException e) {
+					throw new CompletionException(e);
+				}
+			}).thenApplyAsync(aVoid -> {
+				try {
+					Response response = this.connectionManager.getPaymentApi()
+							.getOrderInfo(orderId)
+							.execute();
+					JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+					return Order.deserialize(ret.get("order_info").toString(), Order.class);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			});
 		}
 
 		@Override
 		public CompletableFuture<Receipt> payOrder(String orderId, String transId) {
-			return null;
+			return CompletableFuture.runAsync(() -> {
+				try {
+					appContext.checkToken();
+				} catch (HiveException e) {
+					throw new CompletionException(e);
+				}
+			}).thenApplyAsync(aVoid -> {
+				try {
+					Map<String, Object> map = new HashMap<>();
+					map.put("order_id", orderId);
+					map.put("pay_txids", transId);
+					String json = JsonUtil.serialize(map);
+					Response<ResponseBody> response = this.connectionManager.getPaymentApi()
+							.payOrder(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
+							.execute();
+					JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
+					return Receipt.deserialize(ret.get("order_info").toString(), Receipt.class);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			});
 		}
 
 		@Override
