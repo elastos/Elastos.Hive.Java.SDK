@@ -141,7 +141,19 @@ public class VaultSubscription {
 
 		@Override
 		public CompletableFuture<Void> unsubscribe() {
-			return null;
+			return CompletableFuture.runAsync(() -> {
+				try {
+					appContext.checkToken();
+				} catch (HiveException e) {
+					throw new CompletionException(e);
+				}
+			}).thenAcceptAsync(aVoid -> {
+				try {
+					connectionManager.getSubscriptionApi().removeVault().execute();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
 		}
 
 		@Override
