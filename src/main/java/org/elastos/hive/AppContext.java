@@ -59,6 +59,10 @@ public class AppContext {
 		}
 	}
 
+	public ConnectionManager getConnectionManager() {
+		return this.connectionManager;
+	}
+
 	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
 		if (cacheDir == null || resolver == null)
 			throw new IllegalArgumentException("invalid value for parameter resolver or cacheDir");
