@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.exception.HiveException;
 import retrofit2.Response;
 
-public class ResponseBase {
+public class ResponseBodyBase {
     private static final String SUCCESS = "OK";
 
     @SerializedName("_status")
@@ -29,7 +29,14 @@ public class ResponseBase {
         return error == null ? "" : error.message;
     }
 
-    public static <T extends ResponseBase> T validateBody(Response<T> response) throws HiveException {
+    /**
+     * We can't check status on interceptor because of body string can be only read once.
+     * @param response
+     * @param <T>
+     * @return
+     * @throws HiveException
+     */
+    public static <T extends ResponseBodyBase> T validateBody(Response<T> response) throws HiveException {
         T body = response.body();
         if (body == null) throw new HiveException("Failed to get response body(null)");
         if (!SUCCESS.equals(body.getStatus())) {

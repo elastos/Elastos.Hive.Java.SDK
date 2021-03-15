@@ -2,7 +2,7 @@ package org.elastos.hive.network;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import org.elastos.hive.network.response.FilesHashResponse;
+import org.elastos.hive.network.response.FilesHashResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -25,5 +25,5 @@ public interface FilesApi {
 	Call<ResponseBody> copy(@Body RequestBody body);
 
 	@GET(BaseApi.API_VERSION + "/files/file/hash")
-	Call<FilesHashResponse> hash(@Query("path") String filename);
+	Call<FilesHashResponseBody> hash(@Query("path") String filename);
 }

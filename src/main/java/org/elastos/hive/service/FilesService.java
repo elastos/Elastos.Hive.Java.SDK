@@ -1,5 +1,6 @@
 package org.elastos.hive.service;
 
+import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
 public interface FilesService {
