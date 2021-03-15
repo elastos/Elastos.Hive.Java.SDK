@@ -87,6 +87,18 @@ public class TestData {
 		});
 	}
 
+	public AppContext getAppContext() {
+		return this.context;
+	}
+
+	public String getOwnerDid() {
+		return nodeConfig.ownerDid();
+	}
+
+	public String getProviderAddress() {
+		return nodeConfig.provider();
+	}
+
 	public CompletableFuture<Vault> getVault() {
 		return context.getVault(nodeConfig.ownerDid(), nodeConfig.provider());
 	}

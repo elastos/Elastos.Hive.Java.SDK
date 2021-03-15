@@ -10,20 +10,20 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface FilesApi {
-	String API_UPLOAD = BaseApi.API_PATH + "/files/upload";
+	String API_UPLOAD = BaseApi.API_VERSION + "/files/upload";
 
-	@GET(BaseApi.API_PATH + "/files/download")
+	@GET(BaseApi.API_VERSION + "/files/download")
 	Call<ResponseBody> download(@Query("path") String filename);
 
-	@POST(BaseApi.API_PATH + "/files/delete")
+	@POST(BaseApi.API_VERSION + "/files/delete")
 	Call<ResponseBody> deleteFolder(@Body RequestBody body);
 
-	@POST(BaseApi.API_PATH + "/files/move")
+	@POST(BaseApi.API_VERSION + "/files/move")
 	Call<ResponseBody> move(@Body RequestBody body);
 
-	@POST(BaseApi.API_PATH + "/files/copy")
+	@POST(BaseApi.API_VERSION + "/files/copy")
 	Call<ResponseBody> copy(@Body RequestBody body);
 
-	@GET(BaseApi.API_PATH + "/files/file/hash")
+	@GET(BaseApi.API_VERSION + "/files/file/hash")
 	Call<FilesHashResponse> hash(@Query("path") String filename);
 }

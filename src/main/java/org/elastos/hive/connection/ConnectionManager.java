@@ -24,10 +24,11 @@ package org.elastos.hive.connection;
 
 import okhttp3.OkHttpClient;
 import org.elastos.hive.AppContext;
+import org.elastos.hive.PaymentApi;
+import org.elastos.hive.SubscriptionApi;
 import org.elastos.hive.network.AuthApi;
 import org.elastos.hive.network.BaseApi;
 import org.elastos.hive.network.FilesApi;
-import org.elastos.hive.network.VaultSubscriptionApi;
 import org.elastos.hive.utils.LogUtil;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Retrofit;
@@ -43,7 +44,8 @@ public class ConnectionManager {
 
 	private AppContext context;
 	private RequestInterceptor requestInterceptor;
-	private VaultSubscriptionApi vaultSubscriptionApi;
+	private SubscriptionApi subscriptionApi;
+	private PaymentApi paymentApi;
 
 	private AuthApi authApi;
 	private FilesApi filesApi;
@@ -67,15 +69,22 @@ public class ConnectionManager {
 		return filesApi;
 	}
 
-	public VaultSubscriptionApi getVaultSubscriptionApi() {
-		if (vaultSubscriptionApi == null) {
-			vaultSubscriptionApi = createService(VaultSubscriptionApi.class, this.context.getProviderAddress(), this.requestInterceptor);
+	public SubscriptionApi getSubscriptionApi() {
+		if (subscriptionApi == null) {
+			subscriptionApi = createService(SubscriptionApi.class, this.context.getProviderAddress(), this.requestInterceptor);
 		}
-		return vaultSubscriptionApi;
+		return subscriptionApi;
+	}
+
+	public PaymentApi getPaymentApi() {
+		if (paymentApi == null) {
+			paymentApi = createService(PaymentApi.class, this.context.getProviderAddress(), this.requestInterceptor);
+		}
+		return paymentApi;
 	}
 
 	public HttpURLConnection openURLConnection(String path) throws IOException {
-		String url = this.context.getProviderAddress() + BaseApi.API_PATH + path;
+		String url = this.context.getProviderAddress() + BaseApi.API_VERSION + path;
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setRequestProperty("User-Agent",

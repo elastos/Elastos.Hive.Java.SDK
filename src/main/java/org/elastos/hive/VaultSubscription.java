@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -118,36 +119,27 @@ public class VaultSubscription {
 
 		@Override
 		public <T> CompletableFuture<T> subscribe(String pricingPlan, Class<T> type) {
-			return CompletableFuture.runAsync(() -> {
-				try {
-					appContext.checkToken();
-				} catch (HiveException e) {
-					throw new CompletionException(e);
-				}
-			}).thenApplyAsync((Function<Void, T>) aVoid -> {
-				VaultInfo vaultInfo = new VaultInfo(null, appContext.getUserDid(), null);
-				Response<CreateServiceResult> response;
-				try {
-					response = connectionManager.getSubscriptionApi().createVault().execute();
-					if(response.body().existing()) {
-						throw new VaultAlreadyExistException("The vault already exists");
+			return CompletableFuture.supplyAsync(new Supplier<T>() {
+				@Override
+				public T get() {
+					VaultInfo vaultInfo = new VaultInfo(null, appContext.getUserDid(), null);
+					Response<CreateServiceResult> response;
+					try {
+						response = connectionManager.getSubscriptionApi().createVault().execute();
+						if(response.body().existing()) {
+							throw new VaultAlreadyExistException("The vault already exists");
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
+					return (T)vaultInfo;
 				}
-				return (T)vaultInfo;
 			});
 		}
 
 		@Override
 		public CompletableFuture<Void> unsubscribe() {
 			return CompletableFuture.runAsync(() -> {
-				try {
-					appContext.checkToken();
-				} catch (HiveException e) {
-					throw new CompletionException(e);
-				}
-			}).thenAcceptAsync(aVoid -> {
 				try {
 					connectionManager.getSubscriptionApi().removeVault().execute();
 				} catch (IOException e) {
@@ -160,12 +152,6 @@ public class VaultSubscription {
 		public CompletableFuture<Void> activate() {
 			return CompletableFuture.runAsync(() -> {
 				try {
-					appContext.checkToken();
-				} catch (HiveException e) {
-					throw new CompletionException(e);
-				}
-			}).thenAcceptAsync(aVoid -> {
-				try {
 					connectionManager.getSubscriptionApi().unfreeze().execute();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -176,12 +162,6 @@ public class VaultSubscription {
 		@Override
 		public CompletableFuture<Void> deactivate() {
 			return CompletableFuture.runAsync(() -> {
-				try {
-					appContext.checkToken();
-				} catch (HiveException e) {
-					throw new CompletionException(e);
-				}
-			}).thenAcceptAsync(aVoid -> {
 				try {
 					connectionManager.getSubscriptionApi().freeze().execute();
 				} catch (IOException e) {
@@ -197,13 +177,7 @@ public class VaultSubscription {
 
 		@Override
 		public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
-			return CompletableFuture.runAsync(() -> {
-				try {
-					appContext.checkToken();
-				} catch (HiveException e) {
-					throw new CompletionException(e);
-				}
-			}).thenApplyAsync(aVoid -> {
+			return CompletableFuture.supplyAsync(() -> {
 				Response response = null;
 				try {
 					response = connectionManager.getPaymentApi()
@@ -216,17 +190,12 @@ public class VaultSubscription {
 				}
 				return null;
 			});
+
 		}
 
 		@Override
 		public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-			return CompletableFuture.runAsync(() -> {
-				try {
-					appContext.checkToken();
-				} catch (HiveException e) {
-					throw new CompletionException(e);
-				}
-			}).thenApplyAsync(aVoid -> {
+			return CompletableFuture.supplyAsync(() -> {
 				Response response = null;
 				try {
 					response = connectionManager.getPaymentApi()
@@ -243,18 +212,12 @@ public class VaultSubscription {
 
 		@Override
 		public CompletableFuture<Order> placeOrder(String planName) {
-			return CompletableFuture.runAsync(() -> {
-				try {
-					appContext.checkToken();
-				} catch (HiveException e) {
-					throw new CompletionException(e);
-				}
-			}).thenApplyAsync(aVoid -> {
+			return CompletableFuture.supplyAsync(() -> {
 				try {
 					Map<String, Object> map = new HashMap<>();
 					map.put("pricing_name", planName);
 					String json = JsonUtil.serialize(map);
-					Response<ResponseBody> response = this.connectionManager.getPaymentApi()
+					Response<ResponseBody> response = connectionManager.getPaymentApi()
 							.createOrder(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 							.execute();
 					String ret = ResponseHelper.getValue(response, String.class);
@@ -268,15 +231,9 @@ public class VaultSubscription {
 
 		@Override
 		public CompletableFuture<Order> getOrder(String orderId) {
-			return CompletableFuture.runAsync(() -> {
+			return CompletableFuture.supplyAsync(() -> {
 				try {
-					appContext.checkToken();
-				} catch (HiveException e) {
-					throw new CompletionException(e);
-				}
-			}).thenApplyAsync(aVoid -> {
-				try {
-					Response response = this.connectionManager.getPaymentApi()
+					Response response = connectionManager.getPaymentApi()
 							.getOrderInfo(orderId)
 							.execute();
 					JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);
@@ -290,19 +247,13 @@ public class VaultSubscription {
 
 		@Override
 		public CompletableFuture<Receipt> payOrder(String orderId, String transId) {
-			return CompletableFuture.runAsync(() -> {
-				try {
-					appContext.checkToken();
-				} catch (HiveException e) {
-					throw new CompletionException(e);
-				}
-			}).thenApplyAsync(aVoid -> {
+			return CompletableFuture.supplyAsync(() -> {
 				try {
 					Map<String, Object> map = new HashMap<>();
 					map.put("order_id", orderId);
 					map.put("pay_txids", transId);
 					String json = JsonUtil.serialize(map);
-					Response<ResponseBody> response = this.connectionManager.getPaymentApi()
+					Response<ResponseBody> response = connectionManager.getPaymentApi()
 							.payOrder(RequestBody.create(MediaType.parse("Content-Type, application/json"), json))
 							.execute();
 					JsonNode ret = ResponseHelper.getValue(response, JsonNode.class);

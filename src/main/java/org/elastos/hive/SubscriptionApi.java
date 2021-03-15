@@ -9,15 +9,15 @@ import retrofit2.http.POST;
 
 public interface SubscriptionApi extends BaseApi {
 
-	@POST(API_PATH + "/service/vault/create")
+	@POST(API_VERSION + "/service/vault/create")
 	Call<CreateServiceResult> createVault();
 
-	@POST(API_PATH + "/service/vault/freeze")
+	@POST(API_VERSION + "/service/vault/freeze")
 	Call<ResponseBody> freeze();
 
-	@POST(API_PATH + "/service/vault/freeze")
+	@POST(API_VERSION + "/service/vault/freeze")
 	Call<ResponseBody> unfreeze();
 
-	@POST(API_PATH + "/service/vault/remove")
+	@POST(API_VERSION + "/service/vault/remove")
 	Call<ResponseBody> removeVault();
 }
