@@ -42,18 +42,27 @@ import org.elastos.hive.network.BaseApi;
 public class RequestInterceptor implements Interceptor {
     private AuthToken token;
     private TokenResolver tokenResolver;
+    private final boolean isNeedToken;
 
-    RequestInterceptor(AppContext context, ConnectionManager connectionManager) {
+    RequestInterceptor(AppContext context, ConnectionManager connectionManager, boolean isNeedToken) {
         this.tokenResolver = new LocalResolver(context.getProviderAddress());
         this.tokenResolver.setNextResolver(new RemoteResolver(context, connectionManager));
+        this.isNeedToken = isNeedToken;
+    }
+
+    RequestInterceptor(AppContext context, ConnectionManager connectionManager) {
+        this(context, connectionManager, true);
     }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        checkToken();
-        Request request = chain.request().newBuilder()
-                .addHeader(BaseApi.HTTP_AUTHORIZATION, this.token.getHeaderTokenValue())
-                .build();
+        Request request = chain.request();
+        if (isNeedToken) {
+            checkToken();
+            request = request.newBuilder()
+                    .addHeader(BaseApi.HTTP_AUTHORIZATION, this.token.getHeaderTokenValue())
+                    .build();
+        }
         return handleResponse(chain.proceed(request));
     }
 
@@ -62,10 +71,12 @@ public class RequestInterceptor implements Interceptor {
      */
     private Response handleResponse(Response response) throws IOException {
         if (!response.isSuccessful()) {
-            if (response.code() == 401) {
-                //Remove token for next time refresh.
-                this.token = null;
-                throw new IOException("Failed to request for code " + response.code() + "(auth failed)");
+            if (isNeedToken) {
+                if (response.code() == 401) {
+                    //Remove token for next time refresh.
+                    this.token = null;
+                    throw new IOException("Failed to request for code " + response.code() + "(auth failed)");
+                }
             }
             throw new IOException("Failed to request for code " + response.code());
         }

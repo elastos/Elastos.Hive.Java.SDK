@@ -16,6 +16,9 @@ public class JwtUtil {
     }
 
     public static Claims getBody(String jwt) throws HiveException {
+        if (jwt == null)
+            throw new HiveException("Cannot parse jwt token for body.");
+
         try {
             JwtParser jwtParser = new JwtParserBuilder().build();
             Jws<Claims> jws = jwtParser.parseClaimsJws(jwt);

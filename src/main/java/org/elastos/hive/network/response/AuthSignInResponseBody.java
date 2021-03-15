@@ -1,14 +1,12 @@
 package org.elastos.hive.network.response;
 
-import java.util.Date;
-
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.utils.JwtUtil;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AuthSignInResponse extends ResponseBase {
+public class AuthSignInResponseBody extends ResponseBodyBase {
     @SerializedName("challenge")
     private String challenge;
 
