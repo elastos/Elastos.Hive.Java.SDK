@@ -1,14 +1,22 @@
 package org.elastos.hive.vault;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.Vault;
+import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.network.response.FilesHashResponse;
+import org.elastos.hive.network.response.ResponseBase;
 import org.elastos.hive.service.FilesService;
+import retrofit2.Response;
 
 class FilesServiceRender implements FilesService {
+	private ConnectionManager connectionManager;
 
 	public FilesServiceRender(Vault vault) {
-		// TODO;
+		this.connectionManager = vault.getConnectionManager();
 	}
 
 	@Override
@@ -43,7 +51,16 @@ class FilesServiceRender implements FilesService {
 
 	@Override
 	public CompletableFuture<String> hash(String path) {
-		// TODO Auto-generated method stub
-		return null;
+		return CompletableFuture.supplyAsync(() -> hashImp(path));
+	}
+
+	private String hashImp(String remoteFile) {
+		try {
+			Response<FilesHashResponse> response = connectionManager.getFilesApi().hash(remoteFile).execute();
+			FilesHashResponse hashResponse = ResponseBase.validateBody(response);
+			return hashResponse.getSha256();
+		} catch (HiveException | IOException e) {
+			throw new CompletionException(new HiveException(e.getMessage()));
+		}
 	}
 }

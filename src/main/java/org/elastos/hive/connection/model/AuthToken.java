@@ -1,4 +1,4 @@
-package org.elastos.hive;
+package org.elastos.hive.connection.model;
 
 public class AuthToken {
 	private String accessToken;
@@ -21,6 +21,10 @@ public class AuthToken {
 
 	public String getTokenType() {
 		return tokenType;
+	}
+
+	public String getHeaderTokenValue() {
+		return getTokenType() + " " + getAccessToken();
 	}
 
 	public boolean isExpired() {

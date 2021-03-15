@@ -9,9 +9,6 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.did.exception.MalformedDIDException;
-import org.elastos.hive.auth.LocalResolver;
-import org.elastos.hive.auth.RemoteResolver;
-import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotFoundException;
@@ -33,8 +30,6 @@ public class AppContext {
 	@SuppressWarnings("unused")
 	private String providerAddress;
 
-	private AuthToken token;
-	private TokenResolver tokenResolver;
 	private ConnectionManager connectionManager;
 
 	private AppContext(AppContextProvider provider, String userDid) {
@@ -42,25 +37,9 @@ public class AppContext {
 	}
 
 	private AppContext(AppContextProvider provider, String userDid, String providerAddress) {
+		this.providerAddress = providerAddress;
 		this.contextProvider = provider;
-		this.connectionManager = new ConnectionManager(providerAddress, null);
-		this.tokenResolver = new LocalResolver(providerAddress);
-		this.tokenResolver.setNextResolver(new RemoteResolver(this, connectionManager));
-	}
-
-	/**
-	 * Global check token before every service request.
-	 * @throws HiveException HiveException
-	 */
-	public void checkToken() throws HiveException {
-		if (token == null || token.isExpired()) {
-			token = tokenResolver.getToken();
-			this.connectionManager.refreshToken(token);
-		}
-	}
-
-	public ConnectionManager getConnectionManager() {
-		return this.connectionManager;
+		this.connectionManager = new ConnectionManager(this);
 	}
 
 	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
@@ -89,6 +68,10 @@ public class AppContext {
 
 	public String getProviderAddress() {
 		return this.providerAddress;
+	}
+
+	public ConnectionManager getConnectionManager() {
+		return this.connectionManager;
 	}
 
 	public static AppContext build(AppContextProvider provider) {
@@ -151,7 +134,21 @@ public class AppContext {
 		});
 	}
 
-	AuthToken getAuthToken() throws HiveException {
-		return tokenResolver.getToken();
+	/**
+	 * get Vault instance with specified DID.
+	 * Try to get a vault on target provider address with following steps:
+	 *  - Get the target provider address;
+	 *  - Create a new vaule of local instance..
+	 *
+	 * @param ownerDid  the owner did related to target vault
+	 * @param preferredProviderAddress the preferred target provider address
+	 * @return a new vault instance.
+	 */
+	public CompletableFuture<Vault> getVault(String ownerDid, String preferredProviderAddress) {
+		return getProviderAddress(ownerDid, preferredProviderAddress)
+				.thenApplyAsync(provider -> {
+					this.providerAddress = provider;
+					return new Vault(this, ownerDid, provider);
+				});
 	}
 }

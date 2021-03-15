@@ -1,6 +1,5 @@
 package org.elastos.hive;
 
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.BackupService;
 import org.elastos.hive.service.Database;
 import org.elastos.hive.service.FilesService;
@@ -18,11 +17,11 @@ public class Vault extends ServiceEndpoint {
 	private PubSubService pubsubService;
 	private BackupService 	backupService;
 
-	public Vault(AppContext context, String myDid) throws HiveException {
+	public Vault(AppContext context, String myDid) {
 		super(context, null, myDid);
 	}
 
-	public Vault(AppContext context, String myDid, String providerAddress) throws HiveException {
+	public Vault(AppContext context, String myDid, String providerAddress) {
 		super(context, providerAddress, myDid);
 
 		this.filesService 	= new ServiceBuilder(this).createFilesService();
