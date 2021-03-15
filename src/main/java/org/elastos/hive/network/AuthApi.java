@@ -9,9 +9,9 @@ import retrofit2.http.POST;
 import java.util.Map;
 
 public interface AuthApi {
-	@POST(BaseApi.API_PATH + "/did/sign_in")
+	@POST(BaseApi.API_VERSION + "/did/sign_in")
 	Call<AuthSignInResponse> signIn(@Body Map<String, Object> params);
 
-	@POST(BaseApi.API_PATH + "/did/auth")
+	@POST(BaseApi.API_VERSION + "/did/auth")
 	Call<AuthAuthResponse> auth(@Body Map<String, Object> params);
 }
