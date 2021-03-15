@@ -1,5 +1,9 @@
 package org.elastos.hive;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import org.elastos.hive.connection.model.AuthToken;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 import org.elastos.hive.payment.Order;
@@ -105,23 +109,24 @@ public class VaultSubscription {
 		@Override
 		public <T> CompletableFuture<T> subscribe(String pricingPlan, Class<T> type) {
 			return CompletableFuture.runAsync(() -> {
-				try {
-					appContext.checkToken();
-				} catch (HiveException e) {
-					throw new CompletionException(e);
-				}
+//				try {
+//					appContext.checkToken();
+//				} catch (HiveException e) {
+//					throw new CompletionException(e);
+//				}
 			}).thenApplyAsync((Function<Void, T>) aVoid -> {
-				VaultInfo vaultInfo = new VaultInfo(null, appContext.getUserDid(), null);
-				Response<CreateServiceResult> response;
-				try {
-					response = appContext.getConnectionManager().getVaultSubscriptionApi().createVault().execute();
-					if(response.body().existing()) {
-						throw new VaultAlreadyExistException("The vault already exists");
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				return (T)vaultInfo;
+//				VaultInfo vaultInfo = new VaultInfo(null, appContext.getUserDid(), null);
+//				Response<CreateServiceResult> response;
+//				try {
+//					response = appContext.getConnectionManager().getVaultSubscriptionApi().createVault().execute();
+//					if(response.body().existing()) {
+//						throw new VaultAlreadyExistException("The vault already exists");
+//					}
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//				return (T)vaultInfo;
+				return null;
 			});
 		}
 
@@ -137,12 +142,9 @@ public class VaultSubscription {
 		@Override
 		public CompletableFuture<Void> activate() {
 			return CompletableFuture.supplyAsync(() -> {
-				try {
-					System.out.print("Check access token here, otherwise request the access token");
-					return context.getAuthToken();
-				} catch (HiveException e) {
-					return null;
-				}
+				System.out.print("Check acess token here, otherwise request the access token");
+				//return context.getAuthenToken();
+				return new AuthToken(null, 0, null);
 			}).thenAcceptAsync(token -> {
 				System.out.print("Call activate API here");
 				activateImpl(token);

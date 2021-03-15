@@ -1,5 +1,7 @@
 package org.elastos.hive;
 
+import org.elastos.hive.connection.ConnectionManager;
+
 class ServiceEndpoint {
 	@SuppressWarnings("unused")
 	private AppContext context;
@@ -58,5 +60,9 @@ class ServiceEndpoint {
 
 	public String getServiceInstanceDid() {
 		return null;
+	}
+
+	public ConnectionManager getConnectionManager() {
+		return this.context.getConnectionManager();
 	}
 }
