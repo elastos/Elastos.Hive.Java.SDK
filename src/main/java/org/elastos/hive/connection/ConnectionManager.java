@@ -24,15 +24,12 @@ package org.elastos.hive.connection;
 
 import okhttp3.OkHttpClient;
 import org.elastos.hive.AppContext;
-import org.elastos.hive.network.PaymentApi;
-import org.elastos.hive.network.SubscriptionApi;
-import org.elastos.hive.network.AuthApi;
-import org.elastos.hive.network.BaseApi;
-import org.elastos.hive.network.FilesApi;
+import org.elastos.hive.network.*;
 import org.elastos.hive.utils.LogUtil;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import org.elastos.hive.network.PaymentApi;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -44,6 +41,7 @@ public class ConnectionManager {
 
 	private AppContext context;
 	private RequestInterceptor requestInterceptor;
+	private RequestInterceptor authRequestInterceptor;
 	private SubscriptionApi subscriptionApi;
 	private PaymentApi paymentApi;
 
@@ -53,11 +51,12 @@ public class ConnectionManager {
 	public ConnectionManager(AppContext context) {
 		this.context = context;
 		this.requestInterceptor = new RequestInterceptor(context, this);
+		this.authRequestInterceptor = new RequestInterceptor(context, this, false);
 	}
 
 	public AuthApi getAuthApi() {
 		if (authApi == null) {
-			authApi = createService(AuthApi.class, this.context.getProviderAddress(), null);
+			authApi = createService(AuthApi.class, this.context.getProviderAddress(), this.authRequestInterceptor);
 		}
 		return authApi;
 	}
@@ -119,9 +118,7 @@ public class ConnectionManager {
 				.addConverterFactory(NobodyConverterFactory.create())
 				.addConverterFactory(GsonConverterFactory.create());
 
-		if (requestInterceptor != null)
-			clientBuilder.interceptors().add(requestInterceptor);
-
+		clientBuilder.interceptors().add(requestInterceptor);
 		if (LogUtil.debug)
 			clientBuilder.interceptors().add(new NetworkLogInterceptor());
 
