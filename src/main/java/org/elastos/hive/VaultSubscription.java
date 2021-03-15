@@ -1,14 +1,21 @@
 package org.elastos.hive;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.VaultAlreadyExistException;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
+import org.elastos.hive.subscribe.CreateServiceResult;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.function.Function;
+
+import retrofit2.Response;
 
 public class VaultSubscription {
 	private SubscriptionRender render;
@@ -64,23 +71,58 @@ public class VaultSubscription {
 	}
 
 	public class VaultInfo {
-		// TODO;
-		private String providerAddress;
-		private String ownerDid;
 		private String appInstanceDid;
 		private String userDid;
 		private String serviceDid;
+
+		public VaultInfo(String appInstanceDid, String userDid, String serviceDid) {
+			this.appInstanceDid = appInstanceDid;
+			this.userDid = userDid;
+			this.serviceDid = serviceDid;
+		}
+
+		public String getAppInstanceDid() {
+			return appInstanceDid;
+		}
+
+		public String getUserDid() {
+			return userDid;
+		}
+
+		public String getServiceDid() {
+			return serviceDid;
+		}
 	}
 
 	class SubscriptionRender extends ServiceEndpoint implements SubscriptionService, PaymentService {
+		private AppContext appContext;
+
 		SubscriptionRender(AppContext context, String userDid, String providerAddress) throws HiveException {
 			super(context, providerAddress, userDid);
-			
+			this.appContext = context;
 		}
 
 		@Override
 		public <T> CompletableFuture<T> subscribe(String pricingPlan, Class<T> type) {
-			return null;
+			return CompletableFuture.runAsync(() -> {
+				try {
+					appContext.checkToken();
+				} catch (HiveException e) {
+					throw new CompletionException(e);
+				}
+			}).thenApplyAsync((Function<Void, T>) aVoid -> {
+				VaultInfo vaultInfo = new VaultInfo(null, appContext.getUserDid(), null);
+				Response<CreateServiceResult> response;
+				try {
+					response = appContext.getConnectionManager().getVaultSubscriptionApi().createVault().execute();
+					if(response.body().existing()) {
+						throw new VaultAlreadyExistException("The vault already exists");
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return (T)vaultInfo;
+			});
 		}
 
 		@Override
