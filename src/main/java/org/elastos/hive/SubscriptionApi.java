@@ -3,6 +3,7 @@ package org.elastos.hive;
 import org.elastos.hive.network.BaseApi;
 import org.elastos.hive.subscribe.CreateServiceResult;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.POST;
 
@@ -12,10 +13,11 @@ public interface SubscriptionApi extends BaseApi {
 	Call<CreateServiceResult> createVault();
 
 	@POST(API_PATH + "/service/vault/freeze")
-	Call<Void> freeze();
+	Call<ResponseBody> freeze();
 
 	@POST(API_PATH + "/service/vault/freeze")
-	Call<Void> unfreeze();
+	Call<ResponseBody> unfreeze();
 
-
+	@POST(API_PATH + "/service/vault/remove")
+	Call<ResponseBody> removeVault();
 }
