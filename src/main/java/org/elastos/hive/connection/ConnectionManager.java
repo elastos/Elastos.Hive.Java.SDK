@@ -22,66 +22,60 @@
 
 package org.elastos.hive.connection;
 
-import org.elastos.hive.AuthToken;
-import org.elastos.hive.AuthorizationApi;
-import org.elastos.hive.VaultSubscriptionApi;
-import org.elastos.hive.connection.model.BaseServiceConfig;
-import org.elastos.hive.connection.model.HeaderConfig;
+import okhttp3.OkHttpClient;
+import org.elastos.hive.AppContext;
+import org.elastos.hive.network.AuthApi;
+import org.elastos.hive.network.BaseApi;
+import org.elastos.hive.network.FilesApi;
+import org.elastos.hive.network.VaultSubscriptionApi;
+import org.elastos.hive.utils.LogUtil;
+import org.jetbrains.annotations.NotNull;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class ConnectionManager {
+	private static final int DEFAULT_TIMEOUT = 30;
 
-	private AuthorizationApi authApi;
+	private AppContext context;
+	private RequestInterceptor requestInterceptor;
 	private VaultSubscriptionApi vaultSubscriptionApi;
 
-	private String vaultBaseUrl;
-	private BaseServiceConfig vaultConfig;
+	private AuthApi authApi;
+	private FilesApi filesApi;
 
-	public ConnectionManager(String baseUrl, BaseServiceConfig baseServiceConfig) {
-		resetVaultApi(baseUrl, baseServiceConfig);
+	public ConnectionManager(AppContext context) {
+		this.context = context;
+		this.requestInterceptor = new RequestInterceptor(context, this);
 	}
 
-	public AuthorizationApi getAuthApi() {
-		if (authApi == null)
-			authApi = BaseServiceUtil.createService(AuthorizationApi.class,
-					this.vaultBaseUrl, this.vaultConfig);
+	public AuthApi getAuthApi() {
+		if (authApi == null) {
+			authApi = createService(AuthApi.class, this.context.getProviderAddress(), null);
+		}
 		return authApi;
 	}
 
+	public FilesApi getFilesApi() {
+		if (filesApi == null) {
+			filesApi = createService(FilesApi.class, this.context.getProviderAddress(), this.requestInterceptor);
+		}
+		return filesApi;
+	}
+
 	public VaultSubscriptionApi getVaultSubscriptionApi() {
-		if (vaultSubscriptionApi == null)
-			vaultSubscriptionApi = BaseServiceUtil.createService(VaultSubscriptionApi.class,
-					this.vaultBaseUrl, this.vaultConfig);
+		if (vaultSubscriptionApi == null) {
+			vaultSubscriptionApi = createService(VaultSubscriptionApi.class, this.context.getProviderAddress(), this.requestInterceptor);
+		}
 		return vaultSubscriptionApi;
 	}
 
-	private void updateVaultConfig(BaseServiceConfig vaultConfig) {
-		this.vaultConfig = vaultConfig != null ? vaultConfig : new BaseServiceConfig.Builder().build();
-	}
-
-	private void updateVaultBaseUrl(String vaultBaseUrl) {
-		this.vaultBaseUrl = vaultBaseUrl;
-	}
-
-	public void resetVaultApi(String baseUrl, BaseServiceConfig baseServiceConfig) {
-		authApi = null;
-		updateVaultBaseUrl(baseUrl);
-		updateVaultConfig(baseServiceConfig);
-	}
-
-	public String getVaultBaseUrl() {
-		return this.vaultBaseUrl;
-	}
-
-	public String getAccessToken() {
-		return this.vaultConfig.getHeaderConfig().getAuthToken().getAccessToken();
-	}
-
 	public HttpURLConnection openURLConnection(String path) throws IOException {
-		String url = this.getVaultBaseUrl() + "/api/v1" + path;
+		String url = this.context.getProviderAddress() + BaseApi.API_PATH + path;
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setRequestProperty("User-Agent",
@@ -94,19 +88,27 @@ public class ConnectionManager {
 		httpURLConnection.setUseCaches(false);
 		httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
 		httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
-		httpURLConnection.setRequestProperty("Authorization", "token " + this.getAccessToken());
+		httpURLConnection.setRequestProperty("Authorization", this.requestInterceptor.getAuthToken().getHeaderTokenValue());
 
 		httpURLConnection.setChunkedStreamingMode(0);
-
 		return httpURLConnection;
 	}
 
-	public void refreshToken(AuthToken token) {
-		HeaderConfig headerConfig = new HeaderConfig.Builder()
-				.authToken(token)
-				.build();
-		this.vaultConfig = new BaseServiceConfig.Builder()
-				.headerConfig(headerConfig)
-				.build();
+	private static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl, RequestInterceptor requestInterceptor) {
+		OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
+				.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+				.readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+
+		Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
+				.baseUrl(baseUrl)
+				.addConverterFactory(StringConverterFactory.create())
+				.addConverterFactory(NobodyConverterFactory.create())
+				.addConverterFactory(GsonConverterFactory.create());
+
+		clientBuilder.interceptors().clear();
+		if (requestInterceptor != null) clientBuilder.interceptors().add(requestInterceptor);
+		if (LogUtil.debug) clientBuilder.interceptors().add(new NetworkLogInterceptor());
+
+		return retrofitBuilder.client(clientBuilder.build()).build().create(serviceClass);
 	}
 }

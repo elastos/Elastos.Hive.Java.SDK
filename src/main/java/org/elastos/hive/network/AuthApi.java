@@ -1,15 +1,17 @@
 package org.elastos.hive.network;
 
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
+import org.elastos.hive.network.response.AuthAuthResponse;
+import org.elastos.hive.network.response.AuthSignInResponse;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
-public interface AuthApi {
-	@POST(Constant.API_PATH + "/did/sign_in")
-	Call<ResponseBody> signIn(@Body RequestBody body);
+import java.util.Map;
 
-	@POST(Constant.API_PATH + "/did/auth")
-	Call<ResponseBody> auth(@Body RequestBody body);
+public interface AuthApi {
+	@POST(BaseApi.API_PATH + "/did/sign_in")
+	Call<AuthSignInResponse> signIn(@Body Map<String, Object> params);
+
+	@POST(BaseApi.API_PATH + "/did/auth")
+	Call<AuthAuthResponse> auth(@Body Map<String, Object> params);
 }
