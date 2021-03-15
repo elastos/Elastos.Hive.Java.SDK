@@ -24,8 +24,8 @@ package org.elastos.hive.connection;
 
 import okhttp3.OkHttpClient;
 import org.elastos.hive.AppContext;
-import org.elastos.hive.PaymentApi;
-import org.elastos.hive.SubscriptionApi;
+import org.elastos.hive.network.PaymentApi;
+import org.elastos.hive.network.SubscriptionApi;
 import org.elastos.hive.network.AuthApi;
 import org.elastos.hive.network.BaseApi;
 import org.elastos.hive.network.FilesApi;

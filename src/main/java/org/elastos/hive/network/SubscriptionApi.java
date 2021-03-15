@@ -1,4 +1,4 @@
-package org.elastos.hive;
+package org.elastos.hive.network;
 
 import org.elastos.hive.network.BaseApi;
 import org.elastos.hive.subscribe.CreateServiceResult;

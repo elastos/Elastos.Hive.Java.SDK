@@ -1,4 +1,4 @@
-package org.elastos.hive;
+package org.elastos.hive.network;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
