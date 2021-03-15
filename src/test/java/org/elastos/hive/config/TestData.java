@@ -1,22 +1,21 @@
 package org.elastos.hive.config;
 
+import com.sun.security.ntlm.Client;
+
 import org.elastos.did.DIDDocument;
 import org.elastos.did.VerifiableCredential;
 import org.elastos.did.VerifiablePresentation;
 import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
-import org.elastos.hive.ApplicationContext;
+import org.elastos.hive.AppContext;
+import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.Backup;
-import org.elastos.hive.BackupAuthenticationHandler;
-import org.elastos.hive.Client;
 import org.elastos.hive.Logger;
-import org.elastos.hive.Management;
-import org.elastos.hive.Payment;
 import org.elastos.hive.Utils;
 import org.elastos.hive.Vault;
-import org.elastos.hive.didhelper.DApp;
-import org.elastos.hive.didhelper.DIDApp;
+import org.elastos.hive.did.DApp;
+import org.elastos.hive.did.DIDApp;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.utils.JwtUtil;
 
@@ -35,7 +34,7 @@ public class TestData {
 	private NodeConfig nodeConfig;
 	private CrossConfig crossConfig;
 
-	private ApplicationContext applicationContext;
+	private AppContext appContext;
 
 	private static TestData instance = null;
 
@@ -69,7 +68,7 @@ public class TestData {
 		String configJson = Utils.getConfigure(fileName);
 		clientConfig = ClientConfig.deserialize(configJson);
 
-		Client.setupResolver(clientConfig.resolverUrl(), "data/didCache");
+//		Client.setupResolver(clientConfig.resolverUrl(), "data/didCache");
 
 		DummyAdapter adapter = new DummyAdapter();
 		ApplicationConfig applicationConfig = clientConfig.applicationConfig();
@@ -81,62 +80,33 @@ public class TestData {
 		nodeConfig = clientConfig.nodeConfig();
 		crossConfig = clientConfig.crossConfig();
 
-		//初始化Application Context
-		applicationContext = new ApplicationContext() {
-			@Override
-			public String getLocalDataDir() {
-				return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
-			}
+		//TODO 初始化Application Context
+//		appContext = new AppContextProvider() {
+//			@Override
+//			public String getLocalDataDir() {
+//				return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
+//			}
+//
+//			@Override
+//			public DIDDocument getAppInstanceDocument() {
+//				try {
+//					return appInstanceDid.getDocument();
+//				} catch (DIDException e) {
+//					e.printStackTrace();
+//				}
+//				return null;
+//			}
+//
+//			@Override
+//			public CompletableFuture<String> getAuthorization(String jwtToken) {
+//				return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
+//			}
+//		};
 
-			@Override
-			public DIDDocument getAppInstanceDocument() {
-				try {
-					return appInstanceDid.getDocument();
-				} catch (DIDException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-
-			@Override
-			public CompletableFuture<String> getAuthorization(String jwtToken) {
-				return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
-			}
-		};
-
-		client = Client.createInstance(applicationContext);
-		createVaultAndBackup();
+//		client = Client.createInstance(appContext);
+//		createVaultAndBackup();
 	}
 
-	private void createVaultAndBackup() {
-		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
-//			if(throwable!=null) {
-//				throwable.printStackTrace();
-//			}
-			return true;
-		}).join();
-
-		client.getManager(nodeConfig.ownerDid(), nodeConfig.provider(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createBackup()).handleAsync((backup, throwable) -> {
-//			if(throwable!=null) {
-//				throwable.printStackTrace();
-//			}
-			return true;
-		}).join();
-
-		client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createVault()).handleAsync((vault, throwable) -> {
-//			if(throwable!=null) {
-//				throwable.printStackTrace();
-//			}
-			return true;
-		}).join();
-
-		client.getManager(nodeConfig.targetDid(), nodeConfig.targetHost(), nodeConfig.targetHost()).thenComposeAsync(management -> management.createBackup()).handleAsync((vault, throwable) -> {
-//			if(throwable!=null) {
-//				throwable.printStackTrace();
-//			}
-			return true;
-		}).join();
-	}
 
 	public String signAuthorization(String jwtToken) {
 		try {
@@ -172,34 +142,6 @@ public class TestData {
 		return this.client;
 	}
 
-	public CompletableFuture<Management> getManagement() {
-		return this.client.getManager(nodeConfig.ownerDid(), nodeConfig.provider(), nodeConfig.targetHost());
-	}
-
-	public CompletableFuture<Payment> getPayment() {
-		return getManagement().thenApplyAsync(management -> management.getPayment());
-	}
-
-	public CompletableFuture<Vault> getVault() {
-		return this.client.getVault(nodeConfig.ownerDid(), nodeConfig.provider());
-	}
-
-	public CompletableFuture<Vault> getTargetVault() {
-		return client.getVault(nodeConfig.targetDid(), nodeConfig.targetHost());
-	}
-
-	public CompletableFuture<Backup> getTargetBackup() {
-		return this.client.getBackup(nodeConfig.targetDid(), nodeConfig.targetHost(), null);
-	}
-
-	public CompletableFuture<Backup> getBackup() {
-		return this.client.getBackup(nodeConfig.ownerDid(), nodeConfig.provider(), nodeConfig.targetHost());
-	}
-
-	public BackupAuthenticationHandler getBackupAuthenticationHandler() {
-		return (sourceDid, targetDid, targetHost) ->
-				CompletableFuture.supplyAsync(() -> getBackupVc(sourceDid, targetDid, targetHost));
-	}
 
 	public CrossData getCrossData() {
 		try {
@@ -241,34 +183,30 @@ public class TestData {
 			UserConfig userConfig = crossConfig.userConfig();
 			userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storepass());
 
-			//初始化Application Context
-			ApplicationContext applicationContext = new ApplicationContext() {
-				@Override
-				public String getLocalDataDir() {
-					return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
-				}
+			//TODO 初始化Application Context
+//			AppContext applicationContext = new AppContext() {
+//				@Override
+//				public String getLocalDataDir() {
+//					return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
+//				}
+//
+//				@Override
+//				public DIDDocument getAppInstanceDocument() {
+//					try {
+//						return appInstanceDid.getDocument();
+//					} catch (DIDException e) {
+//						e.printStackTrace();
+//					}
+//					return null;
+//				}
+//
+//				@Override
+//				public CompletableFuture<String> getAuthorization(String jwtToken) {
+//					return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
+//				}
+//			};
 
-				@Override
-				public DIDDocument getAppInstanceDocument() {
-					try {
-						return appInstanceDid.getDocument();
-					} catch (DIDException e) {
-						e.printStackTrace();
-					}
-					return null;
-				}
-
-				@Override
-				public CompletableFuture<String> getAuthorization(String jwtToken) {
-					return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
-				}
-			};
-
-			client = Client.createInstance(applicationContext);
-		}
-
-		public CompletableFuture<Vault> getCrossVault() {
-			return this.client.getVault(crossConfig.crossDid(), nodeConfig.provider());
+//			client = Client.createInstance(applicationContext);
 		}
 
 		public String signAuthorization(String jwtToken) {
