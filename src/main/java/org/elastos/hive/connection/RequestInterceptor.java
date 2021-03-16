@@ -93,7 +93,8 @@ public class RequestInterceptor implements Interceptor {
         }
     }
 
-    public AuthToken getAuthToken() {
+    public AuthToken getAuthToken() throws IOException {
+        checkToken();
         return token;
     }
 }
