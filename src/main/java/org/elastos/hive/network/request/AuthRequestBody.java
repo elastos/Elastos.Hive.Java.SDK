@@ -1,6 +1,6 @@
 package org.elastos.hive.network.request;
 
-public class AuthAuthRequestBody {
+public class AuthRequestBody {
     private String jwt;
 
     public void setJwt(String jwt) {
