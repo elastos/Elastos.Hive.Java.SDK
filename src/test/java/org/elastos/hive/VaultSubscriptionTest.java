@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.exception.VaultAlreadyExistException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -30,6 +31,10 @@ public class VaultSubscriptionTest {
 						}
 					}).get();
 		} catch (InterruptedException|ExecutionException e1) {
+			if(VaultAlreadyExistException.class.isInstance(e1.getCause())) {
+				return;
+			}
+			fail();
 			e1.printStackTrace();
 		}
 	}
