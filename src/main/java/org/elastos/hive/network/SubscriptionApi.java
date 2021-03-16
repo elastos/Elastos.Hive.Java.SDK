@@ -14,7 +14,7 @@ public interface SubscriptionApi {
 	@POST(BaseApi.API_VERSION + "/service/vault/freeze")
 	Call<ResponseBody> freeze();
 
-	@POST(BaseApi.API_VERSION + "/service/vault/freeze")
+	@POST(BaseApi.API_VERSION + "/service/vault/unfreeze")
 	Call<ResponseBody> unfreeze();
 
 	@POST(BaseApi.API_VERSION + "/service/vault/remove")
