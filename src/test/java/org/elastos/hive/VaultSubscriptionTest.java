@@ -23,7 +23,7 @@ public class VaultSubscriptionTest {
 	@Test
 	public void testSubscribe() {
 		try {
-			subscription.unsubscribe()
+			subscription.subscribe("free")
 					.whenComplete((result, ex) -> {
 						if (ex != null) {
 							fail();

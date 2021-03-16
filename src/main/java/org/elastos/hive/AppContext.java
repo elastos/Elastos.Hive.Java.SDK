@@ -38,6 +38,7 @@ public class AppContext {
 
 	private AppContext(AppContextProvider provider, String userDid, String providerAddress) {
 		this.providerAddress = providerAddress;
+		this.userDid = userDid;
 		this.contextProvider = provider;
 		this.connectionManager = new ConnectionManager(this);
 	}
@@ -88,6 +89,22 @@ public class AppContext {
 		// throw new HiveException("Setup DID resolver first");
 
 		return new AppContext(provider, null, null);
+	}
+
+	public static AppContext build(AppContextProvider provider, String userDid, String providerAddress) {
+		if (provider == null)
+			throw new IllegalArgumentException("Missing AppContext provider");
+
+		if (provider.getLocalDataDir() == null)
+			throw new IllegalArgumentException("Missing method to acquire data location in AppContext provider");
+
+		if (provider.getAppInstanceDocument() == null)
+			throw new IllegalArgumentException("Missing method to acquire App instance DID document in AppContext provider");
+
+		// if (!resolverHasSetup)
+		// throw new HiveException("Setup DID resolver first");
+
+		return new AppContext(provider, userDid, providerAddress);
 	}
 
 	public static CompletableFuture<String> getProviderAddress(String targetDid) {
