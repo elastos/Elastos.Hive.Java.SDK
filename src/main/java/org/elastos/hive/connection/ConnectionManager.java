@@ -31,7 +31,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import org.elastos.hive.network.PaymentApi;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
@@ -90,7 +93,7 @@ public class ConnectionManager {
 		return databaseApi;
 	}
 
-	public HttpURLConnection openURLConnection(String path) throws IOException {
+	public HttpURLConnection openConnection(String path) throws IOException {
 		String url = this.context.getProviderAddress() + BaseApi.API_VERSION + path;
 		LogUtil.d("open connection with URL: " + url);
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
@@ -109,6 +112,28 @@ public class ConnectionManager {
 
 		httpURLConnection.setChunkedStreamingMode(0);
 		return httpURLConnection;
+	}
+
+	public static void readConnection(HttpURLConnection httpURLConnection) {
+		try {
+			int code = httpURLConnection.getResponseCode();
+			StringBuilder result = new StringBuilder();
+			if (code == 200) {
+				InputStream is = httpURLConnection.getInputStream();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+				String sCurrentLine = "";
+				while ((sCurrentLine = reader.readLine()) != null)
+					if (sCurrentLine.length() > 0)
+						result.append(sCurrentLine.trim());
+			} else {
+				result = new StringBuilder("error code:" + code);
+				result.append("error code:").append(code).append(";");
+				result.append("message:").append(httpURLConnection.getResponseMessage()).append(";");
+			}
+			LogUtil.d("connection", "response content: " + result);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl, RequestInterceptor requestInterceptor) {

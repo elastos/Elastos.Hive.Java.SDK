@@ -1,6 +1,6 @@
 package org.elastos.hive.network.model;
 
-import org.elastos.hive.utils.ResponseHelper;
+import org.elastos.hive.connection.ConnectionManager;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,7 +42,7 @@ public class UploadOutputStream extends OutputStream {
 		// don't terminate the api call until the server response is read.
 		//
 		// This close() method on the output stream is the only location where we know user has finished writing his file.
-		ResponseHelper.readConnection(connection);
+		ConnectionManager.readConnection(connection);
 		originalStream.close();
 	}
 }
