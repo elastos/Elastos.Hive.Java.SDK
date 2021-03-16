@@ -6,7 +6,7 @@ import org.elastos.hive.utils.JwtUtil;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AuthSignInResponseBody extends ResponseBodyBase {
+public class SignInResponseBody extends ResponseBodyBase {
     @SerializedName("challenge")
     private String challenge;
 

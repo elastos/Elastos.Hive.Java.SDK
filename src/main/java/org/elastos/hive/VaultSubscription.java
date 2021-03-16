@@ -36,6 +36,10 @@ public class VaultSubscription {
 		this.render = new SubscriptionRender(context, userDid, providerAddress);
 	}
 
+	public CompletableFuture<VaultInfo> subscribe() {
+		return render.subscribe(null, VaultInfo.class);
+	}
+
 	public CompletableFuture<VaultInfo> subscribe(String pricingPlan) {
 		return render.subscribe(pricingPlan, VaultInfo.class);
 	}

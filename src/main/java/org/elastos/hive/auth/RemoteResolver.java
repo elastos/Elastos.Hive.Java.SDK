@@ -6,10 +6,10 @@ import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.model.AuthToken;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.network.request.AuthAuthRequestBody;
-import org.elastos.hive.network.request.AuthSignInRequestBody;
-import org.elastos.hive.network.response.AuthAuthResponseBody;
-import org.elastos.hive.network.response.AuthSignInResponseBody;
+import org.elastos.hive.network.request.AuthRequestBody;
+import org.elastos.hive.network.request.SignInRequestBody;
+import org.elastos.hive.network.response.AuthResponseBody;
+import org.elastos.hive.network.response.SignInResponseBody;
 import org.elastos.hive.network.response.ResponseBodyBase;
 import org.elastos.hive.utils.JwtUtil;
 import org.jetbrains.annotations.NotNull;
@@ -34,14 +34,15 @@ public class RemoteResolver implements TokenResolver {
 
 	private String signIn() throws HiveException {
 		try {
-			AuthSignInRequestBody reqBody = new AuthSignInRequestBody();
+			SignInRequestBody reqBody = new SignInRequestBody();
 			reqBody.setDocument(new ObjectMapper().readValue(contextProvider.getAppInstanceDocument().toString(), HashMap.class));
-			Response<AuthSignInResponseBody> response = connectionManager.getAuthApi()
+
+			SignInResponseBody rspBody = connectionManager.getAuthApi()
 					.signIn(reqBody)
-					.execute();
-			AuthSignInResponseBody sp = ResponseBodyBase.validateBody(response);
-			sp.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
-			return contextProvider.getAuthorization(sp.getChallenge()).get();
+					.execute()
+					.body();
+			rspBody.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
+			return contextProvider.getAuthorization(rspBody.getChallenge()).get();
 		} catch (Exception e) {
 			throw new HiveException(e.getMessage());
 		}
@@ -49,27 +50,25 @@ public class RemoteResolver implements TokenResolver {
 
 	private AuthToken auth(String token) throws HiveException {
 		try {
-			AuthAuthRequestBody reqBody = new AuthAuthRequestBody();
+			AuthRequestBody reqBody = new AuthRequestBody();
 			reqBody.setJwt(token);
-			Response<AuthAuthResponseBody> response = connectionManager.getAuthApi()
+
+			AuthResponseBody rspBody = connectionManager.getAuthApi()
 					.auth(reqBody)
-					.execute();
-			AuthAuthResponseBody body = ResponseBodyBase.validateBody(response);
-			long exp = JwtUtil.getBody(body.getToken()).getExpiration().getTime();
+					.execute()
+					.body();
+
+			long exp = JwtUtil.getBody(rspBody.getToken()).getExpiration().getTime();
 			long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
-			return new AuthToken(body.getToken(), expiresTime, "token");
+			return new AuthToken(rspBody.getToken(), expiresTime, "token");
 		} catch (Exception e) {
 			throw new HiveException(e.getMessage());
 		}
 	}
 
 	@Override
-	public void saveToken() {
-		// Do nothing.
-	}
+	public void saveToken() {}
 
 	@Override
-	public void setNextResolver(TokenResolver resolver) {
-		// Do nothing;
-	}
+	public void setNextResolver(TokenResolver resolver) {}
 }
