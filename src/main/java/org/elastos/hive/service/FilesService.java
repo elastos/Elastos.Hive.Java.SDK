@@ -1,6 +1,8 @@
 package org.elastos.hive.service;
 
-import java.io.File;
+import org.elastos.hive.network.model.FileInfo;
+
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface FilesService {
@@ -73,7 +75,7 @@ public interface FilesService {
 	 * @param path the path for the remote folder
 	 * @return the new CompletionStage, the result is List if success; null otherwise
 	 */
-	//CompletableFuture<List<FileInfo>> list(String path);
+	CompletableFuture<List<FileInfo>> list(String path);
 
 	/**
 	 * Information about the target file or folder.
@@ -82,6 +84,6 @@ public interface FilesService {
 	 * @return the new CompletionStage, the result is FileInfo
 	 *         if success; null otherwise
 	 */
-	//CompletableFuture<FileInfo> stat(String path);
+	CompletableFuture<FileInfo> stat(String path);
 
 }

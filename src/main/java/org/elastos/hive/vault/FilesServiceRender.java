@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -11,8 +12,11 @@ import org.elastos.hive.Vault;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.FilesApi;
+import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.network.model.UploadOutputStream;
 import org.elastos.hive.network.response.FilesHashResponseBody;
+import org.elastos.hive.network.response.FilesListResponseBody;
+import org.elastos.hive.network.response.FilesPropertiesResponseBody;
 import org.elastos.hive.network.response.ResponseBodyBase;
 import org.elastos.hive.service.FilesService;
 import retrofit2.Response;
@@ -34,7 +38,7 @@ class FilesServiceRender implements FilesService {
 			HttpURLConnection connection = this.connectionManager.openURLConnection(FilesApi.API_UPLOAD + "/" + path);
 			OutputStream outputStream = connection.getOutputStream();
 
-			if(resultType.isAssignableFrom(OutputStream.class)) {
+			if (resultType.isAssignableFrom(OutputStream.class)) {
 				UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
 				return resultType.cast(uploader);
 			} else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
@@ -45,6 +49,37 @@ class FilesServiceRender implements FilesService {
 			}
 		} catch (HiveException|IOException e) {
 			throw new CompletionException(e);
+		}
+	}
+
+	@Override
+	public CompletableFuture<List<FileInfo>> list(String path) {
+		return CompletableFuture.supplyAsync(() -> listImpl(path));
+	}
+
+	private List<FileInfo> listImpl(String path) {
+		try {
+			Response<FilesListResponseBody> response = connectionManager.getFilesApi().list(path).execute();
+			FilesListResponseBody body = ResponseBodyBase.validateBody(response);
+			return body.getFileInfoList();
+		} catch (HiveException | IOException e) {
+			throw new CompletionException(new HiveException(e.getMessage()));
+		}
+	}
+
+	@Override
+	public CompletableFuture<FileInfo> stat(String path) {
+		return CompletableFuture.supplyAsync(() -> statImpl(path));
+	}
+
+	private FileInfo statImpl(String path) {
+		try {
+			Response<FilesPropertiesResponseBody> response = this.connectionManager.getFilesApi()
+					.properties(path).execute();
+			FilesPropertiesResponseBody body = ResponseBodyBase.validateBody(response);
+			return body.getFileInfo();
+		} catch (Exception e) {
+			throw new CompletionException(new HiveException(e.getMessage()));
 		}
 	}
 

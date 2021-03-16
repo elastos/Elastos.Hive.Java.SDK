@@ -3,6 +3,7 @@ package org.elastos.hive;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.service.FilesService;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -10,6 +11,8 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -18,8 +21,23 @@ public class FilesServiceTest {
 
 	@Test
 	public void test01_uploadText() {
+		try (OutputStream out = filesApi.upload(remoteTextPath, OutputStream.class).exceptionally(e -> {
+			fail();
+			return null;
+		}).get();
+			 FileReader fileReader = new FileReader(textLocalPath)) {
+			assertNotNull(out);
+			char[] buffer = new char[1];
+			while (fileReader.read(buffer) != -1) {
+				out.write(buffer.toString().getBytes(StandardCharsets.UTF_8));
+			}
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		checkFileStat(remoteTextPath);
 	}
-
 
 	@Test
 	public void test02_uploadBin() {
@@ -35,6 +53,16 @@ public class FilesServiceTest {
 
 	@Test
 	public void test05_list() {
+		try {
+			List<FileInfo> files = filesApi.list(".").exceptionally(s->{
+				fail();
+				return null;
+			}).get();
+			assertNotNull(files);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
 	}
 
 	@Test
@@ -59,6 +87,19 @@ public class FilesServiceTest {
 
 	@Test
 	public void test09_deleteFile() {
+	}
+
+	private void checkFileStat(String path) {
+		try {
+			FileInfo info = filesApi.stat(path).exceptionally(s->{
+				fail();
+				return null;
+			}).get();
+			assertNotNull(info);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
 	}
 
 
