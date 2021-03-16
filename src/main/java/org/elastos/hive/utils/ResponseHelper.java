@@ -122,29 +122,4 @@ public class ResponseHelper {
         return inputStream;
     }
 
-    public static void readConnection(HttpURLConnection httpURLConnection) {
-        try {
-            int code = httpURLConnection.getResponseCode();
-            System.out.println("response code=" + code);
-            String message = httpURLConnection.getResponseMessage();
-            System.out.println("message=" + message);
-
-            String sCurrentLine = "";
-            String result = "";
-            if (code == 200) {
-                InputStream is = httpURLConnection.getInputStream();
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(is));
-                while ((sCurrentLine = reader.readLine()) != null)
-                    if (sCurrentLine.length() > 0)
-                        result = result + sCurrentLine.trim();
-            } else {
-                result = "error code:" + code;
-            }
-            System.out.println("response content:" + result);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 }

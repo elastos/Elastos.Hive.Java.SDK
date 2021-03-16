@@ -1,25 +1,25 @@
 package org.elastos.hive.vault;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-
 import org.elastos.hive.Vault;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.network.model.UploadOutputStream;
+import org.elastos.hive.network.request.FilesDeleteRequestBody;
 import org.elastos.hive.network.response.FilesHashResponseBody;
 import org.elastos.hive.network.response.FilesListResponseBody;
 import org.elastos.hive.network.response.FilesPropertiesResponseBody;
 import org.elastos.hive.network.response.ResponseBodyBase;
 import org.elastos.hive.service.FilesService;
+import org.elastos.hive.utils.ResponseHelper;
 import retrofit2.Response;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 class FilesServiceRender implements FilesService {
 	private ConnectionManager connectionManager;
@@ -33,9 +33,9 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> uploadImpl(path, resultType));
 	}
 
-	private <T>  T uploadImpl(String path, Class<T> resultType) {
+	private <T> T uploadImpl(String path, Class<T> resultType) {
 		try {
-			HttpURLConnection connection = this.connectionManager.openURLConnection(FilesApi.API_UPLOAD + "/" + path);
+			HttpURLConnection connection = this.connectionManager.openConnection(FilesApi.API_UPLOAD + "/" + path);
 			OutputStream outputStream = connection.getOutputStream();
 
 			if (resultType.isAssignableFrom(OutputStream.class)) {
@@ -85,14 +85,45 @@ class FilesServiceRender implements FilesService {
 
 	@Override
 	public <T> CompletableFuture<T> download(String path, Class<T> resultType) {
-		// TODO Auto-generated method stub
-		return null;
+		return CompletableFuture.supplyAsync(() -> downloadImpl(path, resultType));
+	}
+
+	private <T> T downloadImpl(String remoteFile, Class<T> resultType) {
+		try {
+			Response response = this.connectionManager.getFilesApi()
+					.download(remoteFile)
+					.execute();
+			if(resultType.isAssignableFrom(Reader.class)) {
+				Reader reader = ResponseHelper.getToReader(response);
+				return resultType.cast(reader);
+			}
+			if (resultType.isAssignableFrom(InputStream.class)){
+				InputStream inputStream = ResponseHelper.getInputStream(response);
+				return resultType.cast(inputStream);
+			}
+			throw new HiveException("Not supported result type");
+		} catch (HiveException|IOException e) {
+			throw new CompletionException(new HiveException(e.getMessage()));
+		}
 	}
 
 	@Override
 	public CompletableFuture<Boolean> delete(String path) {
-		// TODO Auto-generated method stub
-		return null;
+		return CompletableFuture.supplyAsync(() -> deleteImpl(path));
+	}
+
+	private Boolean deleteImpl(String path) {
+		try {
+			FilesDeleteRequestBody reqBody = new FilesDeleteRequestBody();
+			reqBody.setPath(path);
+			Response<ResponseBodyBase> response = this.connectionManager.getFilesApi()
+					.delete(reqBody)
+					.execute();
+			ResponseBodyBase.validateBody(response);
+			return true;
+		} catch (Exception e) {
+			throw new CompletionException(new HiveException(e.getMessage()));
+		}
 	}
 
 	@Override
