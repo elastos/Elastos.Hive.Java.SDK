@@ -3,6 +3,7 @@ package org.elastos.hive;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.VaultAlreadyExistException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
@@ -71,6 +72,7 @@ public class VaultSubscriptionTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void testDeactivate() {
 		try {
