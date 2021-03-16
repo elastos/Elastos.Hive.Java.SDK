@@ -84,7 +84,9 @@ public class TestData {
 			public CompletableFuture<String> getAuthorization(String jwtToken) {
 				return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
 			}
-		});
+		}, nodeConfig.ownerDid(), nodeConfig.provider());
+
+
 	}
 
 	public AppContext getAppContext() {
