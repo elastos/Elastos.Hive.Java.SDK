@@ -14,6 +14,7 @@ didCache/
 .tmp
 ipfs.json
 onedrive.json
+src/test/resources/local/cache/
 
 # Maven build output folder
 /target/

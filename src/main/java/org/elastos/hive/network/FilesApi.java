@@ -2,9 +2,11 @@ package org.elastos.hive.network;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import org.elastos.hive.network.request.FilesDeleteRequestBody;
 import org.elastos.hive.network.response.FilesHashResponseBody;
 import org.elastos.hive.network.response.FilesListResponseBody;
 import org.elastos.hive.network.response.FilesPropertiesResponseBody;
+import org.elastos.hive.network.response.ResponseBodyBase;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -24,7 +26,7 @@ public interface FilesApi {
 	Call<ResponseBody> download(@Query("path") String filename);
 
 	@POST(BaseApi.API_VERSION + "/files/delete")
-	Call<ResponseBody> deleteFolder(@Body RequestBody body);
+	Call<ResponseBodyBase> delete(@Body FilesDeleteRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/files/move")
 	Call<ResponseBody> move(@Body RequestBody body);
