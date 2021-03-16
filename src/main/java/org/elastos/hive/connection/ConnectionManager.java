@@ -84,6 +84,7 @@ public class ConnectionManager {
 
 	public HttpURLConnection openURLConnection(String path) throws IOException {
 		String url = this.context.getProviderAddress() + BaseApi.API_VERSION + path;
+		LogUtil.d("open connection with URL: " + url);
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod("POST");
 		httpURLConnection.setRequestProperty("User-Agent",
