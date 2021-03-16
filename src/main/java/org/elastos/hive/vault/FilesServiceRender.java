@@ -10,8 +10,10 @@ import java.util.concurrent.CompletionException;
 import org.elastos.hive.Vault;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.model.UploadOutputStream;
 import org.elastos.hive.network.response.FilesHashResponseBody;
+import org.elastos.hive.network.response.ResponseBodyBase;
 import org.elastos.hive.service.FilesService;
 import retrofit2.Response;
 
@@ -29,7 +31,7 @@ class FilesServiceRender implements FilesService {
 
 	private <T>  T uploadImpl(String path, Class<T> resultType) {
 		try {
-			HttpURLConnection connection = this.connectionManager.openURLConnection("/files/upload/" + path);
+			HttpURLConnection connection = this.connectionManager.openURLConnection(FilesApi.API_UPLOAD + "/" + path);
 			OutputStream outputStream = connection.getOutputStream();
 
 			if(resultType.isAssignableFrom(OutputStream.class)) {
@@ -78,7 +80,7 @@ class FilesServiceRender implements FilesService {
 	private String hashImp(String remoteFile) {
 		try {
 			Response<FilesHashResponseBody> response = connectionManager.getFilesApi().hash(remoteFile).execute();
-			FilesHashResponseBody hashResponse = FilesHashResponseBody.validateBody(response);
+			FilesHashResponseBody hashResponse = ResponseBodyBase.validateBody(response);
 			return hashResponse.getSha256();
 		} catch (HiveException | IOException e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
