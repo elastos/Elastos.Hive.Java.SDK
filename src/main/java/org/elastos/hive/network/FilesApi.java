@@ -10,7 +10,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface FilesApi {
-	String API_UPLOAD = BaseApi.API_VERSION + "/files/upload";
+	String API_UPLOAD = "/files/upload";
 
 	@GET(BaseApi.API_VERSION + "/files/download")
 	Call<ResponseBody> download(@Query("path") String filename);
