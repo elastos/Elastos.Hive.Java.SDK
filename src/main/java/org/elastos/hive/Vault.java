@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.service.BackupService;
-import org.elastos.hive.service.Database;
+import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.service.PubSubService;
 import org.elastos.hive.service.ScriptingService;
@@ -12,7 +12,7 @@ import org.elastos.hive.vault.ServiceBuilder;
  */
 public class Vault extends ServiceEndpoint {
 	private FilesService 	filesService;
-	private Database	  	database;
+	private DatabaseService databaseService;
 	private ScriptingService scripting;
 	private PubSubService pubsubService;
 	private BackupService 	backupService;
@@ -25,7 +25,7 @@ public class Vault extends ServiceEndpoint {
 		super(context, providerAddress, myDid);
 
 		this.filesService 	= new ServiceBuilder(this).createFilesService();
-		this.database 		= new ServiceBuilder(this).createDatabase();
+		this.databaseService = new ServiceBuilder(this).createDatabase();
 		this.pubsubService 	= new ServiceBuilder(this).createPubsubService();
 		this.backupService 	= new ServiceBuilder(this).createBackupService();
 	}
@@ -34,8 +34,8 @@ public class Vault extends ServiceEndpoint {
 		return this.filesService;
 	}
 
-	public Database getDatabase() {
-		return this.database;
+	public DatabaseService getDatabaseService() {
+		return this.databaseService;
 	}
 
 	public ScriptingService getScripting() {
