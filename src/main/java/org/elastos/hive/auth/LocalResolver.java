@@ -5,6 +5,7 @@ import org.elastos.hive.connection.model.AuthToken;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HiveSdkException;
 import org.elastos.hive.utils.CryptoUtil;
+import org.elastos.hive.utils.LogUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -48,6 +49,7 @@ public class LocalResolver implements TokenResolver {
 		}
 		try {
 			String content = new String(Files.readAllBytes(Paths.get(this.tokenPath)));
+			LogUtil.d("Load token from local file.");
 			return new Gson().fromJson(content, AuthToken.class);
 		} catch (IOException e) {
 			throw new HiveException("Failed to load token from local file.");
@@ -61,7 +63,7 @@ public class LocalResolver implements TokenResolver {
 
 	private void saveToken(AuthToken token) throws HiveException {
 		try {
-			Files.write(Paths.get(this.tokenPath), new Gson().toJson(this.token).getBytes(StandardCharsets.UTF_8));
+			Files.write(Paths.get(this.tokenPath), new Gson().toJson(token).getBytes(StandardCharsets.UTF_8));
 			this.token = token;
 		} catch (IOException e) {
 			throw new HiveException("Failed to save token to local file.");
