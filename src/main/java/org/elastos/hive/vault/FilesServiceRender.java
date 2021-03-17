@@ -1,5 +1,6 @@
 package org.elastos.hive.vault;
 
+import okhttp3.ResponseBody;
 import org.elastos.hive.Vault;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
@@ -7,6 +8,7 @@ import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.network.model.UploadOutputStream;
 import org.elastos.hive.network.request.FilesDeleteRequestBody;
+import org.elastos.hive.network.request.HiveRequestBody;
 import org.elastos.hive.network.response.FilesHashResponseBody;
 import org.elastos.hive.network.response.FilesListResponseBody;
 import org.elastos.hive.network.response.FilesPropertiesResponseBody;
@@ -90,7 +92,7 @@ class FilesServiceRender implements FilesService {
 
 	private <T> T downloadImpl(String remoteFile, Class<T> resultType) {
 		try {
-			Response response = this.connectionManager.getFilesApi()
+			Response<ResponseBody> response = this.connectionManager.getFilesApi()
 					.download(remoteFile)
 					.execute();
 			if(resultType.isAssignableFrom(Reader.class)) {
@@ -128,14 +130,42 @@ class FilesServiceRender implements FilesService {
 
 	@Override
 	public CompletableFuture<Boolean> move(String source, String target) {
-		// TODO Auto-generated method stub
-		return null;
+		return CompletableFuture.supplyAsync(() -> moveImpl(source, target));
+	}
+
+	private Boolean moveImpl(String source, String target) {
+		try {
+			HiveRequestBody reqBody = new HiveRequestBody();
+			reqBody.put("src_path", source);
+			reqBody.put("dst_path", target);
+			Response<ResponseBodyBase> response = this.connectionManager.getFilesApi()
+					.move(reqBody)
+					.execute();
+			ResponseBodyBase.validateBody(response);
+			return true;
+		} catch (Exception e) {
+			throw new CompletionException(new HiveException(e.getMessage()));
+		}
 	}
 
 	@Override
 	public CompletableFuture<Boolean> copy(String source, String target) {
-		// TODO Auto-generated method stub
-		return null;
+		return CompletableFuture.supplyAsync(() -> copyImpl(source, target));
+	}
+
+	private Boolean copyImpl(String source, String target) {
+		try {
+			HiveRequestBody reqBody = new HiveRequestBody();
+			reqBody.put("src_path", source);
+			reqBody.put("dst_path", target);
+			Response<ResponseBodyBase> response = this.connectionManager.getFilesApi()
+					.copy(reqBody)
+					.execute();
+			ResponseBodyBase.validateBody(response);
+			return true;
+		} catch (Exception e) {
+			throw new CompletionException(new HiveException(e.getMessage()));
+		}
 	}
 
 	@Override
