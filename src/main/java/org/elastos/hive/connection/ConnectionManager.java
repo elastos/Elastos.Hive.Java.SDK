@@ -44,6 +44,7 @@ public class ConnectionManager {
 	private RequestInterceptor authRequestInterceptor;
 	private SubscriptionApi subscriptionApi;
 	private PaymentApi paymentApi;
+	private DatabaseApi databaseApi;
 
 	private AuthApi authApi;
 	private FilesApi filesApi;
@@ -80,6 +81,13 @@ public class ConnectionManager {
 			paymentApi = createService(PaymentApi.class, this.context.getProviderAddress(), this.requestInterceptor);
 		}
 		return paymentApi;
+	}
+
+	public DatabaseApi getDatabaseApi() {
+		if (databaseApi == null) {
+			databaseApi = createService(DatabaseApi.class, this.context.getProviderAddress(), this.requestInterceptor);
+		}
+		return databaseApi;
 	}
 
 	public HttpURLConnection openURLConnection(String path) throws IOException {
