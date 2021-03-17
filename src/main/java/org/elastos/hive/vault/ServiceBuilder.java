@@ -2,7 +2,7 @@ package org.elastos.hive.vault;
 
 import org.elastos.hive.Vault;
 import org.elastos.hive.service.BackupService;
-import org.elastos.hive.service.Database;
+import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.service.PubSubService;
 import org.elastos.hive.service.ScriptingService;
@@ -18,8 +18,8 @@ public class ServiceBuilder {
 		return new FilesServiceRender(vault);
 	}
 
-	public Database createDatabase() {
-		return new DatabaseRender(vault);
+	public DatabaseService createDatabase() {
+		return new DatabaseServiceRender(vault);
 	}
 
 	public ScriptingService createScriptingService() {
