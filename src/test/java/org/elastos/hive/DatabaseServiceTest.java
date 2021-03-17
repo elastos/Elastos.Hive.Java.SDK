@@ -1,6 +1,10 @@
 package org.elastos.hive;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
@@ -28,23 +32,27 @@ import org.elastos.hive.database.WriteConcern;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.DatabaseService;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.jupiter.api.Order;
+import org.junit.runners.MethodSorters;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DatabaseServiceTest {
 
-	private static DatabaseService databaseService;
-
 	@Test
-	@Order(1)
-	public void testDbOptions() throws Exception {
+	public void test01_DbOptions() throws Exception {
 		Collation collation = new Collation();
 		collation.locale("en_us")
 				.alternate(Collation.Alternate.SHIFTED)
@@ -157,8 +165,7 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	@Order(2)
-	public void testDbResults() throws Exception {
+	public void test02_DbResults() throws Exception {
 		String json = "{\"deleted_count\":1000}";
 		DeleteResult ds = DeleteResult.deserialize(json);
 		assertEquals(1000, ds.deletedCount());
@@ -220,12 +227,278 @@ public class DatabaseServiceTest {
 		}
 	}
 
+	@Test
+	public void test03_DbDataTypes() throws Exception {
+		Map<String, Object> values = new HashMap<String, Object>();
 
+		values.put("testDate", new Date());
+		values.put("testMaxKey", new MaxKey(10000));
+		values.put("testMinKey", new MinKey(10));
+		values.put("testObjectId", new ObjectId("iiiiiiiidddddddd"));
+		values.put("testTimestamp", new Timestamp(123456, 789));
+		values.put("testRegex", new RegularExpression("*FooBar", "all"));
+
+		ObjectMapper mapper = new ObjectMapper();
+		String json = mapper.writeValueAsString(values);
+
+		TestDBDataTypes tdt = mapper.readValue(json, TestDBDataTypes.class);
+		json = mapper.writeValueAsString(tdt);
+
+		TestDBDataTypes tdt2 = mapper.readValue(json, TestDBDataTypes.class);
+		String json2 = mapper.writeValueAsString(tdt2);
+		assertEquals(json, json2);
+	}
+
+	private static final String collectionName = "works";
+
+	@Test
+	public void test04_createCollection() {
+		CompletableFuture<Boolean> future = database.createCollection(collectionName, null)
+				.handle((success, ex) -> (ex == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test05_insertOne() {
+		ObjectNode docNode = JsonNodeFactory.instance.objectNode();
+		docNode.put("author", "john doe1");
+		docNode.put("title", "Eve for Dummies1");
+
+		InsertOptions insertOptions = new InsertOptions();
+		insertOptions.bypassDocumentValidation(false).ordered(true);
+
+		CompletableFuture<Boolean> future =  database.insertOne(collectionName, docNode, insertOptions)
+				.handle((success, ex) -> (ex == null));
+
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test06_insertMany() {
+		List<JsonNode> nodes = new ArrayList<JsonNode>();
+		ObjectNode docNode1 = JsonNodeFactory.instance.objectNode();
+		docNode1.put("author", "john doe2");
+		docNode1.put("title", "Eve for Dummies2");
+		nodes.add(docNode1);
+		ObjectNode docNode2 = JsonNodeFactory.instance.objectNode();
+		docNode2.put("author", "john doe3");
+		docNode2.put("title", "Eve for Dummies3");
+		nodes.add(docNode1);
+
+		InsertOptions insertOptions = new InsertOptions();
+		insertOptions.bypassDocumentValidation(false).ordered(true);
+
+		CompletableFuture<Boolean> future = database.insertMany(collectionName, nodes, insertOptions)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test07_findOne() {
+		ObjectNode query = JsonNodeFactory.instance.objectNode();
+		query.put("author", "john doe1");
+
+		FindOptions findOptions = new FindOptions();
+		findOptions.skip(0)
+				.allowPartialResults(false)
+				.returnKey(false)
+				.batchSize(0)
+				.projection(Utils.jsonToMap("{\"_id\": false}"));
+
+		CompletableFuture<Boolean> future = database.findOne(collectionName, query, findOptions)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test08_findMany() {
+		ObjectNode query = JsonNodeFactory.instance.objectNode();
+		query.put("author", "john doe1");
+
+		FindOptions findOptions = new FindOptions();
+		findOptions.skip(0)
+				.allowPartialResults(false)
+				.returnKey(false)
+				.batchSize(0)
+				.projection(Utils.jsonToMap("{\"_id\": false}"));
+
+		CompletableFuture<Boolean> future = database.findMany(collectionName, query, findOptions)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test09_countDoc() {
+		ObjectNode filter = JsonNodeFactory.instance.objectNode();
+		filter.put("author", "john doe1");
+
+		CountOptions options = new CountOptions();
+		options.limit(1).skip(0).maxTimeMS(1000000000);
+
+		CompletableFuture<Boolean> future = database.countDocuments(collectionName, filter, options)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test10_updateOne() {
+		ObjectNode filter = JsonNodeFactory.instance.objectNode();
+		filter.put("author", "john doe1");
+
+		String updateJson = "{\"$set\":{\"author\":\"john doe1\",\"title\":\"Eve for Dummies2\"}}";
+		ObjectMapper objectMapper = new ObjectMapper();
+		JsonNode update = null;
+		try {
+			update = objectMapper.readTree(updateJson);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		UpdateOptions updateOptions = new UpdateOptions();
+		updateOptions.upsert(true).bypassDocumentValidation(false);
+
+		CompletableFuture<Boolean> future = database.updateOne(collectionName, filter, update, updateOptions)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test11_updateMany() {
+		ObjectNode filter = JsonNodeFactory.instance.objectNode();
+		filter.put("author", "john doe1");
+
+		String updateJson = "{\"$set\":{\"author\":\"john doe1\",\"title\":\"Eve for Dummies2\"}}";
+		ObjectMapper objectMapper = new ObjectMapper();
+		JsonNode update = null;
+		try {
+			update = objectMapper.readTree(updateJson);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		UpdateOptions updateOptions = new UpdateOptions();
+		updateOptions.upsert(true).bypassDocumentValidation(false);
+
+		CompletableFuture<Boolean> future = database.updateMany(collectionName, filter, update, updateOptions)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test12_deleteOne() {
+		ObjectNode filter = JsonNodeFactory.instance.objectNode();
+		filter.put("author", "john doe2");
+
+		DeleteOptions deleteOptions = new DeleteOptions();
+
+		CompletableFuture<Boolean> future = database.deleteOne(collectionName, filter, null)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test13_deleteMany() {
+		ObjectNode filter = JsonNodeFactory.instance.objectNode();
+		filter.put("author", "john doe2");
+
+		DeleteOptions deleteOptions = new DeleteOptions();
+
+		CompletableFuture<Boolean> future = database.deleteMany(collectionName, filter, null)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test14_deleteCollection() {
+		CompletableFuture<Boolean> future = database.deleteCollection(collectionName)
+				.handle((success, ex) -> (ex == null));
+		try {
+			assertTrue(future.get());
+			assertTrue(future.isCompletedExceptionally() == false);
+			assertTrue(future.isDone());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	private static DatabaseService database;
 
 	@BeforeClass
 	public static void setUp() {
 		try {
-			databaseService = TestData.getInstance().newVault().getDatabaseService();
+			database = TestData.getInstance().newVault().getDatabaseService();
 		} catch (HiveException | DIDException e) {
 			e.printStackTrace();
 		}
