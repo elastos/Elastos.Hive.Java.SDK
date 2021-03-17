@@ -49,7 +49,7 @@ public class FilesServiceTest {
 			e.printStackTrace();
 			fail();
 		}
-		verifyRemoteFileExists(remoteTextPath);
+		verifyRemoteFileExists(remoteImgPath);
 	}
 
 	@Test
