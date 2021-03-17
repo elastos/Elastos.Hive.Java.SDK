@@ -31,4 +31,11 @@ public class AuthToken {
 		long currentSeconds = System.currentTimeMillis() / 1000;
 		return currentSeconds >= expiresTime;
 	}
+
+	/**
+	 * Mark expired for refresh next time.
+	 */
+	public void expire() {
+		this.expiresTime = System.currentTimeMillis() - 1;
+	}
 }

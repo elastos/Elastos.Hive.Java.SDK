@@ -67,7 +67,7 @@ public class RemoteResolver implements TokenResolver {
 	}
 
 	@Override
-	public void saveToken() {}
+	public void saveToken() throws HiveException {}
 
 	@Override
 	public void setNextResolver(TokenResolver resolver) {}

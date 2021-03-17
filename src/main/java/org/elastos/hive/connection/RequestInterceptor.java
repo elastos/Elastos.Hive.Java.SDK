@@ -45,7 +45,7 @@ public class RequestInterceptor implements Interceptor {
     private final boolean isNeedToken;
 
     RequestInterceptor(AppContext context, ConnectionManager connectionManager, boolean isNeedToken) {
-        this.tokenResolver = new LocalResolver(context.getProviderAddress());
+        this.tokenResolver = new LocalResolver(context.getUserDid(), context.getProviderAddress(), context.getAppContextProvider().getLocalDataDir());
         this.tokenResolver.setNextResolver(new RemoteResolver(context, connectionManager));
         this.isNeedToken = isNeedToken;
     }
@@ -73,8 +73,12 @@ public class RequestInterceptor implements Interceptor {
         if (!response.isSuccessful()) {
             if (isNeedToken) {
                 if (response.code() == 401) {
-                    //Remove token for next time refresh.
-                    this.token = null;
+                    try {
+                        this.token.expire();
+                        this.tokenResolver.saveToken();
+                    } catch (HiveException e) {
+                        throw new IOException(e.getMessage());
+                    }
                     throw new IOException("Failed to request for code " + response.code() + "(auth failed)");
                 }
             }
