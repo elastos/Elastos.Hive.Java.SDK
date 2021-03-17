@@ -29,10 +29,8 @@ import retrofit2.Response;
 
 public class VaultSubscription {
 	private SubscriptionRender render;
-	private AppContext context;
 
 	public VaultSubscription(AppContext context, String userDid, String providerAddress) throws HiveException {
-		this.context = context;
 		this.render = new SubscriptionRender(context, userDid, providerAddress);
 	}
 
@@ -120,21 +118,18 @@ public class VaultSubscription {
 
 		@Override
 		public <T> CompletableFuture<T> subscribe(String pricingPlan, Class<T> type) {
-			return CompletableFuture.supplyAsync(new Supplier<T>() {
-				@Override
-				public T get() {
-					VaultInfo vaultInfo = new VaultInfo(null, appContext.getUserDid(), null);
-					Response<CreateServiceResult> response;
-					try {
-						response = connectionManager.getSubscriptionApi().createVault().execute();
-						if(response.body().existing()) {
-							throw new VaultAlreadyExistException("The vault already exists");
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
+			return CompletableFuture.supplyAsync(() -> {
+				VaultInfo vaultInfo = new VaultInfo(null, appContext.getUserDid(), null);
+				Response<CreateServiceResult> response;
+				try {
+					response = connectionManager.getSubscriptionApi().createVault().execute();
+					if(response.body().existing()) {
+						throw new VaultAlreadyExistException("The vault already exists");
 					}
-					return (T)vaultInfo;
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
+				return (T) vaultInfo;
 			});
 		}
 

@@ -19,4 +19,7 @@ public interface SubscriptionApi {
 
 	@POST(BaseApi.API_VERSION + "/service/vault/remove")
 	Call<ResponseBody> removeVault();
+
+	@POST(BaseApi.API_VERSION + "/service/vault_backup/create")
+	Call<CreateServiceResult> createBackupVault();
 }
