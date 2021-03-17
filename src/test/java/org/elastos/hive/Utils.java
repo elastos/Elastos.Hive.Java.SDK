@@ -1,6 +1,10 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.*;
+import java.util.Map;
 import java.util.Properties;
 
 import static org.junit.Assert.fail;
@@ -131,5 +135,17 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return new String(bytes);
+	}
+
+	public static Map<String, Object> jsonToMap(String json) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			Map<String, Object> p = mapper.readValue(json, new TypeReference<Map<String, Object>>() {
+			});
+			return p;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
