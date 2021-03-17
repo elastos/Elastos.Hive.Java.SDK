@@ -1,40 +1,50 @@
 package org.elastos.hive;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.exception.BackupAlreadyExistException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
+import org.elastos.hive.subscribe.CreateServiceResult;
+
+import retrofit2.Response;
 
 public class BackupSubscription {
-	private SubscriptionService service;
+	private SubscriptionRender render;
 
 	public BackupSubscription(AppContext context, String userDid, String providerAddress) throws HiveException {
-		service = new SubscriptionRender(context, userDid, providerAddress);
+		render = new SubscriptionRender(context, userDid, providerAddress);
+	}
+
+	public CompletableFuture<BackupInfo> subscribe() {
+		return render.subscribe(null, BackupInfo.class);
 	}
 
 	public CompletableFuture<BackupInfo> subscribe(String pricingPlan) {
-		return service.subscribe(pricingPlan, BackupInfo.class);
+		return render.subscribe(pricingPlan, BackupInfo.class);
 	}
 
 	public CompletableFuture<Void> unsubscribe() {
-		return service.unsubscribe();
+		return render.unsubscribe();
 	}
 
 	public CompletableFuture<Void> activate() {
-		return service.activate();
+		return render.activate();
 	}
 
 	public CompletableFuture<Void> deactivate() {
-		return service.deactivate();
+		return render.deactivate();
 	}
 
 	public CompletableFuture<BackupInfo> checkSubscription() {
-		return service.checkSubscription();
+		return render.checkSubscription();
 	}
 
 	public class BackupInfo {
@@ -42,15 +52,19 @@ public class BackupSubscription {
 	}
 
 	class SubscriptionRender extends ServiceEndpoint implements SubscriptionService, PaymentService {
+		private AppContext appContext;
+		private ConnectionManager connectionManager;
+
 		protected SubscriptionRender(AppContext context, String userDid, String providerAddress)
 				throws HiveException {
 			super(context, providerAddress, userDid);
+			this.appContext = context;
+			this.connectionManager = appContext.getConnectionManager();
 		}
 
 		@Override
 		public <T> CompletableFuture<T> subscribe(String pricingPlan, Class<T> type) {
-			// TODO Auto-generated method stub
-			return null;
+			return CompletableFuture.supplyAsync(this::subscribeImpl);
 		}
 
 		@Override
@@ -111,6 +125,20 @@ public class BackupSubscription {
 		public CompletableFuture<Receipt> getReceipt(String receiptId) {
 			// TODO Auto-generated method stub
 			return null;
+		}
+
+		private <T> T subscribeImpl() {
+			BackupInfo backupInfo = new BackupInfo();
+			Response<CreateServiceResult> response;
+			try {
+				response = connectionManager.getSubscriptionApi().createBackupVault().execute();
+				if (response.body().existing()) {
+					throw new BackupAlreadyExistException("The backup service already exists");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return (T) backupInfo;
 		}
 	}
 }
