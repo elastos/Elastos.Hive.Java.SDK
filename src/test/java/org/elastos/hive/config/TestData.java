@@ -105,6 +105,10 @@ public class TestData {
 		return context.getVault(nodeConfig.ownerDid(), nodeConfig.provider());
 	}
 
+	public Vault newVault() {
+		return new Vault(context, nodeConfig.ownerDid(), nodeConfig.provider());
+	}
+
 	public String signAuthorization(String jwtToken) {
 		try {
 			Claims claims = JwtUtil.getBody(jwtToken);
