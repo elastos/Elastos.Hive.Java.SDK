@@ -1,4 +1,4 @@
 package org.elastos.hive.service;
 
-public interface Database  {
+public interface DatabaseService {
 }
