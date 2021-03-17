@@ -114,25 +114,22 @@ public class ConnectionManager {
 		return httpURLConnection;
 	}
 
-	public static void readConnection(HttpURLConnection httpURLConnection) {
-		try {
-			int code = httpURLConnection.getResponseCode();
-			StringBuilder result = new StringBuilder();
-			if (code == 200) {
-				InputStream is = httpURLConnection.getInputStream();
-				BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-				String sCurrentLine = "";
-				while ((sCurrentLine = reader.readLine()) != null)
-					if (sCurrentLine.length() > 0)
-						result.append(sCurrentLine.trim());
-			} else {
-				result = new StringBuilder("error code:" + code);
-				result.append("error code:").append(code).append(";");
-				result.append("message:").append(httpURLConnection.getResponseMessage()).append(";");
-			}
+	public static void readConnection(HttpURLConnection httpURLConnection) throws IOException {
+		int code = httpURLConnection.getResponseCode();
+		StringBuilder result = new StringBuilder();
+		if (code == 200) {
+			InputStream is = httpURLConnection.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			String sCurrentLine = "";
+			while ((sCurrentLine = reader.readLine()) != null)
+				if (sCurrentLine.length() > 0)
+					result.append(sCurrentLine.trim());
 			LogUtil.d("connection", "response content: " + result);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} else {
+			result = new StringBuilder("error code:" + code);
+			result.append("error code:").append(code).append(";");
+			result.append("message:").append(httpURLConnection.getResponseMessage()).append(";");
+			throw new IOException("Failed to read connection: " + result);
 		}
 	}
 

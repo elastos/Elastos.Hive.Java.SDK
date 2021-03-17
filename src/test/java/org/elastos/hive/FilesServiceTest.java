@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -21,40 +20,70 @@ public class FilesServiceTest {
 
 	@Test
 	public void test01_uploadText() {
-		try (OutputStream out = filesApi.upload(remoteTextPath, OutputStream.class).exceptionally(e -> {
+		try (Writer writer = filesApi.upload(remoteTextPath, Writer.class).exceptionally(e -> {
 			fail();
 			return null;
-		}).get();
-			 FileReader fileReader = new FileReader(textLocalPath)) {
-			assertNotNull(out);
+		}).get(); FileReader fileReader = new FileReader(textLocalPath)) {
+			assertNotNull(writer);
 			char[] buffer = new char[1];
 			while (fileReader.read(buffer) != -1) {
-				out.write(buffer.toString().getBytes(StandardCharsets.UTF_8));
+				writer.write(buffer);
 			}
-			out.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
 		}
-		checkFileStat(remoteTextPath);
+		verifyRemoteFileExists(remoteTextPath);
 	}
 
 	@Test
 	public void test02_uploadBin() {
+		try (OutputStream out = filesApi.upload(remoteImgPath, OutputStream.class).exceptionally(e->{
+			fail();
+			return null;
+		}).get()) {
+			assertNotNull(out);
+			byte[] bigStream = Utils.readImage(imgLocalPath);
+			out.write(bigStream);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		verifyRemoteFileExists(remoteTextPath);
 	}
 
 	@Test
 	public void test03_downloadText() {
+		try (Reader reader = filesApi.download(remoteTextPath, Reader.class).exceptionally(e->{
+			fail();
+			return null;
+		}).get()) {
+			assertNotNull(reader);
+			Utils.cacheTextFile(reader, rootLocalCachePath, "test.txt");
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
 	}
 
 	@Test
 	public void test04_downloadBin() {
+		try (InputStream in = filesApi.download(remoteImgPath, InputStream.class).exceptionally(e->{
+			fail();
+			return null;
+		}).get()) {
+			assertNotNull(in);
+			Utils.cacheBinFile(in, rootLocalCachePath, "big.png");
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
 	}
 
 	@Test
 	public void test05_list() {
 		try {
-			List<FileInfo> files = filesApi.list(".").exceptionally(s->{
+			List<FileInfo> files = filesApi.list(remoteRootPath).exceptionally(e->{
 				fail();
 				return null;
 			}).get();
@@ -68,7 +97,10 @@ public class FilesServiceTest {
 	@Test
 	public void test06_hash() {
 		try {
-			String hash = filesApi.hash(remoteTextPath).exceptionally(s->null).get();
+			String hash = filesApi.hash(remoteTextPath).exceptionally(e->{
+				fail();
+				return null;
+			}).get();
 			assertNotNull(hash);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -78,18 +110,54 @@ public class FilesServiceTest {
 
 	@Test
 	public void test07_move() {
+		try {
+			Boolean isSuccess = filesApi.delete(remoteTextBackupPath)
+					.thenCompose(result -> filesApi.move(remoteTextPath, remoteTextBackupPath))
+					.exceptionally(e->{
+						fail();
+						return false;
+					}).get();
+			assertTrue(isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		verifyRemoteFileExists(remoteTextBackupPath);
 	}
 
 	@Test
 	public void test08_copy() {
+		try {
+			Boolean isSuccess = filesApi.copy(remoteTextBackupPath, remoteTextPath)
+					.exceptionally(e->{
+						fail();
+						return false;
+					}).get();
+			assertTrue(isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		verifyRemoteFileExists(remoteTextPath);
 	}
-
 
 	@Test
 	public void test09_deleteFile() {
+		try {
+			Boolean isSuccess = filesApi.delete(remoteTextPath)
+					.thenCompose(result -> filesApi.delete(remoteTextBackupPath))
+					.exceptionally(e->{
+						fail();
+						return false;
+					}).get();
+			assertTrue(isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
 	}
 
-	private void checkFileStat(String path) {
+	private void verifyRemoteFileExists(String path) {
 		try {
 			FileInfo info = filesApi.stat(path).exceptionally(s->{
 				fail();
@@ -101,7 +169,6 @@ public class FilesServiceTest {
 			fail();
 		}
 	}
-
 
 	@BeforeClass
 	public static void setUp() {
