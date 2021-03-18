@@ -47,8 +47,8 @@ public class LocalResolver implements TokenResolver {
 	@Override
 	public void invlidateToken() {
 		if (token != null) {
-			token.invalidate();
 			token = null;
+			clearToken();
 		}
 	}
 
@@ -83,6 +83,15 @@ public class LocalResolver implements TokenResolver {
 			Files.write(path, new Gson().toJson(token).getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			LogUtil.e("Failed to save access token to local cache");
+			e.printStackTrace();
+		}
+	}
+
+	private void clearToken() {
+		try {
+			Files.deleteIfExists(Paths.get(tokenPath));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }
