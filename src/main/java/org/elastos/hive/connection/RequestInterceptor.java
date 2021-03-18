@@ -37,17 +37,16 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.BaseApi;
 
 /**
- * Set token to http request.
+ * Set token to HTTP request.
  */
 public class RequestInterceptor implements Interceptor {
-    private AuthToken token;
     private TokenResolver tokenResolver;
-    private final boolean isNeedToken;
+    private final boolean needToken;
 
-    RequestInterceptor(AppContext context, ConnectionManager connectionManager, boolean isNeedToken) {
+    RequestInterceptor(AppContext context, ConnectionManager connectionManager, boolean needToken) {
         this.tokenResolver = new LocalResolver(context.getUserDid(), context.getProviderAddress(), context.getAppContextProvider().getLocalDataDir());
         this.tokenResolver.setNextResolver(new RemoteResolver(context, connectionManager));
-        this.isNeedToken = isNeedToken;
+        this.needToken = needToken;
     }
 
     RequestInterceptor(AppContext context, ConnectionManager connectionManager) {
@@ -57,10 +56,9 @@ public class RequestInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
-        if (isNeedToken) {
-            checkToken();
+        if (needToken) {
             request = request.newBuilder()
-                    .addHeader(BaseApi.HTTP_AUTHORIZATION, this.token.getCanonicalizedAccessToken())
+                    .addHeader(BaseApi.HTTP_AUTHORIZATION, getAuthToken().getCanonicalizedAccessToken())
                     .build();
         }
         return handleResponse(chain.proceed(request));
@@ -70,30 +68,18 @@ public class RequestInterceptor implements Interceptor {
      * Handle response for common error checking.
      */
     private Response handleResponse(Response response) throws IOException {
-        if (!response.isSuccessful()) {
-            if (isNeedToken) {
-                if (response.code() == 401) {
-                    this.tokenResolver.invlidateToken();
-                    throw new IOException("Failed to request for code " + response.code() + "(auth failed)");
-                }
-            }
-            throw new IOException("Failed to request for code " + response.code());
+        if (needToken && !response.isSuccessful() && response.code() == 401) {
+            tokenResolver.invlidateToken();
+            throw new IOException("Failed to request for code " + response.code() + "(auth failed)");
         }
         return response;
     }
 
-    private void checkToken() throws IOException {
-        if (token == null || token.isExpired()) {
-            try {
-                token = tokenResolver.getToken();
-            } catch (HiveException e) {
-                throw new IOException(e.getMessage());
-            }
-        }
-    }
-
     public AuthToken getAuthToken() throws IOException {
-        checkToken();
-        return token;
+        try {
+            return tokenResolver.getToken();
+        } catch (HiveException e) {
+            throw new IOException(e.getMessage());
+        }
     }
 }
