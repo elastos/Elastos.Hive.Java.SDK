@@ -30,12 +30,4 @@ public class AuthToken {
 	public boolean isExpired() {
 		return System.currentTimeMillis() >= (expiresTime * 1000);
 	}
-
-	/**
-	 * invalidate the access token
-	 */
-	public void invalidate() {
-		expiresTime = 0;
-		accessToken = null;
-	}
 }
