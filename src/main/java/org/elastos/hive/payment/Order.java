@@ -19,6 +19,8 @@ public class Order extends Result<Order> {
 
 	private PaymentStatus status;
 
+	private String receiveAddress; // receive token ela address
+
 	public enum PaymentStatus {
 		Unpaid,
 		Paid,
