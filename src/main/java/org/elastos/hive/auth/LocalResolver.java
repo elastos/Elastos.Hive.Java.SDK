@@ -6,7 +6,6 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HiveSdkException;
 import org.elastos.hive.utils.CryptoUtil;
 import org.elastos.hive.utils.LogUtil;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,8 +45,11 @@ public class LocalResolver implements TokenResolver {
 	}
 
 	@Override
-	public void saveToken() throws HiveException {
-		saveToken(this.token);
+	public void invlidateToken() {
+		if (token != null) {
+			token.invalidate();
+			token = null;
+		}
 	}
 
 	@Override
@@ -82,6 +84,5 @@ public class LocalResolver implements TokenResolver {
 		} catch (IOException e) {
 			LogUtil.e("Failed to save access token to local cache");
 		}
-
 	}
 }
