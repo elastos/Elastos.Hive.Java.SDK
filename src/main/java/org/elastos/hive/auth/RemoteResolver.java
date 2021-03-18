@@ -27,6 +27,12 @@ public class RemoteResolver implements TokenResolver {
 		return auth(signIn());
 	}
 
+	@Override
+	public void invlidateToken() {}
+
+	@Override
+	public void setNextResolver(TokenResolver resolver) {}
+
 	private String signIn() throws HiveException {
 		try {
 			SignInRequestBody reqBody = new SignInRequestBody();
@@ -60,12 +66,4 @@ public class RemoteResolver implements TokenResolver {
 			throw new HiveException(e.getMessage());
 		}
 	}
-
-	@Override
-	public void invlidateToken() {}
-
-	@Override
-	public void setNextResolver(TokenResolver resolver) {}
-
-
 }
