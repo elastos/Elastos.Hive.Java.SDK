@@ -7,8 +7,9 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.network.model.UploadOutputStream;
+import org.elastos.hive.network.request.FilesCopyRequestBody;
 import org.elastos.hive.network.request.FilesDeleteRequestBody;
-import org.elastos.hive.network.request.HiveRequestBody;
+import org.elastos.hive.network.request.FilesMoveRequestBody;
 import org.elastos.hive.network.response.FilesHashResponseBody;
 import org.elastos.hive.network.response.FilesListResponseBody;
 import org.elastos.hive.network.response.FilesPropertiesResponseBody;
@@ -135,9 +136,9 @@ class FilesServiceRender implements FilesService {
 
 	private Boolean moveImpl(String source, String target) {
 		try {
-			HiveRequestBody reqBody = new HiveRequestBody();
-			reqBody.put("src_path", source);
-			reqBody.put("dst_path", target);
+			FilesMoveRequestBody reqBody = new FilesMoveRequestBody();
+			reqBody.setSrcPath(source);
+			reqBody.setDstPath(target);
 			Response<ResponseBodyBase> response = this.connectionManager.getFilesApi()
 					.move(reqBody)
 					.execute();
@@ -155,9 +156,9 @@ class FilesServiceRender implements FilesService {
 
 	private Boolean copyImpl(String source, String target) {
 		try {
-			HiveRequestBody reqBody = new HiveRequestBody();
-			reqBody.put("src_path", source);
-			reqBody.put("dst_path", target);
+			FilesCopyRequestBody reqBody = new FilesCopyRequestBody();
+			reqBody.setSrcPath(source);
+			reqBody.setDstPath(target);
 			Response<ResponseBodyBase> response = this.connectionManager.getFilesApi()
 					.copy(reqBody)
 					.execute();
