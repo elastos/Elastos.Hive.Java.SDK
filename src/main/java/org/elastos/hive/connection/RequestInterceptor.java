@@ -60,7 +60,7 @@ public class RequestInterceptor implements Interceptor {
         if (isNeedToken) {
             checkToken();
             request = request.newBuilder()
-                    .addHeader(BaseApi.HTTP_AUTHORIZATION, this.token.getHeaderTokenValue())
+                    .addHeader(BaseApi.HTTP_AUTHORIZATION, this.token.getCanonicalizedAccessToken())
                     .build();
         }
         return handleResponse(chain.proceed(request));
@@ -74,7 +74,7 @@ public class RequestInterceptor implements Interceptor {
             if (isNeedToken) {
                 if (response.code() == 401) {
                     try {
-                        this.token.expire();
+                        this.token.invalidate();
                         this.tokenResolver.saveToken();
                     } catch (HiveException e) {
                         throw new IOException(e.getMessage());

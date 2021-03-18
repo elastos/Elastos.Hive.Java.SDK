@@ -23,19 +23,19 @@ public class AuthToken {
 		return tokenType;
 	}
 
-	public String getHeaderTokenValue() {
-		return getTokenType() + " " + getAccessToken();
+	public String getCanonicalizedAccessToken() {
+		return tokenType + " " + accessToken;
 	}
 
 	public boolean isExpired() {
-		long currentSeconds = System.currentTimeMillis() / 1000;
-		return currentSeconds >= expiresTime;
+		return System.currentTimeMillis() >= (expiresTime * 1000);
 	}
 
 	/**
-	 * Mark expired for refresh next time.
+	 * invalidate the access token
 	 */
-	public void expire() {
-		this.expiresTime = System.currentTimeMillis() - 1;
+	public void invalidate() {
+		expiresTime = 0;
+		accessToken = null;
 	}
 }

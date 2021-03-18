@@ -108,7 +108,7 @@ public class ConnectionManager {
 		httpURLConnection.setUseCaches(false);
 		httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
 		httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
-		httpURLConnection.setRequestProperty("Authorization", this.requestInterceptor.getAuthToken().getHeaderTokenValue());
+		httpURLConnection.setRequestProperty("Authorization", this.requestInterceptor.getAuthToken().getCanonicalizedAccessToken());
 
 		httpURLConnection.setChunkedStreamingMode(0);
 		return httpURLConnection;
