@@ -43,8 +43,9 @@ public class ConnectionManager {
 	private static final int DEFAULT_TIMEOUT = 30;
 
 	private AppContext context;
-	private RequestInterceptor requestInterceptor;
 	private RequestInterceptor authRequestInterceptor;
+	private RequestInterceptor plainRequestInterceptor;
+
 	private SubscriptionApi subscriptionApi;
 	private PaymentApi paymentApi;
 	private DatabaseApi databaseApi;
@@ -54,41 +55,41 @@ public class ConnectionManager {
 
 	public ConnectionManager(AppContext context) {
 		this.context = context;
-		this.requestInterceptor = new RequestInterceptor(context, this);
-		this.authRequestInterceptor = new RequestInterceptor(context, this, false);
+		this.plainRequestInterceptor = new RequestInterceptor(context, this);
+		this.authRequestInterceptor  = new RequestInterceptor(context, this, false);
 	}
 
 	public AuthApi getAuthApi() {
-		if (authApi == null) {
+		if (authApi == null)
 			authApi = createService(AuthApi.class, this.context.getProviderAddress(), this.authRequestInterceptor);
-		}
+
 		return authApi;
 	}
 
 	public FilesApi getFilesApi() {
-		if (filesApi == null) {
-			filesApi = createService(FilesApi.class, this.context.getProviderAddress(), this.requestInterceptor);
-		}
+		if (filesApi == null)
+			filesApi = createService(FilesApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
+
 		return filesApi;
 	}
 
 	public SubscriptionApi getSubscriptionApi() {
 		if (subscriptionApi == null) {
-			subscriptionApi = createService(SubscriptionApi.class, this.context.getProviderAddress(), this.requestInterceptor);
+			subscriptionApi = createService(SubscriptionApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return subscriptionApi;
 	}
 
 	public PaymentApi getPaymentApi() {
 		if (paymentApi == null) {
-			paymentApi = createService(PaymentApi.class, this.context.getProviderAddress(), this.requestInterceptor);
+			paymentApi = createService(PaymentApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return paymentApi;
 	}
 
 	public DatabaseApi getDatabaseApi() {
 		if (databaseApi == null) {
-			databaseApi = createService(DatabaseApi.class, this.context.getProviderAddress(), this.requestInterceptor);
+			databaseApi = createService(DatabaseApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return databaseApi;
 	}
@@ -108,7 +109,7 @@ public class ConnectionManager {
 		httpURLConnection.setUseCaches(false);
 		httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
 		httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
-		httpURLConnection.setRequestProperty("Authorization", this.requestInterceptor.getAuthToken().getCanonicalizedAccessToken());
+		httpURLConnection.setRequestProperty("Authorization", this.plainRequestInterceptor.getAuthToken().getCanonicalizedAccessToken());
 
 		httpURLConnection.setChunkedStreamingMode(0);
 		return httpURLConnection;
@@ -133,7 +134,7 @@ public class ConnectionManager {
 		}
 	}
 
-	private static <S> S createService(Class<S> serviceClass, @NotNull String baseUrl, RequestInterceptor requestInterceptor) {
+	private static <S> S createService(Class<S> serviceClass, String baseUrl, RequestInterceptor requestInterceptor) {
 		OkHttpClient.Builder clientBuilder;
 		Retrofit.Builder retrofitBuilder;
 
@@ -142,15 +143,13 @@ public class ConnectionManager {
 				.readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
 		clientBuilder.interceptors().clear();
+		clientBuilder.interceptors().add(requestInterceptor);
+		clientBuilder.interceptors().add(new LoggerInterceptor());
 
 		retrofitBuilder = new Retrofit.Builder()
 				.baseUrl(baseUrl)
 				.addConverterFactory(StringConverterFactory.create())
 				.addConverterFactory(GsonConverterFactory.create());
-
-		clientBuilder.interceptors().add(requestInterceptor);
-		if (LogUtil.debug)
-			clientBuilder.interceptors().add(new NetworkLogInterceptor());
 
 		return retrofitBuilder.client(clientBuilder.build()).build().create(serviceClass);
 	}
