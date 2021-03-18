@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -83,13 +82,26 @@ public class VaultSubscription {
 	}
 
 	public class VaultInfo {
+		//client info
+		private String myDid;
 		private String appInstanceDid;
-		private String userDid;
-		private String serviceDid;
+		private String appId;
+		private String provider;
 
-		public VaultInfo(String appInstanceDid, String userDid, String serviceDid) {
+		//service info
+		private String serviceDid;
+		private String pricingUsing;
+		private String createTime;
+		private String modifyTime;
+		private long maxSpace; //可用空间
+		private long dbSpaceUsed; //database已用空间
+		private long fileSpaceUsed;//file已用空间
+		//之前这个字段只有在failed情况下才会有，这种情况会抛出VaultNotFoundException
+		private boolean existing;
+
+		public VaultInfo(String appInstanceDid, String myDid, String serviceDid) {
 			this.appInstanceDid = appInstanceDid;
-			this.userDid = userDid;
+			this.myDid = myDid;
 			this.serviceDid = serviceDid;
 		}
 
@@ -97,8 +109,8 @@ public class VaultSubscription {
 			return appInstanceDid;
 		}
 
-		public String getUserDid() {
-			return userDid;
+		public String getMyDid() {
+			return myDid;
 		}
 
 		public String getServiceDid() {
