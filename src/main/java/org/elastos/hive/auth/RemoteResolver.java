@@ -10,10 +10,7 @@ import org.elastos.hive.network.request.AuthRequestBody;
 import org.elastos.hive.network.request.SignInRequestBody;
 import org.elastos.hive.network.response.AuthResponseBody;
 import org.elastos.hive.network.response.SignInResponseBody;
-import org.elastos.hive.network.response.ResponseBodyBase;
 import org.elastos.hive.utils.JwtUtil;
-import org.jetbrains.annotations.NotNull;
-import retrofit2.Response;
 
 import java.util.HashMap;
 
@@ -26,7 +23,6 @@ public class RemoteResolver implements TokenResolver {
 		this.connectionManager = connectionManager;
 	}
 
-	@NotNull
 	@Override
 	public AuthToken getToken() throws HiveException {
 		return auth(signIn());
