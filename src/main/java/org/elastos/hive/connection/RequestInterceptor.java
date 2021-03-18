@@ -73,12 +73,7 @@ public class RequestInterceptor implements Interceptor {
         if (!response.isSuccessful()) {
             if (isNeedToken) {
                 if (response.code() == 401) {
-                    try {
-                        this.token.invalidate();
-                        this.tokenResolver.saveToken();
-                    } catch (HiveException e) {
-                        throw new IOException(e.getMessage());
-                    }
+                    this.tokenResolver.invlidateToken();
                     throw new IOException("Failed to request for code " + response.code() + "(auth failed)");
                 }
             }
