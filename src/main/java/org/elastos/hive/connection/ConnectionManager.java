@@ -146,7 +146,6 @@ public class ConnectionManager {
 		retrofitBuilder = new Retrofit.Builder()
 				.baseUrl(baseUrl)
 				.addConverterFactory(StringConverterFactory.create())
-				.addConverterFactory(NobodyConverterFactory.create())
 				.addConverterFactory(GsonConverterFactory.create());
 
 		clientBuilder.interceptors().add(requestInterceptor);
