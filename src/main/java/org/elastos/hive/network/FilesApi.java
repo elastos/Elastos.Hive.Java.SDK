@@ -1,8 +1,9 @@
 package org.elastos.hive.network;
 
 import okhttp3.ResponseBody;
+import org.elastos.hive.network.request.FilesCopyRequestBody;
 import org.elastos.hive.network.request.FilesDeleteRequestBody;
-import org.elastos.hive.network.request.HiveRequestBody;
+import org.elastos.hive.network.request.FilesMoveRequestBody;
 import org.elastos.hive.network.response.FilesHashResponseBody;
 import org.elastos.hive.network.response.FilesListResponseBody;
 import org.elastos.hive.network.response.FilesPropertiesResponseBody;
@@ -29,10 +30,10 @@ public interface FilesApi {
 	Call<ResponseBodyBase> delete(@Body FilesDeleteRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/files/move")
-	Call<ResponseBodyBase> move(@Body HiveRequestBody body);
+	Call<ResponseBodyBase> move(@Body FilesMoveRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/files/copy")
-	Call<ResponseBodyBase> copy(@Body HiveRequestBody body);
+	Call<ResponseBodyBase> copy(@Body FilesCopyRequestBody body);
 
 	@GET(BaseApi.API_VERSION + "/files/file/hash")
 	Call<FilesHashResponseBody> hash(@Query("path") String filename);
