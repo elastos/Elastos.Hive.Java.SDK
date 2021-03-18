@@ -6,6 +6,6 @@ import org.jetbrains.annotations.NotNull;
 public interface TokenResolver {
 	@NotNull
 	AuthToken getToken() throws HiveException;
-	void saveToken() throws HiveException;
+	void invlidateToken();
 	void setNextResolver(TokenResolver resolver);
 }
