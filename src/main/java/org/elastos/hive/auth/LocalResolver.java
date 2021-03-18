@@ -1,7 +1,7 @@
 package org.elastos.hive.auth;
 
 import com.google.gson.Gson;
-import org.elastos.hive.connection.model.AuthToken;
+
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HiveSdkException;
 import org.elastos.hive.utils.CryptoUtil;

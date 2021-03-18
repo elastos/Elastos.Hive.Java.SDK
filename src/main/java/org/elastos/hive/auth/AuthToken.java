@@ -1,4 +1,4 @@
-package org.elastos.hive.connection.model;
+package org.elastos.hive.auth;
 
 public class AuthToken {
 	private String accessToken;

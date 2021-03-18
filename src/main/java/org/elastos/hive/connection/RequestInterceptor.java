@@ -23,7 +23,7 @@
 package org.elastos.hive.connection;
 
 import org.elastos.hive.AppContext;
-import org.elastos.hive.connection.model.AuthToken;
+import org.elastos.hive.auth.AuthToken;
 import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.RemoteResolver;
 import org.elastos.hive.auth.TokenResolver;
