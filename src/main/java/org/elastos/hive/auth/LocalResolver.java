@@ -36,7 +36,7 @@ public class LocalResolver implements TokenResolver {
 		if (token == null)
 			token = restoreToken();
 
-		if (token == null) {
+		if (token == null || token.isExpired()) {
 			token = nextResolver.getToken();
 			saveToken(token);
 		}
