@@ -23,12 +23,12 @@ class ScriptingRender implements ScriptingService {
 
 	public ScriptingRender(Vault vault) {
 		this.connectionManager = vault.getConnectionManager();
-		this.scriptRunner = new ScriptRunner(vault.getAppContext(), vault.getProviderAddress(), vault.getUserDid(), null, null);
+		this.scriptRunner = new ScriptRunner(vault.getAppContext(), vault.getProviderAddress(), vault.getUserDid(), vault.getOwnerDid(), vault.getAppDid());
 	}
 
 	@Override
 	public CompletableFuture<Boolean> registerScript(String name, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp) {
-		return CompletableFuture.supplyAsync(()->registerScriptImpl(name, null, executable, allowAnonymousUser, allowAnonymousApp));
+		return registerScript(name, null, executable, allowAnonymousUser, allowAnonymousApp);
 	}
 
 	private boolean registerScriptImpl(String name, Condition condition, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp) {
@@ -54,7 +54,7 @@ class ScriptingRender implements ScriptingService {
 
 	@Override
 	public <T> CompletableFuture<T> callScript(String name, JsonNode params, String appDid, Class<T> resultType) {
-		return null;
+		return CompletableFuture.supplyAsync(()->scriptRunner.callScript(name, params, appDid, resultType));
 	}
 
 	@Override
