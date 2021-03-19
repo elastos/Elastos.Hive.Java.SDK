@@ -6,7 +6,7 @@ class ServiceEndpoint {
 	@SuppressWarnings("unused")
 	private AppContext context;
 
-	private String address;
+	private String providerAddress;
 	private String userDid;
 	private String targetDid;
 
@@ -26,16 +26,16 @@ class ServiceEndpoint {
 	// - Vault;
 	// - Backup;
 	// - ScriptRunner;
-	protected ServiceEndpoint(AppContext context, String endpointAddress, String userDid, String targetDid, String targetAppDid) {
+	protected ServiceEndpoint(AppContext context, String providerAddress, String userDid, String targetDid, String targetAppDid) {
 		this.context = context;
-		this.address = endpointAddress;
+		this.providerAddress = providerAddress;
 		this.userDid = userDid;
 		this.targetDid = targetDid;
 		this.targetAppDid = targetAppDid;
 	}
 
 	public String getEndpointAddress() {
-		return this.address;
+		return this.providerAddress;
 	}
 
 	public String getOwnerDid() {
@@ -60,6 +60,14 @@ class ServiceEndpoint {
 
 	public String getServiceInstanceDid() {
 		return null;
+	}
+
+	public String getProviderAddress() {
+		return this.providerAddress;
+	}
+
+	public AppContext getAppContext() {
+		return this.context;
 	}
 
 	public ConnectionManager getConnectionManager() {
