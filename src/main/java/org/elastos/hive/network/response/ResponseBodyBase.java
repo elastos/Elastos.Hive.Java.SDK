@@ -9,9 +9,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HiveSdkException;
 import retrofit2.Response;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 
 public class ResponseBodyBase {
     private static final String SUCCESS = "OK";
@@ -91,6 +89,18 @@ public class ResponseBodyBase {
             throw new HiveSdkException("unsupported result type for call script.");
         }
         return (T) obj;
+    }
+
+    public static <T> T getResponseStream(Response<ResponseBody> response, Class<T> resultType) throws HiveException {
+        ResponseBody body = response.body();
+        if (body == null)
+            throw new HiveException("Failed to get response body");
+        if (resultType.isAssignableFrom(Reader.class)) {
+            return resultType.cast(new InputStreamReader(body.byteStream()));
+        } else if (resultType.isAssignableFrom(InputStream.class)) {
+            return resultType.cast(body.byteStream());
+        }
+        throw new HiveSdkException("Not supported result type");
     }
 
     static class Error {

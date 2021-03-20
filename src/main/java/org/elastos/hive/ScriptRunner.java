@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import okhttp3.ResponseBody;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.HiveSdkException;
 import org.elastos.hive.network.model.ScriptContext;
 import org.elastos.hive.network.request.CallScriptRequestBody;
 import org.elastos.hive.network.response.ResponseBodyBase;
@@ -33,6 +34,31 @@ public class ScriptRunner extends ServiceEndpoint {
 									.setTargetAppDid(appDid)).setParams(params))
 					.execute();
 			return ResponseBodyBase.getValue(ResponseBodyBase.validateBodyStr(response), resultType);
+		} catch (Exception e) {
+			throw new CompletionException(new HiveException(e.getMessage()));
+		}
+	}
+
+	public <T> T callScriptUrl(String name, String params, String appDid, Class<T> resultType) {
+		try {
+			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
+					.callScriptUrl(this.targetDid, appDid, name, params)
+					.execute();
+			return ResponseBodyBase.getValue(ResponseBodyBase.validateBodyStr(response), resultType);
+		} catch (Exception e) {
+			throw new CompletionException(new HiveException(e.getMessage()));
+		}
+	}
+
+	public <T> T downloadFile(String transactionId, Class<T> resultType) {
+		if (transactionId == null)
+			throw new CompletionException(new HiveSdkException("Invalid parameter transactionId."));
+
+		try {
+			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
+					.callDownload(transactionId)
+					.execute();
+			return ResponseBodyBase.getResponseStream(response, resultType);
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
