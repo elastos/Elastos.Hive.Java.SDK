@@ -96,15 +96,7 @@ class FilesServiceRender implements FilesService {
 			Response<ResponseBody> response = this.connectionManager.getFilesApi()
 					.download(remoteFile)
 					.execute();
-			if(resultType.isAssignableFrom(Reader.class)) {
-				Reader reader = ResponseHelper.getToReader(response);
-				return resultType.cast(reader);
-			}
-			if (resultType.isAssignableFrom(InputStream.class)){
-				InputStream inputStream = ResponseHelper.getInputStream(response);
-				return resultType.cast(inputStream);
-			}
-			throw new HiveException("Not supported result type");
+			return ResponseBodyBase.getResponseStream(response, resultType);
 		} catch (HiveException|IOException e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
