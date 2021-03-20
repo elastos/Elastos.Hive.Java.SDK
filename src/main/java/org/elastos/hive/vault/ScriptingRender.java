@@ -59,7 +59,7 @@ class ScriptingRender implements ScriptingService {
 
 	@Override
 	public <T> CompletableFuture<T> callScriptUrl(String name, String params, String appDid, Class<T> resultType) {
-		return null;
+		return CompletableFuture.supplyAsync(()->scriptRunner.callScriptUrl(name, params, appDid, resultType));
 	}
 
 	@Override
@@ -69,6 +69,6 @@ class ScriptingRender implements ScriptingService {
 
 	@Override
 	public <T> CompletableFuture<T> downloadFile(String transactionId, Class<T> resultType) {
-		return null;
+		return CompletableFuture.supplyAsync(()->scriptRunner.downloadFile(transactionId, resultType));
 	}
 }
