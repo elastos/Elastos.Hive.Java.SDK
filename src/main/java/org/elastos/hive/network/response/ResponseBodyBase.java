@@ -7,9 +7,11 @@ import com.google.gson.annotations.SerializedName;
 import okhttp3.ResponseBody;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HiveSdkException;
+import org.elastos.hive.network.model.UploadOutputStream;
 import retrofit2.Response;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 
 public class ResponseBodyBase {
     private static final String SUCCESS = "OK";
@@ -91,6 +93,19 @@ public class ResponseBodyBase {
         return (T) obj;
     }
 
+    public static <T> T getRequestStream(HttpURLConnection connection, Class<T> resultType) throws IOException {
+        OutputStream outputStream = connection.getOutputStream();
+        if (resultType.isAssignableFrom(OutputStream.class)) {
+            UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
+            return resultType.cast(uploader);
+        } else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
+            OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+            return resultType.cast(writer);
+        } else {
+            throw new HiveSdkException("Not supported result type: " + resultType.getName());
+        }
+    }
+
     public static <T> T getResponseStream(Response<ResponseBody> response, Class<T> resultType) throws HiveException {
         ResponseBody body = response.body();
         if (body == null)
@@ -99,8 +114,9 @@ public class ResponseBodyBase {
             return resultType.cast(new InputStreamReader(body.byteStream()));
         } else if (resultType.isAssignableFrom(InputStream.class)) {
             return resultType.cast(body.byteStream());
+        } else {
+            throw new HiveSdkException("Not supported result type");
         }
-        throw new HiveSdkException("Not supported result type");
     }
 
     static class Error {

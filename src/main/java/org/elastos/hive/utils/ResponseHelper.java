@@ -81,4 +81,31 @@ public class ResponseHelper {
         return length;
     }
 
+    public static <T> T getValue(String json, Class<T> clz) {
+        if(null==json) return null;
+
+        Object obj = null;
+        try {
+            if(clz.isAssignableFrom(String.class)) {
+                obj = json;
+            } else if(clz.isAssignableFrom(byte[].class)) {
+                obj = json.getBytes();
+            } else if(clz.isAssignableFrom(JsonNode.class)) {
+                obj = new ObjectMapper().readTree(json);
+            } else if(clz.isAssignableFrom(Reader.class)) {
+                obj = new StringReader(json);
+            } else {
+                obj = new ObjectMapper().readValue(json, clz);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return (T) obj;
+    }
+
+    public static <T> T getValue(Response response, Class<T> clz) throws IOException {
+        String json = toString(response);
+        return getValue(json, clz);
+    }
+
 }
