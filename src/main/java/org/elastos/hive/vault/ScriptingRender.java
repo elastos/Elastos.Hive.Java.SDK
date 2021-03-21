@@ -64,7 +64,7 @@ class ScriptingRender implements ScriptingService {
 
 	@Override
 	public <T> CompletableFuture<T> uploadFile(String transactionId, Class<T> resultType) {
-		return null;
+		return CompletableFuture.supplyAsync(()->scriptRunner.uploadFile(transactionId, resultType));
 	}
 
 	@Override

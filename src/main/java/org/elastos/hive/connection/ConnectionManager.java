@@ -97,7 +97,7 @@ public class ConnectionManager {
 
 	public ScriptingApi getScriptingApi() {
 		if (scriptingApi == null) {
-			scriptingApi = createService(ScriptingApi.class, this.context.getProviderAddress(), this.requestInterceptor);
+			scriptingApi = createService(ScriptingApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return scriptingApi;
 	}

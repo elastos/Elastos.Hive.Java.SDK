@@ -38,19 +38,8 @@ class FilesServiceRender implements FilesService {
 
 	private <T> T uploadImpl(String path, Class<T> resultType) {
 		try {
-			HttpURLConnection connection = this.connectionManager.openConnection(FilesApi.API_UPLOAD + "/" + path);
-			OutputStream outputStream = connection.getOutputStream();
-
-			if (resultType.isAssignableFrom(OutputStream.class)) {
-				UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
-				return resultType.cast(uploader);
-			} else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
-				OutputStreamWriter writer = new OutputStreamWriter(outputStream);
-				return resultType.cast(writer);
-			} else {
-				throw new HiveException("Not supported result type: " + resultType.getName());
-			}
-		} catch (HiveException|IOException e) {
+			return ResponseBodyBase.getRequestStream(this.connectionManager.openConnection(FilesApi.API_UPLOAD + "/" + path), resultType);
+		} catch (IOException e) {
 			throw new CompletionException(e);
 		}
 	}
