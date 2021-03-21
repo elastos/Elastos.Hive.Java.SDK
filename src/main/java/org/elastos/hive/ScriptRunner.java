@@ -5,6 +5,7 @@ import okhttp3.ResponseBody;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HiveSdkException;
+import org.elastos.hive.network.ScriptingApi;
 import org.elastos.hive.network.model.ScriptContext;
 import org.elastos.hive.network.request.CallScriptRequestBody;
 import org.elastos.hive.network.response.ResponseBodyBase;
@@ -59,6 +60,17 @@ public class ScriptRunner extends ServiceEndpoint {
 					.callDownload(transactionId)
 					.execute();
 			return ResponseBodyBase.getResponseStream(response, resultType);
+		} catch (Exception e) {
+			throw new CompletionException(new HiveException(e.getMessage()));
+		}
+	}
+
+	public <T> T uploadFile(String transactionId, Class<T> resultType) {
+		if (transactionId == null)
+			throw new CompletionException(new HiveSdkException("Invalid parameter transactionId."));
+
+		try {
+			return ResponseBodyBase.getRequestStream(this.connectionManager.openConnection(ScriptingApi.API_SCRIPT_UPLOAD + "/" + transactionId), resultType);
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
