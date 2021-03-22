@@ -109,6 +109,11 @@ public class TestData {
 		return new Vault(context, nodeConfig.ownerDid(), nodeConfig.provider());
 	}
 
+	/**
+	 * Called when auth.
+	 * @param jwtToken
+	 * @return
+	 */
 	public String signAuthorization(String jwtToken) {
 		try {
 			Claims claims = JwtUtil.getBody(jwtToken);
