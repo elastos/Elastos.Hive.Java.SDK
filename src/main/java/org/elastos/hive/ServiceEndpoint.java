@@ -18,7 +18,7 @@ class ServiceEndpoint {
 	// - BackupSubscription;
 	// - Provider;
 	protected ServiceEndpoint(AppContext context, String providerAddress, String userDid) {
-		this(context, providerAddress, userDid, null, null);
+		this(context, providerAddress, userDid, userDid, null);
 	}
 
 
