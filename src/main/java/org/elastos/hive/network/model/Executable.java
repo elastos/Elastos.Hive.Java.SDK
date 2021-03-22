@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Executable {
 	public static final String TYPE_FIND = "find";
+	public static final String TYPE_FILE_UPLOAD = "fileUpload";
 
 	@SerializedName("name")
 	private String name;
