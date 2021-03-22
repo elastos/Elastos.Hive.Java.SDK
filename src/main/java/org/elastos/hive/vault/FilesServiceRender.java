@@ -6,20 +6,17 @@ import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.model.FileInfo;
-import org.elastos.hive.network.model.UploadOutputStream;
 import org.elastos.hive.network.request.FilesCopyRequestBody;
 import org.elastos.hive.network.request.FilesDeleteRequestBody;
 import org.elastos.hive.network.request.FilesMoveRequestBody;
 import org.elastos.hive.network.response.FilesHashResponseBody;
 import org.elastos.hive.network.response.FilesListResponseBody;
 import org.elastos.hive.network.response.FilesPropertiesResponseBody;
-import org.elastos.hive.network.response.ResponseBodyBase;
+import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.FilesService;
-import org.elastos.hive.utils.ResponseHelper;
 import retrofit2.Response;
 
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -38,7 +35,7 @@ class FilesServiceRender implements FilesService {
 
 	private <T> T uploadImpl(String path, Class<T> resultType) {
 		try {
-			return ResponseBodyBase.getRequestStream(this.connectionManager.openConnection(FilesApi.API_UPLOAD + "/" + path), resultType);
+			return HiveResponseBody.getRequestStream(this.connectionManager.openConnection(FilesApi.API_UPLOAD + "/" + path), resultType);
 		} catch (IOException e) {
 			throw new CompletionException(e);
 		}
@@ -52,7 +49,7 @@ class FilesServiceRender implements FilesService {
 	private List<FileInfo> listImpl(String path) {
 		try {
 			Response<FilesListResponseBody> response = connectionManager.getFilesApi().list(path).execute();
-			FilesListResponseBody body = ResponseBodyBase.validateBody(response);
+			FilesListResponseBody body = HiveResponseBody.validateBody(response);
 			return body.getFileInfoList();
 		} catch (HiveException | IOException e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
@@ -68,7 +65,7 @@ class FilesServiceRender implements FilesService {
 		try {
 			Response<FilesPropertiesResponseBody> response = this.connectionManager.getFilesApi()
 					.properties(path).execute();
-			FilesPropertiesResponseBody body = ResponseBodyBase.validateBody(response);
+			FilesPropertiesResponseBody body = HiveResponseBody.validateBody(response);
 			return body.getFileInfo();
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
@@ -85,7 +82,7 @@ class FilesServiceRender implements FilesService {
 			Response<ResponseBody> response = this.connectionManager.getFilesApi()
 					.download(remoteFile)
 					.execute();
-			return ResponseBodyBase.getResponseStream(response, resultType);
+			return HiveResponseBody.getResponseStream(response, resultType);
 		} catch (HiveException|IOException e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
@@ -100,10 +97,10 @@ class FilesServiceRender implements FilesService {
 		try {
 			FilesDeleteRequestBody reqBody = new FilesDeleteRequestBody();
 			reqBody.setPath(path);
-			Response<ResponseBodyBase> response = this.connectionManager.getFilesApi()
+			Response<HiveResponseBody> response = this.connectionManager.getFilesApi()
 					.delete(reqBody)
 					.execute();
-			ResponseBodyBase.validateBody(response);
+			HiveResponseBody.validateBody(response);
 			return true;
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
@@ -120,10 +117,10 @@ class FilesServiceRender implements FilesService {
 			FilesMoveRequestBody reqBody = new FilesMoveRequestBody();
 			reqBody.setSrcPath(source);
 			reqBody.setDstPath(target);
-			Response<ResponseBodyBase> response = this.connectionManager.getFilesApi()
+			Response<HiveResponseBody> response = this.connectionManager.getFilesApi()
 					.move(reqBody)
 					.execute();
-			ResponseBodyBase.validateBody(response);
+			HiveResponseBody.validateBody(response);
 			return true;
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
@@ -140,10 +137,10 @@ class FilesServiceRender implements FilesService {
 			FilesCopyRequestBody reqBody = new FilesCopyRequestBody();
 			reqBody.setSrcPath(source);
 			reqBody.setDstPath(target);
-			Response<ResponseBodyBase> response = this.connectionManager.getFilesApi()
+			Response<HiveResponseBody> response = this.connectionManager.getFilesApi()
 					.copy(reqBody)
 					.execute();
-			ResponseBodyBase.validateBody(response);
+			HiveResponseBody.validateBody(response);
 			return true;
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
@@ -158,7 +155,7 @@ class FilesServiceRender implements FilesService {
 	private String hashImp(String remoteFile) {
 		try {
 			Response<FilesHashResponseBody> response = connectionManager.getFilesApi().hash(remoteFile).execute();
-			FilesHashResponseBody hashResponse = ResponseBodyBase.validateBody(response);
+			FilesHashResponseBody hashResponse = HiveResponseBody.validateBody(response);
 			return hashResponse.getSha256();
 		} catch (HiveException | IOException e) {
 			throw new CompletionException(new HiveException(e.getMessage()));

@@ -8,7 +8,7 @@ import org.elastos.hive.exception.HiveSdkException;
 import org.elastos.hive.network.ScriptingApi;
 import org.elastos.hive.network.model.ScriptContext;
 import org.elastos.hive.network.request.CallScriptRequestBody;
-import org.elastos.hive.network.response.ResponseBodyBase;
+import org.elastos.hive.network.response.HiveResponseBody;
 import retrofit2.Response;
 
 import java.util.concurrent.CompletionException;
@@ -34,7 +34,7 @@ public class ScriptRunner extends ServiceEndpoint {
 									.setTargetDid(this.targetDid)
 									.setTargetAppDid(appDid)).setParams(params))
 					.execute();
-			return ResponseBodyBase.getValue(ResponseBodyBase.validateBodyStr(response), resultType);
+			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(response), resultType);
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
@@ -45,7 +45,7 @@ public class ScriptRunner extends ServiceEndpoint {
 			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
 					.callScriptUrl(this.targetDid, appDid, name, params)
 					.execute();
-			return ResponseBodyBase.getValue(ResponseBodyBase.validateBodyStr(response), resultType);
+			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(response), resultType);
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
@@ -59,7 +59,7 @@ public class ScriptRunner extends ServiceEndpoint {
 			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
 					.callDownload(transactionId)
 					.execute();
-			return ResponseBodyBase.getResponseStream(response, resultType);
+			return HiveResponseBody.getResponseStream(response, resultType);
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
@@ -70,7 +70,7 @@ public class ScriptRunner extends ServiceEndpoint {
 			throw new CompletionException(new HiveSdkException("Invalid parameter transactionId."));
 
 		try {
-			return ResponseBodyBase.getRequestStream(this.connectionManager.openConnection(ScriptingApi.API_SCRIPT_UPLOAD + "/" + transactionId), resultType);
+			return HiveResponseBody.getRequestStream(this.connectionManager.openConnection(ScriptingApi.API_SCRIPT_UPLOAD + "/" + transactionId), resultType);
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}

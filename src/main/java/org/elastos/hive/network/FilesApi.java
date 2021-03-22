@@ -7,7 +7,7 @@ import org.elastos.hive.network.request.FilesMoveRequestBody;
 import org.elastos.hive.network.response.FilesHashResponseBody;
 import org.elastos.hive.network.response.FilesListResponseBody;
 import org.elastos.hive.network.response.FilesPropertiesResponseBody;
-import org.elastos.hive.network.response.ResponseBodyBase;
+import org.elastos.hive.network.response.HiveResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -27,13 +27,13 @@ public interface FilesApi {
 	Call<ResponseBody> download(@Query("path") String filename);
 
 	@POST(BaseApi.API_VERSION + "/files/delete")
-	Call<ResponseBodyBase> delete(@Body FilesDeleteRequestBody body);
+	Call<HiveResponseBody> delete(@Body FilesDeleteRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/files/move")
-	Call<ResponseBodyBase> move(@Body FilesMoveRequestBody body);
+	Call<HiveResponseBody> move(@Body FilesMoveRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/files/copy")
-	Call<ResponseBodyBase> copy(@Body FilesCopyRequestBody body);
+	Call<HiveResponseBody> copy(@Body FilesCopyRequestBody body);
 
 	@GET(BaseApi.API_VERSION + "/files/file/hash")
 	Call<FilesHashResponseBody> hash(@Query("path") String filename);
