@@ -72,77 +72,7 @@ task createjavadoc(type: Javadoc) {
         links "http://docs.oracle.com/javase/8/docs/api"
     }
     include(
-            //org.elastos.hive
-            "**/Client.java",
-            "**/SdkVersion.java",
-            "**/Vault.java",
 
-            //interface
-            "**/Database.java",
-            "**/Files.java",
-            "**/ApplicationContext.java",
-            "**/Payment.java",
-            "**/Scripting.java",
-            "**/Version.java",
-
-            //org.elastos.hive.database
-            "**/Collation.java",
-            "**/CountOptions.java",
-            "**/CreateCollectionOptions.java",
-            "**/Date.java",
-            "**/DeleteOptions.java",
-            "**/DeleteResult.java",
-            "**/FindOptions.java",
-            "**/Index.java",
-            "**/InsertManyResult.java",
-            "**/InsertOneResult.java",
-            "**/InsertOptions.java",
-            "**/MaxKey.java",
-            "**/MinKey.java",
-            "**/ObjectId.java",
-            "**/Options.java",
-            "**/ReadConcern.java",
-            "**/ReadPreference.java",
-            "**/RegularExpression.java",
-            "**/Timestamp.java",
-            "**/UpdateOptions.java",
-            "**/UpdateResult.java",
-            "**/WriteConcern.java",
-
-            //org.elastos.hive.file
-            "**/FileInfo.java",
-            "**/UploadOutputStream.java",
-
-            //org.elastos.hive.scripting
-            "**/AggregatedCondition.java",
-            "**/AggregatedExecutable.java",
-            "**/AndCondition.java",
-            "**/Condition.java",
-            "**/DbDeleteQuery.java",
-            "**/DbFindQuery.java",
-            "**/DbInsertQuery.java",
-            "**/DbUpdateQuery.java",
-            "**/DownloadExecutable.java",
-            "**/FileExecutable.java",
-            "**/HashExecutable.java",
-            "**/Executable.java",
-            "**/OrCondition.java",
-            "**/QueryHasResultsCondition.java",
-            "**/RawCondition.java",
-            "**/RawExecutable.java",
-            "**/UploadExecutable.java",
-
-            //org.elastos.hive.payment
-            "**/Order",
-            "**/PricingInfo",
-            "**/PricingPlan",
-            "**/UsingPlan",
-
-            //org.elastos.hive.exception
-            "**/HiveException.java",
-            "**/FileNotFoundException.java",
-            "**/UnsupportFileTypeException.java",
-            "**/VaultAlreadyExistException.java",
     )
     source = sourceSets.main.java.srcDirs
     destinationDir = file("doc/")
