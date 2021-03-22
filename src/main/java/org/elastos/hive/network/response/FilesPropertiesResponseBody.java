@@ -3,7 +3,7 @@ package org.elastos.hive.network.response;
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.network.model.FileInfo;
 
-public class FilesPropertiesResponseBody extends ResponseBodyBase {
+public class FilesPropertiesResponseBody extends HiveResponseBody {
     @SerializedName("type")
     private String type;
     @SerializedName("name")
