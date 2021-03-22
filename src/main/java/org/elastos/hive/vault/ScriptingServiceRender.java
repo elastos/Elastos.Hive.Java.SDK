@@ -17,11 +17,11 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-class ScriptingRender implements ScriptingService {
+class ScriptingServiceRender implements ScriptingService {
 	private ConnectionManager connectionManager;
 	private ScriptRunner scriptRunner;
 
-	public ScriptingRender(Vault vault) {
+	public ScriptingServiceRender(Vault vault) {
 		this.connectionManager = vault.getConnectionManager();
 		this.scriptRunner = new ScriptRunner(vault.getAppContext(), vault.getProviderAddress(), vault.getUserDid(), vault.getOwnerDid(), vault.getAppDid());
 	}
