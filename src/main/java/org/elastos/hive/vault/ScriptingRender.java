@@ -9,7 +9,7 @@ import org.elastos.hive.network.model.Condition;
 import org.elastos.hive.network.model.Executable;
 import org.elastos.hive.network.request.RegisterScriptRequestBody;
 import org.elastos.hive.network.response.RegisterScriptResponseBody;
-import org.elastos.hive.network.response.ResponseBodyBase;
+import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.ScriptingService;
 import retrofit2.Response;
 
@@ -40,7 +40,7 @@ class ScriptingRender implements ScriptingService {
 							.setAllowAnonymousApp(allowAnonymousApp)
 					.setCondition(condition))
 					.execute();
-			ResponseBodyBase.validateBody(response);
+			HiveResponseBody.validateBody(response);
 			return true;
 		} catch (HiveException|IOException e) {
 			throw new CompletionException(new HiveException(e.getMessage()));

@@ -13,7 +13,7 @@ import retrofit2.Response;
 import java.io.*;
 import java.net.HttpURLConnection;
 
-public class ResponseBodyBase {
+public class HiveResponseBody {
     private static final String SUCCESS = "OK";
 
     @SerializedName("_status")
@@ -49,7 +49,7 @@ public class ResponseBodyBase {
      * @return
      * @throws HiveException
      */
-    public static <T extends ResponseBodyBase> T validateBody(Response<T> response) throws HiveException {
+    public static <T extends HiveResponseBody> T validateBody(Response<T> response) throws HiveException {
         T body = response.body();
         if (body == null)
             throw new HiveException("Failed to get response body(null)");
@@ -64,7 +64,7 @@ public class ResponseBodyBase {
             throw new HiveException("Failed to get body on validateBody");
         try {
             String bodyStr = body.string();
-            if (new Gson().fromJson(bodyStr, ResponseBodyBase.class).failed()) {
+            if (new Gson().fromJson(bodyStr, HiveResponseBody.class).failed()) {
                 throw new HiveException("Get ERR response status on validateBody");
             }
             return bodyStr;
