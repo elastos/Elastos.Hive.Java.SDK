@@ -3,25 +3,19 @@ package org.elastos.hive.network.model;
 import com.google.gson.annotations.SerializedName;
 
 public class Executable {
+	public static final String TYPE_FIND = "find";
+
 	@SerializedName("name")
-	protected String name;
+	private String name;
 	@SerializedName("type")
-	protected String type;
+	private String type;
 	@SerializedName("body")
-	protected Object body;
+	private Object body;
 
-	public Executable setName(String name) {
+	public Executable(String name, String type, Object body) {
 		this.name = name;
-		return this;
-	}
-
-	public Executable setType(String type) {
 		this.type = type;
-		return this;
+		this.body = body;
 	}
 
-	public Executable setBody(Object body) {
-		this.body = body;
-		return this;
-	}
 }

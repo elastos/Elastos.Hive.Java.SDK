@@ -13,7 +13,7 @@ import org.elastos.hive.vault.ServiceBuilder;
 public class Vault extends ServiceEndpoint {
 	private FilesService 	filesService;
 	private DatabaseService databaseService;
-	private ScriptingService scripting;
+	private ScriptingService scriptingService;
 	private PubSubService pubsubService;
 	private BackupService 	backupService;
 
@@ -28,6 +28,7 @@ public class Vault extends ServiceEndpoint {
 		this.databaseService = new ServiceBuilder(this).createDatabase();
 		this.pubsubService 	= new ServiceBuilder(this).createPubsubService();
 		this.backupService 	= new ServiceBuilder(this).createBackupService();
+		this.scriptingService = new ServiceBuilder(this).createScriptingService();
 	}
 
 	public FilesService getFilesService() {
@@ -38,8 +39,8 @@ public class Vault extends ServiceEndpoint {
 		return this.databaseService;
 	}
 
-	public ScriptingService getScripting() {
-		return this.scripting;
+	public ScriptingService getScriptingService() {
+		return this.scriptingService;
 	}
 
 	public PubSubService getPubSubService() {
