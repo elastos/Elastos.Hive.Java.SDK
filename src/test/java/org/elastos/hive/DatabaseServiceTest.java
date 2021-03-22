@@ -31,10 +31,11 @@ import org.elastos.hive.database.UpdateResult;
 import org.elastos.hive.database.WriteConcern;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.DatabaseService;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,11 +49,12 @@ import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DatabaseServiceTest {
 
 	@Test
-	public void test01_DbOptions() throws Exception {
+	@Order(1)
+	public void testDbOptions() throws Exception {
 		Collation collation = new Collation();
 		collation.locale("en_us")
 				.alternate(Collation.Alternate.SHIFTED)
@@ -165,7 +167,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test02_DbResults() throws Exception {
+	@Order(2)
+	public void testDbResults() throws Exception {
 		String json = "{\"deleted_count\":1000}";
 		DeleteResult ds = DeleteResult.deserialize(json);
 		assertEquals(1000, ds.deletedCount());
@@ -228,7 +231,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test03_DbDataTypes() throws Exception {
+	@Order(3)
+	public void testDbDataTypes() throws Exception {
 		Map<String, Object> values = new HashMap<String, Object>();
 
 		values.put("testDate", new Date());
@@ -252,7 +256,8 @@ public class DatabaseServiceTest {
 	private static final String collectionName = "works";
 
 	@Test
-	public void test04_createCollection() {
+	@Order(4)
+	public void testCreateCollection() {
 		CompletableFuture<Boolean> future = database.createCollection(collectionName, null)
 				.handle((success, ex) -> (ex == null));
 
@@ -267,7 +272,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test05_insertOne() {
+	@Order(5)
+	public void testInsertOne() {
 		ObjectNode docNode = JsonNodeFactory.instance.objectNode();
 		docNode.put("author", "john doe1");
 		docNode.put("title", "Eve for Dummies1");
@@ -289,7 +295,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test06_insertMany() {
+	@Order(6)
+	public void testInsertMany() {
 		List<JsonNode> nodes = new ArrayList<JsonNode>();
 		ObjectNode docNode1 = JsonNodeFactory.instance.objectNode();
 		docNode1.put("author", "john doe2");
@@ -316,7 +323,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test07_findOne() {
+	@Order(7)
+	public void testFindOne() {
 		ObjectNode query = JsonNodeFactory.instance.objectNode();
 		query.put("author", "john doe1");
 
@@ -340,7 +348,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test08_findMany() {
+	@Order(8)
+	public void testFindMany() {
 		ObjectNode query = JsonNodeFactory.instance.objectNode();
 		query.put("author", "john doe1");
 
@@ -364,7 +373,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test09_countDoc() {
+	@Order(9)
+	public void testCountDoc() {
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe1");
 
@@ -384,7 +394,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test10_updateOne() {
+	@Order(10)
+	public void testUpdateOne() {
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe1");
 
@@ -413,7 +424,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test11_updateMany() {
+	@Order(11)
+	public void testUpdateMany() {
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe1");
 
@@ -442,7 +454,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test12_deleteOne() {
+	@Order(12)
+	public void testDeleteOne() {
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe2");
 
@@ -461,7 +474,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test13_deleteMany() {
+	@Order(13)
+	public void testDeleteMany() {
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe2");
 
@@ -480,7 +494,8 @@ public class DatabaseServiceTest {
 	}
 
 	@Test
-	public void test14_deleteCollection() {
+	@Order(14)
+	public void testDeleteCollection() {
 		CompletableFuture<Boolean> future = database.deleteCollection(collectionName)
 				.handle((success, ex) -> (ex == null));
 		try {
@@ -495,7 +510,7 @@ public class DatabaseServiceTest {
 
 	private static DatabaseService database;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUp() {
 		try {
 			database = TestData.getInstance().newVault().getDatabaseService();
