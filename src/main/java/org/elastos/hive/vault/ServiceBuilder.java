@@ -23,7 +23,7 @@ public class ServiceBuilder {
 	}
 
 	public ScriptingService createScriptingService() {
-		return new ScriptingRender(vault);
+		return new ScriptingServiceRender(vault);
 	}
 
 	public PubSubService createPubsubService() {
