@@ -11,6 +11,10 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -172,6 +176,46 @@ public class FilesServiceTest {
 			e.printStackTrace();
 			fail();
 		}
+	}
+
+	public static void removeLocalFile(String filePath) {
+		try {
+			Files.deleteIfExists(Paths.get(filePath));
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	public static boolean isFileContentEqual(String srcFile, String dstFile) {
+		try {
+			Path file1 = Paths.get(srcFile);
+			Path file2 = Paths.get(dstFile);
+			final long size;
+			size = Files.size(file1);
+			if (size != Files.size(file2))
+				return false;
+
+			if (size < 4096)
+				return Arrays.equals(Files.readAllBytes(file1), Files.readAllBytes(file2));
+
+			try (InputStream is1 = Files.newInputStream(file1);
+				 InputStream is2 = Files.newInputStream(file2)) {
+				// Compare byte-by-byte.
+				// Note that this can be sped up drastically by reading large chunks
+				// (e.g. 16 KBs) but care must be taken as InputStream.read(byte[])
+				// does not neccessarily read a whole array!
+				int data;
+				while ((data = is1.read()) != -1)
+					if (data != is2.read())
+						return false;
+			}
+
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@BeforeClass
