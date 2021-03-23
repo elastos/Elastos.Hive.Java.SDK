@@ -1,7 +1,6 @@
 package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.HiveException;
@@ -21,20 +20,25 @@ import static org.junit.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ScriptingServiceTest {
-	private static final String CONDITION_NAME = "get_group_messages";
-	private static final String NO_CONDITION_NAME = "script_no_condition";
+	private static final String FIND_NAME = "get_group_messages";
+	private static final String FIND_NO_CONDITION_NAME = "script_no_condition";
+	private static final String INSERT_NAME = "insert";
+	private static final String UPDATE_NAME = "update";
+	private static final String DELETE_NAME = "delete";
 	private static final String UPLOAD_FILE_NAME = "upload_file";
 	private static final String DOWNLOAD_FILE_NAME = "download_file";
+	private static final String FILE_PROPERTIES_NAME = "file_properties";
+	private static final String FILE_HASH_NAME = "file_hash";
 
 	@Test
 	public void test01_registerScriptFind() {
 		try {
 			ScriptKvItem filter = new ScriptKvItem().putKv("_id","$params.group_id")
 					.putKv("friends", "$callScripter_did");
-			Boolean isSuccess = scriptingService.registerScript(CONDITION_NAME,
+			Boolean isSuccess = scriptingService.registerScript(FIND_NAME,
 					new Condition("verify_user_permission", "queryHasResults",
 							new ScriptFindBody("test_group", filter)),
-					new Executable(CONDITION_NAME, Executable.TYPE_FIND,
+					new Executable(FIND_NAME, Executable.TYPE_FIND,
 							new ScriptFindBody("test_group", filter)),
 					false, false).exceptionally(e->{
 						fail();
@@ -50,7 +54,7 @@ public class ScriptingServiceTest {
 	@Test
 	public void test02_registerScriptFindWithoutCondition() {
 		try {
-			Boolean isSuccess = scriptingService.registerScript(NO_CONDITION_NAME,
+			Boolean isSuccess = scriptingService.registerScript(FIND_NO_CONDITION_NAME,
 					new Executable("get_groups", Executable.TYPE_FIND,
 							new ScriptFindBody("groups",
 									new ScriptKvItem().putKv("friends","$caller_did"))),
@@ -70,7 +74,7 @@ public class ScriptingServiceTest {
 	public void test03_callScriptFindWithoutCondition() {
 		//TODO: A bug on node did_scripting.py line 121: return col maybe None.
 		try {
-			String result = scriptingService.callScript(NO_CONDITION_NAME,
+			String result = scriptingService.callScript(FIND_NO_CONDITION_NAME,
 					null, "appId", String.class)
 					.exceptionally(e->{
 						fail();
@@ -133,9 +137,9 @@ public class ScriptingServiceTest {
 						fail();
 						return null;
 					}).get();
+			assertNotNull(result);
 			assertTrue(result.has(scriptName));
 			assertTrue(result.get(scriptName).has("transaction_id"));
-			assertNotNull(result);
 			return result.get(scriptName).get("transaction_id").textValue();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -188,15 +192,15 @@ public class ScriptingServiceTest {
 	private String callScriptFileDownload(String scriptName, String fileName) {
 		try {
 			JsonNode result = scriptingService.callScript(scriptName,
-					Executable.createFileUploadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
+					Executable.createFileDownloadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
 					"appId", JsonNode.class)
 					.exceptionally(e->{
 						fail();
 						return null;
 					}).get();
+			assertNotNull(result);
 			assertTrue(result.has(scriptName));
 			assertTrue(result.get(scriptName).has("transaction_id"));
-			assertNotNull(result);
 			return result.get(scriptName).get("transaction_id").textValue();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -212,6 +216,88 @@ public class ScriptingServiceTest {
 		}).get()) {
 			assertNotNull(reader);
 			Utils.cacheTextFile(reader, localDstFileRoot, fileName);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test07_fileProperties() {
+		registerScriptFileProperties(FILE_PROPERTIES_NAME);
+		callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
+	}
+
+	private void registerScriptFileProperties(String scriptName) {
+		try {
+			Boolean isSuccess = scriptingService.registerScript(scriptName,
+					Executable.createFilePropertiesExecutable(scriptName),
+					false, false)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertTrue(isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	private void callScriptFileProperties(String scriptName, String fileName) {
+		try {
+			JsonNode result = scriptingService.callScript(scriptName,
+					Executable.createFilePropertiesParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
+					"appId", JsonNode.class)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertNotNull(result);
+			assertTrue(result.has(scriptName));
+			assertTrue(result.get(scriptName).has("size"));
+			assertTrue(result.get(scriptName).get("size").asInt(0) > 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test08_fileHash() {
+		registerScriptFileHash(FILE_HASH_NAME);
+		callScriptFileHash(FILE_HASH_NAME, fileName);
+	}
+
+	private void registerScriptFileHash(String scriptName) {
+		try {
+			Boolean isSuccess = scriptingService.registerScript(scriptName,
+					Executable.createFileHashExecutable(scriptName),
+					false, false)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertTrue(isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	private void callScriptFileHash(String scriptName, String fileName) {
+		try {
+			JsonNode result = scriptingService.callScript(scriptName,
+					Executable.createFileHashParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
+					"appId", JsonNode.class)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertNotNull(result);
+			assertTrue(result.has(scriptName));
+			assertTrue(result.get(scriptName).has("SHA256"));
+			assertTrue(!"".equals(result.get(scriptName).get("SHA256").asText("")));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
