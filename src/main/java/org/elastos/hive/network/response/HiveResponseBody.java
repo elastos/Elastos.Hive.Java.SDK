@@ -1,5 +1,6 @@
 package org.elastos.hive.network.response;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -12,6 +13,7 @@ import retrofit2.Response;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.util.Map;
 
 public class HiveResponseBody {
     private static final String SUCCESS = "OK";
@@ -21,6 +23,10 @@ public class HiveResponseBody {
 
     @SerializedName("_error")
     private Error error;
+
+    public static Map<String, Object> jsonNode2Map(JsonNode node) {
+        return new ObjectMapper().convertValue(node, new TypeReference<Map<String, Object>>() {});
+    }
 
     public void setStatus(String status) {
         this.status = status;
