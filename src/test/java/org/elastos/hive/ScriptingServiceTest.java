@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.io.FileReader;
+import java.io.Reader;
 import java.io.Writer;
 
 import static org.junit.Assert.*;
@@ -23,8 +24,7 @@ public class ScriptingServiceTest {
 	private static final String CONDITION_NAME = "get_group_messages";
 	private static final String NO_CONDITION_NAME = "script_no_condition";
 	private static final String UPLOAD_FILE_NAME = "upload_file";
-
-	private static final String REMOTE_FILE = "test.txt";
+	private static final String DOWNLOAD_FILE_NAME = "download_file";
 
 	@Test
 	public void test01_registerScriptFind() {
@@ -84,7 +84,7 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test03_callScriptUrlFindWithoutCondition() {
+	public void test04_callScriptUrlFindWithoutCondition() {
 		//TODO: A bug on node did_scripting.py line 121: return col maybe None.
 		try {
 			String result = scriptingService.callScriptUrl(UPLOAD_FILE_NAME,
@@ -101,18 +101,17 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test03_uploadFile() {
-		registerScriptFileUpload();
-		String transactionId = callScriptFileUpload(REMOTE_FILE);
+	public void test05_uploadFile() {
+		registerScriptFileUpload(UPLOAD_FILE_NAME);
+		String transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
 		uploadFileByTransActionId(transactionId);
-		FilesServiceTest.verifyRemoteFileExists(filesService, REMOTE_FILE);
+		FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
 	}
 
-	private void registerScriptFileUpload() {
+	private void registerScriptFileUpload(String scriptName) {
 		try {
-			Boolean isSuccess = scriptingService.registerScript(UPLOAD_FILE_NAME,
-					new Executable(UPLOAD_FILE_NAME, Executable.TYPE_FILE_UPLOAD,
-							new ScriptFileUploadBody("$params.path")).setOutput(true),
+			Boolean isSuccess = scriptingService.registerScript(scriptName,
+					Executable.createFileUploadExecutable(scriptName),
 					false, false)
 					.exceptionally(e->{
 						fail();
@@ -125,19 +124,19 @@ public class ScriptingServiceTest {
 		}
 	}
 
-	private String callScriptFileUpload(String remoteFile) {
+	private String callScriptFileUpload(String scriptName, String fileName) {
 		try {
-			JsonNode result = scriptingService.callScript(UPLOAD_FILE_NAME,
-					new ObjectMapper().readTree("{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"" + remoteFile + "\"}"),
+			JsonNode result = scriptingService.callScript(scriptName,
+					Executable.createFileUploadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
 					"appId", JsonNode.class)
 					.exceptionally(e->{
 						fail();
 						return null;
 					}).get();
-			assertTrue(result.has(UPLOAD_FILE_NAME));
-			assertTrue(result.get(UPLOAD_FILE_NAME).has("transaction_id"));
+			assertTrue(result.has(scriptName));
+			assertTrue(result.get(scriptName).has("transaction_id"));
 			assertNotNull(result);
-			return result.get(UPLOAD_FILE_NAME).get("transaction_id").textValue();
+			return result.get(scriptName).get("transaction_id").textValue();
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
@@ -149,12 +148,70 @@ public class ScriptingServiceTest {
 		try (Writer writer = scriptingService.uploadFile(transactionId, Writer.class).exceptionally(e -> {
 			fail();
 			return null;
-		}).get(); FileReader fileReader = new FileReader(textLocalPath)) {
+		}).get(); FileReader fileReader = new FileReader(localSrcFilePath)) {
 			assertNotNull(writer);
 			char[] buffer = new char[1];
 			while (fileReader.read(buffer) != -1) {
 				writer.write(buffer);
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test06_fileDownload() {
+		FilesServiceTest.removeLocalFile(localDstFilePath);
+		registerScriptFileDownload(DOWNLOAD_FILE_NAME);
+		String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
+		downloadFileByTransActionId(transactionId);
+		assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
+	}
+
+	private void registerScriptFileDownload(String scriptName) {
+		try {
+			Boolean isSuccess = scriptingService.registerScript(scriptName,
+					Executable.createFileDownloadExecutable(scriptName),
+					false, false)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertTrue(isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	private String callScriptFileDownload(String scriptName, String fileName) {
+		try {
+			JsonNode result = scriptingService.callScript(scriptName,
+					Executable.createFileUploadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
+					"appId", JsonNode.class)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertTrue(result.has(scriptName));
+			assertTrue(result.get(scriptName).has("transaction_id"));
+			assertNotNull(result);
+			return result.get(scriptName).get("transaction_id").textValue();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		return null;
+	}
+
+	private void downloadFileByTransActionId(String transactionId) {
+		try (Reader reader = scriptingService.downloadFile(transactionId, Reader.class).exceptionally(e -> {
+			fail();
+			return null;
+		}).get()) {
+			assertNotNull(reader);
+			Utils.cacheTextFile(reader, localDstFileRoot, fileName);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
@@ -174,10 +231,16 @@ public class ScriptingServiceTest {
 	private static ScriptingService scriptingService;
 	private static FilesService filesService;
 
-	private final String textLocalPath;
+	private final String localSrcFilePath;
+	private final String localDstFileRoot;
+	private final String localDstFilePath;
+	private final String fileName;
 
 	public ScriptingServiceTest() {
+		fileName = "test.txt";
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
-		textLocalPath = localRootPath + "test.txt";
+		localSrcFilePath = localRootPath + fileName;
+		localDstFileRoot = localRootPath + "cache/script/";
+		localDstFilePath = localDstFileRoot + fileName;
 	}
 }
