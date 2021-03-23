@@ -13,6 +13,11 @@ import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotFoundException;
 import org.elastos.hive.exception.ProviderNotSetException;
+import org.elastos.hive.exception.BadContextProviderException;
+import org.elastos.hive.exception.IllegalDidFormatException;
+import org.elastos.hive.exception.DIDResolverNotSetupException;
+import org.elastos.hive.exception.DIDResolverSetupException;
+import org.elastos.hive.exception.DIDResoverAlreadySetupException;
 
 /**
  * The application context would contain the resources list below:
@@ -23,11 +28,8 @@ import org.elastos.hive.exception.ProviderNotSetException;
 public class AppContext {
 	private static boolean resolverHasSetup = false;
 
-	@SuppressWarnings("unused")
 	private AppContextProvider contextProvider;
-	@SuppressWarnings("unused")
 	private String userDid;
-	@SuppressWarnings("unused")
 	private String providerAddress;
 
 	private ConnectionManager connectionManager;
@@ -48,14 +50,14 @@ public class AppContext {
 			throw new IllegalArgumentException("invalid value for parameter resolver or cacheDir");
 
 		if (resolverHasSetup)
-			throw new HiveException("Resolver already setup before");
+			throw new DIDResoverAlreadySetupException();
 
 		try {
 			DIDBackend.initialize(resolver, cacheDir);
 			ResolverCache.reset();
 			resolverHasSetup = true;
 		} catch (DIDResolveException e) {
-			throw new HiveException(e.getLocalizedMessage());
+			throw new DIDResolverSetupException(e.getMessage());
 		}
 	}
 
@@ -80,13 +82,13 @@ public class AppContext {
 			throw new IllegalArgumentException("Missing AppContext provider");
 
 		if (provider.getLocalDataDir() == null)
-			throw new IllegalArgumentException("Missing method to acquire data location in AppContext provider");
+			throw new BadContextProviderException("Missing method to acquire data location");
 
 		if (provider.getAppInstanceDocument() == null)
-			throw new IllegalArgumentException("Missing method to acquire App instance DID document in AppContext provider");
+			throw new BadContextProviderException("Missing method to acquire App instance DID document");
 
-		// if (!resolverHasSetup)
-		// throw new HiveException("Setup DID resolver first");
+		if (!resolverHasSetup)
+			throw new DIDResolverNotSetupException();
 
 		return new AppContext(provider, null, null);
 	}
@@ -96,13 +98,13 @@ public class AppContext {
 			throw new IllegalArgumentException("Missing AppContext provider");
 
 		if (provider.getLocalDataDir() == null)
-			throw new IllegalArgumentException("Missing method to acquire data location in AppContext provider");
+			throw new BadContextProviderException("Missing method to acquire data location");
 
 		if (provider.getAppInstanceDocument() == null)
-			throw new IllegalArgumentException("Missing method to acquire App instance DID document in AppContext provider");
+			throw new BadContextProviderException("Missing method to acquire App instance DID document");
 
-		// if (!resolverHasSetup)
-		// throw new HiveException("Setup DID resolver first");
+		if (!resolverHasSetup)
+			throw new DIDResolverNotSetupException();
 
 		return new AppContext(provider, userDid, providerAddress);
 	}
@@ -141,7 +143,7 @@ public class AppContext {
 				 */
 				return services.get(0).getServiceEndpoint();
 			} catch (MalformedDIDException e) {
-				throw new IllegalArgumentException("Invalid format for DID " + targetDid);
+				throw new IllegalDidFormatException("Bad target did: " + targetDid);
 
 			} catch (DIDResolveException e) {
 				// throw new CompletionException(new HiveException(e.getLocalizedMessage()));
