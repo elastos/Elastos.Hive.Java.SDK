@@ -20,7 +20,7 @@ public class FilesServiceTest {
 
 	@Test
 	public void test01_uploadText() {
-		try (Writer writer = filesApi.upload(remoteTextPath, Writer.class).exceptionally(e -> {
+		try (Writer writer = filesService.upload(remoteTextPath, Writer.class).exceptionally(e -> {
 			fail();
 			return null;
 		}).get(); FileReader fileReader = new FileReader(textLocalPath)) {
@@ -38,7 +38,7 @@ public class FilesServiceTest {
 
 	@Test
 	public void test02_uploadBin() {
-		try (OutputStream out = filesApi.upload(remoteImgPath, OutputStream.class).exceptionally(e->{
+		try (OutputStream out = filesService.upload(remoteImgPath, OutputStream.class).exceptionally(e->{
 			fail();
 			return null;
 		}).get()) {
@@ -54,7 +54,7 @@ public class FilesServiceTest {
 
 	@Test
 	public void test03_downloadText() {
-		try (Reader reader = filesApi.download(remoteTextPath, Reader.class).exceptionally(e->{
+		try (Reader reader = filesService.download(remoteTextPath, Reader.class).exceptionally(e->{
 			fail();
 			return null;
 		}).get()) {
@@ -68,7 +68,7 @@ public class FilesServiceTest {
 
 	@Test
 	public void test04_downloadBin() {
-		try (InputStream in = filesApi.download(remoteImgPath, InputStream.class).exceptionally(e->{
+		try (InputStream in = filesService.download(remoteImgPath, InputStream.class).exceptionally(e->{
 			fail();
 			return null;
 		}).get()) {
@@ -83,7 +83,7 @@ public class FilesServiceTest {
 	@Test
 	public void test05_list() {
 		try {
-			List<FileInfo> files = filesApi.list(remoteRootPath).exceptionally(e->{
+			List<FileInfo> files = filesService.list(remoteRootPath).exceptionally(e->{
 				fail();
 				return null;
 			}).get();
@@ -97,7 +97,7 @@ public class FilesServiceTest {
 	@Test
 	public void test06_hash() {
 		try {
-			String hash = filesApi.hash(remoteTextPath).exceptionally(e->{
+			String hash = filesService.hash(remoteTextPath).exceptionally(e->{
 				fail();
 				return null;
 			}).get();
@@ -111,8 +111,8 @@ public class FilesServiceTest {
 	@Test
 	public void test07_move() {
 		try {
-			Boolean isSuccess = filesApi.delete(remoteTextBackupPath)
-					.thenCompose(result -> filesApi.move(remoteTextPath, remoteTextBackupPath))
+			Boolean isSuccess = filesService.delete(remoteTextBackupPath)
+					.thenCompose(result -> filesService.move(remoteTextPath, remoteTextBackupPath))
 					.exceptionally(e->{
 						fail();
 						return false;
@@ -128,7 +128,7 @@ public class FilesServiceTest {
 	@Test
 	public void test08_copy() {
 		try {
-			Boolean isSuccess = filesApi.copy(remoteTextBackupPath, remoteTextPath)
+			Boolean isSuccess = filesService.copy(remoteTextBackupPath, remoteTextPath)
 					.exceptionally(e->{
 						fail();
 						return false;
@@ -144,8 +144,8 @@ public class FilesServiceTest {
 	@Test
 	public void test09_deleteFile() {
 		try {
-			Boolean isSuccess = filesApi.delete(remoteTextPath)
-					.thenCompose(result -> filesApi.delete(remoteTextBackupPath))
+			Boolean isSuccess = filesService.delete(remoteTextPath)
+					.thenCompose(result -> filesService.delete(remoteTextBackupPath))
 					.exceptionally(e->{
 						fail();
 						return false;
@@ -157,9 +157,13 @@ public class FilesServiceTest {
 		}
 	}
 
-	private void verifyRemoteFileExists(String path) {
+	private static void verifyRemoteFileExists(String path) {
+		verifyRemoteFileExists(filesService, path);
+	}
+
+	public static void verifyRemoteFileExists(FilesService filesService, String path) {
 		try {
-			FileInfo info = filesApi.stat(path).exceptionally(s->{
+			FileInfo info = filesService.stat(path).exceptionally(s->{
 				fail();
 				return null;
 			}).get();
@@ -173,7 +177,7 @@ public class FilesServiceTest {
 	@BeforeClass
 	public static void setUp() {
 		try {
-			filesApi = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getFilesService()).join();
+			filesService = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getFilesService()).join();
 		} catch (HiveException|DIDException e) {
 			e.printStackTrace();
 		}
@@ -192,7 +196,7 @@ public class FilesServiceTest {
 	private final String remoteImgPath;
 	private final String remoteTextBackupPath;
 
-	private static FilesService filesApi;
+	private static FilesService filesService;
 
 	public FilesServiceTest() {
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";

@@ -1,5 +1,7 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.HiveException;
@@ -10,6 +12,9 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import java.io.FileReader;
+import java.io.Writer;
 
 import static org.junit.Assert.*;
 
@@ -98,16 +103,16 @@ public class ScriptingServiceTest {
 	@Test
 	public void test03_uploadFile() {
 		registerScriptFileUpload();
-		callScriptFileUpload();
-		uploadFileByTransActionId();
+		String transactionId = callScriptFileUpload(REMOTE_FILE);
+		uploadFileByTransActionId(transactionId);
+		FilesServiceTest.verifyRemoteFileExists(filesService, REMOTE_FILE);
 	}
 
-	private void uploadFileByTransActionId() {
+	private void registerScriptFileUpload() {
 		try {
-			Boolean isSuccess = scriptingService.registerScript(NO_CONDITION_NAME,
-					new Executable("get_groups", Executable.TYPE_FIND,
-							new ScriptFindBody("groups",
-									new ScriptKvItem().putKv("friends","$caller_did"))),
+			Boolean isSuccess = scriptingService.registerScript(UPLOAD_FILE_NAME,
+					new Executable(UPLOAD_FILE_NAME, Executable.TYPE_FILE_UPLOAD,
+							new ScriptFileUploadBody("$params.path")).setOutput(true),
 					false, false)
 					.exceptionally(e->{
 						fail();
@@ -120,27 +125,59 @@ public class ScriptingServiceTest {
 		}
 	}
 
-	private void callScriptFileUpload() {
-
+	private String callScriptFileUpload(String remoteFile) {
+		try {
+			JsonNode result = scriptingService.callScript(UPLOAD_FILE_NAME,
+					new ObjectMapper().readTree("{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"" + remoteFile + "\"}"),
+					"appId", JsonNode.class)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertTrue(result.has(UPLOAD_FILE_NAME));
+			assertTrue(result.get(UPLOAD_FILE_NAME).has("transaction_id"));
+			assertNotNull(result);
+			return result.get(UPLOAD_FILE_NAME).get("transaction_id").textValue();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		return null;
 	}
 
-	private void registerScriptFileUpload() {
-
+	private void uploadFileByTransActionId(String transactionId) {
+		try (Writer writer = scriptingService.uploadFile(transactionId, Writer.class).exceptionally(e -> {
+			fail();
+			return null;
+		}).get(); FileReader fileReader = new FileReader(textLocalPath)) {
+			assertNotNull(writer);
+			char[] buffer = new char[1];
+			while (fileReader.read(buffer) != -1) {
+				writer.write(buffer);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
 	}
 
 	@BeforeClass
 	public static void setUp() {
 		try {
 			scriptingService = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getScriptingService()).join();
-			filesApi = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getFilesService()).join();
+			filesService = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getFilesService()).join();
 		} catch (HiveException|DIDException e) {
 			e.printStackTrace();
 		}
 	}
 
 	private static ScriptingService scriptingService;
-	private static FilesService filesApi;
+	private static FilesService filesService;
+
+	private final String textLocalPath;
 
 	public ScriptingServiceTest() {
+		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
+		textLocalPath = localRootPath + "test.txt";
 	}
 }
