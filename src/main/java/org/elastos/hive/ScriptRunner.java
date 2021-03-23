@@ -33,8 +33,7 @@ public class ScriptRunner extends ServiceEndpoint {
 							.setContext(new ScriptContext()
 									.setTargetDid(this.targetDid)
 									.setTargetAppDid(appDid))
-//							.setContext(null)
-							.setParams(params))
+							.setParams(HiveResponseBody.jsonNode2Map(params)))
 					.execute();
 			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(response), resultType);
 		} catch (Exception e) {
