@@ -18,7 +18,7 @@ import org.elastos.hive.exception.HiveException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-
+@Ignore
 public class VaultSubscriptionTest {
 	private static VaultSubscription subscription;
 
@@ -72,7 +72,6 @@ public class VaultSubscriptionTest {
 		}
 	}
 
-	@Ignore
 	@Test
 	public void testDeactivate() {
 		try {
@@ -89,6 +88,65 @@ public class VaultSubscriptionTest {
 		}
 	}
 
+	@Test
+	public void testGetPricingPlanList() {
+		try {
+			subscription.getPricingPlanList()
+					.whenComplete((result, ex) -> {
+						if (ex != null) {
+							ex.printStackTrace();
+						}
+					}).get();
+		} catch (InterruptedException|ExecutionException e1) {
+			fail();
+			e1.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testGetPricingPlan() {
+		try {
+			subscription.getPricingPlan("free")
+					.whenComplete((result, ex) -> {
+						if (ex != null) {
+							ex.printStackTrace();
+						}
+					}).get();
+		} catch (InterruptedException|ExecutionException e1) {
+			fail();
+			e1.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testPlaceOrder() {
+		try {
+			subscription.placeOrder("")
+					.whenComplete((result, ex) -> {
+						if (ex != null) {
+							ex.printStackTrace();
+						}
+					}).get();
+		} catch (InterruptedException|ExecutionException e1) {
+			fail();
+			e1.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testGetOrder() {
+
+	}
+
+	@Test
+	public void testPayOrder() {
+
+	}
+
+	@Test
+	public void testGetReceipt() {
+
+	}
 
 	@BeforeClass
 	public static void setup() {

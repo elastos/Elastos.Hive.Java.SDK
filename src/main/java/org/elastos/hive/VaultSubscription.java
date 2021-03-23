@@ -82,21 +82,18 @@ public class VaultSubscription {
 	}
 
 	public class VaultInfo {
-		//client info
 		private String myDid;
 		private String appInstanceDid;
 		private String appId;
 		private String provider;
 
-		//service info
 		private String serviceDid;
 		private String pricingUsing;
 		private String createTime;
 		private String modifyTime;
-		private long maxSpace; //可用空间
-		private long dbSpaceUsed; //database已用空间
-		private long fileSpaceUsed;//file已用空间
-		//之前这个字段只有在failed情况下才会有，这种情况会抛出VaultNotFoundException
+		private long maxSpace;
+		private long dbSpaceUsed;
+		private long fileSpaceUsed;
 		private boolean existing;
 
 		public VaultInfo(String appInstanceDid, String myDid, String serviceDid) {
