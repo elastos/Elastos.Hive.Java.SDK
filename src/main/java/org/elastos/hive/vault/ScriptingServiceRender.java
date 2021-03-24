@@ -22,8 +22,8 @@ class ScriptingServiceRender implements ScriptingService {
 	private ScriptRunner scriptRunner;
 
 	public ScriptingServiceRender(Vault vault) {
-		this.connectionManager = vault.getConnectionManager();
-		this.scriptRunner = new ScriptRunner(vault.getAppContext(), vault.getProviderAddress(), vault.getUserDid(), vault.getOwnerDid(), vault.getAppDid());
+		this.connectionManager = vault.getAppContext().getConnectionManager();
+		this.scriptRunner = new ScriptRunner(vault.getAppContext(), vault.getAddress(), vault.getUserDid(), vault.getOwnerDid(), vault.getAppDid());
 	}
 
 	@Override

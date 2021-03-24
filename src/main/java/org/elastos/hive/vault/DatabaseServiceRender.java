@@ -37,7 +37,7 @@ class DatabaseServiceRender implements DatabaseService {
 	private ConnectionManager connectionManager;
 
 	public DatabaseServiceRender(Vault vault) {
-		this.connectionManager = vault.getConnectionManager();
+		this.connectionManager = vault.getAppContext().getConnectionManager();
 	}
 
 	@Override

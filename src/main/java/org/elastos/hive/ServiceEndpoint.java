@@ -1,9 +1,9 @@
 package org.elastos.hive;
 
 import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.exception.UnauthorizedStateException;
 
 class ServiceEndpoint {
-	@SuppressWarnings("unused")
 	private AppContext context;
 
 	private String providerAddress;
@@ -34,7 +34,7 @@ class ServiceEndpoint {
 		this.targetAppDid = targetAppDid;
 	}
 
-	public String getEndpointAddress() {
+	public String getAddress() {
 		return this.providerAddress;
 	}
 
@@ -46,31 +46,27 @@ class ServiceEndpoint {
 		return this.userDid;
 	}
 
-	public String getAppDid() {
+	public String getAppDid() throws UnauthorizedStateException {
+		if (this.context.getConnectionManager() == null)
+			throw new UnauthorizedStateException("This instance has not been authorized by User");
+
+		// TODO:
 		return null;
 	}
 
-	public String getAppInstanceDid() {
+	public String getAppInstanceDid() throws UnauthorizedStateException {
 		return null;
 	}
 
-	public String getServiceDid() {
+	public String getServiceDid() throws UnauthorizedStateException {
 		return null;
 	}
 
-	public String getServiceInstanceDid() {
+	public String getServiceInstanceDid() throws UnauthorizedStateException {
 		return null;
-	}
-
-	public String getProviderAddress() {
-		return this.providerAddress;
 	}
 
 	public AppContext getAppContext() {
 		return this.context;
-	}
-
-	public ConnectionManager getConnectionManager() {
-		return this.context.getConnectionManager();
 	}
 }
