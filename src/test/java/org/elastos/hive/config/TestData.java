@@ -101,9 +101,9 @@ public class TestData {
 		return nodeConfig.provider();
 	}
 
-	public CompletableFuture<Vault> getVault() {
-		return context.getVault(nodeConfig.ownerDid(), nodeConfig.provider());
-	}
+	//public CompletableFuture<Vault> getVault() {
+	//	return context.getVault(nodeConfig.ownerDid(), nodeConfig.provider());
+	//}
 
 	public Vault newVault() {
 		return new Vault(context, nodeConfig.ownerDid(), nodeConfig.provider());
