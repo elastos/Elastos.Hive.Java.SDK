@@ -25,7 +25,7 @@ class FilesServiceRender implements FilesService {
 	private ConnectionManager connectionManager;
 
 	public FilesServiceRender(Vault vault) {
-		this.connectionManager = vault.getConnectionManager();
+		this.connectionManager = vault.getAppContext().getConnectionManager();
 	}
 
 	@Override

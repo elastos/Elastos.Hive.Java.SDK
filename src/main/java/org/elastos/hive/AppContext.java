@@ -152,22 +152,4 @@ public class AppContext {
 			}
 		});
 	}
-
-	/**
-	 * get Vault instance with specified DID.
-	 * Try to get a vault on target provider address with following steps:
-	 *  - Get the target provider address;
-	 *  - Create a new vaule of local instance..
-	 *
-	 * @param ownerDid  the owner did related to target vault
-	 * @param preferredProviderAddress the preferred target provider address
-	 * @return a new vault instance.
-	 */
-	public CompletableFuture<Vault> getVault(String ownerDid, String preferredProviderAddress) {
-		return getProviderAddress(ownerDid, preferredProviderAddress)
-				.thenApplyAsync(provider -> {
-					this.providerAddress = provider;
-					return new Vault(this, ownerDid, provider);
-				});
-	}
 }

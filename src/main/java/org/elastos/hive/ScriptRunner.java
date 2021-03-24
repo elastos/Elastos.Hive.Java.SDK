@@ -22,7 +22,7 @@ public class ScriptRunner extends ServiceEndpoint {
 		super(context, providerAddress, userDid);
 		this.targetDid = targetDid;
 		this.targetAppDid = targetAppDid;
-		this.connectionManager = getConnectionManager();
+		this.connectionManager = getAppContext().getConnectionManager();
 	}
 
 	public <T> T callScript(String name, JsonNode params, String appDid, Class<T> resultType) {
