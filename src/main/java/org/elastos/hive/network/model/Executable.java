@@ -7,9 +7,9 @@ import org.elastos.hive.exception.HiveSdkException;
 
 public class Executable extends Condition {
 	public static final String TYPE_FIND = "find";
-	public static final String TYPE_INSERT = "insert";
-	public static final String TYPE_UPDATE = "update";
-	public static final String TYPE_DELETE = "delete";
+	private static final String TYPE_INSERT = "insert";
+	private static final String TYPE_UPDATE = "update";
+	private static final String TYPE_DELETE = "delete";
 	private static final String TYPE_FILE_UPLOAD = "fileUpload";
 	private static final String TYPE_FILE_DOWNLOAD = "fileDownload";
 	private static final String TYPE_FILE_PROPERTIES = "fileProperties";
@@ -65,5 +65,9 @@ public class Executable extends Condition {
 
 	public static JsonNode createFileHashParams(String groupId, String path) {
 		return createFileUploadParams(groupId, path);
+	}
+
+	public static Executable createInsertExecutable(String name, ScriptInsertExecutableBody body) {
+		return new Executable(name, TYPE_INSERT, body).setOutput(true);
 	}
 }

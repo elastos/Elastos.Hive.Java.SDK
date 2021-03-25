@@ -5,8 +5,11 @@ import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.model.*;
+import org.elastos.hive.network.response.HiveResponseBody;
+import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.service.ScriptingService;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -22,13 +25,15 @@ import static org.junit.Assert.*;
 public class ScriptingServiceTest {
 	private static final String FIND_NAME = "get_group_messages";
 	private static final String FIND_NO_CONDITION_NAME = "script_no_condition";
-	private static final String INSERT_NAME = "insert";
-	private static final String UPDATE_NAME = "update";
-	private static final String DELETE_NAME = "delete";
+	private static final String INSERT_NAME = "database_insert";
+	private static final String UPDATE_NAME = "database_update";
+	private static final String DELETE_NAME = "database_delete";
 	private static final String UPLOAD_FILE_NAME = "upload_file";
 	private static final String DOWNLOAD_FILE_NAME = "download_file";
 	private static final String FILE_PROPERTIES_NAME = "file_properties";
 	private static final String FILE_HASH_NAME = "file_hash";
+
+	private static final String DATABASE_NAME = "script_database";
 
 	@Test
 	public void test01_registerScriptFind() {
@@ -297,7 +302,86 @@ public class ScriptingServiceTest {
 			assertNotNull(result);
 			assertTrue(result.has(scriptName));
 			assertTrue(result.get(scriptName).has("SHA256"));
-			assertTrue(!"".equals(result.get(scriptName).get("SHA256").asText("")));
+			assertFalse("".equals(result.get(scriptName).get("SHA256").asText("")));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test09_insert() {
+		registerScriptInsert(INSERT_NAME);
+		callScriptInsert(INSERT_NAME);
+	}
+
+	private void registerScriptInsert(String scriptName) {
+		try {
+			Boolean isSuccess = scriptingService.registerScript(scriptName,
+					Executable.createInsertExecutable(scriptName,
+							new ScriptInsertExecutableBody(DATABASE_NAME, new ScriptKvItem()
+									.putKv("author", "$params.author")
+									.putKv("content", "$params.content"),
+									new ScriptKvItem().putKv("bypass_document_validation",false).putKv("ordered",true)
+								)), false, false)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertTrue(isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	private void callScriptInsert(String scriptName) {
+		try {
+			JsonNode result = scriptingService.callScript(scriptName,
+					HiveResponseBody.map2JsonNode(
+							new ScriptKvItem().putKv("author", "John").putKv("content", "message")),
+					"appId", JsonNode.class)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertNotNull(result);
+			assertTrue(result.has(scriptName));
+			assertTrue(result.get(scriptName).has("inserted_id"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	/**
+	 * If exists, also return OK(_status).
+	 */
+	private static void create_test_database() {
+		try {
+			Boolean isSuccess = databaseService.createCollection(DATABASE_NAME, null)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertTrue(isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	/**
+	 * If not exists, also return OK(_status).
+	 */
+	private static void remove_test_database() {
+		try {
+			Boolean isSuccess = databaseService.deleteCollection(DATABASE_NAME)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertTrue(isSuccess);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
@@ -309,13 +393,21 @@ public class ScriptingServiceTest {
 		try {
 			scriptingService = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getScriptingService()).join();
 			filesService = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getFilesService()).join();
+			databaseService = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getDatabaseService()).join();
 		} catch (HiveException|DIDException e) {
 			e.printStackTrace();
 		}
+		create_test_database();
+	}
+
+	@AfterClass
+	public static void tearDown() {
+		remove_test_database();
 	}
 
 	private static ScriptingService scriptingService;
 	private static FilesService filesService;
+	private static DatabaseService databaseService;
 
 	private final String localSrcFilePath;
 	private final String localDstFileRoot;
