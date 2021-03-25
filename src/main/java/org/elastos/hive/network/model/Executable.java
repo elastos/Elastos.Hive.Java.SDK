@@ -67,7 +67,15 @@ public class Executable extends Condition {
 		return createFileUploadParams(groupId, path);
 	}
 
-	public static Executable createInsertExecutable(String name, ScriptInsertExecutableBody body) {
-		return new Executable(name, TYPE_INSERT, body).setOutput(true);
+	public static Executable createInsertExecutable(String colletion, ScriptInsertExecutableBody body) {
+		return new Executable(colletion, TYPE_INSERT, body).setOutput(true);
+	}
+
+	public static Executable createUpdateExecutable(String collection, ScriptUpdateExecutableBody body) {
+		return new Executable(collection, TYPE_UPDATE, body).setOutput(true);
+	}
+
+	public static Executable createDeleteExecutable(String collection, ScriptDeleteExecutableBody body) {
+		return new Executable(collection, TYPE_DELETE, body).setOutput(true);
 	}
 }
