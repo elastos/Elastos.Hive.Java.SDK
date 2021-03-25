@@ -24,10 +24,6 @@ public class HiveResponseBody {
     @SerializedName("_error")
     private Error error;
 
-    public static Map<String, Object> jsonNode2Map(JsonNode node) {
-        return new ObjectMapper().convertValue(node, new TypeReference<Map<String, Object>>() {});
-    }
-
     public void setStatus(String status) {
         this.status = status;
     }
@@ -123,6 +119,14 @@ public class HiveResponseBody {
         } else {
             throw new HiveSdkException("Not supported result type");
         }
+    }
+
+    public static Map<String, Object> jsonNode2Map(JsonNode node) {
+        return new ObjectMapper().convertValue(node, new TypeReference<Map<String, Object>>() {});
+    }
+
+    public static JsonNode map2JsonNode(Map<String, Object> map) {
+        return new ObjectMapper().convertValue(map, JsonNode.class);
     }
 
     static class Error {
