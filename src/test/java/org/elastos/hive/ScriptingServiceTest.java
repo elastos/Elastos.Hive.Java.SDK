@@ -354,6 +354,96 @@ public class ScriptingServiceTest {
 		}
 	}
 
+	@Test
+	public void test10_update() {
+		registerScriptUpdate(UPDATE_NAME);
+		callScriptUpdate(UPDATE_NAME);
+	}
+
+	private void registerScriptUpdate(String scriptName) {
+		try {
+			Boolean isSuccess = scriptingService.registerScript(scriptName,
+					Executable.createUpdateExecutable(scriptName,
+							new ScriptUpdateExecutableBody().setCollection(DATABASE_NAME)
+								.setFilter(new ScriptKvItem().putKv("author", "$params.author"))
+								.setUpdate(new ScriptKvItem().putKv("$set", new ScriptKvItem()
+										.putKv("author", "$params.author").putKv("content", "$params.content")))
+								.setOptions(new ScriptKvItem().putKv("bypass_document_validation",false)
+										.putKv("upsert",true))
+					), false, false)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertTrue(isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	private void callScriptUpdate(String scriptName) {
+		try {
+			JsonNode result = scriptingService.callScript(scriptName,
+					HiveResponseBody.map2JsonNode(
+							new ScriptKvItem().putKv("author", "John").putKv("content", "message")),
+					"appId", JsonNode.class)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertNotNull(result);
+			assertTrue(result.has(scriptName));
+			assertTrue(result.get(scriptName).has("upserted_id"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test11_delete() {
+		registerScriptDelete(DELETE_NAME);
+		callScriptDelete(DELETE_NAME);
+	}
+
+	private void registerScriptDelete(String scriptName) {
+		try {
+			Boolean isSuccess = scriptingService.registerScript(scriptName,
+					Executable.createDeleteExecutable(scriptName,
+							new ScriptDeleteExecutableBody().setCollection(DATABASE_NAME)
+									.setFilter(new ScriptKvItem().putKv("author", "$params.author"))
+					), false, false)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertTrue(isSuccess);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	private void callScriptDelete(String scriptName) {
+		try {
+			JsonNode result = scriptingService.callScript(scriptName,
+					HiveResponseBody.map2JsonNode(
+							new ScriptKvItem().putKv("author", "John")),
+					"appId", JsonNode.class)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			assertNotNull(result);
+			assertTrue(result.has(scriptName));
+			assertTrue(result.get(scriptName).has("deleted_count"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
 	/**
 	 * If exists, also return OK(_status).
 	 */
@@ -391,10 +481,10 @@ public class ScriptingServiceTest {
 	@BeforeClass
 	public static void setUp() {
 		try {
-			scriptingService = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getScriptingService()).join();
-			filesService = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getFilesService()).join();
-			databaseService = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getDatabaseService()).join();
-		} catch (HiveException|DIDException e) {
+			scriptingService = TestData.getInstance().newVault().getScriptingService();
+			filesService = TestData.getInstance().newVault().getFilesService();
+			databaseService = TestData.getInstance().newVault().getDatabaseService();
+		} catch (HiveException | DIDException e) {
 			e.printStackTrace();
 		}
 		create_test_database();

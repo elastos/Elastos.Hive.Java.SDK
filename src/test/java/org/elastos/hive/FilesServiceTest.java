@@ -221,8 +221,8 @@ public class FilesServiceTest {
 	@BeforeClass
 	public static void setUp() {
 		try {
-			filesService = TestData.getInstance().getVault().thenApplyAsync(vault -> vault.getFilesService()).join();
-		} catch (HiveException|DIDException e) {
+			filesService = TestData.getInstance().newVault().getFilesService();
+		} catch (HiveException | DIDException e) {
 			e.printStackTrace();
 		}
 	}
