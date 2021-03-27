@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class Condition {
 	public static final String TYPE_AND = "and";
 	public static final String TYPE_OR = "or";
+	public static final String TYPE_QUERY_HAS_RESULTS = "queryHasResults";
 
 	@SerializedName("name")
 	private String name;

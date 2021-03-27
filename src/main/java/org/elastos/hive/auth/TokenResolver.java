@@ -4,6 +4,6 @@ import org.elastos.hive.exception.HiveException;
 
 public interface TokenResolver {
 	AuthToken getToken() throws HiveException;
-	void invlidateToken();
+	void invalidateToken();
 	void setNextResolver(TokenResolver resolver);
 }

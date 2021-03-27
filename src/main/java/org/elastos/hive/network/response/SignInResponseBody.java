@@ -14,7 +14,7 @@ public class SignInResponseBody extends HiveResponseBody {
         return challenge;
     }
 
-    public void checkValid(String validAudience) throws HiveException {
+    public Claims checkValid(String validAudience) throws HiveException {
         Claims claims = JwtUtil.getBody(challenge);
 
         if (claims.getExpiration().getTime() <= System.currentTimeMillis() )
@@ -22,5 +22,7 @@ public class SignInResponseBody extends HiveResponseBody {
 
         if (!claims.getAudience().equals(validAudience))
             throw new HiveException("Bad jwt audidence value");
+
+        return claims;
     }
 }

@@ -28,18 +28,16 @@ public class RemoteResolver implements TokenResolver {
 	}
 
 	@Override
-	public void invlidateToken() {}
+	public void invalidateToken() {}
 
 	@Override
 	public void setNextResolver(TokenResolver resolver) {}
 
 	private String signIn() throws HiveException {
 		try {
-			SignInRequestBody reqBody = new SignInRequestBody();
-			reqBody.setDocument(new ObjectMapper().readValue(contextProvider.getAppInstanceDocument().toString(), HashMap.class));
-
 			SignInResponseBody rspBody = connectionManager.getAuthApi()
-					.signIn(reqBody)
+					.signIn(new SignInRequestBody(new ObjectMapper().readValue(
+							contextProvider.getAppInstanceDocument().toString(), HashMap.class)))
 					.execute()
 					.body();
 			rspBody.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
