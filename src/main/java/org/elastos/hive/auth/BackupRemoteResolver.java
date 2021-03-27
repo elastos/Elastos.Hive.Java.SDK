@@ -7,6 +7,7 @@ import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnauthorizedStateException;
 import org.elastos.hive.network.request.SignInRequestBody;
+import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.network.response.SignInResponseBody;
 
 import java.util.HashMap;
@@ -32,7 +33,7 @@ public class BackupRemoteResolver implements TokenResolver {
     private AuthToken credential(String sourceDid) {
         try {
             return new AuthToken(contextProvider.getAuthorization(sourceDid, this.targetDid, this.targetHost)
-                    .get(), Long.MAX_VALUE, "backup");
+                    .get(), Long.MAX_VALUE, AuthToken.TYPE_BACKUP);
         } catch (Exception e) {
             throw new UnauthorizedStateException("Failed to authentication backup credential.");
         }
@@ -45,7 +46,8 @@ public class BackupRemoteResolver implements TokenResolver {
                             .readValue(contextProvider.getAppInstanceDocument().toString(), HashMap.class)))
                     .execute()
                     .body();
-            return rspBody.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString())
+            return HiveResponseBody.validateBody(rspBody)
+                    .checkValid(contextProvider.getAppInstanceDocument().getSubject().toString())
                     .getIssuer();
         } catch (Exception e) {
             throw new HiveException(e.getMessage());

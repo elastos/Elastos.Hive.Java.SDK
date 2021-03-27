@@ -16,7 +16,6 @@ import org.elastos.hive.network.response.BackupStateResponseBody;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
-import retrofit2.Response;
 
 class BackupServiceRender implements BackupService {
 	private Vault vault;
@@ -32,12 +31,12 @@ class BackupServiceRender implements BackupService {
 	public CompletableFuture<Void> setupContext(BackupContext backupContext) {
 		this.backupContext = backupContext;
 		this.tokenResolver = new LocalResolver(
-				vault.getAppContext().getUserDid(),
-				vault.getAppContext().getProviderAddress(),
-				"backup_credential",
-				vault.getAppContext().getAppContextProvider().getLocalDataDir());
+				this.vault.getAppContext().getUserDid(),
+				this.vault.getAppContext().getProviderAddress(),
+				LocalResolver.TYPE_BACKUP_CREDENTIAL,
+				this.vault.getAppContext().getAppContextProvider().getLocalDataDir());
 		this.tokenResolver.setNextResolver(new BackupRemoteResolver(
-				vault.getAppContext(),
+				this.vault.getAppContext(),
 				backupContext.getParameter("targetDid"),
 				backupContext.getParameter("targetHost")));
 		return null;
@@ -47,10 +46,11 @@ class BackupServiceRender implements BackupService {
 	public CompletableFuture<Void> startBackup() {
 		return CompletableFuture.runAsync(() -> {
 			try {
-				Response<HiveResponseBody> response = connectionManager.getBackupApi()
+				HiveResponseBody respBody = connectionManager.getBackupApi()
 						.saveToNode(new BackupSaveRequestBody(tokenResolver.getToken().getAccessToken()))
-						.execute();
-				HiveResponseBody.validateBody(response);
+						.execute()
+						.body();
+				HiveResponseBody.validateBody(respBody);
 			} catch (HiveException | IOException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
@@ -67,10 +67,11 @@ class BackupServiceRender implements BackupService {
 	public CompletableFuture<Void> restoreFrom() {
 		return CompletableFuture.runAsync(() -> {
 			try {
-				Response<HiveResponseBody> response = connectionManager.getBackupApi()
+				HiveResponseBody respBody = connectionManager.getBackupApi()
 						.restoreFromNode(new BackupRestoreRequestBody(tokenResolver.getToken().getAccessToken()))
-						.execute();
-				HiveResponseBody.validateBody(response);
+						.execute()
+						.body();
+				HiveResponseBody.validateBody(respBody);
 			} catch (HiveException | IOException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
@@ -87,10 +88,11 @@ class BackupServiceRender implements BackupService {
 	public CompletableFuture<BackupResult> checkResult() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				Response<BackupStateResponseBody> response = connectionManager.getBackupApi()
+				BackupStateResponseBody respBody = connectionManager.getBackupApi()
 						.getState()
-						.execute();
-				return HiveResponseBody.validateBody(response).getStatusResult();
+						.execute()
+						.body();
+				return HiveResponseBody.validateBody(respBody).getStatusResult();
 			} catch (HiveException | IOException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
