@@ -1,9 +1,12 @@
 package org.elastos.hive.network.request;
 
-public class AuthRequestBody {
-    private String jwt;
+import com.google.gson.annotations.SerializedName;
 
-    public void setJwt(String jwt) {
+public class AuthRequestBody {
+    @SerializedName("jwt")
+    private final String jwt;
+
+    public AuthRequestBody(String jwt) {
         this.jwt = jwt;
     }
 }
