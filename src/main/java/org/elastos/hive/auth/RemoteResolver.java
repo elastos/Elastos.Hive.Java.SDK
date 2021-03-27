@@ -28,10 +28,14 @@ public class RemoteResolver implements TokenResolver {
 	}
 
 	@Override
-	public void invalidateToken() {}
+	public void invalidateToken() {
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
-	public void setNextResolver(TokenResolver resolver) {}
+	public void setNextResolver(TokenResolver resolver) {
+		throw new UnsupportedOperationException();
+	}
 
 	private String signIn() throws HiveException {
 		try {
@@ -49,14 +53,10 @@ public class RemoteResolver implements TokenResolver {
 
 	private AuthToken auth(String token) throws HiveException {
 		try {
-			AuthRequestBody reqBody = new AuthRequestBody();
-			reqBody.setJwt(token);
-
 			AuthResponseBody rspBody = connectionManager.getAuthApi()
-					.auth(reqBody)
+					.auth(new AuthRequestBody(token))
 					.execute()
 					.body();
-
 			long exp = JwtUtil.getBody(rspBody.getToken()).getExpiration().getTime();
 			long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
 			return new AuthToken(rspBody.getToken(), expiresTime, "token");
