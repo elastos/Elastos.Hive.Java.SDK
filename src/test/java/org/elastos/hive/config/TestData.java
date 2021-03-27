@@ -1,8 +1,6 @@
 package org.elastos.hive.config;
 
 import org.elastos.did.DIDDocument;
-import org.elastos.did.VerifiableCredential;
-import org.elastos.did.VerifiablePresentation;
 import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
@@ -10,10 +8,13 @@ import org.elastos.hive.*;
 import org.elastos.hive.did.DApp;
 import org.elastos.hive.did.DIDApp;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.service.BackupContext;
+import org.elastos.hive.service.BackupService;
 import org.elastos.hive.utils.JwtUtil;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * This is used for representing 3rd-party application.
@@ -82,13 +83,19 @@ public class TestData {
 
 			@Override
 			public CompletableFuture<String> getAuthorization(String jwtToken) {
-				return CompletableFuture.supplyAsync(() -> signAuthorization(jwtToken));
-			}
-
-			@Override
-			public CompletableFuture<String> getAuthorization(String srdDid, String targetDid, String targetHost) {
-				//TODO:
-				return null;
+				return CompletableFuture.supplyAsync(() -> {
+					try {
+						Claims claims = JwtUtil.getBody(jwtToken);
+						if (claims == null)
+							throw new HiveException("Invalid jwt token as authorization.");
+						return appInstanceDid.createToken(appInstanceDid.createPresentation(
+								userDid.issueDiplomaFor(appInstanceDid),
+								claims.getIssuer(),
+								(String) claims.get("nonce")), claims.getIssuer());
+					} catch (Exception e) {
+						throw new CompletionException(new HiveException(e.getMessage()));
+					}
+				});
 			}
 		}, nodeConfig.ownerDid(), nodeConfig.provider());
 	}
@@ -105,32 +112,40 @@ public class TestData {
 		return nodeConfig.provider();
 	}
 
-	//public CompletableFuture<Vault> getVault() {
-	//	return context.getVault(nodeConfig.ownerDid(), nodeConfig.provider());
-	//}
-
 	public Vault newVault() {
 		return new Vault(context, nodeConfig.ownerDid(), nodeConfig.provider());
 	}
 
-	/**
-	 * Called when auth.
-	 * @param jwtToken
-	 * @return
-	 */
-	public String signAuthorization(String jwtToken) {
-		try {
-			Claims claims = JwtUtil.getBody(jwtToken);
-			String iss = claims.getIssuer();
-			String nonce = (String) claims.get("nonce");
+	public BackupService getBackupService() {
+		BackupService bs = this.newVault().getBackupService();
+		bs.setupContext(new BackupContext() {
+			@Override
+			public String getType() {
+				return null;
+			}
 
-			VerifiableCredential vc = userDid.issueDiplomaFor(appInstanceDid);
-			VerifiablePresentation vp = appInstanceDid.createPresentation(vc, iss, nonce);
-			return appInstanceDid.createToken(vp, iss);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+			@Override
+			public String getParameter(String key) {
+				if ("targetDid".equals(key)) {
+					return nodeConfig.targetDid();
+				} else if ("targetHost".equals(key)) {
+					return nodeConfig.targetHost();
+				}
+				return null;
+			}
+
+			@Override
+			public CompletableFuture<String> getAuthorization(String srcDid, String targetDid, String targetHost) {
+				return CompletableFuture.supplyAsync(() -> {
+					try {
+						return userDid.issueBackupDiplomaFor(srcDid, targetHost, targetDid).toString();
+					} catch (DIDException e) {
+						throw new CompletionException(new HiveException(e.getMessage()));
+					}
+				});
+			}
+		});
+		return bs;
 	}
 
 	private enum EnvironmentType {
