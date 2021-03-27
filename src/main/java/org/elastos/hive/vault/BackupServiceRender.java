@@ -24,6 +24,7 @@ class BackupServiceRender implements BackupService {
 	private TokenResolver tokenResolver;
 
 	public BackupServiceRender(Vault vault) {
+		this.vault = vault;
 		this.connectionManager = vault.getAppContext().getConnectionManager();
 	}
 
@@ -37,6 +38,7 @@ class BackupServiceRender implements BackupService {
 				this.vault.getAppContext().getAppContextProvider().getLocalDataDir());
 		this.tokenResolver.setNextResolver(new BackupRemoteResolver(
 				this.vault.getAppContext(),
+				backupContext,
 				backupContext.getParameter("targetDid"),
 				backupContext.getParameter("targetHost")));
 		return null;
