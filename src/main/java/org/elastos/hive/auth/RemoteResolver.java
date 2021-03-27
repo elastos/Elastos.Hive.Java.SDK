@@ -8,6 +8,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.request.AuthRequestBody;
 import org.elastos.hive.network.request.SignInRequestBody;
 import org.elastos.hive.network.response.AuthResponseBody;
+import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.network.response.SignInResponseBody;
 import org.elastos.hive.utils.JwtUtil;
 
@@ -44,7 +45,8 @@ public class RemoteResolver implements TokenResolver {
 							contextProvider.getAppInstanceDocument().toString(), HashMap.class)))
 					.execute()
 					.body();
-			rspBody.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
+			HiveResponseBody.validateBody(rspBody)
+					.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
 			return contextProvider.getAuthorization(rspBody.getChallenge()).get();
 		} catch (Exception e) {
 			throw new HiveException(e.getMessage());
@@ -57,9 +59,10 @@ public class RemoteResolver implements TokenResolver {
 					.auth(new AuthRequestBody(token))
 					.execute()
 					.body();
-			long exp = JwtUtil.getBody(rspBody.getToken()).getExpiration().getTime();
+			long exp = JwtUtil.getBody(HiveResponseBody.validateBody(rspBody)
+					.getToken()).getExpiration().getTime();
 			long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
-			return new AuthToken(rspBody.getToken(), expiresTime, "token");
+			return new AuthToken(rspBody.getToken(), expiresTime, AuthToken.TYPE_TOKEN);
 		} catch (Exception e) {
 			throw new HiveException(e.getMessage());
 		}

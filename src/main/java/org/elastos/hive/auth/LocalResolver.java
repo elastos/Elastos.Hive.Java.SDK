@@ -15,6 +15,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class LocalResolver implements TokenResolver {
+	public static final String TYPE_AUTH_TOKEN = "auth_token";
+	public static final String TYPE_BACKUP_CREDENTIAL = "backup_credential";
+
 	private static final String TOKEN_FOLDER = "/tokens";
 
 	private String tokenPath;

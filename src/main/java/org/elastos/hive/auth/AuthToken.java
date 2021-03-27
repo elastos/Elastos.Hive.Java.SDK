@@ -1,6 +1,9 @@
 package org.elastos.hive.auth;
 
 public class AuthToken {
+	public static final String TYPE_TOKEN = "token";
+	public static final String TYPE_BACKUP = "backup";
+
 	private String accessToken;
 	private long expiresTime;
 	private String tokenType;
