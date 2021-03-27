@@ -10,6 +10,7 @@ import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.network.request.BackupRestoreRequestBody;
 import org.elastos.hive.network.request.BackupSaveRequestBody;
 import org.elastos.hive.network.response.BackupStateResponseBody;
 import org.elastos.hive.network.response.HiveResponseBody;
@@ -58,17 +59,27 @@ class BackupServiceRender implements BackupService {
 
 	@Override
 	public CompletableFuture<Void> stopBackup() {
+		//TODO:
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public CompletableFuture<Void> restoreFrom() {
-		// TODO Auto-generated method stub
-		return null;
+		return CompletableFuture.runAsync(() -> {
+			try {
+				Response<HiveResponseBody> response = connectionManager.getBackupApi()
+						.restoreFromNode(new BackupRestoreRequestBody(tokenResolver.getToken().getAccessToken()))
+						.execute();
+				HiveResponseBody.validateBody(response);
+			} catch (HiveException | IOException e) {
+				throw new CompletionException(new HiveException(e.getMessage()));
+			}
+		});
 	}
 
 	@Override
 	public CompletableFuture<Void> stopRestore() {
+		//TODO:
 		throw new UnsupportedOperationException();
 	}
 
