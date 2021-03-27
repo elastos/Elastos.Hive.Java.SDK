@@ -53,6 +53,7 @@ public class ConnectionManager {
 	private AuthApi authApi;
 	private FilesApi filesApi;
 	private ScriptingApi scriptingApi;
+	private BackupApi backupApi;
 
 	public ConnectionManager(AppContext context) {
 		this.context = context;
@@ -100,6 +101,13 @@ public class ConnectionManager {
 			scriptingApi = createService(ScriptingApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return scriptingApi;
+	}
+
+	public BackupApi getBackupApi() {
+		if (backupApi == null) {
+			backupApi = createService(BackupApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
+		}
+		return backupApi;
 	}
 
 	public HttpURLConnection openConnection(String path) throws IOException {

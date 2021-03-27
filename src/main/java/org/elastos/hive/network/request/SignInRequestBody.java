@@ -1,9 +1,9 @@
 package org.elastos.hive.network.request;
 
 public class SignInRequestBody {
-    private Object document;
+    private final Object document;
 
-    public void setDocument(Object document) {
+    public SignInRequestBody(Object document) {
         this.document = document;
     }
 }

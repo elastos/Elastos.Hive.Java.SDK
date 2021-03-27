@@ -4,7 +4,9 @@ import java.util.concurrent.CompletableFuture;
 
 public interface BackupService {
 	enum BackupResult {
-
+		STATE_STOP,
+		STATE_BACKUP,
+		STATE_RESTORE,
 	}
 
 	CompletableFuture<Void> setupContext(BackupContext context);
