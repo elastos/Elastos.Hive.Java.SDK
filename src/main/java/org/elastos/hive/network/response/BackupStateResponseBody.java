@@ -11,10 +11,10 @@ public class BackupStateResponseBody extends HiveResponseBody {
     private String result;
 
     public BackupService.BackupResult getStatusResult() throws HiveException {
-        if (!"success".equals(hiveBackupState))
+        if (!"success".equals(result))
             throw new HiveException("Failed to get back-up state.");
 
-        switch (result) {
+        switch (hiveBackupState) {
             case "stop":
                 return BackupService.BackupResult.STATE_STOP;
             case "backup":

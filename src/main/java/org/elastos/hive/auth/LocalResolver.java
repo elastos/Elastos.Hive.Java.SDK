@@ -20,11 +20,13 @@ public class LocalResolver implements TokenResolver {
 
 	private static final String TOKEN_FOLDER = "/tokens";
 
+	private String type;
 	private String tokenPath;
 	private TokenResolver nextResolver;
 	private AuthToken token;
 
 	public LocalResolver(String ownerDid, String providerAddress, String type, String cacheDir) {
+		this.type = type;
 		String rootDir = cacheDir + TOKEN_FOLDER;
 		File root = new File(rootDir);
 
