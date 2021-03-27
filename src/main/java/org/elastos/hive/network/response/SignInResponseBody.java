@@ -21,7 +21,7 @@ public class SignInResponseBody extends HiveResponseBody {
             throw new HiveException("Bad jwt expiration date");
 
         if (!claims.getAudience().equals(validAudience))
-            throw new HiveException("Bad jwt audidence value");
+            throw new HiveException("Bad jwt audience value");
 
         return claims;
     }

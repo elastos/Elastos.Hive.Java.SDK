@@ -52,7 +52,10 @@ public class HiveResponseBody {
      * @throws HiveException
      */
     public static <T extends HiveResponseBody> T validateBody(Response<T> response) throws HiveException {
-        T body = response.body();
+        return validateBody(response.body());
+    }
+
+    public static <T extends HiveResponseBody> T validateBody(T body) throws HiveException {
         if (body == null)
             throw new HiveException("Failed to get response body(null)");
         if (body.failed())
