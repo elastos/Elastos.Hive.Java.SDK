@@ -40,13 +40,15 @@ public class RemoteResolver implements TokenResolver {
 
 	private String signIn() throws HiveException {
 		try {
-			SignInResponseBody rspBody = connectionManager.getAuthApi()
-					.signIn(new SignInRequestBody(new ObjectMapper().readValue(
-							contextProvider.getAppInstanceDocument().toString(), HashMap.class)))
-					.execute()
-					.body();
-			HiveResponseBody.validateBody(rspBody)
-					.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
+			SignInResponseBody rspBody = HiveResponseBody.validateBody(
+					connectionManager.getAuthApi()
+							.signIn(new SignInRequestBody(new ObjectMapper()
+									.readValue(
+											contextProvider.getAppInstanceDocument().toString(),
+											HashMap.class)))
+							.execute()
+							.body());
+			rspBody.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
 			return contextProvider.getAuthorization(rspBody.getChallenge()).get();
 		} catch (Exception e) {
 			throw new HiveException(e.getMessage());
@@ -55,12 +57,12 @@ public class RemoteResolver implements TokenResolver {
 
 	private AuthToken auth(String token) throws HiveException {
 		try {
-			AuthResponseBody rspBody = connectionManager.getAuthApi()
+			AuthResponseBody rspBody = HiveResponseBody.validateBody(
+					connectionManager.getAuthApi()
 					.auth(new AuthRequestBody(token))
 					.execute()
-					.body();
-			long exp = JwtUtil.getBody(HiveResponseBody.validateBody(rspBody)
-					.getToken()).getExpiration().getTime();
+					.body());
+			long exp = JwtUtil.getBody(rspBody.getToken()).getExpiration().getTime();
 			long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
 			return new AuthToken(rspBody.getToken(), expiresTime, AuthToken.TYPE_TOKEN);
 		} catch (Exception e) {
