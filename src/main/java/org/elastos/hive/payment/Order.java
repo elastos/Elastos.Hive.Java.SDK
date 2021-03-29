@@ -1,71 +1,60 @@
 package org.elastos.hive.payment;
 
+import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.Result;
 
+import java.util.List;
+
 public class Order extends Result<Order> {
-	private String orderHash;
-	private String inAppDid;
-	private String subscriberDid;
-
-	private float payAmount;
-	private String payCurrency;    	// ELA in default.
-
-	private String pricingPlan;
-
-	private long createdTime;
-	private long expiredTime;
-
-	private String signature;
-
-	private PaymentStatus status;
-
-	private String receiveAddress; // receive token ela address
-
-	public enum PaymentStatus {
-		Unpaid,
-		Paid,
-		Expired
-	};
+	@SerializedName("order_id")
+	private String orderId;
+	private String did;
+	@SerializedName("app_id")
+	private String appId;
+	@SerializedName("pricing_info")
+	private PricingPlan pricingInfo;
+	@SerializedName("pay_txids")
+	private List<String> payTxids;
+	private String state;
+	private String type;
+	@SerializedName("creat_time")
+	private long createTime;
+	@SerializedName("finish_time")
+	private long finishTime;
 
 	public String getOrderId() {
-		return orderHash;
+		return orderId;
 	}
 
-	public String getInAppDid() {
-		return inAppDid;
+	public String getDid() {
+		return did;
 	}
 
-	public String getSubscriberDid() {
-		return subscriberDid;
+	public String getAppId() {
+		return appId;
 	}
 
-	public float getPayAmount() {
-		return payAmount;
+	public PricingPlan getPricingInfo() {
+		return pricingInfo;
 	}
 
-	public String getPayCurrency() {
-		return payCurrency;
+	public List<String> getPayTxids() {
+		return payTxids;
 	}
 
-	public long getCreatedTime() {
-		return createdTime;
+	public String getState() {
+		return state;
 	}
 
-	public long getExpiredTime() {
-		return expiredTime;
+	public String getType() {
+		return type;
 	}
 
-	public String getPricingPlan() {
-		return pricingPlan;
+	public long getCreateTime() {
+		return createTime;
 	}
 
-	public String getSignature() {
-		return signature;
+	public long getFinishTime() {
+		return finishTime;
 	}
-
-	public String getPaymentStatus() {
-		return status.toString();
-	}
-
-
 }
