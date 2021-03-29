@@ -126,7 +126,7 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 			try {
 				paymentService.payOrder(orderId, transIds);
 				//TODO:
-				return null;
+				return new Receipt();
 			} catch (HiveException e) {
 				throw new CompletionException(e);
 			}
