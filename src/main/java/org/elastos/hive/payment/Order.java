@@ -18,9 +18,9 @@ public class Order extends Result<Order> {
 	private String state;
 	private String type;
 	@SerializedName("creat_time")
-	private long createTime;
+	private double createTime;
 	@SerializedName("finish_time")
-	private long finishTime;
+	private double finishTime;
 
 	public String getOrderId() {
 		return orderId;
@@ -50,11 +50,11 @@ public class Order extends Result<Order> {
 		return type;
 	}
 
-	public long getCreateTime() {
+	public double getCreateTime() {
 		return createTime;
 	}
 
-	public long getFinishTime() {
+	public double getFinishTime() {
 		return finishTime;
 	}
 }
