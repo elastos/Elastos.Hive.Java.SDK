@@ -6,9 +6,8 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.service.FilesService;
 import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Order;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -19,11 +18,11 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FilesServiceTest {
 
 	@Test
-	public void test01_uploadText() {
+	@Order(1)
+	public void testUploadText() {
 		try (Writer writer = filesService.upload(remoteTextPath, Writer.class).exceptionally(e -> {
 			fail();
 			return null;
@@ -41,7 +40,8 @@ public class FilesServiceTest {
 	}
 
 	@Test
-	public void test02_uploadBin() {
+	@Order(2)
+	public void testUploadBin() {
 		try (OutputStream out = filesService.upload(remoteImgPath, OutputStream.class).exceptionally(e->{
 			fail();
 			return null;
@@ -57,7 +57,8 @@ public class FilesServiceTest {
 	}
 
 	@Test
-	public void test03_downloadText() {
+	@Order(3)
+	public void testDownloadText() {
 		try (Reader reader = filesService.download(remoteTextPath, Reader.class).exceptionally(e->{
 			fail();
 			return null;
@@ -71,7 +72,8 @@ public class FilesServiceTest {
 	}
 
 	@Test
-	public void test04_downloadBin() {
+	@Order(4)
+	public void testDownloadBin() {
 		try (InputStream in = filesService.download(remoteImgPath, InputStream.class).exceptionally(e->{
 			fail();
 			return null;
@@ -85,7 +87,8 @@ public class FilesServiceTest {
 	}
 
 	@Test
-	public void test05_list() {
+	@Order(5)
+	public void testList() {
 		try {
 			List<FileInfo> files = filesService.list(remoteRootPath).exceptionally(e->{
 				fail();
@@ -99,7 +102,8 @@ public class FilesServiceTest {
 	}
 
 	@Test
-	public void test06_hash() {
+	@Order(6)
+	public void testHash() {
 		try {
 			String hash = filesService.hash(remoteTextPath).exceptionally(e->{
 				fail();
@@ -113,7 +117,8 @@ public class FilesServiceTest {
 	}
 
 	@Test
-	public void test07_move() {
+	@Order(7)
+	public void testMove() {
 		try {
 			Boolean isSuccess = filesService.delete(remoteTextBackupPath)
 					.thenCompose(result -> filesService.move(remoteTextPath, remoteTextBackupPath))
@@ -130,7 +135,8 @@ public class FilesServiceTest {
 	}
 
 	@Test
-	public void test08_copy() {
+	@Order(8)
+	public void testCopy() {
 		try {
 			Boolean isSuccess = filesService.copy(remoteTextBackupPath, remoteTextPath)
 					.exceptionally(e->{
@@ -146,7 +152,8 @@ public class FilesServiceTest {
 	}
 
 	@Test
-	public void test09_deleteFile() {
+	@Order(9)
+	public void testDeleteFile() {
 		try {
 			Boolean isSuccess = filesService.delete(remoteTextPath)
 					.thenCompose(result -> filesService.delete(remoteTextBackupPath))
