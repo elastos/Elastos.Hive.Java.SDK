@@ -4,16 +4,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class FilesMoveRequestBody {
     @SerializedName("src_path")
-    private String srcPath;
+    private final String srcPath;
 
     @SerializedName("dst_path")
-    private String dstPath;
+    private final String dstPath;
 
-    public void setSrcPath(String srcPath) {
+    public FilesMoveRequestBody(String srcPath, String dstPath) {
         this.srcPath = srcPath;
-    }
-
-    public void setDstPath(String dstPath) {
         this.dstPath = dstPath;
     }
 }
