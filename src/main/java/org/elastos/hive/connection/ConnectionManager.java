@@ -54,6 +54,7 @@ public class ConnectionManager {
 	private FilesApi filesApi;
 	private ScriptingApi scriptingApi;
 	private BackupApi backupApi;
+	private NodeManageApi nodeManageApi;
 
 	public ConnectionManager(AppContext context) {
 		this.context = context;
@@ -66,6 +67,13 @@ public class ConnectionManager {
 			authApi = createService(AuthApi.class, this.context.getProviderAddress(), this.authRequestInterceptor);
 
 		return authApi;
+	}
+
+	public NodeManageApi getNodeManagerApi() {
+		if (nodeManageApi == null)
+			nodeManageApi = createService(NodeManageApi.class, this.context.getProviderAddress(), this.authRequestInterceptor);
+
+		return nodeManageApi;
 	}
 
 	public FilesApi getFilesApi() {
