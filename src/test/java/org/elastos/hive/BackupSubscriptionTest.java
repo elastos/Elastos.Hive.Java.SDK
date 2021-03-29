@@ -22,7 +22,7 @@ public class BackupSubscriptionTest {
 	@Test
 	public void testSubscribe() {
 		try {
-			subscription.subscribe()
+			subscription.subscribe("fake_name")
 					.whenComplete((result, ex) -> {
 						if (ex != null) {
 							ex.printStackTrace();

@@ -2,8 +2,8 @@ package org.elastos.hive.service;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface SubscriptionService {
-	<T> CompletableFuture<T> subscribe(String pricingPlan, Class<T> type);
+public interface SubscriptionService<T> {
+	CompletableFuture<T> subscribe(String pricingPlan);
 
 	CompletableFuture<Void> unsubscribe();
 
@@ -11,5 +11,5 @@ public interface SubscriptionService {
 
 	CompletableFuture<Void> deactivate();
 
-	<T> CompletableFuture<T> checkSubscription();
+	CompletableFuture<T> checkSubscription();
 }

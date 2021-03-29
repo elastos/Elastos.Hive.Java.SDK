@@ -16,7 +16,7 @@ public interface PaymentService {
 
 	CompletableFuture<Order> getOrder(String orderId);
 
-	CompletableFuture<Receipt> payOrder(String orderId, String transId);
+	CompletableFuture<Receipt> payOrder(String orderId, List<String> transIds);
 
 	CompletableFuture<Receipt> getReceipt(String receiptId);
 
