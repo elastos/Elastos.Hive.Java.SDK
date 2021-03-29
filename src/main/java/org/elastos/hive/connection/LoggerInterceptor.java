@@ -44,7 +44,7 @@ public class LoggerInterceptor implements Interceptor {
 
         Request request = chain.request();
 
-        LogUtil.d("request url->" + request.url().toString());
+        LogUtil.d("request ->" + request.method() + ", url->" + request.url().toString());
         LogUtil.d("request headers->" + request.headers().toString());
 
         RequestBody requestBody = request.body();
