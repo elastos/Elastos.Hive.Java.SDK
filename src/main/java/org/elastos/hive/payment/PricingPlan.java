@@ -1,41 +1,54 @@
 package org.elastos.hive.payment;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import org.elastos.hive.Result;
-
-public class PricingPlan extends Result<PricingPlan> {
-	private String planName;
-	private int quota;
-	private int serviceDays;
-	private float payAmount;
+public class PricingPlan {
+	private float amount;
 	private String currency;
+	private int maxStorage;
+	private String name;
+	private int serviceDays;
 
-	@SuppressWarnings("unused")
-	private String description;
-
-	@JsonProperty("planName")
-	public String getPlanName() {
-		return planName;
+	public PricingPlan setAmount(float amount) {
+		this.amount = amount;
+		return this;
 	}
 
-	@JsonProperty("quota")
-	public int getStorageQuota() {
-		return quota;
+	public PricingPlan setCurrency(String currency) {
+		this.currency = currency;
+		return this;
 	}
 
-	@JsonProperty("serviceDays")
-	public int getServiceDays() {
-		return serviceDays;
+	public PricingPlan setMaxStorage(int maxStorage) {
+		this.maxStorage = maxStorage;
+		return this;
 	}
 
-	@JsonProperty("payAmount")
-	public float getPayAmount() {
-		return payAmount;
+	public PricingPlan setName(String name) {
+		this.name = name;
+		return this;
 	}
 
-	@JsonProperty("currency")
+	public PricingPlan setServiceDays(int serviceDays) {
+		this.serviceDays = serviceDays;
+		return this;
+	}
+
+	public float getAmount() {
+		return amount;
+	}
+
 	public String getCurrency() {
 		return currency;
+	}
+
+	public int getMaxStorage() {
+		return maxStorage;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getServiceDays() {
+		return serviceDays;
 	}
 }

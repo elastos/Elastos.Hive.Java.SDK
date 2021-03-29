@@ -1,144 +1,131 @@
 package org.elastos.hive;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.exception.BackupAlreadyExistException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
-import org.elastos.hive.subscribe.CreateServiceResult;
+import org.elastos.hive.vault.PaymentServiceRender;
+import org.elastos.hive.vault.SubscriptionServiceRender;
 
-import retrofit2.Response;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
-public class BackupSubscription {
-	private SubscriptionRender render;
+public class BackupSubscription extends ServiceEndpoint implements SubscriptionService<BackupSubscription.BackupInfo>, PaymentService {
+	private SubscriptionServiceRender subscriptionService;
+	private PaymentServiceRender paymentService;
 
 	public BackupSubscription(AppContext context, String userDid, String providerAddress) throws HiveException {
-		render = new SubscriptionRender(context, userDid, providerAddress);
+		super(context, providerAddress, userDid);
+		this.paymentService = new PaymentServiceRender(context);
+		this.subscriptionService = new SubscriptionServiceRender(context);
 	}
 
-	public CompletableFuture<BackupInfo> subscribe() {
-		return render.subscribe(null, BackupInfo.class);
-	}
-
+	@Override
 	public CompletableFuture<BackupInfo> subscribe(String pricingPlan) {
-		return render.subscribe(pricingPlan, BackupInfo.class);
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				this.subscriptionService.subscribeBackup();
+				//TODO:
+				return new BackupSubscription.BackupInfo();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
+	@Override
 	public CompletableFuture<Void> unsubscribe() {
-		return render.unsubscribe();
+		return CompletableFuture.runAsync(() -> {
+			try {
+				this.subscriptionService.unsubscribe();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
+	@Override
 	public CompletableFuture<Void> activate() {
-		return render.activate();
+		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public CompletableFuture<Void> deactivate() {
-		return render.deactivate();
+		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public CompletableFuture<BackupInfo> checkSubscription() {
-		return render.checkSubscription();
+		throw new UnsupportedOperationException();
 	}
 
 	public class BackupInfo {
 		// TODO;
 	}
 
-	class SubscriptionRender extends ServiceEndpoint implements SubscriptionService, PaymentService {
-		private AppContext appContext;
-		private ConnectionManager connectionManager;
-
-		protected SubscriptionRender(AppContext context, String userDid, String providerAddress)
-				throws HiveException {
-			super(context, providerAddress, userDid);
-			this.appContext = context;
-			this.connectionManager = appContext.getConnectionManager();
-		}
-
-		@Override
-		public <T> CompletableFuture<T> subscribe(String pricingPlan, Class<T> type) {
-			return CompletableFuture.supplyAsync(this::subscribeImpl);
-		}
-
-		@Override
-		public CompletableFuture<Void> unsubscribe() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public CompletableFuture<Void> activate() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public CompletableFuture<Void> deactivate() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public <T> CompletableFuture<T> checkSubscription() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public CompletableFuture<Order> placeOrder(String planName) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public CompletableFuture<Order> getOrder(String orderId) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public CompletableFuture<Receipt> payOrder(String orderId, String transId) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public CompletableFuture<Receipt> getReceipt(String receiptId) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		private <T> T subscribeImpl() {
-			BackupInfo backupInfo = new BackupInfo();
-			Response<CreateServiceResult> response;
+	@Override
+	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
+		return CompletableFuture.supplyAsync(()-> {
 			try {
-				response = connectionManager.getSubscriptionApi().createBackupVault().execute();
-				if (response.body().existing()) {
-					throw new BackupAlreadyExistException("The backup service already exists");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
+				return paymentService.getBackupPlanList();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
-			return (T) backupInfo;
-		}
+		});
 	}
+
+	@Override
+	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				return paymentService.getBackupPlan(planName);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<Order> placeOrder(String planName) {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				return paymentService.getOrderInfo(paymentService.createBackupOrder(planName));
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<Order> getOrder(String orderId) {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				return paymentService.getOrderInfo(orderId);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<Receipt> payOrder(String orderId, List<String> transIds) {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				paymentService.payOrder(orderId, transIds);
+				//TODO:
+				return null;
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<Receipt> getReceipt(String receiptId) {
+		throw new UnsupportedOperationException();
+	}
+
 }

@@ -1,7 +1,8 @@
 package org.elastos.hive.network;
 
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
+import org.elastos.hive.network.request.PayOrderRequestBody;
+import org.elastos.hive.network.request.PaymentCreateRequestBody;
+import org.elastos.hive.network.response.*;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -10,26 +11,26 @@ import retrofit2.http.Query;
 
 public interface PaymentApi {
 	@GET(BaseApi.API_VERSION + "/payment/vault_package_info")
-	Call<ResponseBody> getPackageInfo();
+	Call<PaymentPackageResponseBody> getPackageInfo();
 
 	@GET(BaseApi.API_VERSION + "/payment/vault_pricing_plan")
-	Call<ResponseBody> getPricingPlan(@Query("name") String name);
+	Call<PaymentPlanResponseBody> getPricingPlan(@Query("name") String name);
+
+	@GET(BaseApi.API_VERSION + "/payment/vault_backup_plan")
+	Call<PaymentPlanResponseBody> getBackupPlan(@Query("name") String name);
 
 	@POST(BaseApi.API_VERSION + "/payment/create_vault_package_order")
-	Call<ResponseBody> createOrder(@Body RequestBody body);
+	Call<PaymentCreateResponseBody> createOrder(@Body PaymentCreateRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/payment/pay_vault_package_order")
-	Call<ResponseBody> payOrder(@Body RequestBody body);
+	Call<HiveResponseBody> payOrder(@Body PayOrderRequestBody body);
 
 	@GET(BaseApi.API_VERSION + "/payment/vault_package_order")
-	Call<ResponseBody> getOrderInfo(@Query("order_id") String orderId);
+	Call<OrderInfoResponseBody> getOrderInfo(@Query("order_id") String orderId);
 
 	@GET(BaseApi.API_VERSION + "/payment/vault_package_order_list")
-	Call<ResponseBody> getOrderList();
-
-	@GET(BaseApi.API_VERSION + "/service/vault")
-	Call<ResponseBody> getServiceInfo();
+	Call<OrderListResponseBody> getOrderList();
 
 	@GET(BaseApi.API_VERSION + "/payment/version")
-	Call<ResponseBody> getPaymentVersion();
+	Call<PaymentVersionResponseBody> getPaymentVersion();
 }
