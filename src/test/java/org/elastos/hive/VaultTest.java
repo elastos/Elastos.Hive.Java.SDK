@@ -3,13 +3,25 @@ package org.elastos.hive;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.HiveException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 public class VaultTest {
+	private static Vault vault;
+
+	@BeforeAll
+	public static void setUp() {
+		try {
+			vault = TestData.getInstance().newVault();
+		} catch (HiveException | DIDException e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
 	@Test
 	public void testGetFiles() {
 	}
@@ -53,16 +65,4 @@ public class VaultTest {
 			fail();
 		}
 	}
-
-	@BeforeClass
-	public static void setUp() {
-		try {
-			vault = TestData.getInstance().newVault();
-		} catch (HiveException | DIDException e) {
-			e.printStackTrace();
-			fail();
-		}
-	}
-
-	private static Vault vault;
 }
