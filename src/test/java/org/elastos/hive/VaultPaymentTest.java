@@ -5,16 +5,32 @@ import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class VaultPaymentTest {
     private static final String PRICING_PLAN_NAME = "Rookie";
+
+    private static PaymentService paymentService;
+
+    @BeforeAll
+    public static void setUp() {
+        try {
+            TestData testData = TestData.getInstance();
+            paymentService = new VaultSubscription(testData.getAppContext(), testData.getOwnerDid(), testData.getProviderAddress());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 
     @Test
     @org.junit.jupiter.api.Order(1)
@@ -66,19 +82,6 @@ public class VaultPaymentTest {
                 return null;
             }).get();
             assertNotNull(receipt);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    private static PaymentService paymentService;
-
-    @BeforeClass
-    public static void setUp() {
-        try {
-            TestData testData = TestData.getInstance();
-            paymentService = new VaultSubscription(testData.getAppContext(), testData.getOwnerDid(), testData.getProviderAddress());
         } catch (Exception e) {
             e.printStackTrace();
             fail();

@@ -5,9 +5,7 @@ import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.service.FilesService;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -18,7 +16,45 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FilesServiceTest {
+	private final String textLocalPath;
+	private final String imgLocalPath;
+	private final String rootLocalCachePath;
+	@SuppressWarnings("unused")
+	private final String textLocalCachePath;
+	@SuppressWarnings("unused")
+	private final String imgLocalCachePath;
+
+	private final String remoteRootPath;
+	private final String remoteTextPath;
+	private final String remoteImgPath;
+	private final String remoteTextBackupPath;
+
+	private static FilesService filesService;
+
+	public FilesServiceTest() {
+		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
+		textLocalPath = localRootPath +"test.txt";
+		imgLocalPath = localRootPath +"big.png";
+		rootLocalCachePath = localRootPath + "cache/file/";
+		textLocalCachePath = rootLocalCachePath + "test.txt";
+		imgLocalCachePath = rootLocalCachePath + "/big.png";
+
+		remoteRootPath = "hive";
+		remoteTextPath = remoteRootPath + File.separator + "test.txt";
+		remoteImgPath = remoteRootPath + File.separator + "big.png";
+		remoteTextBackupPath = "backup" + File.separator + "test.txt";
+	}
+
+	@BeforeAll
+	public static void setUp() {
+		try {
+			filesService = TestData.getInstance().newVault().getFilesService();
+		} catch (HiveException | DIDException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Test
 	@Order(1)
@@ -223,43 +259,5 @@ public class FilesServiceTest {
 			e.printStackTrace();
 		}
 		return false;
-	}
-
-	@BeforeClass
-	public static void setUp() {
-		try {
-			filesService = TestData.getInstance().newVault().getFilesService();
-		} catch (HiveException | DIDException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private final String textLocalPath;
-	private final String imgLocalPath;
-	private final String rootLocalCachePath;
-	@SuppressWarnings("unused")
-	private final String textLocalCachePath;
-	@SuppressWarnings("unused")
-	private final String imgLocalCachePath;
-
-	private final String remoteRootPath;
-	private final String remoteTextPath;
-	private final String remoteImgPath;
-	private final String remoteTextBackupPath;
-
-	private static FilesService filesService;
-
-	public FilesServiceTest() {
-		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
-		textLocalPath = localRootPath +"test.txt";
-		imgLocalPath = localRootPath +"big.png";
-		rootLocalCachePath = localRootPath + "cache/file/";
-		textLocalCachePath = rootLocalCachePath + "test.txt";
-		imgLocalCachePath = rootLocalCachePath + "/big.png";
-
-		remoteRootPath = "hive";
-		remoteTextPath = remoteRootPath + File.separator + "test.txt";
-		remoteImgPath = remoteRootPath + File.separator + "big.png";
-		remoteTextBackupPath = "backup" + File.separator + "test.txt";
 	}
 }
