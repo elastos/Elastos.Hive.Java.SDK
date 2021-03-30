@@ -59,9 +59,9 @@ public class RemoteResolver implements TokenResolver {
 		try {
 			AuthResponseBody rspBody = HiveResponseBody.validateBody(
 					connectionManager.getAuthApi()
-					.auth(new AuthRequestBody(token))
-					.execute()
-					.body());
+							.auth(new AuthRequestBody(token))
+							.execute()
+							.body());
 			long exp = JwtUtil.getBody(rspBody.getToken()).getExpiration().getTime();
 			long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
 			return new AuthToken(rspBody.getToken(), expiresTime, AuthToken.TYPE_TOKEN);
