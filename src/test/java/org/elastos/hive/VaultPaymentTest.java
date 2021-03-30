@@ -10,7 +10,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -77,10 +77,11 @@ public class VaultPaymentTest {
                 return null;
             }).get();
             assertNotNull(order);
-            Receipt receipt = paymentService.payOrder(order.getOrderId(), Arrays.asList("abcd","efgh")).exceptionally(e->{
-                fail();
-                return null;
-            }).get();
+            Receipt receipt = paymentService.payOrder(order.getOrderId(), Collections.emptyList())
+                    .exceptionally(e -> {
+                        fail();
+                        return null;
+                    }).get();
             assertNotNull(receipt);
         } catch (Exception e) {
             e.printStackTrace();
