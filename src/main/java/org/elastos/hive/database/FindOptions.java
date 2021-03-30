@@ -1,274 +1,165 @@
 package org.elastos.hive.database;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FindOptions extends Options<FindOptions> {
-	@JsonProperty("projection")
+public class FindOptions {
 	private Map<String, Object> projection;
-	@JsonProperty("skip")
 	private Long skip;
-	@JsonProperty("limit")
 	private Long limit;
-	@JsonProperty("no_cursor_timeout")
+	@SerializedName("no_cursor_timeout")
 	private Boolean noCursorTimeout;
-	@JsonProperty("sort")
-	@JsonFormat(with = {JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY,
-			JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
 	private List<Index> sort;
-	@JsonProperty("allow_partial_results")
+	@SerializedName("allow_partial_results")
 	private Boolean allowPartialResults;
-	@JsonProperty("batch_size")
+	@SerializedName("batch_size")
 	private Integer batchSize;
-	@JsonProperty("collation")
 	private Collation collation;
-	@JsonProperty("return_key")
+	@SerializedName("return_key")
 	private Boolean returnKey;
-	@JsonProperty("hint")
-	@JsonFormat(with = {JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY,
-			JsonFormat.Feature.WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED})
 	private List<Index> hint;
-	@JsonProperty("max_time_ms")
+	@SerializedName("max_time_ms")
 	private Integer maxTimeMS;
-	@JsonProperty("min")
 	private Integer min;
-	@JsonProperty("max")
 	private Integer max;
-	@JsonProperty("comment")
 	private String comment;
-	@JsonProperty("allow_disk_use")
+	@SerializedName("allow_disk_use")
 	private Boolean allowDiskUse;
 
-	public FindOptions() {
-	}
-
-	public FindOptions projection(Map<String, Object> value) {
-		if (value == null || value.isEmpty()) {
-			projection = null;
-			return this;
-		}
-
-		projection = new HashMap<String, Object>(value);
-		return this;
-	}
-
-	public FindOptions projection(JsonNode value) {
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> p = mapper.convertValue(value,
-				new TypeReference<Map<String, Object>>() {});
-
-		return projection(p);
-	}
-
-	public Map<String, Object> projection() {
+	public Map<String, Object> getProjection() {
 		return projection;
 	}
 
-	public FindOptions skip(long value) {
-		skip = value;
+	public FindOptions setProjection(Map<String, Object> projection) {
+		this.projection = projection;
 		return this;
 	}
 
-	public Long skip() {
+	public Long getSkip() {
 		return skip;
 	}
 
-	public FindOptions limit(long value) {
-		limit = value;
+	public FindOptions setSkip(Long skip) {
+		this.skip = skip;
 		return this;
 	}
 
-	public Long limit() {
+	public Long getLimit() {
 		return limit;
 	}
 
-	public FindOptions noCursorTimeout(boolean value) {
-		noCursorTimeout = value;
+	public FindOptions setLimit(Long limit) {
+		this.limit = limit;
 		return this;
 	}
 
-	public Boolean noCursorTimeout() {
+	public Boolean getNoCursorTimeout() {
 		return noCursorTimeout;
 	}
 
-	public FindOptions sort(Index value) {
-		if (value == null) {
-			sort = null;
-			return this;
-		}
-
-		if (sort == null)
-			sort = new ArrayList<Index>();
-
-		sort.add(value);
+	public FindOptions setNoCursorTimeout(Boolean noCursorTimeout) {
+		this.noCursorTimeout = noCursorTimeout;
 		return this;
 	}
 
-	public FindOptions sort(List<Index> value) {
-		if (value == null || value.isEmpty()) {
-			sort = null;
-			return this;
-
-		}
-
-		if (sort == null)
-			sort = new ArrayList<Index>();
-
-		sort.addAll(value);
-		return this;
-	}
-
-	public FindOptions sort(Index[] value) {
-		if (value == null || value.length == 0) {
-			sort = null;
-			return this;
-		}
-
-		if (sort == null)
-			sort = new ArrayList<Index>();
-
-		sort.addAll(Arrays.asList(value));
-		return this;
-	}
-
-	public List<Index> sort() {
+	public List<Index> getSort() {
 		return sort;
 	}
 
-	public FindOptions allowPartialResults(boolean value) {
-		allowPartialResults = value;
+	public FindOptions setSort(List<Index> sort) {
+		this.sort = sort;
 		return this;
 	}
 
-	public Boolean allowPartialResults() {
+	public Boolean getAllowPartialResults() {
 		return allowPartialResults;
 	}
 
-	public FindOptions batchSize(int value) {
-		batchSize = value;
+	public FindOptions setAllowPartialResults(Boolean allowPartialResults) {
+		this.allowPartialResults = allowPartialResults;
 		return this;
 	}
 
-	public Integer batchSize() {
+	public Integer getBatchSize() {
 		return batchSize;
 	}
 
-	public FindOptions collation(Collation value) {
-		collation = value;
+	public FindOptions setBatchSize(Integer batchSize) {
+		this.batchSize = batchSize;
 		return this;
 	}
 
-	public Collation collation() {
+	public Collation getCollation() {
 		return collation;
 	}
 
-	public FindOptions returnKey(boolean value) {
-		returnKey = value;
+	public FindOptions setCollation(Collation collation) {
+		this.collation = collation;
 		return this;
 	}
 
-	public Boolean returnKey() {
+	public Boolean getReturnKey() {
 		return returnKey;
 	}
 
-	public FindOptions hint(Index value) {
-		if (value == null) {
-			hint = null;
-			return this;
-		}
-		if (hint == null)
-			hint = new ArrayList<Index>();
-
-		hint.add(value);
+	public FindOptions setReturnKey(Boolean returnKey) {
+		this.returnKey = returnKey;
 		return this;
 	}
 
-	public FindOptions hint(List<Index> value) {
-		if (value == null || value.isEmpty()) {
-			hint = null;
-			return this;
-		}
-
-		if (hint == null)
-			hint = new ArrayList<Index>();
-
-		hint.addAll(value);
-		return this;
-	}
-
-	public FindOptions hint(Index[] value) {
-		if (value == null || value.length == 0) {
-			hint = null;
-			return this;
-		}
-
-		if (hint == null)
-			hint = new ArrayList<Index>();
-
-		hint.addAll(Arrays.asList(value));
-		return this;
-	}
-
-	public List<Index> hint() {
+	public List<Index> getHint() {
 		return hint;
 	}
 
-
-	public FindOptions maxTimeMS(int value) {
-		maxTimeMS =  value;
+	public FindOptions setHint(List<Index> hint) {
+		this.hint = hint;
 		return this;
 	}
 
-	public Integer maxTimeMS() {
+	public Integer getMaxTimeMS() {
 		return maxTimeMS;
 	}
 
-	public FindOptions min(int value) {
-		min = value;
+	public FindOptions setMaxTimeMS(Integer maxTimeMS) {
+		this.maxTimeMS = maxTimeMS;
 		return this;
 	}
 
-	public Integer min() {
+	public Integer getMin() {
 		return min;
 	}
 
-	public FindOptions max(int value) {
-		max = value;
+	public FindOptions setMin(Integer min) {
+		this.min = min;
 		return this;
 	}
 
-	public Integer max() {
+	public Integer getMax() {
 		return max;
 	}
 
-	public FindOptions comment(String value) {
-		comment = value;
+	public FindOptions setMax(Integer max) {
+		this.max = max;
 		return this;
 	}
 
-	public String comment() {
+	public String getComment() {
 		return comment;
 	}
 
-	public FindOptions allowDiskUse(boolean value) {
-		allowDiskUse = value;
+	public FindOptions setComment(String comment) {
+		this.comment = comment;
 		return this;
 	}
 
-	public Boolean allowDiskUse() {
+	public Boolean getAllowDiskUse() {
 		return allowDiskUse;
 	}
 
-	public static FindOptions deserialize(String content) {
-		return deserialize(content, FindOptions.class);
+	public FindOptions setAllowDiskUse(Boolean allowDiskUse) {
+		this.allowDiskUse = allowDiskUse;
+		return this;
 	}
 }

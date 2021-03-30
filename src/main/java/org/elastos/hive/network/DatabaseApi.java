@@ -1,42 +1,42 @@
 package org.elastos.hive.network;
 
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
+import org.elastos.hive.network.request.*;
+import org.elastos.hive.network.response.*;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 public interface DatabaseApi {
 	@POST(BaseApi.API_VERSION + "/db/create_collection")
-	Call<ResponseBody> createCollection(@Body RequestBody body);
+	Call<HiveResponseBody> createCollection(@Body CreateCollectionRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/db/delete_collection")
-	Call<ResponseBody> deleteCollection(@Body RequestBody body);
+	Call<HiveResponseBody> deleteCollection(@Body DeleteCollectionRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/db/insert_one")
-	Call<ResponseBody> insertOne(@Body RequestBody body);
+	Call<InsertDocResponseBody> insertOne(@Body InsertDocRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/db/insert_many")
-	Call<ResponseBody> insertMany(@Body RequestBody body);
+	Call<InsertDocsResponseBody> insertMany(@Body InsertDocsRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/db/update_one")
-	Call<ResponseBody> updateOne(@Body RequestBody body);
+	Call<UpdateDocResponseBody> updateOne(@Body UpdateDocRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/db/update_many")
-	Call<ResponseBody> updateMany(@Body RequestBody body);
+	Call<UpdateDocResponseBody> updateMany(@Body UpdateDocRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/db/delete_one")
-	Call<ResponseBody> deleteOne(@Body RequestBody body);
+	Call<DeleteDocResponseBody> deleteOne(@Body DeleteDocRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/db/delete_many")
-	Call<ResponseBody> deleteMany(@Body RequestBody body);
+	Call<DeleteDocResponseBody> deleteMany(@Body DeleteDocRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/db/count_documents")
-	Call<ResponseBody> countDocs(@Body RequestBody body);
+	Call<CountDocResponseBody> countDocs(@Body CountDocRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/db/find_one")
-	Call<ResponseBody> findOne(@Body RequestBody body);
+	Call<FindDocResponseBody> findOne(@Body FindDocRequestBody body);
 
 	@POST(BaseApi.API_VERSION + "/db/find_many")
-	Call<ResponseBody> findMany(@Body RequestBody body);
+	Call<FindDocsResponseBody> findMany(@Body FindDocsRequestBody body);
 }
