@@ -20,10 +20,10 @@ public interface PubsubApi {
     Call<HiveResponseBody> remove(@Body PubsubRequestBody body);
 
     @GET(BaseApi.API_VERSION + "/pubsub/pub/channels")
-    Call<PubsubChannelsResponseBody> getPublishChannels();
+    Call<PubsubChannelsResponseBody> getPublishedChannels();
 
     @GET(BaseApi.API_VERSION + "/pubsub/sub/channels")
-    Call<PubsubChannelsResponseBody> getSubscribeChannels();
+    Call<PubsubChannelsResponseBody> getSubscribedChannels();
 
     @POST(BaseApi.API_VERSION + "/pubsub/subscribe")
     Call<HiveResponseBody> subscribe(@Body PubsubSubscribeRequestBody body);
@@ -35,5 +35,5 @@ public interface PubsubApi {
     Call<HiveResponseBody> push(@Body PushMessageRequestBody body);
 
     @POST(BaseApi.API_VERSION + "/pubsub/pop")
-    Call<PopMessageResponseBody> push(@Body PopMessageRequestBody body);
+    Call<PopMessageResponseBody> pop(@Body PopMessageRequestBody body);
 }
