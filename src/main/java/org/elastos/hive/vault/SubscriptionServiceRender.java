@@ -21,11 +21,12 @@ public class SubscriptionServiceRender {
 
     public void subscribe() throws HiveException {
         try {
-            VaultCreateResponseBody respBody = connectionManager.getSubscriptionApi()
-                    .createVault()
-                    .execute()
-                    .body();
-            if (HiveResponseBody.validateBody(respBody).getExisting()) {
+            VaultCreateResponseBody body = HiveResponseBody.validateBody(
+                    connectionManager.getSubscriptionApi()
+                            .createVault()
+                            .execute()
+                            .body());
+            if (Boolean.TRUE.equals(body.getExisting())) {
                 throw new VaultAlreadyExistException("The vault already exists");
             }
         } catch (IOException | HiveException e) {
@@ -35,11 +36,12 @@ public class SubscriptionServiceRender {
 
     public void subscribeBackup() throws HiveException {
         try {
-            VaultCreateResponseBody respBody = connectionManager.getSubscriptionApi()
-                    .createBackupVault()
-                    .execute()
-                    .body();
-            if (HiveResponseBody.validateBody(respBody).getExisting()) {
+            VaultCreateResponseBody body = HiveResponseBody.validateBody(
+                    connectionManager.getSubscriptionApi()
+                            .createBackupVault()
+                            .execute()
+                            .body());
+            if (Boolean.TRUE.equals(body.getExisting())) {
                 throw new VaultAlreadyExistException("The backup vault already exists");
             }
         } catch (IOException | HiveException e) {
