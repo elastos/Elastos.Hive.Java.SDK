@@ -151,6 +151,10 @@ public class HiveResponseBody {
         return dicts.stream().map(HiveResponseBody::KeyValueDict2JsonNode).collect(Collectors.toList());
     }
 
+    public static boolean msgContainsCode(String message, int code) {
+        return message != null && message.contains(String.valueOf(code));
+    }
+
     static class Error {
         @SerializedName("code")
         int code;

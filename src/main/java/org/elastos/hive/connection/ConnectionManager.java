@@ -141,20 +141,17 @@ public class ConnectionManager {
 
 	public static void readConnection(HttpURLConnection httpURLConnection) throws IOException {
 		int code = httpURLConnection.getResponseCode();
-		StringBuilder result = new StringBuilder();
 		if (code == 200) {
-			InputStream is = httpURLConnection.getInputStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-			String sCurrentLine = "";
-			while ((sCurrentLine = reader.readLine()) != null)
-				if (sCurrentLine.length() > 0)
-					result.append(sCurrentLine.trim());
-			LogUtil.d("connection", "response content: " + result);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+			StringBuilder result = new StringBuilder();
+			String line = "";
+			while ((line = reader.readLine()) != null)
+				if (line.length() > 0)
+					result.append(line.trim());
+			LogUtil.d("connection", "response content: " + result.toString());
 		} else {
-			result = new StringBuilder("error code:" + code);
-			result.append("error code:").append(code).append(";");
-			result.append("message:").append(httpURLConnection.getResponseMessage()).append(";");
-			throw new IOException("Failed to read connection: " + result);
+			throw new IOException("Failed to read connection with error code:" + code
+					+ ", message:" + httpURLConnection.getResponseMessage());
 		}
 	}
 

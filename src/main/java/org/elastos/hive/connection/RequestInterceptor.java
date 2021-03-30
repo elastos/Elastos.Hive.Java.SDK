@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Elastos Foundation
+ * Copyright (c) 2021 Elastos Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,8 @@ import org.elastos.hive.auth.RemoteResolver;
 import org.elastos.hive.auth.TokenResolver;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -40,13 +42,31 @@ import org.elastos.hive.network.BaseApi;
  * Set token to HTTP request.
  */
 public class RequestInterceptor implements Interceptor {
-    private TokenResolver tokenResolver;
     private final boolean needToken;
+    private TokenResolver tokenResolver;
+    private Map<Integer, String> errorMessages = new HashMap<>();
 
     RequestInterceptor(AppContext context, ConnectionManager connectionManager, boolean needToken) {
         this.tokenResolver = new LocalResolver(context.getUserDid(), context.getProviderAddress(), LocalResolver.TYPE_AUTH_TOKEN, context.getAppContextProvider().getLocalDataDir());
         this.tokenResolver.setNextResolver(new RemoteResolver(context, connectionManager));
         this.needToken = needToken;
+        initErrorMessages(errorMessages);
+    }
+
+    private void initErrorMessages(Map<Integer, String> msgs) {
+        msgs.put(400, "bad request");
+        msgs.put(401, "auth failed");
+        msgs.put(402, "payment required");
+        msgs.put(403, "forbidden");
+        msgs.put(404, "not found");
+        msgs.put(405, "method not allowed");
+        msgs.put(406, "not acceptable");
+        msgs.put(423, "locked");
+        msgs.put(452, "checksum failed or not enough space");
+        msgs.put(500, "internal server error");
+        msgs.put(501, "not implemented");
+        msgs.put(503, "service unavailable");
+        msgs.put(507, "insufficient storage");
     }
 
     RequestInterceptor(AppContext context, ConnectionManager connectionManager) {
@@ -68,11 +88,22 @@ public class RequestInterceptor implements Interceptor {
      * Handle response for common error checking.
      */
     private Response handleResponse(Response response) throws IOException {
-        if (needToken && !response.isSuccessful() && response.code() == 401) {
-            tokenResolver.invalidateToken();
-            throw new IOException("Failed to request for code " + response.code() + "(auth failed)");
-        }
+        if (!response.isSuccessful())
+            handleResponseErrorCode(response.code());
         return response;
+    }
+
+    /**
+     * All error code comes from node service.
+     */
+    private void handleResponseErrorCode(int code) throws IOException {
+        if (needToken && code == 401)
+            tokenResolver.invalidateToken();
+
+        if (errorMessages.containsKey(code))
+            throw new IOException("Failed to request for code " + code + "(" + errorMessages.get(code) + ")");
+        else
+            throw new IOException("Catch an undefined error code " + code);
     }
 
     public AuthToken getAuthToken() throws IOException {
