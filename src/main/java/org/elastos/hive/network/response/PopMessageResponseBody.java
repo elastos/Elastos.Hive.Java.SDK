@@ -1,25 +1,13 @@
 package org.elastos.hive.network.response;
 
+import org.elastos.hive.network.model.ChannelMessage;
+
 import java.util.List;
 
 public class PopMessageResponseBody extends HiveResponseBody {
-    private List<Message> messages;
+    private List<ChannelMessage> messages;
 
-    public List<Message> getMessages() {
+    public List<ChannelMessage> getMessages() {
         return this.messages;
-    }
-
-    public class Message {
-        String message;
-        Long time;
-
-        public Long getTime() {
-            return time;
-        }
-
-        public Message setTime(Long time) {
-            this.time = time;
-            return this;
-        }
     }
 }
