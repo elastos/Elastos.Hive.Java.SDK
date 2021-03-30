@@ -1,31 +1,24 @@
 package org.elastos.hive.database;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import org.elastos.hive.Result;
-
-public class InsertOneResult extends Result<InsertOneResult> {
-	@JsonProperty("acknowledged")
+public class InsertOneResult {
 	private boolean acknowledged;
-	@JsonProperty("inserted_id")
-	@JsonInclude(Include.NON_NULL)
 	private String insertedId;
 
-	@JsonCreator
-	protected InsertOneResult() {}
-
-	public boolean acknowledged() {
+	public boolean isAcknowledged() {
 		return acknowledged;
 	}
 
-	public String insertedId() {
+	public InsertOneResult setAcknowledged(boolean acknowledged) {
+		this.acknowledged = acknowledged;
+		return this;
+	}
+
+	public String getInsertedId() {
 		return insertedId;
 	}
 
-	public static InsertOneResult deserialize(String content) {
-		return deserialize(content, InsertOneResult.class);
+	public InsertOneResult setInsertedId(String insertedId) {
+		this.insertedId = insertedId;
+		return this;
 	}
 }

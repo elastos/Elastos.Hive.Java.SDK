@@ -9,11 +9,7 @@ import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.service.ScriptingService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.*;
 
 import java.io.FileReader;
 import java.io.Reader;
@@ -21,7 +17,7 @@ import java.io.Writer;
 
 import static org.junit.Assert.*;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ScriptingServiceTest {
 	private static final String FIND_NAME = "get_group_messages";
 	private static final String FIND_NO_CONDITION_NAME = "script_no_condition";
@@ -35,10 +31,45 @@ public class ScriptingServiceTest {
 
 	private static final String DATABASE_NAME = "script_database";
 
-	@Test
-	public void test01_registerScriptFind() {
+	private static ScriptingService scriptingService;
+	private static FilesService filesService;
+	private static DatabaseService databaseService;
+
+	private final String localSrcFilePath;
+	private final String localDstFileRoot;
+	private final String localDstFilePath;
+	private final String fileName;
+
+	public ScriptingServiceTest() {
+		fileName = "test.txt";
+		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
+		localSrcFilePath = localRootPath + fileName;
+		localDstFileRoot = localRootPath + "cache/script/";
+		localDstFilePath = localDstFileRoot + fileName;
+	}
+
+	@BeforeAll
+	public static void setUp() {
 		try {
-			ScriptKvItem filter = new ScriptKvItem().putKv("_id","$params.group_id")
+			scriptingService = TestData.getInstance().newVault().getScriptingService();
+			filesService = TestData.getInstance().newVault().getFilesService();
+			databaseService = TestData.getInstance().newVault().getDatabaseService();
+		} catch (HiveException | DIDException e) {
+			e.printStackTrace();
+		}
+		create_test_database();
+	}
+
+	@AfterAll
+	public static void tearDown() {
+		remove_test_database();
+	}
+
+	@Test
+	@Order(1)
+	public void testRegisterScriptFind() {
+		try {
+			KeyValueDict filter = new KeyValueDict().putKv("_id","$params.group_id")
 					.putKv("friends", "$callScripter_did");
 			Boolean isSuccess = scriptingService.registerScript(FIND_NAME,
 					new Condition("verify_user_permission", "queryHasResults",
@@ -57,12 +88,13 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test02_registerScriptFindWithoutCondition() {
+	@Order(2)
+	public void testRegisterScriptFindWithoutCondition() {
 		try {
 			Boolean isSuccess = scriptingService.registerScript(FIND_NO_CONDITION_NAME,
 					new Executable("get_groups", Executable.TYPE_FIND,
 							new ScriptFindBody("groups",
-									new ScriptKvItem().putKv("friends","$caller_did"))),
+									new KeyValueDict().putKv("friends","$caller_did"))),
 					false, false)
 					.exceptionally(e->{
 						fail();
@@ -76,7 +108,8 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test03_callScriptFindWithoutCondition() {
+	@Order(3)
+	public void testCallScriptFindWithoutCondition() {
 		//TODO: A bug on node did_scripting.py line 121: return col maybe None.
 		try {
 			String result = scriptingService.callScript(FIND_NO_CONDITION_NAME,
@@ -93,7 +126,8 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test04_callScriptUrlFindWithoutCondition() {
+	@Order(4)
+	public void testCallScriptUrlFindWithoutCondition() {
 		//TODO: A bug on node did_scripting.py line 121: return col maybe None.
 		try {
 			String result = scriptingService.callScriptUrl(UPLOAD_FILE_NAME,
@@ -110,7 +144,8 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test05_uploadFile() {
+	@Order(5)
+	public void testUploadFile() {
 		registerScriptFileUpload(UPLOAD_FILE_NAME);
 		String transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
 		uploadFileByTransActionId(transactionId);
@@ -170,7 +205,8 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test06_fileDownload() {
+	@Order(6)
+	public void testFileDownload() {
 		FilesServiceTest.removeLocalFile(localDstFilePath);
 		registerScriptFileDownload(DOWNLOAD_FILE_NAME);
 		String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
@@ -228,7 +264,8 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test07_fileProperties() {
+	@Order(7)
+	public void testFileProperties() {
 		registerScriptFileProperties(FILE_PROPERTIES_NAME);
 		callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
 	}
@@ -269,7 +306,8 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test08_fileHash() {
+	@Order(8)
+	public void testFileHash() {
 		registerScriptFileHash(FILE_HASH_NAME);
 		callScriptFileHash(FILE_HASH_NAME, fileName);
 	}
@@ -310,7 +348,8 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test09_insert() {
+	@Order(9)
+	public void testInsert() {
 		registerScriptInsert(INSERT_NAME);
 		callScriptInsert(INSERT_NAME);
 	}
@@ -319,10 +358,10 @@ public class ScriptingServiceTest {
 		try {
 			Boolean isSuccess = scriptingService.registerScript(scriptName,
 					Executable.createInsertExecutable(scriptName,
-							new ScriptInsertExecutableBody(DATABASE_NAME, new ScriptKvItem()
+							new ScriptInsertExecutableBody(DATABASE_NAME, new KeyValueDict()
 									.putKv("author", "$params.author")
 									.putKv("content", "$params.content"),
-									new ScriptKvItem().putKv("bypass_document_validation",false).putKv("ordered",true)
+									new KeyValueDict().putKv("bypass_document_validation",false).putKv("ordered",true)
 								)), false, false)
 					.exceptionally(e->{
 						fail();
@@ -339,7 +378,7 @@ public class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptingService.callScript(scriptName,
 					HiveResponseBody.map2JsonNode(
-							new ScriptKvItem().putKv("author", "John").putKv("content", "message")),
+							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
 					"appId", JsonNode.class)
 					.exceptionally(e->{
 						fail();
@@ -355,7 +394,8 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test10_update() {
+	@Order(10)
+	public void testUpdate() {
 		registerScriptUpdate(UPDATE_NAME);
 		callScriptUpdate(UPDATE_NAME);
 	}
@@ -365,10 +405,10 @@ public class ScriptingServiceTest {
 			Boolean isSuccess = scriptingService.registerScript(scriptName,
 					Executable.createUpdateExecutable(scriptName,
 							new ScriptUpdateExecutableBody().setCollection(DATABASE_NAME)
-								.setFilter(new ScriptKvItem().putKv("author", "$params.author"))
-								.setUpdate(new ScriptKvItem().putKv("$set", new ScriptKvItem()
+								.setFilter(new KeyValueDict().putKv("author", "$params.author"))
+								.setUpdate(new KeyValueDict().putKv("$set", new KeyValueDict()
 										.putKv("author", "$params.author").putKv("content", "$params.content")))
-								.setOptions(new ScriptKvItem().putKv("bypass_document_validation",false)
+								.setOptions(new KeyValueDict().putKv("bypass_document_validation",false)
 										.putKv("upsert",true))
 					), false, false)
 					.exceptionally(e->{
@@ -386,7 +426,7 @@ public class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptingService.callScript(scriptName,
 					HiveResponseBody.map2JsonNode(
-							new ScriptKvItem().putKv("author", "John").putKv("content", "message")),
+							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
 					"appId", JsonNode.class)
 					.exceptionally(e->{
 						fail();
@@ -402,7 +442,8 @@ public class ScriptingServiceTest {
 	}
 
 	@Test
-	public void test11_delete() {
+	@Order(11)
+	public void testDelete() {
 		registerScriptDelete(DELETE_NAME);
 		callScriptDelete(DELETE_NAME);
 	}
@@ -412,7 +453,7 @@ public class ScriptingServiceTest {
 			Boolean isSuccess = scriptingService.registerScript(scriptName,
 					Executable.createDeleteExecutable(scriptName,
 							new ScriptDeleteExecutableBody().setCollection(DATABASE_NAME)
-									.setFilter(new ScriptKvItem().putKv("author", "$params.author"))
+									.setFilter(new KeyValueDict().putKv("author", "$params.author"))
 					), false, false)
 					.exceptionally(e->{
 						fail();
@@ -429,7 +470,7 @@ public class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptingService.callScript(scriptName,
 					HiveResponseBody.map2JsonNode(
-							new ScriptKvItem().putKv("author", "John")),
+							new KeyValueDict().putKv("author", "John")),
 					"appId", JsonNode.class)
 					.exceptionally(e->{
 						fail();
@@ -478,37 +519,4 @@ public class ScriptingServiceTest {
 		}
 	}
 
-	@BeforeClass
-	public static void setUp() {
-		try {
-			scriptingService = TestData.getInstance().newVault().getScriptingService();
-			filesService = TestData.getInstance().newVault().getFilesService();
-			databaseService = TestData.getInstance().newVault().getDatabaseService();
-		} catch (HiveException | DIDException e) {
-			e.printStackTrace();
-		}
-		create_test_database();
-	}
-
-	@AfterClass
-	public static void tearDown() {
-		remove_test_database();
-	}
-
-	private static ScriptingService scriptingService;
-	private static FilesService filesService;
-	private static DatabaseService databaseService;
-
-	private final String localSrcFilePath;
-	private final String localDstFileRoot;
-	private final String localDstFilePath;
-	private final String fileName;
-
-	public ScriptingServiceTest() {
-		fileName = "test.txt";
-		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
-		localSrcFilePath = localRootPath + fileName;
-		localDstFileRoot = localRootPath + "cache/script/";
-		localDstFilePath = localDstFileRoot + fileName;
-	}
 }

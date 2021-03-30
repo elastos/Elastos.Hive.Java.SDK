@@ -9,15 +9,15 @@ public class ScriptFindBody {
     @SerializedName("collection")
     private String collection;
     @SerializedName("filter")
-    private ScriptKvItem filter;
+    private KeyValueDict filter;
     @SerializedName("options")
-    private ScriptKvItem options;
+    private KeyValueDict options;
 
-    public ScriptFindBody(String collection, ScriptKvItem filter) {
+    public ScriptFindBody(String collection, KeyValueDict filter) {
         this(collection, filter, null);
     }
 
-    public ScriptFindBody(String collection, ScriptKvItem filter, ScriptKvItem options) {
+    public ScriptFindBody(String collection, KeyValueDict filter, KeyValueDict options) {
         this.collection = collection;
         this.filter = filter;
         this.options = options;

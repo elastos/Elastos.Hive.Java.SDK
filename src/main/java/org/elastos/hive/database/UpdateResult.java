@@ -1,36 +1,28 @@
 package org.elastos.hive.database;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import org.elastos.hive.Result;
-
-public class UpdateResult extends Result<UpdateResult> {
-	@JsonProperty("matched_count")
+public class UpdateResult {
 	private int matchedCount;
-	@JsonProperty("modified_count")
 	private int modifiedCount;
-	@JsonProperty("upserted_count")
-	private int upsertedCount;
-	@JsonProperty("upserted_id")
+	private Boolean acknowledged;
 	private String upsertedId;
 
-	public long matchedCount() {
-		return matchedCount;
+	public UpdateResult setMatchedCount(int matchedCount) {
+		this.matchedCount = matchedCount;
+		return this;
 	}
 
-	public long modifiedCount() {
-		return modifiedCount;
+	public UpdateResult setModifiedCount(int modifiedCount) {
+		this.modifiedCount = modifiedCount;
+		return this;
 	}
 
-	public long upsertedCount() {
-		return upsertedCount;
+	public UpdateResult setAcknowledged(Boolean acknowledged) {
+		this.acknowledged = acknowledged;
+		return this;
 	}
 
-	public String upsertedId() {
-		return upsertedId;
-	}
-
-	public static UpdateResult deserialize(String content) {
-		return deserialize(content, UpdateResult.class);
+	public UpdateResult setUpsertedId(String upsertedId) {
+		this.upsertedId = upsertedId;
+		return this;
 	}
 }

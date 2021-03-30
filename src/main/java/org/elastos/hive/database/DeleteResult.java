@@ -1,18 +1,24 @@
 package org.elastos.hive.database;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class DeleteResult {
+	private String acknowledged;
+	private Integer deletedCount;
 
-import org.elastos.hive.Result;
+	public String getAcknowledged() {
+		return acknowledged;
+	}
 
-public class DeleteResult extends Result<DeleteResult> {
-	@JsonProperty("deleted_count")
-	private int deletedCount;
+	public DeleteResult setAcknowledged(String acknowledged) {
+		this.acknowledged = acknowledged;
+		return this;
+	}
 
-	public int deletedCount() {
+	public Integer getDeletedCount() {
 		return deletedCount;
 	}
 
-	public static DeleteResult deserialize(String content) {
-		return deserialize(content, DeleteResult.class);
+	public DeleteResult setDeletedCount(Integer deletedCount) {
+		this.deletedCount = deletedCount;
+		return this;
 	}
 }
