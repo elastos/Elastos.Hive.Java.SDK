@@ -1,28 +1,99 @@
 package org.elastos.hive.database;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public class Collation {
-	@JsonProperty("locale")
 	private String locale;
-	@JsonProperty("caseLevel")
 	private Boolean caseLevel;
-	@JsonProperty("caseFirst")
 	private CaseFirst caseFirst;
-	@JsonProperty("strength")
 	private Strength strength;
-	@JsonProperty("numericOrdering")
 	private Boolean numericOrdering;
-	@JsonProperty("alternate")
 	private Alternate alternate;
-	@JsonProperty("maxVariable")
 	private MaxVariable maxVariable;
-	@JsonProperty("normalization")
 	private Boolean normalization;
-	@JsonProperty("backwards")
 	private Boolean backwards;
+
+	public String getLocale() {
+		return locale;
+	}
+
+	public Collation setLocale(String locale) {
+		this.locale = locale;
+		return this;
+	}
+
+	public Boolean getCaseLevel() {
+		return caseLevel;
+	}
+
+	public Collation setCaseLevel(Boolean caseLevel) {
+		this.caseLevel = caseLevel;
+		return this;
+	}
+
+	public CaseFirst getCaseFirst() {
+		return caseFirst;
+	}
+
+	public Collation setCaseFirst(CaseFirst caseFirst) {
+		this.caseFirst = caseFirst;
+		return this;
+	}
+
+	public Strength getStrength() {
+		return strength;
+	}
+
+	public Collation setStrength(Strength strength) {
+		this.strength = strength;
+		return this;
+	}
+
+	public Boolean getNumericOrdering() {
+		return numericOrdering;
+	}
+
+	public Collation setNumericOrdering(Boolean numericOrdering) {
+		this.numericOrdering = numericOrdering;
+		return this;
+	}
+
+	public Alternate getAlternate() {
+		return alternate;
+	}
+
+	public Collation setAlternate(Alternate alternate) {
+		this.alternate = alternate;
+		return this;
+	}
+
+	public MaxVariable getMaxVariable() {
+		return maxVariable;
+	}
+
+	public Collation setMaxVariable(MaxVariable maxVariable) {
+		this.maxVariable = maxVariable;
+		return this;
+	}
+
+	public Boolean getNormalization() {
+		return normalization;
+	}
+
+	public Collation setNormalization(Boolean normalization) {
+		this.normalization = normalization;
+		return this;
+	}
+
+	public Boolean getBackwards() {
+		return backwards;
+	}
+
+	public Collation setBackwards(Boolean backwards) {
+		this.backwards = backwards;
+		return this;
+	}
 
 	public enum CaseFirst {
 		UPPER, LOWER, OFF;
@@ -60,23 +131,23 @@ public class Collation {
 		@JsonCreator
 		public static Strength fromInt(int i) {
 			switch (i) {
-			case 1:
-				return PRIMARY;
+				case 1:
+					return PRIMARY;
 
-			case 2:
-				return SECONDARY;
+				case 2:
+					return SECONDARY;
 
-			case 3:
-				return TERTIARY;
+				case 3:
+					return TERTIARY;
 
-			case 4:
-				return QUATERNARY;
+				case 4:
+					return QUATERNARY;
 
-			case 5:
-				return IDENTICAL;
+				case 5:
+					return IDENTICAL;
 
-			default:
-				throw new IllegalArgumentException("Invalid strength");
+				default:
+					throw new IllegalArgumentException("Invalid strength");
 			}
 		}
 	}
@@ -109,102 +180,5 @@ public class Collation {
 		public static MaxVariable fromString(String name) {
 			return valueOf(name.toUpperCase());
 		}
-	}
-
-	public Collation(String locale, boolean caseLevel, CaseFirst caseFirst,
-			Strength strength, boolean numericOrdering, Alternate alternate,
-			MaxVariable maxVariable, boolean normalization, boolean backwards) {
-		locale(locale);
-		caseLevel(caseLevel);
-		caseFirst(caseFirst);
-		strength(strength);
-		numericOrdering(numericOrdering);
-		alternate(alternate);
-		maxVariable(maxVariable);
-		normalization(normalization);
-		backwards(backwards);
-	}
-
-	public Collation() {}
-
-	public Collation locale(String value) {
-		locale = value;
-		return this;
-	}
-
-	public String getLocale() {
-		return locale;
-	}
-
-	public Collation caseLevel(boolean value) {
-		caseLevel = value;
-		return this;
-	}
-
-	public Boolean getCaseLevel() {
-		return caseLevel;
-	}
-
-	public Collation caseFirst(CaseFirst value) {
-		caseFirst = value;
-		return this;
-	}
-
-	public CaseFirst getCaseFirst() {
-		return caseFirst;
-	}
-
-	public Collation strength(Strength value) {
-		strength = value;
-		return this;
-	}
-
-	public Strength Strength() {
-		return strength;
-	}
-
-	public Collation numericOrdering(boolean value) {
-		numericOrdering = value;
-		return this;
-	}
-
-	public Boolean numericOrdering() {
-		return numericOrdering;
-	}
-
-	public Collation alternate(Alternate value) {
-		alternate = value;
-		return this;
-	}
-
-	public Alternate alternate() {
-		return alternate;
-	}
-
-	public Collation maxVariable(MaxVariable value) {
-		maxVariable = value;
-		return this;
-	}
-
-	public MaxVariable maxVariable() {
-		return maxVariable;
-	}
-
-	public Collation normalization(boolean value) {
-		normalization = value;
-		return this;
-	}
-
-	public Boolean normalization() {
-		return normalization;
-	}
-
-	public Collation backwards(boolean value) {
-		backwards = value;
-		return this;
-	}
-
-	public Boolean backwards() {
-		return backwards;
 	}
 }
