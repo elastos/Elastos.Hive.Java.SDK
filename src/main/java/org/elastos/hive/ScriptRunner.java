@@ -1,7 +1,6 @@
 package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import okhttp3.ResponseBody;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HiveSdkException;
@@ -9,7 +8,6 @@ import org.elastos.hive.network.ScriptingApi;
 import org.elastos.hive.network.model.ScriptContext;
 import org.elastos.hive.network.request.CallScriptRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
-import retrofit2.Response;
 
 import java.util.concurrent.CompletionException;
 
@@ -27,15 +25,16 @@ public class ScriptRunner extends ServiceEndpoint {
 
 	public <T> T callScript(String name, JsonNode params, String appDid, Class<T> resultType) {
 		try {
-			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
-					.callScript(new CallScriptRequestBody()
-							.setName(name)
-							.setContext(new ScriptContext()
-									.setTargetDid(this.targetDid)
-									.setTargetAppDid(appDid))
-							.setParams(HiveResponseBody.jsonNode2Map(params)))
-					.execute();
-			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(response), resultType);
+			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
+					connectionManager.getScriptingApi()
+							.callScript(new CallScriptRequestBody()
+									.setName(name)
+									.setContext(new ScriptContext()
+											.setTargetDid(this.targetDid)
+											.setTargetAppDid(appDid))
+									.setParams(HiveResponseBody.jsonNode2Map(params)))
+							.execute()
+			), resultType);
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
@@ -43,10 +42,11 @@ public class ScriptRunner extends ServiceEndpoint {
 
 	public <T> T callScriptUrl(String name, String params, String appDid, Class<T> resultType) {
 		try {
-			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
-					.callScriptUrl(this.targetDid, appDid, name, params)
-					.execute();
-			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(response), resultType);
+			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
+					connectionManager.getScriptingApi()
+							.callScriptUrl(this.targetDid, appDid, name, params)
+							.execute()
+			), resultType);
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
@@ -57,10 +57,11 @@ public class ScriptRunner extends ServiceEndpoint {
 			throw new CompletionException(new HiveSdkException("Invalid parameter transactionId."));
 
 		try {
-			Response<ResponseBody> response = this.connectionManager.getScriptingApi()
-					.callDownload(transactionId)
-					.execute();
-			return HiveResponseBody.getResponseStream(response, resultType);
+			return HiveResponseBody.getResponseStream(
+					connectionManager.getScriptingApi()
+							.callDownload(transactionId)
+							.execute(),
+					resultType);
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
@@ -71,7 +72,9 @@ public class ScriptRunner extends ServiceEndpoint {
 			throw new CompletionException(new HiveSdkException("Invalid parameter transactionId."));
 
 		try {
-			return HiveResponseBody.getRequestStream(this.connectionManager.openConnection(ScriptingApi.API_SCRIPT_UPLOAD + "/" + transactionId), resultType);
+			return HiveResponseBody.getRequestStream(
+					connectionManager.openConnection(ScriptingApi.API_SCRIPT_UPLOAD + "/" + transactionId),
+					resultType);
 		} catch (Exception e) {
 			throw new CompletionException(new HiveException(e.getMessage()));
 		}
