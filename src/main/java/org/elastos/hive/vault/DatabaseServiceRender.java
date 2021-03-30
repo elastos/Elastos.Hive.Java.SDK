@@ -19,6 +19,7 @@ import org.elastos.hive.network.request.*;
 import org.elastos.hive.network.response.*;
 import org.elastos.hive.service.DatabaseService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -41,7 +42,7 @@ class DatabaseServiceRender implements DatabaseService {
 								.execute()
 								.body());
 				return true;
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
@@ -57,7 +58,7 @@ class DatabaseServiceRender implements DatabaseService {
 								.execute()
 								.body());
 				return true;
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
@@ -77,7 +78,7 @@ class DatabaseServiceRender implements DatabaseService {
 				return new InsertOneResult()
 						.setInsertedId(body.getInsertedId())
 						.setAcknowledged(body.getAcknowledged());
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
@@ -97,7 +98,7 @@ class DatabaseServiceRender implements DatabaseService {
 				return new InsertManyResult()
 						.setInsertedIds(body.getInsertedIds())
 						.setAcknowledged(body.getAcknowledged());
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
@@ -115,7 +116,7 @@ class DatabaseServiceRender implements DatabaseService {
 										options))
 								.execute()
 								.body()).getCount();
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
@@ -133,7 +134,7 @@ class DatabaseServiceRender implements DatabaseService {
 												options))
 										.execute()
 										.body()).getItem());
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
@@ -151,7 +152,7 @@ class DatabaseServiceRender implements DatabaseService {
 								options))
 						.execute()
 						.body()).getItems());
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
@@ -174,7 +175,7 @@ class DatabaseServiceRender implements DatabaseService {
 						.setModifiedCount(body.getModifiedCount())
 						.setAcknowledged(body.getAcknowledged())
 						.setUpsertedId(body.getUpsertedId());
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
@@ -197,7 +198,7 @@ class DatabaseServiceRender implements DatabaseService {
 						.setModifiedCount(body.getModifiedCount())
 						.setAcknowledged(body.getAcknowledged())
 						.setUpsertedId(body.getUpsertedId());
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
@@ -216,7 +217,7 @@ class DatabaseServiceRender implements DatabaseService {
 				return new DeleteResult()
 						.setDeletedCount(body.getDeletedCount())
 						.setAcknowledged(body.getAcknowledged());
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
@@ -235,7 +236,7 @@ class DatabaseServiceRender implements DatabaseService {
 				return new DeleteResult()
 						.setDeletedCount(body.getDeletedCount())
 						.setAcknowledged(body.getAcknowledged());
-			} catch (Exception e) {
+			} catch (IOException | HiveException e) {
 				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});

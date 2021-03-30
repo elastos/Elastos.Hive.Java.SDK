@@ -31,7 +31,7 @@ class FilesServiceRender implements FilesService {
 						connectionManager.openConnection(FilesApi.API_UPLOAD + "/" + path),
 						resultType);
 			} catch (IOException e) {
-				throw new CompletionException(e);
+				throw new CompletionException(new HiveException(e.getMessage()));
 			}
 		});
 	}
