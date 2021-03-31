@@ -1,17 +1,13 @@
 package org.elastos.hive.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elastos.hive.AppContext;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.UnauthorizedStateException;
-import org.elastos.hive.network.request.SignInRequestBody;
-import org.elastos.hive.network.response.HiveResponseBody;
-import org.elastos.hive.network.response.SignInResponseBody;
+import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.service.BackupContext;
+import org.elastos.hive.vault.AuthenticationServiceRender;
 
-import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 public class BackupRemoteResolver implements TokenResolver {
     private AppContextProvider contextProvider;
@@ -19,6 +15,7 @@ public class BackupRemoteResolver implements TokenResolver {
     private ConnectionManager connectionManager;
     private String targetDid;
     private String targetHost;
+    private AuthenticationServiceRender authenticationService;
 
     public BackupRemoteResolver(AppContext context, BackupContext backupContext, String targetDid, String targetHost) {
         this.contextProvider = context.getAppContextProvider();
@@ -26,35 +23,22 @@ public class BackupRemoteResolver implements TokenResolver {
         this.connectionManager = context.getConnectionManager();
         this.targetDid = targetDid;
         this.targetHost = targetHost;
+        this.authenticationService = new AuthenticationServiceRender(context, contextProvider, connectionManager);
     }
 
     @Override
-    public AuthToken getToken() throws HiveException {
-        return credential(signIn());
-    }
-
-    private AuthToken credential(String sourceDid) {
+    public AuthToken getToken() {
         try {
-            return new AuthToken(backupContext.getAuthorization(sourceDid, this.targetDid, this.targetHost)
-                    .get(), 0, AuthToken.TYPE_BACKUP);
+            return credential(authenticationService.signIn4Issuer());
         } catch (Exception e) {
-            throw new UnauthorizedStateException("Failed to authentication backup credential.");
+            throw new HttpFailedException(401, "Failed to authentication backup credential.");
         }
     }
 
-    private String signIn() throws HiveException {
-        try {
-            SignInResponseBody rspBody = connectionManager.getAuthApi()
-                    .signIn(new SignInRequestBody(new ObjectMapper()
-                            .readValue(contextProvider.getAppInstanceDocument().toString(), HashMap.class)))
-                    .execute()
-                    .body();
-            return HiveResponseBody.validateBody(rspBody)
-                    .checkValid(contextProvider.getAppInstanceDocument().getSubject().toString())
-                    .getIssuer();
-        } catch (Exception e) {
-            throw new HiveException(e.getMessage());
-        }
+    private AuthToken credential(String sourceDid) throws ExecutionException, InterruptedException {
+        return new AuthToken(backupContext
+                .getAuthorization(sourceDid, this.targetDid, this.targetHost).get(),
+                0, AuthToken.TYPE_BACKUP);
     }
 
     @Override
