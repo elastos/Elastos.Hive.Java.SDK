@@ -1,20 +1,15 @@
 package org.elastos.hive;
 
+import com.google.common.base.Throwables;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.exception.VaultAlreadyExistException;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.concurrent.ExecutionException;
 
 import org.elastos.hive.exception.HiveException;
 import org.junit.jupiter.api.*;
 
 @Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class VaultSubscriptionTest {
+class VaultSubscriptionTest {
 	private static VaultSubscription subscription;
 
 	@BeforeAll
@@ -23,144 +18,95 @@ public class VaultSubscriptionTest {
 			TestData testData = TestData.getInstance();
 			subscription = new VaultSubscription(testData.getAppContext(), testData.getOwnerDid(), testData.getProviderAddress());
 		} catch (HiveException | DIDException e) {
-			e.printStackTrace();
-			assertTrue(false);
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(1)
-	public void testSubscribe() {
+	void testSubscribe() {
 		try {
-			subscription.subscribe("free")
-					.whenComplete((result, ex) -> {
-						if (ex != null) {
-							ex.printStackTrace();
-						}
-					}).get();
-		} catch (InterruptedException|ExecutionException e1) {
-			if(VaultAlreadyExistException.class.isInstance(e1.getCause())) {
-				return;
-			}
-			fail();
-			e1.printStackTrace();
+			subscription.subscribe("free").get();
+		} catch (Exception e) {
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(2)
-	public void testActivate() {
+	void testActivate() {
 		try {
-			subscription.activate()
-					.whenComplete((result, ex) -> {
-						if (ex != null) {
-							fail();
-							ex.printStackTrace();
-						}
-					}).get();
-		} catch (InterruptedException|ExecutionException e1) {
-			e1.printStackTrace();
-			fail();
+			subscription.activate().get();
+		} catch (Exception e) {
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(3)
-	public void testGetPricingPlanList() {
+	void testGetPricingPlanList() {
 		try {
-			subscription.getPricingPlanList()
-					.whenComplete((result, ex) -> {
-						if (ex != null) {
-							ex.printStackTrace();
-						}
-					}).get();
-		} catch (InterruptedException|ExecutionException e1) {
-			fail();
-			e1.printStackTrace();
+			subscription.getPricingPlanList().get();
+		} catch (Exception e) {
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(4)
-	public void testGetPricingPlan() {
+	void testGetPricingPlan() {
 		try {
-			subscription.getPricingPlan("free")
-					.whenComplete((result, ex) -> {
-						if (ex != null) {
-							ex.printStackTrace();
-						}
-					}).get();
-		} catch (InterruptedException|ExecutionException e1) {
-			fail();
-			e1.printStackTrace();
+			subscription.getPricingPlan("free").get();
+		} catch (Exception e) {
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(5)
-	public void testPlaceOrder() {
+	void testPlaceOrder() {
 		try {
-			subscription.placeOrder("")
-					.whenComplete((result, ex) -> {
-						if (ex != null) {
-							ex.printStackTrace();
-						}
-					}).get();
-		} catch (InterruptedException|ExecutionException e1) {
-			fail();
-			e1.printStackTrace();
+			subscription.placeOrder("").get();
+		} catch (Exception e) {
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(6)
-	public void testGetOrder() {
+	void testGetOrder() {
 
 	}
 
 	@Test
 	@Order(7)
-	public void testPayOrder() {
+	void testPayOrder() {
 
 	}
 
 	@Test
 	@Order(8)
-	public void testGetReceipt() {
+	void testGetReceipt() {
 
 	}
 
 	@Test
 	@Order(9)
-	public void testDeactivate() {
+	void testDeactivate() {
 		try {
-			subscription.deactivate()
-					.whenComplete((result, ex) -> {
-						if (ex != null) {
-							fail();
-							ex.printStackTrace();
-						}
-					}).get();
-		} catch (InterruptedException|ExecutionException e1) {
-			e1.printStackTrace();
-			fail();
+			subscription.deactivate().get();
+		} catch (Exception e) {
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(10)
-	public void testUnsubscribe() {
+	void testUnsubscribe() {
 		try {
-			subscription.unsubscribe()
-					.whenComplete((result, ex) -> {
-						if (ex != null) {
-							fail();
-							ex.printStackTrace();
-						}
-					}).get();
-		} catch (InterruptedException|ExecutionException e1) {
-			e1.printStackTrace();
-			fail();
+			subscription.unsubscribe().get();
+		} catch (Exception e) {
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 }

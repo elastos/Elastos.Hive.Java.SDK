@@ -3,6 +3,7 @@ package org.elastos.hive;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Throwables;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.database.*;
@@ -17,7 +18,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DatabaseServiceTest {
+class DatabaseServiceTest {
 	private static final String COLLECTION_NAME = "works";
 
 	private static DatabaseService databaseService;
@@ -27,49 +28,38 @@ public class DatabaseServiceTest {
 		try {
 			databaseService = TestData.getInstance().newVault().getDatabaseService();
 		} catch (HiveException | DIDException e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(1)
-	public void testCreateCollection() {
+	void testCreateCollection() {
 		try {
-			Boolean isSuccess = databaseService.createCollection(COLLECTION_NAME, null)
-					.exceptionally(e-> {
-						fail();
-						return null;
-					})
-					.get();
-			assertTrue(isSuccess);
+			Boolean isSuccess = databaseService.createCollection(COLLECTION_NAME, null).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(2)
-	public void testInsertOne() {
+	void testInsertOne() {
 		try {
 			ObjectNode docNode = JsonNodeFactory.instance.objectNode();
 			docNode.put("author", "john doe1");
 			docNode.put("title", "Eve for Dummies1");
-			InsertOneResult result = databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, true)).exceptionally(e->{
-				fail();
-				return null;
-			}).get();
-			assertNotNull(result);
+			InsertOneResult result = databaseService.insertOne(COLLECTION_NAME, docNode, new InsertOptions(false, true)).get();
+			Assertions.assertNotNull(result);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(3)
-	public void testInsertMany() {
+	void testInsertMany() {
 		try {
 			List<JsonNode> nodes = new ArrayList<>();
 			ObjectNode docNode1 = JsonNodeFactory.instance.objectNode();
@@ -81,21 +71,16 @@ public class DatabaseServiceTest {
 			docNode2.put("title", "Eve for Dummies3");
 			nodes.add(docNode1);
 			InsertManyResult result = databaseService.insertMany(COLLECTION_NAME, nodes,
-					new InsertOptions(false, true))
-					.exceptionally(e -> {
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
+					new InsertOptions(false, true)).get();
+			Assertions.assertNotNull(result);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(4)
-	public void testFindOne() {
+	void testFindOne() {
 		try {
 			ObjectNode query = JsonNodeFactory.instance.objectNode();
 			query.put("author", "john doe1");
@@ -104,21 +89,16 @@ public class DatabaseServiceTest {
 							.setAllowPartialResults(false)
 							.setReturnKey(false)
 							.setBatchSize(0)
-							.setProjection(Collections.singletonMap("_id", false)))
-					.exceptionally(e -> {
-						fail();
-						return null;
-					}).get();
-			assertNotNull(doc);
+							.setProjection(Collections.singletonMap("_id", false))).get();
+			Assertions.assertNotNull(doc);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(5)
-	public void testFindMany() {
+	void testFindMany() {
 		try {
 			ObjectNode query = JsonNodeFactory.instance.objectNode();
 			query.put("author", "john doe1");
@@ -127,38 +107,29 @@ public class DatabaseServiceTest {
 							.setAllowPartialResults(false)
 							.setReturnKey(false)
 							.setBatchSize(0)
-							.setProjection(Collections.singletonMap("_id", false)))
-					.exceptionally(e -> {
-						fail();
-						return null;
-					}).get();
+							.setProjection(Collections.singletonMap("_id", false))).get();
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(6)
-	public void testCountDoc() {
+	void testCountDoc() {
 		try {
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe1");
 			Long count = databaseService.countDocuments(COLLECTION_NAME, filter,
-					new CountOptions().setLimit(1L).setSkip(0L).setMaxTimeMS(1000000000))
-					.exceptionally(e -> {
-						fail();
-						return null;
-					}).get();
+					new CountOptions().setLimit(1L).setSkip(0L).setMaxTimeMS(1000000000)).get();
+			Assertions.assertNotNull(count);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(7)
-	public void testUpdateOne() {
+	void testUpdateOne() {
 		try {
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe1");
@@ -168,21 +139,16 @@ public class DatabaseServiceTest {
 			ObjectNode update = JsonNodeFactory.instance.objectNode();
 			update.put("$set", doc);
 			UpdateResult result = databaseService.updateOne(COLLECTION_NAME, filter, update,
-					new UpdateOptions().setBypassDocumentValidation(false).setUpsert(true))
-					.exceptionally(e -> {
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
+					new UpdateOptions().setBypassDocumentValidation(false).setUpsert(true)).get();
+			Assertions.assertNotNull(result);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(8)
-	public void testUpdateMany() {
+	void testUpdateMany() {
 		try {
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe1");
@@ -197,62 +163,46 @@ public class DatabaseServiceTest {
 						fail();
 						return null;
 					}).get();
-			assertNotNull(result);
+			Assertions.assertNotNull(result);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(9)
-	public void testDeleteOne() {
+	void testDeleteOne() {
 		try {
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe2");
-			DeleteResult result = databaseService.deleteOne(COLLECTION_NAME, filter, new DeleteOptions())
-					.exceptionally(e -> {
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
+			DeleteResult result = databaseService.deleteOne(COLLECTION_NAME, filter, new DeleteOptions()).get();
+			Assertions.assertNotNull(result);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(10)
-	public void testDeleteMany() {
+	void testDeleteMany() {
 		try {
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe2");
-			DeleteResult result = databaseService.deleteMany(COLLECTION_NAME, filter, new DeleteOptions())
-					.exceptionally(e -> {
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
+			DeleteResult result = databaseService.deleteMany(COLLECTION_NAME, filter, new DeleteOptions()).get();
+			Assertions.assertNotNull(result);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(11)
-	public void testDeleteCollection() {
+	void testDeleteCollection() {
 		try {
-			Boolean isSuccess = databaseService.deleteCollection(COLLECTION_NAME)
-					.exceptionally(e -> {
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+			Boolean isSuccess = databaseService.deleteCollection(COLLECTION_NAME).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 }
