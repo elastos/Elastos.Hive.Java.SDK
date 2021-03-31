@@ -20,6 +20,11 @@ public abstract class HiveVaultRender {
         this.connectionManager = context.getConnectionManager();
     }
 
+    protected HiveVaultRender(AppContext context, ConnectionManager connectionManager) {
+        this.context = context;
+        this.connectionManager = connectionManager;
+    }
+
     protected Vault getVault() {
         return this.vault;
     }
