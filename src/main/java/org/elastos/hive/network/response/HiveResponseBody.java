@@ -8,12 +8,14 @@ import com.google.gson.annotations.SerializedName;
 import okhttp3.ResponseBody;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HiveSdkException;
+import org.elastos.hive.exception.InvalidParameterException;
 import org.elastos.hive.network.model.KeyValueDict;
 import org.elastos.hive.network.model.UploadOutputStream;
 import retrofit2.Response;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -110,7 +112,7 @@ public class HiveResponseBody {
             OutputStreamWriter writer = new OutputStreamWriter(outputStream);
             return resultType.cast(writer);
         } else {
-            throw new HiveSdkException("Not supported result type: " + resultType.getName());
+            throw new InvalidPropertiesFormatException("Not supported result type: " + resultType.getName());
         }
     }
 
@@ -123,7 +125,7 @@ public class HiveResponseBody {
         } else if (resultType.isAssignableFrom(InputStream.class)) {
             return resultType.cast(body.byteStream());
         } else {
-            throw new HiveSdkException("Not supported result type");
+            throw new InvalidParameterException("Not supported result type");
         }
     }
 
