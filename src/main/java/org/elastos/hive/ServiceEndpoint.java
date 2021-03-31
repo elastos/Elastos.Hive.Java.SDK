@@ -1,6 +1,5 @@
 package org.elastos.hive;
 
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.UnauthorizedStateException;
 
 class ServiceEndpoint {

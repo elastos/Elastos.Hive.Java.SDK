@@ -11,10 +11,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import org.elastos.hive.vault.HttpExceptionHandler;
 import org.elastos.hive.vault.PaymentServiceRender;
 import org.elastos.hive.vault.SubscriptionServiceRender;
 
-public class VaultSubscription extends ServiceEndpoint implements SubscriptionService<VaultSubscription.VaultInfo>, PaymentService  {
+public class VaultSubscription extends ServiceEndpoint implements SubscriptionService<VaultSubscription.VaultInfo>, PaymentService, HttpExceptionHandler {
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
 
@@ -31,8 +32,8 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 				this.subscriptionService.subscribe();
 				//TODO:
 				return new VaultInfo(null, getAppContext().getUserDid(), null);
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -42,8 +43,8 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 		return CompletableFuture.runAsync(() -> {
 			try {
 				this.subscriptionService.unsubscribe();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -53,8 +54,8 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 		return CompletableFuture.runAsync(() -> {
 			try {
 				this.subscriptionService.activate();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -64,8 +65,8 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 		return CompletableFuture.runAsync(() -> {
 			try {
 				this.subscriptionService.deactivate();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -81,8 +82,8 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return paymentService.getPricingPlanList();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -92,8 +93,8 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return paymentService.getPricingPlan(planName);
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -103,8 +104,8 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return paymentService.getOrderInfo(paymentService.createPricingOrder(planName));
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -114,8 +115,8 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return paymentService.getOrderInfo(orderId);
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -127,8 +128,8 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 				paymentService.payOrder(orderId, transIds);
 				//TODO:
 				return new Receipt();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}

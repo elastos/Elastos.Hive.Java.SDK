@@ -1,11 +1,10 @@
 package org.elastos.hive.payment;
 
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.Result;
 
 import java.util.List;
 
-public class Order extends Result<Order> {
+public class Order {
 	@SerializedName("order_id")
 	private String orderId;
 	private String did;
