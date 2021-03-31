@@ -1,8 +1,6 @@
 package org.elastos.hive.payment;
 
-import org.elastos.hive.Result;
-
-public class Receipt extends Result<Receipt> {
+public class Receipt {
 	private String receiptId;
 	private String orderId;
 	private String customerDid;
@@ -13,7 +11,6 @@ public class Receipt extends Result<Receipt> {
 	private float currency;
 
 	private long createdTime;
-
 
 	public String getReceiptId() {
 		return receiptId;

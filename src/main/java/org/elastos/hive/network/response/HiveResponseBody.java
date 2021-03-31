@@ -6,15 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import okhttp3.ResponseBody;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.HiveSdkException;
-import org.elastos.hive.exception.InvalidParameterException;
+import org.elastos.hive.exception.*;
 import org.elastos.hive.network.model.KeyValueDict;
 import org.elastos.hive.network.model.UploadOutputStream;
 import retrofit2.Response;
 
+import javax.security.sasl.AuthenticationException;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 
 public class HiveResponseBody {
     private static final String SUCCESS = "OK";
+
+    private static Map<Integer, String> errorMessages;
 
     @SerializedName("_status")
     private String status;
@@ -60,26 +62,29 @@ public class HiveResponseBody {
         return validateBody(response.body());
     }
 
-    public static <T extends HiveResponseBody> T validateBody(T body) throws HiveException {
+    public static <T extends HiveResponseBody> T validateBody(T body) {
         if (body == null)
-            throw new HiveException("Failed to get response body(null)");
+            throw new HiveSdkException("Failed to get response body(null)");
+
         if (body.failed())
-            throw new HiveException("Status 'ERR' gotten from response body, code=" + body.getErrorCode() + ", message=" + body.getErrorMessage());
+            throw new HttpFailedException(600, getHttpErrorMessages().get(600));
+
         return body;
     }
 
-    public static String validateBodyStr(Response<ResponseBody> response) throws HiveException {
+    public static String validateBodyStr(Response<ResponseBody> response) {
         ResponseBody body = response.body();
         if (body == null)
-            throw new HiveException("Failed to get body on validateBody");
+            throw new HiveSdkException("Failed to get body on validateBody");
+
         try {
             String bodyStr = body.string();
             if (new Gson().fromJson(bodyStr, HiveResponseBody.class).failed()) {
-                throw new HiveException("Get ERR response status on validateBody");
+                throw new HiveSdkException("Get ERR response status on validateBody");
             }
             return bodyStr;
         } catch (IOException e) {
-            throw new HiveException(e.getMessage());
+            throw new HiveSdkException(e.getMessage());
         }
     }
 
@@ -116,17 +121,17 @@ public class HiveResponseBody {
         }
     }
 
-    public static <T> T getResponseStream(Response<ResponseBody> response, Class<T> resultType) throws HiveException {
+    public static <T> T getResponseStream(Response<ResponseBody> response, Class<T> resultType) {
         ResponseBody body = response.body();
         if (body == null)
-            throw new HiveException("Failed to get response body");
-        if (resultType.isAssignableFrom(Reader.class)) {
+            throw new HiveSdkException("Failed to get response body");
+
+        if (resultType.isAssignableFrom(Reader.class))
             return resultType.cast(new InputStreamReader(body.byteStream()));
-        } else if (resultType.isAssignableFrom(InputStream.class)) {
+        else if (resultType.isAssignableFrom(InputStream.class))
             return resultType.cast(body.byteStream());
-        } else {
+        else
             throw new InvalidParameterException("Not supported result type");
-        }
     }
 
     public static Map<String, Object> jsonNode2Map(JsonNode node) {
@@ -151,6 +156,47 @@ public class HiveResponseBody {
 
     public static List<JsonNode> KeyValueDictList2JsonNodeList(List<KeyValueDict> dicts) {
         return dicts.stream().map(HiveResponseBody::KeyValueDict2JsonNode).collect(Collectors.toList());
+    }
+
+    public static Map<Integer, String> getHttpErrorMessages() {
+        if (errorMessages == null) {
+            Map<Integer, String> messages = new HashMap<>();
+            messages.put(400, "bad request");
+            messages.put(401, "auth failed");
+            messages.put(402, "payment required");
+            messages.put(403, "forbidden");
+            messages.put(404, "not found");
+            messages.put(405, "method not allowed");
+            messages.put(406, "not acceptable");
+            messages.put(423, "locked");
+            messages.put(452, "checksum failed or not enough space");
+            messages.put(500, "internal server error");
+            messages.put(501, "not implemented");
+            messages.put(503, "service unavailable");
+            messages.put(507, "insufficient storage");
+            messages.put(600, "error body status");
+            errorMessages = messages;
+        }
+        return errorMessages;
+    }
+
+    public static Exception convertException(Exception e) {
+        if (e instanceof HttpFailedException) {
+            HttpFailedException ex = (HttpFailedException) e;
+            switch (ex.getCode()) {
+                case 401:
+                    return new AuthenticationException();
+                case 423:
+                    return new VaultLockedException();
+                case 452:
+                    return new NoEnoughSpaceException();
+                default:
+                    return new HiveException("Http exception, code " + ex.getCode() + "(" + e.getMessage() + ")");
+            }
+        } else if (e instanceof IOException)
+            return new HiveException(e.getMessage());
+        else
+            return e;
     }
 
     static class Error {

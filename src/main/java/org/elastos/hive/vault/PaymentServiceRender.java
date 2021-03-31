@@ -1,8 +1,6 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.AppContext;
-import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.request.PayOrderRequestBody;
 import org.elastos.hive.network.request.PaymentCreateRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
@@ -16,59 +14,42 @@ import java.util.List;
 /**
  * Helper class for vault/backup subscription.
  */
-public class PaymentServiceRender {
-    private ConnectionManager connectionManager;
+public class PaymentServiceRender extends HiveVaultRender {
 
     public PaymentServiceRender(AppContext context) {
-        this.connectionManager = context.getConnectionManager();
+        super(context);
     }
 
-    public List<PricingPlan> getPricingPlanList() throws HiveException {
-        try {
-            return HiveResponseBody.validateBody(
-                    connectionManager.getPaymentApi()
-                            .getPackageInfo()
-                            .execute()
-                            .body()).getPricingPlans();
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
-        }
+    public List<PricingPlan> getPricingPlanList() throws IOException {
+        return HiveResponseBody.validateBody(
+                getConnectionManager().getPaymentApi()
+                        .getPackageInfo()
+                        .execute()
+                        .body()).getPricingPlans();
     }
 
-    public List<PricingPlan> getBackupPlanList() throws HiveException {
-        try {
-            return HiveResponseBody.validateBody(
-                    connectionManager.getPaymentApi()
-                            .getPackageInfo()
-                            .execute()
-                            .body()).getBackupPlans();
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
-        }
+    public List<PricingPlan> getBackupPlanList() throws IOException {
+        return HiveResponseBody.validateBody(
+                getConnectionManager().getPaymentApi()
+                        .getPackageInfo()
+                        .execute()
+                        .body()).getBackupPlans();
     }
 
-    public PricingPlan getPricingPlan(String planName) throws HiveException {
-        try {
-            return getPricePlanByResponseBody(HiveResponseBody.validateBody(
-                    connectionManager.getPaymentApi()
-                            .getPricingPlan(planName)
-                            .execute()
-                            .body()));
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
-        }
+    public PricingPlan getPricingPlan(String planName) throws IOException {
+        return getPricePlanByResponseBody(HiveResponseBody.validateBody(
+                getConnectionManager().getPaymentApi()
+                        .getPricingPlan(planName)
+                        .execute()
+                        .body()));
     }
 
-    public PricingPlan getBackupPlan(String planName) throws HiveException {
-        try {
-            return getPricePlanByResponseBody(HiveResponseBody.validateBody(
-                    connectionManager.getPaymentApi()
-                            .getBackupPlan(planName)
-                            .execute()
-                            .body()));
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
-        }
+    public PricingPlan getBackupPlan(String planName) throws IOException {
+        return getPricePlanByResponseBody(HiveResponseBody.validateBody(
+                getConnectionManager().getPaymentApi()
+                        .getBackupPlan(planName)
+                        .execute()
+                        .body()));
     }
 
     private PricingPlan getPricePlanByResponseBody(PaymentPlanResponseBody respBody) {
@@ -79,49 +60,37 @@ public class PaymentServiceRender {
                 .setName(respBody.getName());
     }
 
-    public String createPricingOrder(String planName) throws HiveException {
+    public String createPricingOrder(String planName) throws IOException {
         return createOrder(planName, null);
     }
 
-    public String createBackupOrder(String planName) throws HiveException {
+    public String createBackupOrder(String planName) throws IOException {
         return createOrder(null, planName);
     }
 
-    private String createOrder(String pricingPlanName, String backupPlanName) throws HiveException {
-        try {
-            return HiveResponseBody.validateBody(
-                    connectionManager.getPaymentApi()
-                            .createOrder(new PaymentCreateRequestBody(pricingPlanName, backupPlanName))
-                            .execute()
-                            .body()).getOrderId();
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
-        }
+    private String createOrder(String pricingPlanName, String backupPlanName) throws IOException {
+        return HiveResponseBody.validateBody(
+                getConnectionManager().getPaymentApi()
+                        .createOrder(new PaymentCreateRequestBody(pricingPlanName, backupPlanName))
+                        .execute()
+                        .body()).getOrderId();
     }
 
-    public void payOrder(String orderId, List<String> transIds) throws HiveException {
-        try {
-            HiveResponseBody.validateBody(
-                    connectionManager.getPaymentApi()
-                            .payOrder(new PayOrderRequestBody()
-                                    .setOrderId(orderId)
-                                    .setPayTxids(transIds))
-                            .execute()
-                            .body());
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
-        }
+    public void payOrder(String orderId, List<String> transIds) throws IOException {
+        HiveResponseBody.validateBody(
+                getConnectionManager().getPaymentApi()
+                        .payOrder(new PayOrderRequestBody()
+                                .setOrderId(orderId)
+                                .setPayTxids(transIds))
+                        .execute()
+                        .body());
     }
 
-    public Order getOrderInfo(String orderId) throws HiveException {
-        try {
-            return HiveResponseBody.validateBody(
-                    connectionManager.getPaymentApi()
-                            .getOrderInfo(orderId)
-                            .execute()
-                            .body()).getOrderInfo();
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
-        }
+    public Order getOrderInfo(String orderId) throws IOException {
+        return HiveResponseBody.validateBody(
+                getConnectionManager().getPaymentApi()
+                        .getOrderInfo(orderId)
+                        .execute()
+                        .body()).getOrderInfo();
     }
 }

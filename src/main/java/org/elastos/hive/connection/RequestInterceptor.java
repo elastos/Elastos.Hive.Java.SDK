@@ -29,8 +29,6 @@ import org.elastos.hive.auth.RemoteResolver;
 import org.elastos.hive.auth.TokenResolver;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -38,6 +36,7 @@ import okhttp3.Response;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.network.BaseApi;
+import org.elastos.hive.network.response.HiveResponseBody;
 
 /**
  * Set token to HTTP request.
@@ -45,29 +44,11 @@ import org.elastos.hive.network.BaseApi;
 public class RequestInterceptor implements Interceptor {
     private final boolean needToken;
     private TokenResolver tokenResolver;
-    private Map<Integer, String> errorMessages = new HashMap<>();
 
     RequestInterceptor(AppContext context, ConnectionManager connectionManager, boolean needToken) {
         this.tokenResolver = new LocalResolver(context.getUserDid(), context.getProviderAddress(), LocalResolver.TYPE_AUTH_TOKEN, context.getAppContextProvider().getLocalDataDir());
         this.tokenResolver.setNextResolver(new RemoteResolver(context, connectionManager));
         this.needToken = needToken;
-        initErrorMessages(errorMessages);
-    }
-
-    private void initErrorMessages(Map<Integer, String> msgs) {
-        msgs.put(400, "bad request");
-        msgs.put(401, "auth failed");
-        msgs.put(402, "payment required");
-        msgs.put(403, "forbidden");
-        msgs.put(404, "not found");
-        msgs.put(405, "method not allowed");
-        msgs.put(406, "not acceptable");
-        msgs.put(423, "locked");
-        msgs.put(452, "checksum failed or not enough space");
-        msgs.put(500, "internal server error");
-        msgs.put(501, "not implemented");
-        msgs.put(503, "service unavailable");
-        msgs.put(507, "insufficient storage");
     }
 
     RequestInterceptor(AppContext context, ConnectionManager connectionManager) {
@@ -101,7 +82,8 @@ public class RequestInterceptor implements Interceptor {
         if (needToken && code == 401)
             tokenResolver.invalidateToken();
 
-        throw new HttpFailedException(code, errorMessages.getOrDefault(code, "Unknown error."));
+        throw new HttpFailedException(code,
+                HiveResponseBody.getHttpErrorMessages().getOrDefault(code, "Unknown error."));
     }
 
     public AuthToken getAuthToken() throws IOException {

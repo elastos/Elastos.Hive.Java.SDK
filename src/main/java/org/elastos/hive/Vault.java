@@ -1,31 +1,23 @@
 package org.elastos.hive;
 
-import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.network.response.HiveResponseBody;
-import org.elastos.hive.network.response.NodeCommitHashResponseBody;
-import org.elastos.hive.network.response.NodeVersionResponseBody;
-import org.elastos.hive.service.BackupService;
-import org.elastos.hive.service.DatabaseService;
-import org.elastos.hive.service.FilesService;
-import org.elastos.hive.service.PubSubService;
-import org.elastos.hive.service.ScriptingService;
+import org.elastos.hive.service.*;
+import org.elastos.hive.vault.HttpExceptionHandler;
+import org.elastos.hive.vault.NodeManageServiceRender;
 import org.elastos.hive.vault.ServiceBuilder;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 /**
  * This class explicitly represents the vault service subscribed by "myDid".
  */
-public class Vault extends ServiceEndpoint {
+public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
 	private FilesService 	filesService;
 	private DatabaseService databaseService;
 	private ScriptingService scriptingService;
 	private PubSubService pubsubService;
 	private BackupService 	backupService;
-	private NodeManageService nodeManageService;
+	private NodeManageServiceRender nodeManageService;
 
 	public Vault(AppContext context, String myDid) {
 		super(context, null, myDid);
@@ -39,7 +31,7 @@ public class Vault extends ServiceEndpoint {
 		this.pubsubService 	= new ServiceBuilder(this).createPubsubService();
 		this.backupService 	= new ServiceBuilder(this).createBackupService();
 		this.scriptingService = new ServiceBuilder(this).createScriptingService();
-		this.nodeManageService = new NodeManageService(this);
+		this.nodeManageService = new NodeManageServiceRender(this);
 	}
 
 	public FilesService getFilesService() {
@@ -63,42 +55,22 @@ public class Vault extends ServiceEndpoint {
 	}
 
 	public CompletableFuture<String> getVersion() {
-		return CompletableFuture.supplyAsync(() -> nodeManageService.getVersion());
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return nodeManageService.getVersion();
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		});
 	}
 
 	public CompletableFuture<String> getCommitHash() {
-		return CompletableFuture.supplyAsync(() -> nodeManageService.getCommitHash());
-	}
-
-	private class NodeManageService {
-		private ConnectionManager connectionManager;
-
-		NodeManageService(Vault vault) {
-			this.connectionManager = vault.getAppContext().getConnectionManager();
-		}
-
-		public String getVersion() {
+		return CompletableFuture.supplyAsync(() -> {
 			try {
-				NodeVersionResponseBody respBody = connectionManager.getNodeManagerApi()
-						.version()
-						.execute()
-						.body();
-				return HiveResponseBody.validateBody(respBody).getVersion();
-			} catch (HiveException | IOException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+				return nodeManageService.getCommitHash();
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
-		}
-
-		public String getCommitHash() {
-			try {
-				NodeCommitHashResponseBody respBody = connectionManager.getNodeManagerApi()
-						.commitHash()
-						.execute()
-						.body();
-				return HiveResponseBody.validateBody(respBody).getCommitHash();
-			} catch (HiveException | IOException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
-			}
-		}
+		});
 	}
 }
