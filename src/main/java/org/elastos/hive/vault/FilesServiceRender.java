@@ -1,10 +1,7 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.Vault;
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NoEnoughSpaceException;
-import org.elastos.hive.exception.VaultLockedException;
 import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.network.request.FilesCopyRequestBody;
@@ -19,11 +16,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-class FilesServiceRender implements FilesService {
-	private ConnectionManager connectionManager;
-
+class FilesServiceRender extends HiveVaultRender implements FilesService {
 	public FilesServiceRender(Vault vault) {
-		this.connectionManager = vault.getAppContext().getConnectionManager();
+		super(vault);
 	}
 
 	@Override
@@ -31,10 +26,10 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.getRequestStream(
-						connectionManager.openConnection(FilesApi.API_UPLOAD + "/" + path),
+						getConnectionManager().openConnection(FilesApi.API_UPLOAD + "/" + path),
 						resultType);
 			} catch (IOException e) {
-				throw new CompletionException(getException(e.getMessage()));
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -44,12 +39,12 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.validateBody(
-						connectionManager.getFilesApi()
+						getConnectionManager().getFilesApi()
 								.list(path)
 								.execute()
 								.body()).getFileInfoList();
 			} catch (HiveException | IOException e) {
-				throw new CompletionException(getException(e.getMessage()));
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -59,11 +54,11 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.validateBody(
-						connectionManager.getFilesApi()
+						getConnectionManager().getFilesApi()
 								.properties(path)
 								.execute().body()).getFileInfo();
-			} catch (Exception e) {
-				throw new CompletionException(getException(e.getMessage()));
+			} catch (HiveException | IOException e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -73,11 +68,11 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.getResponseStream(
-						connectionManager.getFilesApi()
+						getConnectionManager().getFilesApi()
 								.download(path)
 								.execute(), resultType);
-			} catch (HiveException|IOException e) {
-				throw new CompletionException(getException(e.getMessage()));
+			} catch (HiveException | IOException e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -86,12 +81,12 @@ class FilesServiceRender implements FilesService {
 	public CompletableFuture<Boolean> delete(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				HiveResponseBody.validateBody(connectionManager.getFilesApi()
+				HiveResponseBody.validateBody(getConnectionManager().getFilesApi()
 						.delete(new FilesDeleteRequestBody(path))
 						.execute().body());
 				return true;
-			} catch (Exception e) {
-				throw new CompletionException(getException(e.getMessage()));
+			} catch (HiveException | IOException e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -101,12 +96,12 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				HiveResponseBody.validateBody(
-						connectionManager.getFilesApi()
+						getConnectionManager().getFilesApi()
 								.move(new FilesMoveRequestBody(source, target))
 								.execute().body());
 				return true;
-			} catch (Exception e) {
-				throw new CompletionException(getException(e.getMessage()));
+			} catch (HiveException | IOException e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -116,12 +111,12 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				HiveResponseBody.validateBody(
-						connectionManager.getFilesApi()
+						getConnectionManager().getFilesApi()
 						.copy(new FilesCopyRequestBody(source, target))
 						.execute().body());
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(getException(e.getMessage()));
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -131,25 +126,20 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.validateBody(
-						connectionManager.getFilesApi()
+						getConnectionManager().getFilesApi()
 								.hash(path)
 								.execute()
 								.body()).getSha256();
 			} catch (HiveException | IOException e) {
-				throw new CompletionException(getException(e.getMessage()));
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
 
-	private Exception getException(String message) {
-		if (HiveResponseBody.msgContainsCode(message, 404))
-			return new FileNotFoundException(message);
-		else if (HiveResponseBody.msgContainsCode(message, 423))
-			return new VaultLockedException(message);
-		else if (HiveResponseBody.msgContainsCode(message, 452))
-			return new NoEnoughSpaceException(message);
-		else
-			return new HiveException(message);
+	@Override
+	protected Exception convertException(Exception e) {
+		if (HiveResponseBody.msgContainsCode(e.getMessage(), 404))
+			return new FileNotFoundException();
+		return super.convertException(e);
 	}
-
 }
