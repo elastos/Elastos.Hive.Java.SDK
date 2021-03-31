@@ -86,11 +86,7 @@ public class RequestInterceptor implements Interceptor {
                 HiveResponseBody.getHttpErrorMessages().getOrDefault(code, "Unknown error."));
     }
 
-    public AuthToken getAuthToken() throws IOException {
-        try {
-            return tokenResolver.getToken();
-        } catch (HiveException e) {
-            throw new IOException(e.getMessage());
-        }
+    public AuthToken getAuthToken() {
+        return tokenResolver.getToken();
     }
 }

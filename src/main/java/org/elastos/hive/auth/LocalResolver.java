@@ -37,7 +37,7 @@ public class LocalResolver implements TokenResolver {
 	}
 
 	@Override
-	public AuthToken getToken() throws HiveException {
+	public AuthToken getToken() {
 		if (token == null)
 			token = restoreToken();
 
