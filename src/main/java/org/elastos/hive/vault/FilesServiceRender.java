@@ -1,7 +1,6 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.Vault;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.model.FileInfo;
@@ -12,12 +11,11 @@ import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.FilesService;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-class FilesServiceRender extends HiveVaultRender implements FilesService {
+class FilesServiceRender extends HiveVaultRender implements FilesService, HttpExceptionHandler {
 	public FilesServiceRender(Vault vault) {
 		super(vault);
 	}
@@ -29,7 +27,7 @@ class FilesServiceRender extends HiveVaultRender implements FilesService {
 				return HiveResponseBody.getRequestStream(
 						getConnectionManager().openConnection(FilesApi.API_UPLOAD + "/" + path),
 						resultType);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
@@ -44,7 +42,7 @@ class FilesServiceRender extends HiveVaultRender implements FilesService {
 								.list(path)
 								.execute()
 								.body()).getFileInfoList();
-			} catch (HiveException | IOException e) {
+			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
@@ -58,7 +56,7 @@ class FilesServiceRender extends HiveVaultRender implements FilesService {
 						getConnectionManager().getFilesApi()
 								.properties(path)
 								.execute().body()).getFileInfo();
-			} catch (HiveException | IOException e) {
+			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
@@ -72,7 +70,7 @@ class FilesServiceRender extends HiveVaultRender implements FilesService {
 						getConnectionManager().getFilesApi()
 								.download(path)
 								.execute(), resultType);
-			} catch (HiveException | IOException e) {
+			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
@@ -86,7 +84,7 @@ class FilesServiceRender extends HiveVaultRender implements FilesService {
 						.delete(new FilesDeleteRequestBody(path))
 						.execute().body());
 				return true;
-			} catch (HiveException | IOException e) {
+			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
@@ -101,7 +99,7 @@ class FilesServiceRender extends HiveVaultRender implements FilesService {
 								.move(new FilesMoveRequestBody(source, target))
 								.execute().body());
 				return true;
-			} catch (HiveException | IOException e) {
+			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
@@ -131,19 +129,19 @@ class FilesServiceRender extends HiveVaultRender implements FilesService {
 								.hash(path)
 								.execute()
 								.body()).getSha256();
-			} catch (HiveException | IOException e) {
+			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
 	}
 
 	@Override
-	protected Exception convertException(Exception e) {
+	public Exception convertException(Exception e) {
 		if (e instanceof HttpFailedException) {
 			HttpFailedException ex = (HttpFailedException) e;
 			if (ex.getCode() == 404)
 				return new FileNotFoundException();
 		}
-		return super.convertException(e);
+		return HttpExceptionHandler.super.convertException(e);
 	}
 }

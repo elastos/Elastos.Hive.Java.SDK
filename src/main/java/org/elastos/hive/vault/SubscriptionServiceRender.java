@@ -1,8 +1,6 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.AppContext;
-import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.network.response.VaultCreateResponseBody;
@@ -12,73 +10,55 @@ import java.io.IOException;
 /**
  * Helper class for subscription api.
  */
-public class SubscriptionServiceRender {
-    private ConnectionManager connectionManager;
+public class SubscriptionServiceRender extends HiveVaultRender {
 
     public SubscriptionServiceRender(AppContext context) {
-        this.connectionManager = context.getConnectionManager();
+        super(context);
     }
 
-    public void subscribe() throws HiveException {
-        try {
-            VaultCreateResponseBody body = HiveResponseBody.validateBody(
-                    connectionManager.getSubscriptionApi()
-                            .createVault()
-                            .execute()
-                            .body());
-            if (Boolean.TRUE.equals(body.getExisting())) {
-                throw new VaultAlreadyExistException("The vault already exists");
-            }
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
+    public void subscribe() throws IOException {
+        VaultCreateResponseBody body = HiveResponseBody.validateBody(
+                getConnectionManager().getSubscriptionApi()
+                        .createVault()
+                        .execute()
+                        .body());
+        if (Boolean.TRUE.equals(body.getExisting())) {
+            throw new VaultAlreadyExistException("The vault already exists");
         }
     }
 
-    public void subscribeBackup() throws HiveException {
-        try {
-            VaultCreateResponseBody body = HiveResponseBody.validateBody(
-                    connectionManager.getSubscriptionApi()
-                            .createBackupVault()
-                            .execute()
-                            .body());
-            if (Boolean.TRUE.equals(body.getExisting())) {
-                throw new VaultAlreadyExistException("The backup vault already exists");
-            }
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
+    public void subscribeBackup() throws IOException {
+        VaultCreateResponseBody body = HiveResponseBody.validateBody(
+                getConnectionManager().getSubscriptionApi()
+                        .createBackupVault()
+                        .execute()
+                        .body());
+        if (Boolean.TRUE.equals(body.getExisting())) {
+            throw new VaultAlreadyExistException("The backup vault already exists");
         }
     }
 
-    public void unsubscribe() throws HiveException {
-        try {
-            HiveResponseBody.validateBody(connectionManager.getSubscriptionApi()
-                    .removeVault()
-                    .execute()
-                    .body());
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
-        }
+    public void unsubscribe() throws IOException {
+        HiveResponseBody.validateBody(
+                getConnectionManager().getSubscriptionApi()
+                        .removeVault()
+                        .execute()
+                        .body());
     }
 
-    public void activate() throws HiveException {
-        try {
-            HiveResponseBody.validateBody(connectionManager.getSubscriptionApi()
-                    .unfreeze()
-                    .execute()
-                    .body());
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
-        }
+    public void activate() throws IOException {
+        HiveResponseBody.validateBody(
+                getConnectionManager().getSubscriptionApi()
+                        .unfreeze()
+                        .execute()
+                        .body());
     }
 
-    public void deactivate() throws HiveException {
-        try {
-            HiveResponseBody.validateBody(connectionManager.getSubscriptionApi()
-                    .freeze()
-                    .execute()
-                    .body());
-        } catch (IOException | HiveException e) {
-            throw new HiveException(e.getMessage());
-        }
+    public void deactivate() throws IOException {
+        HiveResponseBody.validateBody(
+                getConnectionManager().getSubscriptionApi()
+                        .freeze()
+                        .execute()
+                        .body());
     }
 }

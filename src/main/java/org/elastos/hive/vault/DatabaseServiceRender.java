@@ -3,7 +3,6 @@ package org.elastos.hive.vault;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.elastos.hive.Vault;
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.database.CountOptions;
 import org.elastos.hive.database.CreateCollectionOptions;
 import org.elastos.hive.database.DeleteOptions;
@@ -14,7 +13,6 @@ import org.elastos.hive.database.InsertOneResult;
 import org.elastos.hive.database.InsertOptions;
 import org.elastos.hive.database.UpdateOptions;
 import org.elastos.hive.database.UpdateResult;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.request.*;
 import org.elastos.hive.network.response.*;
 import org.elastos.hive.service.DatabaseService;
@@ -24,12 +22,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-class DatabaseServiceRender implements DatabaseService {
-
-	private ConnectionManager connectionManager;
+class DatabaseServiceRender extends HiveVaultRender implements DatabaseService, HttpExceptionHandler {
 
 	public DatabaseServiceRender(Vault vault) {
-		this.connectionManager = vault.getAppContext().getConnectionManager();
+		super(vault);
 	}
 
 	@Override
@@ -37,13 +33,13 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				HiveResponseBody.validateBody(
-						connectionManager.getDatabaseApi()
+						getConnectionManager().getDatabaseApi()
 								.createCollection(new CreateCollectionRequestBody(name))
 								.execute()
 								.body());
 				return true;
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -53,13 +49,13 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				HiveResponseBody.validateBody(
-						connectionManager.getDatabaseApi()
+						getConnectionManager().getDatabaseApi()
 								.deleteCollection(new DeleteCollectionRequestBody(name))
 								.execute()
 								.body());
 				return true;
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -69,7 +65,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				InsertDocResponseBody body = HiveResponseBody.validateBody(
-						connectionManager.getDatabaseApi()
+						getConnectionManager().getDatabaseApi()
 						.insertOne(new InsertDocRequestBody(collection,
 								HiveResponseBody.jsonNode2KeyValueDic(doc),
 								options))
@@ -78,8 +74,8 @@ class DatabaseServiceRender implements DatabaseService {
 				return new InsertOneResult()
 						.setInsertedId(body.getInsertedId())
 						.setAcknowledged(body.getAcknowledged());
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -89,7 +85,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				InsertDocsResponseBody body = HiveResponseBody.validateBody(
-						connectionManager.getDatabaseApi()
+						getConnectionManager().getDatabaseApi()
 								.insertMany(new InsertDocsRequestBody(collection,
 										HiveResponseBody.jsonNodeList2KeyValueDicList(docs),
 										options))
@@ -98,8 +94,8 @@ class DatabaseServiceRender implements DatabaseService {
 				return new InsertManyResult()
 						.setInsertedIds(body.getInsertedIds())
 						.setAcknowledged(body.getAcknowledged());
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -109,15 +105,15 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.validateBody(
-						connectionManager.getDatabaseApi()
+						getConnectionManager().getDatabaseApi()
 								.countDocs(new CountDocRequestBody(
 										collection,
 										HiveResponseBody.jsonNode2KeyValueDic(query),
 										options))
 								.execute()
 								.body()).getCount();
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -128,14 +124,14 @@ class DatabaseServiceRender implements DatabaseService {
 			try {
 				return HiveResponseBody.KeyValueDict2JsonNode(
 						HiveResponseBody.validateBody(
-								connectionManager.getDatabaseApi()
+								getConnectionManager().getDatabaseApi()
 										.findOne(new FindDocRequestBody(collection,
 												HiveResponseBody.jsonNode2KeyValueDic(query),
 												options))
 										.execute()
 										.body()).getItem());
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -146,14 +142,14 @@ class DatabaseServiceRender implements DatabaseService {
 			try {
 				return HiveResponseBody.KeyValueDictList2JsonNodeList(
 						HiveResponseBody.validateBody(
-								connectionManager.getDatabaseApi()
+								getConnectionManager().getDatabaseApi()
 						.findMany(new FindDocsRequestBody(collection,
 								HiveResponseBody.jsonNode2KeyValueDic(query),
 								options))
 						.execute()
 						.body()).getItems());
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -163,7 +159,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				UpdateDocResponseBody body = HiveResponseBody.validateBody(
-								connectionManager.getDatabaseApi()
+								getConnectionManager().getDatabaseApi()
 										.updateOne(new UpdateDocRequestBody(collection)
 											.setFilter(HiveResponseBody.jsonNode2KeyValueDic(filter))
 											.setUpdate(HiveResponseBody.jsonNode2KeyValueDic(update))
@@ -175,8 +171,8 @@ class DatabaseServiceRender implements DatabaseService {
 						.setModifiedCount(body.getModifiedCount())
 						.setAcknowledged(body.getAcknowledged())
 						.setUpsertedId(body.getUpsertedId());
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -186,7 +182,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				UpdateDocResponseBody body = HiveResponseBody.validateBody(
-						connectionManager.getDatabaseApi()
+						getConnectionManager().getDatabaseApi()
 								.updateMany(new UpdateDocRequestBody(collection)
 										.setFilter(HiveResponseBody.jsonNode2KeyValueDic(filter))
 										.setUpdate(HiveResponseBody.jsonNode2KeyValueDic(update))
@@ -198,8 +194,8 @@ class DatabaseServiceRender implements DatabaseService {
 						.setModifiedCount(body.getModifiedCount())
 						.setAcknowledged(body.getAcknowledged())
 						.setUpsertedId(body.getUpsertedId());
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -209,7 +205,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				DeleteDocResponseBody body = HiveResponseBody.validateBody(
-						connectionManager.getDatabaseApi()
+						getConnectionManager().getDatabaseApi()
 						.deleteOne(new DeleteDocRequestBody(collection,
 								HiveResponseBody.jsonNode2KeyValueDic(filter)))
 						.execute()
@@ -217,8 +213,8 @@ class DatabaseServiceRender implements DatabaseService {
 				return new DeleteResult()
 						.setDeletedCount(body.getDeletedCount())
 						.setAcknowledged(body.getAcknowledged());
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -228,7 +224,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				DeleteDocResponseBody body = HiveResponseBody.validateBody(
-						connectionManager.getDatabaseApi()
+						getConnectionManager().getDatabaseApi()
 								.deleteMany(new DeleteDocRequestBody(collection,
 										HiveResponseBody.jsonNode2KeyValueDic(filter)))
 								.execute()
@@ -236,8 +232,8 @@ class DatabaseServiceRender implements DatabaseService {
 				return new DeleteResult()
 						.setDeletedCount(body.getDeletedCount())
 						.setAcknowledged(body.getAcknowledged());
-			} catch (IOException | HiveException e) {
-				throw new CompletionException(new HiveException(e.getMessage()));
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}

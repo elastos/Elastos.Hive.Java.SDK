@@ -1,6 +1,5 @@
 package org.elastos.hive.vault;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -8,14 +7,13 @@ import org.elastos.hive.Vault;
 import org.elastos.hive.auth.BackupRemoteResolver;
 import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.TokenResolver;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.request.BackupRestoreRequestBody;
 import org.elastos.hive.network.request.BackupSaveRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
 
-class BackupServiceRender extends HiveVaultRender implements BackupService {
+class BackupServiceRender extends HiveVaultRender implements BackupService, HttpExceptionHandler {
     private BackupContext backupContext;
     private TokenResolver tokenResolver;
 
@@ -48,7 +46,7 @@ class BackupServiceRender extends HiveVaultRender implements BackupService {
                                 .saveToNode(new BackupSaveRequestBody(tokenResolver.getToken().getAccessToken()))
                                 .execute()
                                 .body());
-            } catch (HiveException | IOException e) {
+            } catch (Exception e) {
                 throw new CompletionException(convertException(e));
             }
         });
@@ -69,7 +67,7 @@ class BackupServiceRender extends HiveVaultRender implements BackupService {
                                         tokenResolver.getToken().getAccessToken()))
                                 .execute()
                                 .body());
-            } catch (HiveException | IOException e) {
+            } catch (Exception e) {
                 throw new CompletionException(convertException(e));
             }
         });
@@ -89,7 +87,7 @@ class BackupServiceRender extends HiveVaultRender implements BackupService {
                                 .getState()
                                 .execute()
                                 .body()).getStatusResult();
-            } catch (HiveException | IOException e) {
+            } catch (Exception e) {
                 throw new CompletionException(convertException(e));
             }
         });

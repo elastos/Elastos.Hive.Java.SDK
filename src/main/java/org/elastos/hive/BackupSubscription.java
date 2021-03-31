@@ -6,6 +6,7 @@ import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
+import org.elastos.hive.vault.HttpExceptionHandler;
 import org.elastos.hive.vault.PaymentServiceRender;
 import org.elastos.hive.vault.SubscriptionServiceRender;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class BackupSubscription extends ServiceEndpoint implements SubscriptionService<BackupSubscription.BackupInfo>, PaymentService {
+public class BackupSubscription extends ServiceEndpoint implements SubscriptionService<BackupSubscription.BackupInfo>, PaymentService, HttpExceptionHandler {
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
 
@@ -30,8 +31,8 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 				this.subscriptionService.subscribeBackup();
 				//TODO:
 				return new BackupSubscription.BackupInfo();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -41,8 +42,8 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 		return CompletableFuture.runAsync(() -> {
 			try {
 				this.subscriptionService.unsubscribe();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -71,8 +72,8 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return paymentService.getBackupPlanList();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -82,8 +83,8 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return paymentService.getBackupPlan(planName);
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -93,8 +94,8 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return paymentService.getOrderInfo(paymentService.createBackupOrder(planName));
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -104,8 +105,8 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return paymentService.getOrderInfo(orderId);
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
@@ -117,8 +118,8 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 				paymentService.payOrder(orderId, transIds);
 				//TODO:
 				return null;
-			} catch (HiveException e) {
-				throw new CompletionException(e);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
 			}
 		});
 	}
