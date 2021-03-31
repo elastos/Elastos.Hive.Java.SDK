@@ -36,6 +36,7 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.network.BaseApi;
 
 /**
@@ -100,10 +101,7 @@ public class RequestInterceptor implements Interceptor {
         if (needToken && code == 401)
             tokenResolver.invalidateToken();
 
-        if (errorMessages.containsKey(code))
-            throw new IOException("Failed to request for code " + code + "(" + errorMessages.get(code) + ")");
-        else
-            throw new IOException("Catch an undefined error code " + code);
+        throw new HttpFailedException(code, errorMessages.getOrDefault(code, "Unknown error."));
     }
 
     public AuthToken getAuthToken() throws IOException {

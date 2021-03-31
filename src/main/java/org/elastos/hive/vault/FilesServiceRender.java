@@ -2,6 +2,7 @@ package org.elastos.hive.vault;
 
 import org.elastos.hive.Vault;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.network.request.FilesCopyRequestBody;
@@ -138,8 +139,11 @@ class FilesServiceRender extends HiveVaultRender implements FilesService {
 
 	@Override
 	protected Exception convertException(Exception e) {
-		if (HiveResponseBody.msgContainsCode(e.getMessage(), 404))
-			return new FileNotFoundException();
+		if (e instanceof HttpFailedException) {
+			HttpFailedException ex = (HttpFailedException) e;
+			if (ex.getCode() == 404)
+				return new FileNotFoundException();
+		}
 		return super.convertException(e);
 	}
 }

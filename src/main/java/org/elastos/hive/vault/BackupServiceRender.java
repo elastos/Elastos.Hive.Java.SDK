@@ -8,7 +8,6 @@ import org.elastos.hive.Vault;
 import org.elastos.hive.auth.BackupRemoteResolver;
 import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.TokenResolver;
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.request.BackupRestoreRequestBody;
 import org.elastos.hive.network.request.BackupSaveRequestBody;
@@ -16,27 +15,24 @@ import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
 
-class BackupServiceRender implements BackupService {
-    private Vault vault;
+class BackupServiceRender extends HiveVaultRender implements BackupService {
     private BackupContext backupContext;
-    private ConnectionManager connectionManager;
     private TokenResolver tokenResolver;
 
     public BackupServiceRender(Vault vault) {
-        this.vault = vault;
-        this.connectionManager = vault.getAppContext().getConnectionManager();
+        super(vault);
     }
 
     @Override
     public CompletableFuture<Void> setupContext(BackupContext backupContext) {
         this.backupContext = backupContext;
         this.tokenResolver = new LocalResolver(
-                this.vault.getAppContext().getUserDid(),
-                this.vault.getAppContext().getProviderAddress(),
+                getVault().getAppContext().getUserDid(),
+                getVault().getAppContext().getProviderAddress(),
                 LocalResolver.TYPE_BACKUP_CREDENTIAL,
-                this.vault.getAppContext().getAppContextProvider().getLocalDataDir());
+                getVault().getAppContext().getAppContextProvider().getLocalDataDir());
         this.tokenResolver.setNextResolver(new BackupRemoteResolver(
-                this.vault.getAppContext(),
+                getVault().getAppContext(),
                 backupContext,
                 backupContext.getParameter("targetDid"),
                 backupContext.getParameter("targetHost")));
@@ -48,12 +44,12 @@ class BackupServiceRender implements BackupService {
         return CompletableFuture.runAsync(() -> {
             try {
                 HiveResponseBody.validateBody(
-                        connectionManager.getBackupApi()
+                        getConnectionManager().getBackupApi()
                                 .saveToNode(new BackupSaveRequestBody(tokenResolver.getToken().getAccessToken()))
                                 .execute()
                                 .body());
             } catch (HiveException | IOException e) {
-                throw new CompletionException(new HiveException(e.getMessage()));
+                throw new CompletionException(convertException(e));
             }
         });
     }
@@ -68,13 +64,13 @@ class BackupServiceRender implements BackupService {
         return CompletableFuture.runAsync(() -> {
             try {
                 HiveResponseBody.validateBody(
-                        connectionManager.getBackupApi()
+                        getConnectionManager().getBackupApi()
                                 .restoreFromNode(new BackupRestoreRequestBody(
                                         tokenResolver.getToken().getAccessToken()))
                                 .execute()
                                 .body());
             } catch (HiveException | IOException e) {
-                throw new CompletionException(new HiveException(e.getMessage()));
+                throw new CompletionException(convertException(e));
             }
         });
     }
@@ -89,12 +85,12 @@ class BackupServiceRender implements BackupService {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return HiveResponseBody.validateBody(
-                        connectionManager.getBackupApi()
+                        getConnectionManager().getBackupApi()
                                 .getState()
                                 .execute()
                                 .body()).getStatusResult();
             } catch (HiveException | IOException e) {
-                throw new CompletionException(new HiveException(e.getMessage()));
+                throw new CompletionException(convertException(e));
             }
         });
     }
