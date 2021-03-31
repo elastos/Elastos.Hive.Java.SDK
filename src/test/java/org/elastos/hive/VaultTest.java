@@ -1,15 +1,14 @@
 package org.elastos.hive;
 
+import com.google.common.base.Throwables;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.HiveException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-public class VaultTest {
+class VaultTest {
 	private static Vault vault;
 
 	@BeforeAll
@@ -17,52 +16,43 @@ public class VaultTest {
 		try {
 			vault = TestData.getInstance().newVault();
 		} catch (HiveException | DIDException e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
-	public void testGetFiles() {
+	void testGetFiles() {
 	}
 
 	@Test
-	public void testGetMongoDb() {
+	void testGetMongoDb() {
 	}
 
 	@Test
-	public void testGetProviderAddress() {
+	void testGetProviderAddress() {
 	}
 
 	@Test
-	public void testGetOwnerDid() {
+	void testGetOwnerDid() {
 	}
 
 	@Test
-	public void testGetVersion() {
+	void testGetVersion() {
 		try {
-			String version = vault.getVersion().exceptionally(e->{
-				fail();
-				return null;
-			}).get();
-			assertNotNull(version);
+			String version = vault.getVersion().get();
+			Assertions.assertNotNull(version);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
-	public void testGetCommitHash() {
+	void testGetCommitHash() {
 		try {
-			String hash = vault.getCommitHash().exceptionally(e->{
-				fail();
-				return null;
-			}).get();
-			assertNotNull(hash);
+			String hash = vault.getCommitHash().get();
+			Assertions.assertNotNull(hash);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 }

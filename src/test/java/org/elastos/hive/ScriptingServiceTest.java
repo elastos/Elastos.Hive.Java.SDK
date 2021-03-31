@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.base.Throwables;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.HiveException;
@@ -18,7 +19,7 @@ import java.io.Writer;
 import static org.junit.Assert.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ScriptingServiceTest {
+class ScriptingServiceTest {
 	private static final String FIND_NAME = "get_group_messages";
 	private static final String FIND_NO_CONDITION_NAME = "script_no_condition";
 	private static final String INSERT_NAME = "database_insert";
@@ -67,7 +68,7 @@ public class ScriptingServiceTest {
 
 	@Test
 	@Order(1)
-	public void testRegisterScriptFind() {
+	void testRegisterScriptFind() {
 		try {
 			KeyValueDict filter = new KeyValueDict().putKv("_id","$params.group_id")
 					.putKv("friends", "$callScripter_did");
@@ -76,76 +77,57 @@ public class ScriptingServiceTest {
 							new ScriptFindBody("test_group", filter)),
 					new Executable(FIND_NAME, Executable.TYPE_FIND,
 							new ScriptFindBody("test_group", filter)),
-					false, false).exceptionally(e->{
-						fail();
-						return null;
-				}).get();
-			assertTrue(isSuccess);
+					false, false).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(2)
-	public void testRegisterScriptFindWithoutCondition() {
+	void testRegisterScriptFindWithoutCondition() {
 		try {
 			Boolean isSuccess = scriptingService.registerScript(FIND_NO_CONDITION_NAME,
 					new Executable("get_groups", Executable.TYPE_FIND,
 							new ScriptFindBody("groups",
 									new KeyValueDict().putKv("friends","$caller_did"))),
-					false, false)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+					false, false).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(3)
-	public void testCallScriptFindWithoutCondition() {
+	void testCallScriptFindWithoutCondition() {
 		//TODO: A bug on node did_scripting.py line 121: return col maybe None.
 		try {
 			String result = scriptingService.callScript(FIND_NO_CONDITION_NAME,
-					null, "appId", String.class)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
+					null, "appId", String.class).get();
+			Assertions.assertNotNull(result);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(4)
-	public void testCallScriptUrlFindWithoutCondition() {
+	void testCallScriptUrlFindWithoutCondition() {
 		//TODO: A bug on node did_scripting.py line 121: return col maybe None.
 		try {
 			String result = scriptingService.callScriptUrl(UPLOAD_FILE_NAME,
-					null, "appId", String.class)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
+					null, "appId", String.class).get();
+			Assertions.assertNotNull(result);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(5)
-	public void testUploadFile() {
+	void testUploadFile() {
 		registerScriptFileUpload(UPLOAD_FILE_NAME);
 		String transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
 		uploadFileByTransActionId(transactionId);
@@ -156,15 +138,10 @@ public class ScriptingServiceTest {
 		try {
 			Boolean isSuccess = scriptingService.registerScript(scriptName,
 					Executable.createFileUploadExecutable(scriptName),
-					false, false)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+					false, false).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
@@ -172,61 +149,48 @@ public class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptingService.callScript(scriptName,
 					Executable.createFileUploadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					"appId", JsonNode.class)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
-			assertTrue(result.has(scriptName));
-			assertTrue(result.get(scriptName).has("transaction_id"));
+					"appId", JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
 			return result.get(scriptName).get("transaction_id").textValue();
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 		return null;
 	}
 
 	private void uploadFileByTransActionId(String transactionId) {
-		try (Writer writer = scriptingService.uploadFile(transactionId, Writer.class).exceptionally(e -> {
-			fail();
-			return null;
-		}).get(); FileReader fileReader = new FileReader(localSrcFilePath)) {
-			assertNotNull(writer);
+		try (Writer writer = scriptingService.uploadFile(transactionId, Writer.class).get();
+			 FileReader fileReader = new FileReader(localSrcFilePath)) {
+			Assertions.assertNotNull(writer);
 			char[] buffer = new char[1];
 			while (fileReader.read(buffer) != -1) {
 				writer.write(buffer);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(6)
-	public void testFileDownload() {
+	void testFileDownload() {
 		FilesServiceTest.removeLocalFile(localDstFilePath);
 		registerScriptFileDownload(DOWNLOAD_FILE_NAME);
 		String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
 		downloadFileByTransActionId(transactionId);
-		assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
+		Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
 	}
 
 	private void registerScriptFileDownload(String scriptName) {
 		try {
 			Boolean isSuccess = scriptingService.registerScript(scriptName,
 					Executable.createFileDownloadExecutable(scriptName),
-					false, false)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+					false, false).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
@@ -234,38 +198,29 @@ public class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptingService.callScript(scriptName,
 					Executable.createFileDownloadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					"appId", JsonNode.class)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
-			assertTrue(result.has(scriptName));
-			assertTrue(result.get(scriptName).has("transaction_id"));
+					"appId", JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
 			return result.get(scriptName).get("transaction_id").textValue();
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 		return null;
 	}
 
 	private void downloadFileByTransActionId(String transactionId) {
-		try (Reader reader = scriptingService.downloadFile(transactionId, Reader.class).exceptionally(e -> {
-			fail();
-			return null;
-		}).get()) {
-			assertNotNull(reader);
+		try (Reader reader = scriptingService.downloadFile(transactionId, Reader.class).get()) {
+			Assertions.assertNotNull(reader);
 			Utils.cacheTextFile(reader, localDstFileRoot, fileName);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(7)
-	public void testFileProperties() {
+	void testFileProperties() {
 		registerScriptFileProperties(FILE_PROPERTIES_NAME);
 		callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
 	}
@@ -274,15 +229,10 @@ public class ScriptingServiceTest {
 		try {
 			Boolean isSuccess = scriptingService.registerScript(scriptName,
 					Executable.createFilePropertiesExecutable(scriptName),
-					false, false)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+					false, false).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
@@ -290,24 +240,19 @@ public class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptingService.callScript(scriptName,
 					Executable.createFilePropertiesParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					"appId", JsonNode.class)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
-			assertTrue(result.has(scriptName));
-			assertTrue(result.get(scriptName).has("size"));
-			assertTrue(result.get(scriptName).get("size").asInt(0) > 0);
+					"appId", JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("size"));
+			Assertions.assertTrue(result.get(scriptName).get("size").asInt(0) > 0);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(8)
-	public void testFileHash() {
+	void testFileHash() {
 		registerScriptFileHash(FILE_HASH_NAME);
 		callScriptFileHash(FILE_HASH_NAME, fileName);
 	}
@@ -316,15 +261,10 @@ public class ScriptingServiceTest {
 		try {
 			Boolean isSuccess = scriptingService.registerScript(scriptName,
 					Executable.createFileHashExecutable(scriptName),
-					false, false)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+					false, false).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
@@ -332,24 +272,19 @@ public class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptingService.callScript(scriptName,
 					Executable.createFileHashParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					"appId", JsonNode.class)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
-			assertTrue(result.has(scriptName));
-			assertTrue(result.get(scriptName).has("SHA256"));
-			assertFalse("".equals(result.get(scriptName).get("SHA256").asText("")));
+					"appId", JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("SHA256"));
+			Assertions.assertFalse("".equals(result.get(scriptName).get("SHA256").asText("")));
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(9)
-	public void testInsert() {
+	void testInsert() {
 		registerScriptInsert(INSERT_NAME);
 		callScriptInsert(INSERT_NAME);
 	}
@@ -362,15 +297,10 @@ public class ScriptingServiceTest {
 									.putKv("author", "$params.author")
 									.putKv("content", "$params.content"),
 									new KeyValueDict().putKv("bypass_document_validation",false).putKv("ordered",true)
-								)), false, false)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+								)), false, false).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
@@ -379,23 +309,18 @@ public class ScriptingServiceTest {
 			JsonNode result = scriptingService.callScript(scriptName,
 					HiveResponseBody.map2JsonNode(
 							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
-					"appId", JsonNode.class)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
-			assertTrue(result.has(scriptName));
-			assertTrue(result.get(scriptName).has("inserted_id"));
+					"appId", JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("inserted_id"));
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(10)
-	public void testUpdate() {
+	void testUpdate() {
 		registerScriptUpdate(UPDATE_NAME);
 		callScriptUpdate(UPDATE_NAME);
 	}
@@ -410,15 +335,10 @@ public class ScriptingServiceTest {
 										.putKv("author", "$params.author").putKv("content", "$params.content")))
 								.setOptions(new KeyValueDict().putKv("bypass_document_validation",false)
 										.putKv("upsert",true))
-					), false, false)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+					), false, false).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
@@ -427,23 +347,18 @@ public class ScriptingServiceTest {
 			JsonNode result = scriptingService.callScript(scriptName,
 					HiveResponseBody.map2JsonNode(
 							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
-					"appId", JsonNode.class)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertNotNull(result);
-			assertTrue(result.has(scriptName));
-			assertTrue(result.get(scriptName).has("upserted_id"));
+					"appId", JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("upserted_id"));
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test
 	@Order(11)
-	public void testDelete() {
+	void testDelete() {
 		registerScriptDelete(DELETE_NAME);
 		callScriptDelete(DELETE_NAME);
 	}
@@ -454,15 +369,10 @@ public class ScriptingServiceTest {
 					Executable.createDeleteExecutable(scriptName,
 							new ScriptDeleteExecutableBody().setCollection(DATABASE_NAME)
 									.setFilter(new KeyValueDict().putKv("author", "$params.author"))
-					), false, false)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+					), false, false).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
@@ -476,12 +386,11 @@ public class ScriptingServiceTest {
 						fail();
 						return null;
 					}).get();
-			assertNotNull(result);
-			assertTrue(result.has(scriptName));
-			assertTrue(result.get(scriptName).has("deleted_count"));
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("deleted_count"));
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
@@ -490,15 +399,10 @@ public class ScriptingServiceTest {
 	 */
 	private static void create_test_database() {
 		try {
-			Boolean isSuccess = databaseService.createCollection(DATABASE_NAME, null)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+			Boolean isSuccess = databaseService.createCollection(DATABASE_NAME, null).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
@@ -507,15 +411,10 @@ public class ScriptingServiceTest {
 	 */
 	private static void remove_test_database() {
 		try {
-			Boolean isSuccess = databaseService.deleteCollection(DATABASE_NAME)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			assertTrue(isSuccess);
+			Boolean isSuccess = databaseService.deleteCollection(DATABASE_NAME).get();
+			Assertions.assertTrue(isSuccess);
 		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
