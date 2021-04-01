@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FilesServiceTest {
@@ -54,8 +55,8 @@ class FilesServiceTest {
 	@Test
 	@Order(1)
 	void testUploadText() {
-		try (Writer writer = filesService.upload(remoteTxtFilePath, Writer.class)
-				.get(); FileReader fileReader = new FileReader(localTxtFilePath)) {
+		try (Writer writer = filesService.upload(remoteTxtFilePath, Writer.class).get();
+			 FileReader fileReader = new FileReader(localTxtFilePath)) {
 			Assertions.assertNotNull(writer);
 			char[] buffer = new char[1];
 			while (fileReader.read(buffer) != -1) {
@@ -85,6 +86,7 @@ class FilesServiceTest {
 		try (Reader reader = filesService.download(remoteTxtFilePath, Reader.class).get()) {
 			Assertions.assertNotNull(reader);
 			Utils.cacheTextFile(reader, localCacheRootDir, FILE_NAME_TXT);
+			Assertions.assertTrue(isFileContentEqual(localTxtFilePath, localCacheRootDir + FILE_NAME_TXT));
 		} catch (Exception e) {
 			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
@@ -96,6 +98,7 @@ class FilesServiceTest {
 		try (InputStream in = filesService.download(remoteImgFilePath, InputStream.class).get()) {
 			Assertions.assertNotNull(in);
 			Utils.cacheBinFile(in, localCacheRootDir, FILE_NAME_IMG);
+			Assertions.assertTrue(isFileContentEqual(localImgFilePath, localCacheRootDir + FILE_NAME_IMG));
 		} catch (Exception e) {
 			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
@@ -107,6 +110,10 @@ class FilesServiceTest {
 		try {
 			List<FileInfo> files = filesService.list(remoteRootDir).get();
 			Assertions.assertNotNull(files);
+			Assertions.assertEquals(files.size(), 2);
+			List<String> names = files.stream().map(FileInfo::getName).collect(Collectors.toList());
+			Assertions.assertTrue(names.contains(FILE_NAME_TXT));
+			Assertions.assertTrue(names.contains(FILE_NAME_IMG));
 		} catch (Exception e) {
 			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}

@@ -16,7 +16,7 @@ public class RemoteResolver implements TokenResolver {
 	}
 
 	@Override
-	public AuthToken getToken() {
+	public AuthToken getToken() throws HttpFailedException {
 		try {
 			return authenticationService.auth(authenticationService.signIn4Token());
 		} catch (Exception e) {
