@@ -9,6 +9,7 @@ import okhttp3.ResponseBody;
 import org.elastos.hive.exception.*;
 import org.elastos.hive.network.model.KeyValueDict;
 import org.elastos.hive.network.model.UploadOutputStream;
+import org.elastos.hive.network.model.UploadOutputStreamWriter;
 import retrofit2.Response;
 
 import javax.security.sasl.AuthenticationException;
@@ -53,16 +54,16 @@ public class HiveResponseBody {
 
     /**
      * We can't check status on interceptor because of body string can be only read once.
-     * @param response
-     * @param <T>
-     * @return
-     * @throws HiveException
+     * @param response response
+     * @param <T> response body type
+     * @return response body object
+     * @throws IOException IOException
      */
-    public static <T extends HiveResponseBody> T validateBody(Response<T> response) throws HiveException {
+    public static <T extends HiveResponseBody> T validateBody(Response<T> response) throws IOException {
         return validateBody(response.body());
     }
 
-    public static <T extends HiveResponseBody> T validateBody(T body) {
+    public static <T extends HiveResponseBody> T validateBody(T body) throws IOException {
         if (body == null)
             throw new HiveSdkException("Failed to get response body(null)");
 
@@ -114,7 +115,7 @@ public class HiveResponseBody {
             UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
             return resultType.cast(uploader);
         } else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
-            OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+            OutputStreamWriter writer = new UploadOutputStreamWriter(connection, outputStream);
             return resultType.cast(writer);
         } else {
             throw new InvalidPropertiesFormatException("Not supported result type: " + resultType.getName());
@@ -183,20 +184,24 @@ public class HiveResponseBody {
     public static Exception convertException(Exception e) {
         if (e instanceof HttpFailedException) {
             HttpFailedException ex = (HttpFailedException) e;
-            switch (ex.getCode()) {
-                case 401:
-                    return new AuthenticationException();
-                case 423:
-                    return new VaultLockedException();
-                case 452:
-                    return new NoEnoughSpaceException();
-                default:
-                    return new HiveException("Http exception, code " + ex.getCode() + "(" + e.getMessage() + ")");
-            }
+            return getHttpExceptionByCode(ex.getCode(), ex.getMessage());
         } else if (e instanceof IOException)
             return new HiveException(e.getMessage());
         else
             return e;
+    }
+
+    public static IOException getHttpExceptionByCode(int code, String message) {
+        switch (code) {
+            case 401:
+                return new AuthenticationException();
+            case 423:
+                return new VaultLockedException();
+            case 452:
+                return new NoEnoughSpaceException();
+            default:
+                return new HttpFailedException(code, message);
+        }
     }
 
     static class Error {

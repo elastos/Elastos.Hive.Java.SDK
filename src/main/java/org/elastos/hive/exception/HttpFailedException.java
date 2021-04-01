@@ -1,8 +1,11 @@
 package org.elastos.hive.exception;
 
-public class HttpFailedException extends RuntimeException {
+import java.io.IOException;
+
+public class HttpFailedException extends IOException {
     private static final long serialVersionUID = 1L;
 
+    // response status code
     private int code;
 
     public HttpFailedException(int code, String message) {

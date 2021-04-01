@@ -1,6 +1,8 @@
 package org.elastos.hive.exception;
 
-public class VaultLockedException extends Exception {
+import java.io.IOException;
+
+public class VaultLockedException extends IOException {
 	private static final long serialVersionUID = 1L;
 
 	public VaultLockedException() {

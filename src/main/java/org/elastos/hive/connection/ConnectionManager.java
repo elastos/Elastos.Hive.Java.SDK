@@ -25,15 +25,13 @@ package org.elastos.hive.connection;
 import okhttp3.OkHttpClient;
 import org.elastos.hive.AppContext;
 import org.elastos.hive.network.*;
+import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.utils.LogUtil;
-import org.jetbrains.annotations.NotNull;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import org.elastos.hive.network.PaymentApi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -150,8 +148,7 @@ public class ConnectionManager {
 					result.append(line.trim());
 			LogUtil.d("connection", "response content: " + result.toString());
 		} else {
-			throw new IOException("Failed to read connection with error code:" + code
-					+ ", message:" + httpURLConnection.getResponseMessage());
+			throw HiveResponseBody.getHttpExceptionByCode(code, HiveResponseBody.getHttpErrorMessages().get(code));
 		}
 	}
 

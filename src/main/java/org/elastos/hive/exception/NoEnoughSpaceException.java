@@ -1,6 +1,8 @@
 package org.elastos.hive.exception;
 
-public class NoEnoughSpaceException extends Exception {
+import java.io.IOException;
+
+public class NoEnoughSpaceException extends IOException {
 	private static final long serialVersionUID = 1L;
 
 	public NoEnoughSpaceException() {
