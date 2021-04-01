@@ -1,6 +1,7 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.Vault;
+import org.elastos.hive.exception.FileDoesNotExistsException;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.network.FilesApi;
 import org.elastos.hive.network.model.FileInfo;
@@ -10,7 +11,6 @@ import org.elastos.hive.network.request.FilesMoveRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.FilesService;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -140,7 +140,7 @@ class FilesServiceRender extends HiveVaultRender implements FilesService, HttpEx
 		if (e instanceof HttpFailedException) {
 			HttpFailedException ex = (HttpFailedException) e;
 			if (ex.getCode() == 404)
-				return new FileNotFoundException();
+				return new FileDoesNotExistsException();
 		}
 		return HttpExceptionHandler.super.convertException(e);
 	}
