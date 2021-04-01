@@ -27,7 +27,7 @@ public class BackupRemoteResolver implements TokenResolver {
     }
 
     @Override
-    public AuthToken getToken() {
+    public AuthToken getToken() throws HttpFailedException {
         try {
             return credential(authenticationService.signIn4Issuer());
         } catch (Exception e) {
