@@ -1,9 +1,9 @@
 package org.elastos.hive;
 
 import com.google.common.base.Throwables;
-import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.FileDoesNotExistsException;
+import org.elastos.hive.exception.VaultLockedException;
 import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.service.FilesService;
 import org.junit.jupiter.api.*;
@@ -14,12 +14,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FilesServiceTest {
 	private static final String FILE_NAME_TXT = "test.txt";
 	private static final String FILE_NAME_IMG = "big.png";
+	private static final String FILE_NAME_NOT_EXISTS = "not_exists.txt";
 
 	private final String localTxtFilePath;
 	private final String localImgFilePath;
@@ -28,8 +30,10 @@ class FilesServiceTest {
 	private final String remoteRootDir;
 	private final String remoteTxtFilePath;
 	private final String remoteImgFilePath;
+	private final String remoteNotExistsFilePath;
 	private final String remoteBackupTxtFilePath;
 
+	private static VaultSubscription subscription;
 	private static FilesService filesService;
 
 	public FilesServiceTest() {
@@ -40,21 +44,29 @@ class FilesServiceTest {
 		remoteRootDir = "hive";
 		remoteTxtFilePath = remoteRootDir + File.separator + FILE_NAME_TXT;
 		remoteImgFilePath = remoteRootDir + File.separator + FILE_NAME_IMG;
+		remoteNotExistsFilePath = remoteRootDir + File.separator + FILE_NAME_NOT_EXISTS;
 		remoteBackupTxtFilePath = "backup" + File.separator + FILE_NAME_TXT;
 	}
 
 	@BeforeAll
 	public static void setUp() {
-		try {
-			filesService = TestData.getInstance().newVault().getFilesService();
-		} catch (HiveException | DIDException e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		Assertions.assertDoesNotThrow(()->{
+			TestData testData = TestData.getInstance();
+			subscription = new VaultSubscription(testData.getAppContext(),
+					testData.getOwnerDid(),
+					testData.getProviderAddress());
+			filesService = testData.newVault().getFilesService();
+		});
 	}
 
 	@Test
 	@Order(1)
 	void testUploadText() {
+		Assertions.assertDoesNotThrow(this::uploadTextReally);
+		verifyRemoteFileExists(remoteTxtFilePath);
+	}
+
+	private void uploadTextReally() throws IOException, ExecutionException, InterruptedException {
 		try (Writer writer = filesService.upload(remoteTxtFilePath, Writer.class).get();
 			 FileReader fileReader = new FileReader(localTxtFilePath)) {
 			Assertions.assertNotNull(writer);
@@ -62,10 +74,7 @@ class FilesServiceTest {
 			while (fileReader.read(buffer) != -1) {
 				writer.write(buffer);
 			}
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
-		verifyRemoteFileExists(remoteTxtFilePath);
 	}
 
 	@Test
@@ -107,66 +116,71 @@ class FilesServiceTest {
 	@Test
 	@Order(5)
 	void testList() {
-		try {
+		Assertions.assertDoesNotThrow(() -> {
 			List<FileInfo> files = filesService.list(remoteRootDir).get();
 			Assertions.assertNotNull(files);
 			Assertions.assertEquals(files.size(), 2);
 			List<String> names = files.stream().map(FileInfo::getName).collect(Collectors.toList());
 			Assertions.assertTrue(names.contains(FILE_NAME_TXT));
 			Assertions.assertTrue(names.contains(FILE_NAME_IMG));
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		});
 	}
 
 	@Test
 	@Order(6)
 	void testHash() {
-		try {
+		Assertions.assertDoesNotThrow(() -> {
 			String hash = filesService.hash(remoteTxtFilePath).get();
 			Assertions.assertNotNull(hash);
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		});
 	}
 
 	@Test
 	@Order(7)
 	void testMove() {
-		try {
+		Assertions.assertDoesNotThrow(() -> {
 			Boolean isSuccess = filesService.delete(remoteBackupTxtFilePath)
 					.thenCompose(result -> filesService.move(remoteTxtFilePath, remoteBackupTxtFilePath))
 					.get();
 			Assertions.assertTrue(isSuccess);
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		});
 		verifyRemoteFileExists(remoteBackupTxtFilePath);
 	}
 
 	@Test
 	@Order(8)
 	void testCopy() {
-		try {
+		Assertions.assertDoesNotThrow(() -> {
 			Boolean isSuccess = filesService.copy(remoteBackupTxtFilePath, remoteTxtFilePath).get();
 			Assertions.assertTrue(isSuccess);
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		});
 		verifyRemoteFileExists(remoteTxtFilePath);
 	}
 
 	@Test
 	@Order(9)
 	void testDeleteFile() {
-		try {
+		Assertions.assertDoesNotThrow(() -> {
 			Boolean isSuccess = filesService.delete(remoteTxtFilePath)
 					.thenCompose(result -> filesService.delete(remoteBackupTxtFilePath))
 					.get();
 			Assertions.assertTrue(isSuccess);
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		});
+	}
+
+	@Test
+	void testRemoteFileNotExistsException() {
+		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+				() -> filesService.hash(remoteNotExistsFilePath).get());
+		Assertions.assertEquals(e.getCause().getClass(), FileDoesNotExistsException.class);
+	}
+
+	@Test
+	void testVaultLockException() {
+		Assertions.assertDoesNotThrow(() -> subscription.deactivate().get());
+		VaultLockedException e = Assertions.assertThrows(VaultLockedException.class, this::uploadTextReally);
+		Assertions.assertNotNull(e);
+		Assertions.assertDoesNotThrow(() -> subscription.activate().get());
 	}
 
 	private static void verifyRemoteFileExists(String path) {
@@ -174,20 +188,14 @@ class FilesServiceTest {
 	}
 
 	public static void verifyRemoteFileExists(FilesService filesService, String path) {
-		try {
+		Assertions.assertDoesNotThrow(() -> {
 			FileInfo info = filesService.stat(path).get();
 			Assertions.assertNotNull(info);
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		});
 	}
 
 	public static void removeLocalFile(String filePath) {
-		try {
-			Files.deleteIfExists(Paths.get(filePath));
-		} catch (IOException e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		Assertions.assertDoesNotThrow(() -> Files.deleteIfExists(Paths.get(filePath)));
 	}
 
 	public static boolean isFileContentEqual(String srcFile, String dstFile) {

@@ -18,8 +18,8 @@ public class UploadOutputStreamWriter extends OutputStreamWriter {
 
     @Override
     public void close() throws IOException {
+        super.close();
         // In order to get the failed message from response body.
         ConnectionManager.readConnection(connection);
-        super.close();
     }
 }
