@@ -8,8 +8,8 @@ import org.elastos.hive.*;
 import org.elastos.hive.did.DApp;
 import org.elastos.hive.did.DIDApp;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
+import org.elastos.hive.service.HiveBackupContext;
 import org.elastos.hive.utils.JwtUtil;
 
 import java.io.File;
@@ -118,20 +118,20 @@ public class TestData {
 
 	public BackupService getBackupService() {
 		BackupService bs = this.newVault().getBackupService();
-		bs.setupContext(new BackupContext() {
+		bs.setupContext(new HiveBackupContext() {
 			@Override
 			public String getType() {
 				return null;
 			}
 
 			@Override
-			public String getParameter(String key) {
-				if ("targetDid".equals(key)) {
-					return nodeConfig.targetDid();
-				} else if ("targetHost".equals(key)) {
-					return nodeConfig.targetHost();
-				}
-				return null;
+			public String getTargetProviderAddress() {
+				return nodeConfig.targetHost();
+			}
+
+			@Override
+			public String getTargetServiceDid() {
+				return nodeConfig.targetDid();
 			}
 
 			@Override
