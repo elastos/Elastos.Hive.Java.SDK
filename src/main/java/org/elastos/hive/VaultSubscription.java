@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.network.response.VaultInfoResponseBody;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
@@ -16,11 +17,15 @@ import org.elastos.hive.vault.PaymentServiceRender;
 import org.elastos.hive.vault.SubscriptionServiceRender;
 
 public class VaultSubscription extends ServiceEndpoint implements SubscriptionService<VaultSubscription.VaultInfo>, PaymentService, HttpExceptionHandler {
+	private AppContext context;
+	private String userDid;
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
 
 	public VaultSubscription(AppContext context, String userDid, String providerAddress) throws HiveException {
 		super(context, providerAddress, userDid);
+		this.context = context;
+		this.userDid = userDid;
 		this.paymentService = new PaymentServiceRender(context);
 		this.subscriptionService = new SubscriptionServiceRender(context);
 	}
@@ -73,8 +78,21 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 
 	@Override
 	public CompletableFuture<VaultInfo> checkSubscription() {
-		//TODO:
-		throw new UnsupportedOperationException();
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				VaultInfoResponseBody body = this.subscriptionService.getVaultInfo();
+				return new VaultInfo(this.userDid, null, body.getDid())
+						.setProvider(this.context.getProviderAddress())
+						.setCreateTime(body.getStartTimeStr())
+						.setModifyTime(body.getModifyTimeStr())
+						.setMaxSpace(body.getMaxStorage())
+						.setDbSpaceUsed(body.getDbUseStorage())
+						.setFileSpaceUsed(body.getFileUseStorage())
+						.setExisting(body.isExisting());
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		});
 	}
 
 	@Override
@@ -160,16 +178,112 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 			this.serviceDid = serviceDid;
 		}
 
-		public String getAppInstanceDid() {
-			return appInstanceDid;
-		}
-
 		public String getMyDid() {
 			return myDid;
 		}
 
+		public VaultInfo setMyDid(String myDid) {
+			this.myDid = myDid;
+			return this;
+		}
+
+		public String getAppInstanceDid() {
+			return appInstanceDid;
+		}
+
+		public VaultInfo setAppInstanceDid(String appInstanceDid) {
+			this.appInstanceDid = appInstanceDid;
+			return this;
+		}
+
+		public String getAppId() {
+			return appId;
+		}
+
+		public VaultInfo setAppId(String appId) {
+			this.appId = appId;
+			return this;
+		}
+
+		public String getProvider() {
+			return provider;
+		}
+
+		public VaultInfo setProvider(String provider) {
+			this.provider = provider;
+			return this;
+		}
+
 		public String getServiceDid() {
 			return serviceDid;
+		}
+
+		public VaultInfo setServiceDid(String serviceDid) {
+			this.serviceDid = serviceDid;
+			return this;
+		}
+
+		public String getPricingUsing() {
+			return pricingUsing;
+		}
+
+		public VaultInfo setPricingUsing(String pricingUsing) {
+			this.pricingUsing = pricingUsing;
+			return this;
+		}
+
+		public String getCreateTime() {
+			return createTime;
+		}
+
+		public VaultInfo setCreateTime(String createTime) {
+			this.createTime = createTime;
+			return this;
+		}
+
+		public String getModifyTime() {
+			return modifyTime;
+		}
+
+		public VaultInfo setModifyTime(String modifyTime) {
+			this.modifyTime = modifyTime;
+			return this;
+		}
+
+		public long getMaxSpace() {
+			return maxSpace;
+		}
+
+		public VaultInfo setMaxSpace(long maxSpace) {
+			this.maxSpace = maxSpace;
+			return this;
+		}
+
+		public long getDbSpaceUsed() {
+			return dbSpaceUsed;
+		}
+
+		public VaultInfo setDbSpaceUsed(long dbSpaceUsed) {
+			this.dbSpaceUsed = dbSpaceUsed;
+			return this;
+		}
+
+		public long getFileSpaceUsed() {
+			return fileSpaceUsed;
+		}
+
+		public VaultInfo setFileSpaceUsed(long fileSpaceUsed) {
+			this.fileSpaceUsed = fileSpaceUsed;
+			return this;
+		}
+
+		public boolean isExisting() {
+			return existing;
+		}
+
+		public VaultInfo setExisting(boolean existing) {
+			this.existing = existing;
+			return this;
 		}
 	}
 }
