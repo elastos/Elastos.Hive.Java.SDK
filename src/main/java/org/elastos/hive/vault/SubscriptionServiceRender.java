@@ -4,6 +4,7 @@ import org.elastos.hive.AppContext;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.network.response.VaultCreateResponseBody;
+import org.elastos.hive.network.response.VaultInfoResponseBody;
 
 import java.io.IOException;
 
@@ -58,6 +59,14 @@ public class SubscriptionServiceRender extends HiveVaultRender {
         HiveResponseBody.validateBody(
                 getConnectionManager().getSubscriptionApi()
                         .freeze()
+                        .execute()
+                        .body());
+    }
+
+    public VaultInfoResponseBody getVaultInfo() throws IOException {
+        return HiveResponseBody.validateBody(
+                getConnectionManager().getSubscriptionApi()
+                        .getVaultInfo()
                         .execute()
                         .body());
     }

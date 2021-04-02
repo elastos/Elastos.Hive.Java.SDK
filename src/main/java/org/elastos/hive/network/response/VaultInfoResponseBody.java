@@ -5,17 +5,17 @@ import com.google.gson.annotations.SerializedName;
 public class VaultInfoResponseBody extends HiveResponseBody {
     private String did;
     @SerializedName("max_storage")
-    private String maxStorage;
+    private long maxStorage;
     @SerializedName("file_use_storage")
-    private String fileUseStorage;
+    private long fileUseStorage;
     @SerializedName("db_use_storage")
-    private String dbUseStorage;
+    private long dbUseStorage;
     @SerializedName("modify_time")
-    private String modifyTime;
+    private long modifyTime;
     @SerializedName("start_time")
-    private String startTime;
+    private long startTime;
     @SerializedName("end_time")
-    private String endTime;
+    private long endTime;
     @SerializedName("pricing_using")
     private String pricingUsing;
     private String state;
@@ -24,28 +24,40 @@ public class VaultInfoResponseBody extends HiveResponseBody {
         return did;
     }
 
-    public String getMaxStorage() {
+    public long getMaxStorage() {
         return maxStorage;
     }
 
-    public String getFileUseStorage() {
+    public long getFileUseStorage() {
         return fileUseStorage;
     }
 
-    public String getDbUseStorage() {
+    public long getDbUseStorage() {
         return dbUseStorage;
     }
 
-    public String getModifyTime() {
+    public long getModifyTime() {
         return modifyTime;
     }
 
-    public String getStartTime() {
+    public String getModifyTimeStr() {
+        return getDateStrByStamp(this.modifyTime);
+    }
+
+    public long getStartTime() {
         return startTime;
     }
 
-    public String getEndTime() {
+    public String getStartTimeStr() {
+        return getDateStrByStamp(this.startTime);
+    }
+
+    public long getEndTime() {
         return endTime;
+    }
+
+    public String getEndTimeStr() {
+        return getDateStrByStamp(this.endTime);
     }
 
     public String getPricingUsing() {
@@ -54,5 +66,9 @@ public class VaultInfoResponseBody extends HiveResponseBody {
 
     public String getState() {
         return state;
+    }
+
+    public boolean isExisting() {
+        return "running".equals(this.state);
     }
 }

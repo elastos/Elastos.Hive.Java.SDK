@@ -15,14 +15,13 @@ import retrofit2.Response;
 import javax.security.sasl.AuthenticationException;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.util.HashMap;
-import java.util.InvalidPropertiesFormatException;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class HiveResponseBody {
     private static final String SUCCESS = "OK";
+    private static final SimpleDateFormat FORMAT_DT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static Map<Integer, String> errorMessages;
 
@@ -202,6 +201,10 @@ public class HiveResponseBody {
             default:
                 return new HttpFailedException(code, message);
         }
+    }
+
+    protected String getDateStrByStamp(long value) {
+        return FORMAT_DT.format(new Date(value));
     }
 
     static class Error {
