@@ -1,9 +1,6 @@
 package org.elastos.hive;
 
-import com.google.common.base.Throwables;
-import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.BackupService;
 import org.junit.jupiter.api.*;
 
@@ -11,44 +8,30 @@ import org.junit.jupiter.api.*;
 class BackupServiceTest {
 	private static BackupService backupService;
 
-	@BeforeAll
-	public static void setUp() {
-		try {
-			backupService = TestData.getInstance().getBackupService();
-		} catch (HiveException | DIDException e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+	@BeforeAll public static void setUp() {
+		Assertions.assertDoesNotThrow(()->backupService = TestData.getInstance().getBackupService());
 	}
 
-	@Test
-	@Order(1)
-	void testCheckResult() {
-		try {
+	@Test @Order(1) void testCheckResult() {
+		Assertions.assertDoesNotThrow(()->{
 			BackupService.BackupResult result = backupService.checkResult().get();
 			Assertions.assertNotNull(result);
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		});
 	}
 
-	@Test
-	@Order(2)
-	void testStartBackup() {
-		try {
-			backupService.startBackup().get();
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+	@Test @Order(2) void testStartBackup() {
+		Assertions.assertDoesNotThrow(()->backupService.startBackup().get());
 	}
 
-	@Test
-	@Order(3)
-	void testRestoreFrom() {
-		try {
-			backupService.restoreFrom().get();
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+	@Test @Order(3) void testStopBackup() {
+		//TODO:
 	}
 
+	@Test @Order(4) void testRestoreFrom() {
+		Assertions.assertDoesNotThrow(()->backupService.restoreFrom().get());
+	}
+
+	@Test @Order(5) void testStopRestore() {
+		//TODO:
+	}
 }
