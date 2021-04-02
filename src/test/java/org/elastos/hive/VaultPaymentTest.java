@@ -1,9 +1,6 @@
 package org.elastos.hive;
 
-import com.google.common.base.Throwables;
-import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
@@ -21,49 +18,48 @@ class VaultPaymentTest {
 
     @BeforeAll
     public static void setUp() {
-        try {
+        Assertions.assertDoesNotThrow(()->{
             TestData testData = TestData.getInstance();
-            paymentService = new VaultSubscription(testData.getAppContext(), testData.getOwnerDid(), testData.getProviderAddress());
-        } catch (HiveException | DIDException e) {
-            Assertions.fail(Throwables.getStackTraceAsString(e));
-        }
+            paymentService = new VaultSubscription(
+                    testData.getAppContext(),
+                    testData.getOwnerDid(),
+                    testData.getProviderAddress());
+        });
     }
 
     @Test
     @org.junit.jupiter.api.Order(1)
     void testGetPricingPlanList() {
-        try {
+        Assertions.assertDoesNotThrow(()->{
             List<PricingPlan> plans = paymentService.getPricingPlanList().get();
             Assertions.assertNotNull(plans);
             Assertions.assertFalse(plans.isEmpty());
-        } catch (Exception e) {
-            Assertions.fail(Throwables.getStackTraceAsString(e));
-        }
+        });
     }
 
     @Test
     @org.junit.jupiter.api.Order(2)
     void testGetPricingPlan() {
-        try {
-            PricingPlan plan = paymentService.getPricingPlan(PRICING_PLAN_NAME).get();
-            Assertions.assertNotNull(plan);
-        } catch (Exception e) {
-            Assertions.fail(Throwables.getStackTraceAsString(e));
-        }
+        Assertions.assertDoesNotThrow(()->
+                Assertions.assertNotNull(paymentService.getPricingPlan(PRICING_PLAN_NAME).get()));
     }
 
     @Test
     @org.junit.jupiter.api.Order(3)
     void testOrderProcess() {
-        try {
+        Assertions.assertDoesNotThrow(()->{
             Order order = paymentService.placeOrder(PRICING_PLAN_NAME).get();
             Assertions.assertNotNull(order);
             order = paymentService.getOrder(order.getOrderId()).get();
             Assertions.assertNotNull(order);
             Receipt receipt = paymentService.payOrder(order.getOrderId(), Collections.emptyList()).get();
             Assertions.assertNotNull(receipt);
-        } catch (Exception e) {
-            Assertions.fail(Throwables.getStackTraceAsString(e));
-        }
+        });
+    }
+
+    @Test
+    @org.junit.jupiter.api.Order(8)
+    void testGetReceipt() {
+        //TODO:
     }
 }
