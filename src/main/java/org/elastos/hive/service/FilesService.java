@@ -5,11 +5,16 @@ import org.elastos.hive.network.model.FileInfo;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Vault provides a storage for files saving.
+ * Files can be uploading, downloading and getting the status and information.
+ */
 public interface FilesService {
 	/**
 	 * Initiates an upload sequence by returning a Write or OutputStream object that can be
-	 * used to write small file chunks. After writing, flush() must be called
+	 * used to write small file chunks. After writing, flush()/close() must be called
 	 * to actually send the data remotely.
+	 *
 	 * @param path the path for the remote file
 	 * @param resultType Write or OutputStream class
 	 * @param <T> Write, OutputStream
@@ -72,6 +77,7 @@ public interface FilesService {
 
 	/**
 	 * Returns the list of all files in a given folder.
+	 *
 	 * @param path the path for the remote folder
 	 * @return the new CompletionStage, the result is List if success; null otherwise
 	 */
