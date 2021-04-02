@@ -32,8 +32,8 @@ class BackupServiceRender extends HiveVaultRender implements BackupService, Http
         this.tokenResolver.setNextResolver(new BackupRemoteResolver(
                 getVault().getAppContext(),
                 backupContext,
-                backupContext.getParameter("targetDid"),
-                backupContext.getParameter("targetHost")));
+                backupContext.getParameter("targetServiceDid"),
+                backupContext.getParameter("targetAddress")));
         return null;
     }
 
