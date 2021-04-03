@@ -9,6 +9,7 @@ import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.network.request.BackupRestoreRequestBody;
 import org.elastos.hive.network.request.BackupSaveRequestBody;
+import org.elastos.hive.network.request.EmptyRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
@@ -65,6 +66,16 @@ class BackupServiceRender extends HiveVaultRender implements BackupService, Http
                         getConnectionManager().getBackupApi()
                                 .restoreFromNode(new BackupRestoreRequestBody(
                                         tokenResolver.getToken().getAccessToken()))
+                                .execute()
+                                .body());
+            } catch (Exception e) {
+                throw new CompletionException(convertException(e));
+            }
+        }).thenRunAsync(()->{
+            try {
+                HiveResponseBody.validateBody(
+                        getConnectionManager().getBackupApi()
+                                .activeToVault(new EmptyRequestBody())
                                 .execute()
                                 .body());
             } catch (Exception e) {
