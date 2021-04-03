@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.network.response.VaultInfoResponseBody;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
@@ -26,15 +27,31 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 
 	@Override
 	public CompletableFuture<BackupInfo> subscribe(String pricingPlan) {
-		return CompletableFuture.supplyAsync(() -> {
+		return CompletableFuture.runAsync(() -> {
 			try {
 				this.subscriptionService.subscribeBackup();
-				//TODO:
-				return new BackupSubscription.BackupInfo();
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		}).thenApplyAsync(result -> {
+			try {
+				return getBackupInfoByResponseBody(this.subscriptionService.getBackupVaultInfo());
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
+	}
+
+	private BackupInfo getBackupInfoByResponseBody(VaultInfoResponseBody body) {
+		return new BackupInfo().setDid(body.getDid())
+				.setMaxStorage(body.getMaxStorage())
+				.setFileUseStorage(body.getFileUseStorage())
+				.setDbUseStorage(body.getDbUseStorage())
+				.setModifyTime(body.getModifyTimeStr())
+				.setStartTime(body.getStartTimeStr())
+				.setEndTime(body.getEndTimeStr())
+				.setPricingUsing(body.getPricingUsing())
+				.setIsExisting(body.isExisting());
 	}
 
 	@Override
@@ -60,11 +77,106 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 
 	@Override
 	public CompletableFuture<BackupInfo> checkSubscription() {
-		throw new UnsupportedOperationException();
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				return getBackupInfoByResponseBody(this.subscriptionService.getBackupVaultInfo());
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		});
 	}
 
 	public class BackupInfo {
-		// TODO;
+		private String did;
+		private long maxStorage;
+		private long fileUseStorage;
+		private long dbUseStorage;
+		private String modifyTime;
+		private String startTime;
+		private String endTime;
+		private String pricingUsing;
+		private boolean isExisting;
+
+		public String getDid() {
+			return did;
+		}
+
+		public BackupInfo setDid(String did) {
+			this.did = did;
+			return this;
+		}
+
+		public long getMaxStorage() {
+			return maxStorage;
+		}
+
+		public BackupInfo setMaxStorage(long maxStorage) {
+			this.maxStorage = maxStorage;
+			return this;
+		}
+
+		public long getFileUseStorage() {
+			return fileUseStorage;
+		}
+
+		public BackupInfo setFileUseStorage(long fileUseStorage) {
+			this.fileUseStorage = fileUseStorage;
+			return this;
+		}
+
+		public long getDbUseStorage() {
+			return dbUseStorage;
+		}
+
+		public BackupInfo setDbUseStorage(long dbUseStorage) {
+			this.dbUseStorage = dbUseStorage;
+			return this;
+		}
+
+		public String getModifyTime() {
+			return modifyTime;
+		}
+
+		public BackupInfo setModifyTime(String modifyTime) {
+			this.modifyTime = modifyTime;
+			return this;
+		}
+
+		public String getStartTime() {
+			return startTime;
+		}
+
+		public BackupInfo setStartTime(String startTime) {
+			this.startTime = startTime;
+			return this;
+		}
+
+		public String getEndTime() {
+			return endTime;
+		}
+
+		public BackupInfo setEndTime(String endTime) {
+			this.endTime = endTime;
+			return this;
+		}
+
+		public String getPricingUsing() {
+			return pricingUsing;
+		}
+
+		public BackupInfo setPricingUsing(String pricingUsing) {
+			this.pricingUsing = pricingUsing;
+			return this;
+		}
+
+		public boolean getIsExisting() {
+			return isExisting;
+		}
+
+		public BackupInfo setIsExisting(boolean isExisting) {
+			this.isExisting = isExisting;
+			return this;
+		}
 	}
 
 	@Override

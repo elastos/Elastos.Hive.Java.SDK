@@ -70,4 +70,12 @@ public class SubscriptionServiceRender extends HiveVaultRender {
                         .execute()
                         .body());
     }
+
+    public VaultInfoResponseBody getBackupVaultInfo() throws IOException {
+        return HiveResponseBody.validateBody(
+                getConnectionManager().getSubscriptionApi()
+                        .getBackupVaultInfo()
+                        .execute()
+                        .body());
+    }
 }
