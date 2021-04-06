@@ -56,13 +56,7 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 
 	@Override
 	public CompletableFuture<Void> unsubscribe() {
-		return CompletableFuture.runAsync(() -> {
-			try {
-				this.subscriptionService.unsubscribe();
-			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
-			}
-		});
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
