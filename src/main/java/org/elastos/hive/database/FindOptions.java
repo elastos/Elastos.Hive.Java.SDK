@@ -2,12 +2,14 @@ package org.elastos.hive.database;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FindOptions {
 	private Map<String, Object> projection;
 	private Long skip;
-	private Map<String, Object> sort;
+	private List<FieldEntry> sort;
 	@SerializedName("allow_partial_results")
 	private Boolean allowPartialResults;
 	@SerializedName("batch_size")
@@ -27,7 +29,7 @@ public class FindOptions {
 		return this;
 	}
 
-	public FindOptions setSort(Map<String, Object> sort) {
+	public FindOptions setSort(List<FieldEntry> sort) {
 		this.sort = sort;
 		return this;
 	}
@@ -50,5 +52,11 @@ public class FindOptions {
 	public FindOptions setShowRecordId(Boolean showRecordId) {
 		this.showRecordId = showRecordId;
 		return this;
+	}
+
+	public static class FieldEntry extends HashMap<String, Object> {
+		public FieldEntry(String field, Object value) {
+			super.put(field, value);
+		}
 	}
 }

@@ -3,15 +3,12 @@ package org.elastos.hive;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Throwables;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.database.*;
 import org.elastos.hive.service.DatabaseService;
 import org.junit.jupiter.api.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -65,7 +62,8 @@ class DatabaseServiceTest {
 			query.put("author", "john doe1");
 			Assertions.assertNotNull(databaseService.findOne(COLLECTION_NAME, query,
 					new FindOptions().setSkip(0L)
-							.setSort(Collections.singletonMap("_id", "desc"))
+							.setSort(Collections.singletonList(
+									new FindOptions.FieldEntry("_id", -1)))
 							.setAllowPartialResults(false)
 							.setReturnKey(false)
 							.setBatchSize(0)
@@ -79,7 +77,8 @@ class DatabaseServiceTest {
 			query.put("author", "john doe1");
 			List<JsonNode> docs = databaseService.findMany(COLLECTION_NAME, query,
 					new FindOptions().setSkip(0L)
-							.setSort(Collections.singletonMap("_id", "desc"))
+							.setSort(Collections.singletonList(
+									new FindOptions.FieldEntry("_id", -1)))
 							.setAllowPartialResults(false)
 							.setReturnKey(false)
 							.setBatchSize(0)
