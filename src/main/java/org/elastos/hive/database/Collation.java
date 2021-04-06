@@ -1,16 +1,13 @@
 package org.elastos.hive.database;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-
 public class Collation {
 	private String locale;
 	private Boolean caseLevel;
-	private CaseFirst caseFirst;
-	private Strength strength;
+	private String caseFirst;
+	private Long strength;
 	private Boolean numericOrdering;
-	private Alternate alternate;
-	private MaxVariable maxVariable;
+	private String alternate;
+	private String maxVariable;
 	private Boolean normalization;
 	private Boolean backwards;
 
@@ -32,20 +29,20 @@ public class Collation {
 		return this;
 	}
 
-	public CaseFirst getCaseFirst() {
+	public String getCaseFirst() {
 		return caseFirst;
 	}
 
-	public Collation setCaseFirst(CaseFirst caseFirst) {
+	public Collation setCaseFirst(String caseFirst) {
 		this.caseFirst = caseFirst;
 		return this;
 	}
 
-	public Strength getStrength() {
+	public Long getStrength() {
 		return strength;
 	}
 
-	public Collation setStrength(Strength strength) {
+	public Collation setStrength(Long strength) {
 		this.strength = strength;
 		return this;
 	}
@@ -59,20 +56,20 @@ public class Collation {
 		return this;
 	}
 
-	public Alternate getAlternate() {
+	public String getAlternate() {
 		return alternate;
 	}
 
-	public Collation setAlternate(Alternate alternate) {
+	public Collation setAlternate(String alternate) {
 		this.alternate = alternate;
 		return this;
 	}
 
-	public MaxVariable getMaxVariable() {
+	public String getMaxVariable() {
 		return maxVariable;
 	}
 
-	public Collation setMaxVariable(MaxVariable maxVariable) {
+	public Collation setMaxVariable(String maxVariable) {
 		this.maxVariable = maxVariable;
 		return this;
 	}
@@ -93,92 +90,5 @@ public class Collation {
 	public Collation setBackwards(Boolean backwards) {
 		this.backwards = backwards;
 		return this;
-	}
-
-	public enum CaseFirst {
-		UPPER, LOWER, OFF;
-
-		@Override
-		@JsonValue
-		public String toString() {
-			return name().toLowerCase();
-		}
-
-		@JsonCreator
-		public static CaseFirst fromString(String name) {
-			return valueOf(name.toUpperCase());
-		}
-	}
-
-	public enum Strength {
-		PRIMARY(1),
-		SECONDARY(2),
-		TERTIARY(3),
-		QUATERNARY(4),
-		IDENTICAL(5);
-
-		private int value;
-
-		Strength(int value) {
-			this.value = value;
-		}
-
-		@JsonValue
-		public int value() {
-			return value;
-		}
-
-		@JsonCreator
-		public static Strength fromInt(int i) {
-			switch (i) {
-				case 1:
-					return PRIMARY;
-
-				case 2:
-					return SECONDARY;
-
-				case 3:
-					return TERTIARY;
-
-				case 4:
-					return QUATERNARY;
-
-				case 5:
-					return IDENTICAL;
-
-				default:
-					throw new IllegalArgumentException("Invalid strength");
-			}
-		}
-	}
-
-	public enum Alternate {
-		NON_IGNORABLE, SHIFTED;
-
-		@Override
-		@JsonValue
-		public String toString() {
-			return name().toLowerCase();
-		}
-
-		@JsonCreator
-		public static Alternate fromString(String name) {
-			return valueOf(name.toUpperCase());
-		}
-	}
-
-	public enum MaxVariable {
-		PUNCT, SPACE;
-
-		@Override
-		@JsonValue
-		public String toString() {
-			return name().toLowerCase();
-		}
-
-		@JsonCreator
-		public static MaxVariable fromString(String name) {
-			return valueOf(name.toUpperCase());
-		}
 	}
 }

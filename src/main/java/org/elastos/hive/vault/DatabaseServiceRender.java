@@ -3,21 +3,11 @@ package org.elastos.hive.vault;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.elastos.hive.Vault;
-import org.elastos.hive.database.CountOptions;
-import org.elastos.hive.database.CreateCollectionOptions;
-import org.elastos.hive.database.DeleteOptions;
-import org.elastos.hive.database.DeleteResult;
-import org.elastos.hive.database.FindOptions;
-import org.elastos.hive.database.InsertManyResult;
-import org.elastos.hive.database.InsertOneResult;
-import org.elastos.hive.database.InsertOptions;
-import org.elastos.hive.database.UpdateOptions;
-import org.elastos.hive.database.UpdateResult;
+import org.elastos.hive.database.*;
 import org.elastos.hive.network.request.*;
 import org.elastos.hive.network.response.*;
 import org.elastos.hive.service.DatabaseService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -61,7 +51,7 @@ class DatabaseServiceRender extends HiveVaultRender implements DatabaseService, 
 	}
 
 	@Override
-	public CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options) {
+	public CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOneOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				InsertDocResponseBody body = HiveResponseBody.validateBody(
@@ -81,7 +71,7 @@ class DatabaseServiceRender extends HiveVaultRender implements DatabaseService, 
 	}
 
 	@Override
-	public CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options) {
+	public CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertManyOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				InsertDocsResponseBody body = HiveResponseBody.validateBody(
