@@ -1,13 +1,9 @@
 package org.elastos.hive.database;
 
-import java.util.List;
-
 public class CountOptions {
 	private Long skip;
 	private Long limit;
-	private Integer maxTimeMS;
-	private Collation collation;
-	private List<Index> hint;
+	private Long maxTimeMS;
 
 	public CountOptions setSkip(Long skip) {
 		this.skip = skip;
@@ -19,19 +15,8 @@ public class CountOptions {
 		return this;
 	}
 
-	public CountOptions setMaxTimeMS(Integer maxTimeMS) {
+	public CountOptions setMaxTimeMS(Long maxTimeMS) {
 		this.maxTimeMS = maxTimeMS;
 		return this;
 	}
-
-	public CountOptions setCollation(Collation collation) {
-		this.collation = collation;
-		return this;
-	}
-
-	public CountOptions setHint(List<Index> hint) {
-		this.hint = hint;
-		return this;
-	}
-
 }

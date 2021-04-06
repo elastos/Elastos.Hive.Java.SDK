@@ -13,54 +13,36 @@ class BackupSubscriptionTest {
 
 	@BeforeAll
 	public static void setup() {
-		try {
+		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
 			subscription = new BackupSubscription(
 					testData.getAppContext(),
 					testData.getOwnerDid(),
 					testData.getProviderAddress());
-		} catch (HiveException | DIDException e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		} );
 	}
 
 	@Test
 	@Order(1)
 	void testSubscribe() {
-		try {
-			subscription.subscribe("fake_pricing_plan_name").get();
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		Assertions.assertDoesNotThrow(()->subscription.subscribe("fake_pricing_plan_name").get());
 	}
 
 	@Test
 	@Order(2)
 	void testActivate() {
-		try {
-			subscription.activate().get();
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		Assertions.assertDoesNotThrow(()->subscription.activate().get());
 	}
 
 	@Test
 	@Order(3)
 	void testDeactivate() {
-		try {
-			subscription.deactivate().get();
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		Assertions.assertDoesNotThrow(()->subscription.deactivate().get());
 	}
 
 	@Test
 	@Order(4)
 	void testUnsubscribe() {
-		try {
-			subscription.unsubscribe().get();
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+		Assertions.assertDoesNotThrow(()->subscription.unsubscribe().get());
 	}
 }

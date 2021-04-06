@@ -2,16 +2,7 @@ package org.elastos.hive.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.elastos.hive.database.CountOptions;
-import org.elastos.hive.database.CreateCollectionOptions;
-import org.elastos.hive.database.DeleteOptions;
-import org.elastos.hive.database.DeleteResult;
-import org.elastos.hive.database.FindOptions;
-import org.elastos.hive.database.InsertManyResult;
-import org.elastos.hive.database.InsertOneResult;
-import org.elastos.hive.database.InsertOptions;
-import org.elastos.hive.database.UpdateOptions;
-import org.elastos.hive.database.UpdateResult;
+import org.elastos.hive.database.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -42,7 +33,7 @@ public interface DatabaseService {
 	 *                the write to opt-out of document level validation. Default is False.
 	 * @return Results returned by {@link InsertOneResult} wrapper
 	 */
-	CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOptions options);
+	CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOneOptions options);
 
 
 	/**
@@ -56,7 +47,7 @@ public interface DatabaseService {
 	 *                bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
 	 * @return Results returned by {@link InsertManyResult} wrapper
 	 */
-	CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options);
+	CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertManyOptions options);
 
 
 	/**
