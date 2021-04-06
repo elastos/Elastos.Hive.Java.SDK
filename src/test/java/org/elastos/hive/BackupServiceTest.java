@@ -13,10 +13,7 @@ class BackupServiceTest {
 	}
 
 	@Test @Order(1) void testCheckResult() {
-		Assertions.assertDoesNotThrow(()->{
-			BackupService.BackupResult result = backupService.checkResult().get();
-			Assertions.assertNotNull(result);
-		});
+		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(backupService.checkResult().get()));
 	}
 
 	@Test @Order(2) void testStartBackup() {
