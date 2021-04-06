@@ -25,13 +25,13 @@ public interface BackupApi {
 	Call<HiveResponseBody> saveToNode(@Body BackupSaveRequestBody body);
 
 	/**
-	 * Just restore data to vault without replace the exist one.
+	 * Restore backup data to vault and replace the exist one.
 	 */
 	@POST(BaseApi.API_VERSION + "/backup/restore_from_node")
 	Call<HiveResponseBody> restoreFromNode(@Body BackupRestoreRequestBody body);
 
 	/**
-	 * Replace restore data to the current vault and unfreeze it.
+	 * Active backup data to vault on backup server side.
 	 */
 	@POST(BaseApi.API_VERSION + "/backup/activate_to_vault")
 	Call<HiveResponseBody> activeToVault(@Body EmptyRequestBody body);

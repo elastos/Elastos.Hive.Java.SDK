@@ -71,16 +71,6 @@ class BackupServiceRender extends HiveVaultRender implements BackupService, Http
             } catch (Exception e) {
                 throw new CompletionException(convertException(e));
             }
-        }).thenRunAsync(()->{
-            try {
-                HiveResponseBody.validateBody(
-                        getConnectionManager().getBackupApi()
-                                .activeToVault(new EmptyRequestBody())
-                                .execute()
-                                .body());
-            } catch (Exception e) {
-                throw new CompletionException(convertException(e));
-            }
         });
     }
 
