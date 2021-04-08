@@ -4,6 +4,7 @@ import org.elastos.hive.config.TestData;
 import org.elastos.hive.service.PromotionService;
 import org.junit.jupiter.api.*;
 
+@Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PromotionServiceTest {
 
@@ -14,7 +15,7 @@ class PromotionServiceTest {
     }
 
     @Test void testPromote() {
-
+        Assertions.assertDoesNotThrow(()->promotionService.promote().get());
     }
 
 }

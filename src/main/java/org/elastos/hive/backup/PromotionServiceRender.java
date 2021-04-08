@@ -3,7 +3,7 @@ package org.elastos.hive.backup;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-import org.elastos.hive.Backup;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.request.EmptyRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.PromotionService;
@@ -12,8 +12,8 @@ import org.elastos.hive.vault.HttpExceptionHandler;
 
 class PromotionServiceRender extends HiveVaultRender implements PromotionService, HttpExceptionHandler {
 
-	PromotionServiceRender(Backup backup) {
-		super(backup);
+	PromotionServiceRender(ServiceEndpoint serviceEndpoint) {
+		super(serviceEndpoint);
 	}
 
 	@Override
