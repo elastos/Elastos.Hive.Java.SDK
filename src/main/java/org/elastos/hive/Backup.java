@@ -6,8 +6,8 @@ import org.elastos.hive.service.PromotionService;
 public class Backup extends ServiceEndpoint {
 	private PromotionService promotionService;
 
-	public Backup(AppContext context, String userDid, String providerAddress) {
-		super(context, userDid, providerAddress, userDid, null);
+	public Backup(AppContext context, String providerAddress) {
+		super(context, providerAddress);
 		this.promotionService = new ServiceBuilder(this).createPromotionService();
 	}
 

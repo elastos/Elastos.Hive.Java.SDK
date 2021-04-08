@@ -15,12 +15,12 @@ public class ScriptRunner extends ServiceEndpoint {
 	private String targetAppDid;
 	private ConnectionManager connectionManager;
 
-	public ScriptRunner(AppContext context, String userDid, String providerAddress,
+	public ScriptRunner(AppContext context, String providerAddress,
 						String targetDid, String targetAppDid) {
-		super(context, userDid, providerAddress, targetDid, targetAppDid);
+		super(context, providerAddress, targetDid, targetAppDid);
 		this.targetDid = targetDid;
 		this.targetAppDid = targetAppDid;
-		this.connectionManager = getAppContext().getConnectionManager();
+		this.connectionManager = super.getConnectionManager();
 	}
 
 	public <T> T callScript(String name, JsonNode params, String appDid, Class<T> resultType)

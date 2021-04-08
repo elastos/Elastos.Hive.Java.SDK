@@ -1,6 +1,6 @@
 package org.elastos.hive.vault;
 
-import org.elastos.hive.AppContext;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.network.response.VaultCreateResponseBody;
@@ -13,8 +13,8 @@ import java.io.IOException;
  */
 public class SubscriptionServiceRender extends HiveVaultRender {
 
-    public SubscriptionServiceRender(AppContext context) {
-        super(context);
+    public SubscriptionServiceRender(ServiceEndpoint serviceEndpoint) {
+        super(serviceEndpoint);
     }
 
     public void subscribe() throws IOException {

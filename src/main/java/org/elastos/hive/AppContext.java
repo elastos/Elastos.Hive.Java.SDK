@@ -9,7 +9,6 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.did.exception.MalformedDIDException;
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotFoundException;
 import org.elastos.hive.exception.ProviderNotSetException;
@@ -30,19 +29,14 @@ public class AppContext {
 
 	private AppContextProvider contextProvider;
 	private String userDid;
-	private String providerAddress;
 
-	private ConnectionManager connectionManager;
-
-	private AppContext(AppContextProvider provider, String userDid) {
-		this(provider, userDid, null);
+	private AppContext(AppContextProvider provider) {
+		this(provider, null);
 	}
 
-	private AppContext(AppContextProvider provider, String userDid, String providerAddress) {
-		this.providerAddress = providerAddress;
+	private AppContext(AppContextProvider provider, String userDid) {
 		this.userDid = userDid;
 		this.contextProvider = provider;
-		this.connectionManager = new ConnectionManager(this);
 	}
 
 	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
@@ -69,14 +63,6 @@ public class AppContext {
 		return this.userDid;
 	}
 
-	public String getProviderAddress() {
-		return this.providerAddress;
-	}
-
-	public ConnectionManager getConnectionManager() {
-		return this.connectionManager;
-	}
-
 	public static AppContext build(AppContextProvider provider) {
 		if (provider == null)
 			throw new IllegalArgumentException("Missing AppContext provider");
@@ -90,10 +76,10 @@ public class AppContext {
 		if (!resolverHasSetup)
 			throw new DIDResolverNotSetupException();
 
-		return new AppContext(provider, null, null);
+		return new AppContext(provider);
 	}
 
-	public static AppContext build(AppContextProvider provider, String userDid, String providerAddress) {
+	public static AppContext build(AppContextProvider provider, String userDid) {
 		if (provider == null)
 			throw new IllegalArgumentException("Missing AppContext provider");
 
@@ -106,7 +92,7 @@ public class AppContext {
 		if (!resolverHasSetup)
 			throw new DIDResolverNotSetupException();
 
-		return new AppContext(provider, userDid, providerAddress);
+		return new AppContext(provider, userDid);
 	}
 
 	public static CompletableFuture<String> getProviderAddress(String targetDid) {

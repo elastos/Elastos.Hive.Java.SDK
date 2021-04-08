@@ -1,6 +1,6 @@
 package org.elastos.hive.vault;
 
-import org.elastos.hive.AppContext;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.request.PayOrderRequestBody;
 import org.elastos.hive.network.request.PaymentCreateRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class PaymentServiceRender extends HiveVaultRender {
 
-    public PaymentServiceRender(AppContext context) {
-        super(context);
+    public PaymentServiceRender(ServiceEndpoint serviceEndpoint) {
+        super(serviceEndpoint);
     }
 
     public List<PricingPlan> getPricingPlanList() throws IOException {

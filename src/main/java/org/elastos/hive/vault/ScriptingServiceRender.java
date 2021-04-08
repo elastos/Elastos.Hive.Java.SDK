@@ -2,7 +2,7 @@ package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.ScriptRunner;
-import org.elastos.hive.Vault;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.model.Condition;
 import org.elastos.hive.network.model.Executable;
 import org.elastos.hive.network.request.RegisterScriptRequestBody;
@@ -15,11 +15,12 @@ import java.util.concurrent.CompletionException;
 class ScriptingServiceRender extends HiveVaultRender implements ScriptingService, HttpExceptionHandler {
 	private ScriptRunner scriptRunner;
 
-	public ScriptingServiceRender(Vault vault) {
-		super(vault);
-		this.scriptRunner = new ScriptRunner(vault.getAppContext(),
-				vault.getUserDid(), vault.getProviderAddress(),
-				vault.getTargetDid(), vault.getAppDid());
+	public ScriptingServiceRender(ServiceEndpoint serviceEndpoint) {
+		super(serviceEndpoint);
+		this.scriptRunner = new ScriptRunner(getServiceEndpoint().getAppContext(),
+				getServiceEndpoint().getProviderAddress(),
+				getServiceEndpoint().getTargetDid(),
+				getServiceEndpoint().getAppDid());
 	}
 
 	@Override

@@ -18,16 +18,14 @@ import org.elastos.hive.vault.SubscriptionServiceRender;
 
 public class VaultSubscription extends ServiceEndpoint implements SubscriptionService<VaultSubscription.VaultInfo>, PaymentService, HttpExceptionHandler {
 	private AppContext context;
-	private String userDid;
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
 
-	public VaultSubscription(AppContext context, String userDid, String providerAddress) throws HiveException {
-		super(context, userDid, providerAddress);
+	public VaultSubscription(AppContext context, String providerAddress) throws HiveException {
+		super(context, providerAddress);
 		this.context = context;
-		this.userDid = userDid;
-		this.paymentService = new PaymentServiceRender(context);
-		this.subscriptionService = new SubscriptionServiceRender(context);
+		this.paymentService = new PaymentServiceRender(this);
+		this.subscriptionService = new SubscriptionServiceRender(this);
 	}
 
 	@Override
@@ -81,8 +79,8 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				VaultInfoResponseBody body = this.subscriptionService.getVaultInfo();
-				return new VaultInfo(this.userDid, null, body.getDid())
-						.setProvider(this.context.getProviderAddress())
+				return new VaultInfo(this.getUserDid(), null, body.getDid())
+						.setProvider(this.getProviderAddress())
 						.setCreateTime(body.getStartTimeStr())
 						.setModifyTime(body.getModifyTimeStr())
 						.setMaxSpace(body.getMaxStorage())
@@ -158,7 +156,7 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 	}
 
 	public class VaultInfo {
-		private String myDid;
+		private String userDid;
 		private String appInstanceDid;
 		private String appId;
 		private String provider;
@@ -172,18 +170,18 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 		private long fileSpaceUsed;
 		private boolean existing;
 
-		public VaultInfo(String appInstanceDid, String myDid, String serviceDid) {
+		public VaultInfo(String appInstanceDid, String userDid, String serviceDid) {
 			this.appInstanceDid = appInstanceDid;
-			this.myDid = myDid;
+			this.userDid = userDid;
 			this.serviceDid = serviceDid;
 		}
 
-		public String getMyDid() {
-			return myDid;
+		public String getUserDid() {
+			return userDid;
 		}
 
-		public VaultInfo setMyDid(String myDid) {
-			this.myDid = myDid;
+		public VaultInfo setUserDid(String userDid) {
+			this.userDid = userDid;
 			return this;
 		}
 

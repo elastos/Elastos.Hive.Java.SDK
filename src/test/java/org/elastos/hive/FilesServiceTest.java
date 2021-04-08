@@ -52,7 +52,6 @@ class FilesServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
 			subscription = new VaultSubscription(testData.getAppContext(),
-					testData.getOwnerDid(),
 					testData.getProviderAddress());
 			filesService = testData.newVault().getFilesService();
 		});

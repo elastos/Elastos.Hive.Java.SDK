@@ -21,7 +21,6 @@ class VaultPaymentTest {
             TestData testData = TestData.getInstance();
             paymentService = new VaultSubscription(
                     testData.getAppContext(),
-                    testData.getOwnerDid(),
                     testData.getProviderAddress());
         });
     }

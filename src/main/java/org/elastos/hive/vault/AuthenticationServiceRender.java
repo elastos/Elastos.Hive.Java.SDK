@@ -1,10 +1,9 @@
 package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.elastos.hive.AppContext;
 import org.elastos.hive.AppContextProvider;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.AuthToken;
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.network.request.AuthRequestBody;
 import org.elastos.hive.network.request.SignInRequestBody;
 import org.elastos.hive.network.response.AuthResponseBody;
@@ -20,10 +19,9 @@ public class AuthenticationServiceRender extends HiveVaultRender implements Http
 
     private AppContextProvider contextProvider;
 
-    public AuthenticationServiceRender(AppContext context, AppContextProvider contextProvider,
-                                       ConnectionManager connectionManager) {
-        super(context, connectionManager);
-        this.contextProvider = contextProvider;
+    public AuthenticationServiceRender(ServiceEndpoint serviceEndpoint) {
+        super(serviceEndpoint);
+        this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
     }
 
     public String signIn4Token() throws IOException, ExecutionException, InterruptedException {
