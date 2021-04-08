@@ -1,9 +1,6 @@
 package org.elastos.hive;
 
-import com.google.common.base.Throwables;
-import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.exception.HiveException;
 import org.junit.jupiter.api.*;
 
 @Disabled
@@ -37,7 +34,6 @@ class BackupSubscriptionTest {
 	@Test
 	@Order(3)
 	void testDeactivate() {
-		Assertions.assertDoesNotThrow(()->subscription.deactivate().get());
 	}
 
 	@Test

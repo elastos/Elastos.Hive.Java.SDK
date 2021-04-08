@@ -15,9 +15,9 @@ public class ScriptRunner extends ServiceEndpoint {
 	private String targetAppDid;
 	private ConnectionManager connectionManager;
 
-	public ScriptRunner(AppContext context, String providerAddress, String userDid,
+	public ScriptRunner(AppContext context, String userDid, String providerAddress,
 						String targetDid, String targetAppDid) {
-		super(context, providerAddress, userDid);
+		super(context, userDid, providerAddress, targetDid, targetAppDid);
 		this.targetDid = targetDid;
 		this.targetAppDid = targetAppDid;
 		this.connectionManager = getAppContext().getConnectionManager();

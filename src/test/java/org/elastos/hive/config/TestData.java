@@ -116,6 +116,10 @@ public class TestData {
 		return new Vault(context, nodeConfig.ownerDid(), nodeConfig.provider());
 	}
 
+	public Backup newBackup() {
+		return new Backup(context, nodeConfig.ownerDid(), nodeConfig.targetHost());
+	}
+
 	public BackupService getBackupService() {
 		BackupService bs = this.newVault().getBackupService();
 		bs.setupContext(new HiveBackupContext() {

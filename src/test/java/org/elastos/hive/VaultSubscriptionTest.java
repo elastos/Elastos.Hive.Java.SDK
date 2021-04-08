@@ -27,7 +27,7 @@ class VaultSubscriptionTest {
 	}
 
 	@Test @Order(3) void testCheckSubscription() {
-		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(subscription.checkSubscription()));
+		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(subscription.checkSubscription().get()));
 	}
 
 	@Test @Order(4) void testDeactivate() {
@@ -36,5 +36,20 @@ class VaultSubscriptionTest {
 
 	@Test @Order(5) void testUnsubscribe() {
 		Assertions.assertDoesNotThrow(()->subscription.unsubscribe().get());
+	}
+
+	@Test @Order(6) void testGetFileHashProcess() {
+		//prepare for access vault service
+		Assertions.assertDoesNotThrow(() -> {
+			subscription.subscribe("free").get();
+			subscription.activate().get();
+		});
+		//function usage
+		new FilesServiceTest().testHash();
+		//release for disable vault service accessing
+		Assertions.assertDoesNotThrow(() -> {
+			subscription.deactivate().get();
+			subscription.unsubscribe().get();
+		});
 	}
 }
