@@ -116,6 +116,10 @@ public class TestData {
 		return new Vault(context, nodeConfig.provider());
 	}
 
+	public Vault newVault4Scripting() {
+		return new Vault(context, nodeConfig.provider(), nodeConfig.ownerDid(), null);
+	}
+
 	public Backup newBackup() {
 		return new Backup(context, nodeConfig.targetHost());
 	}
