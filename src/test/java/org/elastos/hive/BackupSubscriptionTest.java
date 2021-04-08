@@ -14,7 +14,6 @@ class BackupSubscriptionTest {
 			TestData testData = TestData.getInstance();
 			subscription = new BackupSubscription(
 					testData.getAppContext(),
-					testData.getOwnerDid(),
 					testData.getProviderAddress());
 		} );
 	}

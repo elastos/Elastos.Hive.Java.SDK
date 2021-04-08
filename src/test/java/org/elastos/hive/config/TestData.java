@@ -97,7 +97,7 @@ public class TestData {
 					}
 				});
 			}
-		}, nodeConfig.ownerDid(), nodeConfig.provider());
+		}, nodeConfig.ownerDid());
 	}
 
 	public AppContext getAppContext() {
@@ -113,11 +113,11 @@ public class TestData {
 	}
 
 	public Vault newVault() {
-		return new Vault(context, nodeConfig.ownerDid(), nodeConfig.provider());
+		return new Vault(context, nodeConfig.provider());
 	}
 
 	public Backup newBackup() {
-		return new Backup(context, nodeConfig.ownerDid(), nodeConfig.targetHost());
+		return new Backup(context, nodeConfig.targetHost());
 	}
 
 	public BackupService getBackupService() {

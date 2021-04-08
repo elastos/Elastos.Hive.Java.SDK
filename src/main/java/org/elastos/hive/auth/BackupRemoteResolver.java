@@ -1,7 +1,7 @@
 package org.elastos.hive.auth;
 
-import org.elastos.hive.AppContext;
 import org.elastos.hive.AppContextProvider;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.service.BackupContext;
@@ -17,13 +17,14 @@ public class BackupRemoteResolver implements TokenResolver {
     private String targetHost;
     private AuthenticationServiceRender authenticationService;
 
-    public BackupRemoteResolver(AppContext context, BackupContext backupContext, String targetDid, String targetHost) {
-        this.contextProvider = context.getAppContextProvider();
+    public BackupRemoteResolver(ServiceEndpoint serviceEndpoint, BackupContext backupContext,
+                                String targetServiceDid, String targetAddress) {
+        this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
         this.backupContext = backupContext;
-        this.connectionManager = context.getConnectionManager();
-        this.targetDid = targetDid;
-        this.targetHost = targetHost;
-        this.authenticationService = new AuthenticationServiceRender(context, contextProvider, connectionManager);
+        this.connectionManager = serviceEndpoint.getConnectionManager();
+        this.targetDid = targetServiceDid;
+        this.targetHost = targetAddress;
+        this.authenticationService = new AuthenticationServiceRender(serviceEndpoint);
     }
 
     @Override

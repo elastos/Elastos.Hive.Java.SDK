@@ -1,9 +1,6 @@
 package org.elastos.hive;
 
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.network.request.EmptyRequestBody;
-import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.network.response.VaultInfoResponseBody;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
@@ -22,10 +19,10 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
 
-	public BackupSubscription(AppContext context, String userDid, String providerAddress) throws HiveException {
-		super(context, userDid, providerAddress);
-		this.paymentService = new PaymentServiceRender(context);
-		this.subscriptionService = new SubscriptionServiceRender(context);
+	public BackupSubscription(AppContext context, String providerAddress) throws HiveException {
+		super(context, providerAddress);
+		this.paymentService = new PaymentServiceRender(this);
+		this.subscriptionService = new SubscriptionServiceRender(this);
 	}
 
 	@Override

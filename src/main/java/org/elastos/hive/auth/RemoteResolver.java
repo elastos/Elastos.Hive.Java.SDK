@@ -1,8 +1,7 @@
 package org.elastos.hive.auth;
 
-import org.elastos.hive.AppContext;
 import org.elastos.hive.AppContextProvider;
-import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.vault.AuthenticationServiceRender;
 
@@ -10,9 +9,9 @@ public class RemoteResolver implements TokenResolver {
 	private AppContextProvider contextProvider;
 	private AuthenticationServiceRender authenticationService;
 
-	public RemoteResolver(AppContext context, ConnectionManager connectionManager) {
-		this.contextProvider = context.getAppContextProvider();
-		this.authenticationService = new AuthenticationServiceRender(context, contextProvider, connectionManager);
+	public RemoteResolver(ServiceEndpoint serviceEndpoint) {
+		this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
+		this.authenticationService = new AuthenticationServiceRender(serviceEndpoint);
 	}
 
 	@Override

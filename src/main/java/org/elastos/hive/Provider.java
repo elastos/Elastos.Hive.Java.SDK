@@ -15,12 +15,12 @@ import org.elastos.hive.exception.HiveException;
  *     etc.
  */
 public class Provider extends ServiceEndpoint {
-	public Provider(AppContext context, String myDid) throws HiveException {
-		this(context, myDid, null);
+	public Provider(AppContext context) throws HiveException {
+		this(context, null);
 	}
 
-	public Provider(AppContext context, String userDid, String providerAddress) throws HiveException {
-		super(context, userDid, providerAddress);
+	public Provider(AppContext context, String providerAddress) throws HiveException {
+		super(context, providerAddress);
 	}
 
 	public CompletableFuture<Version> getVersion() {

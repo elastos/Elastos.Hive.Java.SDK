@@ -25,7 +25,7 @@ public class LocalResolver implements TokenResolver {
 	private TokenResolver nextResolver;
 	private AuthToken token;
 
-	public LocalResolver(String ownerDid, String providerAddress, String type, String cacheDir) {
+	public LocalResolver(String userDid, String providerAddress, String type, String cacheDir) {
 		this.type = type;
 		String rootDir = cacheDir + TOKEN_FOLDER;
 		File root = new File(rootDir);
@@ -33,7 +33,7 @@ public class LocalResolver implements TokenResolver {
 		if (!root.exists() && !root.mkdirs()) {
 			throw new HiveSdkException("Cannot create token root path.");
 		}
-		this.tokenPath = String.format("%s/%s", rootDir, CryptoUtil.getSHA256(ownerDid + providerAddress + type));
+		this.tokenPath = String.format("%s/%s", rootDir, CryptoUtil.getSHA256(userDid + providerAddress + type));
 	}
 
 	@Override

@@ -3,13 +3,12 @@ package org.elastos.hive.vault;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-import org.elastos.hive.Vault;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.BackupRemoteResolver;
 import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.network.request.BackupRestoreRequestBody;
 import org.elastos.hive.network.request.BackupSaveRequestBody;
-import org.elastos.hive.network.request.EmptyRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
@@ -18,20 +17,20 @@ class BackupServiceRender extends HiveVaultRender implements BackupService, Http
     private BackupContext backupContext;
     private TokenResolver tokenResolver;
 
-    public BackupServiceRender(Vault vault) {
-        super(vault);
+    public BackupServiceRender(ServiceEndpoint serviceEndpoint) {
+        super(serviceEndpoint);
     }
 
     @Override
     public CompletableFuture<Void> setupContext(BackupContext backupContext) {
         this.backupContext = backupContext;
         this.tokenResolver = new LocalResolver(
-                getVault().getAppContext().getUserDid(),
-                getVault().getAppContext().getProviderAddress(),
+                getServiceEndpoint().getUserDid(),
+                getServiceEndpoint().getProviderAddress(),
                 LocalResolver.TYPE_BACKUP_CREDENTIAL,
-                getVault().getAppContext().getAppContextProvider().getLocalDataDir());
+                getServiceEndpoint().getAppContext().getAppContextProvider().getLocalDataDir());
         this.tokenResolver.setNextResolver(new BackupRemoteResolver(
-                getVault().getAppContext(),
+                getServiceEndpoint(),
                 backupContext,
                 backupContext.getParameter("targetServiceDid"),
                 backupContext.getParameter("targetAddress")));

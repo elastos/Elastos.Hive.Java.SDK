@@ -23,7 +23,7 @@
 package org.elastos.hive.connection;
 
 import okhttp3.OkHttpClient;
-import org.elastos.hive.AppContext;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.*;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.utils.LogUtil;
@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 public class ConnectionManager {
 	private static final int DEFAULT_TIMEOUT = 30;
 
-	private AppContext context;
+	private ServiceEndpoint serviceEndpoint;
 	private RequestInterceptor authRequestInterceptor;
 	private RequestInterceptor plainRequestInterceptor;
 
@@ -54,70 +54,74 @@ public class ConnectionManager {
 	private BackupApi backupApi;
 	private NodeManageApi nodeManageApi;
 
-	public ConnectionManager(AppContext context) {
-		this.context = context;
-		this.plainRequestInterceptor = new RequestInterceptor(context, this);
-		this.authRequestInterceptor  = new RequestInterceptor(context, this, false);
+	public ConnectionManager(ServiceEndpoint serviceEndpoint) {
+		this.serviceEndpoint = serviceEndpoint;
+		this.plainRequestInterceptor = new RequestInterceptor(this);
+		this.authRequestInterceptor  = new RequestInterceptor(this, false);
+	}
+
+	public ServiceEndpoint getServiceEndpoint() {
+		return this.serviceEndpoint;
 	}
 
 	public AuthApi getAuthApi() {
 		if (authApi == null)
-			authApi = createService(AuthApi.class, this.context.getProviderAddress(), this.authRequestInterceptor);
+			authApi = createService(AuthApi.class, serviceEndpoint.getProviderAddress(), this.authRequestInterceptor);
 
 		return authApi;
 	}
 
 	public NodeManageApi getNodeManagerApi() {
 		if (nodeManageApi == null)
-			nodeManageApi = createService(NodeManageApi.class, this.context.getProviderAddress(), this.authRequestInterceptor);
+			nodeManageApi = createService(NodeManageApi.class, serviceEndpoint.getProviderAddress(), this.authRequestInterceptor);
 
 		return nodeManageApi;
 	}
 
 	public FilesApi getFilesApi() {
 		if (filesApi == null)
-			filesApi = createService(FilesApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
+			filesApi = createService(FilesApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 
 		return filesApi;
 	}
 
 	public SubscriptionApi getSubscriptionApi() {
 		if (subscriptionApi == null) {
-			subscriptionApi = createService(SubscriptionApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
+			subscriptionApi = createService(SubscriptionApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return subscriptionApi;
 	}
 
 	public PaymentApi getPaymentApi() {
 		if (paymentApi == null) {
-			paymentApi = createService(PaymentApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
+			paymentApi = createService(PaymentApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return paymentApi;
 	}
 
 	public DatabaseApi getDatabaseApi() {
 		if (databaseApi == null) {
-			databaseApi = createService(DatabaseApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
+			databaseApi = createService(DatabaseApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return databaseApi;
 	}
 
 	public ScriptingApi getScriptingApi() {
 		if (scriptingApi == null) {
-			scriptingApi = createService(ScriptingApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
+			scriptingApi = createService(ScriptingApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return scriptingApi;
 	}
 
 	public BackupApi getBackupApi() {
 		if (backupApi == null) {
-			backupApi = createService(BackupApi.class, this.context.getProviderAddress(), this.plainRequestInterceptor);
+			backupApi = createService(BackupApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return backupApi;
 	}
 
 	public HttpURLConnection openConnection(String path) throws IOException {
-		String url = this.context.getProviderAddress() + BaseApi.API_VERSION + path;
+		String url = serviceEndpoint.getProviderAddress() + BaseApi.API_VERSION + path;
 		LogUtil.d("open connection with URL: " + url);
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod("POST");

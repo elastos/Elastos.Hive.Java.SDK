@@ -13,7 +13,6 @@ class VaultSubscriptionTest {
 			TestData testData = TestData.getInstance();
 			subscription = new VaultSubscription(
 					testData.getAppContext(),
-					testData.getOwnerDid(),
 					testData.getProviderAddress());
 		});
 	}

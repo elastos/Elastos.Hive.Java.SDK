@@ -1,36 +1,41 @@
 package org.elastos.hive;
 
+import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.UnauthorizedStateException;
 
-class ServiceEndpoint {
+public class ServiceEndpoint {
 	private AppContext context;
-
 	private String providerAddress;
-	private String userDid;
 	private String targetDid;
-
-	@SuppressWarnings("unused")
 	private String targetAppDid;
+	private ConnectionManager connectionManager;
 
 	// This constructor will be embedded in the following global-grained extends:
 	// - VaultSubscription;
 	// - BackupSubscription;
 	// - Provider;
-	protected ServiceEndpoint(AppContext context, String userDid, String providerAddress) {
-		this(context, userDid, providerAddress, userDid, null);
-	}
-
-
-	// This constructor will be embedded in the following service-grained extends:
 	// - Vault;
 	// - Backup;
+	protected ServiceEndpoint(AppContext context, String providerAddress) {
+		this(context, providerAddress, null, null);
+	}
+
+	// This constructor will be embedded in the following service-grained extends:
 	// - ScriptRunner;
-	protected ServiceEndpoint(AppContext context, String userDid, String providerAddress, String targetDid, String targetAppDid) {
+	protected ServiceEndpoint(AppContext context, String providerAddress, String targetDid, String targetAppDid) {
 		this.context = context;
 		this.providerAddress = providerAddress;
-		this.userDid = userDid;
 		this.targetDid = targetDid;
 		this.targetAppDid = targetAppDid;
+		this.connectionManager = new ConnectionManager(this);
+	}
+
+	public AppContext getAppContext() {
+		return this.context;
+	}
+
+	public String getUserDid() {
+		return this.context.getUserDid();
 	}
 
 	public String getProviderAddress() {
@@ -41,15 +46,15 @@ class ServiceEndpoint {
 		return this.targetDid;
 	}
 
-	public String getUserDid() {
-		return this.userDid;
+	public String getTargetAppDid() {
+		return this.targetAppDid;
+	}
+
+	public ConnectionManager getConnectionManager() {
+		return this.connectionManager;
 	}
 
 	public String getAppDid() throws UnauthorizedStateException {
-		if (this.context.getConnectionManager() == null)
-			throw new UnauthorizedStateException("This instance has not been authorized by User");
-
-		// TODO:
 		return null;
 	}
 
@@ -63,9 +68,5 @@ class ServiceEndpoint {
 
 	public String getServiceInstanceDid() throws UnauthorizedStateException {
 		return null;
-	}
-
-	public AppContext getAppContext() {
-		return this.context;
 	}
 }
