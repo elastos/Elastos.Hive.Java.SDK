@@ -16,8 +16,7 @@ class VaultPaymentTest {
 
     private static PaymentService paymentService;
 
-    @BeforeAll
-    public static void setUp() {
+    @BeforeAll public static void setUp() {
         Assertions.assertDoesNotThrow(()->{
             TestData testData = TestData.getInstance();
             paymentService = new VaultSubscription(
@@ -27,9 +26,7 @@ class VaultPaymentTest {
         });
     }
 
-    @Test
-    @org.junit.jupiter.api.Order(1)
-    void testGetPricingPlanList() {
+    @Test @org.junit.jupiter.api.Order(1) void testGetPricingPlanList() {
         Assertions.assertDoesNotThrow(()->{
             List<PricingPlan> plans = paymentService.getPricingPlanList().get();
             Assertions.assertNotNull(plans);
@@ -37,9 +34,7 @@ class VaultPaymentTest {
         });
     }
 
-    @Test
-    @org.junit.jupiter.api.Order(2)
-    void testGetPricingPlan() {
+    @Test @org.junit.jupiter.api.Order(2) void testGetPricingPlan() {
         Assertions.assertDoesNotThrow(()->
                 Assertions.assertNotNull(paymentService.getPricingPlan(PRICING_PLAN_NAME).get()));
     }
@@ -57,9 +52,6 @@ class VaultPaymentTest {
         });
     }
 
-    @Test
-    @org.junit.jupiter.api.Order(8)
-    void testGetReceipt() {
-        //TODO:
+    @Test @org.junit.jupiter.api.Order(4) void testGetReceipt() {
     }
 }

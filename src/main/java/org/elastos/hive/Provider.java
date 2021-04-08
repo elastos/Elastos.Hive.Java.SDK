@@ -19,8 +19,8 @@ public class Provider extends ServiceEndpoint {
 		this(context, myDid, null);
 	}
 
-	public Provider(AppContext context, String myDid, String endpoint) throws HiveException {
-		super(context, endpoint, myDid);
+	public Provider(AppContext context, String userDid, String providerAddress) throws HiveException {
+		super(context, userDid, providerAddress);
 	}
 
 	public CompletableFuture<Version> getVersion() {

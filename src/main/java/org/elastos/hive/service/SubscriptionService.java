@@ -25,14 +25,14 @@ public interface SubscriptionService<T> {
 	CompletableFuture<Void> unsubscribe();
 
 	/**
-	 * Activate vault service for writing permission.
+	 * Activate vault service for using.
 	 *
 	 * @return Void.
 	 */
 	CompletableFuture<Void> activate();
 
 	/**
-	 * Remove writing permission for vault service.
+	 * Deactive vault service for restrict access it later.
 	 *
 	 * @return Void
 	 */

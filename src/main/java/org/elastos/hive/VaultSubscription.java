@@ -23,7 +23,7 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 	private PaymentServiceRender paymentService;
 
 	public VaultSubscription(AppContext context, String userDid, String providerAddress) throws HiveException {
-		super(context, providerAddress, userDid);
+		super(context, userDid, providerAddress);
 		this.context = context;
 		this.userDid = userDid;
 		this.paymentService = new PaymentServiceRender(context);

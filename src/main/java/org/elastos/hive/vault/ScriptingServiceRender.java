@@ -17,7 +17,9 @@ class ScriptingServiceRender extends HiveVaultRender implements ScriptingService
 
 	public ScriptingServiceRender(Vault vault) {
 		super(vault);
-		this.scriptRunner = new ScriptRunner(vault.getAppContext(), vault.getAddress(), vault.getUserDid(), vault.getOwnerDid(), vault.getAppDid());
+		this.scriptRunner = new ScriptRunner(vault.getAppContext(),
+				vault.getUserDid(), vault.getProviderAddress(),
+				vault.getTargetDid(), vault.getAppDid());
 	}
 
 	@Override

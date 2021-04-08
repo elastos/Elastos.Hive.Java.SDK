@@ -16,8 +16,8 @@ class ServiceEndpoint {
 	// - VaultSubscription;
 	// - BackupSubscription;
 	// - Provider;
-	protected ServiceEndpoint(AppContext context, String providerAddress, String userDid) {
-		this(context, providerAddress, userDid, userDid, null);
+	protected ServiceEndpoint(AppContext context, String userDid, String providerAddress) {
+		this(context, userDid, providerAddress, userDid, null);
 	}
 
 
@@ -25,7 +25,7 @@ class ServiceEndpoint {
 	// - Vault;
 	// - Backup;
 	// - ScriptRunner;
-	protected ServiceEndpoint(AppContext context, String providerAddress, String userDid, String targetDid, String targetAppDid) {
+	protected ServiceEndpoint(AppContext context, String userDid, String providerAddress, String targetDid, String targetAppDid) {
 		this.context = context;
 		this.providerAddress = providerAddress;
 		this.userDid = userDid;
@@ -33,11 +33,11 @@ class ServiceEndpoint {
 		this.targetAppDid = targetAppDid;
 	}
 
-	public String getAddress() {
+	public String getProviderAddress() {
 		return this.providerAddress;
 	}
 
-	public String getOwnerDid() {
+	public String getTargetDid() {
 		return this.targetDid;
 	}
 

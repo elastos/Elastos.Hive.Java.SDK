@@ -48,8 +48,7 @@ class FilesServiceTest {
 		remoteBackupTxtFilePath = "backup" + File.separator + FILE_NAME_TXT;
 	}
 
-	@BeforeAll
-	public static void setUp() {
+	@BeforeAll public static void setUp() {
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
 			subscription = new VaultSubscription(testData.getAppContext(),
@@ -59,9 +58,7 @@ class FilesServiceTest {
 		});
 	}
 
-	@Test
-	@Order(1)
-	void testUploadText() {
+	@Test @Order(1) void testUploadText() {
 		Assertions.assertDoesNotThrow(this::uploadTextReally);
 		verifyRemoteFileExists(remoteTxtFilePath);
 	}
@@ -77,9 +74,7 @@ class FilesServiceTest {
 		}
 	}
 
-	@Test
-	@Order(2)
-	void testUploadBin() {
+	@Test @Order(2) void testUploadBin() {
 		try (OutputStream out = filesService.upload(remoteImgFilePath, OutputStream.class).get()) {
 			Assertions.assertNotNull(out);
 			out.write(Utils.readImage(localImgFilePath));
@@ -89,9 +84,7 @@ class FilesServiceTest {
 		verifyRemoteFileExists(remoteImgFilePath);
 	}
 
-	@Test
-	@Order(3)
-	void testDownloadText() {
+	@Test @Order(3) void testDownloadText() {
 		try (Reader reader = filesService.download(remoteTxtFilePath, Reader.class).get()) {
 			Assertions.assertNotNull(reader);
 			Utils.cacheTextFile(reader, localCacheRootDir, FILE_NAME_TXT);
@@ -101,9 +94,7 @@ class FilesServiceTest {
 		}
 	}
 
-	@Test
-	@Order(4)
-	void testDownloadBin() {
+	@Test @Order(4) void testDownloadBin() {
 		try (InputStream in = filesService.download(remoteImgFilePath, InputStream.class).get()) {
 			Assertions.assertNotNull(in);
 			Utils.cacheBinFile(in, localCacheRootDir, FILE_NAME_IMG);
@@ -113,70 +104,50 @@ class FilesServiceTest {
 		}
 	}
 
-	@Test
-	@Order(5)
-	void testList() {
+	@Test @Order(5) void testList() {
 		Assertions.assertDoesNotThrow(() -> {
 			List<FileInfo> files = filesService.list(remoteRootDir).get();
 			Assertions.assertNotNull(files);
-			Assertions.assertEquals(files.size(), 2);
+			Assertions.assertTrue(files.size() >= 2);
 			List<String> names = files.stream().map(FileInfo::getName).collect(Collectors.toList());
 			Assertions.assertTrue(names.contains(FILE_NAME_TXT));
 			Assertions.assertTrue(names.contains(FILE_NAME_IMG));
 		});
 	}
 
-	@Test
-	@Order(6)
-	void testHash() {
-		Assertions.assertDoesNotThrow(() -> {
-			String hash = filesService.hash(remoteTxtFilePath).get();
-			Assertions.assertNotNull(hash);
-		});
+	@Test @Order(6) void testHash() {
+		Assertions.assertDoesNotThrow(() -> Assertions.assertNotNull(
+				filesService.hash(remoteTxtFilePath).get()));
 	}
 
-	@Test
-	@Order(7)
-	void testMove() {
-		Assertions.assertDoesNotThrow(() -> {
-			Boolean isSuccess = filesService.delete(remoteBackupTxtFilePath)
-					.thenCompose(result -> filesService.move(remoteTxtFilePath, remoteBackupTxtFilePath))
-					.get();
-			Assertions.assertTrue(isSuccess);
-		});
+	@Test @Order(7) void testMove() {
+		Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(
+				filesService.delete(remoteBackupTxtFilePath)
+						.thenCompose(result -> filesService.move(remoteTxtFilePath, remoteBackupTxtFilePath))
+						.get()));
 		verifyRemoteFileExists(remoteBackupTxtFilePath);
 	}
 
-	@Test
-	@Order(8)
-	void testCopy() {
-		Assertions.assertDoesNotThrow(() -> {
-			Boolean isSuccess = filesService.copy(remoteBackupTxtFilePath, remoteTxtFilePath).get();
-			Assertions.assertTrue(isSuccess);
-		});
+	@Test @Order(8) void testCopy() {
+		Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(
+				filesService.copy(remoteBackupTxtFilePath, remoteTxtFilePath).get()));
 		verifyRemoteFileExists(remoteTxtFilePath);
 	}
 
-	@Test
-	@Order(9)
-	void testDeleteFile() {
-		Assertions.assertDoesNotThrow(() -> {
-			Boolean isSuccess = filesService.delete(remoteTxtFilePath)
-					.thenCompose(result -> filesService.delete(remoteBackupTxtFilePath))
-					.get();
-			Assertions.assertTrue(isSuccess);
-		});
+	@Test @Order(9) void testDeleteFile() {
+		Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(
+				filesService.delete(remoteTxtFilePath)
+						.thenCompose(result -> filesService.delete(remoteBackupTxtFilePath))
+						.get()));
 	}
 
-	@Test
-	void testRemoteFileNotExistsException() {
+	@Test void testRemoteFileNotExistsException() {
 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
 				() -> filesService.hash(remoteNotExistsFilePath).get());
 		Assertions.assertEquals(e.getCause().getClass(), FileDoesNotExistsException.class);
 	}
 
-	@Test
-	void testVaultLockException() {
+	@Test void testVaultLockException() {
 		Assertions.assertDoesNotThrow(() -> subscription.deactivate().get());
 		VaultLockedException e = Assertions.assertThrows(VaultLockedException.class, this::uploadTextReally);
 		Assertions.assertNotNull(e);
@@ -188,10 +159,7 @@ class FilesServiceTest {
 	}
 
 	public static void verifyRemoteFileExists(FilesService filesService, String path) {
-		Assertions.assertDoesNotThrow(() -> {
-			FileInfo info = filesService.stat(path).get();
-			Assertions.assertNotNull(info);
-		});
+		Assertions.assertDoesNotThrow(() -> Assertions.assertNotNull(filesService.stat(path).get()));
 	}
 
 	public static void removeLocalFile(String filePath) {
