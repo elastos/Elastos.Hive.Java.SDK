@@ -1,8 +1,10 @@
 package org.elastos.hive.auth;
 
+import com.google.common.base.Throwables;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HttpFailedException;
+import org.elastos.hive.utils.LogUtil;
 import org.elastos.hive.vault.AuthenticationServiceRender;
 
 public class RemoteResolver implements TokenResolver {
@@ -19,6 +21,7 @@ public class RemoteResolver implements TokenResolver {
 		try {
 			return authenticationService.auth(authenticationService.signIn4Token());
 		} catch (Exception e) {
+			LogUtil.d(Throwables.getStackTraceAsString(e));
 			throw new HttpFailedException(401, "Failed to get token by auth requests.");
 		}
 	}

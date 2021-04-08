@@ -7,17 +7,10 @@ import org.elastos.hive.connection.ConnectionManager;
 public abstract class HiveVaultRender {
     private AppContext context;
     private ServiceEndpoint serviceEndpoint;
-    private ConnectionManager connectionManager;
 
     protected HiveVaultRender(ServiceEndpoint serviceEndpoint) {
         this.serviceEndpoint = serviceEndpoint;
         this.context = serviceEndpoint.getAppContext();
-        this.connectionManager = serviceEndpoint.getConnectionManager();
-    }
-
-    protected HiveVaultRender(AppContext context, ConnectionManager connectionManager) {
-        this.context = context;
-        this.connectionManager = connectionManager;
     }
 
     protected AppContext getAppContext() {
@@ -29,6 +22,6 @@ public abstract class HiveVaultRender {
     }
 
     protected ConnectionManager getConnectionManager() {
-        return this.connectionManager;
+        return this.serviceEndpoint.getConnectionManager();
     }
 }
