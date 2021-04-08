@@ -51,7 +51,7 @@ class ScriptingServiceTest {
 
 	@BeforeAll public static void setUp() {
 		Assertions.assertDoesNotThrow(()->{
-			scriptingService = TestData.getInstance().newVault().getScriptingService();
+			scriptingService = TestData.getInstance().newVault4Scripting().getScriptingService();
 			filesService = TestData.getInstance().newVault().getFilesService();
 			databaseService = TestData.getInstance().newVault().getDatabaseService();
 		});
