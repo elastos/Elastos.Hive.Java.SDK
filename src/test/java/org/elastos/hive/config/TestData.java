@@ -57,10 +57,18 @@ public class TestData {
 
 		DummyAdapter adapter = new DummyAdapter();
 		ApplicationConfig applicationConfig = clientConfig.applicationConfig();
-		appInstanceDid = new DApp(applicationConfig.name(), applicationConfig.mnemonic(), adapter, applicationConfig.passPhrase(), applicationConfig.storepass());
+		appInstanceDid = new DApp(applicationConfig.name(),
+				applicationConfig.mnemonic(),
+				adapter,
+				applicationConfig.passPhrase(),
+				applicationConfig.storepass());
 
 		UserConfig userConfig = clientConfig.userConfig();
-		userDid = new DIDApp(userConfig.name(), userConfig.mnemonic(), adapter, userConfig.passPhrase(), userConfig.storepass());
+		userDid = new DIDApp(userConfig.name(),
+				userConfig.mnemonic(),
+				adapter,
+				userConfig.passPhrase(),
+				userConfig.storepass());
 
 		nodeConfig = clientConfig.nodeConfig();
 
