@@ -156,7 +156,11 @@ public class TestData {
 		return bs;
 	}
 
-	private enum EnvironmentType {
+	public String getAppId() {
+		return appInstanceDid.appId;
+	}
+
+    private enum EnvironmentType {
 		DEVELOPING,
 		PRODUCTION,
 		LOCAL

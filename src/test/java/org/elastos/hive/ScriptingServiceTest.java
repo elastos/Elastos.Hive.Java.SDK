@@ -30,11 +30,17 @@ class ScriptingServiceTest {
 	private static final String FILE_PROPERTIES_NAME = "file_properties";
 	private static final String FILE_HASH_NAME = "file_hash";
 
+	//for other app access script function.
+	private static final String APP_ID_OTHER = "appIdOther";
+	//cross.user.did
+	private static final String USER_ID_OTHER = "did:elastos:ip1e2eAY6Kw6shCbZhzksy9pYwLjTRFEU7";
+
 	private static final String DATABASE_NAME = "script_database";
 
 	private static ScriptingService scriptingService;
 	private static FilesService filesService;
 	private static DatabaseService databaseService;
+	private static String appId;
 
 	private final String localSrcFilePath;
 	private final String localDstFileRoot;
@@ -51,9 +57,11 @@ class ScriptingServiceTest {
 
 	@BeforeAll public static void setUp() {
 		Assertions.assertDoesNotThrow(()->{
-			scriptingService = TestData.getInstance().newVault4Scripting().getScriptingService();
-			filesService = TestData.getInstance().newVault().getFilesService();
-			databaseService = TestData.getInstance().newVault().getDatabaseService();
+			TestData testData = TestData.getInstance();
+			scriptingService = testData.newVault4Scripting().getScriptingService();
+			filesService = testData.newVault().getFilesService();
+			databaseService = testData.newVault().getDatabaseService();
+			appId = testData.getAppId();
 		});
 		create_test_database();
 	}
@@ -62,20 +70,46 @@ class ScriptingServiceTest {
 		remove_test_database();
 	}
 
-	@Test @Order(1) void testRegisterScriptFind() {
+	@Test @Order(1) void testInsert() {
+		registerScriptInsert(INSERT_NAME);
+		callScriptInsert(INSERT_NAME);
+	}
+
+	private void registerScriptInsert(String scriptName) {
+		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(scriptingService.registerScript(scriptName,
+				Executable.createInsertExecutable(scriptName,
+						new ScriptInsertExecutableBody(DATABASE_NAME, new KeyValueDict()
+								.putKv("author", "$params.author")
+								.putKv("content", "$params.content"),
+								new KeyValueDict().putKv("bypass_document_validation",false).putKv("ordered",true)
+						)), false, false).get()));
+	}
+
+	private void callScriptInsert(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
-			KeyValueDict filter = new KeyValueDict().putKv("_id","$params.group_id")
-					.putKv("friends", "$callScripter_did");
+			JsonNode result = scriptingService.callScript(scriptName,
+					HiveResponseBody.map2JsonNode(
+							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
+					appId, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("inserted_id"));
+		});
+	}
+
+	@Test @Order(2) void testRegisterScriptFind() {
+		Assertions.assertDoesNotThrow(()->{
+			KeyValueDict filter = new KeyValueDict().putKv("author","John");
 			Assertions.assertTrue(scriptingService.registerScript(FIND_NAME,
 					new Condition("verify_user_permission", "queryHasResults",
-							new ScriptFindBody("test_group", filter)),
+							new ScriptFindBody(DATABASE_NAME, filter)),
 					new Executable(FIND_NAME, Executable.TYPE_FIND,
-							new ScriptFindBody("test_group", filter)),
+							new ScriptFindBody(DATABASE_NAME, filter)),
 					false, false).get());
 		});
 	}
 
-	@Test @Order(2) void testRegisterScriptFindWithoutCondition() {
+	@Test @Order(3) void testRegisterScriptFindWithoutCondition() {
 		Assertions.assertDoesNotThrow(()->{
 			Assertions.assertTrue(scriptingService.registerScript(FIND_NO_CONDITION_NAME,
 					new Executable("get_groups", Executable.TYPE_FIND,
@@ -85,19 +119,81 @@ class ScriptingServiceTest {
 		});
 	}
 
-	@Test @Order(3) void testCallScriptFindWithoutCondition() {
+	@Test @Order(4) void testCallScriptFind() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-				scriptingService.callScript(FIND_NO_CONDITION_NAME,
-				null, "appId", String.class).get()));
+				scriptingService.callScript(FIND_NAME,
+				null, appId, String.class).get()));
 	}
 
-	@Test @Order(4) void testCallScriptUrlFindWithoutCondition() {
+	@Test @Order(5) void testCallScriptUrlFindWithoutCondition() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
 				scriptingService.callScriptUrl(UPLOAD_FILE_NAME,
-				null, "appId", String.class).get()));
+				null, appId, String.class).get()));
 	}
 
-	@Test @Order(5) void testUploadFile() {
+	@Test @Order(6) void testUpdate() {
+		registerScriptUpdate(UPDATE_NAME);
+		callScriptUpdate(UPDATE_NAME);
+	}
+
+	private void registerScriptUpdate(String scriptName) {
+		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(
+				scriptingService.registerScript(scriptName,
+						Executable.createUpdateExecutable(scriptName,
+								new ScriptUpdateExecutableBody().setCollection(DATABASE_NAME)
+										.setFilter(new KeyValueDict().putKv("author", "$params.author"))
+										.setUpdate(new KeyValueDict().putKv("$set", new KeyValueDict()
+												.putKv("author", "$params.author").putKv("content", "$params.content")))
+										.setOptions(new KeyValueDict().putKv("bypass_document_validation",false)
+												.putKv("upsert",true))
+						), false, false).get()));
+	}
+
+	private void callScriptUpdate(String scriptName) {
+		Assertions.assertDoesNotThrow(()->{
+			JsonNode result = scriptingService.callScript(scriptName,
+					HiveResponseBody.map2JsonNode(
+							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
+					appId, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("upserted_id"));
+		});
+	}
+
+	@Test @Order(7) void testDelete() {
+		registerScriptDelete(DELETE_NAME);
+		callScriptDelete(DELETE_NAME);
+	}
+
+	private void registerScriptDelete(String scriptName) {
+		Assertions.assertDoesNotThrow(()->{
+			Boolean isSuccess = scriptingService.registerScript(scriptName,
+					Executable.createDeleteExecutable(scriptName,
+							new ScriptDeleteExecutableBody().setCollection(DATABASE_NAME)
+									.setFilter(new KeyValueDict().putKv("author", "$params.author"))
+					), false, false).get();
+			Assertions.assertTrue(isSuccess);
+		});
+	}
+
+	private void callScriptDelete(String scriptName) {
+		Assertions.assertDoesNotThrow(()->{
+			JsonNode result = scriptingService.callScript(scriptName,
+					HiveResponseBody.map2JsonNode(
+							new KeyValueDict().putKv("author", "John")),
+					appId, JsonNode.class)
+					.exceptionally(e->{
+						fail();
+						return null;
+					}).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("deleted_count"));
+		});
+	}
+
+	@Test @Order(8) void testUploadFile() {
 		registerScriptFileUpload(UPLOAD_FILE_NAME);
 		String transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
 		uploadFileByTransActionId(transactionId);
@@ -115,7 +211,7 @@ class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptingService.callScript(scriptName,
 					Executable.createFileUploadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					"appId", JsonNode.class).get();
+					appId, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
@@ -139,7 +235,7 @@ class ScriptingServiceTest {
 		}
 	}
 
-	@Test @Order(6) void testFileDownload() {
+	@Test @Order(9) void testFileDownload() {
 		FilesServiceTest.removeLocalFile(localDstFilePath);
 		registerScriptFileDownload(DOWNLOAD_FILE_NAME);
 		String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
@@ -158,7 +254,7 @@ class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptingService.callScript(scriptName,
 					Executable.createFileDownloadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					"appId", JsonNode.class).get();
+					appId, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
@@ -178,7 +274,7 @@ class ScriptingServiceTest {
 		}
 	}
 
-	@Test @Order(7) void testFileProperties() {
+	@Test @Order(10) void testFileProperties() {
 		registerScriptFileProperties(FILE_PROPERTIES_NAME);
 		callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
 	}
@@ -194,7 +290,7 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			JsonNode result = scriptingService.callScript(scriptName,
 					Executable.createFilePropertiesParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					"appId", JsonNode.class).get();
+					appId, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("size"));
@@ -202,7 +298,7 @@ class ScriptingServiceTest {
 		});
 	}
 
-	@Test @Order(8) void testFileHash() {
+	@Test @Order(11) void testFileHash() {
 		registerScriptFileHash(FILE_HASH_NAME);
 		callScriptFileHash(FILE_HASH_NAME, fileName);
 	}
@@ -218,7 +314,7 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			JsonNode result = scriptingService.callScript(scriptName,
 					Executable.createFileHashParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					"appId", JsonNode.class).get();
+					appId, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("SHA256"));
@@ -226,94 +322,7 @@ class ScriptingServiceTest {
 		});
 	}
 
-	@Test @Order(9) void testInsert() {
-		registerScriptInsert(INSERT_NAME);
-		callScriptInsert(INSERT_NAME);
-	}
 
-	private void registerScriptInsert(String scriptName) {
-		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(scriptingService.registerScript(scriptName,
-				Executable.createInsertExecutable(scriptName,
-						new ScriptInsertExecutableBody(DATABASE_NAME, new KeyValueDict()
-								.putKv("author", "$params.author")
-								.putKv("content", "$params.content"),
-								new KeyValueDict().putKv("bypass_document_validation",false).putKv("ordered",true)
-						)), false, false).get()));
-	}
-
-	private void callScriptInsert(String scriptName) {
-		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptingService.callScript(scriptName,
-					HiveResponseBody.map2JsonNode(
-							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
-					"appId", JsonNode.class).get();
-			Assertions.assertNotNull(result);
-			Assertions.assertTrue(result.has(scriptName));
-			Assertions.assertTrue(result.get(scriptName).has("inserted_id"));
-		});
-	}
-
-	@Test @Order(10) void testUpdate() {
-		registerScriptUpdate(UPDATE_NAME);
-		callScriptUpdate(UPDATE_NAME);
-	}
-
-	private void registerScriptUpdate(String scriptName) {
-		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(
-				scriptingService.registerScript(scriptName,
-				Executable.createUpdateExecutable(scriptName,
-						new ScriptUpdateExecutableBody().setCollection(DATABASE_NAME)
-								.setFilter(new KeyValueDict().putKv("author", "$params.author"))
-								.setUpdate(new KeyValueDict().putKv("$set", new KeyValueDict()
-										.putKv("author", "$params.author").putKv("content", "$params.content")))
-								.setOptions(new KeyValueDict().putKv("bypass_document_validation",false)
-										.putKv("upsert",true))
-				), false, false).get()));
-	}
-
-	private void callScriptUpdate(String scriptName) {
-		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptingService.callScript(scriptName,
-					HiveResponseBody.map2JsonNode(
-							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
-					"appId", JsonNode.class).get();
-			Assertions.assertNotNull(result);
-			Assertions.assertTrue(result.has(scriptName));
-			Assertions.assertTrue(result.get(scriptName).has("upserted_id"));
-		});
-	}
-
-	@Test @Order(11) void testDelete() {
-		registerScriptDelete(DELETE_NAME);
-		callScriptDelete(DELETE_NAME);
-	}
-
-	private void registerScriptDelete(String scriptName) {
-		Assertions.assertDoesNotThrow(()->{
-			Boolean isSuccess = scriptingService.registerScript(scriptName,
-					Executable.createDeleteExecutable(scriptName,
-							new ScriptDeleteExecutableBody().setCollection(DATABASE_NAME)
-									.setFilter(new KeyValueDict().putKv("author", "$params.author"))
-					), false, false).get();
-			Assertions.assertTrue(isSuccess);
-		});
-	}
-
-	private void callScriptDelete(String scriptName) {
-		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptingService.callScript(scriptName,
-					HiveResponseBody.map2JsonNode(
-							new KeyValueDict().putKv("author", "John")),
-					"appId", JsonNode.class)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
-			Assertions.assertNotNull(result);
-			Assertions.assertTrue(result.has(scriptName));
-			Assertions.assertTrue(result.get(scriptName).has("deleted_count"));
-		});
-	}
 
 	/**
 	 * If exists, also return OK(_status).
