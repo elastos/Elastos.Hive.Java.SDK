@@ -2,9 +2,7 @@ package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Throwables;
-import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.model.*;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.DatabaseService;
@@ -35,7 +33,7 @@ class ScriptingServiceTest {
 	//cross.user.did
 	private static final String USER_ID_OTHER = "did:elastos:ip1e2eAY6Kw6shCbZhzksy9pYwLjTRFEU7";
 
-	private static final String DATABASE_NAME = "script_database";
+	private static final String COLLECTION_NAME = "script_database";
 
 	private static ScriptingService scriptingService;
 	private static FilesService filesService;
@@ -78,7 +76,7 @@ class ScriptingServiceTest {
 	private void registerScriptInsert(String scriptName) {
 		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(scriptingService.registerScript(scriptName,
 				Executable.createInsertExecutable(scriptName,
-						new ScriptInsertExecutableBody(DATABASE_NAME, new KeyValueDict()
+						new ScriptInsertExecutableBody(COLLECTION_NAME, new KeyValueDict()
 								.putKv("author", "$params.author")
 								.putKv("content", "$params.content"),
 								new KeyValueDict().putKv("bypass_document_validation",false).putKv("ordered",true)
@@ -97,41 +95,52 @@ class ScriptingServiceTest {
 		});
 	}
 
-	@Test @Order(2) void testRegisterScriptFind() {
+	@Test @Order(2) void testFindWithoutCondition() {
+		registerScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
+		callScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
+	}
+
+	private void registerScriptFindWithoutCondition(String scriptName) {
+		Assertions.assertDoesNotThrow(()->{
+			Assertions.assertTrue(scriptingService.registerScript(scriptName,
+					new Executable(scriptName, Executable.TYPE_FIND,
+							new ScriptFindBody(COLLECTION_NAME, new KeyValueDict().putKv("author","John"))),
+					false, false).get());
+		});
+	}
+
+	private void callScriptFindWithoutCondition(String scriptName) {
+		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
+				scriptingService.callScriptUrl(scriptName,null, appId, String.class).get()));
+	}
+
+	@Test @Order(3) void testFind() {
+		registerScriptFind(FIND_NAME);
+		callScriptFind(FIND_NAME);
+	}
+
+	private void registerScriptFind(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
 			KeyValueDict filter = new KeyValueDict().putKv("author","John");
-			Assertions.assertTrue(scriptingService.registerScript(FIND_NAME,
-					new Condition("verify_user_permission", "queryHasResults",
-							new ScriptFindBody(DATABASE_NAME, filter)),
-					new Executable(FIND_NAME, Executable.TYPE_FIND,
-							new ScriptFindBody(DATABASE_NAME, filter)),
+			Assertions.assertTrue(scriptingService.registerScript(scriptName,
+					new Condition(
+							"verify_user_permission",
+							"queryHasResults",
+							new ScriptFindBody(COLLECTION_NAME, filter)),
+					new Executable(
+							scriptName,
+							Executable.TYPE_FIND,
+							new ScriptFindBody(COLLECTION_NAME, filter)),
 					false, false).get());
 		});
 	}
 
-	@Test @Order(3) void testRegisterScriptFindWithoutCondition() {
-		Assertions.assertDoesNotThrow(()->{
-			Assertions.assertTrue(scriptingService.registerScript(FIND_NO_CONDITION_NAME,
-					new Executable("get_groups", Executable.TYPE_FIND,
-							new ScriptFindBody("groups",
-									new KeyValueDict().putKv("friends","$caller_did"))),
-					false, false).get());
-		});
-	}
-
-	@Test @Order(4) void testCallScriptFind() {
+	private void callScriptFind(String scriptName) {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-				scriptingService.callScript(FIND_NAME,
-				null, appId, String.class).get()));
+				scriptingService.callScript(scriptName,null, appId, String.class).get()));
 	}
 
-	@Test @Order(5) void testCallScriptUrlFindWithoutCondition() {
-		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-				scriptingService.callScriptUrl(UPLOAD_FILE_NAME,
-				null, appId, String.class).get()));
-	}
-
-	@Test @Order(6) void testUpdate() {
+	@Test @Order(4) void testUpdate() {
 		registerScriptUpdate(UPDATE_NAME);
 		callScriptUpdate(UPDATE_NAME);
 	}
@@ -140,11 +149,12 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(
 				scriptingService.registerScript(scriptName,
 						Executable.createUpdateExecutable(scriptName,
-								new ScriptUpdateExecutableBody().setCollection(DATABASE_NAME)
+								new ScriptUpdateExecutableBody().setCollection(COLLECTION_NAME)
 										.setFilter(new KeyValueDict().putKv("author", "$params.author"))
 										.setUpdate(new KeyValueDict().putKv("$set", new KeyValueDict()
 												.putKv("author", "$params.author").putKv("content", "$params.content")))
-										.setOptions(new KeyValueDict().putKv("bypass_document_validation",false)
+										.setOptions(new KeyValueDict()
+												.putKv("bypass_document_validation",false)
 												.putKv("upsert",true))
 						), false, false).get()));
 	}
@@ -161,7 +171,7 @@ class ScriptingServiceTest {
 		});
 	}
 
-	@Test @Order(7) void testDelete() {
+	@Test @Order(5) void testDelete() {
 		registerScriptDelete(DELETE_NAME);
 		callScriptDelete(DELETE_NAME);
 	}
@@ -170,7 +180,7 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			Boolean isSuccess = scriptingService.registerScript(scriptName,
 					Executable.createDeleteExecutable(scriptName,
-							new ScriptDeleteExecutableBody().setCollection(DATABASE_NAME)
+							new ScriptDeleteExecutableBody().setCollection(COLLECTION_NAME)
 									.setFilter(new KeyValueDict().putKv("author", "$params.author"))
 					), false, false).get();
 			Assertions.assertTrue(isSuccess);
@@ -179,21 +189,18 @@ class ScriptingServiceTest {
 
 	private void callScriptDelete(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptingService.callScript(scriptName,
-					HiveResponseBody.map2JsonNode(
-							new KeyValueDict().putKv("author", "John")),
-					appId, JsonNode.class)
-					.exceptionally(e->{
-						fail();
-						return null;
-					}).get();
+			JsonNode result = scriptingService.callScript(
+					scriptName,
+					HiveResponseBody.map2JsonNode(new KeyValueDict().putKv("author", "John")),
+					appId,
+					JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("deleted_count"));
 		});
 	}
 
-	@Test @Order(8) void testUploadFile() {
+	@Test @Order(6) void testUploadFile() {
 		registerScriptFileUpload(UPLOAD_FILE_NAME);
 		String transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
 		uploadFileByTransActionId(transactionId);
@@ -235,7 +242,7 @@ class ScriptingServiceTest {
 		}
 	}
 
-	@Test @Order(9) void testFileDownload() {
+	@Test @Order(7) void testFileDownload() {
 		FilesServiceTest.removeLocalFile(localDstFilePath);
 		registerScriptFileDownload(DOWNLOAD_FILE_NAME);
 		String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
@@ -274,7 +281,7 @@ class ScriptingServiceTest {
 		}
 	}
 
-	@Test @Order(10) void testFileProperties() {
+	@Test @Order(8) void testFileProperties() {
 		registerScriptFileProperties(FILE_PROPERTIES_NAME);
 		callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
 	}
@@ -298,7 +305,7 @@ class ScriptingServiceTest {
 		});
 	}
 
-	@Test @Order(11) void testFileHash() {
+	@Test @Order(9) void testFileHash() {
 		registerScriptFileHash(FILE_HASH_NAME);
 		callScriptFileHash(FILE_HASH_NAME, fileName);
 	}
@@ -322,14 +329,12 @@ class ScriptingServiceTest {
 		});
 	}
 
-
-
 	/**
 	 * If exists, also return OK(_status).
 	 */
 	private static void create_test_database() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(
-				databaseService.createCollection(DATABASE_NAME, null).get()));
+				databaseService.createCollection(COLLECTION_NAME, null).get()));
 	}
 
 	/**
@@ -337,7 +342,7 @@ class ScriptingServiceTest {
 	 */
 	private static void remove_test_database() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(
-				databaseService.deleteCollection(DATABASE_NAME).get()));
+				databaseService.deleteCollection(COLLECTION_NAME).get()));
 	}
 
 }
