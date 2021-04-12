@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 /**
- * This class explicitly represents the vault service subscribed by "myDid".
+ * This class explicitly represents the vault service subscribed by "userDid".
  */
 public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
 	private FilesService 	filesService;
