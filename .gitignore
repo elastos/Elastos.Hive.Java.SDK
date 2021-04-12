@@ -4,7 +4,6 @@
 .classpath
 .settings/
 bin/
-doc/
 build/
 data/
 store/
