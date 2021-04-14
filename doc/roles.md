@@ -4,17 +4,20 @@ As Hive environment design, some roles has been involved and have different resp
 
 ## Owner Use Vault
 
-When user uses application, application will access data stored in Hive Node by Hive SDK. Hive Vault Node is used for store user application data which keep in database or file system. The relating pattern is like the followings.
+Generally, any user can subscribe to a vault on the preferred Hive node (or service), then the user can store all persistent application data in that vault while still keeping complete control of data.
+
+The developers would utilize Hive SDKs (Java/Swift) to develop the applications to store (access) users' data onto (from) their vaults.  There are two types of application data supported:
+
+-  Files;
+-  Structured data, similar to data in JSON format.
+
+The simple figure below describes the relationship among users, Hive SDK (application),  Vault service, and backup service.
 
 ![title](img/roles_ower_use_vault.png)
 
-User is called owner of the vault data. In vault node, the binding will be setup among owner user did, app did and vault data.
+A user can have multiple DIDs, and each DID represents an avatar of user himself.  The user would subscribe to a vault via the specific DID on the remote preferred Hive node.  Therefore, we would call user the owner of that vault in the specific user DID context. 
 
-Owner can use FilesService and DatabaseService access vault data after get authorization token from vault node.
-
-For security purpose, BackupService is used for backup all data to Hive Backup Node. With BackupService APIs, vault node will backup or restore data between vault node and backup node.
-
-Some other services can also be used to control owner's data. Please check API documentation.
+To ensure all data in the vault have its copy at all times, the user can subscribe to a backup service on another Hive node.  The backup would be used to keep a full copy of data in the vault with recent updates periodically.
 
 ## Scripting Service
 
