@@ -19,7 +19,7 @@ buildscript {
     }
 }
 
-version = 'v2.0.1'
+version = 'alpha-v2.1.1'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -65,21 +65,21 @@ jar {
     }
 }
 
-task createjavadoc(type: Javadoc) {
-    options{
-        encoding "UTF-8"
-        charSet 'UTF-8'
-        links "http://docs.oracle.com/javase/8/docs/api"
-    }
-    include(
-
-    )
-    source = sourceSets.main.java.srcDirs
-    destinationDir = file("doc/")
-    failOnError false
-}
-
-javadoc.dependsOn(build)
+//task createjavadoc(type: Javadoc) {
+//    options{
+//        encoding "UTF-8"
+//        charSet 'UTF-8'
+//        links "http://docs.oracle.com/javase/8/docs/api"
+//    }
+//    include(
+//
+//    )
+//    source = sourceSets.main.java.srcDirs
+//    destinationDir = file("doc/")
+//    failOnError false
+//}
+//
+//javadoc.dependsOn(build)
 
 test {
     useJUnitPlatform()
@@ -88,6 +88,11 @@ test {
         outputs.upToDateWhen {false}
         showStandardStreams = true
     }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 publish {
