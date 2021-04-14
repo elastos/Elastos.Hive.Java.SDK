@@ -23,9 +23,12 @@ public class TestData {
 	private static TestData instance = null;
 
 	private DIDApp userDid;
+	private DIDApp userDidCaller;
+	private String callerDid;
 	private DApp appInstanceDid;
 	private NodeConfig nodeConfig;
 	private AppContext context;
+	private AppContext contextCaller;
 
 	public static TestData getInstance() throws HiveException, DIDException {
 		if (instance == null) instance = new TestData();
@@ -69,6 +72,12 @@ public class TestData {
 				adapter,
 				userConfig.passPhrase(),
 				userConfig.storepass());
+		UserConfig userConfigCaller = clientConfig.crossConfig().userConfig();
+		userDidCaller = new DIDApp(userConfigCaller.name(),
+				userConfigCaller.mnemonic(),
+				adapter,
+				userConfigCaller.passPhrase(),
+				userConfigCaller.storepass());
 
 		nodeConfig = clientConfig.nodeConfig();
 
@@ -106,6 +115,41 @@ public class TestData {
 				});
 			}
 		}, nodeConfig.ownerDid());
+
+		contextCaller = AppContext.build(new AppContextProvider() {
+			@Override
+			public String getLocalDataDir() {
+				return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
+			}
+
+			@Override
+			public DIDDocument getAppInstanceDocument() {
+				try {
+					return appInstanceDid.getDocument();
+				} catch (DIDException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+
+			@Override
+			public CompletableFuture<String> getAuthorization(String jwtToken) {
+				return CompletableFuture.supplyAsync(() -> {
+					try {
+						Claims claims = JwtUtil.getBody(jwtToken);
+						if (claims == null)
+							throw new HiveException("Invalid jwt token as authorization.");
+						return appInstanceDid.createToken(appInstanceDid.createPresentation(
+								userDidCaller.issueDiplomaFor(appInstanceDid),
+								claims.getIssuer(),
+								(String) claims.get("nonce")), claims.getIssuer());
+					} catch (Exception e) {
+						throw new CompletionException(new HiveException(e.getMessage()));
+					}
+				});
+			}
+		}, userConfigCaller.did());
+		callerDid = userConfigCaller.did();
 	}
 
 	public AppContext getAppContext() {
@@ -124,8 +168,8 @@ public class TestData {
 		return new Vault(context, nodeConfig.provider());
 	}
 
-	public Vault newVault4Scripting() {
-		return new Vault(context, nodeConfig.provider(), nodeConfig.ownerDid(), null);
+	public Vault newVault4ScriptingCaller() {
+		return new Vault(contextCaller, nodeConfig.provider(), nodeConfig.ownerDid(), null);
 	}
 
 	public Backup newBackup() {
@@ -168,7 +212,11 @@ public class TestData {
 		return appInstanceDid.appId;
 	}
 
-    private enum EnvironmentType {
+	public String getCallerDid() {
+		return this.callerDid;
+	}
+
+	private enum EnvironmentType {
 		DEVELOPING,
 		PRODUCTION,
 		LOCAL
