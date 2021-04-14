@@ -28,11 +28,6 @@ class ScriptingServiceTest {
 	private static final String FILE_PROPERTIES_NAME = "file_properties";
 	private static final String FILE_HASH_NAME = "file_hash";
 
-	//for other app access script function.
-	private static final String APP_ID_OTHER = "appIdOther";
-	//cross.user.did
-	private static final String USER_ID_OTHER = "did:elastos:ip1e2eAY6Kw6shCbZhzksy9pYwLjTRFEU7";
-
 	private static final String COLLECTION_NAME = "script_database";
 
 	private static ScriptingService scriptingService;
@@ -56,7 +51,7 @@ class ScriptingServiceTest {
 	@BeforeAll public static void setUp() {
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
-			scriptingService = testData.newVault4Scripting().getScriptingService();
+			scriptingService = testData.newVault().getScriptingService();
 			filesService = testData.newVault().getFilesService();
 			databaseService = testData.newVault().getDatabaseService();
 			appId = testData.getAppId();
@@ -325,7 +320,7 @@ class ScriptingServiceTest {
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("SHA256"));
-			Assertions.assertFalse("".equals(result.get(scriptName).get("SHA256").asText("")));
+			Assertions.assertNotEquals(result.get(scriptName).get("SHA256").asText(""), "");
 		});
 	}
 
