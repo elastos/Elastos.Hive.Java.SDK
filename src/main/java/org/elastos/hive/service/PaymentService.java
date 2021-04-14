@@ -9,7 +9,7 @@ import org.elastos.hive.payment.Receipt;
 
 public interface PaymentService {
 	/**
-	 * Get pricing plan list from vault & backup service,
+	 * Get pricing plan list from vault and backup service,
 	 * such as more storage usage, backup service support, etc.
 	 *
 	 * @return the list of pricing plans
