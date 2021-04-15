@@ -6,27 +6,11 @@ import org.elastos.hive.exception.UnauthorizedStateException;
 public class ServiceEndpoint {
 	private AppContext context;
 	private String providerAddress;
-	private String targetDid;
-	private String targetAppDid;
 	private ConnectionManager connectionManager;
 
-	// This constructor will be embedded in the following global-grained extends:
-	// - VaultSubscription;
-	// - BackupSubscription;
-	// - Provider;
-	// - Vault;
-	// - Backup;
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
-		this(context, providerAddress, null, null);
-	}
-
-	// This constructor will be embedded in the following service-grained extends:
-	// - ScriptRunner;
-	protected ServiceEndpoint(AppContext context, String providerAddress, String targetDid, String targetAppDid) {
 		this.context = context;
 		this.providerAddress = providerAddress;
-		this.targetDid = targetDid;
-		this.targetAppDid = targetAppDid;
 		this.connectionManager = new ConnectionManager(this);
 	}
 
@@ -40,14 +24,6 @@ public class ServiceEndpoint {
 
 	public String getProviderAddress() {
 		return this.providerAddress;
-	}
-
-	public String getTargetDid() {
-		return this.targetDid;
-	}
-
-	public String getTargetAppDid() {
-		return this.targetAppDid;
 	}
 
 	public ConnectionManager getConnectionManager() {

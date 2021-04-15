@@ -165,11 +165,15 @@ public class TestData {
 	}
 
 	public Vault newVault() {
-		return new Vault(context, nodeConfig.provider(), nodeConfig.ownerDid(), null);
+		return new Vault(context, nodeConfig.provider());
 	}
 
-	public Vault newVault4ScriptingCaller() {
-		return new Vault(contextCaller, nodeConfig.provider(), nodeConfig.ownerDid(), null);
+	public ScriptRunner newScriptRunner() {
+		return new ScriptRunner(context, nodeConfig.provider());
+	}
+
+	public ScriptRunner newCallerScriptRunner() {
+		return new ScriptRunner(contextCaller, nodeConfig.provider());
 	}
 
 	public Backup newBackup() {

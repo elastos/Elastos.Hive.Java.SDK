@@ -21,20 +21,22 @@ class ScriptingServiceCallerPermissionTest {
     private static final String SCRIPT_NAME = "get_group_message";
 
     private static ScriptingService scriptingService;
-    private static ScriptingService scriptingServiceCaller;
+    private static ScriptRunner scriptRunner;
     private static DatabaseService databaseService;
 
+    private static String ownerDid;
     private static String callDid;
-    private static String appId;
+    private static String appDid;
 
     @BeforeAll
     public static void setUp() {
         Assertions.assertDoesNotThrow(()->{
             TestData testData = TestData.getInstance();
             scriptingService = testData.newVault().getScriptingService();
-            scriptingServiceCaller = testData.newVault4ScriptingCaller().getScriptingService();
+            scriptRunner = testData.newCallerScriptRunner();
             databaseService = testData.newVault().getDatabaseService();
-            appId = testData.getAppId();
+            ownerDid = testData.getOwnerDid();
+            appDid = testData.getAppId();
             callDid = testData.getCallerDid();
         });
     }
@@ -95,10 +97,10 @@ class ScriptingServiceCallerPermissionTest {
 
     private void run_script_with_group_permission() {
         Assertions.assertDoesNotThrow(()->{
-            JsonNode result = scriptingServiceCaller.callScript(SCRIPT_NAME,
+            JsonNode result = scriptRunner.callScript(SCRIPT_NAME,
                     HiveResponseBody.map2JsonNode(
                             new KeyValueDict().putKv("author", "John").putKv("content", "message")),
-                    appId, JsonNode.class).get();
+                    ownerDid, appDid, JsonNode.class).get();
             Assertions.assertNotNull(result);
             Assertions.assertTrue(result.has(SCRIPT_NAME));
             Assertions.assertTrue(result.get(SCRIPT_NAME).has("inserted_id"));
@@ -117,10 +119,10 @@ class ScriptingServiceCallerPermissionTest {
     private void run_script_without_group_permission() {
         //TODO:
         Assertions.assertDoesNotThrow(()->{
-            JsonNode result = scriptingServiceCaller.callScript(SCRIPT_NAME,
+            JsonNode result = scriptRunner.callScript(SCRIPT_NAME,
                     HiveResponseBody.map2JsonNode(
                             new KeyValueDict().putKv("author", "John").putKv("content", "message")),
-                    appId, JsonNode.class).get();
+                    ownerDid, appDid, JsonNode.class).get();
             Assertions.assertNotNull(result);
             Assertions.assertTrue(result.has(SCRIPT_NAME));
             Assertions.assertTrue(result.get(SCRIPT_NAME).has("inserted_id"));
