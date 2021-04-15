@@ -165,7 +165,7 @@ public class TestData {
 	}
 
 	public Vault newVault() {
-		return new Vault(context, nodeConfig.provider());
+		return new Vault(context, nodeConfig.provider(), nodeConfig.ownerDid(), null);
 	}
 
 	public Vault newVault4ScriptingCaller() {
