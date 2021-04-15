@@ -14,8 +14,6 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.io.Writer;
 
-import static org.junit.Assert.*;
-
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ScriptingServiceTest {
 	private static final String FIND_NAME = "get_group_messages";
@@ -24,16 +22,19 @@ class ScriptingServiceTest {
 	private static final String UPDATE_NAME = "database_update";
 	private static final String DELETE_NAME = "database_delete";
 	private static final String UPLOAD_FILE_NAME = "upload_file";
-	private static final String DOWNLOAD_FILE_NAME = "download_file";
+	private static final String DOWNLOAD_FILE_NAME = "upload_file";
 	private static final String FILE_PROPERTIES_NAME = "file_properties";
 	private static final String FILE_HASH_NAME = "file_hash";
 
 	private static final String COLLECTION_NAME = "script_database";
 
-	private static ScriptingService scriptingService;
+	private static String ownerDid;
+	private static String appDid;
+
 	private static FilesService filesService;
 	private static DatabaseService databaseService;
-	private static String appId;
+	private static ScriptingService scriptingService;
+	private static ScriptRunner scriptRunner;
 
 	private final String localSrcFilePath;
 	private final String localDstFileRoot;
@@ -52,9 +53,11 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
 			scriptingService = testData.newVault().getScriptingService();
+			scriptRunner = testData.newScriptRunner();
 			filesService = testData.newVault().getFilesService();
 			databaseService = testData.newVault().getDatabaseService();
-			appId = testData.getAppId();
+			ownerDid = testData.getOwnerDid();
+			appDid = testData.getAppId();
 		});
 		create_test_database();
 	}
@@ -80,10 +83,10 @@ class ScriptingServiceTest {
 
 	private void callScriptInsert(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptingService.callScript(scriptName,
+			JsonNode result = scriptRunner.callScript(scriptName,
 					HiveResponseBody.map2JsonNode(
 							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
-					appId, JsonNode.class).get();
+					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("inserted_id"));
@@ -106,7 +109,7 @@ class ScriptingServiceTest {
 
 	private void callScriptFindWithoutCondition(String scriptName) {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-				scriptingService.callScriptUrl(scriptName,null, appId, String.class).get()));
+				scriptRunner.callScriptUrl(scriptName,null, ownerDid, appDid, String.class).get()));
 	}
 
 	@Test @Order(3) void testFind() {
@@ -132,7 +135,7 @@ class ScriptingServiceTest {
 
 	private void callScriptFind(String scriptName) {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-				scriptingService.callScript(scriptName,null, appId, String.class).get()));
+				scriptRunner.callScript(scriptName,null, ownerDid, appDid, String.class).get()));
 	}
 
 	@Test @Order(4) void testUpdate() {
@@ -156,10 +159,10 @@ class ScriptingServiceTest {
 
 	private void callScriptUpdate(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptingService.callScript(scriptName,
+			JsonNode result = scriptRunner.callScript(scriptName,
 					HiveResponseBody.map2JsonNode(
 							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
-					appId, JsonNode.class).get();
+					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("upserted_id"));
@@ -184,11 +187,10 @@ class ScriptingServiceTest {
 
 	private void callScriptDelete(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptingService.callScript(
+			JsonNode result = scriptRunner.callScript(
 					scriptName,
 					HiveResponseBody.map2JsonNode(new KeyValueDict().putKv("author", "John")),
-					appId,
-					JsonNode.class).get();
+					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("deleted_count"));
@@ -211,9 +213,9 @@ class ScriptingServiceTest {
 
 	private String callScriptFileUpload(String scriptName, String fileName) {
 		try {
-			JsonNode result = scriptingService.callScript(scriptName,
+			JsonNode result = scriptRunner.callScript(scriptName,
 					Executable.createFileUploadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					appId, JsonNode.class).get();
+					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
@@ -225,7 +227,7 @@ class ScriptingServiceTest {
 	}
 
 	private void uploadFileByTransActionId(String transactionId) {
-		try (Writer writer = scriptingService.uploadFile(transactionId, Writer.class).get();
+		try (Writer writer = scriptRunner.uploadFile(transactionId, Writer.class).get();
 			 FileReader fileReader = new FileReader(localSrcFilePath)) {
 			Assertions.assertNotNull(writer);
 			char[] buffer = new char[1];
@@ -254,9 +256,9 @@ class ScriptingServiceTest {
 
 	private String callScriptFileDownload(String scriptName, String fileName) {
 		try {
-			JsonNode result = scriptingService.callScript(scriptName,
+			JsonNode result = scriptRunner.callScript(scriptName,
 					Executable.createFileDownloadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					appId, JsonNode.class).get();
+					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
@@ -268,7 +270,7 @@ class ScriptingServiceTest {
 	}
 
 	private void downloadFileByTransActionId(String transactionId) {
-		try (Reader reader = scriptingService.downloadFile(transactionId, Reader.class).get()) {
+		try (Reader reader = scriptRunner.downloadFile(transactionId, Reader.class).get()) {
 			Assertions.assertNotNull(reader);
 			Utils.cacheTextFile(reader, localDstFileRoot, fileName);
 		} catch (Exception e) {
@@ -290,9 +292,9 @@ class ScriptingServiceTest {
 
 	private void callScriptFileProperties(String scriptName, String fileName) {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptingService.callScript(scriptName,
+			JsonNode result = scriptRunner.callScript(scriptName,
 					Executable.createFilePropertiesParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					appId, JsonNode.class).get();
+					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("size"));
@@ -314,9 +316,9 @@ class ScriptingServiceTest {
 
 	private void callScriptFileHash(String scriptName, String fileName) {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptingService.callScript(scriptName,
+			JsonNode result = scriptRunner.callScript(scriptName,
 					Executable.createFileHashParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
-					appId, JsonNode.class).get();
+					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("SHA256"));

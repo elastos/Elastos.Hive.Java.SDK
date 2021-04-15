@@ -20,11 +20,7 @@ public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
 	private NodeManageServiceRender nodeManageService;
 
 	public Vault(AppContext context, String providerAddress) {
-		this(context, providerAddress, null, null);
-	}
-
-	public Vault(AppContext context, String providerAddress, String targetDid, String targetAppDid) {
-		super(context, providerAddress, targetDid, targetAppDid);
+		super(context, providerAddress);
 
 		this.filesService 	= new ServiceBuilder(this).createFilesService();
 		this.databaseService = new ServiceBuilder(this).createDatabase();

@@ -1,10 +1,13 @@
 package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.elastos.hive.ScriptRunner;
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.exception.InvalidParameterException;
+import org.elastos.hive.network.ScriptingApi;
 import org.elastos.hive.network.model.Condition;
 import org.elastos.hive.network.model.Executable;
+import org.elastos.hive.network.model.ScriptContext;
+import org.elastos.hive.network.request.CallScriptRequestBody;
 import org.elastos.hive.network.request.RegisterScriptRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.ScriptingService;
@@ -12,15 +15,9 @@ import org.elastos.hive.service.ScriptingService;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-class ScriptingServiceRender extends HiveVaultRender implements ScriptingService, HttpExceptionHandler {
-	private ScriptRunner scriptRunner;
-
+public class ScriptingServiceRender extends HiveVaultRender implements ScriptingService, HttpExceptionHandler {
 	public ScriptingServiceRender(ServiceEndpoint serviceEndpoint) {
 		super(serviceEndpoint);
-		this.scriptRunner = new ScriptRunner(getServiceEndpoint().getAppContext(),
-				getServiceEndpoint().getProviderAddress(),
-				getServiceEndpoint().getTargetDid(),
-				getServiceEndpoint().getAppDid());
 	}
 
 	@Override
@@ -49,44 +46,65 @@ class ScriptingServiceRender extends HiveVaultRender implements ScriptingService
 		});
 	}
 
-	@Override
-	public <T> CompletableFuture<T> callScript(String name, JsonNode params, String appDid, Class<T> resultType) {
+	public <T> CompletableFuture<T> callScript(String name, JsonNode params, String targetDid, String targetAppDid, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return scriptRunner.callScript(name, params, appDid, resultType);
+				return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
+						getConnectionManager().getScriptingApi()
+								.callScript(new CallScriptRequestBody()
+										.setName(name)
+										.setContext(new ScriptContext()
+												.setTargetDid(targetDid)
+												.setTargetAppDid(targetAppDid))
+										.setParams(HiveResponseBody.jsonNode2Map(params)))
+								.execute()
+				), resultType);
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
 	}
 
-	@Override
-	public <T> CompletableFuture<T> callScriptUrl(String name, String params, String appDid, Class<T> resultType) {
+	public <T> CompletableFuture<T> callScriptUrl(String name, String params, String targetDid, String targetAppDid, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return scriptRunner.callScriptUrl(name, params, appDid, resultType);
+				return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
+						getConnectionManager().getScriptingApi()
+								.callScriptUrl(targetDid, targetAppDid, name, params)
+								.execute()
+				), resultType);
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
 	}
 
-	@Override
 	public <T> CompletableFuture<T> uploadFile(String transactionId, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return scriptRunner.uploadFile(transactionId, resultType);
+				if (transactionId == null)
+					throw new InvalidParameterException("Invalid parameter transactionId.");
+
+				return HiveResponseBody.getRequestStream(
+						getConnectionManager().openConnection(ScriptingApi.API_SCRIPT_UPLOAD + "/" + transactionId),
+						resultType);
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
 	}
 
-	@Override
 	public <T> CompletableFuture<T> downloadFile(String transactionId, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return scriptRunner.downloadFile(transactionId, resultType);
+				if (transactionId == null)
+					throw new InvalidParameterException("Invalid parameter transactionId.");
+
+				return HiveResponseBody.getResponseStream(
+						getConnectionManager().getScriptingApi()
+								.callDownload(transactionId)
+								.execute(),
+						resultType);
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
