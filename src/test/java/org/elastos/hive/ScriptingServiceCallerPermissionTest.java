@@ -78,7 +78,7 @@ class ScriptingServiceCallerPermissionTest {
     private void register_script_for_caller() {
         Assertions.assertDoesNotThrow(()->{
             KeyValueDict filter = new KeyValueDict().putKv("collection", COLLECTION_GROUP_MESSAGE)
-                    .putKv("did", "$callScripter_did");
+                    .putKv("did", "$caller_did");
             Assertions.assertTrue(scriptingService.registerScript(SCRIPT_NAME,
                     new Condition(
                             "verify_user_permission",
