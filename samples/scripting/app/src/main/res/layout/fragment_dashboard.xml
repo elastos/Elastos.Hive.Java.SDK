@@ -19,4 +19,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/caller_output"
+        android:layout_width="match_parent"
+        android:layout_height="543dp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="85dp" />
+
+    <Button
+        android:id="@+id/caller_run_bttn"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Run Script"
+        tools:layout_editor_absoluteX="-8dp"
+        tools:layout_editor_absoluteY="16dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
