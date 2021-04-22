@@ -34,6 +34,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        // listen button to set script.
         mainActivity = (MainActivity) getActivity();
         homeViewModel.setMainActivity(mainActivity);
         Button button= (Button)root.findViewById(R.id.owner_set_bttn);
