@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,10 +13,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import org.elastos.hive.demo.MainActivity;
 import org.elastos.hive.demo.R;
 
 public class HomeFragment extends Fragment {
 
+    private MainActivity mainActivity;
     private HomeViewModel homeViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -30,6 +33,14 @@ public class HomeFragment extends Fragment {
                 textView.setText(s);
             }
         });
+
+        mainActivity = (MainActivity) getActivity();
+        homeViewModel.setSdkContext(mainActivity.getSdkContext());
+        Button button= (Button)root.findViewById(R.id.owner_set_bttn);
+        button.setOnClickListener(view -> {
+                homeViewModel.setScript();
+        });
+
         return root;
     }
 }
