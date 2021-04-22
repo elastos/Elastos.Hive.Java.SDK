@@ -14,7 +14,8 @@ import org.elastos.hive.network.model.ScriptInsertExecutableBody;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.ScriptingService;
 
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class ScriptOwner {
     private final SdkContext sdkContext;
@@ -35,39 +36,24 @@ public class ScriptOwner {
         appDid = this.sdkContext.getAppId();
     }
 
-    public boolean setScript() throws ExecutionException, InterruptedException {
-        if (!init_for_caller())
-            return false;
-        if (!set_permission_for_caller())
-            return false;
-        return register_script_for_caller();
-    }
-
-    private boolean init_for_caller() throws ExecutionException, InterruptedException {
-        Boolean isSuccess = databaseService.createCollection(
-                ScriptConst.COLLECTION_GROUP, null).get();
-        if (!isSuccess)
-            return false;
-        return databaseService.createCollection(
-                ScriptConst.COLLECTION_GROUP_MESSAGE, null).get();
-    }
-
-    private boolean set_permission_for_caller() throws ExecutionException, InterruptedException {
+    public CompletableFuture<Boolean> setScript() {
+        CompletableFuture<Boolean> createGroup = databaseService.createCollection(
+                ScriptConst.COLLECTION_GROUP, null);
+        CompletableFuture<Boolean> createMessage = databaseService.createCollection(
+                ScriptConst.COLLECTION_GROUP_MESSAGE, null);
         //add group named COLLECTION_GROUP_MESSAGE and add caller did into it,
         //  then caller will get the permission
         //  to access collection COLLECTION_GROUP_MESSAGE
         ObjectNode docNode = JsonNodeFactory.instance.objectNode();
         docNode.put("collection", ScriptConst.COLLECTION_GROUP_MESSAGE);
         docNode.put("did", callDid);
-        InsertOneResult result = databaseService.insertOne(ScriptConst.COLLECTION_GROUP, docNode,
-                new InsertOneOptions(false)).get();
-        return result.getInsertedId() != null && !result.getInsertedId().isEmpty();
-    }
-
-    private boolean register_script_for_caller() throws ExecutionException, InterruptedException {
+        CompletableFuture<InsertOneResult> addPermission = databaseService.insertOne(
+                ScriptConst.COLLECTION_GROUP,
+                docNode,
+                new InsertOneOptions(false));
         KeyValueDict filter = new KeyValueDict().putKv("collection", ScriptConst.COLLECTION_GROUP_MESSAGE)
                 .putKv("did", "$caller_did");
-        return scriptingService.registerScript(ScriptConst.SCRIPT_NAME,
+        CompletableFuture<Boolean> setScript = scriptingService.registerScript(ScriptConst.SCRIPT_NAME,
                 new Condition(
                         "verify_user_permission",
                         "queryHasResults",
@@ -79,6 +65,19 @@ public class ScriptOwner {
                                 new KeyValueDict().putKv("bypass_document_validation",false)
                                         .putKv("ordered",true)
                         )),
-                false, false).get();
+                false, false);
+        return createGroup.thenCombineAsync(createMessage, (r1, r2)->{
+            if (!r1 || !r2)
+                throw new CompletionException(new Exception("Failed to prepare."));
+            return true;
+        }).thenCombineAsync(addPermission, (r1, r2)->{
+            if (r2.getInsertedId() == null || r2.getInsertedId().isEmpty())
+                throw new CompletionException(new Exception("Failed to add permission."));
+            return true;
+        }).thenCombineAsync(setScript, (r1,r2)->{
+            if (!r2)
+                throw new CompletionException(new Exception("Failed to set script."));
+            return true;
+        });
     }
 }
