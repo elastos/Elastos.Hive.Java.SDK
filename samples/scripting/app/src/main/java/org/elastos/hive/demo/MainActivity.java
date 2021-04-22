@@ -1,5 +1,6 @@
 package org.elastos.hive.demo;
 
+import android.content.res.AssetManager;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -10,11 +11,16 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import org.elastos.hive.demo.sdk.SdkContext;
+
 public class MainActivity extends AppCompatActivity {
+    private AssetManager assetManager;
+    private SdkContext sdkContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initSdkContext();
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -27,4 +33,16 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navView, navController);
     }
 
+    private void initSdkContext() {
+        assetManager = getAssets();
+        try {
+            sdkContext = SdkContext.getInstance(assetManager);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public SdkContext getSdkContext() {
+        return sdkContext;
+    }
 }
