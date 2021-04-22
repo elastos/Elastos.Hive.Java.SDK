@@ -1,11 +1,8 @@
 package org.elastos.hive.config;
 
-import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.adapter.DummyAdapter;
-import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDException;
-import org.elastos.did.exception.DIDResolveException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.*;
 import org.elastos.hive.did.DApp;
@@ -227,13 +224,5 @@ public class TestData {
 		DEVELOPING,
 		PRODUCTION,
 		LOCAL
-	}
-
-	public static void main(String[] args) throws DIDResolveException {
-		DIDBackend.initialize("http://api.elastos.io:21606", "data/didCache");
-		ResolverCache.reset();
-
-		String jwt = "eyJhbGciOiAiRVMyNTYiLCAidHlwZSI6ICJKV1QiLCAidmVyc2lvbiI6ICIxLjAiLCAia2lkIjogImRpZDplbGFzdG9zOmlqVW5ENEtlUnBlQlVGbWNFRENiaHhNVEpSelVZQ1FDWk0jcHJpbWFyeSJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppalVuRDRLZVJwZUJVRm1jRURDYmh4TVRKUnpVWUNRQ1pNIiwic3ViIjoiRElEQXV0aENoYWxsZW5nZSIsImF1ZCI6ImRpZDplbGFzdG9zOmltTVk3dUhjNVdDRFVoV0NWYUg1TXRGRkNCTWVnQ2FFWUgiLCJub25jZSI6IjAxYWE5MDRjLWEyODMtMTFlYi04Mzg1LTAyNDJhYzE2MDAwMyIsImV4cCI6MTYxODk5NzA5MX0.DBJj5OkM2XVEYfeEoa0dVYne4EBj_-G0IZRhdshTiNW0AIniJTSqkErC9uBmMEsZxVCodrKgldmhhmcgOwgdig";
-		Claims claims = JwtUtil.getBody(jwt);
 	}
 }
