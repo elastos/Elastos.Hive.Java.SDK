@@ -2,6 +2,7 @@ package org.elastos.hive.demo;
 
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -44,5 +45,9 @@ public class MainActivity extends AppCompatActivity {
 
     public SdkContext getSdkContext() {
         return sdkContext;
+    }
+
+    public void loading(boolean isVisible) {
+        findViewById(R.id.loadingPanel).setVisibility(isVisible ? View.VISIBLE : View.GONE);
     }
 }

@@ -35,7 +35,7 @@ public class HomeFragment extends Fragment {
         });
 
         mainActivity = (MainActivity) getActivity();
-        homeViewModel.setSdkContext(mainActivity.getSdkContext());
+        homeViewModel.setMainActivity(mainActivity);
         Button button= (Button)root.findViewById(R.id.owner_set_bttn);
         button.setOnClickListener(view -> {
                 homeViewModel.setScript();
