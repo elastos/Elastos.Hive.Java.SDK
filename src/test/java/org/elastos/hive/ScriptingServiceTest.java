@@ -342,4 +342,11 @@ class ScriptingServiceTest {
 				databaseService.deleteCollection(COLLECTION_NAME).get()));
 	}
 
+	@Disabled
+	@Test @Order(10) void testUnregisterScript() {
+		Assertions.assertDoesNotThrow(()->{
+			scriptingService.unregisterScript(FILE_HASH_NAME).get();
+		});
+	}
+
 }

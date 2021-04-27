@@ -22,28 +22,25 @@
 
 package org.elastos.hive.connection;
 
-import org.elastos.hive.AppContext;
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.elastos.hive.auth.AuthToken;
 import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.RemoteResolver;
 import org.elastos.hive.auth.TokenResolver;
-
-import java.io.IOException;
-
-import okhttp3.Interceptor;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.network.BaseApi;
 import org.elastos.hive.network.response.HiveResponseBody;
+
+import java.io.IOException;
 
 /**
  * Set token to HTTP request.
  */
 public class RequestInterceptor implements Interceptor {
-    private final boolean needToken;
-    private TokenResolver tokenResolver;
+    protected final boolean needToken;
+    protected TokenResolver tokenResolver;
 
     RequestInterceptor(ConnectionManager connectionManager, boolean needToken) {
         this.tokenResolver = new LocalResolver(connectionManager.getServiceEndpoint().getAppContext().getUserDid(),
@@ -74,14 +71,15 @@ public class RequestInterceptor implements Interceptor {
      */
     private Response handleResponse(Response response) throws IOException {
         if (!response.isSuccessful())
-            handleResponseErrorCode(response.code());
+            handleResponseErrorCode(response);
         return response;
     }
 
     /**
      * All error code comes from node service.
      */
-    private void handleResponseErrorCode(int code) throws IOException {
+    protected void handleResponseErrorCode(Response response) throws IOException {
+        int code = response.code();
         if (needToken && code == 401)
             tokenResolver.invalidateToken();
 
