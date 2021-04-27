@@ -14,4 +14,9 @@ public interface ScriptingService {
     CompletableFuture<Boolean> registerScript(String name, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp);
 
     CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp);
+
+    /**
+     * Unregister the script by name. After this, the script will not be used anymore.
+     */
+    CompletableFuture<Void> unregisterScript(String name);
 }

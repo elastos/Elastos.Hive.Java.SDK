@@ -43,6 +43,7 @@ public class ConnectionManager {
 	private ServiceEndpoint serviceEndpoint;
 	private RequestInterceptor authRequestInterceptor;
 	private RequestInterceptor plainRequestInterceptor;
+	private RequestInterceptor plainV2RequestInterceptor;
 
 	private SubscriptionApi subscriptionApi;
 	private PaymentApi paymentApi;
@@ -51,12 +52,14 @@ public class ConnectionManager {
 	private AuthApi authApi;
 	private FilesApi filesApi;
 	private ScriptingApi scriptingApi;
+	private ScriptingV2Api scriptingV2Api;
 	private BackupApi backupApi;
 	private NodeManageApi nodeManageApi;
 
 	public ConnectionManager(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
 		this.plainRequestInterceptor = new RequestInterceptor(this);
+		this.plainV2RequestInterceptor = new RequestV2Interceptor(this);
 		this.authRequestInterceptor  = new RequestInterceptor(this, false);
 	}
 
@@ -111,6 +114,13 @@ public class ConnectionManager {
 			scriptingApi = createService(ScriptingApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return scriptingApi;
+	}
+
+	public ScriptingV2Api getScriptingV2Api() {
+		if (scriptingV2Api == null) {
+			scriptingV2Api = createService(ScriptingV2Api.class, serviceEndpoint.getProviderAddress(), this.plainV2RequestInterceptor);
+		}
+		return scriptingV2Api;
 	}
 
 	public BackupApi getBackupApi() {

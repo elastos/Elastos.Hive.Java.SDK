@@ -46,6 +46,18 @@ public class ScriptingServiceRender extends HiveVaultRender implements Scripting
 		});
 	}
 
+	@Override
+	public CompletableFuture<Void> unregisterScript(String name) {
+		return CompletableFuture.runAsync(()-> {
+			try {
+				getConnectionManager().getScriptingV2Api()
+						.deleteScript(name).execute();
+			} catch (Exception e) {
+				throw new CompletionException(convertExceptionV2(e));
+			}
+		});
+	}
+
 	public <T> CompletableFuture<T> callScript(String name, JsonNode params, String targetDid, String targetAppDid, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {

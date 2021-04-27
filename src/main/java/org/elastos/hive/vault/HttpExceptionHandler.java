@@ -1,6 +1,9 @@
 package org.elastos.hive.vault;
 
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.network.response.HiveResponseBody;
+
+import java.io.IOException;
 
 public interface HttpExceptionHandler {
     /**
@@ -14,5 +17,12 @@ public interface HttpExceptionHandler {
      */
     default Exception convertException(Exception e) {
         return HiveResponseBody.convertException(e);
+    }
+
+    default Exception convertExceptionV2(Exception e) {
+        if (e instanceof IOException)
+            return new HiveException(e.getMessage());
+        else
+            return e;
     }
 }
