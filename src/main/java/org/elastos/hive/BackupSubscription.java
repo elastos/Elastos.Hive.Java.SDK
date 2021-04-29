@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.network.response.VaultInfoResponseBody;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
@@ -33,7 +34,33 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
-		}).thenApplyAsync(result -> {
+		}).thenApplyAsync(success -> {
+			try {
+				return getBackupInfoByResponseBody(this.subscriptionService.getBackupVaultInfo());
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<Void> unsubscribe() {
+		throw new UnsupportedMethodException();
+	}
+
+	@Override
+	public CompletableFuture<Void> activate() {
+		throw new UnsupportedMethodException();
+	}
+
+	@Override
+	public CompletableFuture<Void> deactivate() {
+		throw new UnsupportedMethodException();
+	}
+
+	@Override
+	public CompletableFuture<BackupInfo> checkSubscription() {
+		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return getBackupInfoByResponseBody(this.subscriptionService.getBackupVaultInfo());
 			} catch (Exception e) {
@@ -52,32 +79,6 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 				.setEndTime(body.getEndTimeStr())
 				.setPricingUsing(body.getPricingUsing())
 				.setIsExisting(body.isExisting());
-	}
-
-	@Override
-	public CompletableFuture<Void> unsubscribe() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public CompletableFuture<Void> activate() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public CompletableFuture<Void> deactivate() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public CompletableFuture<BackupInfo> checkSubscription() {
-		return CompletableFuture.supplyAsync(()-> {
-			try {
-				return getBackupInfoByResponseBody(this.subscriptionService.getBackupVaultInfo());
-			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
-			}
-		});
 	}
 
 	public class BackupInfo {
@@ -232,7 +233,6 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 
 	@Override
 	public CompletableFuture<Receipt> getReceipt(String receiptId) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedMethodException();
 	}
-
 }
