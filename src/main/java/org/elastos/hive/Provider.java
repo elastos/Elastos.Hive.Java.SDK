@@ -3,6 +3,7 @@ package org.elastos.hive;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.UnsupportedMethodException;
 
 /**
  * This class is used to fetch some possible information from remote hive node.
@@ -24,13 +25,11 @@ public class Provider extends ServiceEndpoint {
 	}
 
 	public CompletableFuture<Version> getVersion() {
-		// TODO:
-		return null;
+		throw new UnsupportedMethodException();
 	}
 
 	public CompletableFuture<String> getLatestCommitId() {
-		// TODO:
-		return null;
+		throw new UnsupportedMethodException();
 	}
 
 	public class Version {
@@ -38,29 +37,25 @@ public class Provider extends ServiceEndpoint {
 		private int minor;
 		private int hotfix;
 
-		public int getMajorNumber() {
+		public int getMajor() {
 			return this.major;
 		}
 
-		public int getMinorNumber() {
+		public int getNinor() {
 			return this.minor;
 		}
 
-		public int getFixNumber() {
+		public int getHotfix() {
 			return this.hotfix;
 		}
 
-		public int getFullNumber() {
-			return 0;
-		}
-
-		public String getVersionName() {
-			return null;
+		public String getFullVersion() {
+			return String.format("%s.%s.%s", major, minor, hotfix);
 		}
 
 		@Override
 		public String toString() {
-			return getVersionName();
+			return getFullVersion();
 		}
 	}
 }
