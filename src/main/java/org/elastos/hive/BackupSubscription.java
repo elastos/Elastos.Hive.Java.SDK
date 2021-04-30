@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class BackupSubscription extends ServiceEndpoint implements SubscriptionService<BackupSubscription.BackupInfo>, PaymentService, HttpExceptionHandler {
+public class BackupSubscription extends ServiceEndpoint implements SubscriptionService<Backup.PropertySet>, PaymentService, HttpExceptionHandler {
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
 
@@ -27,7 +27,7 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 	}
 
 	@Override
-	public CompletableFuture<BackupInfo> subscribe(String pricingPlan) {
+	public CompletableFuture<Backup.PropertySet> subscribe(String pricingPlan) {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				this.subscriptionService.subscribeBackup();
@@ -59,7 +59,7 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 	}
 
 	@Override
-	public CompletableFuture<BackupInfo> checkSubscription() {
+	public CompletableFuture<Backup.PropertySet> checkSubscription() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return getBackupInfoByResponseBody(this.subscriptionService.getBackupVaultInfo());
@@ -69,109 +69,9 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 		});
 	}
 
-	private BackupInfo getBackupInfoByResponseBody(VaultInfoResponseBody body) {
-		return new BackupInfo().setDid(body.getDid())
-				.setMaxStorage(body.getMaxStorage())
-				.setFileUseStorage(body.getFileUseStorage())
-				.setDbUseStorage(body.getDbUseStorage())
-				.setModifyTime(body.getModifyTimeStr())
-				.setStartTime(body.getStartTimeStr())
-				.setEndTime(body.getEndTimeStr())
-				.setPricingUsing(body.getPricingUsing())
-				.setIsExisting(body.isExisting());
-	}
-
-	public class BackupInfo {
-		private String did;
-		private long maxStorage;
-		private long fileUseStorage;
-		private long dbUseStorage;
-		private String modifyTime;
-		private String startTime;
-		private String endTime;
-		private String pricingUsing;
-		private boolean isExisting;
-
-		public String getDid() {
-			return did;
-		}
-
-		public BackupInfo setDid(String did) {
-			this.did = did;
-			return this;
-		}
-
-		public long getMaxStorage() {
-			return maxStorage;
-		}
-
-		public BackupInfo setMaxStorage(long maxStorage) {
-			this.maxStorage = maxStorage;
-			return this;
-		}
-
-		public long getFileUseStorage() {
-			return fileUseStorage;
-		}
-
-		public BackupInfo setFileUseStorage(long fileUseStorage) {
-			this.fileUseStorage = fileUseStorage;
-			return this;
-		}
-
-		public long getDbUseStorage() {
-			return dbUseStorage;
-		}
-
-		public BackupInfo setDbUseStorage(long dbUseStorage) {
-			this.dbUseStorage = dbUseStorage;
-			return this;
-		}
-
-		public String getModifyTime() {
-			return modifyTime;
-		}
-
-		public BackupInfo setModifyTime(String modifyTime) {
-			this.modifyTime = modifyTime;
-			return this;
-		}
-
-		public String getStartTime() {
-			return startTime;
-		}
-
-		public BackupInfo setStartTime(String startTime) {
-			this.startTime = startTime;
-			return this;
-		}
-
-		public String getEndTime() {
-			return endTime;
-		}
-
-		public BackupInfo setEndTime(String endTime) {
-			this.endTime = endTime;
-			return this;
-		}
-
-		public String getPricingUsing() {
-			return pricingUsing;
-		}
-
-		public BackupInfo setPricingUsing(String pricingUsing) {
-			this.pricingUsing = pricingUsing;
-			return this;
-		}
-
-		public boolean getIsExisting() {
-			return isExisting;
-		}
-
-		public BackupInfo setIsExisting(boolean isExisting) {
-			this.isExisting = isExisting;
-			return this;
-		}
+	private Backup.PropertySet getBackupInfoByResponseBody(VaultInfoResponseBody body) {
+		// TODO:
+		return null;
 	}
 
 	@Override
