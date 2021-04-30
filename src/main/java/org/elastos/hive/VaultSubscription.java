@@ -16,7 +16,7 @@ import org.elastos.hive.vault.HttpExceptionHandler;
 import org.elastos.hive.vault.PaymentServiceRender;
 import org.elastos.hive.vault.SubscriptionServiceRender;
 
-public class VaultSubscription extends ServiceEndpoint implements SubscriptionService<VaultSubscription.VaultInfo>, PaymentService, HttpExceptionHandler {
+public class VaultSubscription extends ServiceEndpoint implements SubscriptionService<Vault.PropertySet>, PaymentService, HttpExceptionHandler {
 	private AppContext context;
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
@@ -29,12 +29,13 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 	}
 
 	@Override
-	public CompletableFuture<VaultInfo> subscribe(String pricingPlan) {
+	public CompletableFuture<Vault.PropertySet> subscribe(String pricingPlan) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				this.subscriptionService.subscribe();
+
 				//TODO:
-				return new VaultInfo(null, getAppContext().getUserDid(), null);
+				return null;
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
@@ -75,18 +76,12 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 	}
 
 	@Override
-	public CompletableFuture<VaultInfo> checkSubscription() {
+	public CompletableFuture<Vault.PropertySet> checkSubscription() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				VaultInfoResponseBody body = this.subscriptionService.getVaultInfo();
-				return new VaultInfo(this.getUserDid(), null, body.getDid())
-						.setProvider(this.getProviderAddress())
-						.setCreateTime(body.getStartTimeStr())
-						.setModifyTime(body.getModifyTimeStr())
-						.setMaxSpace(body.getMaxStorage())
-						.setDbSpaceUsed(body.getDbUseStorage())
-						.setFileSpaceUsed(body.getFileUseStorage())
-						.setExisting(body.isExisting());
+				//
+				return null;
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
@@ -153,135 +148,5 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 	@Override
 	public CompletableFuture<Receipt> getReceipt(String receiptId) {
 		throw new UnsupportedOperationException();
-	}
-
-	public class VaultInfo {
-		private String userDid;
-		private String appInstanceDid;
-		private String appId;
-		private String provider;
-
-		private String serviceDid;
-		private String pricingUsing;
-		private String createTime;
-		private String modifyTime;
-		private long maxSpace;
-		private long dbSpaceUsed;
-		private long fileSpaceUsed;
-		private boolean existing;
-
-		public VaultInfo(String appInstanceDid, String userDid, String serviceDid) {
-			this.appInstanceDid = appInstanceDid;
-			this.userDid = userDid;
-			this.serviceDid = serviceDid;
-		}
-
-		public String getUserDid() {
-			return userDid;
-		}
-
-		public VaultInfo setUserDid(String userDid) {
-			this.userDid = userDid;
-			return this;
-		}
-
-		public String getAppInstanceDid() {
-			return appInstanceDid;
-		}
-
-		public VaultInfo setAppInstanceDid(String appInstanceDid) {
-			this.appInstanceDid = appInstanceDid;
-			return this;
-		}
-
-		public String getAppId() {
-			return appId;
-		}
-
-		public VaultInfo setAppId(String appId) {
-			this.appId = appId;
-			return this;
-		}
-
-		public String getProvider() {
-			return provider;
-		}
-
-		public VaultInfo setProvider(String provider) {
-			this.provider = provider;
-			return this;
-		}
-
-		public String getServiceDid() {
-			return serviceDid;
-		}
-
-		public VaultInfo setServiceDid(String serviceDid) {
-			this.serviceDid = serviceDid;
-			return this;
-		}
-
-		public String getPricingUsing() {
-			return pricingUsing;
-		}
-
-		public VaultInfo setPricingUsing(String pricingUsing) {
-			this.pricingUsing = pricingUsing;
-			return this;
-		}
-
-		public String getCreateTime() {
-			return createTime;
-		}
-
-		public VaultInfo setCreateTime(String createTime) {
-			this.createTime = createTime;
-			return this;
-		}
-
-		public String getModifyTime() {
-			return modifyTime;
-		}
-
-		public VaultInfo setModifyTime(String modifyTime) {
-			this.modifyTime = modifyTime;
-			return this;
-		}
-
-		public long getMaxSpace() {
-			return maxSpace;
-		}
-
-		public VaultInfo setMaxSpace(long maxSpace) {
-			this.maxSpace = maxSpace;
-			return this;
-		}
-
-		public long getDbSpaceUsed() {
-			return dbSpaceUsed;
-		}
-
-		public VaultInfo setDbSpaceUsed(long dbSpaceUsed) {
-			this.dbSpaceUsed = dbSpaceUsed;
-			return this;
-		}
-
-		public long getFileSpaceUsed() {
-			return fileSpaceUsed;
-		}
-
-		public VaultInfo setFileSpaceUsed(long fileSpaceUsed) {
-			this.fileSpaceUsed = fileSpaceUsed;
-			return this;
-		}
-
-		public boolean isExisting() {
-			return existing;
-		}
-
-		public VaultInfo setExisting(boolean existing) {
-			this.existing = existing;
-			return this;
-		}
 	}
 }
