@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportedMethodException;
@@ -22,14 +23,6 @@ public class Provider extends ServiceEndpoint {
 
 	public Provider(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
-	}
-
-	public CompletableFuture<Version> getVersion() {
-		throw new UnsupportedMethodException();
-	}
-
-	public CompletableFuture<String> getLatestCommitId() {
-		throw new UnsupportedMethodException();
 	}
 
 	public class Version {
@@ -57,5 +50,13 @@ public class Provider extends ServiceEndpoint {
 		public String toString() {
 			return getFullVersion();
 		}
+	}
+
+	public static CompletableFuture<Version> getVersion() {
+		throw new UnsupportedMethodException();
+	}
+
+	public static CompletableFuture<String> getLatestCommitId() {
+		throw new UnsupportedMethodException();
 	}
 }

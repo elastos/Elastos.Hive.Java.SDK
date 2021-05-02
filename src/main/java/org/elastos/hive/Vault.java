@@ -120,6 +120,7 @@ public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
 		throw new UnsupportedMethodException();
 	}
 
+	/*
 	public CompletableFuture<String> getVersion() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
@@ -139,4 +140,5 @@ public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
 			}
 		});
 	}
+	*/
 }
