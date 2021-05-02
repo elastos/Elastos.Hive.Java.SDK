@@ -1,7 +1,6 @@
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.network.response.VaultInfoResponseBody;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
@@ -19,13 +18,11 @@ import org.elastos.hive.vault.SubscriptionServiceRender;
 public class VaultSubscription extends ServiceEndpoint
 	implements SubscriptionService<Vault.PropertySet>, PaymentService, HttpExceptionHandler {
 
-	private AppContext context;
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
 
 	public VaultSubscription(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
-		this.context = context;
 		this.paymentService = new PaymentServiceRender(this);
 		this.subscriptionService = new SubscriptionServiceRender(this);
 	}
@@ -81,8 +78,8 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Vault.PropertySet> checkSubscription() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				VaultInfoResponseBody body = this.subscriptionService.getVaultInfo();
-				//
+				// VaultInfoResponseBody body = this.subscriptionService.getVaultInfo();
+				// TODO:
 				return null;
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
