@@ -41,7 +41,7 @@ public class AppContext {
 
 	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
 		if (cacheDir == null || resolver == null)
-			throw new IllegalArgumentException("invalid value for parameter resolver or cacheDir");
+			throw new IllegalArgumentException("Invalid parameters to setup DID resolver");
 
 		if (resolverHasSetup)
 			throw new DIDResoverAlreadySetupException();

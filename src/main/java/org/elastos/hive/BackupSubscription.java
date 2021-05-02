@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class BackupSubscription extends ServiceEndpoint implements SubscriptionService<Backup.PropertySet>, PaymentService, HttpExceptionHandler {
+public class BackupSubscription extends ServiceEndpoint
+	implements SubscriptionService<Backup.PropertySet>, PaymentService, HttpExceptionHandler {
+
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
 
@@ -27,7 +29,7 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 	}
 
 	@Override
-	public CompletableFuture<Backup.PropertySet> subscribe(String pricingPlan) {
+	public CompletableFuture<Backup.PropertySet> subscribe() {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				this.subscriptionService.subscribeBackup();
@@ -42,6 +44,7 @@ public class BackupSubscription extends ServiceEndpoint implements SubscriptionS
 			}
 		});
 	}
+
 
 	@Override
 	public CompletableFuture<Void> unsubscribe() {

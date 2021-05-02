@@ -16,7 +16,9 @@ import org.elastos.hive.vault.HttpExceptionHandler;
 import org.elastos.hive.vault.PaymentServiceRender;
 import org.elastos.hive.vault.SubscriptionServiceRender;
 
-public class VaultSubscription extends ServiceEndpoint implements SubscriptionService<Vault.PropertySet>, PaymentService, HttpExceptionHandler {
+public class VaultSubscription extends ServiceEndpoint
+	implements SubscriptionService<Vault.PropertySet>, PaymentService, HttpExceptionHandler {
+
 	private AppContext context;
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
@@ -29,7 +31,7 @@ public class VaultSubscription extends ServiceEndpoint implements SubscriptionSe
 	}
 
 	@Override
-	public CompletableFuture<Vault.PropertySet> subscribe(String pricingPlan) {
+	public CompletableFuture<Vault.PropertySet> subscribe() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				this.subscriptionService.subscribe();
