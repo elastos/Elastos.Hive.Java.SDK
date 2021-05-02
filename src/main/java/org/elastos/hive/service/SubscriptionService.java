@@ -12,13 +12,12 @@ public interface SubscriptionService<T> {
 	/**
 	 * Subscript for using vault relating service.
 	 *
-	 * @param pricingPlan Pricing plan name for using the vault service.
 	 * @return Vault service information.
 	 */
-	CompletableFuture<T> subscribe(String pricingPlan);
+	CompletableFuture<T> subscribe();
 
 	/**
-	 * Unsubscript vault service. After this, user can't use it.
+	 * Unsubscribe vault service. After this, user can't use it.
 	 *
 	 * @return Void
 	 */
@@ -32,7 +31,7 @@ public interface SubscriptionService<T> {
 	CompletableFuture<Void> activate();
 
 	/**
-	 * Deactive vault service for restrict access it later.
+	 * Deactivate vault service for restrict access it later.
 	 *
 	 * @return Void
 	 */
