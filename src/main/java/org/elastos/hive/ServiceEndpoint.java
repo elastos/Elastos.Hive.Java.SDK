@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.UnauthorizedStateException;
+import org.elastos.hive.exception.UnsupportedMethodException;
 
 public class ServiceEndpoint {
 	private AppContext context;
@@ -18,10 +19,18 @@ public class ServiceEndpoint {
 		return this.context;
 	}
 
+	/**
+	 * Get the user DID string of this serviceEndpoint.
+	 * @return
+	 */
 	public String getUserDid() {
 		return this.context.getUserDid();
 	}
 
+	/**
+	 * Get the end-point address of this service End-point.
+	 * @return
+	 */
 	public String getProviderAddress() {
 		return this.providerAddress;
 	}
@@ -30,19 +39,36 @@ public class ServiceEndpoint {
 		return this.connectionManager;
 	}
 
-	public String getAppDid() throws UnauthorizedStateException {
-		return null;
+	/**
+	 * Get the application DID in the current calling context.
+	 * @return
+	 */
+	public String getAppDid() {
+		throw new UnauthorizedStateException();
 	}
 
-	public String getAppInstanceDid() throws UnauthorizedStateException {
-		return null;
+	/**
+	 * Get the application instance DID in the current calling context;
+	 * @return
+	 */
+	public String getAppInstanceDid() {
+		throw new UnauthorizedStateException();
 	}
 
-	public String getServiceDid() throws UnauthorizedStateException {
-		return null;
+
+	/**
+	 * Get the remote node service application DID.
+	 * @return
+	 */
+	public String getServiceDid() {
+		throw new UnsupportedMethodException();
 	}
 
-	public String getServiceInstanceDid() throws UnauthorizedStateException {
-		return null;
+	/**
+	 * Get the remote node service instance DID where is serving the storage service.
+	 * @return
+	 */
+	public String getServiceInstanceDid() {
+		throw new UnauthorizedStateException();
 	}
 }
