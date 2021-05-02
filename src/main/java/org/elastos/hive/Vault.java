@@ -3,13 +3,11 @@ package org.elastos.hive;
 import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.service.*;
 import org.elastos.hive.vault.HttpExceptionHandler;
-import org.elastos.hive.vault.NodeManageServiceRender;
 import org.elastos.hive.vault.ServiceBuilder;
 
 import java.util.Date;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
@@ -20,7 +18,6 @@ public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
 	private ScriptingService scriptingService;
 	private PubSubService pubsubService;
 	private BackupService 	backupService;
-	private NodeManageServiceRender nodeManageService;
 
 	public class PropertySet {
 		private String serviceDid;
@@ -93,7 +90,6 @@ public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
 		this.pubsubService 	= new ServiceBuilder(this).createPubsubService();
 		this.backupService 	= new ServiceBuilder(this).createBackupService();
 		this.scriptingService = new ServiceBuilder(this).createScriptingService();
-		this.nodeManageService = new NodeManageServiceRender(this);
 	}
 
 	public FilesService getFilesService() {
