@@ -18,7 +18,7 @@ class VaultSubscriptionTest {
 	}
 
 	@Test @Order(1) void testSubscribe() {
-		Assertions.assertDoesNotThrow(()->subscription.subscribe("free").get());
+		Assertions.assertDoesNotThrow(()->subscription.subscribe().get());
 	}
 
 	@Test @Order(2) void testActivate() {
@@ -40,7 +40,7 @@ class VaultSubscriptionTest {
 	@Test @Order(6) void testGetFileHashProcess() {
 		//prepare for access vault service
 		Assertions.assertDoesNotThrow(() -> {
-			subscription.subscribe("free").get();
+			subscription.subscribe().get();
 			subscription.activate().get();
 		});
 		//function usage
