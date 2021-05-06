@@ -18,7 +18,7 @@ class BackupSubscriptionTest {
 	}
 
 	@Test @Order(1) void testSubscribe() {
-		Assertions.assertDoesNotThrow(()->subscription.subscribe("fake_pricing_plan_name").get());
+		Assertions.assertDoesNotThrow(()->subscription.subscribe().get());
 	}
 
 	@Test @Order(2) void testActivate() {
