@@ -1,6 +1,5 @@
 package org.elastos.hive;
 
-import com.google.common.base.Throwables;
 import org.elastos.hive.config.TestData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,10 +25,10 @@ class VaultManagementTest {
 	}
 
 	@Test void testGetVersion() {
-		//Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(vault.getVersion().get()));
+		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(vault.getVersion().get()));
 	}
 
 	@Test void testGetCommitHash() {
-		//Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(vault.getCommitHash().get()));
+		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(vault.getLatestCommitId().get()));
 	}
 }
