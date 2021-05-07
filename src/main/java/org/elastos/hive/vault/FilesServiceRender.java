@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-class FilesServiceRender extends HiveVaultRender implements FilesService, HttpExceptionHandler {
+class FilesServiceRender extends BaseServiceRender implements FilesService, HttpExceptionHandler {
 	public FilesServiceRender(Vault vault) {
 		super(vault);
 	}

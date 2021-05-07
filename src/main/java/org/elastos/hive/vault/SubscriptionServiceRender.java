@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * Helper class for subscription api.
  */
-public class SubscriptionServiceRender extends HiveVaultRender {
+public class SubscriptionServiceRender extends BaseServiceRender {
 
     public SubscriptionServiceRender(ServiceEndpoint serviceEndpoint) {
         super(serviceEndpoint);

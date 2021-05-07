@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-class DatabaseServiceRender extends HiveVaultRender implements DatabaseService, HttpExceptionHandler {
+class DatabaseServiceRender extends BaseServiceRender implements DatabaseService, HttpExceptionHandler {
 
 	public DatabaseServiceRender(Vault vault) {
 		super(vault);

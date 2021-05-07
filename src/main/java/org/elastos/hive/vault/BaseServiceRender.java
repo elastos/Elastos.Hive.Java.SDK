@@ -4,11 +4,11 @@ import org.elastos.hive.AppContext;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.ConnectionManager;
 
-public abstract class HiveVaultRender {
+public abstract class BaseServiceRender {
     private AppContext context;
     private ServiceEndpoint serviceEndpoint;
 
-    protected HiveVaultRender(ServiceEndpoint serviceEndpoint) {
+    protected BaseServiceRender(ServiceEndpoint serviceEndpoint) {
         this.serviceEndpoint = serviceEndpoint;
         this.context = serviceEndpoint.getAppContext();
     }

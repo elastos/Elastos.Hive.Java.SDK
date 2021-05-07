@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Helper class for vault/backup subscription.
  */
-public class PaymentServiceRender extends HiveVaultRender {
+public class PaymentServiceRender extends BaseServiceRender {
 
     public PaymentServiceRender(ServiceEndpoint serviceEndpoint) {
         super(serviceEndpoint);

@@ -71,7 +71,7 @@ public class Backup extends ServiceEndpoint {
 			this.used = used;
 			return this;
 		}
-	};
+	}
 
 	public Backup(AppContext context, String providerAddress) {
 		super(context, providerAddress);
@@ -82,7 +82,7 @@ public class Backup extends ServiceEndpoint {
 		return this.promotionService;
 	}
 
-	public CompletableFuture<PropertySet> getPropertSet() {
+	public CompletableFuture<PropertySet> getPropertySet() {
 		throw new UnsupportedMethodException();
 	}
 }

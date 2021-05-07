@@ -22,7 +22,6 @@
 
 package org.elastos.hive.connection;
 
-import org.elastos.hive.AppContext;
 import org.elastos.hive.auth.AuthToken;
 import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.RemoteResolver;
@@ -33,7 +32,6 @@ import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.network.BaseApi;
 import org.elastos.hive.network.response.HiveResponseBody;
