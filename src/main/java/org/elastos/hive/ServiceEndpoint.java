@@ -1,21 +1,26 @@
 package org.elastos.hive;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
-import org.elastos.hive.Provider.Version;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.UnauthorizedStateException;
 import org.elastos.hive.exception.UnsupportedMethodException;
+import org.elastos.hive.service.Version;
+import org.elastos.hive.vault.HttpExceptionHandler;
+import org.elastos.hive.vault.NodeManageServiceRender;
 
-public class ServiceEndpoint {
+public class ServiceEndpoint implements HttpExceptionHandler {
 	private AppContext context;
 	private String providerAddress;
 	private ConnectionManager connectionManager;
+	private NodeManageServiceRender nodeManageService;
 
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
 		this.context = context;
 		this.providerAddress = providerAddress;
 		this.connectionManager = new ConnectionManager(this);
+		this.nodeManageService = new NodeManageServiceRender(this);
 	}
 
 	public AppContext getAppContext() {
@@ -46,7 +51,7 @@ public class ServiceEndpoint {
 	 * Get the application DID in the current calling context.
 	 * @return
 	 */
-	public String getAppDid() {
+	protected String getAppDid() {
 		throw new UnauthorizedStateException();
 	}
 
@@ -54,7 +59,7 @@ public class ServiceEndpoint {
 	 * Get the application instance DID in the current calling context;
 	 * @return
 	 */
-	public String getAppInstanceDid() {
+	protected String getAppInstanceDid() {
 		throw new UnauthorizedStateException();
 	}
 
@@ -63,7 +68,7 @@ public class ServiceEndpoint {
 	 * Get the remote node service application DID.
 	 * @return
 	 */
-	public String getServiceDid() {
+	protected String getServiceDid() {
 		throw new UnsupportedMethodException();
 	}
 
@@ -71,15 +76,32 @@ public class ServiceEndpoint {
 	 * Get the remote node service instance DID where is serving the storage service.
 	 * @return
 	 */
-	public String getServiceInstanceDid() {
+	protected String getServiceInstanceDid() {
 		throw new UnauthorizedStateException();
 	}
 
 	public CompletableFuture<Version> getVersion() {
-		throw new UnsupportedMethodException();
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return getVersionByStr(nodeManageService.getVersion());
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		});
+	}
+
+	private Version getVersionByStr(String version) {
+		// TODO: Required version number is *.*.*, such as 1.0.12
+		return new Version();
 	}
 
 	public CompletableFuture<String> getLatestCommitId() {
-		throw new UnsupportedMethodException();
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return nodeManageService.getCommitHash();
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		});
 	}
 }

@@ -20,31 +20,4 @@ public class Provider extends ServiceEndpoint {
 	public Provider(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
 	}
-
-	public class Version {
-		private int major;
-		private int minor;
-		private int hotfix;
-
-		public int getMajor() {
-			return this.major;
-		}
-
-		public int getNinor() {
-			return this.minor;
-		}
-
-		public int getHotfix() {
-			return this.hotfix;
-		}
-
-		public String getFullVersion() {
-			return String.format("%s.%s.%s", major, minor, hotfix);
-		}
-
-		@Override
-		public String toString() {
-			return getFullVersion();
-		}
-	}
 }

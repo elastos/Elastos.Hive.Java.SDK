@@ -1,13 +1,13 @@
 package org.elastos.hive.vault;
 
-import org.elastos.hive.Vault;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.response.HiveResponseBody;
 
 import java.io.IOException;
 
 public class NodeManageServiceRender extends HiveVaultRender {
-    public NodeManageServiceRender(Vault vault) {
-        super(vault);
+    public NodeManageServiceRender(ServiceEndpoint serviceEndpoint) {
+        super(serviceEndpoint);
     }
 
     public String getVersion() throws IOException {
