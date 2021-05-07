@@ -1,5 +1,8 @@
 package org.elastos.hive;
 
+import java.util.concurrent.CompletableFuture;
+
+import org.elastos.hive.Provider.Version;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.UnauthorizedStateException;
 import org.elastos.hive.exception.UnsupportedMethodException;
@@ -70,5 +73,13 @@ public class ServiceEndpoint {
 	 */
 	public String getServiceInstanceDid() {
 		throw new UnauthorizedStateException();
+	}
+
+	public static CompletableFuture<Version> getVersion() {
+		throw new UnsupportedMethodException();
+	}
+
+	public static CompletableFuture<String> getLatestCommitId() {
+		throw new UnsupportedMethodException();
 	}
 }
