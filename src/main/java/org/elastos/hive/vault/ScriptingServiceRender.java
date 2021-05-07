@@ -15,7 +15,7 @@ import org.elastos.hive.service.ScriptingService;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class ScriptingServiceRender extends HiveVaultRender implements ScriptingService, HttpExceptionHandler {
+public class ScriptingServiceRender extends BaseServiceRender implements ScriptingService, HttpExceptionHandler {
 	public ScriptingServiceRender(ServiceEndpoint serviceEndpoint) {
 		super(serviceEndpoint);
 	}

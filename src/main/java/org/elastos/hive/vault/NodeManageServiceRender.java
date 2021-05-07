@@ -5,7 +5,7 @@ import org.elastos.hive.network.response.HiveResponseBody;
 
 import java.io.IOException;
 
-public class NodeManageServiceRender extends HiveVaultRender {
+public class NodeManageServiceRender extends BaseServiceRender {
     public NodeManageServiceRender(ServiceEndpoint serviceEndpoint) {
         super(serviceEndpoint);
     }

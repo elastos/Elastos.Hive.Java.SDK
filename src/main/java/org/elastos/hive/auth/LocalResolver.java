@@ -81,7 +81,7 @@ public class LocalResolver implements TokenResolver {
 		Path path = Paths.get(tokenPath);
 
 		if (!Files.exists(path)) {
-			// TODO: create path.
+			// TODO: create path. (path already created on constructor)
 		}
 
 		try {

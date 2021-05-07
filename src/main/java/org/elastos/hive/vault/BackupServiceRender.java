@@ -13,8 +13,7 @@ import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
 
-class BackupServiceRender extends HiveVaultRender implements BackupService, HttpExceptionHandler {
-    private BackupContext backupContext;
+class BackupServiceRender extends BaseServiceRender implements BackupService, HttpExceptionHandler {
     private TokenResolver tokenResolver;
 
     public BackupServiceRender(ServiceEndpoint serviceEndpoint) {
@@ -23,7 +22,6 @@ class BackupServiceRender extends HiveVaultRender implements BackupService, Http
 
     @Override
     public CompletableFuture<Void> setupContext(BackupContext backupContext) {
-        this.backupContext = backupContext;
         this.tokenResolver = new LocalResolver(
                 getServiceEndpoint().getUserDid(),
                 getServiceEndpoint().getProviderAddress(),

@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-public class AuthenticationServiceRender extends HiveVaultRender implements HttpExceptionHandler {
+public class AuthenticationServiceRender extends BaseServiceRender implements HttpExceptionHandler {
 
     private AppContextProvider contextProvider;
 

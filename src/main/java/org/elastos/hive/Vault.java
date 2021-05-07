@@ -115,26 +115,4 @@ public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
 	public CompletableFuture<PropertySet> getPropertySet() {
 		throw new UnsupportedMethodException();
 	}
-
-	/*
-	public CompletableFuture<String> getVersion() {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return nodeManageService.getVersion();
-			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
-			}
-		});
-	}
-
-	public CompletableFuture<String> getCommitHash() {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return nodeManageService.getCommitHash();
-			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
-			}
-		});
-	}
-	*/
 }

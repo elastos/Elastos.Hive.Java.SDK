@@ -4,11 +4,14 @@ public abstract class HiveBackupContext implements BackupContext {
 	@Override
 	public String getParameter(String parameter) {
 		switch (parameter) {
-		case "targetAddress":
-			return this.getTargetProviderAddress();
+			case "targetAddress":
+				return this.getTargetProviderAddress();
 
-		case "targetServiceDid":
-			return this.getTargetServiceDid();
+			case "targetServiceDid":
+				return this.getTargetServiceDid();
+
+			default:
+				break;
 		}
 		return null;
 	}
