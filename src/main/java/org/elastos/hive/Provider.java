@@ -1,9 +1,6 @@
 package org.elastos.hive;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.UnsupportedMethodException;
 
 /**
  * This class is used to fetch some possible information from remote hive node.
@@ -49,13 +46,5 @@ public class Provider extends ServiceEndpoint {
 		public String toString() {
 			return getFullVersion();
 		}
-	}
-
-	public static CompletableFuture<Version> getVersion() {
-		throw new UnsupportedMethodException();
-	}
-
-	public static CompletableFuture<String> getLatestCommitId() {
-		throw new UnsupportedMethodException();
 	}
 }
