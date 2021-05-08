@@ -27,6 +27,7 @@ public interface FilesService {
 	 * Initiates a download sequence by returning a Reader or InputStream object that can
 	 * be used to read the downloaded file in chunks.
 	 *
+	 * @param <T> Reader or InputStream class
 	 * @param path the path for the remote file
 	 * @param resultType Reader or InputStream class
 	 * @return the new CompletionStage, the result is the Reader or InputStream interface for

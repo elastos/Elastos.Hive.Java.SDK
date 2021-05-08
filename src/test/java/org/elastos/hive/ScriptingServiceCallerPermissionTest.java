@@ -79,7 +79,7 @@ class ScriptingServiceCallerPermissionTest {
         Assertions.assertDoesNotThrow(()->{
             KeyValueDict filter = new KeyValueDict().putKv("collection", COLLECTION_GROUP_MESSAGE)
                     .putKv("did", "$caller_did");
-            Assertions.assertTrue(scriptingService.registerScript(SCRIPT_NAME,
+            scriptingService.registerScript(SCRIPT_NAME,
                     new Condition(
                             "verify_user_permission",
                             "queryHasResults",
@@ -91,7 +91,7 @@ class ScriptingServiceCallerPermissionTest {
                                     new KeyValueDict().putKv("bypass_document_validation",false)
                                             .putKv("ordered",true)
                             )),
-                    false, false).get());
+                    false, false).get();
         });
     }
 

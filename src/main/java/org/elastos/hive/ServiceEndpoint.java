@@ -29,7 +29,8 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 
 	/**
 	 * Get the user DID string of this serviceEndpoint.
-	 * @return
+	 *
+	 * @return user did
 	 */
 	public String getUserDid() {
 		return this.context.getUserDid();
@@ -37,7 +38,8 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 
 	/**
 	 * Get the end-point address of this service End-point.
-	 * @return
+	 *
+	 * @return provider address
 	 */
 	public String getProviderAddress() {
 		return this.providerAddress;
@@ -49,7 +51,8 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 
 	/**
 	 * Get the application DID in the current calling context.
-	 * @return
+	 *
+	 * @return application did
 	 */
 	protected String getAppDid() {
 		throw new UnauthorizedStateException();
@@ -57,7 +60,8 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 
 	/**
 	 * Get the application instance DID in the current calling context;
-	 * @return
+	 *
+	 * @return application instance did
 	 */
 	protected String getAppInstanceDid() {
 		throw new UnauthorizedStateException();
@@ -66,7 +70,8 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 
 	/**
 	 * Get the remote node service application DID.
-	 * @return
+	 *
+	 * @return node service did
 	 */
 	protected String getServiceDid() {
 		throw new UnsupportedMethodException();
@@ -74,7 +79,8 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 
 	/**
 	 * Get the remote node service instance DID where is serving the storage service.
-	 * @return
+	 *
+	 * @return node service instance did
 	 */
 	protected String getServiceInstanceDid() {
 		throw new UnauthorizedStateException();

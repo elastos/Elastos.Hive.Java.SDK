@@ -11,6 +11,7 @@ public interface DatabaseService {
 	/**
 	 * Lets the vault owner create a collection on database.
 	 * @param name the collection name
+	 * @param options the options for create collection
 	 * @return fail(false) or success(true)
 	 */
 	CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options);
@@ -108,8 +109,8 @@ public interface DatabaseService {
 	 * Delete an existing document in a given collection
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to delete.
-	 * @param options
-	 * @return
+	 * @param options The options for delete collection
+	 * @return Delete result
 	 */
 	CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options);
 
@@ -118,8 +119,8 @@ public interface DatabaseService {
 	 * Delete many existing documents in a given collection
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to delete.
-	 * @param options
-	 * @return
+	 * @param options The options for delete collection
+	 * @return Delete result
 	 */
 	CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options);
 }

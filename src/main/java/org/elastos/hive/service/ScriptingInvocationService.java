@@ -14,10 +14,12 @@ public interface ScriptingInvocationService {
 	 * owner, where the script is defined with certain preset routines.
 	 * It's the general invocation method for external users to call.
 	 *
+	 * @param <T> String, byte[], JsonNode, Reader
 	 * @param name  the name of script to invoke.
 	 * @param params the parameters as input to the invocation.
+	 * @param appDid The owner's application did.
 	 * @param resultType String, byte[], JsonNode, Reader
-	 * @return TODO:
+	 * @return String, byte[], JsonNode, Reader
 	 */
 	<T> CompletableFuture<T> callScript(String name, JsonNode params, String appDid, Class<T> resultType);
 
@@ -27,9 +29,10 @@ public interface ScriptingInvocationService {
      * are two steps to this executable. First, register a script on the vault,
      * then you call this API actually to upload the file
      *
+	 * @param <T> Reader or InputStream class
 	 * @param transactionId the streaming identifier to the upload process
 	 * @param resultType Reader or InputStream class
-	 * @return TODO
+	 * @return Reader or InputStream class
 	 */
 	<T> CompletableFuture<T> uploadFile(String transactionId, Class<T> resultType);
 
@@ -39,9 +42,10 @@ public interface ScriptingInvocationService {
      * are two steps to this executable. First, register a script on the vault,
      * then you call this API actually to download the file
      *
+	 * @param <T> Reader or InputStream class
      * @param transactionId the streaming identifier to the upload process
 	 * @param resultType Reader or InputStream class
-	 * @return TODO
+	 * @return Reader or InputStream class
 	 */
 	<T> CompletableFuture<T> downloadFile(String transactionId, Class<T> resultType);
 }
