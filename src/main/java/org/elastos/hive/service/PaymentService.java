@@ -9,23 +9,6 @@ import org.elastos.hive.payment.Receipt;
 
 public interface PaymentService {
 	/**
-	 * Get pricing plan list from vault and backup service,
-	 * such as more storage usage, backup service support, etc.
-	 *
-	 * @return the list of pricing plans
-	 */
-	CompletableFuture<List<PricingPlan>> getPricingPlanList();
-
-	/**
-	 * Get a pricing plan by name. Every pricing plan has a name with which we can do
-	 * the corresponding payment operation.
-	 *
-	 * @param planName the name of the pricing plan
-	 * @return pricing plan
-	 */
-	CompletableFuture<PricingPlan> getPricingPlan(String planName);
-
-	/**
 	 * Make an order for the pricing plan named with planName.
 	 *
 	 * @param planName the name of the pricing plan

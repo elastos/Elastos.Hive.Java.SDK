@@ -28,7 +28,33 @@ public class VaultSubscription extends ServiceEndpoint
 	}
 
 	@Override
+	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				return paymentService.getPricingPlanList();
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				return paymentService.getPricingPlan(planName);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		});
+	}
+
 	public CompletableFuture<Vault.PropertySet> subscribe() {
+		return this.subscribe();
+	}
+
+	@Override
+	public CompletableFuture<Vault.PropertySet> subscribe(String reserved) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				this.subscriptionService.subscribe();
@@ -81,28 +107,6 @@ public class VaultSubscription extends ServiceEndpoint
 				// VaultInfoResponseBody body = this.subscriptionService.getVaultInfo();
 				// TODO:
 				return null;
-			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
-			}
-		});
-	}
-
-	@Override
-	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
-		return CompletableFuture.supplyAsync(()-> {
-			try {
-				return paymentService.getPricingPlanList();
-			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
-			}
-		});
-	}
-
-	@Override
-	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-		return CompletableFuture.supplyAsync(()-> {
-			try {
-				return paymentService.getPricingPlan(planName);
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
