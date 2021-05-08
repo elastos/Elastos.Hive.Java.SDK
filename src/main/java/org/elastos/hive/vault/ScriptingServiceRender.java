@@ -21,15 +21,15 @@ public class ScriptingServiceRender extends HiveVaultRender implements Scripting
 	}
 
 	@Override
-	public CompletableFuture<Boolean> registerScript(String name, Executable executable,
+	public CompletableFuture<Void> registerScript(String name, Executable executable,
 													 boolean allowAnonymousUser, boolean allowAnonymousApp) {
 		return registerScript(name, null, executable, allowAnonymousUser, allowAnonymousApp);
 	}
 
 	@Override
-	public CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable,
+	public CompletableFuture<Void> registerScript(String name, Condition condition, Executable executable,
 													 boolean allowAnonymousUser, boolean allowAnonymousApp) {
-		return CompletableFuture.supplyAsync(()-> {
+		return CompletableFuture.runAsync(()-> {
 			try {
 				HiveResponseBody.validateBody(
 						getConnectionManager().getScriptingApi()
@@ -39,7 +39,6 @@ public class ScriptingServiceRender extends HiveVaultRender implements Scripting
 										.setAllowAnonymousApp(allowAnonymousApp)
 										.setCondition(condition))
 								.execute().body());
-				return true;
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
@@ -79,6 +78,7 @@ public class ScriptingServiceRender extends HiveVaultRender implements Scripting
 		});
 	}
 
+	@Override
 	public <T> CompletableFuture<T> uploadFile(String transactionId, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
@@ -94,6 +94,7 @@ public class ScriptingServiceRender extends HiveVaultRender implements Scripting
 		});
 	}
 
+	@Override
 	public <T> CompletableFuture<T> downloadFile(String transactionId, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
@@ -109,5 +110,11 @@ public class ScriptingServiceRender extends HiveVaultRender implements Scripting
 				throw new CompletionException(convertException(e));
 			}
 		});
+	}
+
+	@Override
+	public <T> CompletableFuture<T> callScript(String name, JsonNode params, String appDid, Class<T> resultType) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
