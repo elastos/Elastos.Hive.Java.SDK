@@ -126,10 +126,10 @@ public class BackupSubscription extends ServiceEndpoint
 	}
 
 	@Override
-	public CompletableFuture<Receipt> payOrder(String orderId, List<String> transIds) {
+	public CompletableFuture<Receipt> payOrder(String orderId, String transactionId) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				paymentService.payOrder(orderId, transIds);
+				//TODO:paymentService.payOrder(orderId, transactionId);
 				//TODO:
 				return null;
 			} catch (Exception e) {
@@ -140,6 +140,19 @@ public class BackupSubscription extends ServiceEndpoint
 
 	@Override
 	public CompletableFuture<Receipt> getReceipt(String receiptId) {
+		// TODO:
+		throw new UnsupportedMethodException();
+	}
+
+	@Override
+	public CompletableFuture<List<Order>> getOrderList() {
+		// TODO:
+		throw new UnsupportedMethodException();
+	}
+
+	@Override
+	public CompletableFuture<List<Receipt>> getReceiptList() {
+		// TODO:
 		throw new UnsupportedMethodException();
 	}
 }
