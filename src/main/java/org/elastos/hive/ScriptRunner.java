@@ -20,6 +20,9 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 	 * Vault owner or external users are allowed to call scripts on someone's vault.
 	 *
 	 * @param name       The call's script name
+	 * @param params     The parameters for the script.
+	 * @param targetDid  The script owner's user did.
+	 * @param targetAppDid The script owner's application did.
 	 * @param resultType String, byte[], JsonNode, Reader
 	 * @param <T> 		 String, byte[], JsonNode, Reader
 	 * @return 			 Result for specific script type
@@ -35,6 +38,9 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 	 * Vault owner or external users are allowed to call scripts on someone's vault.
 	 *
 	 * @param name       The call's script name
+	 * @param params     The parameters for the script.
+	 * @param targetDid  The script owner's user did.
+	 * @param targetAppDid The script owner's application did.
 	 * @param resultType String, byte[], JsonNode, Reader, Write, OutputStream, Reader, InputStream
 	 * @param <T>        String, byte[], JsonNode, Reader, Write, OutputStream, Reader, InputStream
 	 * @return 			 Result for specific script type
