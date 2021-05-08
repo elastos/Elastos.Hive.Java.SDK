@@ -4,40 +4,73 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.payment.Order;
-import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
 
+/**
+ * The payment service provides users with the way to purchase a paid vault or
+ * backup service, such as to subscribe to a new vault or backup with paid
+ * pricing plan or extend the purchased subscription service.
+ *
+ */
 public interface PaymentService {
 	/**
-	 * Make an order for the pricing plan named with planName.
+	 * Place an order for new subscription or extending the existing subscription
+	 * service.
 	 *
 	 * @param planName the name of the pricing plan
-	 * @return the corresponding order details.
+	 * @return
+	 * 		return the new order detail when the request successfully was received
+	 * 		by back-end node, otherwise return the specific exception.
 	 */
 	CompletableFuture<Order> placeOrder(String planName);
 
 	/**
-	 * Get order information by order id.
+	 * Obtain the order detail according to the given order id.
 	 *
 	 * @param orderId order id
-	 * @return the corresponding order details.
+	 * @return
+	 *		return the order detail in case there is a order with order id existing.
+	 *		otherwise, return the specific exception.
 	 */
 	CompletableFuture<Order> getOrder(String orderId);
 
-	/**
-	 * Pay for the order made before.
-	 *
-	 * @param orderId order id
-	 * @param transIds payment transaction ids.
-	 * @return receipt details.
-	 */
-	CompletableFuture<Receipt> payOrder(String orderId, List<String> transIds);
 
 	/**
-	 * Get receipt details by receipt id.
+	 * Obtain all the list of order detail.
+	 *
+	 * @return
+	 *		return the list of order detail on success, otherwise, return the specific
+	 *		exception.
+	 */
+	CompletableFuture<List<Order>> getOrderList();
+
+	/**
+	 * Pay for the order with a given id.
+	 *
+	 * @param orderId order id
+	 * @param transactionId the transaction id on the block-chain.
+	 * @return
+	 * 		return the receipt detail in case the payment was accepted by hive
+	 * 		node, otherwise return the specific exception.
+	 */
+	CompletableFuture<Receipt> payOrder(String orderId, String transactionId);
+
+	/**
+	 * Obtain the receipt detail according to the receipt id.
 	 *
 	 * @param receiptId receipt id.
-	 * @return receipt details.
+	 * @return
+	 * 		return the receipt detail in case there is a receipt existing,
+	 * 		otherwise, return the specific exception.
 	 */
 	CompletableFuture<Receipt> getReceipt(String receiptId);
+
+	/**
+	 * Obtain all the list of receipt detail.
+	 *
+	 * @return
+	 *		return the list of receipt detail on success, otherwise, return the
+	 *		specific exception.
+	 */
+	CompletableFuture<List<Receipt>> getReceiptList();
 }

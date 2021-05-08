@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
@@ -136,10 +137,10 @@ public class VaultSubscription extends ServiceEndpoint
 	}
 
 	@Override
-	public CompletableFuture<Receipt> payOrder(String orderId, List<String> transIds) {
+	public CompletableFuture<Receipt> payOrder(String orderId, String transactionId) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				paymentService.payOrder(orderId, transIds);
+				//TODO: paymentService.payOrder(orderId, transIds);
 				//TODO:
 				return new Receipt();
 			} catch (Exception e) {
@@ -150,6 +151,19 @@ public class VaultSubscription extends ServiceEndpoint
 
 	@Override
 	public CompletableFuture<Receipt> getReceipt(String receiptId) {
-		throw new UnsupportedOperationException();
+		// TODO:
+		throw new UnsupportedMethodException();
+	}
+
+	@Override
+	public CompletableFuture<List<Order>> getOrderList() {
+		// TODO:
+		throw new UnsupportedMethodException();
+	}
+
+	@Override
+	public CompletableFuture<List<Receipt>> getReceiptList() {
+		// TODO:
+		throw new UnsupportedMethodException();
 	}
 }
