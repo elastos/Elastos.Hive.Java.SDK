@@ -38,8 +38,18 @@ public interface ScriptingService extends ScriptingInvocationService {
      * @param executable the executable body of the script with preset routines
      * @param allowAnonymousUser
      * @param allowAnonymousApp
-     * @return
+     * @return TODO
      */
     CompletableFuture<Void> registerScript(String name, Condition condition, Executable executable,
     					boolean allowAnonymousUser, boolean allowAnonymousApp);
+
+
+    /**
+     * Let the vault owner unregister a script when the script become useless to
+     * applications.
+     *
+     * @param name the name of script to unregister.
+     * @return TODO
+     */
+    CompletableFuture<Void> unregisterScript(String name);
 }
