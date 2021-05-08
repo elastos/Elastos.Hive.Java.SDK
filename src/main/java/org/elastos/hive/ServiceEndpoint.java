@@ -75,11 +75,11 @@ public class ServiceEndpoint {
 		throw new UnauthorizedStateException();
 	}
 
-	public static CompletableFuture<Version> getVersion() {
+	public CompletableFuture<Version> getVersion() {
 		throw new UnsupportedMethodException();
 	}
 
-	public static CompletableFuture<String> getLatestCommitId() {
+	public CompletableFuture<String> getLatestCommitId() {
 		throw new UnsupportedMethodException();
 	}
 }

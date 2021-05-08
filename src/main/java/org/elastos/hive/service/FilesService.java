@@ -91,5 +91,4 @@ public interface FilesService {
 	 *         if success; null otherwise
 	 */
 	CompletableFuture<FileInfo> stat(String path);
-
 }

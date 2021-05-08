@@ -5,13 +5,41 @@ import org.elastos.hive.network.model.Executable;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface ScriptingService {
+/**
+ * Vault provides the scripting service to vault owners to register executable
+ * script and make invocation as well. The executable script registered by the
+ * vault owner mainly serves external users to invoke for executing the preset
+ * routine defined in the script.
+ */
+public interface ScriptingService extends ScriptingInvocationService {
     /**
-     * Lets the vault owner register a script on his vault for a given app. The script is built on the client side, then
-     * serialized and stored on the hive back-end. Later on, anyone, including the vault owner or external users, can
-     * use Scripting.call() to execute one of those scripts and get results/data.
+     *
+     * Lets the vault owner register a script on his vault for a given application.
+     * The script is built on the client-side, then serialized and stored on the
+     * vault service. Later on, the vault owner or external users can invoke the script
+     * to execute one of those scripts and get results or data.
+     *
+     * @param name the name of script to register
+     * @param executable the executable body of the script with preset routines
+     * @param allowAnonymousUser
+     * @param allowAnonymousApp
+     * @return
+     * 		 Return the result whether the registration of script is succeeded
+     *        or failed.
      */
-    CompletableFuture<Boolean> registerScript(String name, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp);
+    CompletableFuture<Void> registerScript(String name, Executable executable,
+    					boolean allowAnonymousUser, boolean allowAnonymousApp);
 
-    CompletableFuture<Boolean> registerScript(String name, Condition condition, Executable executable, boolean allowAnonymousUser, boolean allowAnonymousApp);
+    /**
+     * Let the vault owner register a script on his vault for a given application.
+     *
+     * @param name the name of script to register
+     * @param condition the condition on which the script could be executed.
+     * @param executable the executable body of the script with preset routines
+     * @param allowAnonymousUser
+     * @param allowAnonymousApp
+     * @return
+     */
+    CompletableFuture<Void> registerScript(String name, Condition condition, Executable executable,
+    					boolean allowAnonymousUser, boolean allowAnonymousApp);
 }

@@ -11,7 +11,7 @@ public interface DatabaseService {
 	/**
 	 * Lets the vault owner create a collection on database.
 	 * @param name the collection name
-	 * @return fail(false) or success(treu)
+	 * @return fail(false) or success(true)
 	 */
 	CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options);
 
