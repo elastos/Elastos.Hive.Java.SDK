@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import org.elastos.hive.Backup.PropertySet;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.network.response.VaultInfoResponseBody;
@@ -29,7 +30,33 @@ public class BackupSubscription extends ServiceEndpoint
 	}
 
 	@Override
+	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				return paymentService.getBackupPlanList();
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				return paymentService.getBackupPlan(planName);
+			} catch (Exception e) {
+				throw new CompletionException(convertException(e));
+			}
+		});
+	}
+
 	public CompletableFuture<Backup.PropertySet> subscribe() {
+		return this.subscribe(null);
+	}
+
+	@Override
+	public CompletableFuture<Backup.PropertySet> subscribe(String reserved) {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				this.subscriptionService.subscribeBackup();
@@ -44,7 +71,6 @@ public class BackupSubscription extends ServiceEndpoint
 			}
 		});
 	}
-
 
 	@Override
 	public CompletableFuture<Void> unsubscribe() {
@@ -75,28 +101,6 @@ public class BackupSubscription extends ServiceEndpoint
 	private Backup.PropertySet getBackupInfoByResponseBody(VaultInfoResponseBody body) {
 		// TODO:
 		return null;
-	}
-
-	@Override
-	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
-		return CompletableFuture.supplyAsync(()-> {
-			try {
-				return paymentService.getBackupPlanList();
-			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
-			}
-		});
-	}
-
-	@Override
-	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
-		return CompletableFuture.supplyAsync(()-> {
-			try {
-				return paymentService.getBackupPlan(planName);
-			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
-			}
-		});
 	}
 
 	@Override
