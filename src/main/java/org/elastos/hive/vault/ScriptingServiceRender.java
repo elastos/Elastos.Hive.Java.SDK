@@ -117,4 +117,10 @@ public class ScriptingServiceRender extends HiveVaultRender implements Scripting
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public CompletableFuture<Void> unregisterScript(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
