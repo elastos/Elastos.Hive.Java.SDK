@@ -21,10 +21,9 @@ public interface ScriptingService extends ScriptingInvocationService {
      *
      * @param name the name of script to register
      * @param executable the executable body of the script with preset routines
-     * @param allowAnonymousUser
-     * @param allowAnonymousApp
-     * @return
-     * 		 Return the result whether the registration of script is succeeded
+     * @param allowAnonymouseUser
+     * @param allowAnonymouseApp
+     * @param Return the result whether the registration of script is succeeded
      *        or failed.
      */
     CompletableFuture<Void> registerScript(String name, Executable executable,
@@ -53,3 +52,4 @@ public interface ScriptingService extends ScriptingInvocationService {
      */
     CompletableFuture<Void> unregisterScript(String name);
 }
+
