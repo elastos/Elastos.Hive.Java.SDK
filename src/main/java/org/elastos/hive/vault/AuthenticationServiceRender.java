@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.AuthToken;
+import org.elastos.hive.auth.AuthTokenToVault;
 import org.elastos.hive.network.request.AuthRequestBody;
 import org.elastos.hive.network.request.SignInRequestBody;
 import org.elastos.hive.network.response.AuthResponseBody;
@@ -56,6 +57,6 @@ public class AuthenticationServiceRender extends BaseServiceRender implements Ht
                         .body());
         long exp = JwtUtil.getBody(rspBody.getToken()).getExpiration().getTime();
         long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
-        return new AuthToken(rspBody.getToken(), expiresTime, AuthToken.TYPE_TOKEN);
+        return new AuthTokenToVault(rspBody.getToken(), expiresTime);
     }
 }
