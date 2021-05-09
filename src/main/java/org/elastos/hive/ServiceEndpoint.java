@@ -6,7 +6,6 @@ import java.util.concurrent.CompletionException;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.UnauthorizedStateException;
 import org.elastos.hive.exception.UnsupportedMethodException;
-import org.elastos.hive.service.Version;
 import org.elastos.hive.vault.HttpExceptionHandler;
 import org.elastos.hive.vault.NodeManageServiceRender;
 
