@@ -3,10 +3,10 @@ package org.elastos.hive.vault;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.InvalidParameterException;
+import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.network.ScriptingApi;
 import org.elastos.hive.network.model.Condition;
 import org.elastos.hive.network.model.Executable;
-import org.elastos.hive.network.model.ScriptContext;
 import org.elastos.hive.network.request.CallScriptRequestBody;
 import org.elastos.hive.network.request.RegisterScriptRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
@@ -45,6 +45,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 		});
 	}
 
+	@Override
 	public <T> CompletableFuture<T> callScript(String name, JsonNode params, String targetDid, String targetAppDid, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
@@ -52,9 +53,6 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 						getConnectionManager().getScriptingApi()
 								.callScript(new CallScriptRequestBody()
 										.setName(name)
-										.setContext(new ScriptContext()
-												.setTargetDid(targetDid)
-												.setTargetAppDid(targetAppDid))
 										.setParams(HiveResponseBody.jsonNode2Map(params)))
 								.execute()
 				), resultType);
@@ -113,14 +111,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 	}
 
 	@Override
-	public <T> CompletableFuture<T> callScript(String name, JsonNode params, String appDid, Class<T> resultType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public CompletableFuture<Void> unregisterScript(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedMethodException();
 	}
 }

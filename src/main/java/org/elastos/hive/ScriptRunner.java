@@ -15,18 +15,7 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 		this.scriptingServiceRender = new ScriptingServiceRender(this);
 	}
 
-	/**
-	 * Executes a previously registered server side script using Scripting.setScript().
-	 * Vault owner or external users are allowed to call scripts on someone's vault.
-	 *
-	 * @param name       The call's script name
-	 * @param params     The parameters for the script.
-	 * @param targetDid  The script owner's user did.
-	 * @param targetAppDid The script owner's application did.
-	 * @param resultType String, byte[], JsonNode, Reader
-	 * @param <T> 		 String, byte[], JsonNode, Reader
-	 * @return 			 Result for specific script type
-	 */
+	@Override
 	public <T> CompletableFuture<T> callScript(String name, JsonNode params,
 											   String targetDid, String targetAppDid, Class<T> resultType) {
 		return scriptingServiceRender.callScript(name, params, targetDid, targetAppDid, resultType);
@@ -50,36 +39,13 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 		return scriptingServiceRender.callScriptUrl(name, params, targetDid, targetAppDid, resultType);
 	}
 
-	/**
-	 * Run a script to upload a file NOTE: The upload works a bit differently compared to other
-	 * types of executable queries because there are two steps to this executable. First, register a
-	 * script on the vault, then you call this api to actually upload the file
-	 * @param transactionId Transaction id
-	 * @param resultType    Write, OutputStream
-	 * @param <T>           Write, OutputStream
-	 * @return 				Write, OutputStream
-	 */
 	@Override
 	public <T> CompletableFuture<T> downloadFile(String transactionId, Class<T> resultType) {
 		return scriptingServiceRender.downloadFile(transactionId, resultType);
 	}
 
-	/**
-	 * Run a script to download a file NOTE: The download works a bit differently compared to other
-	 * types of executable queries because there are two steps to this executable. First, register a
-	 * script on the vault, then you call this api to actually upload the file
-	 * @param resultType Reader or InputStream class
-	 * @param <T>        Reader, InputStream
-	 * @return			 Reader, InputStream
-	 */
 	@Override
 	public <T> CompletableFuture<T> uploadFile(String transactionId, Class<T> resultType) {
 		return scriptingServiceRender.uploadFile(transactionId, resultType);
-	}
-
-	@Override
-	public <T> CompletableFuture<T> callScript(String name, JsonNode params, String appDid, Class<T> resultType) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
