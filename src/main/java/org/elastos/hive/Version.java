@@ -1,4 +1,4 @@
-package org.elastos.hive.service;
+package org.elastos.hive;
 
 public class Version {
     private int major;

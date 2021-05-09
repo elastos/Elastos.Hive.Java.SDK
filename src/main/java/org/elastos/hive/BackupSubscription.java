@@ -1,6 +1,5 @@
 package org.elastos.hive;
 
-import org.elastos.hive.Backup.PropertySet;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.network.response.VaultInfoResponseBody;
