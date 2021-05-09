@@ -14,14 +14,16 @@ public interface ScriptingInvocationService {
 	 * owner, where the script is defined with certain preset routines.
 	 * It's the general invocation method for external users to call.
 	 *
-	 * @param <T> String, byte[], JsonNode, Reader
-	 * @param name  the name of script to invoke.
-	 * @param params the parameters as input to the invocation.
-	 * @param appDid The owner's application did.
-	 * @param resultType String, byte[], JsonNode, Reader
-	 * @return String, byte[], JsonNode, Reader
+	 * @param name  			The name of script to invoke.
+	 * @param params 			The parameters as input to the invocation.
+	 * @param targetDid  		The script owner's user did. Skipped when owner calls.
+	 * @param targetAppDid 		The script owner's application did. Skipped when owner calls.
+	 * @param resultType 		String, byte[], JsonNode, Reader
+	 * @param <T> 				String, byte[], JsonNode, Reader
+	 * @return 					String, byte[], JsonNode, Reader
 	 */
-	<T> CompletableFuture<T> callScript(String name, JsonNode params, String appDid, Class<T> resultType);
+	<T> CompletableFuture<T> callScript(String name, JsonNode params,
+										String targetDid, String targetAppDid, Class<T> resultType);
 
 	/**
 	 * Invoke the execution of the script to upload a file in the streaming mode.
@@ -29,10 +31,10 @@ public interface ScriptingInvocationService {
      * are two steps to this executable. First, register a script on the vault,
      * then you call this API actually to upload the file
      *
-	 * @param <T> Reader or InputStream class
-	 * @param transactionId the streaming identifier to the upload process
-	 * @param resultType Reader or InputStream class
-	 * @return Reader or InputStream class
+	 * @param transactionId 	The streaming identifier to the upload process
+	 * @param resultType 		Reader or InputStream class
+	 * @param <T> 				Reader or InputStream class
+	 * @return 					Reader or InputStream class
 	 */
 	<T> CompletableFuture<T> uploadFile(String transactionId, Class<T> resultType);
 
@@ -42,10 +44,10 @@ public interface ScriptingInvocationService {
      * are two steps to this executable. First, register a script on the vault,
      * then you call this API actually to download the file
      *
-	 * @param <T> Reader or InputStream class
-     * @param transactionId the streaming identifier to the upload process
-	 * @param resultType Reader or InputStream class
-	 * @return Reader or InputStream class
+     * @param transactionId 	The streaming identifier to the upload process
+	 * @param resultType 		Reader or InputStream class
+	 * @param <T> 				Reader or InputStream class
+	 * @return 					Reader or InputStream class
 	 */
 	<T> CompletableFuture<T> downloadFile(String transactionId, Class<T> resultType);
 }

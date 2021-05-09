@@ -68,7 +68,7 @@ public class LocalResolver implements TokenResolver {
 
 		try {
 			LogUtil.d("Restore access token  from local cache");
-			return new Gson().fromJson(new String(Files.readAllBytes(path)), AuthToken.class);
+			return new Gson().fromJson(new String(Files.readAllBytes(path)), AuthTokenToVault.class);
 		} catch (IOException e) {
 			LogUtil.e("Failed to restore access token from local cache");
 			return null;

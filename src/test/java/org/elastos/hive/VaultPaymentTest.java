@@ -50,7 +50,7 @@ class VaultPaymentTest {
             Assertions.assertNotNull(order);
             order = paymentService.getOrder(order.getOrderId()).get();
             Assertions.assertNotNull(order);
-            Receipt receipt = paymentService.payOrder(order.getOrderId(), Collections.emptyList()).get();
+            Receipt receipt = paymentService.payOrder(order.getOrderId(), null).get();
             Assertions.assertNotNull(receipt);
         });
     }

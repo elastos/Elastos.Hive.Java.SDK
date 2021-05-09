@@ -12,6 +12,7 @@ import org.elastos.hive.vault.HttpExceptionHandler;
 import org.elastos.hive.vault.PaymentServiceRender;
 import org.elastos.hive.vault.SubscriptionServiceRender;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -128,7 +129,7 @@ public class BackupSubscription extends ServiceEndpoint
 	public CompletableFuture<Receipt> payOrder(String orderId, String transactionId) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				//TODO:paymentService.payOrder(orderId, transactionId);
+				paymentService.payOrder(orderId, Collections.singletonList(transactionId));
 				//TODO:
 				return null;
 			} catch (Exception e) {
