@@ -22,7 +22,7 @@ class ScriptingServiceTest {
 	private static final String UPDATE_NAME = "database_update";
 	private static final String DELETE_NAME = "database_delete";
 	private static final String UPLOAD_FILE_NAME = "upload_file";
-	private static final String DOWNLOAD_FILE_NAME = "upload_file";
+	private static final String DOWNLOAD_FILE_NAME = "download_file";
 	private static final String FILE_PROPERTIES_NAME = "file_properties";
 	private static final String FILE_HASH_NAME = "file_hash";
 
