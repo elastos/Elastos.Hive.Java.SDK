@@ -10,7 +10,7 @@ import org.elastos.hive.service.PromotionService;
 public class Backup extends ServiceEndpoint {
 	private PromotionService promotionService;
 
-	public class PropertySet {
+	public static class PropertySet {
 		private String serviceDid;
 		private String pricingPlan;
 		private long created;

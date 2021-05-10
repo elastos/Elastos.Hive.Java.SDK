@@ -12,6 +12,7 @@ import org.elastos.hive.vault.HttpExceptionHandler;
 import org.elastos.hive.vault.PaymentServiceRender;
 import org.elastos.hive.vault.SubscriptionServiceRender;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -33,7 +34,7 @@ public class BackupSubscription extends ServiceEndpoint
 	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return paymentService.getBackupPlanList();
+				return subscriptionService.getBackupPlanList();
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
@@ -44,7 +45,7 @@ public class BackupSubscription extends ServiceEndpoint
 	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return paymentService.getBackupPlan(planName);
+				return subscriptionService.getBackupPlan(planName);
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
@@ -57,15 +58,10 @@ public class BackupSubscription extends ServiceEndpoint
 
 	@Override
 	public CompletableFuture<Backup.PropertySet> subscribe(String reserved) {
-		return CompletableFuture.runAsync(() -> {
+		return CompletableFuture.supplyAsync(() -> {
 			try {
 				this.subscriptionService.subscribeBackup();
-			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
-			}
-		}).thenApplyAsync(success -> {
-			try {
-				return getBackupInfoByResponseBody(this.subscriptionService.getBackupVaultInfo());
+				return getPropertySet();
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
@@ -91,16 +87,22 @@ public class BackupSubscription extends ServiceEndpoint
 	public CompletableFuture<Backup.PropertySet> checkSubscription() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return getBackupInfoByResponseBody(this.subscriptionService.getBackupVaultInfo());
+				return getPropertySet();
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
 	}
 
-	private Backup.PropertySet getBackupInfoByResponseBody(VaultInfoResponseBody body) {
-		// TODO:
-		return null;
+	private Backup.PropertySet getPropertySet() throws IOException {
+		VaultInfoResponseBody body = this.subscriptionService.getBackupVaultInfo();
+		// TODO: serviceDid
+		return new Backup.PropertySet()
+				.setPricingPlan(body.getPricingUsing())
+				.setCreated(body.getStartTime())
+				.setUpdated(body.getModifyTime())
+				.setQuota(body.getMaxStorage())
+				.setUsedSpace(body.getFileUseStorage() + body.getDbUseStorage());
 	}
 
 	@Override
