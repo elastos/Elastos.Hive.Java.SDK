@@ -19,7 +19,7 @@ public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
 	private PubSubService pubsubService;
 	private BackupService 	backupService;
 
-	public class PropertySet {
+	public static class PropertySet {
 		private String serviceDid;
 		private String pricingPlan;
 		private long created;
@@ -80,7 +80,7 @@ public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
 			this.used = used;
 			return this;
 		}
-	};
+	}
 
 	public Vault(AppContext context, String providerAddress) {
 		super(context, providerAddress);

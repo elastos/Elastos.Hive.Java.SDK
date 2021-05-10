@@ -20,46 +20,6 @@ public class PaymentServiceRender extends BaseServiceRender {
         super(serviceEndpoint);
     }
 
-    public List<PricingPlan> getPricingPlanList() throws IOException {
-        return HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
-                        .getPackageInfo()
-                        .execute()
-                        .body()).getPricingPlans();
-    }
-
-    public List<PricingPlan> getBackupPlanList() throws IOException {
-        return HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
-                        .getPackageInfo()
-                        .execute()
-                        .body()).getBackupPlans();
-    }
-
-    public PricingPlan getPricingPlan(String planName) throws IOException {
-        return getPricePlanByResponseBody(HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
-                        .getPricingPlan(planName)
-                        .execute()
-                        .body()));
-    }
-
-    public PricingPlan getBackupPlan(String planName) throws IOException {
-        return getPricePlanByResponseBody(HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
-                        .getBackupPlan(planName)
-                        .execute()
-                        .body()));
-    }
-
-    private PricingPlan getPricePlanByResponseBody(PaymentPlanResponseBody respBody) {
-        return new PricingPlan().setAmount(respBody.getAmount())
-                .setCurrency(respBody.getCurrency())
-                .setServiceDays(respBody.getServiceDays())
-                .setMaxStorage(respBody.getMaxStorage())
-                .setName(respBody.getName());
-    }
-
     public String createPricingOrder(String planName) throws IOException {
         return createOrder(planName, null);
     }

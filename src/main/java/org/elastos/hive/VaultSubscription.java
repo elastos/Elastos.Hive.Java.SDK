@@ -2,12 +2,15 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportedMethodException;
+import org.elastos.hive.network.response.VaultInfoResponseBody;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -32,7 +35,7 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return paymentService.getPricingPlanList();
+				return subscriptionService.getPricingPlanList();
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
@@ -43,7 +46,7 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return paymentService.getPricingPlan(planName);
+				return subscriptionService.getPricingPlan(planName);
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
@@ -59,9 +62,7 @@ public class VaultSubscription extends ServiceEndpoint
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				this.subscriptionService.subscribe();
-
-				//TODO:
-				return null;
+				return getPropertySet();
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
@@ -105,13 +106,22 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Vault.PropertySet> checkSubscription() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				// VaultInfoResponseBody body = this.subscriptionService.getVaultInfo();
-				// TODO:
-				return null;
+				return getPropertySet();
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
+	}
+
+	private Vault.PropertySet getPropertySet() throws IOException {
+		VaultInfoResponseBody body = this.subscriptionService.getVaultInfo();
+		// TODO: serviceDid
+		return new Vault.PropertySet()
+				.setPricingPlan(body.getPricingUsing())
+				.setCreated(body.getStartTime())
+				.setUpdated(body.getModifyTime())
+				.setQuota(body.getMaxStorage())
+				.setUsedSpace(body.getFileUseStorage() + body.getDbUseStorage());
 	}
 
 	@Override
@@ -140,7 +150,7 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Receipt> payOrder(String orderId, String transactionId) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				//TODO: paymentService.payOrder(orderId, transIds);
+				paymentService.payOrder(orderId, Collections.singletonList(transactionId));
 				//TODO:
 				return new Receipt();
 			} catch (Exception e) {
