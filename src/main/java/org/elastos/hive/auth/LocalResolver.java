@@ -1,37 +1,22 @@
 package org.elastos.hive.auth;
 
 import com.google.gson.Gson;
-
-import org.elastos.hive.exception.HiveSdkException;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HttpFailedException;
-import org.elastos.hive.utils.CryptoUtil;
-import org.elastos.hive.utils.LogUtil;
+import org.elastos.hive.storage.DataStorage;
+import org.elastos.hive.storage.FileStorage;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class LocalResolver implements TokenResolver {
-	public static final String TYPE_AUTH_TOKEN = "auth_token";
-	public static final String TYPE_BACKUP_CREDENTIAL = "backup_credential";
-
-	private static final String TOKEN_FOLDER = "/tokens";
-
-	private String tokenPath;
 	private TokenResolver nextResolver;
 	private AuthToken token;
+	private DataStorage dataStorage;
+	private ServiceEndpoint serviceEndpoint;
 
-	public LocalResolver(String userDid, String providerAddress, String type, String cacheDir) {
-		String rootDir = cacheDir + TOKEN_FOLDER;
-		File root = new File(rootDir);
-
-		if (!root.exists() && !root.mkdirs()) {
-			throw new HiveSdkException("Cannot create token root path.");
-		}
-		this.tokenPath = String.format("%s/%s", rootDir, CryptoUtil.getSHA256(userDid + providerAddress + type));
+	public LocalResolver(String userDid, ServiceEndpoint serviceEndpoint, String cacheDir) {
+		this.dataStorage = new FileStorage(cacheDir + File.pathSeparator + "access-cache", userDid);
+		this.serviceEndpoint = serviceEndpoint;
 	}
 
 	@Override
@@ -61,40 +46,29 @@ public class LocalResolver implements TokenResolver {
 	}
 
 	private AuthToken restoreToken() {
-		Path path = Paths.get(tokenPath);
-
-		if (!Files.exists(path))
-			return null;
-
-		try {
-			LogUtil.d("Restore access token  from local cache");
-			return new Gson().fromJson(new String(Files.readAllBytes(path)), AuthTokenToVault.class);
-		} catch (IOException e) {
-			LogUtil.e("Failed to restore access token from local cache");
-			return null;
+		String token = null;
+		if (serviceEndpoint.getServiceDid() != null) {
+			token = dataStorage.loadAccessToken(serviceEndpoint.getServiceDid());
+			if (token == null)
+				token = dataStorage.loadAccessTokenByAddress(serviceEndpoint.getProviderAddress());
 		}
+
+		if (token == null)
+			return null;
+
+		return new Gson().fromJson(token, AuthTokenToVault.class);
 	}
 
 	private void saveToken(AuthToken token) {
-		Path path = Paths.get(tokenPath);
-
-		if (!Files.exists(path)) {
-			// TODO: create path. (path already created on constructor)
-		}
-
-		try {
-			Files.write(path, new Gson().toJson(token).getBytes(StandardCharsets.UTF_8));
-		} catch (IOException e) {
-			LogUtil.e("Failed to save access token to local cache");
-			e.printStackTrace();
-		}
+		String tokenStr = new Gson().toJson(token);
+		if (serviceEndpoint.getServiceDid() != null)
+			dataStorage.storeAccessToken(serviceEndpoint.getServiceDid(), tokenStr);
+		dataStorage.storeAccessTokenByAddress(serviceEndpoint.getProviderAddress(), tokenStr);
 	}
 
 	private void clearToken() {
-		try {
-			Files.deleteIfExists(Paths.get(tokenPath));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		if (serviceEndpoint.getServiceDid() != null)
+			dataStorage.clearAccessToken(serviceEndpoint.getServiceDid());
+		dataStorage.clearAccessTokenByAddress(serviceEndpoint.getProviderAddress());
 	}
 }

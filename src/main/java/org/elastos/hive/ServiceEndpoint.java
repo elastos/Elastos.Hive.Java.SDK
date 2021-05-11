@@ -72,7 +72,7 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 	 *
 	 * @return node service did
 	 */
-	protected String getServiceDid() {
+	public String getServiceDid() {
 		throw new UnsupportedMethodException();
 	}
 

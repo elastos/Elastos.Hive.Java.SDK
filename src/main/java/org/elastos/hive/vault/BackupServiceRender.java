@@ -24,8 +24,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ht
     public CompletableFuture<Void> setupContext(BackupContext backupContext) {
         this.tokenResolver = new LocalResolver(
                 getServiceEndpoint().getUserDid(),
-                getServiceEndpoint().getProviderAddress(),
-                LocalResolver.TYPE_BACKUP_CREDENTIAL,
+                getServiceEndpoint(),
                 getServiceEndpoint().getAppContext().getAppContextProvider().getLocalDataDir());
         this.tokenResolver.setNextResolver(new BackupRemoteResolver(
                 getServiceEndpoint(),

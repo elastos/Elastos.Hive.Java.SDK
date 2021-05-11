@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -22,6 +23,19 @@ public class FileStorage implements DataStorage {
 
 	public FileStorage(String rootPath, String userDid) {
 		this.basePath = rootPath + File.pathSeparator + getRelativeDidStr(userDid);
+		File root = new File(this.basePath);
+		if (!root.exists() && !root.mkdirs()) {
+			LogUtil.e("Failed to create root folder " + this.basePath);
+		}
+	}
+
+	private boolean createParentDir(String filePath) {
+		File parent = Paths.get(filePath).getParent().toFile();
+		if (!parent.exists() && !parent.mkdirs()) {
+			LogUtil.e("Failed to create parent for file " + filePath);
+			return false;
+		}
+		return true;
 	}
 
 	private String getRelativeDidStr(String did) {
@@ -30,8 +44,12 @@ public class FileStorage implements DataStorage {
 	}
 
 	private String getFileContent(String path) {
+		Path p = Paths.get(path);
+		if (!Files.exists(p))
+			return null;
+
 		try {
-			return new String(Files.readAllBytes(Paths.get(path)));
+			return new String(Files.readAllBytes(p));
 		} catch (IOException e) {
 			LogUtil.e("Failed to get content from file " + path);
 			return null;
@@ -39,6 +57,9 @@ public class FileStorage implements DataStorage {
 	}
 
 	private void saveFileContent(String path, String content) {
+		if (!createParentDir(path))
+			return;
+
 		try {
 			Files.write(Paths.get(path), content.getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
