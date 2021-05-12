@@ -34,15 +34,10 @@ public class AppContext {
 	private String userDid;
 	private DataStorage dataStorage;
 
-	private AppContext(AppContextProvider provider) {
-		this(provider, null);
-	}
-
 	private AppContext(AppContextProvider provider, String userDid) {
 		this.userDid = userDid;
 		this.contextProvider = provider;
-		this.dataStorage = new FileStorage(provider.getLocalDataDir()
-				+ File.separator + "access-cache", userDid);
+		this.dataStorage = new FileStorage(provider.getLocalDataDir() + File.separator, userDid);
 	}
 
 	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
@@ -71,22 +66,6 @@ public class AppContext {
 
 	public DataStorage getDataStorage() {
 		return this.dataStorage;
-	}
-
-	public static AppContext build(AppContextProvider provider) {
-		if (provider == null)
-			throw new IllegalArgumentException("Missing AppContext provider");
-
-		if (provider.getLocalDataDir() == null)
-			throw new BadContextProviderException("Missing method to acquire data location");
-
-		if (provider.getAppInstanceDocument() == null)
-			throw new BadContextProviderException("Missing method to acquire App instance DID document");
-
-		if (!resolverHasSetup)
-			throw new DIDResolverNotSetupException();
-
-		return new AppContext(provider);
 	}
 
 	public static AppContext build(AppContextProvider provider, String userDid) {

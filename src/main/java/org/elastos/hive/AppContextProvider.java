@@ -27,5 +27,5 @@ public interface AppContextProvider {
      * @param jwtToken  The input challenge code from back-end node service.
      * @return The credential issued by user.
      */
-    CompletableFuture<String> getAuthorization(String jwtToken);
+    CompletableFuture<String> getAuthorization(String authenticationChallenge);
 }
