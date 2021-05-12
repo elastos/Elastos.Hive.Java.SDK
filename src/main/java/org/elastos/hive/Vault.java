@@ -2,7 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.service.*;
-import org.elastos.hive.vault.HttpExceptionHandler;
+import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.vault.ServiceBuilder;
 
 import java.util.Date;
@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
  */
-public class Vault extends ServiceEndpoint implements HttpExceptionHandler {
+public class Vault extends ServiceEndpoint implements ExceptionConvertor {
 	private FilesService 	filesService;
 	private DatabaseService databaseService;
 	private ScriptingService scriptingService;

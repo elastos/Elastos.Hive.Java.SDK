@@ -6,9 +6,9 @@ import java.util.concurrent.CompletionException;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.UnauthorizedStateException;
 import org.elastos.hive.network.response.HiveResponseBody;
-import org.elastos.hive.vault.HttpExceptionHandler;
+import org.elastos.hive.vault.ExceptionConvertor;
 
-public class ServiceEndpoint implements HttpExceptionHandler {
+public class ServiceEndpoint implements ExceptionConvertor {
 	private AppContext context;
 	private String providerAddress;
 	private ConnectionManager connectionManager;
@@ -96,7 +96,7 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 
 				return getVersionByStr(version);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
     }
@@ -115,7 +115,7 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 		                        .execute()
 		                        .body()).getCommitHash();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
     }

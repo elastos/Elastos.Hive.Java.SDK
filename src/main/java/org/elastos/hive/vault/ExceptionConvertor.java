@@ -2,7 +2,7 @@ package org.elastos.hive.vault;
 
 import org.elastos.hive.network.response.HiveResponseBody;
 
-public interface HttpExceptionHandler {
+public interface ExceptionConvertor {
     /**
      * Common exception conversion for response code.
      * Original exception comes from:
@@ -12,7 +12,10 @@ public interface HttpExceptionHandler {
      * @param e exception from http calling.
      * @return expect exception already defined.
      */
-    default Exception convertException(Exception e) {
+
+
+	//
+    default Exception toHiveException(Exception e) {
         return HiveResponseBody.convertException(e);
     }
 }

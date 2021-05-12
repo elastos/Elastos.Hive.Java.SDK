@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-class DatabaseServiceRender extends BaseServiceRender implements DatabaseService, HttpExceptionHandler {
+class DatabaseServiceRender extends BaseServiceRender implements DatabaseService, ExceptionConvertor {
 
 	public DatabaseServiceRender(Vault vault) {
 		super(vault);
@@ -29,7 +29,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 								.body());
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -45,7 +45,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 								.body());
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -65,7 +65,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 						.setInsertedId(body.getInsertedId())
 						.setAcknowledged(body.getAcknowledged());
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -85,7 +85,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 						.setInsertedIds(body.getInsertedIds())
 						.setAcknowledged(body.getAcknowledged());
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -103,7 +103,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 								.execute()
 								.body()).getCount();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -121,7 +121,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 										.execute()
 										.body()).getItem());
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -139,7 +139,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 						.execute()
 						.body()).getItems());
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -162,7 +162,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 						.setAcknowledged(body.getAcknowledged())
 						.setUpsertedId(body.getUpsertedId());
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -185,7 +185,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 						.setAcknowledged(body.getAcknowledged())
 						.setUpsertedId(body.getUpsertedId());
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -204,7 +204,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 						.setDeletedCount(body.getDeletedCount())
 						.setAcknowledged(body.getAcknowledged());
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -223,7 +223,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 						.setDeletedCount(body.getDeletedCount())
 						.setAcknowledged(body.getAcknowledged());
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}

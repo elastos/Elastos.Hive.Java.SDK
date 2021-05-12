@@ -15,7 +15,7 @@ import org.elastos.hive.service.ScriptingService;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class ScriptingServiceRender extends BaseServiceRender implements ScriptingService, HttpExceptionHandler {
+public class ScriptingServiceRender extends BaseServiceRender implements ScriptingService, ExceptionConvertor {
 	public ScriptingServiceRender(ServiceEndpoint serviceEndpoint) {
 		super(serviceEndpoint);
 	}
@@ -40,7 +40,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 										.setCondition(condition))
 								.execute().body());
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -57,7 +57,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 								.execute()
 				), resultType);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -71,7 +71,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 								.execute()
 				), resultType);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -87,7 +87,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 						getConnectionManager().openConnection(ScriptingApi.API_SCRIPT_UPLOAD + "/" + transactionId),
 						resultType);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -105,7 +105,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 								.execute(),
 						resultType);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}

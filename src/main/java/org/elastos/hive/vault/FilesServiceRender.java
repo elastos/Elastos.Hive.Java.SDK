@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-class FilesServiceRender extends BaseServiceRender implements FilesService, HttpExceptionHandler {
+class FilesServiceRender extends BaseServiceRender implements FilesService, ExceptionConvertor {
 	public FilesServiceRender(Vault vault) {
 		super(vault);
 	}
@@ -28,7 +28,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Http
 						getConnectionManager().openConnection(FilesApi.API_UPLOAD + "/" + path),
 						resultType);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -43,7 +43,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Http
 								.execute()
 								.body()).getFileInfoList();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -57,7 +57,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Http
 								.properties(path)
 								.execute().body()).getFileInfo();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -71,7 +71,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Http
 								.download(path)
 								.execute(), resultType);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -85,7 +85,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Http
 						.execute().body());
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -100,7 +100,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Http
 								.execute().body());
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -115,7 +115,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Http
 						.execute().body());
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -130,18 +130,18 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Http
 								.execute()
 								.body()).getSha256();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
 
 	@Override
-	public Exception convertException(Exception e) {
+	public Exception toHiveException(Exception e) {
 		if (e instanceof HttpFailedException) {
 			HttpFailedException ex = (HttpFailedException) e;
 			if (ex.getCode() == 404)
 				return new FileDoesNotExistsException();
 		}
-		return HttpExceptionHandler.super.convertException(e);
+		return ExceptionConvertor.super.toHiveException(e);
 	}
 }
