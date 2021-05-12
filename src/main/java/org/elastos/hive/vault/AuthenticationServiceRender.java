@@ -25,7 +25,7 @@ public class AuthenticationServiceRender extends BaseServiceRender implements Ht
         this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
     }
 
-    public String signIn4Token() throws IOException, ExecutionException, InterruptedException {
+    public String signIn4AccessToken() throws IOException, ExecutionException, InterruptedException {
         SignInResponseBody rspBody = HiveResponseBody.validateBody(
                 getConnectionManager().getAuthApi()
                         .signIn(new SignInRequestBody(new ObjectMapper()
@@ -35,7 +35,13 @@ public class AuthenticationServiceRender extends BaseServiceRender implements Ht
                         .execute()
                         .body());
         rspBody.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
-        return contextProvider.getAuthorization(rspBody.getChallenge()).get();
+        String challenge = rspBody.getChallenge();
+        updateServiceDid(challenge);
+        return contextProvider.getAuthorization(challenge).get();
+    }
+
+    private void updateServiceDid(String challenge) {
+        getServiceEndpoint().setServiceDid(JwtUtil.getBody(challenge).getIssuer());
     }
 
     public String signIn4Issuer() throws IOException {
