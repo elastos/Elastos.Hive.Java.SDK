@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -17,6 +18,8 @@ import org.elastos.hive.exception.IllegalDidFormatException;
 import org.elastos.hive.exception.DIDResolverNotSetupException;
 import org.elastos.hive.exception.DIDResolverSetupException;
 import org.elastos.hive.exception.DIDResoverAlreadySetupException;
+import org.elastos.hive.storage.DataStorage;
+import org.elastos.hive.storage.FileStorage;
 
 /**
  * The application context would contain the resources list below:
@@ -29,6 +32,7 @@ public class AppContext {
 
 	private AppContextProvider contextProvider;
 	private String userDid;
+	private DataStorage dataStorage;
 
 	private AppContext(AppContextProvider provider) {
 		this(provider, null);
@@ -37,6 +41,8 @@ public class AppContext {
 	private AppContext(AppContextProvider provider, String userDid) {
 		this.userDid = userDid;
 		this.contextProvider = provider;
+		this.dataStorage = new FileStorage(provider.getLocalDataDir()
+				+ File.separator + "access-cache", userDid);
 	}
 
 	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
@@ -61,6 +67,10 @@ public class AppContext {
 
 	public String getUserDid() {
 		return this.userDid;
+	}
+
+	public DataStorage getDataStorage() {
+		return this.dataStorage;
 	}
 
 	public static AppContext build(AppContextProvider provider) {

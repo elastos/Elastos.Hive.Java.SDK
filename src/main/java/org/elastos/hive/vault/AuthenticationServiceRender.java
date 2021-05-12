@@ -1,6 +1,7 @@
 package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.elastos.did.jwt.Claims;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.AuthToken;
@@ -26,33 +27,24 @@ public class AuthenticationServiceRender extends BaseServiceRender implements Ht
     }
 
     public String signIn4AccessToken() throws IOException, ExecutionException, InterruptedException {
-        SignInResponseBody rspBody = HiveResponseBody.validateBody(
-                getConnectionManager().getAuthApi()
-                        .signIn(new SignInRequestBody(new ObjectMapper()
-                                .readValue(
-                                        contextProvider.getAppInstanceDocument().toString(),
-                                        HashMap.class)))
-                        .execute()
-                        .body());
-        rspBody.checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
-        String challenge = rspBody.getChallenge();
-        updateServiceDid(challenge);
-        return contextProvider.getAuthorization(challenge).get();
+        return contextProvider.getAuthorization(signIn()).get();
     }
 
-    private void updateServiceDid(String challenge) {
-        getServiceEndpoint().setServiceDid(JwtUtil.getBody(challenge).getIssuer());
+    public String signIn4ServiceDid() throws IOException {
+        return JwtUtil.getBody(signIn()).getIssuer();
     }
 
-    public String signIn4Issuer() throws IOException {
+    public String signIn() throws IOException {
         SignInResponseBody rspBody = getConnectionManager().getAuthApi()
                 .signIn(new SignInRequestBody(new ObjectMapper()
                         .readValue(contextProvider.getAppInstanceDocument().toString(), HashMap.class)))
                 .execute()
                 .body();
-        return HiveResponseBody.validateBody(rspBody)
-                .checkValid(contextProvider.getAppInstanceDocument().getSubject().toString())
-                .getIssuer();
+        Claims claims = HiveResponseBody.validateBody(rspBody)
+                .checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
+        // Update the service did to service end-point for future usage.
+        getServiceEndpoint().setServiceDid(claims.getIssuer());
+        return rspBody.getChallenge();
     }
 
     public AuthToken auth(String token) throws IOException {

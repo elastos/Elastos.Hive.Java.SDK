@@ -44,9 +44,7 @@ public class RequestInterceptor implements Interceptor {
     private TokenResolver tokenResolver;
 
     RequestInterceptor(ConnectionManager connectionManager, boolean needToken) {
-        this.tokenResolver = new LocalResolver(connectionManager.getServiceEndpoint().getAppContext().getUserDid(),
-                connectionManager.getServiceEndpoint(),
-                connectionManager.getServiceEndpoint().getAppContext().getAppContextProvider().getLocalDataDir());
+        this.tokenResolver = new LocalResolver(connectionManager.getServiceEndpoint());
         this.tokenResolver.setNextResolver(new RemoteResolver(connectionManager.getServiceEndpoint()));
         this.needToken = needToken;
     }
