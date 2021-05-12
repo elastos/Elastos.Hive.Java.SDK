@@ -5,26 +5,23 @@ import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.UnauthorizedStateException;
-import org.elastos.hive.exception.UnsupportedMethodException;
+import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.vault.HttpExceptionHandler;
-import org.elastos.hive.vault.NodeManageServiceRender;
 
 public class ServiceEndpoint implements HttpExceptionHandler {
 	private AppContext context;
 	private String providerAddress;
 	private ConnectionManager connectionManager;
-	private NodeManageServiceRender nodeManageService;
 	private String serviceDid;
 
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
 		this.context = context;
 		this.providerAddress = providerAddress;
 		this.connectionManager = new ConnectionManager(this);
-		this.nodeManageService = new NodeManageServiceRender(this);
 	}
 
 	public AppContext getAppContext() {
-		return this.context;
+		return context;
 	}
 
 	/**
@@ -33,7 +30,7 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 	 * @return user did
 	 */
 	public String getUserDid() {
-		return this.context.getUserDid();
+		return context.getUserDid();
 	}
 
 	/**
@@ -42,11 +39,11 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 	 * @return provider address
 	 */
 	public String getProviderAddress() {
-		return this.providerAddress;
+		return providerAddress;
 	}
 
 	public ConnectionManager getConnectionManager() {
-		return this.connectionManager;
+		return connectionManager;
 	}
 
 	/**
@@ -74,7 +71,7 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 	 * @return node service did
 	 */
 	public String getServiceDid() {
-		return this.serviceDid;
+		return serviceDid;
 	}
 
 	public void setServiceDid(String serviceDid) {
@@ -93,12 +90,16 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 	public CompletableFuture<Version> getVersion() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return getVersionByStr(nodeManageService.getVersion());
+				String version = HiveResponseBody.validateBody(
+						connectionManager.getNodeManagerApi().version().execute().body())
+					.getVersion();
+
+				return getVersionByStr(version);
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
-	}
+    }
 
 	private Version getVersionByStr(String version) {
 		// TODO: Required version number is *.*.*, such as 1.0.12
@@ -108,10 +109,14 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 	public CompletableFuture<String> getLatestCommitId() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return nodeManageService.getCommitHash();
+				return HiveResponseBody.validateBody(
+		                connectionManager.getNodeManagerApi()
+		                        .commitHash()
+		                        .execute()
+		                        .body()).getCommitHash();
 			} catch (Exception e) {
 				throw new CompletionException(convertException(e));
 			}
 		});
-	}
+    }
 }
