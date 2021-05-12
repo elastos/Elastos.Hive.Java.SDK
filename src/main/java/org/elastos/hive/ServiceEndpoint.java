@@ -14,6 +14,7 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 	private String providerAddress;
 	private ConnectionManager connectionManager;
 	private NodeManageServiceRender nodeManageService;
+	private String serviceDid;
 
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
 		this.context = context;
@@ -73,7 +74,11 @@ public class ServiceEndpoint implements HttpExceptionHandler {
 	 * @return node service did
 	 */
 	public String getServiceDid() {
-		throw new UnsupportedMethodException();
+		return this.serviceDid;
+	}
+
+	public void setServiceDid(String serviceDid) {
+		this.serviceDid = serviceDid;
 	}
 
 	/**
