@@ -150,7 +150,7 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Receipt> payOrder(String orderId, String transactionId) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				paymentService.payOrder(orderId, Collections.singletonList(transactionId));
+				paymentService.payOrder(orderId, transactionId == null ? Collections.emptyList() : Collections.singletonList(transactionId));
 				//TODO:
 				return new Receipt();
 			} catch (Exception e) {
