@@ -13,7 +13,7 @@ import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
 
-class BackupServiceRender extends BaseServiceRender implements BackupService, HttpExceptionHandler {
+class BackupServiceRender extends BaseServiceRender implements BackupService, ExceptionConvertor {
     private TokenResolver tokenResolver;
 
     public BackupServiceRender(ServiceEndpoint serviceEndpoint) {
@@ -41,7 +41,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ht
                                 .execute()
                                 .body());
             } catch (Exception e) {
-                throw new CompletionException(convertException(e));
+                throw new CompletionException(toHiveException(e));
             }
         });
     }
@@ -62,7 +62,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ht
                                 .execute()
                                 .body());
             } catch (Exception e) {
-                throw new CompletionException(convertException(e));
+                throw new CompletionException(toHiveException(e));
             }
         });
     }
@@ -82,7 +82,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ht
                                 .execute()
                                 .body()).getStatusResult();
             } catch (Exception e) {
-                throw new CompletionException(convertException(e));
+                throw new CompletionException(toHiveException(e));
             }
         });
     }

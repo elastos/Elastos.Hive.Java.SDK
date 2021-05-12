@@ -7,7 +7,7 @@ import org.elastos.hive.service.PubSubService;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-class PubSubServiceRender extends BaseServiceRender implements PubSubService, HttpExceptionHandler {
+class PubSubServiceRender extends BaseServiceRender implements PubSubService, ExceptionConvertor {
 	public PubSubServiceRender(Vault vault) {
 		super(vault);
 	}

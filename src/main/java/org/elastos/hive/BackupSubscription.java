@@ -8,7 +8,7 @@ import org.elastos.hive.payment.PricingPlan;
 import org.elastos.hive.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
-import org.elastos.hive.vault.HttpExceptionHandler;
+import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.vault.PaymentServiceRender;
 import org.elastos.hive.vault.SubscriptionServiceRender;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class BackupSubscription extends ServiceEndpoint
-	implements SubscriptionService<Backup.PropertySet>, PaymentService, HttpExceptionHandler {
+	implements SubscriptionService<Backup.PropertySet>, PaymentService, ExceptionConvertor {
 
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
@@ -36,7 +36,7 @@ public class BackupSubscription extends ServiceEndpoint
 			try {
 				return subscriptionService.getBackupPlanList();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -47,7 +47,7 @@ public class BackupSubscription extends ServiceEndpoint
 			try {
 				return subscriptionService.getBackupPlan(planName);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -63,7 +63,7 @@ public class BackupSubscription extends ServiceEndpoint
 				this.subscriptionService.subscribeBackup();
 				return getPropertySet();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -89,7 +89,7 @@ public class BackupSubscription extends ServiceEndpoint
 			try {
 				return getPropertySet();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -111,7 +111,7 @@ public class BackupSubscription extends ServiceEndpoint
 			try {
 				return paymentService.getOrderInfo(paymentService.createBackupOrder(planName));
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -122,7 +122,7 @@ public class BackupSubscription extends ServiceEndpoint
 			try {
 				return paymentService.getOrderInfo(orderId);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -135,7 +135,7 @@ public class BackupSubscription extends ServiceEndpoint
 				//TODO:
 				return null;
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}

@@ -8,9 +8,9 @@ import org.elastos.hive.network.request.EmptyRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.PromotionService;
 import org.elastos.hive.vault.BaseServiceRender;
-import org.elastos.hive.vault.HttpExceptionHandler;
+import org.elastos.hive.vault.ExceptionConvertor;
 
-class PromotionServiceRender extends BaseServiceRender implements PromotionService, HttpExceptionHandler {
+class PromotionServiceRender extends BaseServiceRender implements PromotionService, ExceptionConvertor {
 
 	PromotionServiceRender(ServiceEndpoint serviceEndpoint) {
 		super(serviceEndpoint);
@@ -26,7 +26,7 @@ class PromotionServiceRender extends BaseServiceRender implements PromotionServi
 								.execute()
 								.body());
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}

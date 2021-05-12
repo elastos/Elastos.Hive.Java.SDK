@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-import org.elastos.hive.vault.HttpExceptionHandler;
+import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.vault.PaymentServiceRender;
 import org.elastos.hive.vault.SubscriptionServiceRender;
 
 public class VaultSubscription extends ServiceEndpoint
-	implements SubscriptionService<Vault.PropertySet>, PaymentService, HttpExceptionHandler {
+	implements SubscriptionService<Vault.PropertySet>, PaymentService, ExceptionConvertor {
 
 	private SubscriptionServiceRender subscriptionService;
 	private PaymentServiceRender paymentService;
@@ -37,7 +37,7 @@ public class VaultSubscription extends ServiceEndpoint
 			try {
 				return subscriptionService.getPricingPlanList();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -48,7 +48,7 @@ public class VaultSubscription extends ServiceEndpoint
 			try {
 				return subscriptionService.getPricingPlan(planName);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -64,7 +64,7 @@ public class VaultSubscription extends ServiceEndpoint
 				this.subscriptionService.subscribe();
 				return getPropertySet();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -75,7 +75,7 @@ public class VaultSubscription extends ServiceEndpoint
 			try {
 				this.subscriptionService.unsubscribe();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -86,7 +86,7 @@ public class VaultSubscription extends ServiceEndpoint
 			try {
 				this.subscriptionService.activate();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -97,7 +97,7 @@ public class VaultSubscription extends ServiceEndpoint
 			try {
 				this.subscriptionService.deactivate();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -108,7 +108,7 @@ public class VaultSubscription extends ServiceEndpoint
 			try {
 				return getPropertySet();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -130,7 +130,7 @@ public class VaultSubscription extends ServiceEndpoint
 			try {
 				return paymentService.getOrderInfo(paymentService.createPricingOrder(planName));
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -141,7 +141,7 @@ public class VaultSubscription extends ServiceEndpoint
 			try {
 				return paymentService.getOrderInfo(orderId);
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
@@ -154,7 +154,7 @@ public class VaultSubscription extends ServiceEndpoint
 				//TODO:
 				return new Receipt();
 			} catch (Exception e) {
-				throw new CompletionException(convertException(e));
+				throw new CompletionException(toHiveException(e));
 			}
 		});
 	}
