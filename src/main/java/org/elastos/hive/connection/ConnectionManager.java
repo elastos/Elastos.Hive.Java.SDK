@@ -52,7 +52,7 @@ public class ConnectionManager {
 	private FilesApi filesApi;
 	private ScriptingApi scriptingApi;
 	private BackupApi backupApi;
-	private NodeManageApi nodeManageApi;
+	private AboutAPI aboutAPI;
 
 	public ConnectionManager(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
@@ -71,11 +71,11 @@ public class ConnectionManager {
 		return authApi;
 	}
 
-	public NodeManageApi getNodeManagerApi() {
-		if (nodeManageApi == null)
-			nodeManageApi = createService(NodeManageApi.class, serviceEndpoint.getProviderAddress(), this.authRequestInterceptor);
+	public AboutAPI getAboutAPI() {
+		if (aboutAPI == null)
+			aboutAPI = createService(AboutAPI.class, serviceEndpoint.getProviderAddress(), this.authRequestInterceptor);
 
-		return nodeManageApi;
+		return aboutAPI;
 	}
 
 	public FilesApi getFilesApi() {

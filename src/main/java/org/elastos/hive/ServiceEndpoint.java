@@ -91,7 +91,7 @@ public class ServiceEndpoint implements ExceptionConvertor {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				String version = HiveResponseBody.validateBody(
-						connectionManager.getNodeManagerApi().version().execute().body())
+						connectionManager.getAboutAPI().version().execute().body())
 					.getVersion();
 
 				return getVersionByStr(version);
@@ -110,7 +110,7 @@ public class ServiceEndpoint implements ExceptionConvertor {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.validateBody(
-		                connectionManager.getNodeManagerApi()
+		                connectionManager.getAboutAPI()
 		                        .commitHash()
 		                        .execute()
 		                        .body()).getCommitHash();
