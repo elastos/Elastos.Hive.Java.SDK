@@ -24,7 +24,7 @@ public class BackupRemoteResolver implements TokenResolver {
     @Override
     public AuthToken getToken() throws HttpFailedException {
         try {
-            return credential(authenticationService.signIn4Issuer());
+            return credential(authenticationService.signIn4ServiceDid());
         } catch (Exception e) {
             throw new HttpFailedException(401, "Failed to authentication backup credential.");
         }

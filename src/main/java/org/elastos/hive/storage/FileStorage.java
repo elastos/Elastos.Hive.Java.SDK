@@ -22,7 +22,7 @@ public class FileStorage implements DataStorage {
 	private String basePath;
 
 	public FileStorage(String rootPath, String userDid) {
-		this.basePath = rootPath + File.pathSeparator + getRelativeDidStr(userDid);
+		this.basePath = rootPath + File.separator + getRelativeDidStr(userDid);
 		File root = new File(this.basePath);
 		if (!root.exists() && !root.mkdirs()) {
 			LogUtil.e("Failed to create root folder " + this.basePath);
@@ -77,12 +77,12 @@ public class FileStorage implements DataStorage {
 
 	@NotNull
 	private String getFilePath(String folder, String fileName) {
-		return this.basePath + File.pathSeparator + folder + File.pathSeparator + fileName;
+		return this.basePath + File.separator + folder + File.separator + fileName;
 	}
 
 	@NotNull
 	private String getFilePath(String fileName) {
-		return this.basePath + File.pathSeparator + fileName;
+		return this.basePath + File.separator + fileName;
 	}
 
 	@Override

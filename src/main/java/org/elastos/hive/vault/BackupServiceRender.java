@@ -4,8 +4,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.auth.BackupLocalResolver;
 import org.elastos.hive.auth.BackupRemoteResolver;
-import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.network.request.BackupRestoreRequestBody;
 import org.elastos.hive.network.request.BackupSaveRequestBody;
@@ -22,10 +22,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ht
 
     @Override
     public CompletableFuture<Void> setupContext(BackupContext backupContext) {
-        this.tokenResolver = new LocalResolver(
-                getServiceEndpoint().getUserDid(),
-                getServiceEndpoint(),
-                getServiceEndpoint().getAppContext().getAppContextProvider().getLocalDataDir());
+        this.tokenResolver = new BackupLocalResolver(getServiceEndpoint());
         this.tokenResolver.setNextResolver(new BackupRemoteResolver(
                 getServiceEndpoint(),
                 backupContext,
