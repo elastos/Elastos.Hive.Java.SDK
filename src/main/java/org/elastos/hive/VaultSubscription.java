@@ -54,7 +54,7 @@ public class VaultSubscription extends ServiceEndpoint
 	}
 
 	public CompletableFuture<Vault.PropertySet> subscribe() {
-		return this.subscribe();
+		return this.subscribe(null);
 	}
 
 	@Override
