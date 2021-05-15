@@ -22,6 +22,7 @@
 
 package org.elastos.hive.connection;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.*;
@@ -41,8 +42,8 @@ public class ConnectionManager {
 	private static final int DEFAULT_TIMEOUT = 30;
 
 	private ServiceEndpoint serviceEndpoint;
-	private RequestInterceptor authRequestInterceptor;
-	private RequestInterceptor plainRequestInterceptor;
+	private Interceptor authRequestInterceptor;
+	private PlainRequestInterceptor plainRequestInterceptor;
 
 	private SubscriptionApi subscriptionApi;
 	private PaymentApi paymentApi;
@@ -56,8 +57,8 @@ public class ConnectionManager {
 
 	public ConnectionManager(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
-		this.plainRequestInterceptor = new RequestInterceptor(this);
-		this.authRequestInterceptor  = new RequestInterceptor(this, false);
+		this.plainRequestInterceptor = new PlainRequestInterceptor(this.serviceEndpoint);
+		this.authRequestInterceptor  = new AuthRequestInterceptor();
 	}
 
 	public ServiceEndpoint getServiceEndpoint() {
@@ -156,7 +157,7 @@ public class ConnectionManager {
 		}
 	}
 
-	private static <S> S createService(Class<S> serviceClass, String baseUrl, RequestInterceptor requestInterceptor) {
+	private static <S> S createService(Class<S> serviceClass, String baseUrl, Interceptor requestInterceptor) {
 		OkHttpClient.Builder clientBuilder;
 		Retrofit.Builder retrofitBuilder;
 
