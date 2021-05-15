@@ -45,15 +45,9 @@ public class ConnectionManager {
 	private Interceptor authRequestInterceptor;
 	private PlainRequestInterceptor plainRequestInterceptor;
 
-	private SubscriptionAPI subscriptionApi;
-	private PaymentAPI paymentApi;
-	private DatabaseAPI databaseApi;
-
-	private AuthAPI authApi;
-	private FilesAPI filesApi;
-	private ScriptingAPI scriptingApi;
-	private BackupAPI backupApi;
-	private AboutAPI aboutAPI;
+	private CallAPI 	callAPI;
+	private AuthAPI  	authAPI;
+	private AboutAPI	aboutAPI;
 
 	public ConnectionManager(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
@@ -65,60 +59,25 @@ public class ConnectionManager {
 		return this.serviceEndpoint;
 	}
 
-	public AuthAPI getAuthApi() {
-		if (authApi == null)
-			authApi = createService(AuthAPI.class, serviceEndpoint.getProviderAddress(), this.authRequestInterceptor);
+	public CallAPI getCallAPI() {
+		if (callAPI == null)
+			callAPI = createService(CallAPI.class, serviceEndpoint.getProviderAddress(), plainRequestInterceptor);
 
-		return authApi;
+		return callAPI;
+	}
+
+	public AuthAPI getAuthAPI() {
+		if (authAPI == null)
+			authAPI = createService(AuthAPI.class, serviceEndpoint.getProviderAddress(), authRequestInterceptor);
+
+		return authAPI;
 	}
 
 	public AboutAPI getAboutAPI() {
 		if (aboutAPI == null)
-			aboutAPI = createService(AboutAPI.class, serviceEndpoint.getProviderAddress(), this.authRequestInterceptor);
+			aboutAPI = createService(AboutAPI.class, serviceEndpoint.getProviderAddress(), authRequestInterceptor);
 
 		return aboutAPI;
-	}
-
-	public FilesAPI getFilesApi() {
-		if (filesApi == null)
-			filesApi = createService(FilesAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
-
-		return filesApi;
-	}
-
-	public SubscriptionAPI getSubscriptionApi() {
-		if (subscriptionApi == null) {
-			subscriptionApi = createService(SubscriptionAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
-		}
-		return subscriptionApi;
-	}
-
-	public PaymentAPI getPaymentApi() {
-		if (paymentApi == null) {
-			paymentApi = createService(PaymentAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
-		}
-		return paymentApi;
-	}
-
-	public DatabaseAPI getDatabaseApi() {
-		if (databaseApi == null) {
-			databaseApi = createService(DatabaseAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
-		}
-		return databaseApi;
-	}
-
-	public ScriptingAPI getScriptingApi() {
-		if (scriptingApi == null) {
-			scriptingApi = createService(ScriptingAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
-		}
-		return scriptingApi;
-	}
-
-	public BackupAPI getBackupApi() {
-		if (backupApi == null) {
-			backupApi = createService(BackupAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
-		}
-		return backupApi;
 	}
 
 	public HttpURLConnection openConnection(String path) throws IOException {

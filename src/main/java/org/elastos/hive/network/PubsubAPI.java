@@ -12,7 +12,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
-public interface PubsubAPI {
+interface PubsubAPI {
     @POST("/api/v1/pubsub/publish")
     Call<HiveResponseBody> publish(@Body PubsubRequestBody body);
 

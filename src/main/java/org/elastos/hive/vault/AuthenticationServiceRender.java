@@ -35,7 +35,7 @@ public class AuthenticationServiceRender extends BaseServiceRender implements Ex
     }
 
     public String signIn() throws IOException {
-        SignInResponseBody rspBody = getConnectionManager().getAuthApi()
+        SignInResponseBody rspBody = getConnectionManager().getAuthAPI()
                 .signIn(new SignInRequestBody(new ObjectMapper()
                         .readValue(contextProvider.getAppInstanceDocument().toString(), HashMap.class)))
                 .execute()
@@ -49,7 +49,7 @@ public class AuthenticationServiceRender extends BaseServiceRender implements Ex
 
     public AuthToken auth(String token) throws IOException {
         AuthResponseBody rspBody = HiveResponseBody.validateBody(
-                getConnectionManager().getAuthApi()
+                getConnectionManager().getAuthAPI()
                         .auth(new AuthRequestBody(token))
                         .execute()
                         .body());

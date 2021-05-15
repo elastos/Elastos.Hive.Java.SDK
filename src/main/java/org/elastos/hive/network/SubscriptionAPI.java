@@ -8,7 +8,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
-public interface SubscriptionAPI {
+interface SubscriptionAPI {
 	@POST("/api/v1/service/vault/create")
 	Call<VaultCreateResponseBody> createVault();
 

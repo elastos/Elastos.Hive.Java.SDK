@@ -14,9 +14,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
-public interface FilesAPI {
-	String API_UPLOAD = "/files/upload";
-
+interface FilesAPI {
 	@GET("/api/v1/files/list/folder")
 	Call<FilesListResponseBody> list(@Query("path") String filename);
 

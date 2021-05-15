@@ -23,7 +23,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				HiveResponseBody.validateBody(
-						getConnectionManager().getDatabaseApi()
+						getConnectionManager().getCallAPI()
 								.createCollection(new CreateCollectionRequestBody(name))
 								.execute()
 								.body());
@@ -39,7 +39,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				HiveResponseBody.validateBody(
-						getConnectionManager().getDatabaseApi()
+						getConnectionManager().getCallAPI()
 								.deleteCollection(new DeleteCollectionRequestBody(name))
 								.execute()
 								.body());
@@ -55,7 +55,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				InsertDocResponseBody body = HiveResponseBody.validateBody(
-						getConnectionManager().getDatabaseApi()
+						getConnectionManager().getCallAPI()
 						.insertOne(new InsertDocRequestBody(collection,
 								HiveResponseBody.jsonNode2KeyValueDic(doc),
 								options))
@@ -75,7 +75,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				InsertDocsResponseBody body = HiveResponseBody.validateBody(
-						getConnectionManager().getDatabaseApi()
+						getConnectionManager().getCallAPI()
 								.insertMany(new InsertDocsRequestBody(collection,
 										HiveResponseBody.jsonNodeList2KeyValueDicList(docs),
 										options))
@@ -95,7 +95,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.validateBody(
-						getConnectionManager().getDatabaseApi()
+						getConnectionManager().getCallAPI()
 								.countDocs(new CountDocRequestBody(
 										collection,
 										HiveResponseBody.jsonNode2KeyValueDic(query),
@@ -114,7 +114,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 			try {
 				return HiveResponseBody.KeyValueDict2JsonNode(
 						HiveResponseBody.validateBody(
-								getConnectionManager().getDatabaseApi()
+								getConnectionManager().getCallAPI()
 										.findOne(new FindDocRequestBody(collection,
 												HiveResponseBody.jsonNode2KeyValueDic(query),
 												options))
@@ -132,7 +132,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 			try {
 				return HiveResponseBody.KeyValueDictList2JsonNodeList(
 						HiveResponseBody.validateBody(
-								getConnectionManager().getDatabaseApi()
+								getConnectionManager().getCallAPI()
 						.findMany(new FindDocsRequestBody(collection,
 								HiveResponseBody.jsonNode2KeyValueDic(query),
 								options))
@@ -149,7 +149,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				UpdateDocResponseBody body = HiveResponseBody.validateBody(
-								getConnectionManager().getDatabaseApi()
+								getConnectionManager().getCallAPI()
 										.updateOne(new UpdateDocRequestBody(collection)
 											.setFilter(HiveResponseBody.jsonNode2KeyValueDic(filter))
 											.setUpdate(HiveResponseBody.jsonNode2KeyValueDic(update))
@@ -172,7 +172,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				UpdateDocResponseBody body = HiveResponseBody.validateBody(
-						getConnectionManager().getDatabaseApi()
+						getConnectionManager().getCallAPI()
 								.updateMany(new UpdateDocRequestBody(collection)
 										.setFilter(HiveResponseBody.jsonNode2KeyValueDic(filter))
 										.setUpdate(HiveResponseBody.jsonNode2KeyValueDic(update))
@@ -195,7 +195,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				DeleteDocResponseBody body = HiveResponseBody.validateBody(
-						getConnectionManager().getDatabaseApi()
+						getConnectionManager().getCallAPI()
 						.deleteOne(new DeleteDocRequestBody(collection,
 								HiveResponseBody.jsonNode2KeyValueDic(filter)))
 						.execute()
@@ -214,7 +214,7 @@ class DatabaseServiceRender extends BaseServiceRender implements DatabaseService
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				DeleteDocResponseBody body = HiveResponseBody.validateBody(
-						getConnectionManager().getDatabaseApi()
+						getConnectionManager().getCallAPI()
 								.deleteMany(new DeleteDocRequestBody(collection,
 										HiveResponseBody.jsonNode2KeyValueDic(filter)))
 								.execute()

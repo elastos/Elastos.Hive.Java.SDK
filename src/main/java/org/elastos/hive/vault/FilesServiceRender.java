@@ -3,7 +3,7 @@ package org.elastos.hive.vault;
 import org.elastos.hive.Vault;
 import org.elastos.hive.exception.FileDoesNotExistsException;
 import org.elastos.hive.exception.HttpFailedException;
-import org.elastos.hive.network.FilesAPI;
+import org.elastos.hive.network.CallAPI;
 import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.network.request.FilesCopyRequestBody;
 import org.elastos.hive.network.request.FilesDeleteRequestBody;
@@ -25,7 +25,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Exce
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.getRequestStream(
-						getConnectionManager().openConnection(FilesAPI.API_UPLOAD + "/" + path),
+						getConnectionManager().openConnection(CallAPI.API_UPLOAD + "/" + path),
 						resultType);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
@@ -38,7 +38,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Exce
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.validateBody(
-						getConnectionManager().getFilesApi()
+						getConnectionManager().getCallAPI()
 								.list(path)
 								.execute()
 								.body()).getFileInfoList();
@@ -53,7 +53,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Exce
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.validateBody(
-						getConnectionManager().getFilesApi()
+						getConnectionManager().getCallAPI()
 								.properties(path)
 								.execute().body()).getFileInfo();
 			} catch (Exception e) {
@@ -67,7 +67,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Exce
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.getResponseStream(
-						getConnectionManager().getFilesApi()
+						getConnectionManager().getCallAPI()
 								.download(path)
 								.execute(), resultType);
 			} catch (Exception e) {
@@ -80,7 +80,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Exce
 	public CompletableFuture<Boolean> delete(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				HiveResponseBody.validateBody(getConnectionManager().getFilesApi()
+				HiveResponseBody.validateBody(getConnectionManager().getCallAPI()
 						.delete(new FilesDeleteRequestBody(path))
 						.execute().body());
 				return true;
@@ -95,7 +95,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Exce
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				HiveResponseBody.validateBody(
-						getConnectionManager().getFilesApi()
+						getConnectionManager().getCallAPI()
 								.move(new FilesMoveRequestBody(source, target))
 								.execute().body());
 				return true;
@@ -110,7 +110,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Exce
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				HiveResponseBody.validateBody(
-						getConnectionManager().getFilesApi()
+						getConnectionManager().getCallAPI()
 						.copy(new FilesCopyRequestBody(source, target))
 						.execute().body());
 				return true;
@@ -125,7 +125,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Exce
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.validateBody(
-						getConnectionManager().getFilesApi()
+						getConnectionManager().getCallAPI()
 								.hash(path)
 								.execute()
 								.body()).getSha256();

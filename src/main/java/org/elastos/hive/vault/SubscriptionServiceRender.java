@@ -22,7 +22,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public void subscribe() throws IOException {
         VaultCreateResponseBody body = HiveResponseBody.validateBody(
-                getConnectionManager().getSubscriptionApi()
+                getConnectionManager().getCallAPI()
                         .createVault()
                         .execute()
                         .body());
@@ -33,7 +33,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public void subscribeBackup() throws IOException {
         VaultCreateResponseBody body = HiveResponseBody.validateBody(
-                getConnectionManager().getSubscriptionApi()
+                getConnectionManager().getCallAPI()
                         .createBackupVault()
                         .execute()
                         .body());
@@ -44,7 +44,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public void unsubscribe() throws IOException {
         HiveResponseBody.validateBody(
-                getConnectionManager().getSubscriptionApi()
+                getConnectionManager().getCallAPI()
                         .removeVault()
                         .execute()
                         .body());
@@ -52,7 +52,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public void activate() throws IOException {
         HiveResponseBody.validateBody(
-                getConnectionManager().getSubscriptionApi()
+                getConnectionManager().getCallAPI()
                         .unfreeze()
                         .execute()
                         .body());
@@ -60,7 +60,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public void deactivate() throws IOException {
         HiveResponseBody.validateBody(
-                getConnectionManager().getSubscriptionApi()
+                getConnectionManager().getCallAPI()
                         .freeze()
                         .execute()
                         .body());
@@ -68,7 +68,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public VaultInfoResponseBody getVaultInfo() throws IOException {
         return HiveResponseBody.validateBody(
-                getConnectionManager().getSubscriptionApi()
+                getConnectionManager().getCallAPI()
                         .getVaultInfo()
                         .execute()
                         .body());
@@ -76,7 +76,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public VaultInfoResponseBody getBackupVaultInfo() throws IOException {
         return HiveResponseBody.validateBody(
-                getConnectionManager().getSubscriptionApi()
+                getConnectionManager().getCallAPI()
                         .getBackupVaultInfo()
                         .execute()
                         .body());
@@ -84,7 +84,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public List<PricingPlan> getPricingPlanList() throws IOException {
         return HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
+                getConnectionManager().getCallAPI()
                         .getPackageInfo()
                         .execute()
                         .body()).getPricingPlans();
@@ -92,7 +92,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public PricingPlan getPricingPlan(String planName) throws IOException {
         return getPricePlanByResponseBody(HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
+                getConnectionManager().getCallAPI()
                         .getPricingPlan(planName)
                         .execute()
                         .body()));
@@ -100,7 +100,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public List<PricingPlan> getBackupPlanList() throws IOException {
         return HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
+                getConnectionManager().getCallAPI()
                         .getPackageInfo()
                         .execute()
                         .body()).getBackupPlans();
@@ -108,7 +108,7 @@ public class SubscriptionServiceRender extends BaseServiceRender {
 
     public PricingPlan getBackupPlan(String planName) throws IOException {
         return getPricePlanByResponseBody(HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
+                getConnectionManager().getCallAPI()
                         .getBackupPlan(planName)
                         .execute()
                         .body()));

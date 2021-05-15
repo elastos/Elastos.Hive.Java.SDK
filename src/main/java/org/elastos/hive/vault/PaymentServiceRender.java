@@ -30,7 +30,7 @@ public class PaymentServiceRender extends BaseServiceRender {
 
     private String createOrder(String pricingPlanName, String backupPlanName) throws IOException {
         return HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
+                getConnectionManager().getCallAPI()
                         .createOrder(new PaymentCreateRequestBody(pricingPlanName, backupPlanName))
                         .execute()
                         .body()).getOrderId();
@@ -38,7 +38,7 @@ public class PaymentServiceRender extends BaseServiceRender {
 
     public void payOrder(String orderId, List<String> transIds) throws IOException {
         HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
+                getConnectionManager().getCallAPI()
                         .payOrder(new PayOrderRequestBody()
                                 .setOrderId(orderId)
                                 .setPayTxids(transIds))
@@ -48,7 +48,7 @@ public class PaymentServiceRender extends BaseServiceRender {
 
     public Order getOrderInfo(String orderId) throws IOException {
         return HiveResponseBody.validateBody(
-                getConnectionManager().getPaymentApi()
+                getConnectionManager().getCallAPI()
                         .getOrderInfo(orderId)
                         .execute()
                         .body()).getOrderInfo();
