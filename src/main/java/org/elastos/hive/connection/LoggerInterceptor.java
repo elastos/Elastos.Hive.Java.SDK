@@ -38,67 +38,15 @@ import okhttp3.ResponseBody;
 import okio.Buffer;
 import okio.BufferedSource;
 
-public class LoggerInterceptor implements Interceptor {
+class LoggerInterceptor implements Interceptor {
+
     @Override
     public Response intercept(Chain chain) throws IOException {
-
         Request request = chain.request();
-
-        LogUtil.d("request ->" + request.method() + ", url->" + request.url().toString());
-        LogUtil.d("request headers->" + request.headers().toString());
-
-        RequestBody requestBody = request.body();
-
-        String rbString = null;
-
-        if (requestBody != null) {
-            Buffer buffer = new Buffer();
-            requestBody.writeTo(buffer);
-
-            Charset charset = Charset.defaultCharset();
-            MediaType contentType = requestBody.contentType();
-            if (contentType != null) {
-                charset = contentType.charset(charset);
-            }
-            if (charset != null) {
-                rbString = buffer.readString(charset);
-            }
-        }
-
-        if (rbString!=null && !rbString.equals("")) {
-            LogUtil.d("request body->" + rbString);
-        }
+        dumpRequest(request);
 
         Response response = chain.proceed(request);
-
-        LogUtil.d("response headers ->" + response.headers().toString());
-
-        ResponseBody responseBody = response.body();
-        String rbBody = null;
-
-        if (responseBody != null) {
-            BufferedSource source = responseBody.source();
-            source.request(Long.MAX_VALUE); // Buffer the entire body.
-            Buffer buffer = source.buffer();
-
-            Charset charset = Charset.defaultCharset();
-
-            MediaType contentType = responseBody.contentType();
-            if (contentType != null) {
-                try {
-                    charset = contentType.charset(charset);
-                } catch (UnsupportedCharsetException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (charset != null) {
-                rbBody = buffer.clone().readString(charset);
-            }
-        }
-
-        LogUtil.d("response Code ->" + response.code());
-        if (rbBody != null && !rbBody.equals(""))
-            LogUtil.d("response body ->" + rbBody);
+        dumpResponse(response);
 
         if (Objects.requireNonNull(response.header("Content-Type")).equals("text/html; charset=utf-8")) {
             try {
@@ -113,5 +61,67 @@ public class LoggerInterceptor implements Interceptor {
         }
         return response;
     }
-}
 
+    private void dumpRequest(Request request) throws IOException {
+        RequestBody body = request.body();
+        String bodyInString = null;
+
+        LogUtil.d("request -> [" + request.method() + "] " + request.url().toString());
+        LogUtil.d("request headers->" + request.headers().toString());
+
+        if (body != null) {
+            Buffer buffer = new Buffer();
+            body.writeTo(buffer);
+
+            Charset charset = Charset.defaultCharset();
+            MediaType type  = body.contentType();
+
+            if (type != null) {
+                try {
+                    charset = type.charset(charset);
+                } catch (UnsupportedCharsetException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (charset != null)
+                bodyInString = buffer.readString(charset);
+
+        }
+
+        if (bodyInString != null && !bodyInString.equals(""))
+            LogUtil.d("request body->" + bodyInString);
+    }
+
+    private void dumpResponse(Response response) throws IOException {
+        ResponseBody body = response.body();
+        String bodyInString = null;
+
+        LogUtil.d("response headers ->" + response.headers().toString());
+
+        if (body != null) {
+            BufferedSource source = body.source();
+            source.request(Long.MAX_VALUE); // Buffer the entire body.
+            Buffer buffer = source.buffer();
+
+            Charset charset = Charset.defaultCharset();
+            MediaType type = body.contentType();
+
+            if (type != null) {
+                try {
+                    charset = type.charset(charset);
+                } catch (UnsupportedCharsetException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (charset != null)
+                bodyInString = buffer.clone().readString(charset);
+
+        }
+
+        LogUtil.d("response Code ->" + response.code());
+
+        if (bodyInString != null && !bodyInString.equals(""))
+            LogUtil.d("response body ->" + bodyInString);
+    }
+}
