@@ -9,7 +9,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
-public interface PaymentAPI {
+interface PaymentAPI {
 	@GET("/api/v1/payment/vault_package_info")
 	Call<PaymentPackageResponseBody> getPackageInfo();
 

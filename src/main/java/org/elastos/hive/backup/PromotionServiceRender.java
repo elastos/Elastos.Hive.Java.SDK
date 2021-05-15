@@ -21,7 +21,7 @@ class PromotionServiceRender extends BaseServiceRender implements PromotionServi
 		return CompletableFuture.runAsync(() -> {
 			try {
 				HiveResponseBody.validateBody(
-						getConnectionManager().getBackupApi()
+						getConnectionManager().getCallAPI()
 								.activeToVault(new EmptyRequestBody())
 								.execute()
 								.body());

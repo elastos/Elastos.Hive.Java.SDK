@@ -6,7 +6,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
-public interface DatabaseAPI {
+interface DatabaseAPI {
 	@POST("/api/v1/db/create_collection")
 	Call<HiveResponseBody> createCollection(@Body CreateCollectionRequestBody body);
 

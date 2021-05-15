@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.InvalidParameterException;
 import org.elastos.hive.exception.UnsupportedMethodException;
-import org.elastos.hive.network.ScriptingAPI;
+import org.elastos.hive.network.CallAPI;
 import org.elastos.hive.network.model.Condition;
 import org.elastos.hive.network.model.Executable;
 import org.elastos.hive.network.request.CallScriptRequestBody;
@@ -32,7 +32,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 		return CompletableFuture.runAsync(()-> {
 			try {
 				HiveResponseBody.validateBody(
-						getConnectionManager().getScriptingApi()
+						getConnectionManager().getCallAPI()
 								.registerScript(new RegisterScriptRequestBody().setName(name)
 										.setExecutable(executable)
 										.setAllowAnonymousUser(allowAnonymousUser)
@@ -50,7 +50,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
-						getConnectionManager().getScriptingApi()
+						getConnectionManager().getCallAPI()
 								.callScript(new CallScriptRequestBody()
 										.setName(name)
 										.setParams(HiveResponseBody.jsonNode2Map(params)))
@@ -66,7 +66,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
-						getConnectionManager().getScriptingApi()
+						getConnectionManager().getCallAPI()
 								.callScriptUrl(targetDid, targetAppDid, name, params)
 								.execute()
 				), resultType);
@@ -84,7 +84,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 					throw new InvalidParameterException("Invalid parameter transactionId.");
 
 				return HiveResponseBody.getRequestStream(
-						getConnectionManager().openConnection(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId),
+						getConnectionManager().openConnection(CallAPI.API_SCRIPT_UPLOAD + "/" + transactionId),
 						resultType);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
@@ -100,7 +100,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 					throw new InvalidParameterException("Invalid parameter transactionId.");
 
 				return HiveResponseBody.getResponseStream(
-						getConnectionManager().getScriptingApi()
+						getConnectionManager().getCallAPI()
 								.callDownload(transactionId)
 								.execute(),
 						resultType);

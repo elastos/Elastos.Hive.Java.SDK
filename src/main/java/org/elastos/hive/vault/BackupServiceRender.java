@@ -36,7 +36,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ex
         return CompletableFuture.runAsync(() -> {
             try {
                 HiveResponseBody.validateBody(
-                        getConnectionManager().getBackupApi()
+                        getConnectionManager().getCallAPI()
                                 .saveToNode(new BackupSaveRequestBody(tokenResolver.getToken().getAccessToken()))
                                 .execute()
                                 .body());
@@ -56,7 +56,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ex
         return CompletableFuture.runAsync(() -> {
             try {
                 HiveResponseBody.validateBody(
-                        getConnectionManager().getBackupApi()
+                        getConnectionManager().getCallAPI()
                                 .restoreFromNode(new BackupRestoreRequestBody(
                                         tokenResolver.getToken().getAccessToken()))
                                 .execute()
@@ -77,7 +77,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ex
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return HiveResponseBody.validateBody(
-                        getConnectionManager().getBackupApi()
+                        getConnectionManager().getCallAPI()
                                 .getState()
                                 .execute()
                                 .body()).getStatusResult();

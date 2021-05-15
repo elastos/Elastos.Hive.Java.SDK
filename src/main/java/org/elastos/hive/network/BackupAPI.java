@@ -10,7 +10,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
-public interface BackupAPI {
+interface BackupAPI {
 	@GET("/api/v1/backup/state")
 	Call<BackupStateResponseBody> getState();
 

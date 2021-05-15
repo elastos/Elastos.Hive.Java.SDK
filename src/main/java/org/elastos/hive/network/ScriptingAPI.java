@@ -7,9 +7,7 @@ import org.elastos.hive.network.response.RegisterScriptResponseBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
-public interface ScriptingAPI {
-	String API_SCRIPT_UPLOAD = "/scripting/run_script_upload";
-
+interface ScriptingAPI {
 	@POST("/api/v1/scripting/set_script")
 	Call<RegisterScriptResponseBody> registerScript(@Body RegisterScriptRequestBody body);
 
