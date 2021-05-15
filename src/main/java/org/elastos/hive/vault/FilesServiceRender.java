@@ -3,7 +3,7 @@ package org.elastos.hive.vault;
 import org.elastos.hive.Vault;
 import org.elastos.hive.exception.FileDoesNotExistsException;
 import org.elastos.hive.exception.HttpFailedException;
-import org.elastos.hive.network.FilesApi;
+import org.elastos.hive.network.FilesAPI;
 import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.network.request.FilesCopyRequestBody;
 import org.elastos.hive.network.request.FilesDeleteRequestBody;
@@ -25,7 +25,7 @@ class FilesServiceRender extends BaseServiceRender implements FilesService, Exce
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return HiveResponseBody.getRequestStream(
-						getConnectionManager().openConnection(FilesApi.API_UPLOAD + "/" + path),
+						getConnectionManager().openConnection(FilesAPI.API_UPLOAD + "/" + path),
 						resultType);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));

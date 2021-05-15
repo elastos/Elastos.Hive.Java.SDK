@@ -8,10 +8,10 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
-public interface AuthApi {
-	@POST(BaseApi.API_VERSION + "/did/sign_in")
+public interface AuthAPI {
+	@POST("/api/v1/did/sign_in")
 	Call<SignInResponseBody> signIn(@Body SignInRequestBody reqBody);
 
-	@POST(BaseApi.API_VERSION + "/did/auth")
+	@POST("/api/v1/did/auth")
 	Call<AuthResponseBody> auth(@Body AuthRequestBody reqBody);
 }

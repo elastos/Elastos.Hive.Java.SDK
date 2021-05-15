@@ -8,7 +8,6 @@ import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.RemoteResolver;
 import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.exception.HttpFailedException;
-import org.elastos.hive.network.BaseApi;
 import org.elastos.hive.network.response.HiveResponseBody;
 
 import okhttp3.Request;
@@ -27,7 +26,7 @@ class PlainRequestInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         request = request.newBuilder()
-        			.addHeader(BaseApi.HTTP_AUTHORIZATION, getAuthToken().getCanonicalizedAccessToken())
+        			.addHeader("Authorization", getAuthToken().getCanonicalizedAccessToken())
                     .build();
         return handleResponse(chain.proceed(request));
     }

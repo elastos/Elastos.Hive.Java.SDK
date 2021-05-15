@@ -6,9 +6,9 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface AboutAPI {
-	@GET(BaseApi.API_VERSION + "/about/version")
+	@GET("/api/v2/about/version")
 	Call<NodeVersionResponseBody> version();
 
-	@GET(BaseApi.API_VERSION + "/about/commithash")
+	@GET("/api/v2/about/commithash")
 	Call<NodeCommitHashResponseBody> commitHash();
 }
