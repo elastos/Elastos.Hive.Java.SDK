@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.InvalidParameterException;
 import org.elastos.hive.exception.UnsupportedMethodException;
-import org.elastos.hive.network.ScriptingApi;
+import org.elastos.hive.network.ScriptingAPI;
 import org.elastos.hive.network.model.Condition;
 import org.elastos.hive.network.model.Executable;
 import org.elastos.hive.network.request.CallScriptRequestBody;
@@ -84,7 +84,7 @@ public class ScriptingServiceRender extends BaseServiceRender implements Scripti
 					throw new InvalidParameterException("Invalid parameter transactionId.");
 
 				return HiveResponseBody.getRequestStream(
-						getConnectionManager().openConnection(ScriptingApi.API_SCRIPT_UPLOAD + "/" + transactionId),
+						getConnectionManager().openConnection(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId),
 						resultType);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));

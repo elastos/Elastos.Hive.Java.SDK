@@ -45,14 +45,14 @@ public class ConnectionManager {
 	private Interceptor authRequestInterceptor;
 	private PlainRequestInterceptor plainRequestInterceptor;
 
-	private SubscriptionApi subscriptionApi;
-	private PaymentApi paymentApi;
-	private DatabaseApi databaseApi;
+	private SubscriptionAPI subscriptionApi;
+	private PaymentAPI paymentApi;
+	private DatabaseAPI databaseApi;
 
-	private AuthApi authApi;
-	private FilesApi filesApi;
-	private ScriptingApi scriptingApi;
-	private BackupApi backupApi;
+	private AuthAPI authApi;
+	private FilesAPI filesApi;
+	private ScriptingAPI scriptingApi;
+	private BackupAPI backupApi;
 	private AboutAPI aboutAPI;
 
 	public ConnectionManager(ServiceEndpoint serviceEndpoint) {
@@ -65,9 +65,9 @@ public class ConnectionManager {
 		return this.serviceEndpoint;
 	}
 
-	public AuthApi getAuthApi() {
+	public AuthAPI getAuthApi() {
 		if (authApi == null)
-			authApi = createService(AuthApi.class, serviceEndpoint.getProviderAddress(), this.authRequestInterceptor);
+			authApi = createService(AuthAPI.class, serviceEndpoint.getProviderAddress(), this.authRequestInterceptor);
 
 		return authApi;
 	}
@@ -79,50 +79,50 @@ public class ConnectionManager {
 		return aboutAPI;
 	}
 
-	public FilesApi getFilesApi() {
+	public FilesAPI getFilesApi() {
 		if (filesApi == null)
-			filesApi = createService(FilesApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
+			filesApi = createService(FilesAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 
 		return filesApi;
 	}
 
-	public SubscriptionApi getSubscriptionApi() {
+	public SubscriptionAPI getSubscriptionApi() {
 		if (subscriptionApi == null) {
-			subscriptionApi = createService(SubscriptionApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
+			subscriptionApi = createService(SubscriptionAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return subscriptionApi;
 	}
 
-	public PaymentApi getPaymentApi() {
+	public PaymentAPI getPaymentApi() {
 		if (paymentApi == null) {
-			paymentApi = createService(PaymentApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
+			paymentApi = createService(PaymentAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return paymentApi;
 	}
 
-	public DatabaseApi getDatabaseApi() {
+	public DatabaseAPI getDatabaseApi() {
 		if (databaseApi == null) {
-			databaseApi = createService(DatabaseApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
+			databaseApi = createService(DatabaseAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return databaseApi;
 	}
 
-	public ScriptingApi getScriptingApi() {
+	public ScriptingAPI getScriptingApi() {
 		if (scriptingApi == null) {
-			scriptingApi = createService(ScriptingApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
+			scriptingApi = createService(ScriptingAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return scriptingApi;
 	}
 
-	public BackupApi getBackupApi() {
+	public BackupAPI getBackupApi() {
 		if (backupApi == null) {
-			backupApi = createService(BackupApi.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
+			backupApi = createService(BackupAPI.class, serviceEndpoint.getProviderAddress(), this.plainRequestInterceptor);
 		}
 		return backupApi;
 	}
 
 	public HttpURLConnection openConnection(String path) throws IOException {
-		String url = serviceEndpoint.getProviderAddress() + BaseApi.API_VERSION + path;
+		String url = serviceEndpoint.getProviderAddress() + "/api/v1" + path;
 		LogUtil.d("open connection with URL: " + url);
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod("POST");

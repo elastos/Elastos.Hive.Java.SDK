@@ -12,28 +12,28 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
-public interface PubsubApi {
-    @POST(BaseApi.API_VERSION + "/pubsub/publish")
+public interface PubsubAPI {
+    @POST("/api/v1/pubsub/publish")
     Call<HiveResponseBody> publish(@Body PubsubRequestBody body);
 
-    @POST(BaseApi.API_VERSION + "/pubsub/remove")
+    @POST("/api/v1/pubsub/remove")
     Call<HiveResponseBody> remove(@Body PubsubRequestBody body);
 
-    @GET(BaseApi.API_VERSION + "/pubsub/pub/channels")
+    @GET("/api/v1/pubsub/pub/channels")
     Call<PubsubChannelsResponseBody> getPublishedChannels();
 
-    @GET(BaseApi.API_VERSION + "/pubsub/sub/channels")
+    @GET("/api/v1/pubsub/sub/channels")
     Call<PubsubChannelsResponseBody> getSubscribedChannels();
 
-    @POST(BaseApi.API_VERSION + "/pubsub/subscribe")
+    @POST("/api/v1/pubsub/subscribe")
     Call<HiveResponseBody> subscribe(@Body PubsubSubscribeRequestBody body);
 
-    @POST(BaseApi.API_VERSION + "/pubsub/unsubscribe")
+    @POST("/api/v1/pubsub/unsubscribe")
     Call<HiveResponseBody> unsubscribe(@Body PubsubSubscribeRequestBody body);
 
-    @POST(BaseApi.API_VERSION + "/pubsub/push")
+    @POST("/api/v1/pubsub/push")
     Call<HiveResponseBody> push(@Body PushMessageRequestBody body);
 
-    @POST(BaseApi.API_VERSION + "/pubsub/pop")
+    @POST("/api/v1/pubsub/pop")
     Call<PopMessageResponseBody> pop(@Body PopMessageRequestBody body);
 }
