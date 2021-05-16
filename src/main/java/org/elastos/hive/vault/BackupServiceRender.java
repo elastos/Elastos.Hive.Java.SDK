@@ -13,18 +13,19 @@ import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
 
-class BackupServiceRender extends BaseServiceRender implements BackupService, ExceptionConvertor {
+class BackupServiceRender implements BackupService, ExceptionConvertor {
     private TokenResolver tokenResolver;
+    private ServiceEndpoint serviceEndpoint;
 
     public BackupServiceRender(ServiceEndpoint serviceEndpoint) {
-        super(serviceEndpoint);
+    	this.serviceEndpoint = serviceEndpoint;
     }
 
     @Override
     public CompletableFuture<Void> setupContext(BackupContext backupContext) {
-        this.tokenResolver = new BackupLocalResolver(getServiceEndpoint());
+        this.tokenResolver = new BackupLocalResolver(serviceEndpoint);
         this.tokenResolver.setNextResolver(new BackupRemoteResolver(
-                getServiceEndpoint(),
+        		serviceEndpoint,
                 backupContext,
                 backupContext.getParameter("targetServiceDid"),
                 backupContext.getParameter("targetAddress")));
@@ -36,7 +37,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ex
         return CompletableFuture.runAsync(() -> {
             try {
                 HiveResponseBody.validateBody(
-                        getConnectionManager().getCallAPI()
+                        serviceEndpoint.getConnectionManager().getCallAPI()
                                 .saveToNode(new BackupSaveRequestBody(tokenResolver.getToken().getAccessToken()))
                                 .execute()
                                 .body());
@@ -56,7 +57,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ex
         return CompletableFuture.runAsync(() -> {
             try {
                 HiveResponseBody.validateBody(
-                        getConnectionManager().getCallAPI()
+                        serviceEndpoint.getConnectionManager().getCallAPI()
                                 .restoreFromNode(new BackupRestoreRequestBody(
                                         tokenResolver.getToken().getAccessToken()))
                                 .execute()
@@ -77,7 +78,7 @@ class BackupServiceRender extends BaseServiceRender implements BackupService, Ex
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return HiveResponseBody.validateBody(
-                        getConnectionManager().getCallAPI()
+                        serviceEndpoint.getConnectionManager().getCallAPI()
                                 .getState()
                                 .execute()
                                 .body()).getStatusResult();

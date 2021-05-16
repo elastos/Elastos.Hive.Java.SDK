@@ -14,10 +14,11 @@ import java.util.List;
 /**
  * Helper class for vault/backup subscription.
  */
-public class PaymentServiceRender extends BaseServiceRender {
+public class PaymentServiceRender {
+	private ServiceEndpoint serviceEndpoint;
 
     public PaymentServiceRender(ServiceEndpoint serviceEndpoint) {
-        super(serviceEndpoint);
+        this.serviceEndpoint = serviceEndpoint;
     }
 
     public String createPricingOrder(String planName) throws IOException {
@@ -30,7 +31,7 @@ public class PaymentServiceRender extends BaseServiceRender {
 
     private String createOrder(String pricingPlanName, String backupPlanName) throws IOException {
         return HiveResponseBody.validateBody(
-                getConnectionManager().getCallAPI()
+        		serviceEndpoint.getConnectionManager().getCallAPI()
                         .createOrder(new PaymentCreateRequestBody(pricingPlanName, backupPlanName))
                         .execute()
                         .body()).getOrderId();
@@ -38,7 +39,7 @@ public class PaymentServiceRender extends BaseServiceRender {
 
     public void payOrder(String orderId, List<String> transIds) throws IOException {
         HiveResponseBody.validateBody(
-                getConnectionManager().getCallAPI()
+        		serviceEndpoint.getConnectionManager().getCallAPI()
                         .payOrder(new PayOrderRequestBody()
                                 .setOrderId(orderId)
                                 .setPayTxids(transIds))
@@ -48,7 +49,7 @@ public class PaymentServiceRender extends BaseServiceRender {
 
     public Order getOrderInfo(String orderId) throws IOException {
         return HiveResponseBody.validateBody(
-                getConnectionManager().getCallAPI()
+        		serviceEndpoint.getConnectionManager().getCallAPI()
                         .getOrderInfo(orderId)
                         .execute()
                         .body()).getOrderInfo();
