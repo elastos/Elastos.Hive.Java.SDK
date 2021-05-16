@@ -7,9 +7,12 @@ import org.elastos.hive.service.PubSubService;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-class PubSubServiceRender extends BaseServiceRender implements PubSubService, ExceptionConvertor {
+class PubSubServiceRender implements PubSubService, ExceptionConvertor {
+	@SuppressWarnings("unused")
+	private ServiceEndpoint serviceEndpoint;
+
 	public PubSubServiceRender(Vault vault) {
-		super(vault);
+		this.serviceEndpoint = vault;
 	}
 
 	@Override

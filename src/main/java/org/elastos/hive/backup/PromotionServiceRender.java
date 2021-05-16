@@ -7,13 +7,13 @@ import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.request.EmptyRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.PromotionService;
-import org.elastos.hive.vault.BaseServiceRender;
 import org.elastos.hive.vault.ExceptionConvertor;
 
-class PromotionServiceRender extends BaseServiceRender implements PromotionService, ExceptionConvertor {
+class PromotionServiceRender implements PromotionService, ExceptionConvertor {
+	private ServiceEndpoint serviceEndpoint;
 
 	PromotionServiceRender(ServiceEndpoint serviceEndpoint) {
-		super(serviceEndpoint);
+		this.serviceEndpoint = serviceEndpoint;
 	}
 
 	@Override
@@ -21,7 +21,7 @@ class PromotionServiceRender extends BaseServiceRender implements PromotionServi
 		return CompletableFuture.runAsync(() -> {
 			try {
 				HiveResponseBody.validateBody(
-						getConnectionManager().getCallAPI()
+						serviceEndpoint.getConnectionManager().getCallAPI()
 								.activeToVault(new EmptyRequestBody())
 								.execute()
 								.body());
