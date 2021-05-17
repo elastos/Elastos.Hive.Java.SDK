@@ -3,6 +3,7 @@ package org.elastos.hive;
 import org.elastos.hive.config.TestData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class VaultManagementTest {
@@ -24,10 +25,12 @@ class VaultManagementTest {
 	@Test void testGetOwnerDid() {
 	}
 
+	@Disabled
 	@Test void testGetVersion() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(vault.getVersion().get()));
 	}
 
+	@Disabled
 	@Test void testGetCommitHash() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(vault.getLatestCommitId().get()));
 	}
