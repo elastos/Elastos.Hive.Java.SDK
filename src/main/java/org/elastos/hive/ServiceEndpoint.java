@@ -12,7 +12,8 @@ public class ServiceEndpoint implements ExceptionConvertor {
 	private AppContext context;
 	private String providerAddress;
 	private ConnectionManager connectionManager;
-	private String serviceDid;
+	private String appInstanceDid;
+	private String serviceInstanceDid;
 
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
 		this.context = context;
@@ -52,7 +53,11 @@ public class ServiceEndpoint implements ExceptionConvertor {
 	 * @return application did
 	 */
 	protected String getAppDid() {
-		throw new UnauthorizedStateException();
+		return getAppContext().getAppContextProvider().getAppDid();
+	}
+
+	public void setAppInstanceDid(String appInstanceDid) {
+		this.appInstanceDid = appInstanceDid;
 	}
 
 	/**
@@ -61,21 +66,11 @@ public class ServiceEndpoint implements ExceptionConvertor {
 	 * @return application instance did
 	 */
 	protected String getAppInstanceDid() {
-		throw new UnauthorizedStateException();
+		return appInstanceDid;
 	}
 
-
-	/**
-	 * Get the remote node service application DID.
-	 *
-	 * @return node service did
-	 */
-	public String getServiceDid() {
-		return serviceDid;
-	}
-
-	public void setServiceDid(String serviceDid) {
-		this.serviceDid = serviceDid;
+	public void setServiceInstanceDid(String serviceInstanceDid) {
+		this.serviceInstanceDid = serviceInstanceDid;
 	}
 
 	/**
@@ -83,7 +78,16 @@ public class ServiceEndpoint implements ExceptionConvertor {
 	 *
 	 * @return node service instance did
 	 */
-	protected String getServiceInstanceDid() {
+	public String getServiceInstanceDid() {
+		return serviceInstanceDid;
+	}
+
+	/**
+	 * Get the remote node service application DID.
+	 *
+	 * @return node service did
+	 */
+	public String getServiceDid() {
 		throw new UnauthorizedStateException();
 	}
 
@@ -119,4 +123,5 @@ public class ServiceEndpoint implements ExceptionConvertor {
 			}
 		});
     }
+
 }

@@ -45,8 +45,8 @@ public class LocalResolver implements TokenResolver {
 
 	protected AuthToken restoreToken() {
 		String tokenStr = null;
-		if (serviceEndpoint.getServiceDid() != null) {
-			tokenStr = dataStorage.loadAccessToken(serviceEndpoint.getServiceDid());
+		if (serviceEndpoint.getServiceInstanceDid() != null) {
+			tokenStr = dataStorage.loadAccessToken(serviceEndpoint.getServiceInstanceDid());
 			if (tokenStr == null)
 				tokenStr = dataStorage.loadAccessTokenByAddress(serviceEndpoint.getProviderAddress());
 		}
@@ -59,14 +59,14 @@ public class LocalResolver implements TokenResolver {
 
 	protected void saveToken(AuthToken token) {
 		String tokenStr = new Gson().toJson(token);
-		if (serviceEndpoint.getServiceDid() != null)
-			dataStorage.storeAccessToken(serviceEndpoint.getServiceDid(), tokenStr);
+		if (serviceEndpoint.getServiceInstanceDid() != null)
+			dataStorage.storeAccessToken(serviceEndpoint.getServiceInstanceDid(), tokenStr);
 		dataStorage.storeAccessTokenByAddress(serviceEndpoint.getProviderAddress(), tokenStr);
 	}
 
 	protected void clearToken() {
-		if (serviceEndpoint.getServiceDid() != null)
-			dataStorage.clearAccessToken(serviceEndpoint.getServiceDid());
+		if (serviceEndpoint.getServiceInstanceDid() != null)
+			dataStorage.clearAccessToken(serviceEndpoint.getServiceInstanceDid());
 		dataStorage.clearAccessTokenByAddress(serviceEndpoint.getProviderAddress());
 	}
 }

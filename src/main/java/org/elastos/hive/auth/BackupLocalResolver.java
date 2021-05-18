@@ -11,10 +11,10 @@ public class BackupLocalResolver extends LocalResolver {
 
     @Override
     protected AuthToken restoreToken() {
-        if (serviceEndpoint.getServiceDid() == null)
+        if (serviceEndpoint.getServiceInstanceDid() == null)
             return null;
 
-        String tokenStr = dataStorage.loadBackupCredential(serviceEndpoint.getServiceDid());
+        String tokenStr = dataStorage.loadBackupCredential(serviceEndpoint.getServiceInstanceDid());
         if (tokenStr == null)
             return null;
 
@@ -23,13 +23,13 @@ public class BackupLocalResolver extends LocalResolver {
 
     @Override
     protected void saveToken(AuthToken token) {
-        if (serviceEndpoint.getServiceDid() != null)
-            dataStorage.storeBackupCredential(serviceEndpoint.getServiceDid(), new Gson().toJson(token));
+        if (serviceEndpoint.getServiceInstanceDid() != null)
+            dataStorage.storeBackupCredential(serviceEndpoint.getServiceInstanceDid(), new Gson().toJson(token));
     }
 
     @Override
     protected void clearToken() {
-        if (serviceEndpoint.getServiceDid() != null)
-            dataStorage.clearBackupCredential(serviceEndpoint.getServiceDid());
+        if (serviceEndpoint.getServiceInstanceDid() != null)
+            dataStorage.clearBackupCredential(serviceEndpoint.getServiceInstanceDid());
     }
 }

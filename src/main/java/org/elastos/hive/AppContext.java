@@ -61,7 +61,7 @@ public class AppContext {
 	}
 
 	public String getUserDid() {
-		return this.userDid;
+		return userDid;
 	}
 
 	public DataStorage getDataStorage() {
