@@ -6,7 +6,6 @@ import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.AuthToken;
 import org.elastos.hive.auth.AuthTokenToVault;
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.network.request.AuthRequestBody;
 import org.elastos.hive.network.request.SignInRequestBody;
 import org.elastos.hive.network.response.AuthResponseBody;
@@ -46,7 +45,8 @@ public class AuthenticationServiceRender implements ExceptionConvertor {
         Claims claims = HiveResponseBody.validateBody(rspBody)
                 .checkValid(contextProvider.getAppInstanceDocument().getSubject().toString());
         // Update the service did to service end-point for future usage.
-        serviceEndpoint.setServiceDid(claims.getIssuer());
+        serviceEndpoint.setServiceInstanceDid(claims.getIssuer());
+        serviceEndpoint.setAppInstanceDid(claims.getSubject());
         return rspBody.getChallenge();
     }
 
