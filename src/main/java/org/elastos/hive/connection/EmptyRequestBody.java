@@ -1,4 +1,4 @@
-package org.elastos.hive.network.request;
+package org.elastos.hive.connection;
 
 /**
  * Used for empty body "{}".
