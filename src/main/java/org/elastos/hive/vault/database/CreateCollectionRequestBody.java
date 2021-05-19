@@ -1,4 +1,4 @@
-package org.elastos.hive.network.request;
+package org.elastos.hive.vault.database;
 
 public class CreateCollectionRequestBody {
     private final String collection;

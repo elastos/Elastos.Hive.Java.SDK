@@ -1,6 +1,5 @@
-package org.elastos.hive.network.request;
+package org.elastos.hive.vault.database;
 
-import org.elastos.hive.database.InsertOneOptions;
 import org.elastos.hive.network.model.KeyValueDict;
 
 public class InsertDocRequestBody extends CreateCollectionRequestBody {

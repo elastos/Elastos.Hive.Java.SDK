@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.network.response.HiveResponseBody;
+import org.elastos.hive.connection.HiveResponseBody;
 
 public class FilesController {
 	private FilesAPI filesAPI;

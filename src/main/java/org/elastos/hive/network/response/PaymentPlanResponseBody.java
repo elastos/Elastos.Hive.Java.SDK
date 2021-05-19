@@ -1,5 +1,7 @@
 package org.elastos.hive.network.response;
 
+import org.elastos.hive.connection.HiveResponseBody;
+
 public class PaymentPlanResponseBody extends HiveResponseBody {
     private float amount;
     private String currency;

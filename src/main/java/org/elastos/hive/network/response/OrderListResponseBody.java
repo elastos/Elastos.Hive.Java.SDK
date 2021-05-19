@@ -1,6 +1,7 @@
 package org.elastos.hive.network.response;
 
 import com.google.gson.annotations.SerializedName;
+import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.payment.Order;
 
 import java.util.List;

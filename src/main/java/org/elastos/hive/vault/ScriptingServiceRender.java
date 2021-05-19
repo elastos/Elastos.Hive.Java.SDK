@@ -2,7 +2,6 @@ package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.InvalidParameterException;
 import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.network.CallAPI;
@@ -10,7 +9,7 @@ import org.elastos.hive.network.model.Condition;
 import org.elastos.hive.network.model.Executable;
 import org.elastos.hive.network.request.CallScriptRequestBody;
 import org.elastos.hive.network.request.RegisterScriptRequestBody;
-import org.elastos.hive.network.response.HiveResponseBody;
+import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.ScriptingService;
 
 import java.util.concurrent.CompletableFuture;

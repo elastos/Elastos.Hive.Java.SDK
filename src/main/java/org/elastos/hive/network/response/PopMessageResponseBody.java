@@ -1,5 +1,6 @@
 package org.elastos.hive.network.response;
 
+import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.network.model.ChannelMessage;
 
 import java.util.List;

@@ -1,7 +1,6 @@
-package org.elastos.hive.network.request;
+package org.elastos.hive.vault.database;
 
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.database.InsertManyOptions;
 import org.elastos.hive.network.model.KeyValueDict;
 
 import java.util.List;

@@ -26,7 +26,6 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.*;
-import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.utils.LogUtil;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

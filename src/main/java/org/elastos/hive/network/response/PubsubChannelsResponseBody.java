@@ -1,5 +1,7 @@
 package org.elastos.hive.network.response;
 
+import org.elastos.hive.connection.HiveResponseBody;
+
 import java.util.List;
 
 public class PubsubChannelsResponseBody extends HiveResponseBody {

@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.database.*;
 import org.elastos.hive.service.DatabaseService;
+import org.elastos.hive.vault.database.*;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
-
-import static org.junit.Assert.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DatabaseServiceTest {

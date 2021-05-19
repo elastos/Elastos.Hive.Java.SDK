@@ -1,6 +1,7 @@
 package org.elastos.hive.network.response;
 
 import com.google.gson.annotations.SerializedName;
+import org.elastos.hive.connection.HiveResponseBody;
 
 public class RegisterScriptResponseBody extends HiveResponseBody {
     @SerializedName("acknowledged")

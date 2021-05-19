@@ -1,6 +1,5 @@
-package org.elastos.hive.network.request;
+package org.elastos.hive.vault.database;
 
-import org.elastos.hive.database.FindOptions;
 import org.elastos.hive.network.model.KeyValueDict;
 
 public class FindDocsRequestBody extends FindDocRequestBody {

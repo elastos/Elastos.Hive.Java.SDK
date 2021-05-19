@@ -5,7 +5,7 @@ import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.request.EmptyRequestBody;
-import org.elastos.hive.network.response.HiveResponseBody;
+import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.PromotionService;
 import org.elastos.hive.vault.ExceptionConvertor;
 
