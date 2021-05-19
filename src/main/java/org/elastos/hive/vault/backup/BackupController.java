@@ -1,6 +1,7 @@
 package org.elastos.hive.vault.backup;
 
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.connection.EmptyRequestBody;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.BackupService;
 
@@ -24,5 +25,9 @@ public class BackupController {
 
 	public BackupService.BackupResult checkResult() throws IOException {
 		return HiveResponseBody.validateBody(backupAPI.getState().execute().body()).getStatusResult();
+	}
+
+	public void promote() throws IOException {
+		HiveResponseBody.validateBody(backupAPI.activeToVault(new EmptyRequestBody()).execute().body());
 	}
 }
