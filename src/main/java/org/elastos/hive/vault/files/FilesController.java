@@ -1,37 +1,52 @@
 package org.elastos.hive.vault.files;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.UnsupportedMethodException;
+import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.network.response.HiveResponseBody;
 
 public class FilesController {
-	private FilesAPI filesAPI = null;
+	private FilesAPI filesAPI;
+	private ConnectionManager connectionManager;
 
 	public FilesController(ServiceEndpoint serviceEndpoint) {
-		// TODO:
+		filesAPI = serviceEndpoint.getConnectionManager().createService(FilesAPI.class, true);
+		connectionManager = serviceEndpoint.getConnectionManager();
 	}
 
-	public void copyFile(String path) throws HiveException {
-		throw new UnsupportedMethodException();
+	public List<FileInfo> listChildren(String path) throws IOException {
+		return HiveResponseBody.validateBody(filesAPI.listChildren(path).execute().body()).getFileInfoList();
 	}
 
-	public void moveFile(String path) throws HiveException {
-		throw new UnsupportedMethodException();
+	public void copyFile(String srcPath, String dstPath) throws IOException {
+		HiveResponseBody.validateBody(filesAPI.copy(new FilesCopyRequestBody(srcPath, dstPath)).execute());
 	}
 
-	public List<FileInfo> list(String path) throws HiveException {
-		FileInfoList list = filesAPI.listChidren(path).execute().body();
-
-		throw new UnsupportedMethodException();
+	public void moveFile(String srcPath, String dstPath) throws IOException {
+		HiveResponseBody.validateBody(filesAPI.move(new FilesMoveRequestBody(srcPath, dstPath)).execute());
 	}
 
-	public FileInfo getProperty(String path) throws HiveException {
-		throw new UnsupportedMethodException();
+	public void delete(String path) throws IOException {
+		HiveResponseBody.validateBody(filesAPI.delete(new FilesDeleteRequestBody(path)).execute());
 	}
 
-	public String getHash(String path) throws HiveException {
-		throw new UnsupportedMethodException();
+	public FileInfo getProperty(String path) throws IOException {
+		return HiveResponseBody.validateBody(filesAPI.properties(path).execute().body()).getFileInfo();
+	}
+
+	public String getHash(String path) throws IOException {
+		return HiveResponseBody.validateBody(filesAPI.hash(path).execute().body()).getSha256();
+	}
+
+	public <T> T upload(String path, Class<T> resultType) throws IOException {
+		return HiveResponseBody.getRequestStream(
+				connectionManager.openConnection(FilesAPI.API_UPLOAD + "/" + path),
+				resultType);
+	}
+
+	public <T> T download(String path, Class<T> resultType) throws IOException {
+		return HiveResponseBody.getResponseStream(filesAPI.download(path).execute(), resultType);
 	}
 }

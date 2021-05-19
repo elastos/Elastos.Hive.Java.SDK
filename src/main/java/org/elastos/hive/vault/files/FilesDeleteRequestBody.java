@@ -1,4 +1,4 @@
-package org.elastos.hive.network.request;
+package org.elastos.hive.vault.files;
 
 public class FilesDeleteRequestBody {
     private final String path;

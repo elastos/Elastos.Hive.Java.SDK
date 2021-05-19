@@ -3,6 +3,7 @@ package org.elastos.hive.network;
 import okhttp3.ResponseBody;
 import org.elastos.hive.network.request.*;
 import org.elastos.hive.network.response.*;
+import org.elastos.hive.vault.files.*;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -14,23 +15,23 @@ public interface CallAPI {
 	@GET("/api/v1/files/list/folder")
 	Call<FilesListResponseBody> list(@Query("path") String filename);
 
-	@GET("/api/v1/files/properties")
-	Call<FilesPropertiesResponseBody> properties(@Query("path") String filename);
-
-	@GET("/api/v1/files/download")
-	Call<ResponseBody> download(@Query("path") String filename);
-
-	@POST("/api/v1/files/delete")
-	Call<HiveResponseBody> delete(@Body FilesDeleteRequestBody body);
+	@POST("/api/v1/files/copy")
+	Call<HiveResponseBody> copy(@Body FilesCopyRequestBody body);
 
 	@POST("/api/v1/files/move")
 	Call<HiveResponseBody> move(@Body FilesMoveRequestBody body);
 
-	@POST("/api/v1/files/copy")
-	Call<HiveResponseBody> copy(@Body FilesCopyRequestBody body);
+	@POST("/api/v1/files/delete")
+	Call<HiveResponseBody> delete(@Body FilesDeleteRequestBody body);
+
+	@GET("/api/v1/files/properties")
+	Call<FilesPropertiesResponseBody> properties(@Query("path") String filename);
 
 	@GET("/api/v1/files/file/hash")
 	Call<FilesHashResponseBody> hash(@Query("path") String filename);
+
+	@GET("/api/v1/files/download")
+	Call<ResponseBody> download(@Query("path") String filename);
 
 	// database
 
