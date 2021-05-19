@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.vault.database.DeleteOptions;
 import org.elastos.hive.vault.database.InsertOneOptions;
 import org.elastos.hive.network.model.*;

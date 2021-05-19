@@ -27,7 +27,7 @@ class VaultManagementTest {
 
 	@Disabled
 	@Test void testGetVersion() {
-		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(vault.getVersion().get()));
+		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(vault.getNodeVersion().get()));
 	}
 
 	@Disabled

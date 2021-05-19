@@ -1,10 +1,8 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.network.request.PayOrderRequestBody;
-import org.elastos.hive.network.request.PaymentCreateRequestBody;
-import org.elastos.hive.connection.HiveResponseBody;
-import org.elastos.hive.payment.Order;
+import org.elastos.hive.vault.payment.Order;
+import org.elastos.hive.vault.payment.PaymentController;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,10 +11,10 @@ import java.util.List;
  * Helper class for vault/backup subscription.
  */
 public class PaymentServiceRender {
-	private ServiceEndpoint serviceEndpoint;
+	private PaymentController controller;
 
     public PaymentServiceRender(ServiceEndpoint serviceEndpoint) {
-        this.serviceEndpoint = serviceEndpoint;
+        controller = new PaymentController(serviceEndpoint);
     }
 
     public String createPricingOrder(String planName) throws IOException {
@@ -28,28 +26,14 @@ public class PaymentServiceRender {
     }
 
     private String createOrder(String pricingPlanName, String backupPlanName) throws IOException {
-        return HiveResponseBody.validateBody(
-        		serviceEndpoint.getConnectionManager().getCallAPI()
-                        .createOrder(new PaymentCreateRequestBody(pricingPlanName, backupPlanName))
-                        .execute()
-                        .body()).getOrderId();
+        return controller.createOrder(pricingPlanName, backupPlanName);
     }
 
     public void payOrder(String orderId, List<String> transIds) throws IOException {
-        HiveResponseBody.validateBody(
-        		serviceEndpoint.getConnectionManager().getCallAPI()
-                        .payOrder(new PayOrderRequestBody()
-                                .setOrderId(orderId)
-                                .setPayTxids(transIds))
-                        .execute()
-                        .body());
+        controller.payOrder(orderId, transIds);
     }
 
     public Order getOrderInfo(String orderId) throws IOException {
-        return HiveResponseBody.validateBody(
-        		serviceEndpoint.getConnectionManager().getCallAPI()
-                        .getOrderInfo(orderId)
-                        .execute()
-                        .body()).getOrderInfo();
+        return controller.getOrderInfo(orderId);
     }
 }

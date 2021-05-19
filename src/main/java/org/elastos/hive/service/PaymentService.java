@@ -3,8 +3,8 @@ package org.elastos.hive.service;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.elastos.hive.payment.Order;
-import org.elastos.hive.payment.Receipt;
+import org.elastos.hive.vault.payment.Order;
+import org.elastos.hive.vault.payment.Receipt;
 
 /**
  * The payment service provides users with the way to purchase a paid vault or

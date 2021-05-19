@@ -27,36 +27,6 @@ public interface CallAPI {
 	@POST("/api/v1/scripting/run_script_download/{transaction_id}")
 	Call<ResponseBody> callDownload(@Path("transaction_id") String transactionId);
 
-	// backup
-
-
-
-	// payment
-
-	@GET("/api/v1/payment/vault_package_info")
-	Call<PaymentPackageResponseBody> getPackageInfo();
-
-	@GET("/api/v1/payment/vault_pricing_plan")
-	Call<PaymentPlanResponseBody> getPricingPlan(@Query("name") String name);
-
-	@GET("/api/v1/payment/vault_backup_plan")
-	Call<PaymentPlanResponseBody> getBackupPlan(@Query("name") String name);
-
-	@POST("/api/v1/payment/create_vault_package_order")
-	Call<PaymentCreateResponseBody> createOrder(@Body PaymentCreateRequestBody body);
-
-	@POST("/api/v1/payment/pay_vault_package_order")
-	Call<HiveResponseBody> payOrder(@Body PayOrderRequestBody body);
-
-	@GET("/api/v1/payment/vault_package_order")
-	Call<OrderInfoResponseBody> getOrderInfo(@Query("order_id") String orderId);
-
-	@GET("/api/v1/payment/vault_package_order_list")
-	Call<OrderListResponseBody> getOrderList();
-
-	@GET("/api/v1/payment/version")
-	Call<PaymentVersionResponseBody> getPaymentVersion();
-
 	// vault
 
 	@POST("/api/v1/service/vault/create")
@@ -79,31 +49,5 @@ public interface CallAPI {
 
 	@GET("/api/v1/service/vault_backup")
 	Call<VaultInfoResponseBody> getBackupVaultInfo();
-
-	// pubsub
-
-	@POST("/api/v1/pubsub/publish")
-	Call<HiveResponseBody> publish(@Body PubsubRequestBody body);
-
-	@POST("/api/v1/pubsub/remove")
-	Call<HiveResponseBody> remove(@Body PubsubRequestBody body);
-
-	@GET("/api/v1/pubsub/pub/channels")
-	Call<PubsubChannelsResponseBody> getPublishedChannels();
-
-	@GET("/api/v1/pubsub/sub/channels")
-	Call<PubsubChannelsResponseBody> getSubscribedChannels();
-
-	@POST("/api/v1/pubsub/subscribe")
-	Call<HiveResponseBody> subscribe(@Body PubsubSubscribeRequestBody body);
-
-	@POST("/api/v1/pubsub/unsubscribe")
-	Call<HiveResponseBody> unsubscribe(@Body PubsubSubscribeRequestBody body);
-
-	@POST("/api/v1/pubsub/push")
-	Call<HiveResponseBody> push(@Body PushMessageRequestBody body);
-
-	@POST("/api/v1/pubsub/pop")
-	Call<PopMessageResponseBody> pop(@Body PopMessageRequestBody body);
 
 }

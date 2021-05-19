@@ -27,6 +27,7 @@ import okhttp3.OkHttpClient;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.*;
 import org.elastos.hive.utils.LogUtil;
+import org.elastos.hive.vault.auth.AuthAPI;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -45,8 +46,7 @@ public class ConnectionManager {
 	private PlainRequestInterceptor plainRequestInterceptor;
 
 	private CallAPI 	callAPI;
-	private AuthAPI  	authAPI;
-	private AboutAPI	aboutAPI;
+	private AuthAPI authAPI;
 
 	public ConnectionManager(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
@@ -70,13 +70,6 @@ public class ConnectionManager {
 			authAPI = createService(AuthAPI.class, serviceEndpoint.getProviderAddress(), authRequestInterceptor);
 
 		return authAPI;
-	}
-
-	public AboutAPI getAboutAPI() {
-		if (aboutAPI == null)
-			aboutAPI = createService(AboutAPI.class, serviceEndpoint.getProviderAddress(), authRequestInterceptor);
-
-		return aboutAPI;
 	}
 
 	public HttpURLConnection openConnection(String path) throws IOException {

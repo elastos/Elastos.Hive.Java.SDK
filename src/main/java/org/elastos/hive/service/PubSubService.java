@@ -1,6 +1,6 @@
 package org.elastos.hive.service;
 
-import org.elastos.hive.network.model.ChannelMessage;
+import org.elastos.hive.vault.pubsub.ChannelMessage;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

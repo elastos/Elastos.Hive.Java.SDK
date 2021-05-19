@@ -2,7 +2,7 @@ package org.elastos.hive.vault;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.Vault;
-import org.elastos.hive.network.model.ChannelMessage;
+import org.elastos.hive.vault.pubsub.ChannelMessage;
 import org.elastos.hive.service.PubSubService;
 
 import java.util.List;

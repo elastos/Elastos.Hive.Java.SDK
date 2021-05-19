@@ -3,9 +3,9 @@ package org.elastos.hive;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.network.response.VaultInfoResponseBody;
-import org.elastos.hive.payment.Order;
-import org.elastos.hive.payment.PricingPlan;
-import org.elastos.hive.payment.Receipt;
+import org.elastos.hive.vault.payment.Order;
+import org.elastos.hive.vault.payment.PricingPlan;
+import org.elastos.hive.vault.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
 

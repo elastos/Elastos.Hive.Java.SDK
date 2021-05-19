@@ -1,6 +1,7 @@
 package org.elastos.hive.network.model;
 
 import com.google.gson.annotations.SerializedName;
+import org.elastos.hive.connection.KeyValueDict;
 
 public class ScriptDeleteExecutableBody {
     @SerializedName("collection")
