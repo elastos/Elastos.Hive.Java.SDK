@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 class VaultManagementTest {
 	private static Vault vault;
 
@@ -25,12 +26,10 @@ class VaultManagementTest {
 	@Test void testGetOwnerDid() {
 	}
 
-	@Disabled
 	@Test void testGetVersion() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(vault.getNodeVersion().get()));
 	}
 
-	@Disabled
 	@Test void testGetCommitHash() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(vault.getLatestCommitId().get()));
 	}

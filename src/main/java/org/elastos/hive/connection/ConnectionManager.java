@@ -43,10 +43,13 @@ public class ConnectionManager {
 	private Interceptor authRequestInterceptor;
 	private PlainRequestInterceptor plainRequestInterceptor;
 
-	public ConnectionManager(ServiceEndpoint serviceEndpoint) {
+	public ConnectionManager() {
+		this.authRequestInterceptor  = new AuthRequestInterceptor();
+	}
+
+	public void attach(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
 		this.plainRequestInterceptor = new PlainRequestInterceptor(this.serviceEndpoint);
-		this.authRequestInterceptor  = new AuthRequestInterceptor();
 	}
 
 	public ServiceEndpoint getServiceEndpoint() {
