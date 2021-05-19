@@ -3,9 +3,11 @@ package org.elastos.hive;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import org.elastos.hive.about.AboutController;
+import org.elastos.hive.about.NodeVersion;
 import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnauthorizedStateException;
-import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.vault.ExceptionConvertor;
 
 public class ServiceEndpoint implements ExceptionConvertor {
@@ -91,37 +93,33 @@ public class ServiceEndpoint implements ExceptionConvertor {
 		throw new UnauthorizedStateException();
 	}
 
-	public CompletableFuture<Version> getVersion() {
+	public CompletableFuture<NodeVersion> getNodeVersion() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				String version = HiveResponseBody.validateBody(
-						connectionManager.getAboutAPI().version().execute().body())
-					.getVersion();
-
-				return getVersionByStr(version);
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				AboutController controller = new AboutController(this);
+				return controller.getNodeVersion();
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
 			}
 		});
-    }
-
-	private Version getVersionByStr(String version) {
-		// TODO: Required version number is *.*.*, such as 1.0.12
-		return new Version();
 	}
 
 	public CompletableFuture<String> getLatestCommitId() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return HiveResponseBody.validateBody(
-		                connectionManager.getAboutAPI()
-		                        .commitHash()
-		                        .execute()
-		                        .body()).getCommitHash();
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				AboutController controller = new AboutController(this);
+				return controller.getCommitId();
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
 			}
 		});
-    }
-
+	}
 }
