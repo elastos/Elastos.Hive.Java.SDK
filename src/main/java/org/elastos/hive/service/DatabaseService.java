@@ -2,7 +2,7 @@ package org.elastos.hive.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import org.elastos.hive.database.*;
+import org.elastos.hive.vault.database.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

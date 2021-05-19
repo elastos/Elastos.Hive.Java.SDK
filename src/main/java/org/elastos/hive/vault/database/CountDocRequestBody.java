@@ -1,7 +1,8 @@
-package org.elastos.hive.network.request;
+package org.elastos.hive.vault.database;
 
-import org.elastos.hive.database.CountOptions;
+import org.elastos.hive.vault.database.CountOptions;
 import org.elastos.hive.network.model.KeyValueDict;
+import org.elastos.hive.vault.database.CreateCollectionRequestBody;
 
 public class CountDocRequestBody extends CreateCollectionRequestBody {
     private final KeyValueDict filter;

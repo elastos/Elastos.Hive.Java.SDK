@@ -2,7 +2,7 @@ package org.elastos.hive.vault;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.VaultAlreadyExistException;
-import org.elastos.hive.network.response.HiveResponseBody;
+import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.network.response.PaymentPlanResponseBody;
 import org.elastos.hive.network.response.VaultCreateResponseBody;
 import org.elastos.hive.network.response.VaultInfoResponseBody;

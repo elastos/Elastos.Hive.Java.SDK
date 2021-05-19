@@ -1,6 +1,6 @@
 package org.elastos.hive.vault;
 
-import org.elastos.hive.network.response.HiveResponseBody;
+import org.elastos.hive.connection.HiveResponseBody;
 
 public interface ExceptionConvertor {
     /**

@@ -8,7 +8,6 @@ import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.RemoteResolver;
 import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.exception.HttpFailedException;
-import org.elastos.hive.network.response.HiveResponseBody;
 
 import okhttp3.Request;
 import okhttp3.Response;

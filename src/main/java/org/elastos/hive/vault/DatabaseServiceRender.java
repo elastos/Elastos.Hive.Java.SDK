@@ -1,34 +1,26 @@
 package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.Vault;
-import org.elastos.hive.database.*;
-import org.elastos.hive.network.request.*;
-import org.elastos.hive.network.response.*;
 import org.elastos.hive.service.DatabaseService;
+import org.elastos.hive.vault.database.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
-	private ServiceEndpoint serviceEndpoint;
+	DatabaseController controller;
 
 	public DatabaseServiceRender(Vault vault) {
-		serviceEndpoint = vault;
+		controller = new DatabaseController(vault);
 	}
 
 	@Override
 	public CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.createCollection(new CreateCollectionRequestBody(name))
-								.execute()
-								.body());
+				controller.createCollection(name);
 				return true;
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
@@ -40,11 +32,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 	public CompletableFuture<Boolean> deleteCollection(String name) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.deleteCollection(new DeleteCollectionRequestBody(name))
-								.execute()
-								.body());
+				controller.deleteCollection(name);
 				return true;
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
@@ -56,16 +44,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 	public CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOneOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				InsertDocResponseBody body = HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-						.insertOne(new InsertDocRequestBody(collection,
-								HiveResponseBody.jsonNode2KeyValueDic(doc),
-								options))
-						.execute()
-						.body());
-				return new InsertOneResult()
-						.setInsertedId(body.getInsertedId())
-						.setAcknowledged(body.getAcknowledged());
+				return controller.insertOne(collection, doc, options);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -76,16 +55,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 	public CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertManyOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				InsertDocsResponseBody body = HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.insertMany(new InsertDocsRequestBody(collection,
-										HiveResponseBody.jsonNodeList2KeyValueDicList(docs),
-										options))
-								.execute()
-								.body());
-				return new InsertManyResult()
-						.setInsertedIds(body.getInsertedIds())
-						.setAcknowledged(body.getAcknowledged());
+				return controller.insertMany(collection, docs, options);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -96,14 +66,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 	public CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.countDocs(new CountDocRequestBody(
-										collection,
-										HiveResponseBody.jsonNode2KeyValueDic(query),
-										options))
-								.execute()
-								.body()).getCount();
+				return controller.countDocuments(collection, query, options);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -114,14 +77,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 	public CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return HiveResponseBody.KeyValueDict2JsonNode(
-						HiveResponseBody.validateBody(
-								serviceEndpoint.getConnectionManager().getCallAPI()
-										.findOne(new FindDocRequestBody(collection,
-												HiveResponseBody.jsonNode2KeyValueDic(query),
-												options))
-										.execute()
-										.body()).getItem());
+				return controller.findOne(collection, query, options);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -132,14 +88,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 	public CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return HiveResponseBody.KeyValueDictList2JsonNodeList(
-						HiveResponseBody.validateBody(
-								serviceEndpoint.getConnectionManager().getCallAPI()
-						.findMany(new FindDocsRequestBody(collection,
-								HiveResponseBody.jsonNode2KeyValueDic(query),
-								options))
-						.execute()
-						.body()).getItems());
+				return controller.findMany(collection, query, options);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -150,19 +99,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 	public CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				UpdateDocResponseBody body = HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-										.updateOne(new UpdateDocRequestBody(collection)
-											.setFilter(HiveResponseBody.jsonNode2KeyValueDic(filter))
-											.setUpdate(HiveResponseBody.jsonNode2KeyValueDic(update))
-										.setOptions(options))
-										.execute()
-										.body());
-				return new UpdateResult()
-						.setMatchedCount(body.getMatchedCount())
-						.setModifiedCount(body.getModifiedCount())
-						.setAcknowledged(body.getAcknowledged())
-						.setUpsertedId(body.getUpsertedId());
+				return controller.updateOne(collection, filter, update, options);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -173,19 +110,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 	public CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				UpdateDocResponseBody body = HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.updateMany(new UpdateDocRequestBody(collection)
-										.setFilter(HiveResponseBody.jsonNode2KeyValueDic(filter))
-										.setUpdate(HiveResponseBody.jsonNode2KeyValueDic(update))
-										.setOptions(options))
-								.execute()
-								.body());
-				return new UpdateResult()
-						.setMatchedCount(body.getMatchedCount())
-						.setModifiedCount(body.getModifiedCount())
-						.setAcknowledged(body.getAcknowledged())
-						.setUpsertedId(body.getUpsertedId());
+				return controller.updateMany(collection, filter, update, options);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -196,15 +121,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 	public CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				DeleteDocResponseBody body = HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-						.deleteOne(new DeleteDocRequestBody(collection,
-								HiveResponseBody.jsonNode2KeyValueDic(filter)))
-						.execute()
-						.body());
-				return new DeleteResult()
-						.setDeletedCount(body.getDeletedCount())
-						.setAcknowledged(body.getAcknowledged());
+				return controller.deleteOne(collection, filter, options);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -215,15 +132,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 	public CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				DeleteDocResponseBody body = HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.deleteMany(new DeleteDocRequestBody(collection,
-										HiveResponseBody.jsonNode2KeyValueDic(filter)))
-								.execute()
-								.body());
-				return new DeleteResult()
-						.setDeletedCount(body.getDeletedCount())
-						.setAcknowledged(body.getAcknowledged());
+				return controller.deleteMany(collection, filter, options);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}

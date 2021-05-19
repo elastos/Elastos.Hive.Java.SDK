@@ -3,10 +3,8 @@ package org.elastos.hive.vault;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.network.request.PayOrderRequestBody;
 import org.elastos.hive.network.request.PaymentCreateRequestBody;
-import org.elastos.hive.network.response.HiveResponseBody;
-import org.elastos.hive.network.response.PaymentPlanResponseBody;
+import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.payment.Order;
-import org.elastos.hive.payment.PricingPlan;
 
 import java.io.IOException;
 import java.util.List;

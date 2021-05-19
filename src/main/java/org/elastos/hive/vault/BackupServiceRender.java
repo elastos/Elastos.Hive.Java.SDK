@@ -9,7 +9,7 @@ import org.elastos.hive.auth.BackupRemoteResolver;
 import org.elastos.hive.auth.TokenResolver;
 import org.elastos.hive.network.request.BackupRestoreRequestBody;
 import org.elastos.hive.network.request.BackupSaveRequestBody;
-import org.elastos.hive.network.response.HiveResponseBody;
+import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
 

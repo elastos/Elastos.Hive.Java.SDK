@@ -1,4 +1,4 @@
-package org.elastos.hive.network.response;
+package org.elastos.hive.connection;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;

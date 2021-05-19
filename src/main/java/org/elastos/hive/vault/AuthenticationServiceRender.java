@@ -9,7 +9,7 @@ import org.elastos.hive.auth.AuthTokenToVault;
 import org.elastos.hive.network.request.AuthRequestBody;
 import org.elastos.hive.network.request.SignInRequestBody;
 import org.elastos.hive.network.response.AuthResponseBody;
-import org.elastos.hive.network.response.HiveResponseBody;
+import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.network.response.SignInResponseBody;
 import org.elastos.hive.utils.JwtUtil;
 

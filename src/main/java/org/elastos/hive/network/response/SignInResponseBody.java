@@ -1,6 +1,7 @@
 package org.elastos.hive.network.response;
 
 import org.elastos.did.jwt.Claims;
+import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.exception.HiveSdkException;
 import org.elastos.hive.utils.JwtUtil;
 

@@ -1,6 +1,7 @@
-package org.elastos.hive.network.response;
+package org.elastos.hive.vault.database;
 
 import com.google.gson.annotations.SerializedName;
+import org.elastos.hive.connection.HiveResponseBody;
 
 public class InsertDocResponseBody extends HiveResponseBody {
     private Boolean acknowledged;
