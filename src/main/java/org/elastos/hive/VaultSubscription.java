@@ -2,7 +2,6 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportedMethodException;
-import org.elastos.hive.vault.scripting.VaultInfoResponseBody;
 import org.elastos.hive.vault.payment.Order;
 import org.elastos.hive.vault.payment.PricingPlan;
 import org.elastos.hive.vault.payment.Receipt;
@@ -18,6 +17,7 @@ import java.util.concurrent.CompletionException;
 import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.vault.PaymentServiceRender;
 import org.elastos.hive.vault.SubscriptionServiceRender;
+import org.elastos.hive.vault.subscription.VaultInfoResponseBody;
 
 public class VaultSubscription extends ServiceEndpoint
 	implements SubscriptionService<Vault.PropertySet>, PaymentService, ExceptionConvertor {

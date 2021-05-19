@@ -1,4 +1,4 @@
-package org.elastos.hive.vault.scripting;
+package org.elastos.hive.vault.subscription;
 
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.connection.HiveResponseBody;

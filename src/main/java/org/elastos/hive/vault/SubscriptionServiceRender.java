@@ -2,85 +2,53 @@ package org.elastos.hive.vault;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.VaultAlreadyExistException;
-import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.vault.payment.PaymentController;
-import org.elastos.hive.vault.scripting.VaultCreateResponseBody;
-import org.elastos.hive.vault.scripting.VaultInfoResponseBody;
 import org.elastos.hive.vault.payment.PricingPlan;
+import org.elastos.hive.vault.subscription.SubscriptionController;
+import org.elastos.hive.vault.subscription.VaultInfoResponseBody;
 
 import java.io.IOException;
 import java.util.List;
 
 public class SubscriptionServiceRender {
-	private ServiceEndpoint serviceEndpoint;
 	private PaymentController paymentController;
+	private SubscriptionController subscriptionController;
 
     public SubscriptionServiceRender(ServiceEndpoint serviceEndpoint) {
-        this.serviceEndpoint = serviceEndpoint;
-        this.paymentController = new PaymentController(serviceEndpoint);
-
+        paymentController = new PaymentController(serviceEndpoint);
+        subscriptionController = new SubscriptionController(serviceEndpoint);
     }
 
     public void subscribe() throws IOException {
-        VaultCreateResponseBody body = HiveResponseBody.validateBody(
-        		serviceEndpoint.getConnectionManager().getCallAPI()
-                        .createVault()
-                        .execute()
-                        .body());
-        if (Boolean.TRUE.equals(body.getExisting())) {
+        if (Boolean.TRUE.equals(subscriptionController.subscribe())) {
             throw new VaultAlreadyExistException("The vault already exists");
         }
     }
 
     public void subscribeBackup() throws IOException {
-        VaultCreateResponseBody body = HiveResponseBody.validateBody(
-        		serviceEndpoint.getConnectionManager().getCallAPI()
-                        .createBackupVault()
-                        .execute()
-                        .body());
-        if (Boolean.TRUE.equals(body.getExisting())) {
+        if (Boolean.TRUE.equals(subscriptionController.subscribeBackup())) {
             throw new VaultAlreadyExistException("The backup vault already exists");
         }
     }
 
     public void unsubscribe() throws IOException {
-        HiveResponseBody.validateBody(
-        		serviceEndpoint.getConnectionManager().getCallAPI()
-                        .removeVault()
-                        .execute()
-                        .body());
+        subscriptionController.unsubscribe();
     }
 
     public void activate() throws IOException {
-        HiveResponseBody.validateBody(
-        		serviceEndpoint.getConnectionManager().getCallAPI()
-                        .unfreeze()
-                        .execute()
-                        .body());
+        subscriptionController.activate();
     }
 
     public void deactivate() throws IOException {
-        HiveResponseBody.validateBody(
-        		serviceEndpoint.getConnectionManager().getCallAPI()
-                        .freeze()
-                        .execute()
-                        .body());
+        subscriptionController.deactivate();
     }
 
     public VaultInfoResponseBody getVaultInfo() throws IOException {
-        return HiveResponseBody.validateBody(
-        		serviceEndpoint.getConnectionManager().getCallAPI()
-                        .getVaultInfo()
-                        .execute()
-                        .body());
+        return subscriptionController.getVaultInfo();
     }
 
     public VaultInfoResponseBody getBackupVaultInfo() throws IOException {
-        return HiveResponseBody.validateBody(
-        		serviceEndpoint.getConnectionManager().getCallAPI()
-                        .getBackupVaultInfo()
-                        .execute()
-                        .body());
+        return subscriptionController.getBackupVaultInfo();
     }
 
     public List<PricingPlan> getPricingPlanList() throws IOException {

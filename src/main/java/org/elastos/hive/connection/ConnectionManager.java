@@ -25,9 +25,7 @@ package org.elastos.hive.connection;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.network.*;
 import org.elastos.hive.utils.LogUtil;
-import org.elastos.hive.vault.auth.AuthAPI;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -45,9 +43,6 @@ public class ConnectionManager {
 	private Interceptor authRequestInterceptor;
 	private PlainRequestInterceptor plainRequestInterceptor;
 
-	private CallAPI 	callAPI;
-	private AuthAPI authAPI;
-
 	public ConnectionManager(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
 		this.plainRequestInterceptor = new PlainRequestInterceptor(this.serviceEndpoint);
@@ -56,20 +51,6 @@ public class ConnectionManager {
 
 	public ServiceEndpoint getServiceEndpoint() {
 		return this.serviceEndpoint;
-	}
-
-	public CallAPI getCallAPI() {
-		if (callAPI == null)
-			callAPI = createService(CallAPI.class, serviceEndpoint.getProviderAddress(), plainRequestInterceptor);
-
-		return callAPI;
-	}
-
-	public AuthAPI getAuthAPI() {
-		if (authAPI == null)
-			authAPI = createService(AuthAPI.class, serviceEndpoint.getProviderAddress(), authRequestInterceptor);
-
-		return authAPI;
 	}
 
 	public HttpURLConnection openConnection(String path) throws IOException {
@@ -106,26 +87,6 @@ public class ConnectionManager {
 		} else {
 			throw HiveResponseBody.getHttpExceptionByCode(code, HiveResponseBody.getHttpErrorMessages().get(code));
 		}
-	}
-
-	private static <S> S createService(Class<S> serviceClass, String baseUrl, Interceptor requestInterceptor) {
-		OkHttpClient.Builder builder;
-
-		builder = new OkHttpClient.Builder()
-				.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-				.readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
-
-		builder.interceptors().clear();
-		builder.interceptors().add(requestInterceptor);
-		builder.interceptors().add(new LoggerInterceptor());
-
-		return new Retrofit.Builder()
-				.baseUrl(baseUrl)
-				.addConverterFactory(StringConverterFactory.create())
-				.addConverterFactory(GsonConverterFactory.create())
-				.client(builder.build())
-				.build()
-				.create(serviceClass);
 	}
 
 	/**

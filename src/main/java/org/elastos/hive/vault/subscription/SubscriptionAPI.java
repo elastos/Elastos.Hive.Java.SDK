@@ -1,15 +1,12 @@
-package org.elastos.hive.network;
+package org.elastos.hive.vault.subscription;
 
 import org.elastos.hive.connection.HiveResponseBody;
-import org.elastos.hive.vault.scripting.VaultCreateResponseBody;
-import org.elastos.hive.vault.scripting.VaultInfoResponseBody;
+import org.elastos.hive.vault.subscription.VaultCreateResponseBody;
+import org.elastos.hive.vault.subscription.VaultInfoResponseBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
-public interface CallAPI {
-
-	// vault
-
+interface SubscriptionAPI {
 	@POST("/api/v1/service/vault/create")
 	Call<VaultCreateResponseBody> createVault();
 
@@ -30,5 +27,4 @@ public interface CallAPI {
 
 	@GET("/api/v1/service/vault_backup")
 	Call<VaultInfoResponseBody> getBackupVaultInfo();
-
 }
