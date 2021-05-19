@@ -12,6 +12,7 @@ import org.elastos.hive.network.request.FilesDeleteRequestBody;
 import org.elastos.hive.network.request.FilesMoveRequestBody;
 import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.FilesService;
+import org.elastos.hive.vault.files.FilesController;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -19,6 +20,7 @@ import java.util.concurrent.CompletionException;
 
 class FilesServiceRender implements FilesService, ExceptionConvertor {
 	private ServiceEndpoint serviceEndpoint;
+	private FilesController controller;
 
 	public FilesServiceRender(Vault vault) {
 		this.serviceEndpoint = vault;
@@ -56,6 +58,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 	public CompletableFuture<FileInfo> stat(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
+
 				return HiveResponseBody.validateBody(
 						serviceEndpoint.getConnectionManager().getCallAPI()
 								.properties(path)
@@ -113,6 +116,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 	public CompletableFuture<Boolean> copy(String source, String target) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
+
 				HiveResponseBody.validateBody(
 						serviceEndpoint.getConnectionManager().getCallAPI()
 						.copy(new FilesCopyRequestBody(source, target))

@@ -135,4 +135,23 @@ public class ConnectionManager {
 				.build()
 				.create(serviceClass);
 	}
+
+	public Retrofit createRetrofit(boolean requiredAuthorization) {
+		OkHttpClient.Builder builder;
+
+		builder = new OkHttpClient.Builder()
+				.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+				.readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+
+		builder.interceptors().clear();
+		builder.interceptors().add(requiredAuthorization ? this.plainRequestInterceptor : this.authRequestInterceptor);
+		builder.interceptors().add(new LoggerInterceptor());
+
+		return new Retrofit.Builder()
+				.baseUrl(serviceEndpoint.getProviderAddress())
+				.addConverterFactory(StringConverterFactory.create())
+				.addConverterFactory(GsonConverterFactory.create())
+				.client(builder.build())
+				.build();
+	}
 }
