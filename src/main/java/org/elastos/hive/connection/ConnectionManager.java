@@ -136,7 +136,19 @@ public class ConnectionManager {
 				.create(serviceClass);
 	}
 
-	public Retrofit createRetrofit(boolean requiredAuthorization) {
+	/**
+	 * Create network API service by service class.
+	 * @param serviceClass the class of the service.
+	 * @param requiredAuthorization	need authorization when requests.
+	 * @param <S> the class of the service.
+	 * @return the service instance.
+	 */
+	public <S> S createService(Class<S> serviceClass, boolean requiredAuthorization) {
+		return createRetrofit(requiredAuthorization ? this.plainRequestInterceptor : this.authRequestInterceptor)
+				.create(serviceClass);
+	}
+
+	private Retrofit createRetrofit(Interceptor requestInterceptor) {
 		OkHttpClient.Builder builder;
 
 		builder = new OkHttpClient.Builder()
@@ -144,11 +156,12 @@ public class ConnectionManager {
 				.readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
 		builder.interceptors().clear();
-		builder.interceptors().add(requiredAuthorization ? this.plainRequestInterceptor : this.authRequestInterceptor);
+		builder.interceptors().add(requestInterceptor);
 		builder.interceptors().add(new LoggerInterceptor());
 
 		return new Retrofit.Builder()
 				.baseUrl(serviceEndpoint.getProviderAddress())
+				// TODO: remove class StringConverterFactory and this line after v2 completes.
 				.addConverterFactory(StringConverterFactory.create())
 				.addConverterFactory(GsonConverterFactory.create())
 				.client(builder.build())

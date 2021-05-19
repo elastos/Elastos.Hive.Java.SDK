@@ -1,17 +1,10 @@
 package org.elastos.hive.vault;
 
-import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.Vault;
-import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.FileDoesNotExistsException;
 import org.elastos.hive.exception.HttpFailedException;
-import org.elastos.hive.network.CallAPI;
-import org.elastos.hive.network.model.FileInfo;
-import org.elastos.hive.network.request.FilesCopyRequestBody;
-import org.elastos.hive.network.request.FilesDeleteRequestBody;
-import org.elastos.hive.network.request.FilesMoveRequestBody;
-import org.elastos.hive.network.response.HiveResponseBody;
 import org.elastos.hive.service.FilesService;
+import org.elastos.hive.vault.files.FileInfo;
 import org.elastos.hive.vault.files.FilesController;
 
 import java.util.List;
@@ -19,20 +12,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 class FilesServiceRender implements FilesService, ExceptionConvertor {
-	private ServiceEndpoint serviceEndpoint;
 	private FilesController controller;
 
 	public FilesServiceRender(Vault vault) {
-		this.serviceEndpoint = vault;
+		this.controller = new FilesController(vault);
 	}
 
 	@Override
 	public <T> CompletableFuture<T> upload(String path, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return HiveResponseBody.getRequestStream(
-						serviceEndpoint.getConnectionManager().openConnection(CallAPI.API_UPLOAD + "/" + path),
-						resultType);
+				return controller.upload(path, resultType);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -43,11 +33,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 	public CompletableFuture<List<FileInfo>> list(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.list(path)
-								.execute()
-								.body()).getFileInfoList();
+				return controller.listChildren(path);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -58,11 +44,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 	public CompletableFuture<FileInfo> stat(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-
-				return HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.properties(path)
-								.execute().body()).getFileInfo();
+				return controller.getProperty(path);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -73,10 +55,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 	public <T> CompletableFuture<T> download(String path, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return HiveResponseBody.getResponseStream(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.download(path)
-								.execute(), resultType);
+				return controller.download(path, resultType);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}
@@ -87,9 +66,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 	public CompletableFuture<Boolean> delete(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				HiveResponseBody.validateBody(serviceEndpoint.getConnectionManager().getCallAPI()
-						.delete(new FilesDeleteRequestBody(path))
-						.execute().body());
+				controller.delete(path);
 				return true;
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
@@ -101,10 +78,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 	public CompletableFuture<Boolean> move(String source, String target) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.move(new FilesMoveRequestBody(source, target))
-								.execute().body());
+				controller.moveFile(source, target);
 				return true;
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
@@ -116,11 +90,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 	public CompletableFuture<Boolean> copy(String source, String target) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-
-				HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-						.copy(new FilesCopyRequestBody(source, target))
-						.execute().body());
+				controller.copyFile(source, target);
 				return true;
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
@@ -132,11 +102,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 	public CompletableFuture<String> hash(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return HiveResponseBody.validateBody(
-						serviceEndpoint.getConnectionManager().getCallAPI()
-								.hash(path)
-								.execute()
-								.body()).getSha256();
+				return controller.getHash(path);
 			} catch (Exception e) {
 				throw new CompletionException(toHiveException(e));
 			}

@@ -1,6 +1,6 @@
 package org.elastos.hive.service;
 
-import org.elastos.hive.network.model.FileInfo;
+import org.elastos.hive.vault.files.FileInfo;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
