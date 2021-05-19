@@ -1,4 +1,4 @@
-package org.elastos.hive.network.request;
+package org.elastos.hive.vault.backup;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,9 +1,10 @@
-package org.elastos.hive.network.response;
+package org.elastos.hive.vault.backup;
 
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.connection.HiveResponseBody;
-import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.BackupService;
+
+import java.io.IOException;
 
 public class BackupStateResponseBody extends HiveResponseBody {
     @SerializedName("hive_backup_state")
@@ -11,7 +12,7 @@ public class BackupStateResponseBody extends HiveResponseBody {
     @SerializedName("result")
     private String result;
 
-    public BackupService.BackupResult getStatusResult() throws HiveException {
+    public BackupService.BackupResult getStatusResult() throws IOException {
         switch (hiveBackupState) {
             case "stop":
                 return BackupService.BackupResult.STATE_STOP;
@@ -20,7 +21,7 @@ public class BackupStateResponseBody extends HiveResponseBody {
             case "restore":
                 return BackupService.BackupResult.STATE_RESTORE;
             default:
-                throw new HiveException("Unknown state :" + result);
+                throw new IOException("Unknown state :" + result);
         }
     }
 }

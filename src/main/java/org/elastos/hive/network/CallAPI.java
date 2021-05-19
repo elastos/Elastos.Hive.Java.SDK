@@ -29,17 +29,7 @@ public interface CallAPI {
 
 	// backup
 
-	@GET("/api/v1/backup/state")
-	Call<BackupStateResponseBody> getState();
 
-	@POST("/api/v1/backup/save_to_node")
-	Call<HiveResponseBody> saveToNode(@Body BackupSaveRequestBody body);
-
-	@POST("/api/v1/backup/restore_from_node")
-	Call<HiveResponseBody> restoreFromNode(@Body BackupRestoreRequestBody body);
-
-	@POST("/api/v1/backup/activate_to_vault")
-	Call<HiveResponseBody> activeToVault(@Body EmptyRequestBody body);
 
 	// payment
 
