@@ -20,7 +20,8 @@ public class ServiceEndpoint implements ExceptionConvertor {
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
 		this.context = context;
 		this.providerAddress = providerAddress;
-		this.connectionManager = new ConnectionManager(this);
+		this.connectionManager = new ConnectionManager();
+		this.connectionManager.attach(this);
 	}
 
 	public AppContext getAppContext() {

@@ -31,7 +31,8 @@ public class TestData {
 	private AppContext contextCaller;
 
 	public static TestData getInstance() throws HiveException, DIDException {
-		if (instance == null) instance = new TestData();
+		if (instance == null)
+			instance = new TestData();
 		return instance;
 	}
 

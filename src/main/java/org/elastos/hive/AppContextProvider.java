@@ -31,6 +31,8 @@ public interface AppContextProvider {
 
 	/**
 	 * The application did identifies the application with others.
+	 *
+	 * @return appDid
 	 */
 	String getAppDid();
 }
