@@ -1,10 +1,8 @@
-package org.elastos.hive.network.request;
+package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.network.model.Condition;
-import org.elastos.hive.network.model.Executable;
 
-public class RegisterScriptRequestBody {
+class RegisterScriptRequestBody {
     @SerializedName("name")
     private String name;
     @SerializedName("executable")

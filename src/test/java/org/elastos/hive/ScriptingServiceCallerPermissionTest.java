@@ -7,10 +7,13 @@ import org.elastos.hive.config.TestData;
 import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.vault.database.DeleteOptions;
 import org.elastos.hive.vault.database.InsertOneOptions;
-import org.elastos.hive.network.model.*;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.ScriptingService;
+import org.elastos.hive.vault.scripting.Condition;
+import org.elastos.hive.vault.scripting.Executable;
+import org.elastos.hive.vault.scripting.ScriptFindBody;
+import org.elastos.hive.vault.scripting.ScriptInsertExecutableBody;
 import org.junit.jupiter.api.*;
 
 @Disabled

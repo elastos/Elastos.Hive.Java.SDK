@@ -1,7 +1,7 @@
 package org.elastos.hive.service;
 
-import org.elastos.hive.network.model.Condition;
-import org.elastos.hive.network.model.Executable;
+import org.elastos.hive.vault.scripting.Condition;
+import org.elastos.hive.vault.scripting.Executable;
 
 import java.util.concurrent.CompletableFuture;
 
