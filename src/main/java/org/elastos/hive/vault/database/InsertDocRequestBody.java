@@ -2,7 +2,7 @@ package org.elastos.hive.vault.database;
 
 import org.elastos.hive.network.model.KeyValueDict;
 
-public class InsertDocRequestBody extends CreateCollectionRequestBody {
+class InsertDocRequestBody extends CreateCollectionRequestBody {
     private final KeyValueDict document;
     private final InsertOneOptions options;
 

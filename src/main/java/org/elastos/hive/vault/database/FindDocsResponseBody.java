@@ -6,7 +6,7 @@ import org.elastos.hive.connection.HiveResponseBody;
 
 import java.util.List;
 
-public class FindDocsResponseBody extends HiveResponseBody {
+class FindDocsResponseBody extends HiveResponseBody {
     @SerializedName("items")
     private List<KeyValueDict> items;
 

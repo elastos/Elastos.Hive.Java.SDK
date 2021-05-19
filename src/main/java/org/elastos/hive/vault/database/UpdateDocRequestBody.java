@@ -2,7 +2,7 @@ package org.elastos.hive.vault.database;
 
 import org.elastos.hive.network.model.KeyValueDict;
 
-public class UpdateDocRequestBody extends CreateCollectionRequestBody {
+class UpdateDocRequestBody extends CreateCollectionRequestBody {
     private KeyValueDict filter;
     private KeyValueDict update;
     private UpdateOptions options;

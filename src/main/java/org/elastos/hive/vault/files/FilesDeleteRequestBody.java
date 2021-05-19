@@ -1,6 +1,6 @@
 package org.elastos.hive.vault.files;
 
-public class FilesDeleteRequestBody {
+class FilesDeleteRequestBody {
     private final String path;
 
     public FilesDeleteRequestBody(String path) {
