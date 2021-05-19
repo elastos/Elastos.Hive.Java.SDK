@@ -2,7 +2,7 @@ package org.elastos.hive.vault.backup;
 
 import com.google.gson.annotations.SerializedName;
 
-public class BackupSaveRequestBody {
+class BackupSaveRequestBody {
     @SerializedName("backup_credential")
     private final String backupCredential;
 

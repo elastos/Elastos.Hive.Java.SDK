@@ -3,6 +3,7 @@ package org.elastos.hive;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Throwables;
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.network.model.*;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.DatabaseService;

@@ -7,9 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import okhttp3.ResponseBody;
 import org.elastos.hive.exception.*;
-import org.elastos.hive.network.model.KeyValueDict;
-import org.elastos.hive.network.model.UploadOutputStream;
-import org.elastos.hive.network.model.UploadOutputStreamWriter;
 import retrofit2.Response;
 
 import javax.security.sasl.AuthenticationException;

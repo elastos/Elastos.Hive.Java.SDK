@@ -6,7 +6,7 @@ import org.elastos.hive.service.BackupService;
 
 import java.io.IOException;
 
-public class BackupStateResponseBody extends HiveResponseBody {
+class BackupStateResponseBody extends HiveResponseBody {
     @SerializedName("hive_backup_state")
     private String hiveBackupState;
     @SerializedName("result")

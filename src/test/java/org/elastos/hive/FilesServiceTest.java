@@ -4,8 +4,8 @@ import com.google.common.base.Throwables;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.FileDoesNotExistsException;
 import org.elastos.hive.exception.VaultLockedException;
-import org.elastos.hive.network.model.FileInfo;
 import org.elastos.hive.service.FilesService;
+import org.elastos.hive.vault.files.FileInfo;
 import org.junit.jupiter.api.*;
 
 import java.io.*;
