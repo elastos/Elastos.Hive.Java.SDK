@@ -4,8 +4,8 @@ import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.vault.payment.PaymentController;
-import org.elastos.hive.network.response.VaultCreateResponseBody;
-import org.elastos.hive.network.response.VaultInfoResponseBody;
+import org.elastos.hive.vault.scripting.VaultCreateResponseBody;
+import org.elastos.hive.vault.scripting.VaultInfoResponseBody;
 import org.elastos.hive.vault.payment.PricingPlan;
 
 import java.io.IOException;

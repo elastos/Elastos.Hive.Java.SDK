@@ -1,8 +1,8 @@
-package org.elastos.hive.network.model;
+package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ScriptFileUploadBody {
+class ScriptFileUploadBody {
     @SerializedName("path")
     private String path;
 

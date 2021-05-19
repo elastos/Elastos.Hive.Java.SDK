@@ -1,9 +1,9 @@
-package org.elastos.hive.network.response;
+package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.connection.HiveResponseBody;
 
-public class RegisterScriptResponseBody extends HiveResponseBody {
+class RegisterScriptResponseBody extends HiveResponseBody {
     @SerializedName("acknowledged")
     private Boolean acknowledged;
     @SerializedName("matched_count")

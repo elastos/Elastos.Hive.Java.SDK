@@ -1,9 +1,8 @@
-package org.elastos.hive.network.request;
+package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.network.model.ScriptContext;
 
-public class CallScriptRequestBody {
+class CallScriptRequestBody {
     @SerializedName("name")
     private String name;
     @SerializedName("context")

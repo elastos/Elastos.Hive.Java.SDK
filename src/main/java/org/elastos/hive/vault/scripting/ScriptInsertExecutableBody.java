@@ -1,4 +1,4 @@
-package org.elastos.hive.network.model;
+package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.connection.KeyValueDict;

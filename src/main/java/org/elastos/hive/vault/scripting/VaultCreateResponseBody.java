@@ -1,4 +1,4 @@
-package org.elastos.hive.network.response;
+package org.elastos.hive.vault.scripting;
 
 import org.elastos.hive.connection.HiveResponseBody;
 
