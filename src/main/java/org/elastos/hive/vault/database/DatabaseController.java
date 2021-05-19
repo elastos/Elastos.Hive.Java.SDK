@@ -3,14 +3,9 @@ package org.elastos.hive.vault.database;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.HiveResponseBody;
-import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.POST;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 public class DatabaseController {
 	private DatabaseAPI databaseAPI;

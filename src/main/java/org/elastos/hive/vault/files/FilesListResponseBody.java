@@ -5,7 +5,7 @@ import org.elastos.hive.connection.HiveResponseBody;
 
 import java.util.List;
 
-public class FilesListResponseBody extends HiveResponseBody {
+class FilesListResponseBody extends HiveResponseBody {
 
     @SerializedName("file_info_list")
     private List<FileInfo> fileInfoList;

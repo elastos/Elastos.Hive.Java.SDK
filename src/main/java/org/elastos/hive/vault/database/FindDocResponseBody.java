@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.network.model.KeyValueDict;
 import org.elastos.hive.connection.HiveResponseBody;
 
-public class FindDocResponseBody extends HiveResponseBody {
+class FindDocResponseBody extends HiveResponseBody {
     @SerializedName("items")
     private KeyValueDict item;
 

@@ -3,7 +3,7 @@ package org.elastos.hive.vault.files;
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.connection.HiveResponseBody;
 
-public class FilesHashResponseBody extends HiveResponseBody {
+class FilesHashResponseBody extends HiveResponseBody {
     @SerializedName("SHA256")
     private String sha256;
 

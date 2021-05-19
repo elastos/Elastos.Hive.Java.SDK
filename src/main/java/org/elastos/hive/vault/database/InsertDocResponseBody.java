@@ -3,7 +3,7 @@ package org.elastos.hive.vault.database;
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.connection.HiveResponseBody;
 
-public class InsertDocResponseBody extends HiveResponseBody {
+class InsertDocResponseBody extends HiveResponseBody {
     private Boolean acknowledged;
     @SerializedName("inserted_id")
     private String insertedId;

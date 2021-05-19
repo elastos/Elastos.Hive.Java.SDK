@@ -2,7 +2,7 @@ package org.elastos.hive.vault.files;
 
 import com.google.gson.annotations.SerializedName;
 
-public class FilesMoveRequestBody {
+class FilesMoveRequestBody {
     @SerializedName("src_path")
     private final String srcPath;
 

@@ -5,7 +5,7 @@ import org.elastos.hive.connection.HiveResponseBody;
 
 import java.util.List;
 
-public class InsertDocsResponseBody extends HiveResponseBody {
+class InsertDocsResponseBody extends HiveResponseBody {
     private Boolean acknowledged;
     @SerializedName("inserted_ids")
     private List<String> insertedIds;
