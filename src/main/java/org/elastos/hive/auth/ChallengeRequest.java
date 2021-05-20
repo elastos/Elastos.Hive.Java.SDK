@@ -1,4 +1,4 @@
-package org.elastos.hive.vault.auth;
+package org.elastos.hive.auth;
 
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.connection.HiveResponseBody;
@@ -7,7 +7,7 @@ import org.elastos.hive.utils.JwtUtil;
 
 import com.google.gson.annotations.SerializedName;
 
-class SignInResponseBody extends HiveResponseBody {
+class ChallengeRequest {
     @SerializedName("challenge")
     private String challenge;
 

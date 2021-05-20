@@ -1,4 +1,4 @@
-package org.elastos.hive.vault.auth;
+package org.elastos.hive.auth;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -6,8 +6,8 @@ import retrofit2.http.POST;
 
 public interface AuthAPI {
 	@POST("/api/v1/did/sign_in")
-	Call<SignInResponseBody> signIn(@Body SignInRequestBody reqBody);
+	Call<ChallengeRequest> signIn(@Body SigninRequest reqBody);
 
 	@POST("/api/v1/did/auth")
-	Call<AuthResponseBody> auth(@Body AuthRequestBody reqBody);
+	Call<AccessToken> auth(@Body ChallengeResponse reqBody);
 }
