@@ -15,8 +15,8 @@ class ChallengeRequest {
         return challenge;
     }
 
-    public Claims checkValid(String validAudience) {
-        Claims claims = JwtUtil.getBody(challenge);
+    public static Claims checkValid(String jwt, String validAudience) {
+        Claims claims = JwtUtil.getBody(jwt);
 
         if (claims.getExpiration().getTime() <= System.currentTimeMillis() )
             throw new HiveSdkException("Bad jwt expiration date");
@@ -25,5 +25,9 @@ class ChallengeRequest {
             throw new HiveSdkException("Bad jwt audience value");
 
         return claims;
+    }
+
+    public Claims checkValid(String validAudience) {
+        return checkValid(challenge, validAudience);
     }
 }

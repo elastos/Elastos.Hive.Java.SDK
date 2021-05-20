@@ -14,6 +14,7 @@ public class ServiceEndpoint implements ExceptionConvertor {
 	private AppContext context;
 	private String providerAddress;
 	private ConnectionManager connectionManager;
+	private String appDid;
 	private String appInstanceDid;
 	private String serviceInstanceDid;
 
@@ -50,13 +51,17 @@ public class ServiceEndpoint implements ExceptionConvertor {
 		return connectionManager;
 	}
 
+	public void setAppDid(String appDid) {
+		this.appDid = appDid;
+	}
+
 	/**
 	 * Get the application DID in the current calling context.
 	 *
 	 * @return application did
 	 */
 	protected String getAppDid() {
-		return getAppContext().getAppContextProvider().getAppDid();
+		return appDid;
 	}
 
 	public void setAppInstanceDid(String appInstanceDid) {
