@@ -5,9 +5,9 @@ import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.backup.promotion.PromotionController;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.PromotionService;
 import org.elastos.hive.vault.ExceptionConvertor;
-import org.elastos.hive.vault.backup.BackupController;
 
 class PromotionServiceRender implements PromotionService, ExceptionConvertor {
 	private PromotionController controller;
@@ -21,10 +21,12 @@ class PromotionServiceRender implements PromotionService, ExceptionConvertor {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.promote();
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+			} catch (HiveException e) {
+				e.printStackTrace();
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
-
 }

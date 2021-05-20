@@ -25,4 +25,7 @@ interface SubscriptionAPI {
 
 	@GET("/api/v1/service/vault_backup")
 	Call<VaultInfoResponseBody> getBackupVaultInfo();
+
+
+	//@GET("/api/v2/subscription/pricing_plan")
 }
