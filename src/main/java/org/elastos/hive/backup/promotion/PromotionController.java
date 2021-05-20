@@ -1,10 +1,8 @@
 package org.elastos.hive.backup.promotion;
 
-import java.io.IOException;
-
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.EmptyRequestBody;
-import org.elastos.hive.connection.HiveResponseBody;
+import org.elastos.hive.exception.HiveException;
 
 public class PromotionController {
 	private PromotionAPI api;
@@ -13,7 +11,12 @@ public class PromotionController {
 		api = serviceEndpoint.getConnectionManager().createService(PromotionAPI.class, true);
 	}
 
-	public void promote() throws IOException {
-		HiveResponseBody.validateBody(api.activeToVault(new EmptyRequestBody()).execute().body());
+	public void promote() throws HiveException {
+		try {
+			api.activeToVault(new EmptyRequestBody()).execute().body();
+		} catch (Exception e) {
+			// TOOD:
+			throw new HiveException(e);
+		}
 	}
 }
