@@ -1,4 +1,4 @@
-package org.elastos.hive.vault.payment;
+package org.elastos.hive.subscription.payment;
 
 import com.google.gson.annotations.SerializedName;
 

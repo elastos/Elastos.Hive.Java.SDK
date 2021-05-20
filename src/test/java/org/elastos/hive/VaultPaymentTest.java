@@ -1,9 +1,9 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.vault.payment.Order;
-import org.elastos.hive.vault.payment.PricingPlan;
-import org.elastos.hive.vault.payment.Receipt;
+import org.elastos.hive.subscription.payment.Order;
+import org.elastos.hive.subscription.payment.PricingPlan;
+import org.elastos.hive.subscription.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
 import org.junit.jupiter.api.*;

@@ -1,4 +1,4 @@
-package org.elastos.hive.vault.payment;
+package org.elastos.hive.subscription.payment;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.HiveResponseBody;
