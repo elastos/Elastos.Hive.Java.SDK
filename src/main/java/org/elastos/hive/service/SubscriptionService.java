@@ -3,7 +3,7 @@ package org.elastos.hive.service;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.elastos.hive.vault.payment.PricingPlan;
+import org.elastos.hive.subscription.payment.PricingPlan;
 
 /**
  * Hive node provides the subscription service to let a new user subscribe to their

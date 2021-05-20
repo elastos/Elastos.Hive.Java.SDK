@@ -1,8 +1,6 @@
-package org.elastos.hive.vault.subscription;
+package org.elastos.hive.subscription;
 
 import org.elastos.hive.connection.HiveResponseBody;
-import org.elastos.hive.vault.subscription.VaultCreateResponseBody;
-import org.elastos.hive.vault.subscription.VaultInfoResponseBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 

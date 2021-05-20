@@ -1,11 +1,9 @@
-package org.elastos.hive.vault;
+package org.elastos.hive.subscription;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.VaultAlreadyExistException;
-import org.elastos.hive.vault.payment.PaymentController;
-import org.elastos.hive.vault.payment.PricingPlan;
-import org.elastos.hive.vault.subscription.SubscriptionController;
-import org.elastos.hive.vault.subscription.VaultInfoResponseBody;
+import org.elastos.hive.subscription.payment.PaymentController;
+import org.elastos.hive.subscription.payment.PricingPlan;
 
 import java.io.IOException;
 import java.util.List;

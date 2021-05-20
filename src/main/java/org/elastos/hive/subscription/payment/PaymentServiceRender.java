@@ -1,8 +1,6 @@
-package org.elastos.hive.vault;
+package org.elastos.hive.subscription.payment;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.vault.payment.Order;
-import org.elastos.hive.vault.payment.PaymentController;
 
 import java.io.IOException;
 import java.util.List;
