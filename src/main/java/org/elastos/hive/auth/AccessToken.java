@@ -1,9 +1,9 @@
-package org.elastos.hive.vault.auth;
+package org.elastos.hive.auth;
 
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.connection.HiveResponseBody;
 
-class AuthResponseBody extends HiveResponseBody {
+class AccessToken {
     @SerializedName("access_token")
     private String token;
 
