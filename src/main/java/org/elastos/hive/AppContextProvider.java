@@ -28,11 +28,4 @@ public interface AppContextProvider {
      * @return The credential issued by user.
      */
     CompletableFuture<String> getAuthorization(String authenticationChallengeJWtCode);
-
-	/**
-	 * The application did identifies the application with others.
-	 *
-	 * @return appDid
-	 */
-	String getAppDid();
 }

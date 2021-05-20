@@ -115,11 +115,6 @@ public class TestData {
 					}
 				});
 			}
-
-			@Override
-			public String getAppDid() {
-				return appInstanceDid.appId;
-			}
 		}, nodeConfig.ownerDid());
 
 		contextCaller = AppContext.build(new AppContextProvider() {
@@ -153,11 +148,6 @@ public class TestData {
 						throw new CompletionException(new HiveException(e.getMessage()));
 					}
 				});
-			}
-
-			@Override
-			public String getAppDid() {
-				return appInstanceDid.appId;
 			}
 		}, userConfigCaller.did());
 		callerDid = userConfigCaller.did();
