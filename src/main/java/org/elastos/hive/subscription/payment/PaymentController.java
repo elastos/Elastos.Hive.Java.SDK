@@ -1,9 +1,8 @@
 package org.elastos.hive.subscription.payment;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.connection.HiveResponseBody;
+import org.elastos.hive.exception.HiveException;
 
-import java.io.IOException;
 import java.util.List;
 
 public class PaymentController {
@@ -13,37 +12,58 @@ public class PaymentController {
 		paymentAPI = serviceEndpoint.getConnectionManager().createService(PaymentAPI.class, true);
 	}
 
-	public String createOrder(String pricingPlanName, String backupPlanName) throws IOException {
-		return HiveResponseBody.validateBody(
-				paymentAPI.createOrder(new PaymentCreateRequestBody(pricingPlanName, backupPlanName))
+	public String createOrder(String pricingPlanName, String backupPlanName) throws HiveException {
+		try {
+			return paymentAPI.createOrder(new PaymentCreateRequestBody(pricingPlanName, backupPlanName))
 						.execute()
-						.body()).getOrderId();
+						.body().getOrderId();
+		 } catch (Exception e) {
+			 // TODO:
+			 e.printStackTrace();
+			 throw new HiveException(e.getMessage());
+		 }
 	}
 
-	public void payOrder(String orderId, List<String> transIds) throws IOException {
-		HiveResponseBody.validateBody(
-				paymentAPI.payOrder(new PayOrderRequestBody().setOrderId(orderId).setPayTxids(transIds))
+	public void payOrder(String orderId, List<String> transIds) throws HiveException {
+		 try {
+			paymentAPI.payOrder(new PayOrderRequestBody().setOrderId(orderId).setPayTxids(transIds))
 						.execute()
-						.body());
+						.body();
+		 } catch (Exception e) {
+			 // TODO:
+			 e.printStackTrace();
+			 throw new HiveException(e.getMessage());
+		 }
 	}
 
-	public Order getOrderInfo(String orderId) throws IOException {
-		return HiveResponseBody.validateBody(
-				paymentAPI.getOrderInfo(orderId).execute().body()).getOrderInfo();
+	public Order getOrderInfo(String orderId) throws HiveException {
+		try {
+			return paymentAPI.getOrderInfo(orderId).execute().body().getOrderInfo();
+		} catch (Exception e) {
+			// TODO:
+			e.printStackTrace();
+			throw new HiveException(e.getMessage());
+		}
 	}
 
-	public List<PricingPlan> getPricingPlanList() throws IOException {
-		return HiveResponseBody.validateBody(
-				paymentAPI.getPackageInfo()
-						.execute()
-						.body()).getPricingPlans();
+	public List<PricingPlan> getPricingPlanList() throws HiveException {
+		try {
+			return paymentAPI.getPackageInfo().execute().body().getPricingPlans();
+		} catch (Exception e) {
+			// TODO:
+			e.printStackTrace();
+			throw new HiveException(e.getMessage());
+		}
 	}
 
-	public PricingPlan getPricingPlan(String planName) throws IOException {
-		return getPricePlanByResponseBody(HiveResponseBody.validateBody(
-				paymentAPI.getPricingPlan(planName)
-						.execute()
-						.body()));
+	public PricingPlan getPricingPlan(String planName) throws HiveException {
+		try {
+			return getPricePlanByResponseBody(paymentAPI.getPricingPlan(planName).execute().body());
+		} catch (Exception e) {
+			// TODO:
+			e.printStackTrace();
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	private PricingPlan getPricePlanByResponseBody(PaymentPlanResponseBody respBody) {
@@ -54,17 +74,23 @@ public class PaymentController {
 				.setName(respBody.getName());
 	}
 
-	public List<PricingPlan> getBackupPlanList() throws IOException {
-		return HiveResponseBody.validateBody(
-				paymentAPI.getPackageInfo()
-						.execute()
-						.body()).getBackupPlans();
+	public List<PricingPlan> getBackupPlanList() throws HiveException {
+		try {
+			return paymentAPI.getPackageInfo().execute().body().getBackupPlans();
+		} catch (Exception e) {
+			// TODO:
+			e.printStackTrace();
+			throw new HiveException(e.getMessage());
+		}
 	}
 
-	public PricingPlan getBackupPlan(String planName) throws IOException {
-		return getPricePlanByResponseBody(HiveResponseBody.validateBody(
-				paymentAPI.getBackupPlan(planName)
-						.execute()
-						.body()));
+	public PricingPlan getBackupPlan(String planName) throws HiveException {
+		try {
+			return getPricePlanByResponseBody(paymentAPI.getBackupPlan(planName).execute().body());
+		} catch (Exception e) {
+			// TODO:
+			e.printStackTrace();
+			throw new HiveException(e.getMessage());
+		}
 	}
 }

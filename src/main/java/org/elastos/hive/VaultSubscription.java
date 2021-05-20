@@ -1,43 +1,45 @@
 package org.elastos.hive;
 
+import org.elastos.hive.Vault.PropertySet;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.subscription.payment.Order;
-import org.elastos.hive.subscription.payment.PaymentServiceRender;
+import org.elastos.hive.subscription.payment.PaymentController;
 import org.elastos.hive.subscription.payment.PricingPlan;
 import org.elastos.hive.subscription.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.vault.ExceptionConvertor;
-import org.elastos.hive.subscription.SubscriptionServiceRender;
+import org.elastos.hive.subscription.SubscriptionController;
 import org.elastos.hive.subscription.VaultInfoResponseBody;
 
 public class VaultSubscription extends ServiceEndpoint
 	implements SubscriptionService<Vault.PropertySet>, PaymentService, ExceptionConvertor {
 
-	private SubscriptionServiceRender subscriptionService;
-	private PaymentServiceRender paymentService;
+	private SubscriptionController subscriptionController;
+	private PaymentController paymentController;
 
 	public VaultSubscription(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
-		this.paymentService = new PaymentServiceRender(this);
-		this.subscriptionService = new SubscriptionServiceRender(this);
+		subscriptionController = new SubscriptionController(this);
+		paymentController = new PaymentController(this);
 	}
 
 	@Override
 	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return subscriptionService.getPricingPlanList();
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				return paymentController.getPricingPlanList();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -46,9 +48,11 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return subscriptionService.getPricingPlan(planName);
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				return paymentController.getPricingPlan(planName);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -59,62 +63,74 @@ public class VaultSubscription extends ServiceEndpoint
 
 	@Override
 	public CompletableFuture<Vault.PropertySet> subscribe(String reserved) {
-		return CompletableFuture.supplyAsync(() -> {
+		return CompletableFuture.supplyAsync(()-> {
 			try {
-				this.subscriptionService.subscribe();
-				return getPropertySet();
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				// TODO:
+				subscriptionController.subscribe();
+				return new PropertySet();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
 
 	@Override
 	public CompletableFuture<Void> unsubscribe() {
-		return CompletableFuture.runAsync(() -> {
+		return CompletableFuture.runAsync(()-> {
 			try {
-				this.subscriptionService.unsubscribe();
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				subscriptionController.unsubscribe();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
 
 	@Override
 	public CompletableFuture<Void> activate() {
-		return CompletableFuture.runAsync(() -> {
+		return CompletableFuture.runAsync(()-> {
 			try {
-				this.subscriptionService.activate();
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				subscriptionController.activate();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
 
 	@Override
 	public CompletableFuture<Void> deactivate() {
-		return CompletableFuture.runAsync(() -> {
+		return CompletableFuture.runAsync(()-> {
 			try {
-				this.subscriptionService.deactivate();
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				subscriptionController.deactivate();
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
 
 	@Override
 	public CompletableFuture<Vault.PropertySet> checkSubscription() {
-		return CompletableFuture.supplyAsync(() -> {
+		return CompletableFuture.supplyAsync(()-> {
 			try {
+				// TODO:
 				return getPropertySet();
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
 
-	private Vault.PropertySet getPropertySet() throws IOException {
-		VaultInfoResponseBody body = this.subscriptionService.getVaultInfo();
+	private Vault.PropertySet getPropertySet() throws HiveException {
+		VaultInfoResponseBody body = subscriptionController.getVaultInfo();
 		// TODO: serviceDid
 		return new Vault.PropertySet()
 				.setPricingPlan(body.getPricingUsing())
@@ -128,9 +144,11 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Order> placeOrder(String planName) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return paymentService.getOrderInfo(paymentService.createPricingOrder(planName));
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				return paymentController.getOrderInfo(paymentController.createOrder(null, planName));
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -139,9 +157,11 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Order> getOrder(String orderId) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return paymentService.getOrderInfo(orderId);
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				return paymentController.getOrderInfo(orderId);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -150,11 +170,12 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Receipt> payOrder(String orderId, String transactionId) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				paymentService.payOrder(orderId, transactionId == null ? Collections.emptyList() : Collections.singletonList(transactionId));
-				//TODO:
-				return new Receipt();
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				paymentController.payOrder(orderId, Collections.singletonList(transactionId));
+				return null;
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			} catch (RuntimeException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}

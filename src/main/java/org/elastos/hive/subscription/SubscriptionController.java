@@ -1,9 +1,7 @@
 package org.elastos.hive.subscription;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.connection.HiveResponseBody;
-
-import java.io.IOException;
+import org.elastos.hive.exception.HiveException;
 
 public class SubscriptionController {
 	private SubscriptionAPI subscriptionAPI;
@@ -12,37 +10,73 @@ public class SubscriptionController {
 		this.subscriptionAPI = serviceEndpoint.getConnectionManager().createService(SubscriptionAPI.class, true);
 	}
 
-	public boolean subscribe() throws IOException {
-        return Boolean.TRUE.equals(HiveResponseBody.validateBody(
-        		subscriptionAPI.createVault()
-                        .execute()
-                        .body()).getExisting());
+	public boolean subscribe() throws HiveException {
+        try {
+        	return subscriptionAPI.createVault().execute().body().getExisting();
+		 } catch (Exception e) {
+			 // TODO:
+			 e.printStackTrace();
+			 throw new HiveException(e.getMessage());
+		 }
 	}
 
-	public boolean subscribeBackup() throws IOException {
-		return Boolean.TRUE.equals(HiveResponseBody.validateBody(
-        		subscriptionAPI.createBackupVault()
-                        .execute()
-                        .body()).getExisting());
+	public boolean subscribeBackup() throws HiveException {
+		try {
+        	return subscriptionAPI.createBackupVault().execute().body().getExisting();
+		 } catch (Exception e) {
+			 // TODO:
+			 e.printStackTrace();
+			 throw new HiveException(e.getMessage());
+		 }
 	}
 
-	public void unsubscribe() throws IOException {
-        HiveResponseBody.validateBody(subscriptionAPI.removeVault().execute().body());
+	public void unsubscribe() throws HiveException {
+         try {
+        	subscriptionAPI.removeVault().execute().body();
+		 } catch (Exception e) {
+			 // TODO:
+			 e.printStackTrace();
+			 throw new HiveException(e.getMessage());
+		 }
 	}
 
-	public void activate() throws IOException {
-        HiveResponseBody.validateBody(subscriptionAPI.unfreeze().execute().body());
+	public void activate() throws HiveException {
+         try {
+        	subscriptionAPI.unfreeze().execute().body();
+		 } catch (Exception e) {
+			 // TODO:
+			 e.printStackTrace();
+			 throw new HiveException(e.getMessage());
+		 }
 	}
 
-	public void deactivate() throws IOException {
-        HiveResponseBody.validateBody(subscriptionAPI.freeze().execute().body());
+	public void deactivate() throws HiveException {
+        try {
+        	subscriptionAPI.freeze().execute().body();
+		 } catch (Exception e) {
+			 // TODO:
+			 e.printStackTrace();
+			 throw new HiveException(e.getMessage());
+		 }
 	}
 
-	public VaultInfoResponseBody getVaultInfo() throws IOException {
-        return HiveResponseBody.validateBody(subscriptionAPI.getVaultInfo().execute().body());
+	public VaultInfoResponseBody getVaultInfo() throws HiveException {
+         try {
+        	return subscriptionAPI.getVaultInfo().execute().body();
+		 } catch (Exception e) {
+			 // TODO:
+			 e.printStackTrace();
+			 throw new HiveException(e.getMessage());
+		 }
 	}
 
-	public VaultInfoResponseBody getBackupVaultInfo() throws IOException {
-        return HiveResponseBody.validateBody(subscriptionAPI.getBackupVaultInfo().execute().body());
+	public VaultInfoResponseBody getBackupVaultInfo() throws HiveException {
+         try {
+        	 return subscriptionAPI.getBackupVaultInfo().execute().body();
+		 } catch (Exception e) {
+			 // TODO:
+			 e.printStackTrace();
+			 throw new HiveException(e.getMessage());
+		 }
 	}
 }
