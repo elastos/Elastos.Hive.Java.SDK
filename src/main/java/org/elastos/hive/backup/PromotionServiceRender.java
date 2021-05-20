@@ -4,15 +4,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.backup.promotion.PromotionController;
 import org.elastos.hive.service.PromotionService;
 import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.vault.backup.BackupController;
 
 class PromotionServiceRender implements PromotionService, ExceptionConvertor {
-	private BackupController controller;
+	private PromotionController controller;
 
 	PromotionServiceRender(ServiceEndpoint serviceEndpoint) {
-		controller = new BackupController(serviceEndpoint);
+		controller = new PromotionController(serviceEndpoint);
 	}
 
 	@Override
