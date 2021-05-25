@@ -31,6 +31,7 @@ public class ScriptingController {
 		return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
 				scriptingAPI.callScript(new CallScriptRequestBody()
 						.setName(name)
+						.setContext(new ScriptContext().setTargetDid(targetDid).setTargetAppDid(targetAppDid))
 						.setParams(HiveResponseBody.jsonNode2Map(params)))
 						.execute()
 		), resultType);
