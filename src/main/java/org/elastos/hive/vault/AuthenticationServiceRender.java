@@ -3,9 +3,9 @@ package org.elastos.hive.vault;
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.auth.AuthController;
 import org.elastos.hive.auth.AuthToken;
 import org.elastos.hive.auth.AuthTokenToVault;
-import org.elastos.hive.vault.auth.*;
 import org.elastos.hive.utils.JwtUtil;
 
 import java.io.IOException;

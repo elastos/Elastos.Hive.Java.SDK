@@ -2,11 +2,11 @@ package org.elastos.hive.auth;
 
 import com.google.gson.annotations.SerializedName;
 
-class ChallengeResponse {
+class AuthRequest {
     @SerializedName("jwt")
     private final String jwt;
 
-    public ChallengeResponse(String jwt) {
+    public AuthRequest(String jwt) {
         this.jwt = jwt;
     }
 }

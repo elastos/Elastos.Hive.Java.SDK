@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.connection.HiveResponseBody;
 
-class AccessToken {
+class AuthResponse extends HiveResponseBody {
     @SerializedName("access_token")
     private String token;
 
@@ -13,6 +13,6 @@ class AccessToken {
     }
 
     public Claims checkValid(String validAudience) {
-        return SignInResponseBody.checkValid(token, validAudience);
+        return SignInResponse.checkValid(token, validAudience);
     }
 }
