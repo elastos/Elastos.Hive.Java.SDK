@@ -1,4 +1,4 @@
-package org.elastos.hive.vault.auth;
+package org.elastos.hive.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elastos.hive.AppContextProvider;
@@ -18,7 +18,7 @@ public class AuthController {
     }
 
     public String signIn(String appInstanceDid) throws IOException {
-        SignInResponseBody body = HiveResponseBody.validateBody(authAPI.signIn(new SignInRequestBody(new ObjectMapper()
+        SignInResponse body = HiveResponseBody.validateBody(authAPI.signIn(new SigninRequest(new ObjectMapper()
                         .readValue(provider.getAppInstanceDocument().toString(), HashMap.class)))
                 .execute()
                 .body());
@@ -27,6 +27,6 @@ public class AuthController {
     }
 
     public String auth(String token) throws IOException {
-        return HiveResponseBody.validateBody(authAPI.auth(new AuthRequestBody(token)).execute().body()).getToken();
+        return HiveResponseBody.validateBody(authAPI.auth(new AuthRequest(token)).execute().body()).getToken();
     }
 }
