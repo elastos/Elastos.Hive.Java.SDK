@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 class PaymentCreateRequestBody {
     @SerializedName("pricing_name")
     private final String pricingName;
-    @SerializedName("backing_name")
+    @SerializedName("backup_name")
     private final String backupName;
 
     public PaymentCreateRequestBody(String pricingPlanName, String backupPlanName) {
