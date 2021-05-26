@@ -1,4 +1,4 @@
-package org.elastos.hive.auth;
+package org.elastos.hive.auth.controller;
 
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.connection.HiveResponseBody;

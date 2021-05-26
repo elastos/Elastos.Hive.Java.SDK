@@ -1,4 +1,4 @@
-package org.elastos.hive.auth;
+package org.elastos.hive.auth.controller;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
