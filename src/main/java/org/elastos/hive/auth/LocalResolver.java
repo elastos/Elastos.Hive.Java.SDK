@@ -1,6 +1,5 @@
 package org.elastos.hive.auth;
 
-import com.google.gson.Gson;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.storage.DataStorage;
@@ -10,7 +9,6 @@ public class LocalResolver implements TokenResolver {
 
 	protected DataStorage dataStorage;
 	protected ServiceEndpoint serviceEndpoint;
-	protected AuthToken token;
 
 	public LocalResolver(ServiceEndpoint serviceEndpoint) {
 		this.dataStorage = serviceEndpoint.getAppContext().getDataStorage();
@@ -18,11 +16,9 @@ public class LocalResolver implements TokenResolver {
 	}
 
 	@Override
-	public AuthToken getToken() throws HttpFailedException {
-		if (token == null)
-			token = restoreToken();
-
-		if (token == null || token.isExpired()) {
+	public String getToken() throws HttpFailedException {
+		String token = restoreToken();
+		if (token == null) {
 			token = nextResolver.getToken();
 			saveToken(token);
 		}
@@ -32,10 +28,7 @@ public class LocalResolver implements TokenResolver {
 
 	@Override
 	public void invalidateToken() {
-		if (token != null) {
-			token = null;
-			clearToken();
-		}
+		clearToken();
 	}
 
 	@Override
@@ -43,7 +36,7 @@ public class LocalResolver implements TokenResolver {
 		this.nextResolver = resolver;
 	}
 
-	protected AuthToken restoreToken() {
+	protected String restoreToken() {
 		String tokenStr = null;
 		if (serviceEndpoint.getServiceInstanceDid() != null) {
 			tokenStr = dataStorage.loadAccessToken(serviceEndpoint.getServiceInstanceDid());
@@ -51,14 +44,10 @@ public class LocalResolver implements TokenResolver {
 				tokenStr = dataStorage.loadAccessTokenByAddress(serviceEndpoint.getProviderAddress());
 		}
 
-		if (tokenStr == null)
-			return null;
-
-		return new Gson().fromJson(tokenStr, AuthTokenToVault.class);
+		return tokenStr;
 	}
 
-	protected void saveToken(AuthToken token) {
-		String tokenStr = new Gson().toJson(token);
+	protected void saveToken(String tokenStr) {
 		if (serviceEndpoint.getServiceInstanceDid() != null)
 			dataStorage.storeAccessToken(serviceEndpoint.getServiceInstanceDid(), tokenStr);
 		dataStorage.storeAccessTokenByAddress(serviceEndpoint.getProviderAddress(), tokenStr);

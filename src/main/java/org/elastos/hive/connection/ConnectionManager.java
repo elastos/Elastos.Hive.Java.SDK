@@ -25,6 +25,7 @@ package org.elastos.hive.connection;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.auth.AccessToken;
 import org.elastos.hive.utils.LogUtil;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -43,6 +44,7 @@ public class ConnectionManager {
 	private Interceptor authRequestInterceptor;
 	private PlainRequestInterceptor plainRequestInterceptor;
 	private NormalRequestInterceptor normalRequestInterceptor;
+	private AccessToken accessToken;
 
 	public ConnectionManager() {
 		this.authRequestInterceptor  = new AuthRequestInterceptor();
@@ -50,9 +52,9 @@ public class ConnectionManager {
 
 	public void attach(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
-		this.plainRequestInterceptor = new PlainRequestInterceptor(this.serviceEndpoint);
-		this.normalRequestInterceptor = new NormalRequestInterceptor(this.serviceEndpoint);
-		this.normalRequestInterceptor.setTokenResolver(this.plainRequestInterceptor.getTokenResolver());
+		this.accessToken = new AccessToken(serviceEndpoint);
+		this.plainRequestInterceptor = new PlainRequestInterceptor(accessToken);
+		this.normalRequestInterceptor = new NormalRequestInterceptor(accessToken);
 	}
 
 	public ServiceEndpoint getServiceEndpoint() {
@@ -78,7 +80,7 @@ public class ConnectionManager {
 		httpURLConnection.setUseCaches(false);
 		httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
 		httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
-		httpURLConnection.setRequestProperty("Authorization", this.plainRequestInterceptor.getAuthToken().getCanonicalizedAccessToken());
+		httpURLConnection.setRequestProperty("Authorization", accessToken.getCanonicalizedAccessToken());
 
 		httpURLConnection.setChunkedStreamingMode(0);
 		return httpURLConnection;

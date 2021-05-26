@@ -6,6 +6,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.auth.AccessToken;
 import org.elastos.hive.auth.AuthToken;
 import org.elastos.hive.auth.LocalResolver;
 import org.elastos.hive.auth.RemoteResolver;
@@ -18,23 +19,17 @@ import org.elastos.hive.exception.UnauthorizedException;
 import java.io.IOException;
 
 class NormalRequestInterceptor implements Interceptor {
-    private TokenResolver tokenResolver;
+	private AccessToken accessToken;
 
-    NormalRequestInterceptor(ServiceEndpoint endpoint) {
-        this.tokenResolver = new LocalResolver(endpoint);
-        this.tokenResolver.setNextResolver(new RemoteResolver(endpoint));
-    }
-
-    public NormalRequestInterceptor setTokenResolver(TokenResolver tokenResolver) {
-        this.tokenResolver = tokenResolver;
-        return this;
+	NormalRequestInterceptor(AccessToken accessToken) {
+    	this.accessToken = accessToken;
     }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         request = request.newBuilder()
-        			.addHeader("Authorization", getAuthToken().getCanonicalizedAccessToken())
+        			.addHeader("Authorization", accessToken.getCanonicalizedAccessToken())
                     .build();
         return handleResponse(chain.proceed(request));
     }
@@ -51,7 +46,7 @@ class NormalRequestInterceptor implements Interceptor {
     private void handleResponseErrorCode(Response response) throws IOException {
         int code = response.code();
         if (code == 401)
-            tokenResolver.invalidateToken();
+            accessToken.invalidateToken();
 
         ResponseBody body = response.body();
         if (body == null)
@@ -66,9 +61,5 @@ class NormalRequestInterceptor implements Interceptor {
         } catch (IOException e) {
             throw new HiveSdkException(e.getMessage());
         }
-    }
-
-    public AuthToken getAuthToken() throws HttpFailedException {
-        return tokenResolver.getToken();
     }
 }

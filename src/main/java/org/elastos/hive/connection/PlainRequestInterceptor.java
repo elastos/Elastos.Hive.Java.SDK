@@ -2,11 +2,7 @@ package org.elastos.hive.connection;
 
 import java.io.IOException;
 
-import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.auth.AuthToken;
-import org.elastos.hive.auth.LocalResolver;
-import org.elastos.hive.auth.RemoteResolver;
-import org.elastos.hive.auth.TokenResolver;
+import org.elastos.hive.auth.AccessToken;
 import org.elastos.hive.exception.HttpFailedException;
 
 import okhttp3.Request;
@@ -14,22 +10,17 @@ import okhttp3.Response;
 import okhttp3.Interceptor;
 
 class PlainRequestInterceptor implements Interceptor {
-	private TokenResolver tokenResolver;
+	private AccessToken accessToken;
 
-    PlainRequestInterceptor(ServiceEndpoint endpoint) {
-        this.tokenResolver = new LocalResolver(endpoint);
-        this.tokenResolver.setNextResolver(new RemoteResolver(endpoint));
-    }
-
-    public TokenResolver getTokenResolver() {
-        return tokenResolver;
+    PlainRequestInterceptor(AccessToken accessToken) {
+    	this.accessToken = accessToken;
     }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         request = request.newBuilder()
-        			.addHeader("Authorization", getAuthToken().getCanonicalizedAccessToken())
+        			.addHeader("Authorization", accessToken.getCanonicalizedAccessToken())
                     .build();
         return handleResponse(chain.proceed(request));
     }
@@ -40,18 +31,11 @@ class PlainRequestInterceptor implements Interceptor {
         return response;
     }
 
-    /**
-     * All error code comes from node service.
-     */
     private void handleResponseErrorCode(int code) throws IOException {
         if (code == 401)
-            tokenResolver.invalidateToken();
+        	accessToken.invalidateToken();
 
         throw new HttpFailedException(code,
                 HiveResponseBody.getHttpErrorMessages().getOrDefault(code, "Unknown error."));
-    }
-
-    public AuthToken getAuthToken() throws HttpFailedException {
-        return tokenResolver.getToken();
     }
 }

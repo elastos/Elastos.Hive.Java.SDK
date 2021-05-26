@@ -21,7 +21,7 @@ public class BackupRemoteResolver implements TokenResolver {
     }
 
     @Override
-    public AuthToken getToken() throws HttpFailedException {
+    public String getToken() throws HttpFailedException {
        /* try {
             return credential(authenticationService.signIn4ServiceDid());
         } catch (Exception e) {
@@ -30,11 +30,12 @@ public class BackupRemoteResolver implements TokenResolver {
     	return null;
     }
 
+    /*
     private AuthToken credential(String sourceDid) throws ExecutionException, InterruptedException {
         return new AuthTokenToBackup(backupContext
                 .getAuthorization(sourceDid, this.targetDid, this.targetHost).get(),
                 0);
-    }
+    }*/
 
     @Override
     public void invalidateToken() {
