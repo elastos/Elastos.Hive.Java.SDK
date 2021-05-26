@@ -28,7 +28,7 @@ public class AccessToken extends AuthToken {
 
 	@Override
 	public String getCanonicalizedAccessToken() {
-		return "token " + jwtCode;
+		return "token " + getToken();
 	}
 
 	@Override
