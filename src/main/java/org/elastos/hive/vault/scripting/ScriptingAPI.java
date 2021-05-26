@@ -5,20 +5,25 @@ import retrofit2.Call;
 import retrofit2.http.*;
 
 interface ScriptingAPI {
-	String API_SCRIPT_UPLOAD = "/scripting/run_script_upload";
+	String API_SCRIPT_UPLOAD = "/api/v2/vault/scripting/stream";
 
-	@POST("/api/v1/scripting/set_script")
-	Call<RegisterScriptResponseBody> registerScript(@Body RegisterScriptRequestBody body);
+	@PUT("/api/v2/vault/scripting/{scriptName}")
+	Call<RegisterScriptResponse> registerScript(@Path("scriptName") String scriptName,
+												@Body RegisterScriptRequest body);
 
-	@POST("/api/v1/scripting/run_script")
-	Call<ResponseBody> callScript(@Body CallScriptRequestBody body);
+	@PATCH("/api/v2/vault/scripting/{scriptName}")
+	Call<ResponseBody> runScript(@Path("scriptName") String scriptName,
+						         @Body CallScriptRequest body);
 
-	@GET("/api/v1/scripting/run_script_url/{targetDid}@{appDid}/{scriptName}")
-	Call<ResponseBody> callScriptUrl(@Path("targetDid") String targetDid,
-									 @Path("appDid") String appDid,
-									 @Path("scriptName") String scriptName,
-									 @Query("params") String params);
+	@GET("/api/v2/vault/scripting/{scriptName}/{targetDid}@{targetAppDid}/{params}")
+	Call<ResponseBody> runScriptUrl(@Path("scriptName") String scriptName,
+									@Path("targetDid") String targetDid,
+									@Path("targetAppDid") String targetAppDid,
+									@Path("params") String params);
 
-	@POST("/api/v1/scripting/run_script_download/{transaction_id}")
-	Call<ResponseBody> callDownload(@Path("transaction_id") String transactionId);
+	@GET("/api/v2/vault/scripting/stream/{transactionId}")
+	Call<ResponseBody> downloadFile(@Path("transactionId") String transactionId);
+
+	@DELETE("/api/v2/vault/scripting/{scriptName}")
+	Call<Void> unregisterScript(@Path("scriptName") String scriptName);
 }

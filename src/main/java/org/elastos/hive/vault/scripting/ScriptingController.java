@@ -12,46 +12,42 @@ public class ScriptingController {
 
 	public ScriptingController(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
-		this.scriptingAPI = serviceEndpoint.getConnectionManager().createService(ScriptingAPI.class, true);
+		this.scriptingAPI = serviceEndpoint.getConnectionManager().createService(ScriptingAPI.class);
 	}
 
 	public void registerScript(String name, Condition condition, Executable executable,
 							   boolean allowAnonymousUser, boolean allowAnonymousApp) throws IOException {
-		HiveResponseBody.validateBody(
-				scriptingAPI.registerScript(new RegisterScriptRequestBody().setName(name)
+		scriptingAPI.registerScript(name, new RegisterScriptRequest()
 						.setExecutable(executable)
 						.setAllowAnonymousUser(allowAnonymousUser)
 						.setAllowAnonymousApp(allowAnonymousApp)
 						.setCondition(condition))
-						.execute().body());
+						.execute().body();
 	}
 
 	public <T> T callScript(String name, JsonNode params,
 							String targetDid, String targetAppDid, Class<T> resultType) throws IOException {
 		return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
-				scriptingAPI.callScript(new CallScriptRequestBody()
-						.setName(name)
-						.setContext(new ScriptContext().setTargetDid(targetDid).setTargetAppDid(targetAppDid))
-						.setParams(HiveResponseBody.jsonNode2Map(params)))
-						.execute()
-		), resultType);
+				scriptingAPI.runScript(name, new CallScriptRequest()
+					.setContext(new ScriptContext().setTargetDid(targetDid).setTargetAppDid(targetAppDid))
+					.setParams(HiveResponseBody.jsonNode2Map(params)))
+					.execute(), false), resultType);
 	}
 
 	public <T> T callScriptUrl(String name, String params,
 							   String targetDid, String targetAppDid, Class<T> resultType) throws IOException {
 		return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
-				scriptingAPI.callScriptUrl(targetDid, targetAppDid, name, params)
-						.execute()
-		), resultType);
+				scriptingAPI.runScriptUrl(name, targetDid, targetAppDid, params)
+						.execute(), false), resultType);
 	}
 
 	public <T> T uploadFile(String transactionId, Class<T> resultType) throws IOException {
 		return HiveResponseBody.getRequestStream(
-				serviceEndpoint.getConnectionManager().openConnection(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId),
+				serviceEndpoint.getConnectionManager().openConnectionWithUrl(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId, "PUT"),
 				resultType);
 	}
 
 	public <T> T downloadFile(String transactionId, Class<T> resultType) throws IOException {
-		return HiveResponseBody.getResponseStream(scriptingAPI.callDownload(transactionId).execute(), resultType);
+		return HiveResponseBody.getResponseStream(scriptingAPI.downloadFile(transactionId).execute(), resultType);
 	}
 }

@@ -21,6 +21,10 @@ class PlainRequestInterceptor implements Interceptor {
         this.tokenResolver.setNextResolver(new RemoteResolver(endpoint));
     }
 
+    public TokenResolver getTokenResolver() {
+        return tokenResolver;
+    }
+
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();

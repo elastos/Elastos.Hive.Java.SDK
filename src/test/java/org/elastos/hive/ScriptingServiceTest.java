@@ -1,6 +1,8 @@
 package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Throwables;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.connection.KeyValueDict;
@@ -41,6 +43,7 @@ class ScriptingServiceTest {
 	private final String localDstFileRoot;
 	private final String localDstFilePath;
 	private final String fileName;
+	private final String fakeParams;
 
 	public ScriptingServiceTest() {
 		fileName = "test.txt";
@@ -48,6 +51,7 @@ class ScriptingServiceTest {
 		localSrcFilePath = localRootPath + fileName;
 		localDstFileRoot = localRootPath + "cache/script/";
 		localDstFilePath = localDstFileRoot + fileName;
+		fakeParams = "{\"path\":\"invalid_path\"}";
 	}
 
 	@BeforeAll public static void setUp() {
@@ -103,14 +107,14 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			scriptingService.registerScript(scriptName,
 					new Executable(scriptName, Executable.TYPE_FIND,
-							new ScriptFindBody(COLLECTION_NAME, new KeyValueDict().putKv("author","John"))),
+							new ScriptFindBody(COLLECTION_NAME, new KeyValueDict().putKv("author","John"))).setOutput(true),
 					false, false).get();
 		});
 	}
 
 	private void callScriptFindWithoutCondition(String scriptName) {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-				scriptRunner.callScriptUrl(scriptName,null, ownerDid, appDid, String.class).get()));
+				scriptRunner.callScriptUrl(scriptName, fakeParams, ownerDid, appDid, String.class).get()));
 	}
 
 	@Test @Order(3) void testFind() {
@@ -129,14 +133,18 @@ class ScriptingServiceTest {
 					new Executable(
 							scriptName,
 							Executable.TYPE_FIND,
-							new ScriptFindBody(COLLECTION_NAME, filter)),
+							new ScriptFindBody(COLLECTION_NAME, filter)).setOutput(true),
 					false, false).get();
 		});
 	}
 
 	private void callScriptFind(String scriptName) {
-		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-				scriptRunner.callScript(scriptName,null, ownerDid, appDid, String.class).get()));
+		Assertions.assertDoesNotThrow(()->{
+			ObjectNode node = JsonNodeFactory.instance.objectNode();
+			node.put("path", "fake_path");
+			Assertions.assertNotNull(
+				scriptRunner.callScript(scriptName, node, ownerDid, appDid, String.class).get());
+		});
 	}
 
 	@Test @Order(4) void testUpdate() {
@@ -207,8 +215,8 @@ class ScriptingServiceTest {
 	private void registerScriptFileUpload(String scriptName) {
 		Assertions.assertDoesNotThrow(()->
 				scriptingService.registerScript(scriptName,
-				Executable.createFileUploadExecutable(scriptName),
-				false, false).get());
+					Executable.createFileUploadExecutable(scriptName).setOutput(true),
+					false, false).get());
 	}
 
 	private String callScriptFileUpload(String scriptName, String fileName) {
@@ -250,8 +258,8 @@ class ScriptingServiceTest {
 	private void registerScriptFileDownload(String scriptName) {
 		Assertions.assertDoesNotThrow(()->
 				scriptingService.registerScript(scriptName,
-				Executable.createFileDownloadExecutable(scriptName),
-				false, false).get());
+					Executable.createFileDownloadExecutable(scriptName).setOutput(true),
+					false, false).get());
 	}
 
 	private String callScriptFileDownload(String scriptName, String fileName) {
