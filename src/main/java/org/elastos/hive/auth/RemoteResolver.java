@@ -2,12 +2,13 @@ package org.elastos.hive.auth;
 
 import com.google.common.base.Throwables;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.elastos.did.jwt.Claims;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.auth.controller.AuthController;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.utils.LogUtil;
@@ -36,8 +37,8 @@ public class RemoteResolver implements TokenResolver {
 		}
 	}
 
-	public String signIn() throws IOException {
-        String challenge = controller.signIn(contextProvider.getAppInstanceDocument().getSubject().toString());
+	public String signIn() throws HiveException {
+        String challenge = controller.signIn(contextProvider.getAppInstanceDocument().toString());
         Claims claims = JwtUtil.getBody(challenge);
         // Update the service did to service end-point for future usage.
         serviceEndpoint.setServiceInstanceDid(claims.getIssuer());
@@ -45,7 +46,7 @@ public class RemoteResolver implements TokenResolver {
         return challenge;
     }
 
-	private String signIn4AccessToken() throws IOException, ExecutionException, InterruptedException {
+	private String signIn4AccessToken() throws HiveException, ExecutionException, InterruptedException {
         return contextProvider.getAuthorization(signIn()).get();
     }
 
