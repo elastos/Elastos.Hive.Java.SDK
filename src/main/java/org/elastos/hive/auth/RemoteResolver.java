@@ -25,12 +25,14 @@ public class RemoteResolver implements TokenResolver {
 	}
 
 	@Override
-	public AuthToken getToken() throws HttpFailedException {
+	public String getToken() throws HttpFailedException {
 		try {
-			String accessToken = controller.auth(signIn4AccessToken());
-	        long exp = JwtUtil.getBody(accessToken).getExpiration().getTime();
+			return controller.auth(signIn4AccessToken());
+	        /*long exp = JwtUtil.getBody(accessToken).getExpiration().getTime();
 	        long expiresTime = System.currentTimeMillis() / 1000 + exp / 1000;
 	        return new AuthTokenToVault(accessToken, expiresTime);
+	        */
+
 		} catch (Exception e) {
 			LogUtil.d(Throwables.getStackTraceAsString(e));
 			throw new HttpFailedException(401, "Failed to get token by auth requests.");

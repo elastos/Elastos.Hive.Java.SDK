@@ -4,17 +4,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.auth.BackupLocalResolver;
-import org.elastos.hive.auth.BackupRemoteResolver;
-import org.elastos.hive.auth.TokenResolver;
+import org.elastos.hive.auth.AuthTokenToBackup;
 import org.elastos.hive.vault.backup.BackupController;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
 
 class BackupServiceRender implements BackupService, ExceptionConvertor {
-    private TokenResolver tokenResolver;
     private ServiceEndpoint serviceEndpoint;
     private BackupController controller;
+    private AuthTokenToBackup authToken;
 
     public BackupServiceRender(ServiceEndpoint serviceEndpoint) {
     	this.serviceEndpoint = serviceEndpoint;
@@ -23,12 +21,7 @@ class BackupServiceRender implements BackupService, ExceptionConvertor {
 
     @Override
     public CompletableFuture<Void> setupContext(BackupContext backupContext) {
-        this.tokenResolver = new BackupLocalResolver(serviceEndpoint);
-        this.tokenResolver.setNextResolver(new BackupRemoteResolver(
-        		serviceEndpoint,
-                backupContext,
-                backupContext.getParameter("targetServiceDid"),
-                backupContext.getParameter("targetAddress")));
+    	this.authToken = new AuthTokenToBackup(serviceEndpoint, backupContext);
         return null;
     }
 
@@ -36,7 +29,7 @@ class BackupServiceRender implements BackupService, ExceptionConvertor {
     public CompletableFuture<Void> startBackup() {
         return CompletableFuture.runAsync(() -> {
             try {
-                controller.startBackup(tokenResolver.getToken().getAccessToken());
+                controller.startBackup(authToken.getToken());
             } catch (Exception e) {
                 throw new CompletionException(toHiveException(e));
             }
@@ -52,7 +45,7 @@ class BackupServiceRender implements BackupService, ExceptionConvertor {
     public CompletableFuture<Void> restoreFrom() {
         return CompletableFuture.runAsync(() -> {
             try {
-                controller.restoreFrom(tokenResolver.getToken().getAccessToken());
+                controller.restoreFrom(authToken.getToken());
             } catch (Exception e) {
                 throw new CompletionException(toHiveException(e));
             }
