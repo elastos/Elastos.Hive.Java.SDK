@@ -27,7 +27,7 @@ public class AuthController {
 
 	public String auth(String token) throws HiveException {
 		try {
-			return authAPI.auth(new AuthRequest(token)).execute().body().getToken();
+			return authAPI.auth(new ChallengeResponse(token)).execute().body().getToken();
 		} catch (IOException e) {
 			// TODO:
 			e.printStackTrace();

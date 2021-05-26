@@ -6,8 +6,8 @@ import retrofit2.http.POST;
 
 public interface AuthAPI {
 	@POST("/api/v1/did/sign_in")
-	Call<SignInResponse> signIn(@Body SigninRequest reqBody);
+	Call<ChallengeRequest> signIn(@Body SigninRequest request);
 
 	@POST("/api/v1/did/auth")
-	Call<AuthResponse> auth(@Body AuthRequest reqBody);
+	Call<AuthResponse> auth(@Body ChallengeResponse request);
 }
