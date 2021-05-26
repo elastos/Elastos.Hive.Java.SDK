@@ -4,6 +4,7 @@ import org.elastos.hive.config.TestData;
 import org.elastos.hive.service.BackupService;
 import org.junit.jupiter.api.*;
 
+@Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BackupServiceTest {
 	private static BackupService backupService;

@@ -140,6 +140,7 @@ class FilesServiceTest {
 						.get()));
 	}
 
+	@Disabled
 	@Test void testRemoteFileNotExistsException() {
 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
 				() -> filesService.hash(remoteNotExistsFilePath).get());
