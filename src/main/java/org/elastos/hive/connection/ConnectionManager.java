@@ -42,6 +42,7 @@ public class ConnectionManager {
 	private ServiceEndpoint serviceEndpoint;
 	private Interceptor authRequestInterceptor;
 	private PlainRequestInterceptor plainRequestInterceptor;
+	private NormalRequestInterceptor normalRequestInterceptor;
 
 	public ConnectionManager() {
 		this.authRequestInterceptor  = new AuthRequestInterceptor();
@@ -50,6 +51,8 @@ public class ConnectionManager {
 	public void attach(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
 		this.plainRequestInterceptor = new PlainRequestInterceptor(this.serviceEndpoint);
+		this.normalRequestInterceptor = new NormalRequestInterceptor(this.serviceEndpoint);
+		this.normalRequestInterceptor.setTokenResolver(this.plainRequestInterceptor.getTokenResolver());
 	}
 
 	public ServiceEndpoint getServiceEndpoint() {
@@ -57,10 +60,14 @@ public class ConnectionManager {
 	}
 
 	public HttpURLConnection openConnection(String path) throws IOException {
-		String url = serviceEndpoint.getProviderAddress() + "/api/v1" + path;
+		return openConnectionWithUrl("/api/v1" + path, "POST");
+	}
+
+	public HttpURLConnection openConnectionWithUrl(String relativeUrl, String method) throws IOException {
+		String url = serviceEndpoint.getProviderAddress() + relativeUrl;
 		LogUtil.d("open connection with URL: " + url);
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
-		httpURLConnection.setRequestMethod("POST");
+		httpURLConnection.setRequestMethod(method);
 		httpURLConnection.setRequestProperty("User-Agent",
 				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
 		httpURLConnection.setConnectTimeout(5000);
@@ -102,6 +109,10 @@ public class ConnectionManager {
 	public <S> S createService(Class<S> serviceClass, boolean requiredAuthorization) {
 		return createRetrofit(requiredAuthorization ? this.plainRequestInterceptor : this.authRequestInterceptor)
 				.create(serviceClass);
+	}
+
+	public <S> S createService(Class<S> serviceClass) {
+		return createRetrofit(normalRequestInterceptor).create(serviceClass);
 	}
 
 	private Retrofit createRetrofit(Interceptor requestInterceptor) {

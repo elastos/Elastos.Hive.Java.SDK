@@ -2,9 +2,7 @@ package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
 
-class RegisterScriptRequestBody {
-    @SerializedName("name")
-    private String name;
+class RegisterScriptRequest {
     @SerializedName("executable")
     private Executable executable;
     @SerializedName("allowAnonymousUser")
@@ -14,27 +12,22 @@ class RegisterScriptRequestBody {
     @SerializedName("condition")
     private Condition condition;
 
-    public RegisterScriptRequestBody setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public RegisterScriptRequestBody setExecutable(Executable executable) {
+    public RegisterScriptRequest setExecutable(Executable executable) {
         this.executable = executable;
         return this;
     }
 
-    public RegisterScriptRequestBody setAllowAnonymousUser(Boolean allowAnonymousUser) {
+    public RegisterScriptRequest setAllowAnonymousUser(Boolean allowAnonymousUser) {
         this.allowAnonymousUser = allowAnonymousUser;
         return this;
     }
 
-    public RegisterScriptRequestBody setAllowAnonymousApp(Boolean allowAnonymousApp) {
+    public RegisterScriptRequest setAllowAnonymousApp(Boolean allowAnonymousApp) {
         this.allowAnonymousApp = allowAnonymousApp;
         return this;
     }
 
-    public RegisterScriptRequestBody setCondition(Condition condition) {
+    public RegisterScriptRequest setCondition(Condition condition) {
         this.condition = condition;
         return this;
     }

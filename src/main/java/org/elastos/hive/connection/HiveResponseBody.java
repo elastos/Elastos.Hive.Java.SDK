@@ -70,14 +70,20 @@ public class HiveResponseBody {
     }
 
     public static String validateBodyStr(Response<ResponseBody> response) {
+        return validateBodyStr(response, true);
+    }
+
+    public static String validateBodyStr(Response<ResponseBody> response, boolean failedCheck) {
         ResponseBody body = response.body();
         if (body == null)
             throw new HiveSdkException("Failed to get body on validateBody");
 
         try {
             String bodyStr = body.string();
-            if (new Gson().fromJson(bodyStr, HiveResponseBody.class).failed()) {
-                throw new HiveSdkException("Get ERR response status on validateBody");
+            if (failedCheck) {
+                if (new Gson().fromJson(bodyStr, HiveResponseBody.class).failed()) {
+                    throw new HiveSdkException("Get ERR response status on validateBody");
+                }
             }
             return bodyStr;
         } catch (IOException e) {
