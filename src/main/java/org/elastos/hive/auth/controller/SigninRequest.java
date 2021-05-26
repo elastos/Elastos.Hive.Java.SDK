@@ -1,9 +1,12 @@
 package org.elastos.hive.auth.controller;
 
-class SigninRequest {
-    private Object document;
+import com.google.gson.annotations.SerializedName;
 
-    public SigninRequest(Object document) {
-        this.document = document;
+class SigninRequest {
+	@SerializedName("id")
+    private Object didDocument;
+
+    public SigninRequest(Object didDocument) {
+        this.didDocument = didDocument;
     }
 }
