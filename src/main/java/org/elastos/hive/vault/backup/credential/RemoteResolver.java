@@ -5,7 +5,7 @@ import org.elastos.hive.auth.CodeResolver;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.service.BackupContext;
 
-public class RemoteResolver implements CodeResolver {
+class RemoteResolver implements CodeResolver {
     private BackupContext backupContext;
     private String targetDid;
     private String targetHost;

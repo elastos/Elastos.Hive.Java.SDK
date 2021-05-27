@@ -9,5 +9,5 @@ public interface AuthAPI {
 	Call<ChallengeRequest> signIn(@Body SigninRequest request);
 
 	@POST("/api/v1/did/auth")
-	Call<AuthResponse> auth(@Body ChallengeResponse request);
+	Call<AccessToken> auth(@Body ChallengeResponse request);
 }
