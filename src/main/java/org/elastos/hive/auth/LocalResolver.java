@@ -4,7 +4,7 @@ import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.storage.DataStorage;
 
-public class LocalResolver implements CodeResolver {
+class LocalResolver implements CodeResolver {
 	private CodeResolver nextResolver;
 	protected DataStorage storage;
 	protected ServiceEndpoint serviceEndpoint;

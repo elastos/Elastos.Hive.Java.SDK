@@ -10,7 +10,7 @@ import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.utils.LogUtil;
 
-public class RemoteResolver implements CodeResolver {
+class RemoteResolver implements CodeResolver {
 	private ServiceEndpoint serviceEndpoint;
 	private AppContextProvider contextProvider;
 	private AuthController controller;
