@@ -67,7 +67,7 @@ public class ConnectionManager {
 
 	public HttpURLConnection openConnectionWithUrl(String relativeUrl, String method) throws IOException {
 		String url = serviceEndpoint.getProviderAddress() + relativeUrl;
-		LogUtil.d("open connection with URL: " + url);
+		LogUtil.d("open connection with URL: " + url + ", and method: " + method);
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod(method);
 		httpURLConnection.setRequestProperty("User-Agent",

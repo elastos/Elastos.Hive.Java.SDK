@@ -2,7 +2,7 @@ package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ScriptContext {
+class ScriptContext {
     @SerializedName("target_did")
     private String targetDid;
     @SerializedName("target_app_did")
