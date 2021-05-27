@@ -2,7 +2,6 @@ package org.elastos.hive.storage;
 
 public interface DataStorage {
 	String loadBackupCredential(String serviceDid);
-	String loadSignInCredential();
 
 	/**
 	 * Load access token by serviceDid which can be used for authorization.
@@ -19,7 +18,6 @@ public interface DataStorage {
 	String loadAccessTokenByAddress(String providerAddress);
 
 	void storeBackupCredential(String serviceDid, String credential);
-	void storeSignInCredential(String credential);
 
 	/**
 	 * Store access token to data storage by service did.
@@ -36,7 +34,6 @@ public interface DataStorage {
 	void storeAccessTokenByAddress(String providerAddress, String accessToken);
 
 	void clearBackupCredential(String serviceDid);
-	void clearSignInCredential();
 	void clearAccessToken(String serviceDid);
 	void clearAccessTokenByAddress(String providerAddress);
 }

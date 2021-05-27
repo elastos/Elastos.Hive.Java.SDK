@@ -16,7 +16,6 @@ import java.nio.file.Paths;
  */
 public class FileStorage implements DataStorage {
 	private static final String CREDENTIAL_BACKUP = "credential-backup";
-	private static final String CREDENTIAL_SIGNIN = "credential-signin";
 	private static final String TOKENS = "tokens";
 
 	private String basePath;
@@ -91,11 +90,6 @@ public class FileStorage implements DataStorage {
 	}
 
 	@Override
-	public String loadSignInCredential() {
-		return getFileContent(getFilePath(CREDENTIAL_SIGNIN));
-	}
-
-	@Override
 	public String loadAccessToken(String serviceDid) {
 		return getFileContent(getFilePath(TOKENS, getRelativeDidStr(serviceDid)));
 	}
@@ -111,11 +105,6 @@ public class FileStorage implements DataStorage {
 	}
 
 	@Override
-	public void storeSignInCredential(String credential) {
-		saveFileContent(getFilePath(CREDENTIAL_SIGNIN), credential);
-	}
-
-	@Override
 	public void storeAccessToken(String serviceDid, String accessToken) {
 		saveFileContent(getFilePath(TOKENS, getRelativeDidStr(serviceDid)), accessToken);
 	}
@@ -128,11 +117,6 @@ public class FileStorage implements DataStorage {
 	@Override
 	public void clearBackupCredential(String serviceDid) {
 		removeFile(getFilePath(CREDENTIAL_BACKUP, getRelativeDidStr(serviceDid)));
-	}
-
-	@Override
-	public void clearSignInCredential() {
-		removeFile(getFilePath(CREDENTIAL_SIGNIN));
 	}
 
 	@Override
