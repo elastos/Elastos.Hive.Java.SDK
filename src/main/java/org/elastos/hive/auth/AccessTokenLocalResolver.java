@@ -57,7 +57,7 @@ public class AccessTokenLocalResolver implements CodeResolver {
 	}
 
 	protected void clearToken() {
-		String serviceDid = serviceEndpoint.getServiceDid();
+		String serviceDid = serviceEndpoint.getServiceInstanceDid();
 		String address    = serviceEndpoint.getProviderAddress();
 
 		storage.clearAccessToken(serviceDid);
