@@ -61,9 +61,9 @@ public class ConnectionManager {
 		return this.serviceEndpoint;
 	}
 
-	public HttpURLConnection openConnection(String path) throws IOException {
+	/*public HttpURLConnection openConnection(String path) throws IOException {
 		return openConnectionWithUrl("/api/v1" + path, "POST");
-	}
+	}*/
 
 	public HttpURLConnection openConnectionWithUrl(String relativeUrl, String method) throws IOException {
 		String url = serviceEndpoint.getProviderAddress() + relativeUrl;
