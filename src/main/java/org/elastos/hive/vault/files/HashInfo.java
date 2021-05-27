@@ -1,13 +1,14 @@
 package org.elastos.hive.vault.files;
 
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.connection.HiveResponseBody;
 
-class FilesHashResponse {
+class HashInfo {
     @SerializedName("name")
     private String name;
+
     @SerializedName("algorithm")
     private String algorithm;
+
     @SerializedName("hash")
     private String hash;
 
