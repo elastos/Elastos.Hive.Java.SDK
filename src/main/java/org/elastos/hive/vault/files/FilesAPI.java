@@ -22,7 +22,7 @@ interface FilesAPI {
 
 	@PUT("/api/v2/vault/files/{path}")
 	Call<FilesCopyResponse> copy(@Path("path") String src,
-								 @Query("dest") String dst);
+								 @Query("dst") String dst);
 
 	@PATCH("/api/v2/vault/files/{path}")
 	Call<FilesMoveResponse> move(@Path("path") String src,
