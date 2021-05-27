@@ -9,45 +9,34 @@ import java.math.BigDecimal;
  * The class to represent the information of File or Folder.
  */
 public class FileInfo {
-	@SerializedName("type")
-	private String type;
 	@SerializedName("name")
 	private String name;
+	@SerializedName("is_file")
+	private boolean isFile;
 	@SerializedName("size")
 	private int size;
-	@SerializedName("last_modify")
-	private double lastModify;
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
+	@SerializedName("created")
+	private long created;
+	@SerializedName("updated")
+	private long updated;
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public boolean isFile() {
+		return isFile;
 	}
 
 	public int getSize() {
 		return size;
 	}
 
-	public void setSize(int size) {
-		this.size = size;
+	public long getCreated() {
+		return created;
 	}
 
-	public void setLastModify(double lastModify) {
-		this.lastModify = lastModify;
-	}
-
-	public String getLastModified() {
-		long timeStamp = BigDecimal.valueOf(lastModify).multiply(new BigDecimal(1000)).longValue();
-		return DateUtil.getCurrentEpochTimeStamp(timeStamp);
+	public long getUpdated() {
+		return updated;
 	}
 }

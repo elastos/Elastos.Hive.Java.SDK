@@ -1,9 +1,8 @@
 package org.elastos.hive.subscription;
 
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.connection.HiveResponseBody;
 
-public class VaultInfoResponseBody extends HiveResponseBody {
+public class BackupInfoResponse {
     private String did;
     @SerializedName("max_storage")
     private long maxStorage;
@@ -41,24 +40,12 @@ public class VaultInfoResponseBody extends HiveResponseBody {
         return modifyTime;
     }
 
-    public String getModifyTimeStr() {
-        return getDateStrByStamp(this.modifyTime);
-    }
-
     public long getStartTime() {
         return startTime;
     }
 
-    public String getStartTimeStr() {
-        return getDateStrByStamp(this.startTime);
-    }
-
     public long getEndTime() {
         return endTime;
-    }
-
-    public String getEndTimeStr() {
-        return getDateStrByStamp(this.endTime);
     }
 
     public String getPricingUsing() {
@@ -67,9 +54,5 @@ public class VaultInfoResponseBody extends HiveResponseBody {
 
     public String getState() {
         return state;
-    }
-
-    public boolean isExisting() {
-        return "running".equals(this.state);
     }
 }

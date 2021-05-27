@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportedMethodException;
+import org.elastos.hive.subscription.BackupInfoResponse;
 import org.elastos.hive.subscription.payment.Order;
 import org.elastos.hive.subscription.payment.PaymentController;
 import org.elastos.hive.subscription.payment.PricingPlan;
@@ -10,7 +11,6 @@ import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
 import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.subscription.SubscriptionController;
-import org.elastos.hive.subscription.VaultInfoResponseBody;
 
 import java.util.Collections;
 import java.util.List;
@@ -100,7 +100,7 @@ public class BackupSubscription extends ServiceEndpoint
 	}
 
 	private Backup.PropertySet getPropertySet() throws HiveException {
-		VaultInfoResponseBody body = subscriptionController.getBackupVaultInfo();
+		BackupInfoResponse body = subscriptionController.getBackupVaultInfo();
 		// TODO: serviceDid
 		return new Backup.PropertySet()
 				.setPricingPlan(body.getPricingUsing())

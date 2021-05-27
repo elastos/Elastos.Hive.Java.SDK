@@ -3,32 +3,31 @@ package org.elastos.hive.vault.files;
 import okhttp3.ResponseBody;
 import org.elastos.hive.connection.HiveResponseBody;
 import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 
 interface FilesAPI {
-	String API_UPLOAD = "/files/upload";
+	String API_UPLOAD = "/api/v2/vault/files";
 
-	@GET("/api/v1/files/list/folder")
-	Call<FilesListResponseBody> listChildren(@Query("path") String filename);
+	@GET("/api/v2/vault/files/{path}")
+	Call<ResponseBody> download(@Path("path") String path);
 
-	@POST("/api/v1/files/copy")
-	Call<HiveResponseBody> copy(@Body FilesCopyRequestBody body);
+	@GET("/api/v2/vault/files/{path}?comp=children")
+	Call<ListChildrenResponse> listChildren(@Path("path") String path);
 
-	@POST("/api/v1/files/move")
-	Call<HiveResponseBody> move(@Body FilesMoveRequestBody body);
+	@GET("/api/v2/vault/files/{path}?comp=metadata")
+	Call<FileInfo> getProperties(@Path("path") String path);
 
-	@POST("/api/v1/files/delete")
-	Call<HiveResponseBody> delete(@Body FilesDeleteRequestBody body);
+	@GET("/api/v2/vault/files/{path}?comp=hash")
+	Call<FilesHashResponse> getHash(@Path("path") String path);
 
-	@GET("/api/v1/files/properties")
-	Call<FilesPropertiesResponseBody> properties(@Query("path") String filename);
+	@PUT("/api/v2/vault/files/{path}")
+	Call<FilesCopyResponse> copy(@Path("path") String src,
+								 @Query("dest") String dst);
 
-	@GET("/api/v1/files/file/hash")
-	Call<FilesHashResponseBody> hash(@Query("path") String filename);
+	@PATCH("/api/v2/vault/files/{path}")
+	Call<FilesMoveResponse> move(@Path("path") String src,
+								 @Query("to") String dst);
 
-	@GET("/api/v1/files/download")
-	Call<ResponseBody> download(@Query("path") String filename);
+	@DELETE("/api/v2/vault/files/{path}")
+	Call<HiveResponseBody> delete(@Path("path") String path);
 }
