@@ -38,7 +38,7 @@ public class FilesController extends ExceptionHandler {
 
 	public List<FileInfo> listChildren(String path) throws HiveException {
 		try {
-			return filesAPI.listChildren(path).execute().body().getItems();
+			return filesAPI.listChildren(path).execute().body().getValue();
 		} catch (IOException e) {
 			throw super.toHiveException(e);
 		}

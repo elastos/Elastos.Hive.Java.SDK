@@ -1,9 +1,6 @@
 package org.elastos.hive.vault.files;
 
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.utils.DateUtil;
-
-import java.math.BigDecimal;
 
 /**
  * The class to represent the information of File or Folder.

@@ -4,11 +4,11 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-class ListChildrenResponse {
+class ChildrenInfo {
     @SerializedName("value")
-    private List<FileInfo> items;
+    private List<FileInfo> value;
 
-    public List<FileInfo> getItems() {
-        return items;
+    public List<FileInfo> getValue() {
+        return value;
     }
 }
