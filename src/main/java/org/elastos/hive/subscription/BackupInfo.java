@@ -2,7 +2,7 @@ package org.elastos.hive.subscription;
 
 import com.google.gson.annotations.SerializedName;
 
-public class BackupInfoResponse {
+public class BackupInfo {
     private String did;
     @SerializedName("max_storage")
     private long maxStorage;

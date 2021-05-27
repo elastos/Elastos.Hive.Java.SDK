@@ -2,8 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportedMethodException;
-import org.elastos.hive.subscription.VaultInfoResponse;
-import org.elastos.hive.subscription.VaultSubscribeResponse;
+import org.elastos.hive.subscription.VaultInfo;
 import org.elastos.hive.subscription.payment.Order;
 import org.elastos.hive.subscription.payment.PaymentController;
 import org.elastos.hive.subscription.payment.PricingPlan;
@@ -61,13 +60,13 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Vault.PropertySet> subscribe(String reserved) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				VaultSubscribeResponse body = subscriptionController.subscribe(reserved);
+				VaultInfo info = subscriptionController.subscribeToVault(reserved);
 				return new Vault.PropertySet()
-						.setServiceId(body.getServiceDid())
-						.setPricingPlan(body.getPricePlan())
-						.setCreated((long)body.getCreated())
-						.setUpdated(body.getUpdated())
-						.setQuota(body.getQuota())
+						.setServiceId(info.getServiceDid())
+						.setPricingPlan(info.getPricePlan())
+						.setCreated((long)info.getCreated())
+						.setUpdated(info.getUpdated())
+						//.setQuota(info.getQuota())
 						.setUsedSpace(0);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
@@ -79,7 +78,7 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Void> unsubscribe() {
 		return CompletableFuture.runAsync(()-> {
 			try {
-				subscriptionController.unsubscribe();
+				subscriptionController.unsubscribeVault();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -90,7 +89,7 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Void> activate() {
 		return CompletableFuture.runAsync(()-> {
 			try {
-				subscriptionController.activate();
+				subscriptionController.activateVault();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -101,7 +100,7 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Void> deactivate() {
 		return CompletableFuture.runAsync(()-> {
 			try {
-				subscriptionController.deactivate();
+				subscriptionController.deactivateVault();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -112,14 +111,14 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<Vault.PropertySet> checkSubscription() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				VaultInfoResponse body = subscriptionController.getVaultInfo();
+				VaultInfo info = subscriptionController.getVaultInfo();
 				return new Vault.PropertySet()
-						.setServiceId(body.getServiceDid())
-						.setPricingPlan(body.getPricePlan())
-						.setCreated((long)body.getCreated())
-						.setUpdated(body.getUpdated())
-						.setQuota(body.getStorageQuota())
-						.setUsedSpace(body.getStorageUsed());
+						.setServiceId(info.getServiceDid())
+						.setPricingPlan(info.getPricePlan())
+						.setCreated((long)info.getCreated())
+						.setUpdated(info.getUpdated())
+						.setQuota(info.getStorageQuota())
+						.setUsedSpace(info.getStorageUsed());
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}

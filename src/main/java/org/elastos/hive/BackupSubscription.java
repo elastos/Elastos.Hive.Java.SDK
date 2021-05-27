@@ -2,7 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.UnsupportedMethodException;
-import org.elastos.hive.subscription.BackupInfoResponse;
+import org.elastos.hive.subscription.BackupInfo;
 import org.elastos.hive.subscription.payment.Order;
 import org.elastos.hive.subscription.payment.PaymentController;
 import org.elastos.hive.subscription.payment.PricingPlan;
@@ -63,7 +63,7 @@ public class BackupSubscription extends ServiceEndpoint
 	public CompletableFuture<Backup.PropertySet> subscribe(String reserved) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				subscriptionController.subscribeBackup();
+				subscriptionController.subscribeToBackup(null);
 				return getPropertySet();
 			} catch (HiveException e) {
 				throw new CompletionException(e);
@@ -100,7 +100,7 @@ public class BackupSubscription extends ServiceEndpoint
 	}
 
 	private Backup.PropertySet getPropertySet() throws HiveException {
-		BackupInfoResponse body = subscriptionController.getBackupVaultInfo();
+		BackupInfo body = subscriptionController.getBackupInfo();
 		// TODO: serviceDid
 		return new Backup.PropertySet()
 				.setPricingPlan(body.getPricingUsing())

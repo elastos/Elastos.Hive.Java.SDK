@@ -7,7 +7,6 @@ import org.elastos.hive.about.AboutController;
 import org.elastos.hive.about.NodeVersion;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.UnauthorizedStateException;
 import org.elastos.hive.vault.ExceptionConvertor;
 
 public class ServiceEndpoint implements ExceptionConvertor {
