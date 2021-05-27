@@ -70,7 +70,7 @@ public class FilesController extends ExceptionHandler {
 
 	public FileInfo getProperty(String path) throws HiveException {
 		try {
-			return filesAPI.getProperties(path).execute().body();
+			return filesAPI.getMetadata(path).execute().body();
 		} catch (IOException e) {
 			throw super.toHiveException(e);
 		}
