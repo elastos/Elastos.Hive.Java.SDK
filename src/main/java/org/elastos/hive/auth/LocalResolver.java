@@ -4,12 +4,12 @@ import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.storage.DataStorage;
 
-public class AccessTokenLocalResolver implements CodeResolver {
+public class LocalResolver implements CodeResolver {
 	private CodeResolver nextResolver;
 	protected DataStorage storage;
 	protected ServiceEndpoint serviceEndpoint;
 
-	public AccessTokenLocalResolver(ServiceEndpoint endpoint, CodeResolver next) {
+	public LocalResolver(ServiceEndpoint endpoint, CodeResolver next) {
 		this.storage  = endpoint.getAppContext().getDataStorage();
 		this.serviceEndpoint = endpoint;
 		this.nextResolver = next;

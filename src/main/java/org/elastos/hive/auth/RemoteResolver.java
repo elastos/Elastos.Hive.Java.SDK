@@ -10,12 +10,12 @@ import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.utils.LogUtil;
 
-public class AccessTokenRemoteResolver implements CodeResolver {
+public class RemoteResolver implements CodeResolver {
 	private ServiceEndpoint serviceEndpoint;
 	private AppContextProvider contextProvider;
 	private AuthController controller;
 
-	public AccessTokenRemoteResolver(ServiceEndpoint serviceEndpoint) {
+	public RemoteResolver(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
 		this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
 		this.controller = new AuthController(serviceEndpoint);

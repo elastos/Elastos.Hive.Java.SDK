@@ -1,21 +1,21 @@
-package org.elastos.hive.auth;
+package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.auth.CodeResolver;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.service.BackupContext;
 
-public class BackupRemoteResolver implements CodeResolver {
+public class RemoteResolver implements CodeResolver {
     private BackupContext backupContext;
     private String targetDid;
     private String targetHost;
     //private AuthenticationServiceRender authenticationService;
 
-    public BackupRemoteResolver(ServiceEndpoint serviceEndpoint, BackupContext backupContext,
-                                String targetServiceDid, String targetAddress) {
+    public RemoteResolver(ServiceEndpoint serviceEndpoint, BackupContext backupContext,
+                          String targetServiceDid, String targetAddress) {
         this.backupContext = backupContext;
         this.targetDid = targetServiceDid;
         this.targetHost = targetAddress;
-        //this.authenticationService = new AuthenticationServiceRender(serviceEndpoint);
     }
 
     @Override

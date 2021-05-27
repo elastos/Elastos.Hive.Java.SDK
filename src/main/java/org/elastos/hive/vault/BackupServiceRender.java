@@ -4,15 +4,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.auth.BackupCredential;
 import org.elastos.hive.vault.backup.BackupController;
+import org.elastos.hive.vault.backup.credential.CredentialCode;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
 
 class BackupServiceRender implements BackupService, ExceptionConvertor {
     private ServiceEndpoint serviceEndpoint;
     private BackupController controller;
-    private BackupCredential authToken;
+    private CredentialCode credentialCode;
 
     public BackupServiceRender(ServiceEndpoint serviceEndpoint) {
     	this.serviceEndpoint = serviceEndpoint;
@@ -21,7 +21,7 @@ class BackupServiceRender implements BackupService, ExceptionConvertor {
 
     @Override
     public CompletableFuture<Void> setupContext(BackupContext backupContext) {
-		this.authToken = new BackupCredential(serviceEndpoint, backupContext);
+		this.credentialCode = new CredentialCode(serviceEndpoint, backupContext);
         return null;
     }
 
@@ -29,7 +29,7 @@ class BackupServiceRender implements BackupService, ExceptionConvertor {
     public CompletableFuture<Void> startBackup() {
         return CompletableFuture.runAsync(() -> {
             try {
-                controller.startBackup(authToken.getToken());
+                controller.startBackup(credentialCode.getToken());
             } catch (Exception e) {
                 throw new CompletionException(toHiveException(e));
             }
@@ -45,7 +45,7 @@ class BackupServiceRender implements BackupService, ExceptionConvertor {
     public CompletableFuture<Void> restoreFrom() {
         return CompletableFuture.runAsync(() -> {
             try {
-                controller.restoreFrom(authToken.getToken());
+                controller.restoreFrom(credentialCode.getToken());
             } catch (Exception e) {
                 throw new CompletionException(toHiveException(e));
             }

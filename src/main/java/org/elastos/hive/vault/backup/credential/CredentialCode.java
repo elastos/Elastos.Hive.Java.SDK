@@ -1,22 +1,22 @@
-package org.elastos.hive.auth;
+package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.did.VerifiableCredential;
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.auth.CodeResolver;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.utils.LogUtil;
 
-public class BackupCredential {
+public class CredentialCode {
 	public static final String TOKEN_TYPE = "backup";
 	private String jwtCode;
 	private CodeResolver resolver;
 
-	public BackupCredential(ServiceEndpoint endpoint, BackupContext context) {
-		CodeResolver remoteResolver = new BackupRemoteResolver(
-        		endpoint,
-        		context,
+	public CredentialCode(ServiceEndpoint endpoint, BackupContext context) {
+		CodeResolver remoteResolver = new RemoteResolver(
+        		endpoint,context,
         		context.getParameter("targetServiceDid"),
         		context.getParameter("targetAddress"));
-		resolver = new AccessTokenLocalResolver(endpoint, remoteResolver);
+		resolver = new LocalResolver(endpoint, remoteResolver);
 	}
 
 	public String getToken() {
