@@ -46,7 +46,7 @@ public class AccessTokenLocalResolver implements CodeResolver {
 	}
 
 	protected void saveToken(String jwtCode) {
-		String serviceDid = serviceEndpoint.getServiceDid();
+		String serviceDid = serviceEndpoint.getServiceInstanceDid();
 		String address    = serviceEndpoint.getProviderAddress();
 
 		if (jwtCode == null)
