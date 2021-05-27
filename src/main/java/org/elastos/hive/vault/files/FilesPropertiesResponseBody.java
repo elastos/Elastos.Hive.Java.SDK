@@ -13,8 +13,8 @@ class FilesPropertiesResponseBody extends HiveResponseBody {
     @SerializedName("last_modify")
     private double lastModify;
 
-    public FileInfo getFileInfo() {
-        FileInfo info = new FileInfo();
+    public FileInfoV1 getFileInfo() {
+        FileInfoV1 info = new FileInfoV1();
         info.setType(this.type);
         info.setName(this.name);
         info.setSize(this.size);

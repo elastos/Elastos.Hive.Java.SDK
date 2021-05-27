@@ -1,6 +1,6 @@
 package org.elastos.hive.exception;
 
-public class InvalidParameterException extends RuntimeException {
+public class InvalidParameterException extends HiveException {
     private static final long serialVersionUID = 1L;
 
     public InvalidParameterException() {

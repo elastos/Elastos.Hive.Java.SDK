@@ -5,27 +5,18 @@ import retrofit2.Call;
 import retrofit2.http.*;
 
 interface SubscriptionAPI {
-	@POST("/api/v1/service/vault/create")
-	Call<VaultCreateResponseBody> createVault();
+	@GET("/api/v2/subscription/vault")
+	Call<VaultInfoResponse> getVaultInfo();
 
-	@POST("/api/v1/service/vault/freeze")
-	Call<HiveResponseBody> freeze();
+	@PUT("/api/v2/subscription/vault")
+	Call<VaultSubscribeResponse> vaultSubscribe(@Query("credential") String credential);
 
-	@POST("/api/v1/service/vault/unfreeze")
-	Call<HiveResponseBody> unfreeze();
+	@POST("/api/v2/subscription/vault?op=activation")
+	Call<Void> vaultActivate();
 
-	@POST("/api/v1/service/vault/remove")
-	Call<HiveResponseBody> removeVault();
+	@POST("/api/v2/subscription/vault?op=deactivation")
+	Call<Void> vaultDeactivate();
 
-	@GET("/api/v1/service/vault")
-	Call<VaultInfoResponseBody> getVaultInfo();
-
-	@POST("/api/v1/service/vault_backup/create")
-	Call<VaultCreateResponseBody> createBackupVault();
-
-	@GET("/api/v1/service/vault_backup")
-	Call<VaultInfoResponseBody> getBackupVaultInfo();
-
-
-	//@GET("/api/v2/subscription/pricing_plan")
+	@DELETE("/api/v2/subscription/vault")
+	Call<HiveResponseBody> vaultUnsubscribe();
 }

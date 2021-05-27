@@ -2,7 +2,7 @@ package org.elastos.hive.vault;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.exception.InvalidParameterException;
+import org.elastos.hive.exception.InvalidParameterV1Exception;
 import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.vault.scripting.Condition;
 import org.elastos.hive.vault.scripting.Executable;
@@ -64,7 +64,7 @@ public class ScriptingServiceRender implements ScriptingService, ExceptionConver
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				if (transactionId == null)
-					throw new InvalidParameterException("Invalid parameter transactionId.");
+					throw new InvalidParameterV1Exception("Invalid parameter transactionId.");
 
 				return controller.uploadFile(transactionId, resultType);
 			} catch (Exception e) {
@@ -78,7 +78,7 @@ public class ScriptingServiceRender implements ScriptingService, ExceptionConver
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				if (transactionId == null)
-					throw new InvalidParameterException("Invalid parameter transactionId.");
+					throw new InvalidParameterV1Exception("Invalid parameter transactionId.");
 
 				return controller.downloadFile(transactionId, resultType);
 			} catch (Exception e) {

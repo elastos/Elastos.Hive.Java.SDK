@@ -6,93 +6,81 @@ import java.util.List;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.HiveResponseBody;
+import org.elastos.hive.exception.ExceptionHandler;
 import org.elastos.hive.exception.HiveException;
 
-public class FilesController {
-	private FilesAPI filesAPI;
+public class FilesController extends ExceptionHandler {
 	private ConnectionManager connectionManager;
+	private FilesAPI filesAPI;
 
 	public FilesController(ServiceEndpoint serviceEndpoint) {
-		filesAPI = serviceEndpoint.getConnectionManager().createService(FilesAPI.class, true);
 		connectionManager = serviceEndpoint.getConnectionManager();
+		filesAPI = serviceEndpoint.getConnectionManager().createService(FilesAPI.class);
 	}
 
 	public <T> T upload(String path, Class<T> resultType) throws HiveException {
 		try {
 			return HiveResponseBody.getRequestStream(
-				connectionManager.openConnection(FilesAPI.API_UPLOAD + "/" + path),
+				connectionManager.openConnectionWithUrl(FilesAPI.API_UPLOAD + "/" + path, "PUT"),
 				resultType);
 		} catch (IOException e) {
-			// TODO:
-			e.printStackTrace();
+			throw super.toHiveException(e);
 		}
-		return null;
 	}
 
 	public <T> T download(String path, Class<T> resultType) throws HiveException {
 		try {
 			return HiveResponseBody.getResponseStream(filesAPI.download(path).execute(), resultType);
 		} catch (IOException e) {
-			// TODO:
-			e.printStackTrace();
+			throw super.toHiveException(e);
 		}
-		return null;
 	}
 
 	public List<FileInfo> listChildren(String path) throws HiveException {
 		try {
-			return filesAPI.listChildren(path).execute().body().getFileInfoList();
+			return filesAPI.listChildren(path).execute().body().getItems();
 		} catch (IOException e) {
-			// TODO: throw exception.
-			e.printStackTrace();
+			throw super.toHiveException(e);
 		}
-		return null;
 	}
 
 	public void copyFile(String srcPath, String destPath) throws HiveException {
 		try {
-			filesAPI.copy(new FilesCopyRequestBody(srcPath, destPath)).execute();
+			filesAPI.copy(srcPath, destPath).execute();
 		} catch (IOException e) {
-			// TODO: throw exception.
-			e.printStackTrace();
+			throw super.toHiveException(e);
 		}
 	}
 
 	public void moveFile(String srcPath, String destPath) throws HiveException {
 		try {
-			filesAPI.move(new FilesMoveRequestBody(srcPath, destPath)).execute();
+			filesAPI.move(srcPath, destPath).execute();
 		} catch (IOException e) {
-			// TODO: throw exception.
-			e.printStackTrace();
+			throw super.toHiveException(e);
 		}
 	}
 
 	public void delete(String path) throws HiveException {
 		try {
-			filesAPI.delete(new FilesDeleteRequestBody(path)).execute();
+			filesAPI.delete(path).execute();
 		} catch (IOException e) {
-			// TODO: throw exception.
-			e.printStackTrace();
+			throw super.toHiveException(e);
 		}
 	}
 
 	public FileInfo getProperty(String path) throws HiveException {
 		try {
-			return filesAPI.properties(path).execute().body().getFileInfo();
+			return filesAPI.getProperties(path).execute().body();
 		} catch (IOException e) {
-			// TODO: throw exception.
-			e.printStackTrace();
+			throw super.toHiveException(e);
 		}
-		return null;
 	}
 
 	public String getHash(String path) throws HiveException {
 		try {
-			return filesAPI.hash(path).execute().body().getSha256();
+			return filesAPI.getHash(path).execute().body().getHash();
 		} catch (IOException e) {
-			// TODO: throw exception.
-			e.printStackTrace();
+			throw super.toHiveException(e);
 		}
-		return null;
 	}
 }

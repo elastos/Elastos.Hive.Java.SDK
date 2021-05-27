@@ -5,16 +5,8 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.AccessToken;
-import org.elastos.hive.auth.AuthToken;
-import org.elastos.hive.auth.AccessTokenLocalResolver;
-import org.elastos.hive.auth.AccessTokenRemoteResolver;
-import org.elastos.hive.auth.CodeResolver;
-import org.elastos.hive.exception.HiveSdkException;
-import org.elastos.hive.exception.HttpFailedException;
-import org.elastos.hive.exception.NotFoundException;
-import org.elastos.hive.exception.UnauthorizedException;
+import org.elastos.hive.exception.*;
 
 import java.io.IOException;
 
@@ -54,10 +46,7 @@ class NormalRequestInterceptor implements Interceptor {
 
         try {
             ErrorResponseBody error = new Gson().fromJson(body.string(), ErrorResponseBody.class);
-            if (code == 401)
-                throw new UnauthorizedException(error.getError().getMessage());
-            else if (code == 404)
-                throw new NotFoundException(error.getError().getMessage());
+            throw new HiveHttpException(error.getError().getCode(), error.getError().getMessage());
         } catch (IOException e) {
             throw new HiveSdkException(e.getMessage());
         }

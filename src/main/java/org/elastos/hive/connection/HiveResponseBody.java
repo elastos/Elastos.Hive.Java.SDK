@@ -134,7 +134,7 @@ public class HiveResponseBody {
         else if (resultType.isAssignableFrom(InputStream.class))
             return resultType.cast(body.byteStream());
         else
-            throw new InvalidParameterException("Not supported result type");
+            throw new InvalidParameterV1Exception("Not supported result type");
     }
 
     public static Map<String, Object> jsonNode2Map(JsonNode node) {
