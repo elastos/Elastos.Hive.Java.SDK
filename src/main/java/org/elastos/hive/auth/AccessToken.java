@@ -2,7 +2,7 @@ package org.elastos.hive.auth;
 
 import org.elastos.hive.ServiceEndpoint;
 
-public class AccessToken extends AuthToken {
+public class AccessToken {
 	private String jwtCode;
 	private CodeResolver resolver;
 
@@ -25,12 +25,10 @@ public class AccessToken extends AuthToken {
 		return jwtCode;
 	}
 
-	@Override
 	public String getCanonicalizedAccessToken() {
 		return "token " + getToken();
 	}
 
-	@Override
 	public boolean isExpired() {
 		//return System.currentTimeMillis() >= (getExpiresTime() * 1000);
 		return false;
