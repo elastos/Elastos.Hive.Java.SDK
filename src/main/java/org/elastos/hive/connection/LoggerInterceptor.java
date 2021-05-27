@@ -39,6 +39,7 @@ import okio.Buffer;
 import okio.BufferedSource;
 
 class LoggerInterceptor implements Interceptor {
+    private static final int MAX_BODY_LEN = 500;
 
     @Override
     public Response intercept(Chain chain) throws IOException {
@@ -90,7 +91,7 @@ class LoggerInterceptor implements Interceptor {
         }
 
         if (bodyInString != null && !bodyInString.equals(""))
-            LogUtil.d("request body->" + bodyInString);
+            LogUtil.d("request body->" + getOutputBodyContent(bodyInString));
     }
 
     private void dumpResponse(Response response) throws IOException {
@@ -122,6 +123,10 @@ class LoggerInterceptor implements Interceptor {
         LogUtil.d("response Code ->" + response.code());
 
         if (bodyInString != null && !bodyInString.equals(""))
-            LogUtil.d("response body ->" + bodyInString);
+            LogUtil.d("response body ->" + getOutputBodyContent(bodyInString));
+    }
+
+    private String getOutputBodyContent(String body) {
+        return body.length() > MAX_BODY_LEN ? body.substring(0, MAX_BODY_LEN) : body;
     }
 }

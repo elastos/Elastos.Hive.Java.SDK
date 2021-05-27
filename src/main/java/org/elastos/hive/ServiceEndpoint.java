@@ -96,7 +96,7 @@ public class ServiceEndpoint implements ExceptionConvertor {
 	 * @return node service did
 	 */
 	public String getServiceDid() {
-		throw new UnauthorizedStateException();
+		throw new UnsupportedOperationException();
 	}
 
 	public CompletableFuture<NodeVersion> getNodeVersion() {
