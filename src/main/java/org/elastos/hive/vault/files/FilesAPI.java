@@ -14,16 +14,16 @@ interface FilesAPI {
 	Call<ChildrenInfo> listChildren(@Path("path") String path);
 
 	@GET("/api/v2/vault/files/{path}?comp=metadata")
-	Call<FileInfo> getProperties(@Path("path") String path);
+	Call<FileInfo> getMetadata(@Path("path") String path);
 
 	@GET("/api/v2/vault/files/{path}?comp=hash")
 	Call<HashInfo> getHash(@Path("path") String path);
 
 	@PUT("/api/v2/vault/files/{path}")
-	Call<UpdateResult> copy(@Path("path") String src, @Query("dst") String dst);
+	Call<UpdatedResult> copy(@Path("path") String src, @Query("dst") String dst);
 
 	@PATCH("/api/v2/vault/files/{path}")
-	Call<UpdateResult> move(@Path("path") String src, @Query("to") String dst);
+	Call<UpdatedResult> move(@Path("path") String src, @Query("to") String dst);
 
 	@DELETE("/api/v2/vault/files/{path}")
 	Call<Void> delete(@Path("path") String path);
