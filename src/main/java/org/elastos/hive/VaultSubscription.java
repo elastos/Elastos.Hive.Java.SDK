@@ -65,7 +65,7 @@ public class VaultSubscription extends ServiceEndpoint
 				return new Vault.PropertySet()
 						.setServiceId(body.getServiceDid())
 						.setPricingPlan(body.getPricePlan())
-						.setCreated(body.getCreated())
+						.setCreated((long)body.getCreated())
 						.setUpdated(body.getUpdated())
 						.setQuota(body.getQuota())
 						.setUsedSpace(0);
@@ -116,7 +116,7 @@ public class VaultSubscription extends ServiceEndpoint
 				return new Vault.PropertySet()
 						.setServiceId(body.getServiceDid())
 						.setPricingPlan(body.getPricePlan())
-						.setCreated(body.getCreated())
+						.setCreated((long)body.getCreated())
 						.setUpdated(body.getUpdated())
 						.setQuota(body.getStorageQuota())
 						.setUsedSpace(body.getStorageUsed());

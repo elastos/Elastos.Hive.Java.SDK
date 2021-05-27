@@ -9,8 +9,9 @@ public class VaultInfoResponse {
     private int storageQuota;
     @SerializedName("storageUsed")
     private int storageUsed;
-    @SerializedName("updated")
-    private long created;
+    @SerializedName("created")
+    //TODO:
+    private double created;
     @SerializedName("updated")
     private long updated;
     @SerializedName("pricePlan")
@@ -28,7 +29,7 @@ public class VaultInfoResponse {
         return storageUsed;
     }
 
-    public long getCreated() {
+    public double getCreated() {
         return created;
     }
 
