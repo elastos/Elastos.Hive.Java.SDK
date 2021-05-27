@@ -4,12 +4,11 @@ import org.elastos.hive.ServiceEndpoint;
 
 public class AccessToken extends AuthToken {
 	private String jwtCode;
-	private TokenResolver resolver;
+	private CodeResolver resolver;
 
 	public AccessToken(ServiceEndpoint endpoint) {
-		TokenResolver remoteResolver = new RemoteResolver(endpoint);
-		resolver = new LocalResolver(endpoint);
-		resolver.setNextResolver(remoteResolver);
+		CodeResolver remoteResolver = new AccessTokenRemoteResolver(endpoint);
+		resolver = new AccessTokenLocalResolver(endpoint, remoteResolver);
 	}
 
 	public String getToken() {
@@ -17,7 +16,7 @@ public class AccessToken extends AuthToken {
 			return jwtCode;
 
 		try {
-			jwtCode = resolver.getToken();
+			jwtCode = resolver.resolve();
 		} catch (Exception e) {
 			// TODO:
 			e.printStackTrace();
@@ -38,6 +37,6 @@ public class AccessToken extends AuthToken {
 	}
 
 	public void invalidateToken() {
-		resolver.invalidateToken();
+		resolver.invalidate();
 	}
 }

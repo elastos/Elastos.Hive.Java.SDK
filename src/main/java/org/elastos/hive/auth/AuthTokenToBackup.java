@@ -8,16 +8,15 @@ import org.elastos.hive.utils.LogUtil;
 public class AuthTokenToBackup extends AuthToken {
 	public static final String TOKEN_TYPE = "backup";
 	private String jwtCode;
-	private TokenResolver resolver;
+	private CodeResolver resolver;
 
 	public AuthTokenToBackup(ServiceEndpoint endpoint, BackupContext context) {
-		TokenResolver remoteResolver = new BackupRemoteResolver(
+		CodeResolver remoteResolver = new BackupRemoteResolver(
         		endpoint,
         		context,
         		context.getParameter("targetServiceDid"),
         		context.getParameter("targetAddress"));
-		resolver = new LocalResolver(endpoint);
-		resolver.setNextResolver(remoteResolver);
+		resolver = new AccessTokenLocalResolver(endpoint, remoteResolver);
 	}
 
 	public String getToken() {
@@ -25,7 +24,7 @@ public class AuthTokenToBackup extends AuthToken {
 			return jwtCode;
 
 		try {
-			jwtCode = resolver.getToken();
+			jwtCode = resolver.resolve();
 		} catch (Exception e) {
 			// TODO:
 			e.printStackTrace();

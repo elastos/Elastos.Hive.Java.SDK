@@ -13,19 +13,19 @@ import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.utils.LogUtil;
 
-public class RemoteResolver implements TokenResolver {
+public class AccessTokenRemoteResolver implements CodeResolver {
 	private ServiceEndpoint serviceEndpoint;
 	private AppContextProvider contextProvider;
 	private AuthController controller;
 
-	public RemoteResolver(ServiceEndpoint serviceEndpoint) {
+	public AccessTokenRemoteResolver(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
 		this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
 		this.controller = new AuthController(serviceEndpoint);
 	}
 
 	@Override
-	public String getToken() throws HttpFailedException {
+	public String resolve() throws HttpFailedException {
 		try {
 			return controller.auth(signIn4AccessToken());
 	        /*long exp = JwtUtil.getBody(accessToken).getExpiration().getTime();
@@ -53,12 +53,5 @@ public class RemoteResolver implements TokenResolver {
     }
 
 	@Override
-	public void invalidateToken() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void setNextResolver(TokenResolver resolver) {
-		throw new UnsupportedOperationException();
-	}
+	public void invalidate() {}
 }

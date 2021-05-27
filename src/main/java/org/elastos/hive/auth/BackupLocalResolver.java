@@ -2,10 +2,10 @@ package org.elastos.hive.auth;
 
 import org.elastos.hive.ServiceEndpoint;
 
-public class BackupLocalResolver extends LocalResolver {
+public class BackupLocalResolver extends AccessTokenLocalResolver {
 
-    public BackupLocalResolver(ServiceEndpoint serviceEndpoint) {
-        super(serviceEndpoint);
+    public BackupLocalResolver(ServiceEndpoint serviceEndpoint, CodeResolver next) {
+        super(serviceEndpoint, next);
     }
 
     @Override
@@ -13,18 +13,18 @@ public class BackupLocalResolver extends LocalResolver {
         if (serviceEndpoint.getServiceInstanceDid() == null)
             return null;
 
-        return dataStorage.loadBackupCredential(serviceEndpoint.getServiceInstanceDid());
+        return storage.loadBackupCredential(serviceEndpoint.getServiceInstanceDid());
     }
 
     @Override
     protected void saveToken(String token) {
         if (serviceEndpoint.getServiceInstanceDid() != null)
-            dataStorage.storeBackupCredential(serviceEndpoint.getServiceInstanceDid(), token);
+        	storage.storeBackupCredential(serviceEndpoint.getServiceInstanceDid(), token);
     }
 
     @Override
     protected void clearToken() {
         if (serviceEndpoint.getServiceInstanceDid() != null)
-            dataStorage.clearBackupCredential(serviceEndpoint.getServiceInstanceDid());
+        	storage.clearBackupCredential(serviceEndpoint.getServiceInstanceDid());
     }
 }
