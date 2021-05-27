@@ -6,7 +6,7 @@ import org.elastos.hive.service.BackupContext;
 
 import java.util.concurrent.ExecutionException;
 
-public class BackupRemoteResolver implements TokenResolver {
+public class BackupRemoteResolver implements CodeResolver {
     private BackupContext backupContext;
     private String targetDid;
     private String targetHost;
@@ -21,7 +21,7 @@ public class BackupRemoteResolver implements TokenResolver {
     }
 
     @Override
-    public String getToken() throws HttpFailedException {
+    public String resolve() throws HttpFailedException {
        /* try {
             return credential(authenticationService.signIn4ServiceDid());
         } catch (Exception e) {
@@ -38,12 +38,5 @@ public class BackupRemoteResolver implements TokenResolver {
     }*/
 
     @Override
-    public void invalidateToken() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setNextResolver(TokenResolver resolver) {
-        throw new UnsupportedOperationException();
-    }
+    public void invalidate() {}
 }
