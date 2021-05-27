@@ -10,7 +10,8 @@ public class VaultSubscribeResponse {
     @SerializedName("quota")
     private int quota;
     @SerializedName("created")
-    private long created;
+    //TODO:
+    private double created;
     @SerializedName("updated")
     private long updated;
 
@@ -26,7 +27,7 @@ public class VaultSubscribeResponse {
         return quota;
     }
 
-    public long getCreated() {
+    public double getCreated() {
         return created;
     }
 
