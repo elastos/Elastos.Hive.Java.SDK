@@ -4,8 +4,6 @@ import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.service.BackupContext;
 
-import java.util.concurrent.ExecutionException;
-
 public class BackupRemoteResolver implements CodeResolver {
     private BackupContext backupContext;
     private String targetDid;
