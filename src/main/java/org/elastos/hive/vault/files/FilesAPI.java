@@ -20,10 +20,10 @@ interface FilesAPI {
 	Call<HashInfo> getHash(@Path("path") String path);
 
 	@PUT("/api/v2/vault/files/{path}")
-	Call<UpdatedResult> copy(@Path("path") String src, @Query("dst") String dst);
+	Call<GeneralResult> copy(@Path("path") String src, @Query("dst") String dst);
 
 	@PATCH("/api/v2/vault/files/{path}")
-	Call<UpdatedResult> move(@Path("path") String src, @Query("to") String dst);
+	Call<GeneralResult> move(@Path("path") String src, @Query("to") String dst);
 
 	@DELETE("/api/v2/vault/files/{path}")
 	Call<Void> delete(@Path("path") String path);
