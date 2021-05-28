@@ -1,6 +1,6 @@
 package org.elastos.hive.subscription;
 
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.ExceptionHandler;
 import org.elastos.hive.exception.HiveException;
 import java.io.IOException;
@@ -8,8 +8,8 @@ import java.io.IOException;
 public class SubscriptionController extends ExceptionHandler {
 	private SubscriptionAPI subscriptionAPI;
 
-	public SubscriptionController(ServiceEndpoint serviceEndpoint) {
-		this.subscriptionAPI = serviceEndpoint.getConnectionManager().createService(SubscriptionAPI.class);
+	public SubscriptionController(ConnectionManager connection) {
+		this.subscriptionAPI = connection.createService(SubscriptionAPI.class);
 	}
 
 	public VaultInfo getVaultInfo() throws HiveException {

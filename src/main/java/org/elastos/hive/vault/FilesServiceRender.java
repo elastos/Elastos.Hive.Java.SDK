@@ -1,6 +1,6 @@
 package org.elastos.hive.vault;
 
-import org.elastos.hive.Vault;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.FileDoesNotExistsException;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.service.FilesService;
@@ -14,8 +14,8 @@ import java.util.concurrent.CompletionException;
 class FilesServiceRender implements FilesService, ExceptionConvertor {
 	private FilesController controller;
 
-	public FilesServiceRender(Vault vault) {
-		this.controller = new FilesController(vault);
+	public FilesServiceRender(ServiceEndpoint serviceEndpoint) {
+		this.controller = new FilesController(serviceEndpoint.getConnectionManager());
 	}
 
 	@Override

@@ -3,25 +3,24 @@ package org.elastos.hive.vault.files;
 import java.io.IOException;
 import java.util.List;
 
-import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.exception.ExceptionHandler;
 import org.elastos.hive.exception.HiveException;
 
 public class FilesController extends ExceptionHandler {
-	private ConnectionManager connectionManager;
+	private ConnectionManager connection;
 	private FilesAPI filesAPI;
 
-	public FilesController(ServiceEndpoint serviceEndpoint) {
-		connectionManager = serviceEndpoint.getConnectionManager();
-		filesAPI = serviceEndpoint.getConnectionManager().createService(FilesAPI.class);
+	public FilesController(ConnectionManager connection) {
+		this.connection = connection;
+		this.filesAPI = connection.createService(FilesAPI.class);
 	}
 
 	public <T> T upload(String path, Class<T> resultType) throws HiveException {
 		try {
 			return HiveResponseBody.getRequestStream(
-				connectionManager.openConnectionWithUrl(FilesAPI.API_UPLOAD + "/" + path, "PUT"),
+				connection.openConnectionWithUrl(FilesAPI.API_UPLOAD + "/" + path, "PUT"),
 				resultType);
 		} catch (IOException e) {
 			throw super.toHiveException(e);

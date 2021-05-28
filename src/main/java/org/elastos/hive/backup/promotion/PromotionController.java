@@ -1,14 +1,14 @@
 package org.elastos.hive.backup.promotion;
 
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.EmptyRequestBody;
 import org.elastos.hive.exception.HiveException;
 
 public class PromotionController {
 	private PromotionAPI api;
 
-	public PromotionController(ServiceEndpoint serviceEndpoint) {
-		api = serviceEndpoint.getConnectionManager().createService(PromotionAPI.class, true);
+	public PromotionController(ConnectionManager connection) {
+		api = connection.createService(PromotionAPI.class, true);
 	}
 
 	public void promote() throws HiveException {

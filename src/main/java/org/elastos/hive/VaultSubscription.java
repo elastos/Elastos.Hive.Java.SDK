@@ -26,7 +26,7 @@ public class VaultSubscription extends ServiceEndpoint
 
 	public VaultSubscription(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
-		subscriptionController = new SubscriptionController(this);
+		subscriptionController = new SubscriptionController(this.getConnectionManager());
 		paymentController = new PaymentController(this);
 	}
 

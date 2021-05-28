@@ -2,17 +2,19 @@ package org.elastos.hive.vault.scripting;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.HiveResponseBody;
 
 import java.io.IOException;
 
 public class ScriptingController {
-	private ServiceEndpoint serviceEndpoint;
+	private ConnectionManager connectionManager;
 	private ScriptingAPI scriptingAPI;
 
-	public ScriptingController(ServiceEndpoint serviceEndpoint) {
-		this.serviceEndpoint = serviceEndpoint;
-		this.scriptingAPI = serviceEndpoint.getConnectionManager().createService(ScriptingAPI.class);
+
+	public ScriptingController(ConnectionManager connection) {
+		this.connectionManager = connection;
+		this.scriptingAPI = connection.createService(ScriptingAPI.class);
 	}
 
 	public void registerScript(String name, Condition condition, Executable executable,
@@ -43,7 +45,7 @@ public class ScriptingController {
 
 	public <T> T uploadFile(String transactionId, Class<T> resultType) throws IOException {
 		return HiveResponseBody.getRequestStream(
-				serviceEndpoint.getConnectionManager().openConnectionWithUrl(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId, "PUT"),
+				connectionManager.openConnectionWithUrl(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId, "PUT"),
 				resultType);
 	}
 
