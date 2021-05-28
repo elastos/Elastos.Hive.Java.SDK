@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 public class ConnectionManager {
 	private static final int DEFAULT_TIMEOUT = 30;
 
-	private ServiceEndpoint serviceEndpoint;
+	private String providerAddress;
 	private Interceptor authRequestInterceptor;
 	private PlainRequestInterceptor plainRequestInterceptor;
 	private NormalRequestInterceptor normalRequestInterceptor;
@@ -51,14 +51,10 @@ public class ConnectionManager {
 	}
 
 	public void attach(ServiceEndpoint serviceEndpoint) {
-		this.serviceEndpoint = serviceEndpoint;
+		this.providerAddress = serviceEndpoint.getProviderAddress();
 		this.accessToken = new AccessToken(serviceEndpoint);
 		this.plainRequestInterceptor = new PlainRequestInterceptor(accessToken);
 		this.normalRequestInterceptor = new NormalRequestInterceptor(accessToken);
-	}
-
-	public ServiceEndpoint getServiceEndpoint() {
-		return this.serviceEndpoint;
 	}
 
 	/*public HttpURLConnection openConnection(String path) throws IOException {
@@ -66,7 +62,7 @@ public class ConnectionManager {
 	}*/
 
 	public HttpURLConnection openConnectionWithUrl(String relativeUrl, String method) throws IOException {
-		String url = serviceEndpoint.getProviderAddress() + relativeUrl;
+		String url = providerAddress + relativeUrl;
 		LogUtil.d("open connection with URL: " + url + ", and method: " + method);
 		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
 		httpURLConnection.setRequestMethod(method);
@@ -129,7 +125,7 @@ public class ConnectionManager {
 		builder.interceptors().add(new LoggerInterceptor());
 
 		return new Retrofit.Builder()
-				.baseUrl(serviceEndpoint.getProviderAddress())
+				.baseUrl(providerAddress)
 				// TODO: remove class StringConverterFactory and this line after v2 completes.
 				.addConverterFactory(StringConverterFactory.create())
 				.addConverterFactory(GsonConverterFactory.create())
