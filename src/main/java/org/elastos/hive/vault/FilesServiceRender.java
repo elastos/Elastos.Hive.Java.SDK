@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import java.io.OutputStream;
+import java.io.Writer;
+import java.io.InputStream;
+import java.io.Reader;
+
 class FilesServiceRender implements FilesService, ExceptionConvertor {
 	private FilesController controller;
 
@@ -18,8 +23,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 		this.controller = new FilesController(serviceEndpoint.getConnectionManager());
 	}
 
-	@Override
-	public <T> CompletableFuture<T> upload(String path, Class<T> resultType) {
+	private <T> CompletableFuture<T> upload(String path, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.upload(path, resultType);
@@ -27,6 +31,16 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 				throw new CompletionException(toHiveException(e));
 			}
 		});
+	}
+
+	@Override
+	public CompletableFuture<OutputStream> getUploadStream(String path) {
+		return this.upload(path, OutputStream.class);
+	}
+
+	@Override
+	public CompletableFuture<Writer> getUploadWriter(String path) {
+		return this.upload(path, Writer.class);
 	}
 
 	@Override
@@ -51,8 +65,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 		});
 	}
 
-	@Override
-	public <T> CompletableFuture<T> download(String path, Class<T> resultType) {
+	private <T> CompletableFuture<T> download(String path, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.download(path, resultType);
@@ -60,6 +73,16 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 				throw new CompletionException(toHiveException(e));
 			}
 		});
+	}
+
+	@Override
+	public CompletableFuture<InputStream> getDownloadStream(String path) {
+		return this.download(path, InputStream.class);
+	}
+
+	@Override
+	public CompletableFuture<Reader> getDownloadReader(String path) {
+		return this.download(path, Reader.class);
 	}
 
 	@Override

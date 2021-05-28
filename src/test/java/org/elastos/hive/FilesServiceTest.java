@@ -64,7 +64,7 @@ class FilesServiceTest {
 	}
 
 	private void uploadTextReally() throws IOException, ExecutionException, InterruptedException {
-		try (Writer writer = filesService.upload(remoteTxtFilePath, Writer.class).get();
+		try (Writer writer = filesService.getUploadWriter(remoteTxtFilePath).get();
 			 FileReader fileReader = new FileReader(localTxtFilePath)) {
 			Assertions.assertNotNull(writer);
 			char[] buffer = new char[1];
@@ -75,7 +75,7 @@ class FilesServiceTest {
 	}
 
 	@Test @Order(2) void testUploadBin() {
-		try (OutputStream out = filesService.upload(remoteImgFilePath, OutputStream.class).get()) {
+		try (OutputStream out = filesService.getUploadStream(remoteImgFilePath).get()) {
 			Assertions.assertNotNull(out);
 			out.write(Utils.readImage(localImgFilePath));
 			out.flush();
@@ -87,7 +87,7 @@ class FilesServiceTest {
 	}
 
 	@Test @Order(3) void testDownloadText() {
-		try (Reader reader = filesService.download(remoteTxtFilePath, Reader.class).get()) {
+		try (Reader reader = filesService.getDownloadReader(remoteTxtFilePath).get()) {
 			Assertions.assertNotNull(reader);
 			Utils.cacheTextFile(reader, localCacheRootDir, FILE_NAME_TXT);
 			Assertions.assertTrue(isFileContentEqual(localTxtFilePath, localCacheRootDir + FILE_NAME_TXT));
@@ -97,7 +97,7 @@ class FilesServiceTest {
 	}
 
 	@Test @Order(4) void testDownloadBin() {
-		try (InputStream in = filesService.download(remoteImgFilePath, InputStream.class).get()) {
+		try (InputStream in = filesService.getDownloadStream(remoteImgFilePath).get()) {
 			Assertions.assertNotNull(in);
 			Utils.cacheBinFile(in, localCacheRootDir, FILE_NAME_IMG);
 			Assertions.assertTrue(isFileContentEqual(localImgFilePath, localCacheRootDir + FILE_NAME_IMG));

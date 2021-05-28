@@ -1,38 +1,36 @@
 package org.elastos.hive.connection;
 
-import org.elastos.hive.connection.ConnectionManager;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
 public class UploadOutputStream extends OutputStream {
 	private HttpURLConnection connection;
-	private OutputStream originalStream;
+	private OutputStream outputStream;
 
-	public UploadOutputStream(HttpURLConnection connection, OutputStream stream) {
+	public UploadOutputStream(HttpURLConnection connection, OutputStream output) {
 		this.connection = connection;
-		this.originalStream = stream;
+		this.outputStream = output;
 	}
 
 	@Override
 	public void write(int b) throws IOException {
-		originalStream.write(b);
+		outputStream.write(b);
 	}
 
 	@Override
 	public void write(byte[] bytes) throws IOException {
-		originalStream.write(bytes);
+		outputStream.write(bytes);
 	}
 
 	@Override
 	public void write(byte[] bytes, int offset, int length) throws IOException {
-		originalStream.write(bytes, offset, length);
+		outputStream.write(bytes, offset, length);
 	}
 
 	@Override
 	public void flush() throws IOException {
-		originalStream.flush();
+		outputStream.flush();
 	}
 
 	@Override
@@ -43,6 +41,6 @@ public class UploadOutputStream extends OutputStream {
 		//
 		// This close() method on the output stream is the only location where we know user has finished writing his file.
 		ConnectionManager.readConnection(connection);
-		originalStream.close();
+		outputStream.close();
 	}
 }

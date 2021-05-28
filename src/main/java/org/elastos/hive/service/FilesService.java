@@ -2,6 +2,11 @@ package org.elastos.hive.service;
 
 import org.elastos.hive.vault.files.FileInfo;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -16,24 +21,22 @@ public interface FilesService {
 	 * to actually send the data remotely.
 	 *
 	 * @param path the path for the remote file
-	 * @param resultType Write or OutputStream class
-	 * @param <T> Write, OutputStream
 	 * @return the new CompletionStage, the result is the Writer or OutputStream interface for
 	 *              upload the file content if success; null otherwise
 	 */
-	<T> CompletableFuture<T> upload(String path, Class<T> resultType);
+	CompletableFuture<OutputStream> getUploadStream(String path);
+	CompletableFuture<Writer> getUploadWriter(String path);
 
 	/**
 	 * Initiates a download sequence by returning a Reader or InputStream object that can
-	 * be used to read the downloaded file in chunks.
+	 * be used to read the download file in chunks.
 	 *
-	 * @param <T> Reader or InputStream class
 	 * @param path the path for the remote file
-	 * @param resultType Reader or InputStream class
 	 * @return the new CompletionStage, the result is the Reader or InputStream interface for
 	 *      read the file content if success; null otherwise
 	 */
-	<T> CompletableFuture<T> download(String path, Class<T> resultType);
+	CompletableFuture<InputStream> getDownloadStream(String path);
+	CompletableFuture<Reader> getDownloadReader(String path);
 
 	/**
 	 * Deletes a file, or a folder. In case the given path is a folder,

@@ -1,6 +1,5 @@
 package org.elastos.hive.connection;
 
-import org.elastos.hive.connection.ConnectionManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
