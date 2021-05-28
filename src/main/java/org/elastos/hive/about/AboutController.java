@@ -2,14 +2,14 @@ package org.elastos.hive.about;
 
 import java.io.IOException;
 
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
 
 public class AboutController {
 	private AboutAPI aboutAPI;
 
-	public AboutController(ServiceEndpoint serviceEndpoint) {
-		aboutAPI = serviceEndpoint.getConnectionManager().createService(AboutAPI.class, false);
+	public AboutController(ConnectionManager connection) {
+		aboutAPI = connection.createService(AboutAPI.class, false);
 	}
 
 	public NodeVersion getNodeVersion() throws HiveException {

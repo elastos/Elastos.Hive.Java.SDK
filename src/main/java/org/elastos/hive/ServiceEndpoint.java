@@ -101,7 +101,7 @@ public class ServiceEndpoint implements ExceptionConvertor {
 	public CompletableFuture<NodeVersion> getNodeVersion() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				AboutController controller = new AboutController(this);
+				AboutController controller = new AboutController(connectionManager);
 				return controller.getNodeVersion();
 			} catch (HiveException e) {
 				e.printStackTrace();
@@ -116,7 +116,7 @@ public class ServiceEndpoint implements ExceptionConvertor {
 	public CompletableFuture<String> getLatestCommitId() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				AboutController controller = new AboutController(this);
+				AboutController controller = new AboutController(connectionManager);
 				return controller.getCommitId();
 			} catch (HiveException e) {
 				e.printStackTrace();

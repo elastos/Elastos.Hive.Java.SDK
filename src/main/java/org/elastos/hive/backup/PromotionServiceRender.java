@@ -13,7 +13,7 @@ class PromotionServiceRender implements PromotionService, ExceptionConvertor {
 	private PromotionController controller;
 
 	PromotionServiceRender(ServiceEndpoint serviceEndpoint) {
-		controller = new PromotionController(serviceEndpoint);
+		controller = new PromotionController(serviceEndpoint.getConnectionManager());
 	}
 
 	@Override

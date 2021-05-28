@@ -16,7 +16,7 @@ class BackupServiceRender implements BackupService, ExceptionConvertor {
 
     public BackupServiceRender(ServiceEndpoint serviceEndpoint) {
     	this.serviceEndpoint = serviceEndpoint;
-    	this.controller = new BackupController(serviceEndpoint);
+    	this.controller = new BackupController(serviceEndpoint.getConnectionManager());
     }
 
     @Override

@@ -16,7 +16,7 @@ public class ScriptingServiceRender implements ScriptingService, ExceptionConver
 	private ScriptingController controller;
 
 	public ScriptingServiceRender(ServiceEndpoint serviceEndpoint) {
-		this.controller = new ScriptingController(serviceEndpoint);
+		this.controller = new ScriptingController(serviceEndpoint.getConnectionManager());
 	}
 
 	@Override

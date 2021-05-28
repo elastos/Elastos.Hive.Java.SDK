@@ -25,7 +25,7 @@ public class BackupSubscription extends ServiceEndpoint
 
 	public BackupSubscription(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
-		subscriptionController = new SubscriptionController(this);
+		subscriptionController = new SubscriptionController(this.getConnectionManager());
 		paymentController = new PaymentController(this);
 	}
 
