@@ -57,29 +57,31 @@ public class ConnectionManager {
 		this.normalRequestInterceptor = new NormalRequestInterceptor(accessToken);
 	}
 
-	/*public HttpURLConnection openConnection(String path) throws IOException {
-		return openConnectionWithUrl("/api/v1" + path, "POST");
-	}*/
+	public HttpURLConnection openConnection(String urlPath) throws IOException {
+		return openConnection(urlPath, "PUT");
+	}
 
-	public HttpURLConnection openConnectionWithUrl(String relativeUrl, String method) throws IOException {
-		String url = providerAddress + relativeUrl;
+	private HttpURLConnection openConnection(String urlPath, String method) throws IOException {
+		String url = providerAddress + urlPath;
 		LogUtil.d("open connection with URL: " + url + ", and method: " + method);
-		HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
-		httpURLConnection.setRequestMethod(method);
-		httpURLConnection.setRequestProperty("User-Agent",
+
+		HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
+		urlConnection.setRequestMethod(method);
+		urlConnection.setRequestProperty("User-Agent",
 				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
-		httpURLConnection.setConnectTimeout(5000);
-		httpURLConnection.setReadTimeout(5000);
+		urlConnection.setConnectTimeout(5000);
+		urlConnection.setReadTimeout(5000);
 
-		httpURLConnection.setDoOutput(true);
-		httpURLConnection.setDoInput(true);
-		httpURLConnection.setUseCaches(false);
-		httpURLConnection.setRequestProperty("Transfer-Encoding", "chunked");
-		httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
-		httpURLConnection.setRequestProperty("Authorization", accessToken.getCanonicalizedAccessToken());
+		urlConnection.setDoOutput(true);
+		urlConnection.setDoInput(true);
+		urlConnection.setUseCaches(false);
+		urlConnection.setRequestProperty("Transfer-Encoding", "chunked");
+		urlConnection.setRequestProperty("Connection", "Keep-Alive");
+		urlConnection.setRequestProperty("Authorization", accessToken.getCanonicalizedAccessToken());
 
-		httpURLConnection.setChunkedStreamingMode(0);
-		return httpURLConnection;
+		urlConnection.setChunkedStreamingMode(0);
+
+		return urlConnection;
 	}
 
 	/**

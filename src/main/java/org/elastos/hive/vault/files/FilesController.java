@@ -24,7 +24,7 @@ public class FilesController extends ExceptionHandler {
 
 	public OutputStream getUploadStream(String path) throws HiveException {
 		try {
-			HttpURLConnection urlConnection = connection.openConnectionWithUrl(FilesAPI.API_UPLOAD + path,  "PUT");
+			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
 			return new UploadOutputStream(urlConnection, urlConnection.getOutputStream());
 		} catch (IOException e) {
 			throw new HiveException(e);
@@ -33,7 +33,7 @@ public class FilesController extends ExceptionHandler {
 
 	public Writer getUploadWriter(String path) throws HiveException {
 		try {
-			HttpURLConnection urlConnection = connection.openConnectionWithUrl(FilesAPI.API_UPLOAD + path,  "PUT");
+			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
 			return new UploadOutputStreamWriter(urlConnection, urlConnection.getOutputStream());
 		} catch (IOException e) {
 			throw new HiveException(e);
