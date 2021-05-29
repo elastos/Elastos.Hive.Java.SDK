@@ -24,20 +24,18 @@ public class FilesController extends ExceptionHandler {
 	}
 
 	private <T> T getUploadingStream(HttpURLConnection connection, Class<T> resultType) throws IOException {
-		OutputStream stream = connection.getOutputStream();
-
-        OutputStream outputStream = connection.getOutputStream();
-        if (resultType.isAssignableFrom(OutputStream.class)) {
-            UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
-            return resultType.cast(uploader);
-        } else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
-            OutputStreamWriter writer = new UploadOutputStreamWriter(connection, outputStream);
-            return resultType.cast(writer);
-        } else {
-        	// TODO: output the log
-            throw new InvalidPropertiesFormatException("Not supported result type: " + resultType.getName());
-        }
-    }
+		OutputStream outputStream = connection.getOutputStream();
+		if (resultType.isAssignableFrom(OutputStream.class)) {
+			UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
+			return resultType.cast(uploader);
+		} else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
+			OutputStreamWriter writer = new UploadOutputStreamWriter(connection, outputStream);
+			return resultType.cast(writer);
+		} else {
+			// TODO: output the log
+			throw new InvalidPropertiesFormatException("Not supported result type: " + resultType.getName());
+		}
+	}
 
 	public <T> T upload(String path, Class<T> resultType) throws HiveException {
 		try {
