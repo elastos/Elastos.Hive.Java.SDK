@@ -43,15 +43,13 @@ class ScriptingServiceTest {
 	private final String localDstFileRoot;
 	private final String localDstFilePath;
 	private final String fileName;
-	private final String fakeParams;
 
 	public ScriptingServiceTest() {
-		fileName = "text";
+		fileName = "test.txt";
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/local/";
 		localSrcFilePath = localRootPath + fileName;
 		localDstFileRoot = localRootPath + "cache/script/";
 		localDstFilePath = localDstFileRoot + fileName;
-		fakeParams = "{\"path\":\"invalid_path\"}";
 	}
 
 	@BeforeAll public static void setUp() {
@@ -114,7 +112,7 @@ class ScriptingServiceTest {
 
 	private void callScriptFindWithoutCondition(String scriptName) {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-				scriptRunner.callScriptUrl(scriptName, fakeParams, ownerDid, appDid, String.class).get()));
+				scriptRunner.callScriptUrl(scriptName, "{}", ownerDid, appDid, String.class).get()));
 	}
 
 	@Test @Order(3) void testFind() {
@@ -140,10 +138,8 @@ class ScriptingServiceTest {
 
 	private void callScriptFind(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
-			ObjectNode node = JsonNodeFactory.instance.objectNode();
-			node.put("path", "fake_path");
 			Assertions.assertNotNull(
-				scriptRunner.callScript(scriptName, node, ownerDid, appDid, String.class).get());
+				scriptRunner.callScript(scriptName, null, ownerDid, appDid, String.class).get());
 		});
 	}
 
@@ -209,8 +205,7 @@ class ScriptingServiceTest {
 		registerScriptFileUpload(UPLOAD_FILE_NAME);
 		String transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
 		uploadFileByTransActionId(transactionId);
-		//TODO：fix the error on node: 'os.stat_result' object has no attribute 'st_birthtime'
-		//FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
+		FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
 	}
 
 	private void registerScriptFileUpload(String scriptName) {
