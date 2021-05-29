@@ -45,7 +45,7 @@ public class ScriptingController {
 
 	public <T> T uploadFile(String transactionId, Class<T> resultType) throws IOException {
 		return HiveResponseBody.getRequestStream(
-				connectionManager.openConnectionWithUrl(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId, "PUT"),
+				connectionManager.openConnection(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId),
 				resultType);
 	}
 
