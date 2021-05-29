@@ -2,6 +2,7 @@ package org.elastos.hive.vault;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.FileDoesNotExistsException;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.files.FileInfo;
@@ -23,24 +24,26 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 		this.controller = new FilesController(serviceEndpoint.getConnectionManager());
 	}
 
-	private <T> CompletableFuture<T> upload(String path, Class<T> resultType) {
-		return CompletableFuture.supplyAsync(() -> {
+	@Override
+	public CompletableFuture<OutputStream> getUploadStream(String path) {
+		return CompletableFuture.supplyAsync(() ->  {
 			try {
-				return controller.upload(path, resultType);
-			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				return controller.getUploadStream(path);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
 			}
 		});
 	}
 
 	@Override
-	public CompletableFuture<OutputStream> getUploadStream(String path) {
-		return this.upload(path, OutputStream.class);
-	}
-
-	@Override
 	public CompletableFuture<Writer> getUploadWriter(String path) {
-		return this.upload(path, Writer.class);
+		return CompletableFuture.supplyAsync(() ->  {
+			try {
+				return controller.getUploadWriter(path);
+			} catch (HiveException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
 	@Override
