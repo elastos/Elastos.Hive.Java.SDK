@@ -101,31 +101,43 @@ public class FileStorage implements DataStorage {
 
 	@Override
 	public void storeBackupCredential(String serviceDid, String credential) {
+		if (serviceDid == null)
+			return;
 		saveFileContent(getFilePath(CREDENTIAL_BACKUP, getRelativeDidStr(serviceDid)), credential);
 	}
 
 	@Override
 	public void storeAccessToken(String serviceDid, String accessToken) {
+		if (serviceDid == null)
+			return;
 		saveFileContent(getFilePath(TOKENS, getRelativeDidStr(serviceDid)), accessToken);
 	}
 
 	@Override
 	public void storeAccessTokenByAddress(String providerAddress, String accessToken) {
+		if (providerAddress == null)
+			return;
 		saveFileContent(getFilePath(TOKENS, CryptoUtil.getSHA256(providerAddress)), accessToken);
 	}
 
 	@Override
 	public void clearBackupCredential(String serviceDid) {
+		if (serviceDid == null)
+			return;
 		removeFile(getFilePath(CREDENTIAL_BACKUP, getRelativeDidStr(serviceDid)));
 	}
 
 	@Override
 	public void clearAccessToken(String serviceDid) {
+		if (serviceDid == null)
+			return;
 		removeFile(getFilePath(TOKENS, getRelativeDidStr(serviceDid)));
 	}
 
 	@Override
 	public void clearAccessTokenByAddress(String providerAddress) {
+		if (providerAddress == null)
+			return;
 		removeFile(getFilePath(TOKENS, CryptoUtil.getSHA256(providerAddress)));
 	}
 }

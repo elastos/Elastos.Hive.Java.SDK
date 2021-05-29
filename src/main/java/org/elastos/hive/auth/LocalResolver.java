@@ -22,7 +22,6 @@ class LocalResolver implements CodeResolver {
 			token = nextResolver.resolve();
 			saveToken(token);
 		}
-
 		return token;
 	}
 
@@ -32,35 +31,40 @@ class LocalResolver implements CodeResolver {
 	}
 
 	protected String restoreToken() {
-		String serviceDid = serviceEndpoint.getServiceInstanceDid();
 		String jwtCode = null;
 
-		if (serviceDid != null)
+		String serviceDid = serviceEndpoint.getServiceInstanceDid();
+		if (serviceDid != null) {
 			jwtCode = storage.loadAccessToken(serviceDid);
+			if (jwtCode != null && isTokenExpired(jwtCode))
+				storage.clearAccessToken(serviceDid);
+		}
 
-		String address = serviceEndpoint.getProviderAddress();
-		if (serviceDid == null && jwtCode == null)
+		if (jwtCode == null) {
+			String address = serviceEndpoint.getProviderAddress();
 			jwtCode = storage.loadAccessToken(address);
+			if (jwtCode != null && isTokenExpired(jwtCode))
+				storage.clearAccessToken(address);
+		}
 
 		return jwtCode;
 	}
 
-	protected void saveToken(String jwtCode) {
-		String serviceDid = serviceEndpoint.getServiceInstanceDid();
-		String address    = serviceEndpoint.getProviderAddress();
+	private boolean isTokenExpired(String jwtCode) {
+		// TODO: check the expiration of the access token.
+		return false;
+	}
 
+	protected void saveToken(String jwtCode) {
 		if (jwtCode == null)
 			return;
 
-		storage.storeAccessToken(serviceDid, jwtCode);
-		storage.storeAccessToken(address, jwtCode);
+		storage.storeAccessToken(serviceEndpoint.getServiceInstanceDid(), jwtCode);
+		storage.storeAccessTokenByAddress(serviceEndpoint.getProviderAddress(), jwtCode);
 	}
 
 	protected void clearToken() {
-		String serviceDid = serviceEndpoint.getServiceInstanceDid();
-		String address    = serviceEndpoint.getProviderAddress();
-
-		storage.clearAccessToken(serviceDid);
-		storage.clearAccessTokenByAddress(address);
+		storage.clearAccessToken(serviceEndpoint.getServiceInstanceDid());
+		storage.clearAccessTokenByAddress(serviceEndpoint.getProviderAddress());
 	}
 }
