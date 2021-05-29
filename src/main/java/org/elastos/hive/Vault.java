@@ -2,10 +2,9 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.UnsupportedMethodException;
 import org.elastos.hive.service.*;
+import org.elastos.hive.subscription.VaultInfo;
 import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.vault.ServiceBuilder;
-
-import java.util.Date;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -18,69 +17,6 @@ public class Vault extends ServiceEndpoint implements ExceptionConvertor {
 	private ScriptingService scriptingService;
 	private PubSubService pubsubService;
 	private BackupService 	backupService;
-
-	public static class PropertySet {
-		private String serviceDid;
-		private String pricingPlan;
-		private long created;
-		private long updated;
-		private long quota;
-		private long used;
-
-		public String getServiceId() {
-			return serviceDid;
-		}
-
-		public String getPricingPlan() {
-			return pricingPlan;
-		}
-
-		public Date getCreated() {
-			return new Date(created);
-		}
-
-		public Date getLastUpdated() {
-			return new Date(updated);
-		}
-
-		public long getQuotaSpace() {
-			return quota;
-		}
-
-		public long getUsedSpace() {
-			return used;
-		}
-
-		PropertySet setServiceId(String serviceId) {
-			this.serviceDid = serviceId;
-			return this;
-		}
-
-		PropertySet setPricingPlan(String pricingPlan) {
-			this.pricingPlan = pricingPlan;
-			return this;
-		}
-
-		PropertySet setCreated(long created) {
-			this.created = created;
-			return this;
-		}
-
-		PropertySet setUpdated(long updated) {
-			this.updated = updated;
-			return this;
-		}
-
-		PropertySet setQuota(long quota) {
-			this.quota = quota;
-			return this;
-		}
-
-		PropertySet setUsedSpace(long used) {
-			this.used = used;
-			return this;
-		}
-	}
 
 	public Vault(AppContext context, String providerAddress) {
 		super(context, providerAddress);
@@ -112,7 +48,7 @@ public class Vault extends ServiceEndpoint implements ExceptionConvertor {
 		return this.backupService;
 	}
 
-	public CompletableFuture<PropertySet> getPropertySet() {
+	public CompletableFuture<VaultInfo> getPropertySet() {
 		throw new UnsupportedMethodException();
 	}
 }
