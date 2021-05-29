@@ -5,7 +5,7 @@ import retrofit2.Call;
 import retrofit2.http.*;
 
 interface FilesAPI {
-	String API_UPLOAD = "/api/v2/vault/files";
+	String API_UPLOAD = "/api/v2/vault/files/";
 
 	@GET("/api/v2/vault/files/{path}")
 	Call<ResponseBody> download(@Path("path") String path);
@@ -20,10 +20,10 @@ interface FilesAPI {
 	Call<HashInfo> getHash(@Path("path") String path);
 
 	@PUT("/api/v2/vault/files/{path}")
-	Call<GeneralResult> copy(@Path("path") String src, @Query("dst") String dst);
+	Call<GeneralResult> copy(@Path("path") String src, @Query("dst") String dest);
 
 	@PATCH("/api/v2/vault/files/{path}")
-	Call<GeneralResult> move(@Path("path") String src, @Query("to") String dst);
+	Call<GeneralResult> move(@Path("path") String src, @Query("to") String dest);
 
 	@DELETE("/api/v2/vault/files/{path}")
 	Call<Void> delete(@Path("path") String path);

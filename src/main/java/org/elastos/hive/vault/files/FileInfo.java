@@ -1,5 +1,7 @@
 package org.elastos.hive.vault.files;
 
+import java.util.Date;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -8,12 +10,16 @@ import com.google.gson.annotations.SerializedName;
 public class FileInfo {
 	@SerializedName("name")
 	private String name;
+
 	@SerializedName("is_file")
 	private boolean isFile;
+
 	@SerializedName("size")
 	private int size;
+
 	@SerializedName("created")
 	private long created;
+
 	@SerializedName("updated")
 	private long updated;
 
@@ -29,11 +35,11 @@ public class FileInfo {
 		return size;
 	}
 
-	public long getCreated() {
-		return created;
+	public Date getCreated() {
+		return new Date(created * 1000);
 	}
 
-	public long getUpdated() {
-		return updated;
+	public Date getUpdated() {
+		return new Date(updated * 1000);
 	}
 }

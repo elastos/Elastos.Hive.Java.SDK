@@ -2,9 +2,8 @@ package org.elastos.hive.vault.files;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.HttpURLConnection;
-import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 
 import org.elastos.hive.connection.ConnectionManager;
@@ -23,27 +22,21 @@ public class FilesController extends ExceptionHandler {
 		this.filesAPI = connection.createService(FilesAPI.class);
 	}
 
-	private <T> T getUploadingStream(HttpURLConnection connection, Class<T> resultType) throws IOException {
-		OutputStream outputStream = connection.getOutputStream();
-		if (resultType.isAssignableFrom(OutputStream.class)) {
-			UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
-			return resultType.cast(uploader);
-		} else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
-			OutputStreamWriter writer = new UploadOutputStreamWriter(connection, outputStream);
-			return resultType.cast(writer);
-		} else {
-			// TODO: output the log
-			throw new InvalidPropertiesFormatException("Not supported result type: " + resultType.getName());
+	public OutputStream getUploadStream(String path) throws HiveException {
+		try {
+			HttpURLConnection urlConnection = connection.openConnectionWithUrl(FilesAPI.API_UPLOAD + path,  "PUT");
+			return new UploadOutputStream(urlConnection, urlConnection.getOutputStream());
+		} catch (IOException e) {
+			throw new HiveException(e);
 		}
 	}
 
-	public <T> T upload(String path, Class<T> resultType) throws HiveException {
+	public Writer getUploadWriter(String path) throws HiveException {
 		try {
-			return getUploadingStream(
-				connection.openConnectionWithUrl(FilesAPI.API_UPLOAD + "/" + path, "PUT"),
-				resultType);
+			HttpURLConnection urlConnection = connection.openConnectionWithUrl(FilesAPI.API_UPLOAD + path,  "PUT");
+			return new UploadOutputStreamWriter(urlConnection, urlConnection.getOutputStream());
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new HiveException(e);
 		}
 	}
 
