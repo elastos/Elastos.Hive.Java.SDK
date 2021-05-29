@@ -35,12 +35,15 @@ public class UploadOutputStream extends OutputStream {
 
 	@Override
 	public void close() throws IOException {
-		// In order for uploads to complete successfully in chunk mode, we have to read the server response.
-		// This doesn't seem to behave identically on all devices. Some devices work without this. But some devices
-		// don't terminate the api call until the server response is read.
+		// In order for uploads to complete successfully in chunk mode, we have to
+		// read the server response.
+		// This doesn't seem to behave identically on all devices. Some devices work
+		// without this. But some devices don't terminate the API call until the server
+		// response is read.
 		//
-		// This close() method on the output stream is the only location where we know user has finished writing his file.
-		ConnectionManager.readConnection(connection);
+		// This close() method on the output stream is the only location where we know
+		// user has finished writing his file.
+		new ConnectionClosure().confirmClosed(connection);
 		outputStream.close();
 	}
 }

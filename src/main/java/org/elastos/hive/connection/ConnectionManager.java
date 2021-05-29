@@ -82,21 +82,6 @@ public class ConnectionManager {
 		return httpURLConnection;
 	}
 
-	public static void readConnection(HttpURLConnection httpURLConnection) throws IOException {
-		int code = httpURLConnection.getResponseCode();
-		if (code == 200) {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-			StringBuilder result = new StringBuilder();
-			String line = "";
-			while ((line = reader.readLine()) != null)
-				if (line.length() > 0)
-					result.append(line.trim());
-			LogUtil.d("connection", "response content: " + result.toString());
-		} else {
-			throw HiveResponseBody.getHttpExceptionByCode(code, HiveResponseBody.getHttpErrorMessages().get(code));
-		}
-	}
-
 	/**
 	 * Create network API service by service class.
 	 * @param serviceClass the class of the service.
