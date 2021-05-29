@@ -6,7 +6,7 @@ class ChallengeResponse {
     @SerializedName("jwt")
     private final String challengeResponse;
 
-    public ChallengeResponse(String challengeResponse) {
+    ChallengeResponse(String challengeResponse) {
         this.challengeResponse = challengeResponse;
     }
 }

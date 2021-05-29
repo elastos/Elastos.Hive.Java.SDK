@@ -7,8 +7,7 @@ public class AccessToken {
 	private CodeResolver resolver;
 
 	public AccessToken(ServiceEndpoint endpoint) {
-		CodeResolver remoteResolver = new RemoteResolver(endpoint);
-		resolver = new LocalResolver(endpoint, remoteResolver);
+		resolver = new LocalResolver(endpoint, new RemoteResolver(endpoint));
 	}
 
 	public String getToken() {

@@ -6,7 +6,7 @@ class SigninRequest {
 	@SerializedName("document")
     private Object didDocument;
 
-    public SigninRequest(Object didDocument) {
+    SigninRequest(Object didDocument) {
         this.didDocument = didDocument;
     }
 }

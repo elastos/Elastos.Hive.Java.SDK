@@ -10,11 +10,7 @@ class ChallengeRequest {
     @SerializedName("challenge")
     private String challenge;
 
-    public String getChallenge() {
-        return challenge;
-    }
-
-    public static Claims checkValid(String jwt, String validAudience) {
+    static String getValidJwt(String jwt, String validAudience) {
         Claims claims = JwtUtil.getBody(jwt);
 
         if (claims.getExpiration().getTime() <= System.currentTimeMillis() )
@@ -23,10 +19,10 @@ class ChallengeRequest {
         if (!claims.getAudience().equals(validAudience))
             throw new HiveSdkException("Bad jwt audience value");
 
-        return claims;
+        return jwt;
     }
 
-    public Claims checkValid(String validAudience) {
-        return checkValid(challenge, validAudience);
+    String getValidChallenge(String appInstanceDid) {
+        return getValidJwt(challenge, appInstanceDid);
     }
 }
