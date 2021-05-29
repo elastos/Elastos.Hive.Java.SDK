@@ -19,7 +19,7 @@ import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.subscription.SubscriptionController;
 
 public class VaultSubscription extends ServiceEndpoint
-	implements SubscriptionService<Vault.PropertySet>, PaymentService, ExceptionConvertor {
+	implements SubscriptionService<VaultInfo>, PaymentService, ExceptionConvertor {
 
 	private SubscriptionController subscriptionController;
 	private PaymentController paymentController;
@@ -52,22 +52,15 @@ public class VaultSubscription extends ServiceEndpoint
 		});
 	}
 
-	public CompletableFuture<Vault.PropertySet> subscribe() {
+	public CompletableFuture<VaultInfo> subscribe() {
 		return this.subscribe("");
 	}
 
 	@Override
-	public CompletableFuture<Vault.PropertySet> subscribe(String reserved) {
+	public CompletableFuture<VaultInfo> subscribe(String reserved) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				VaultInfo info = subscriptionController.subscribeToVault(reserved);
-				return new Vault.PropertySet()
-						.setServiceId(info.getServiceDid())
-						.setPricingPlan(info.getPricePlan())
-						.setCreated((long)info.getCreated())
-						.setUpdated(info.getUpdated())
-						//.setQuota(info.getQuota())
-						.setUsedSpace(0);
+				return subscriptionController.subscribeToVault(reserved);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -108,17 +101,10 @@ public class VaultSubscription extends ServiceEndpoint
 	}
 
 	@Override
-	public CompletableFuture<Vault.PropertySet> checkSubscription() {
+	public CompletableFuture<VaultInfo> checkSubscription() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				VaultInfo info = subscriptionController.getVaultInfo();
-				return new Vault.PropertySet()
-						.setServiceId(info.getServiceDid())
-						.setPricingPlan(info.getPricePlan())
-						.setCreated((long)info.getCreated())
-						.setUpdated(info.getUpdated())
-						.setQuota(info.getStorageQuota())
-						.setUsedSpace(info.getStorageUsed());
+				return subscriptionController.getVaultInfo();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}

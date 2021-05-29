@@ -13,10 +13,10 @@ public class VaultInfo {
     private int storageUsed;
 
     @SerializedName("created")
-    private double created;  // TODO:
+    private long created;
 
     @SerializedName("updated")
-    private long updated;	// TODO:
+    private long updated;
 
     @SerializedName("pricePlan")
     private String pricePlan;
@@ -33,7 +33,7 @@ public class VaultInfo {
         return storageUsed;
     }
 
-    public double getCreated() {
+    public long getCreated() {
         return created;
     }
 

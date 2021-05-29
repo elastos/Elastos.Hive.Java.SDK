@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FilesServiceTest {
-	private static final String FILE_NAME_TXT = "text";
-	private static final String FILE_NAME_IMG = "big_png";
+	private static final String FILE_NAME_TXT = "test.txt";
+	private static final String FILE_NAME_IMG = "big.png";
 	private static final String FILE_NAME_NOT_EXISTS = "not_exists";
 
 	private final String localTxtFilePath;
@@ -41,11 +41,11 @@ class FilesServiceTest {
 		localTxtFilePath = rootDir + FILE_NAME_TXT;
 		localImgFilePath = rootDir + FILE_NAME_IMG;
 		localCacheRootDir = rootDir + "cache/file/";
-		remoteRootDir = "";
-		remoteTxtFilePath = FILE_NAME_TXT;
-		remoteImgFilePath = FILE_NAME_IMG;
-		remoteNotExistsFilePath = FILE_NAME_NOT_EXISTS;
-		remoteBackupTxtFilePath = FILE_NAME_TXT + "2";
+		remoteRootDir = "hive";
+		remoteTxtFilePath = remoteRootDir + "/" + FILE_NAME_TXT;
+		remoteImgFilePath = remoteRootDir + "/" + FILE_NAME_IMG;
+		remoteNotExistsFilePath = remoteRootDir + "/" + FILE_NAME_NOT_EXISTS;
+		remoteBackupTxtFilePath = remoteRootDir + "/" + FILE_NAME_TXT + "2";
 	}
 
 	@BeforeAll public static void setUp() {
@@ -59,8 +59,7 @@ class FilesServiceTest {
 
 	@Test @Order(1) void testUploadText() {
 		Assertions.assertDoesNotThrow(this::uploadTextReally);
-		//TODO: fix error on node: 'os.stat_result' object has no attribute 'st_birthtime'
-		//verifyRemoteFileExists(remoteTxtFilePath);
+		verifyRemoteFileExists(remoteTxtFilePath);
 	}
 
 	private void uploadTextReally() throws IOException, ExecutionException, InterruptedException {
@@ -82,8 +81,7 @@ class FilesServiceTest {
 		} catch (Exception e) {
 			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
-		//TODO:
-		//verifyRemoteFileExists(remoteImgFilePath);
+		verifyRemoteFileExists(remoteImgFilePath);
 	}
 
 	@Test @Order(3) void testDownloadText() {
@@ -107,14 +105,13 @@ class FilesServiceTest {
 	}
 
 	@Test @Order(5) void testList() {
-		//TODO：
 		Assertions.assertDoesNotThrow(() -> {
-//			List<FileInfo> files = filesService.list(remoteRootDir).get();
-//			Assertions.assertNotNull(files);
-//			Assertions.assertTrue(files.size() >= 2);
-//			List<String> names = files.stream().map(FileInfo::getName).collect(Collectors.toList());
-//			Assertions.assertTrue(names.contains(FILE_NAME_TXT));
-//			Assertions.assertTrue(names.contains(FILE_NAME_IMG));
+			List<FileInfo> files = filesService.list(remoteRootDir).get();
+			Assertions.assertNotNull(files);
+			Assertions.assertTrue(files.size() >= 2);
+			List<String> names = files.stream().map(FileInfo::getName).collect(Collectors.toList());
+			Assertions.assertTrue(names.contains(FILE_NAME_TXT));
+			Assertions.assertTrue(names.contains(FILE_NAME_IMG));
 		});
 	}
 
@@ -128,15 +125,13 @@ class FilesServiceTest {
 				filesService.delete(remoteBackupTxtFilePath)
 						.thenCompose(result -> filesService.move(remoteTxtFilePath, remoteBackupTxtFilePath))
 						.get()));
-		//TODO：
-		//verifyRemoteFileExists(remoteBackupTxtFilePath);
+		verifyRemoteFileExists(remoteBackupTxtFilePath);
 	}
 
 	@Test @Order(8) void testCopy() {
 		Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(
 				filesService.copy(remoteBackupTxtFilePath, remoteTxtFilePath).get()));
-		//TODO：
-		//verifyRemoteFileExists(remoteTxtFilePath);
+		verifyRemoteFileExists(remoteTxtFilePath);
 	}
 
 	@Test @Order(9) void testDeleteFile() {

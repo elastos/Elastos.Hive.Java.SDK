@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.subscription.VaultInfo;
 import org.elastos.hive.subscription.payment.Order;
 import org.elastos.hive.subscription.payment.PricingPlan;
 import org.elastos.hive.subscription.payment.Receipt;
@@ -14,7 +15,7 @@ import java.util.List;
 class VaultPaymentTest {
     private static final String PRICING_PLAN_NAME = "Rookie";
 
-    private static SubscriptionService<Vault.PropertySet> subscriptionService;
+    private static SubscriptionService<VaultInfo> subscriptionService;
     private static PaymentService paymentService;
 
     @BeforeAll public static void setUp() {
