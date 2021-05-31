@@ -18,13 +18,13 @@ class RemoteResolver implements CodeResolver {
 	public RemoteResolver(ServiceEndpoint serviceEndpoint) {
 		this.serviceEndpoint = serviceEndpoint;
 		this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
-		this.controller = new AuthController(serviceEndpoint);
+		this.controller = new AuthController(serviceEndpoint, contextProvider.getAppInstanceDocument());
 	}
 
 	@Override
 	public String resolve() throws HttpFailedException {
 		try {
-			String challenge = controller.signIn(contextProvider.getAppInstanceDocument().toString());
+			String challenge = controller.signIn(contextProvider.getAppInstanceDocument());
 			Claims claims = JwtUtil.getBody(challenge);
 	        // Update the service did to service end-point for future usage.
 	        serviceEndpoint.setServiceInstanceDid(claims.getIssuer());
