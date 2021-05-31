@@ -33,10 +33,8 @@ public class BackupSubscription extends ServiceEndpoint
 	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return paymentController.getBackupPlanList();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
-			} catch (RuntimeException e) {
+				return subscriptionController.getBackupPlanList();
+			} catch (RuntimeException | HiveException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -46,10 +44,8 @@ public class BackupSubscription extends ServiceEndpoint
 	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return paymentController.getBackupPlan(planName);
-			} catch (HiveException e) {
-				throw new CompletionException(e);
-			} catch (RuntimeException e) {
+				return subscriptionController.getBackupPlan(planName);
+			} catch (RuntimeException | HiveException e) {
 				throw new CompletionException(e);
 			}
 		});

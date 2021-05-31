@@ -3,13 +3,34 @@ package org.elastos.hive.subscription;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.ExceptionHandler;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.subscription.payment.PricingPlan;
+
 import java.io.IOException;
+import java.util.List;
 
 public class SubscriptionController extends ExceptionHandler {
 	private SubscriptionAPI subscriptionAPI;
 
 	public SubscriptionController(ConnectionManager connection) {
 		this.subscriptionAPI = connection.createService(SubscriptionAPI.class);
+	}
+
+	public List<PricingPlan> getPricingPlanList() throws HiveException {
+		try {
+			return subscriptionAPI.getPricePlans("vault", "").execute().body().getPricingPlans();
+		} catch (IOException e) {
+			throw super.toHiveException(e);
+		}
+	}
+
+	public PricingPlan getPricingPlan(String planName) throws HiveException {
+		try {
+			List<PricingPlan> plans = subscriptionAPI.getPricePlans("vault", planName).execute()
+					.body().getPricingPlans();
+			return plans.isEmpty() ? null : plans.get(0);
+		} catch (IOException e) {
+			throw super.toHiveException(e);
+		}
 	}
 
 	public VaultInfo getVaultInfo() throws HiveException {
@@ -50,6 +71,24 @@ public class SubscriptionController extends ExceptionHandler {
 		 } catch (IOException e) {
 			throw super.toHiveException(e);
 		 }
+	}
+
+	public List<PricingPlan> getBackupPlanList() throws HiveException {
+		try {
+			return subscriptionAPI.getPricePlans("backup", "").execute().body().getBackupPlans();
+		} catch (IOException e) {
+			throw super.toHiveException(e);
+		}
+	}
+
+	public PricingPlan getBackupPlan(String planName) throws HiveException {
+		try {
+			List<PricingPlan> plans = subscriptionAPI.getPricePlans("backup", planName).execute()
+					.body().getBackupPlans();
+			return plans.isEmpty() ? null : plans.get(0);
+		} catch (IOException e) {
+			throw super.toHiveException(e);
+		}
 	}
 
 	public BackupInfo getBackupInfo() throws HiveException {

@@ -19,7 +19,7 @@ public class AuthController {
 	public String signIn(String appInstanceDidDocument) throws HiveException {
 		try {
 			Object document = new ObjectMapper().readValue(appInstanceDidDocument, HashMap.class);
-			return authAPI.signIn(new SigninRequest(document)).execute().body().getValidChallenge(appInstanceDid);
+			return authAPI.signIn(new SignInRequest(document)).execute().body().getValidChallenge(appInstanceDid);
 		} catch (IOException e) {
 			// TODO:
 			e.printStackTrace();
