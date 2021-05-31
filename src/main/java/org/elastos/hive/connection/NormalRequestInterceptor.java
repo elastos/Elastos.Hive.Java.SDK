@@ -42,13 +42,13 @@ class NormalRequestInterceptor implements Interceptor {
 
         ResponseBody body = response.body();
         if (body == null)
-            throw new HiveSdkException("Failed to get body on validateBody");
+            throw new IOException("Failed to get body on validateBody");
 
         try {
             ErrorResponseBody error = new Gson().fromJson(body.string(), ErrorResponseBody.class);
-            throw new HiveHttpException(error.getError().getCode(), error.getError().getMessage());
-        } catch (IOException e) {
-            throw new HiveSdkException(e.getMessage());
+            throw new HiveHttpException(code, error.getError().getCode(), error.getError().getMessage());
+        } catch (Exception e) {
+            throw new IOException(e.getMessage());
         }
     }
 }

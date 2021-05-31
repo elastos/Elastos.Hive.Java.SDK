@@ -1,8 +1,7 @@
 package org.elastos.hive.subscription;
 
 import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.exception.ExceptionHandler;
-import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.*;
 import org.elastos.hive.subscription.payment.PricingPlan;
 
 import java.io.IOException;
@@ -42,18 +41,32 @@ public class SubscriptionController extends ExceptionHandler {
 	}
 
 	public VaultInfo subscribeToVault(String credential) throws HiveException {
-        try {
-        	return subscriptionAPI.subscribeToVault(credential).execute().body();
-		 } catch (IOException e) {
-			 throw super.toHiveException(e);
-		 }
+		try {
+			return subscriptionAPI.subscribeToVault(credential).execute().body();
+		} catch (HiveHttpException e) {
+			if (e.getCode() == 501)
+				throw new UnsupportedOperationException();
+			else if (e.getCode() == 401)
+				throw new UnauthorizedException();
+			else if (e.getCode() == 200)
+				throw new VaultAlreadyExistException();
+			else
+				throw new HiveException("Unknown exception: " + e.getCode() + "," + e.getInternalCode() + "," + e.getMessage());
+		} catch (IOException e) {
+			throw new HiveException(e.getMessage());
+		}
 	}
 
 	public void unsubscribeVault() throws HiveException {
          try {
         	 subscriptionAPI.unsubscribeVault().execute();
+		 } catch (HiveHttpException e) {
+			 if (e.getCode() == 401)
+				 throw new UnauthorizedException();
+			 else
+				 throw new HiveException("Unknown exception: " + e.getCode() + "," + e.getInternalCode() + "," + e.getMessage());
 		 } catch (IOException e) {
-			 throw super.toHiveException(e);
+			 throw new HiveException(e.getMessage());
 		 }
 	}
 
