@@ -1,6 +1,8 @@
 package org.elastos.hive.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.elastos.did.DIDDocument;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HiveException;
 
@@ -11,15 +13,21 @@ public class AuthController {
 	private AuthAPI authAPI;
 	private String appInstanceDid;
 
-	public AuthController(ServiceEndpoint serviceEndpoint) {
+	public AuthController(ServiceEndpoint serviceEndpoint, DIDDocument appInstanceDidDocument ) {
 		this.authAPI = serviceEndpoint.getConnectionManager().createService(AuthAPI.class, false);
-		this.appInstanceDid = serviceEndpoint.getAppContext().getAppContextProvider().getAppInstanceDocument().getSubject().toString();
+		this.appInstanceDid = appInstanceDidDocument.getSubject().toString();
 	}
 
-	public String signIn(String appInstanceDidDocument) throws HiveException {
+	public String signIn(DIDDocument appInstanceDidDocument) throws HiveException {
 		try {
-			Object document = new ObjectMapper().readValue(appInstanceDidDocument, HashMap.class);
-			return authAPI.signIn(new SignInRequest(document)).execute().body().getValidChallenge(appInstanceDid);
+			Object document = new ObjectMapper().readValue(appInstanceDidDocument.toString(), HashMap.class);
+			ChallengeRequest challenge = authAPI.signIn(new SignInRequest(document)).execute().body();
+			if (!challenge.checkValid(appInstanceDid)) {
+				// TODO:
+				throw new HiveException("Unknown sign-in failure, probably being hacked.");
+			}
+
+			return challenge.getChallenge();
 		} catch (IOException e) {
 			// TODO:
 			e.printStackTrace();
@@ -27,9 +35,15 @@ public class AuthController {
 		return null;
 	}
 
-	public String auth(String token) throws HiveException {
+	public String auth(String challengeResponse) throws HiveException {
 		try {
-			return authAPI.auth(new ChallengeResponse(token)).execute().body().getValidAccessToken(appInstanceDid);
+			AccessToken token = authAPI.auth(new ChallengeResponse(challengeResponse)).execute().body();
+			if (!token.checkValid(appInstanceDid)) {
+				// TODO:
+				throw new HiveException("Unknown auth failure, probably being hacked.");
+			}
+
+			return token.getAccessToken();
 		} catch (IOException e) {
 			// TODO:
 			e.printStackTrace();
