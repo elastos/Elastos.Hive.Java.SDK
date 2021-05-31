@@ -1,9 +1,11 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.subscription.payment.PricingPlan;
 import org.junit.jupiter.api.*;
 
-@Disabled
+import java.util.List;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BackupSubscriptionTest {
 	private static BackupSubscription subscription;
@@ -17,18 +19,38 @@ class BackupSubscriptionTest {
 		} );
 	}
 
-	@Test @Order(1) void testSubscribe() {
+	@Test @Order(1) void testGetPricingPlanList() {
+		Assertions.assertDoesNotThrow(()->{
+			List<PricingPlan> plans = subscription.getPricingPlanList().get();
+			Assertions.assertNotNull(plans);
+			Assertions.assertFalse(plans.isEmpty());
+		});
+	}
+
+	@Test @Order(2) void testGetPricingPlan() {
+		Assertions.assertDoesNotThrow(()-> {
+			PricingPlan plan = subscription.getPricingPlan(VaultSubscriptionTest.PRICING_PLAN_NAME).get();
+			Assertions.assertNotNull(plan);
+			Assertions.assertEquals(plan.getName(), VaultSubscriptionTest.PRICING_PLAN_NAME);
+		});
+	}
+
+	@Disabled
+	@Test @Order(3) void testSubscribe() {
 		Assertions.assertDoesNotThrow(()->subscription.subscribe().get());
 	}
 
-	@Test @Order(2) void testActivate() {
+	@Disabled
+	@Test @Order(4) void testActivate() {
 		Assertions.assertDoesNotThrow(()->subscription.activate().get());
 	}
 
-	@Test @Order(3) void testDeactivate() {
+	@Disabled
+	@Test @Order(5) void testDeactivate() {
 	}
 
-	@Test @Order(4) void testUnsubscribe() {
+	@Disabled
+	@Test @Order(6) void testUnsubscribe() {
 		Assertions.assertDoesNotThrow(()->subscription.unsubscribe().get());
 	}
 }

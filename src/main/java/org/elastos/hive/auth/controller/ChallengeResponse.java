@@ -3,7 +3,7 @@ package org.elastos.hive.auth.controller;
 import com.google.gson.annotations.SerializedName;
 
 class ChallengeResponse {
-    @SerializedName("jwt")
+    @SerializedName("challenge_response")
     private final String challengeResponse;
 
     ChallengeResponse(String challengeResponse) {

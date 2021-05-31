@@ -3,18 +3,13 @@ package org.elastos.hive;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.subscription.VaultInfo;
 import org.elastos.hive.subscription.payment.Order;
-import org.elastos.hive.subscription.payment.PricingPlan;
 import org.elastos.hive.subscription.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
 import org.junit.jupiter.api.*;
 
-import java.util.List;
-
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class VaultPaymentTest {
-    private static final String PRICING_PLAN_NAME = "Rookie";
-
     private static SubscriptionService<VaultInfo> subscriptionService;
     private static PaymentService paymentService;
 
@@ -29,24 +24,11 @@ class VaultPaymentTest {
         });
     }
 
-    @Test @org.junit.jupiter.api.Order(1) void testGetPricingPlanList() {
-        Assertions.assertDoesNotThrow(()->{
-            List<PricingPlan> plans = subscriptionService.getPricingPlanList().get();
-            Assertions.assertNotNull(plans);
-            Assertions.assertFalse(plans.isEmpty());
-        });
-    }
-
-    @Test @org.junit.jupiter.api.Order(2) void testGetPricingPlan() {
-        Assertions.assertDoesNotThrow(()->
-                Assertions.assertNotNull(subscriptionService.getPricingPlan(PRICING_PLAN_NAME).get()));
-    }
-
     @Test
     @org.junit.jupiter.api.Order(3)
     void testOrderProcess() {
         Assertions.assertDoesNotThrow(()->{
-            Order order = paymentService.placeOrder(PRICING_PLAN_NAME).get();
+            Order order = paymentService.placeOrder(VaultSubscriptionTest.PRICING_PLAN_NAME).get();
             Assertions.assertNotNull(order);
             order = paymentService.getOrder(order.getOrderId()).get();
             Assertions.assertNotNull(order);

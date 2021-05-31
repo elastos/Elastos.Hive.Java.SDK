@@ -19,6 +19,8 @@ interface SubscriptionAPI {
 	@DELETE("/api/v2/subscription/vault")
 	Call<Void> unsubscribeVault();
 
+	@GET("/api/v2/subscription/pricing_plan")
+	Call<PricingPlansResponse> getPricePlans(@Query("subscription") String subscription, @Query("name") String name);
 
 	@GET("/api/v2/subscription/backup")
 	Call<BackupInfo> getBackupInfo();

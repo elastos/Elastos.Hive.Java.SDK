@@ -34,7 +34,7 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return paymentController.getPricingPlanList();
+				return subscriptionController.getPricingPlanList();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -45,7 +45,7 @@ public class VaultSubscription extends ServiceEndpoint
 	public CompletableFuture<PricingPlan> getPricingPlan(String planName) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return paymentController.getPricingPlan(planName);
+				return subscriptionController.getPricingPlan(planName);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
