@@ -4,9 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 class SignInRequest {
 	@SerializedName("id")
-    private Object didDocument;
+	private Object didDocument;
 
-    SignInRequest(Object didDocument) {
-        this.didDocument = didDocument;
-    }
+	SignInRequest(Object didDocument) {
+		this.didDocument = didDocument;
+	}
 }
