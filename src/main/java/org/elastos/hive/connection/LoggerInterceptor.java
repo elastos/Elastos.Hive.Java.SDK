@@ -27,7 +27,6 @@ import org.elastos.hive.utils.LogUtil;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.Objects;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -43,27 +42,10 @@ class LoggerInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Request request = chain.request();
-        dumpRequest(request);
-
-        Response response = chain.proceed(request);
-        dumpResponse(response);
-
-        if (Objects.requireNonNull(response.header("Content-Type")).equals("text/html; charset=utf-8")) {
-            try {
-                response.peekBody(0);
-                response.newBuilder()
-                        .headers(response.headers())
-                        .message(response.message())
-                        .body(ResponseBody.create(null, "")).build();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return response;
+        return dumpResponse(chain.proceed(dumpRequest(chain.request())));
     }
 
-    private void dumpRequest(Request request) throws IOException {
+    private Request dumpRequest(Request request) throws IOException {
         RequestBody body = request.body();
         String bodyInString = null;
 
@@ -92,9 +74,11 @@ class LoggerInterceptor implements Interceptor {
 
         if (bodyInString != null && !bodyInString.equals(""))
             LogUtil.d("request body->" + getOutputBodyContent(bodyInString));
+
+        return request;
     }
 
-    private void dumpResponse(Response response) throws IOException {
+    private Response dumpResponse(Response response) throws IOException {
         ResponseBody body = response.body();
         String bodyInString = null;
 
@@ -124,6 +108,8 @@ class LoggerInterceptor implements Interceptor {
 
         if (bodyInString != null && !bodyInString.equals(""))
             LogUtil.d("response body ->" + getOutputBodyContent(bodyInString));
+
+        return response;
     }
 
     private String getOutputBodyContent(String body) {
