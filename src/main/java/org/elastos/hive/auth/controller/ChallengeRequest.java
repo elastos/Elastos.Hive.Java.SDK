@@ -7,22 +7,22 @@ import org.elastos.hive.utils.JwtUtil;
 import com.google.gson.annotations.SerializedName;
 
 class ChallengeRequest {
-    @SerializedName("challenge")
-    private String challenge;
+	@SerializedName("challenge")
+	private String challenge;
 
-    static String getValidJwt(String jwt, String validAudience) {
-        Claims claims = JwtUtil.getBody(jwt);
+	static String getValidJwt(String jwt, String validAudience) {
+		Claims claims = JwtUtil.getBody(jwt);
 
-        if (claims.getExpiration().getTime() <= System.currentTimeMillis() )
-            throw new HiveSdkException("Bad jwt expiration date");
+		if (claims.getExpiration().getTime() <= System.currentTimeMillis() )
+			throw new HiveSdkException("Bad jwt expiration date");
 
-        if (!claims.getAudience().equals(validAudience))
-            throw new HiveSdkException("Bad jwt audience value");
+		if (!claims.getAudience().equals(validAudience))
+			throw new HiveSdkException("Bad jwt audience value");
 
-        return jwt;
-    }
+		return jwt;
+	}
 
-    String getValidChallenge(String appInstanceDid) {
-        return getValidJwt(challenge, appInstanceDid);
-    }
+	String getValidChallenge(String appInstanceDid) {
+		return getValidJwt(challenge, appInstanceDid);
+	}
 }
