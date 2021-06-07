@@ -23,7 +23,7 @@ class DatabaseServiceTest {
 
 	@Test @Order(1) void testCreateCollection() {
 		Assertions.assertDoesNotThrow(()->{
-			Boolean isSuccess = databaseService.createCollection(COLLECTION_NAME, null).get();
+			Boolean isSuccess = databaseService.createCollection(COLLECTION_NAME).get();
 			Assertions.assertTrue(isSuccess);
 		});
 	}
@@ -34,7 +34,7 @@ class DatabaseServiceTest {
 			docNode.put("author", "john doe1");
 			docNode.put("title", "Eve for Dummies1");
 			Assertions.assertNotNull(databaseService.insertOne(COLLECTION_NAME, docNode,
-					new InsertOneOptions(false)).get());
+					new InsertDocumentsOptions().setBypassDocumentValidation(false)).get());
 		});
 	}
 
@@ -50,7 +50,7 @@ class DatabaseServiceTest {
 			docNode2.put("title", "Eve for Dummies3");
 			nodes.add(docNode1);
 			Assertions.assertNotNull(databaseService.insertMany(COLLECTION_NAME, nodes,
-					new InsertManyOptions(false, true)).get());
+					new InsertDocumentsOptions().setBypassDocumentValidation(false).setOrdered(true)).get());
 		});
 	}
 
@@ -59,13 +59,7 @@ class DatabaseServiceTest {
 			ObjectNode query = JsonNodeFactory.instance.objectNode();
 			query.put("author", "john doe1");
 			Assertions.assertNotNull(databaseService.findOne(COLLECTION_NAME, query,
-					new FindOptions().setSkip(0L)
-							.setSort(Collections.singletonList(
-									new FindOptions.FieldEntry("_id", -1)))
-							.setAllowPartialResults(false)
-							.setReturnKey(false)
-							.setBatchSize(0)
-							.setProjection(Collections.singletonMap("_id", false))).get());
+					new FindOptions().setSkip(0L).setLimit(0L)).get());
 		});
 	}
 
@@ -74,13 +68,7 @@ class DatabaseServiceTest {
 			ObjectNode query = JsonNodeFactory.instance.objectNode();
 			query.put("author", "john doe1");
 			List<JsonNode> docs = databaseService.findMany(COLLECTION_NAME, query,
-					new FindOptions().setSkip(0L)
-							.setSort(Collections.singletonList(
-									new FindOptions.FieldEntry("_id", -1)))
-							.setAllowPartialResults(false)
-							.setReturnKey(false)
-							.setBatchSize(0)
-							.setProjection(Collections.singletonMap("_id", false))).get();
+					new FindOptions().setSkip(0L).setLimit(0L)).get();
 		});
 	}
 
@@ -89,7 +77,7 @@ class DatabaseServiceTest {
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe1");
 			Assertions.assertNotNull(databaseService.countDocuments(COLLECTION_NAME, filter,
-					new CountOptions().setLimit(1L).setSkip(0L).setMaxTimeMS(1000000000L)).get());
+					new CountDocumentOptions().setLimit(1L).setSkip(0L).setMaxTimeMS(1000000000L)).get());
 		});
 	}
 
@@ -103,7 +91,7 @@ class DatabaseServiceTest {
 			ObjectNode update = JsonNodeFactory.instance.objectNode();
 			update.put("$set", doc);
 			Assertions.assertNotNull(databaseService.updateOne(COLLECTION_NAME, filter, update,
-					new UpdateOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
+					new UpdateDocumentsOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
 		});
 	}
 
@@ -117,7 +105,7 @@ class DatabaseServiceTest {
 			ObjectNode update = JsonNodeFactory.instance.objectNode();
 			update.put("$set", doc);
 			Assertions.assertNotNull(databaseService.updateMany(COLLECTION_NAME, filter, update,
-					new UpdateOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
+					new UpdateDocumentsOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
 		});
 	}
 
@@ -125,7 +113,7 @@ class DatabaseServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe2");
-			Assertions.assertNotNull(databaseService.deleteOne(COLLECTION_NAME, filter, new DeleteOptions()).get());
+			Assertions.assertNotNull(databaseService.deleteOne(COLLECTION_NAME, filter).get());
 		});
 	}
 
@@ -133,7 +121,7 @@ class DatabaseServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe2");
-			Assertions.assertNotNull(databaseService.deleteMany(COLLECTION_NAME, filter, new DeleteOptions()).get());
+			Assertions.assertNotNull(databaseService.deleteMany(COLLECTION_NAME, filter).get());
 		});
 	}
 

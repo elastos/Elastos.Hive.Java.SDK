@@ -1,8 +1,9 @@
 package org.elastos.hive.vault.database;
 
-import org.elastos.hive.connection.HiveResponseBody;
+import com.google.gson.annotations.SerializedName;
 
-class CountDocResponseBody extends HiveResponseBody {
+class CountDocumentResponse {
+    @SerializedName("count")
     private Long count;
 
     public Long getCount() {

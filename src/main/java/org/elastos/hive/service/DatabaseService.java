@@ -7,6 +7,9 @@ import org.elastos.hive.vault.database.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * TODO: refine APIs like *One, *Many, find*.
+ */
 public interface DatabaseService {
 	/**
 	 * Lets the vault owner create a collection on database.
@@ -14,7 +17,7 @@ public interface DatabaseService {
 	 * @param options the options for create collection
 	 * @return fail(false) or success(true)
 	 */
-	CompletableFuture<Boolean> createCollection(String name, CreateCollectionOptions options);
+	CompletableFuture<Boolean> createCollection(String name);
 
 
 	/**
@@ -32,9 +35,9 @@ public interface DatabaseService {
 	 *            the document does not have an _id field one will be added automatically
 	 * @param options bypass_document_validation: (optional) If True, allows
 	 *                the write to opt-out of document level validation. Default is False.
-	 * @return Results returned by {@link InsertOneResult} wrapper
+	 * @return Results returned by {@link InsertDocumentsResponse} wrapper
 	 */
-	CompletableFuture<InsertOneResult> insertOne(String collection, JsonNode doc, InsertOneOptions options);
+	CompletableFuture<InsertDocumentsResponse> insertOne(String collection, JsonNode doc, InsertDocumentsOptions options);
 
 
 	/**
@@ -46,9 +49,9 @@ public interface DatabaseService {
 	 *                in the order provided. If an error occurs all remaining inserts are aborted. If False, documents
 	 *                will be inserted on the server in arbitrary order, possibly in parallel, and all document inserts will be attempted.
 	 *                bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
-	 * @return Results returned by {@link InsertManyResult} wrapper
+	 * @return Results returned by {@link InsertDocumentsResponse} wrapper
 	 */
-	CompletableFuture<InsertManyResult> insertMany(String collection, List<JsonNode> docs, InsertManyOptions options);
+	CompletableFuture<InsertDocumentsResponse> insertMany(String collection, List<JsonNode> docs, InsertDocumentsOptions options);
 
 
 	/**
@@ -61,7 +64,7 @@ public interface DatabaseService {
 	 *              maxTimeMS (int): The maximum amount of time to allow this operation to run, in milliseconds.
 	 * @return count size
 	 */
-	CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options);
+	CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountDocumentOptions options);
 
 
 	/**
@@ -71,7 +74,7 @@ public interface DatabaseService {
 	 * @param options optional,refer to {@link FindOptions}
 	 * @return a JSON object document result
 	 */
-	CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options);
+	CompletableFuture<List<JsonNode>> findOne(String collection, JsonNode query, FindOptions options);
 
 	/**
 	 * Find many documents
@@ -82,16 +85,24 @@ public interface DatabaseService {
 	 */
 	CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options);
 
+	/**
+	 * Find many documents by many options.
+	 * @param collection the collection name
+	 * @param query optional, a JSON object specifying elements which must be present for a document to be included in the result set
+	 * @param options optional,refer to {@link QueryDocumentsOptions}
+	 * @return a JsonNode array result of document
+	 */
+	CompletableFuture<List<JsonNode>> query(String collection, JsonNode query, QueryDocumentsOptions options);
 
 	/**
 	 * Update an existing document in a given collection
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to update.
 	 * @param update The modifications to apply.
-	 * @param options optional, refer to {@link UpdateOptions}
-	 * @return Results returned by {@link UpdateResult} wrapper
+	 * @param options optional, refer to {@link UpdateDocumentsOptions}
+	 * @return Results returned by {@link UpdateDocumentsResponse} wrapper
 	 */
-	CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
+	CompletableFuture<UpdateDocumentsResponse> updateOne(String collection, JsonNode filter, JsonNode update, UpdateDocumentsOptions options);
 
 
 	/**
@@ -99,10 +110,10 @@ public interface DatabaseService {
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to update.
 	 * @param update The modifications to apply.
-	 * @param options optional, refer to {@link UpdateOptions}
-	 * @return Results returned by {@link UpdateResult} wrapper
+	 * @param options optional, refer to {@link UpdateDocumentsOptions}
+	 * @return Results returned by {@link UpdateDocumentsResponse} wrapper
 	 */
-	CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
+	CompletableFuture<UpdateDocumentsResponse> updateMany(String collection, JsonNode filter, JsonNode update, UpdateDocumentsOptions options);
 
 
 	/**
@@ -112,15 +123,14 @@ public interface DatabaseService {
 	 * @param options The options for delete collection
 	 * @return Delete result
 	 */
-	CompletableFuture<DeleteResult> deleteOne(String collection, JsonNode filter, DeleteOptions options);
+	CompletableFuture<Void> deleteOne(String collection, JsonNode filter);
 
 
 	/**
 	 * Delete many existing documents in a given collection
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to delete.
-	 * @param options The options for delete collection
 	 * @return Delete result
 	 */
-	CompletableFuture<DeleteResult> deleteMany(String collection, JsonNode filter, DeleteOptions options);
+	CompletableFuture<Void> deleteMany(String collection, JsonNode filter);
 }

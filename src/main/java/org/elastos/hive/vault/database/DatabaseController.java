@@ -1,11 +1,18 @@
 package org.elastos.hive.vault.database;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.HiveResponseBody;
+import org.elastos.hive.connection.KeyValueDict;
+import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.NetworkException;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DatabaseController {
 	private DatabaseAPI databaseAPI;
@@ -14,101 +21,109 @@ public class DatabaseController {
 		databaseAPI = serviceEndpoint.getConnectionManager().createService(DatabaseAPI.class, true);
 	}
 
-	public void createCollection(String collectionName) throws IOException {
-		HiveResponseBody.validateBody(databaseAPI.createCollection(new CreateCollectionRequestBody(collectionName)).execute().body());
+	public void createCollection(String collectionName) throws HiveException {
+		try {
+			databaseAPI.createCollection(collectionName).execute();
+		} catch (IOException e) {
+			// TODO:
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
-	public void deleteCollection(String collectionName) throws IOException {
-		HiveResponseBody.validateBody(databaseAPI.deleteCollection(new DeleteCollectionRequestBody(collectionName)).execute().body());
+	public void deleteCollection(String collectionName) throws HiveException {
+		try {
+			databaseAPI.deleteCollection(collectionName).execute();
+		} catch (IOException e) {
+			// TODO:
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
-	public InsertOneResult insertOne(String collectionName, JsonNode doc, InsertOneOptions options) throws IOException {
-		InsertDocResponseBody body = HiveResponseBody.validateBody(
-				databaseAPI.insertOne(new InsertDocRequestBody(collectionName,
-								HiveResponseBody.jsonNode2KeyValueDic(doc),
-								options)).execute().body());
-		return new InsertOneResult()
-				.setInsertedId(body.getInsertedId())
-				.setAcknowledged(body.getAcknowledged());
+	public static KeyValueDict jsonNode2KeyValueDic(JsonNode node) {
+		return new ObjectMapper().convertValue(node, new TypeReference<KeyValueDict>() {});
 	}
 
-	public InsertManyResult insertMany(String collectionName, List<JsonNode> docs, InsertManyOptions options) throws IOException {
-		InsertDocsResponseBody body = HiveResponseBody.validateBody(
-				databaseAPI.insertMany(new InsertDocsRequestBody(collectionName,
-								HiveResponseBody.jsonNodeList2KeyValueDicList(docs),
-								options)).execute().body());
-		return new InsertManyResult()
-				.setInsertedIds(body.getInsertedIds())
-				.setAcknowledged(body.getAcknowledged());
+	public static List<KeyValueDict> jsonNodeList2KeyValueDicList(List<JsonNode> docs) {
+		return docs.stream().map(DatabaseController::jsonNode2KeyValueDic).collect(Collectors.toList());
 	}
 
-	public UpdateResult updateOne(String collectionName, JsonNode filter, JsonNode update, UpdateOptions options) throws IOException {
-		UpdateDocResponseBody body = HiveResponseBody.validateBody(
-				databaseAPI.updateOne(new UpdateDocRequestBody(collectionName)
-								.setFilter(HiveResponseBody.jsonNode2KeyValueDic(filter))
-								.setUpdate(HiveResponseBody.jsonNode2KeyValueDic(update))
-								.setOptions(options)).execute().body());
-		return new UpdateResult()
-				.setMatchedCount(body.getMatchedCount())
-				.setModifiedCount(body.getModifiedCount())
-				.setAcknowledged(body.getAcknowledged())
-				.setUpsertedId(body.getUpsertedId());
+	public InsertDocumentsResponse insertOne(String collectionName,
+									 JsonNode doc,
+									 InsertDocumentsOptions options) throws HiveException {
+		return insertMany(collectionName, Collections.singletonList(doc), options);
 	}
 
-	public UpdateResult updateMany(String collectionName, JsonNode filter, JsonNode update, UpdateOptions options) throws IOException {
-		UpdateDocResponseBody body = HiveResponseBody.validateBody(
-				databaseAPI.updateMany(new UpdateDocRequestBody(collectionName)
-						.setFilter(HiveResponseBody.jsonNode2KeyValueDic(filter))
-						.setUpdate(HiveResponseBody.jsonNode2KeyValueDic(update))
-						.setOptions(options)).execute().body());
-		return new UpdateResult()
-				.setMatchedCount(body.getMatchedCount())
-				.setModifiedCount(body.getModifiedCount())
-				.setAcknowledged(body.getAcknowledged())
-				.setUpsertedId(body.getUpsertedId());
+	public InsertDocumentsResponse insertMany(String collectionName,
+									   List<JsonNode> docs,
+									   InsertDocumentsOptions options) throws HiveException {
+		try {
+			return databaseAPI.insertDocuments(collectionName, new InsertDocumentsRequest()
+					.setDocuments(jsonNodeList2KeyValueDicList(docs))
+					.setOptions(options)
+			).execute().body();
+		} catch (IOException e) {
+			// TODO:
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
-	public DeleteResult deleteOne(String collectionName, JsonNode filter, DeleteOptions options) throws IOException {
-		DeleteDocResponseBody body = HiveResponseBody.validateBody(
-				databaseAPI.deleteOne(new DeleteDocRequestBody(collectionName,
-						HiveResponseBody.jsonNode2KeyValueDic(filter))).execute().body());
-		return new DeleteResult()
-				.setDeletedCount(body.getDeletedCount())
-				.setAcknowledged(body.getAcknowledged());
+	public UpdateDocumentsResponse updateMany(String collectionName, JsonNode filter,
+								   JsonNode update,
+								   UpdateDocumentsOptions options) throws HiveException {
+		try {
+			return databaseAPI.updateDocuments(collectionName, new UpdateDocumentsRequest()
+					.setFilter(jsonNode2KeyValueDic(filter))
+					.setUpdate(jsonNode2KeyValueDic(update))
+					.setOptions(options)
+			).execute().body();
+		} catch (IOException e) {
+			// TODO:
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
-	public DeleteResult deleteMany(String collectionName, JsonNode filter, DeleteOptions options) throws IOException {
-		DeleteDocResponseBody body = HiveResponseBody.validateBody(
-				databaseAPI.deleteMany(new DeleteDocRequestBody(collectionName,
-						HiveResponseBody.jsonNode2KeyValueDic(filter))).execute().body());
-		return new DeleteResult()
-				.setDeletedCount(body.getDeletedCount())
-				.setAcknowledged(body.getAcknowledged());
+	public void deleteMany(String collectionName, JsonNode filter) throws HiveException {
+		try {
+			databaseAPI.deleteDocuments(collectionName, new DeleteDocumentsRequest(jsonNode2KeyValueDic(filter))).execute();
+		} catch (IOException e) {
+			// TODO:
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
-	public Long countDocuments(String collectionName, JsonNode query, CountOptions options) throws IOException {
-		return HiveResponseBody.validateBody(
-				databaseAPI.countDocs(new CountDocRequestBody(
-								collectionName,
-								HiveResponseBody.jsonNode2KeyValueDic(query),
-								options)).execute().body()).getCount();
+	public Long countDocuments(String collectionName, JsonNode filter, CountDocumentOptions options) throws HiveException {
+		try {
+			return databaseAPI.countDocuments(collectionName, new CountDocumentRequest(jsonNode2KeyValueDic(filter), options))
+					.execute().body().getCount();
+		} catch (IOException e) {
+			// TODO:
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
-	public JsonNode findOne(String collectionName, JsonNode query, FindOptions options) throws IOException {
-		return HiveResponseBody.KeyValueDict2JsonNode(
-				HiveResponseBody.validateBody(
-						databaseAPI.findOne(new FindDocRequestBody(collectionName,
-								HiveResponseBody.jsonNode2KeyValueDic(query),
-								options)).execute().body()).getItem());
+	public List<JsonNode> find(String collectionName, JsonNode filter, FindOptions options) throws HiveException {
+		try {
+			return HiveResponseBody.KeyValueDictList2JsonNodeList(
+					databaseAPI.findDocuments(collectionName,
+							jsonNode2KeyValueDic(filter), options.getSkip(), options.getLimit())
+					.execute().body().getItems());
+		} catch (IOException e) {
+			// TODO:
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
-	public List<JsonNode> findMany(String collection, JsonNode query, FindOptions options) throws IOException {
-		return HiveResponseBody.KeyValueDictList2JsonNodeList(
-				HiveResponseBody.validateBody(
-						databaseAPI.findMany(new FindDocsRequestBody(collection,
-								HiveResponseBody.jsonNode2KeyValueDic(query),
-								options))
-								.execute()
-								.body()).getItems());
+	public List<JsonNode> query(String collectionName, JsonNode filter, QueryDocumentsOptions options) throws HiveException {
+		try {
+			return HiveResponseBody.KeyValueDictList2JsonNodeList(
+					databaseAPI.queryDocuments(new QueryDocumentsRequest()
+							.setCollectionName(collectionName)
+							.setFilter(jsonNode2KeyValueDic(filter))
+							.setOptions(options)
+					).execute().body().getItems());
+		} catch (IOException e) {
+			// TODO:
+			throw new NetworkException(e.getMessage());
+		}
 	}
 }
