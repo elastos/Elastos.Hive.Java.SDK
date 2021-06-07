@@ -8,7 +8,7 @@ import org.elastos.hive.service.PubSubService;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-class PubSubServiceRender implements PubSubService, ExceptionConvertor {
+class PubSubServiceRender implements PubSubService {
 	@SuppressWarnings("unused")
 	private ServiceEndpoint serviceEndpoint;
 

@@ -89,7 +89,7 @@ public class BackupSubscription extends ServiceEndpoint
 			try {
 				return getPropertySet();
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}

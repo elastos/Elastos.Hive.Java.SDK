@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
+class DatabaseServiceRender implements DatabaseService {
 	DatabaseController controller;
 
 	public DatabaseServiceRender(Vault vault) {
@@ -23,7 +23,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 				controller.createCollection(name);
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -35,7 +35,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 				controller.deleteCollection(name);
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -46,7 +46,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 			try {
 				return controller.insertOne(collection, doc, options);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -57,7 +57,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 			try {
 				return controller.insertMany(collection, docs, options);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -68,7 +68,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 			try {
 				return controller.countDocuments(collection, query, options);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -79,7 +79,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 			try {
 				return controller.findOne(collection, query, options);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -90,7 +90,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 			try {
 				return controller.findMany(collection, query, options);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -101,7 +101,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 			try {
 				return controller.updateOne(collection, filter, update, options);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -112,7 +112,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 			try {
 				return controller.updateMany(collection, filter, update, options);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -123,7 +123,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 			try {
 				return controller.deleteOne(collection, filter, options);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -134,7 +134,7 @@ class DatabaseServiceRender implements DatabaseService, ExceptionConvertor {
 			try {
 				return controller.deleteMany(collection, filter, options);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
