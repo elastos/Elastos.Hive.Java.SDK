@@ -6,7 +6,7 @@ import org.elastos.hive.utils.JwtUtil;
 import com.google.gson.annotations.SerializedName;
 
 class AccessToken {
-	@SerializedName("access_token")
+	@SerializedName("token")
 	private String token;
 
 	boolean checkValid(String appInstanceDid) {
