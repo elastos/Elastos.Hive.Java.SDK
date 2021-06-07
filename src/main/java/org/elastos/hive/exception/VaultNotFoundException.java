@@ -1,6 +1,6 @@
 package org.elastos.hive.exception;
 
-public class VaultNotFoundException extends HiveException {
+public class VaultNotFoundException extends EntityNotFoundException {
     private static final long serialVersionUID = -586039279266427101L;
 
     public VaultNotFoundException() {
