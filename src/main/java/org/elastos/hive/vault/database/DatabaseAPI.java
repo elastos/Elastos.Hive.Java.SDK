@@ -6,33 +6,33 @@ import retrofit2.http.*;
 
 interface DatabaseAPI {
 	@PUT("/api/v2/vault/db/collections/{collectionName}")
-	Call<CreateCollectionResponse> createCollection(@Path("collectionName") String collectionName);
+	Call<CreateCollectionResult> createCollection(@Path("collectionName") String collectionName);
 
 	@DELETE("/api/v2/vault/db/{collectionName}")
 	Call<Void> deleteCollection(@Path("collectionName") String collectionName);
 
 	@POST("/api/v2/vault/db/collection/{collection_name}")
-	Call<InsertDocumentsResponse> insertDocuments(@Path("collectionName") String collectionName,
-							                      @Body InsertDocumentsRequest body);
+	Call<InsertResult> insert(@Path("collectionName") String collectionName,
+							  @Body InsertRequest body);
 
 	@PATCH("/api/v2/vault/db/collection/{collection_name}")
-	Call<UpdateDocumentsResponse> updateDocuments(@Path("collectionName") String collectionName,
-							                      @Body UpdateDocumentsRequest body);
+	Call<UpdateResult> update(@Path("collectionName") String collectionName,
+							  @Body UpdateRequest body);
 
 	@DELETE("/api/v2/vault/db/collection/{collection_name}")
-	Call<Void> deleteDocuments(@Path("collectionName") String collectionName,
-							   @Body DeleteDocumentsRequest body);
+	Call<Void> delete(@Path("collectionName") String collectionName,
+					  @Body DeleteRequest body);
 
 	@GET("/api/v2/vault/db/collection/{collection_name}?op=count")
-	Call<CountDocumentResponse> countDocuments(@Path("collectionName") String collectionName,
-							                   @Body CountDocumentRequest body);
+	Call<CountResult> count(@Path("collectionName") String collectionName,
+							@Body CountRequest body);
 
 	@GET("/api/v2/vault/db/{collection_name}")
-	Call<FindDocumentsResponse> findDocuments(@Path("collectionName") String collectionName,
-											  @Query("filter") KeyValueDict filter,
-											  @Query("skip") Long skip,
-											  @Query("limit") Long limit);
+	Call<QueryResult> find(@Path("collectionName") String collectionName,
+						   @Query("filter") KeyValueDict filter,
+						   @Query("skip") Long skip,
+						   @Query("limit") Long limit);
 
 	@POST("/api/v2/vault/db/query")
-	Call<FindDocumentsResponse> queryDocuments(@Body QueryDocumentsRequest body);
+	Call<QueryResult> query(@Body QueryRequest body);
 }

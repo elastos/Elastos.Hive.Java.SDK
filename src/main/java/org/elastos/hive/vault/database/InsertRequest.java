@@ -5,18 +5,18 @@ import org.elastos.hive.connection.KeyValueDict;
 
 import java.util.List;
 
-class InsertDocumentsRequest {
+class InsertRequest {
     @SerializedName("document")
     private List<KeyValueDict> documents;
     @SerializedName("options")
-    private InsertDocumentsOptions options;
+    private InsertOptions options;
 
-    public InsertDocumentsRequest setDocuments(List<KeyValueDict> documents) {
+    public InsertRequest setDocuments(List<KeyValueDict> documents) {
         this.documents = documents;
         return this;
     }
 
-    public InsertDocumentsRequest setOptions(InsertDocumentsOptions options) {
+    public InsertRequest setOptions(InsertOptions options) {
         this.options = options;
         return this;
     }

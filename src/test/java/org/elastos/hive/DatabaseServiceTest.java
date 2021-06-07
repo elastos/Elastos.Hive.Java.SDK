@@ -34,7 +34,7 @@ class DatabaseServiceTest {
 			docNode.put("author", "john doe1");
 			docNode.put("title", "Eve for Dummies1");
 			Assertions.assertNotNull(databaseService.insertOne(COLLECTION_NAME, docNode,
-					new InsertDocumentsOptions().setBypassDocumentValidation(false)).get());
+					new InsertOptions().setBypassDocumentValidation(false)).get());
 		});
 	}
 
@@ -50,7 +50,7 @@ class DatabaseServiceTest {
 			docNode2.put("title", "Eve for Dummies3");
 			nodes.add(docNode1);
 			Assertions.assertNotNull(databaseService.insertMany(COLLECTION_NAME, nodes,
-					new InsertDocumentsOptions().setBypassDocumentValidation(false).setOrdered(true)).get());
+					new InsertOptions().setBypassDocumentValidation(false).setOrdered(true)).get());
 		});
 	}
 
@@ -77,7 +77,7 @@ class DatabaseServiceTest {
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe1");
 			Assertions.assertNotNull(databaseService.countDocuments(COLLECTION_NAME, filter,
-					new CountDocumentOptions().setLimit(1L).setSkip(0L).setMaxTimeMS(1000000000L)).get());
+					new CountOptions().setLimit(1L).setSkip(0L).setMaxTimeMS(1000000000L)).get());
 		});
 	}
 
@@ -91,7 +91,7 @@ class DatabaseServiceTest {
 			ObjectNode update = JsonNodeFactory.instance.objectNode();
 			update.put("$set", doc);
 			Assertions.assertNotNull(databaseService.updateOne(COLLECTION_NAME, filter, update,
-					new UpdateDocumentsOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
+					new UpdateOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
 		});
 	}
 
@@ -105,7 +105,7 @@ class DatabaseServiceTest {
 			ObjectNode update = JsonNodeFactory.instance.objectNode();
 			update.put("$set", doc);
 			Assertions.assertNotNull(databaseService.updateMany(COLLECTION_NAME, filter, update,
-					new UpdateDocumentsOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
+					new UpdateOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
 		});
 	}
 

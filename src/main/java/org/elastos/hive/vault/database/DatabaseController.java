@@ -47,17 +47,17 @@ public class DatabaseController {
 		return docs.stream().map(DatabaseController::jsonNode2KeyValueDic).collect(Collectors.toList());
 	}
 
-	public InsertDocumentsResponse insertOne(String collectionName,
-									 JsonNode doc,
-									 InsertDocumentsOptions options) throws HiveException {
+	public InsertResult insertOne(String collectionName,
+								  JsonNode doc,
+								  InsertOptions options) throws HiveException {
 		return insertMany(collectionName, Collections.singletonList(doc), options);
 	}
 
-	public InsertDocumentsResponse insertMany(String collectionName,
-									   List<JsonNode> docs,
-									   InsertDocumentsOptions options) throws HiveException {
+	public InsertResult insertMany(String collectionName,
+								   List<JsonNode> docs,
+								   InsertOptions options) throws HiveException {
 		try {
-			return databaseAPI.insertDocuments(collectionName, new InsertDocumentsRequest()
+			return databaseAPI.insert(collectionName, new InsertRequest()
 					.setDocuments(jsonNodeList2KeyValueDicList(docs))
 					.setOptions(options)
 			).execute().body();
@@ -67,11 +67,11 @@ public class DatabaseController {
 		}
 	}
 
-	public UpdateDocumentsResponse updateMany(String collectionName, JsonNode filter,
+	public UpdateResult updateMany(String collectionName, JsonNode filter,
 								   JsonNode update,
-								   UpdateDocumentsOptions options) throws HiveException {
+								   UpdateOptions options) throws HiveException {
 		try {
-			return databaseAPI.updateDocuments(collectionName, new UpdateDocumentsRequest()
+			return databaseAPI.update(collectionName, new UpdateRequest()
 					.setFilter(jsonNode2KeyValueDic(filter))
 					.setUpdate(jsonNode2KeyValueDic(update))
 					.setOptions(options)
@@ -84,16 +84,16 @@ public class DatabaseController {
 
 	public void deleteMany(String collectionName, JsonNode filter) throws HiveException {
 		try {
-			databaseAPI.deleteDocuments(collectionName, new DeleteDocumentsRequest(jsonNode2KeyValueDic(filter))).execute();
+			databaseAPI.delete(collectionName, new DeleteRequest(jsonNode2KeyValueDic(filter))).execute();
 		} catch (IOException e) {
 			// TODO:
 			throw new NetworkException(e.getMessage());
 		}
 	}
 
-	public Long countDocuments(String collectionName, JsonNode filter, CountDocumentOptions options) throws HiveException {
+	public Long countDocuments(String collectionName, JsonNode filter, CountOptions options) throws HiveException {
 		try {
-			return databaseAPI.countDocuments(collectionName, new CountDocumentRequest(jsonNode2KeyValueDic(filter), options))
+			return databaseAPI.count(collectionName, new CountRequest(jsonNode2KeyValueDic(filter), options))
 					.execute().body().getCount();
 		} catch (IOException e) {
 			// TODO:
@@ -104,7 +104,7 @@ public class DatabaseController {
 	public List<JsonNode> find(String collectionName, JsonNode filter, FindOptions options) throws HiveException {
 		try {
 			return HiveResponseBody.KeyValueDictList2JsonNodeList(
-					databaseAPI.findDocuments(collectionName,
+					databaseAPI.find(collectionName,
 							jsonNode2KeyValueDic(filter), options.getSkip(), options.getLimit())
 					.execute().body().getItems());
 		} catch (IOException e) {
@@ -113,10 +113,10 @@ public class DatabaseController {
 		}
 	}
 
-	public List<JsonNode> query(String collectionName, JsonNode filter, QueryDocumentsOptions options) throws HiveException {
+	public List<JsonNode> query(String collectionName, JsonNode filter, QueryOptions options) throws HiveException {
 		try {
 			return HiveResponseBody.KeyValueDictList2JsonNodeList(
-					databaseAPI.queryDocuments(new QueryDocumentsRequest()
+					databaseAPI.query(new QueryRequest()
 							.setCollectionName(collectionName)
 							.setFilter(jsonNode2KeyValueDic(filter))
 							.setOptions(options)

@@ -5,7 +5,7 @@ import org.elastos.hive.connection.KeyValueDict;
 
 import java.util.List;
 
-class FindDocumentsResponse {
+class QueryResult {
     @SerializedName("items")
     private List<KeyValueDict> items;
 

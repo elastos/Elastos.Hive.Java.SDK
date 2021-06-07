@@ -2,7 +2,7 @@ package org.elastos.hive.vault.database;
 
 import com.google.gson.annotations.SerializedName;
 
-public class UpdateDocumentsResponse {
+public class UpdateResult {
     private Boolean acknowledged;
     @SerializedName("matched_count")
     private int matchedCount;

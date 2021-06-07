@@ -35,9 +35,9 @@ public interface DatabaseService {
 	 *            the document does not have an _id field one will be added automatically
 	 * @param options bypass_document_validation: (optional) If True, allows
 	 *                the write to opt-out of document level validation. Default is False.
-	 * @return Results returned by {@link InsertDocumentsResponse} wrapper
+	 * @return Results returned by {@link InsertResult} wrapper
 	 */
-	CompletableFuture<InsertDocumentsResponse> insertOne(String collection, JsonNode doc, InsertDocumentsOptions options);
+	CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options);
 
 
 	/**
@@ -49,9 +49,9 @@ public interface DatabaseService {
 	 *                in the order provided. If an error occurs all remaining inserts are aborted. If False, documents
 	 *                will be inserted on the server in arbitrary order, possibly in parallel, and all document inserts will be attempted.
 	 *                bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
-	 * @return Results returned by {@link InsertDocumentsResponse} wrapper
+	 * @return Results returned by {@link InsertResult} wrapper
 	 */
-	CompletableFuture<InsertDocumentsResponse> insertMany(String collection, List<JsonNode> docs, InsertDocumentsOptions options);
+	CompletableFuture<InsertResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options);
 
 
 	/**
@@ -64,7 +64,7 @@ public interface DatabaseService {
 	 *              maxTimeMS (int): The maximum amount of time to allow this operation to run, in milliseconds.
 	 * @return count size
 	 */
-	CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountDocumentOptions options);
+	CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options);
 
 
 	/**
@@ -89,20 +89,20 @@ public interface DatabaseService {
 	 * Find many documents by many options.
 	 * @param collection the collection name
 	 * @param query optional, a JSON object specifying elements which must be present for a document to be included in the result set
-	 * @param options optional,refer to {@link QueryDocumentsOptions}
+	 * @param options optional,refer to {@link QueryOptions}
 	 * @return a JsonNode array result of document
 	 */
-	CompletableFuture<List<JsonNode>> query(String collection, JsonNode query, QueryDocumentsOptions options);
+	CompletableFuture<List<JsonNode>> query(String collection, JsonNode query, QueryOptions options);
 
 	/**
 	 * Update an existing document in a given collection
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to update.
 	 * @param update The modifications to apply.
-	 * @param options optional, refer to {@link UpdateDocumentsOptions}
-	 * @return Results returned by {@link UpdateDocumentsResponse} wrapper
+	 * @param options optional, refer to {@link UpdateOptions}
+	 * @return Results returned by {@link UpdateResult} wrapper
 	 */
-	CompletableFuture<UpdateDocumentsResponse> updateOne(String collection, JsonNode filter, JsonNode update, UpdateDocumentsOptions options);
+	CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
 
 
 	/**
@@ -110,10 +110,10 @@ public interface DatabaseService {
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to update.
 	 * @param update The modifications to apply.
-	 * @param options optional, refer to {@link UpdateDocumentsOptions}
-	 * @return Results returned by {@link UpdateDocumentsResponse} wrapper
+	 * @param options optional, refer to {@link UpdateOptions}
+	 * @return Results returned by {@link UpdateResult} wrapper
 	 */
-	CompletableFuture<UpdateDocumentsResponse> updateMany(String collection, JsonNode filter, JsonNode update, UpdateDocumentsOptions options);
+	CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options);
 
 
 	/**

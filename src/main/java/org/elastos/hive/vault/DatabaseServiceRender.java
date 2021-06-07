@@ -41,7 +41,7 @@ class DatabaseServiceRender implements DatabaseService {
 	}
 
 	@Override
-	public CompletableFuture<InsertDocumentsResponse> insertOne(String collection, JsonNode doc, InsertDocumentsOptions options) {
+	public CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.insertOne(collection, doc, options);
@@ -52,7 +52,7 @@ class DatabaseServiceRender implements DatabaseService {
 	}
 
 	@Override
-	public CompletableFuture<InsertDocumentsResponse> insertMany(String collection, List<JsonNode> docs, InsertDocumentsOptions options) {
+	public CompletableFuture<InsertResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.insertMany(collection, docs, options);
@@ -63,7 +63,7 @@ class DatabaseServiceRender implements DatabaseService {
 	}
 
 	@Override
-	public CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountDocumentOptions options) {
+	public CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.countDocuments(collection, query, options);
@@ -90,7 +90,7 @@ class DatabaseServiceRender implements DatabaseService {
 	}
 
 	@Override
-	public CompletableFuture<List<JsonNode>> query(String collection, JsonNode query, QueryDocumentsOptions options) {
+	public CompletableFuture<List<JsonNode>> query(String collection, JsonNode query, QueryOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.query(collection, query, options);
@@ -101,12 +101,12 @@ class DatabaseServiceRender implements DatabaseService {
 	}
 
 	@Override
-	public CompletableFuture<UpdateDocumentsResponse> updateOne(String collection, JsonNode filter, JsonNode update, UpdateDocumentsOptions options) {
+	public CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
 		return updateMany(collection, filter, update, options);
 	}
 
 	@Override
-	public CompletableFuture<UpdateDocumentsResponse> updateMany(String collection, JsonNode filter, JsonNode update, UpdateDocumentsOptions options) {
+	public CompletableFuture<UpdateResult> updateMany(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.updateMany(collection, filter, update, options);
