@@ -41,17 +41,22 @@ public class SubscriptionController extends ExceptionHandler {
 	}
 
 	public VaultInfo subscribeToVault(String credential) throws HiveException {
+		if (credential != null)
+			throw new NotImplementedException();
+
 		try {
 			return subscriptionAPI.subscribeToVault(credential).execute().body();
 		} catch (HiveHttpException e) {
-			if (e.getCode() == 501)
-				throw new UnsupportedOperationException();
-			else if (e.getCode() == 401)
+			switch (e.getCode()) {
+			case HiveHttpException.HttpCodeUnauthorized:
 				throw new UnauthorizedException();
-			else if (e.getCode() == 200)
+
+			case 200:
 				throw new VaultAlreadyExistException();
-			else
+
+			default:
 				throw new HiveException("Unknown exception: " + e.getCode() + "," + e.getInternalCode() + "," + e.getMessage());
+			}
 		} catch (IOException e) {
 			throw new HiveException(e.getMessage());
 		}
