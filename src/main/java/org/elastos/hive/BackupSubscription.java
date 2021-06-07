@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.UnsupportedMethodException;
+import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.subscription.BackupInfo;
 import org.elastos.hive.subscription.PricingPlan;
 import org.elastos.hive.subscription.payment.Order;
@@ -9,7 +9,6 @@ import org.elastos.hive.subscription.payment.PaymentController;
 import org.elastos.hive.subscription.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
-import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.subscription.SubscriptionController;
 
 import java.util.Collections;
@@ -18,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class BackupSubscription extends ServiceEndpoint
-	implements SubscriptionService<Backup.PropertySet>, PaymentService, ExceptionConvertor {
+	implements SubscriptionService<Backup.PropertySet>, PaymentService {
 
 	private SubscriptionController subscriptionController;
 	private PaymentController paymentController;
@@ -71,17 +70,17 @@ public class BackupSubscription extends ServiceEndpoint
 
 	@Override
 	public CompletableFuture<Void> unsubscribe() {
-		throw new UnsupportedMethodException();
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public CompletableFuture<Void> activate() {
-		throw new UnsupportedMethodException();
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public CompletableFuture<Void> deactivate() {
-		throw new UnsupportedMethodException();
+		throw new NotImplementedException();
 	}
 
 	@Override
@@ -148,19 +147,16 @@ public class BackupSubscription extends ServiceEndpoint
 
 	@Override
 	public CompletableFuture<Receipt> getReceipt(String receiptId) {
-		// TODO:
-		throw new UnsupportedMethodException();
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public CompletableFuture<List<Order>> getOrderList() {
-		// TODO:
-		throw new UnsupportedMethodException();
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public CompletableFuture<List<Receipt>> getReceiptList() {
-		// TODO:
-		throw new UnsupportedMethodException();
+		throw new NotImplementedException();
 	}
 }

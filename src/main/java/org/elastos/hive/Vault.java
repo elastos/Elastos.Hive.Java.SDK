@@ -1,6 +1,6 @@
 package org.elastos.hive;
 
-import org.elastos.hive.exception.UnsupportedMethodException;
+import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.service.*;
 import org.elastos.hive.subscription.VaultInfo;
 import org.elastos.hive.vault.ExceptionConvertor;
@@ -48,7 +48,7 @@ public class Vault extends ServiceEndpoint implements ExceptionConvertor {
 		return this.backupService;
 	}
 
-	public CompletableFuture<VaultInfo> getPropertySet() {
-		throw new UnsupportedMethodException();
+	public CompletableFuture<VaultInfo> getInfo() {
+		throw new NotImplementedException();
 	}
 }

@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.UnsupportedMethodException;
+import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.subscription.VaultInfo;
 import org.elastos.hive.subscription.payment.Order;
 import org.elastos.hive.subscription.payment.PaymentController;
@@ -14,12 +14,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.subscription.PricingPlan;
 import org.elastos.hive.subscription.SubscriptionController;
 
 public class VaultSubscription extends ServiceEndpoint
-	implements SubscriptionService<VaultInfo>, PaymentService, ExceptionConvertor {
+	implements SubscriptionService<VaultInfo>, PaymentService {
 
 	private SubscriptionController subscriptionController;
 	private PaymentController paymentController;
@@ -150,18 +149,18 @@ public class VaultSubscription extends ServiceEndpoint
 	@Override
 	public CompletableFuture<Receipt> getReceipt(String receiptId) {
 		// TODO:
-		throw new UnsupportedMethodException();
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public CompletableFuture<List<Order>> getOrderList() {
 		// TODO:
-		throw new UnsupportedMethodException();
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public CompletableFuture<List<Receipt>> getReceiptList() {
 		// TODO:
-		throw new UnsupportedMethodException();
+		throw new NotImplementedException();
 	}
 }

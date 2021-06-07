@@ -60,7 +60,7 @@ public class SubscriptionController {
 				throw new UnauthorizedException();
 
 			case 200:
-				throw new VaultAlreadyExistException();
+				throw new VaultAlreadyExistsException();
 
 			default:
 				throw new UnknownServerException(e);
@@ -147,7 +147,7 @@ public class SubscriptionController {
 				throw new UnauthorizedException();
 
 			case 200:
-				throw new VaultAlreadyExistException();
+				throw new VaultAlreadyExistsException();
 
 			default:
 				throw new UnknownServerException(e);
