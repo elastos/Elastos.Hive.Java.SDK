@@ -5,16 +5,17 @@ import java.io.IOException;
 /**
  * Main error response exception for internal usage.
  */
-public class HiveHttpException extends IOException {
+public class RPCException extends IOException {
     private static final long serialVersionUID = 1L;
 
-    public static final int HttpCodeBadRequest = 400;
-    public static final int HttpCodeUnauthorized = 401;
+    public static final int BAD_REQUEST     = 400;
+    public static final int UNAUTHORIZED    = 401;
+    public static final int NOT_FOUND       = 404;
 
     private final int code;
     private final int internalCode;
 
-    public HiveHttpException(int code, int internalCode, String message) {
+    public RPCException(int code, int internalCode, String message) {
         super(message);
         this.code = code;
         this.internalCode = internalCode;

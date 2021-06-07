@@ -35,5 +35,5 @@ interface SubscriptionAPI {
 	Call<Void> deactivateBackup();
 
 	@DELETE("/api/v2/subscription/backup")
-	Call<Void> UnsubscribeBackup();
+	Call<Void> unsubscribeBackup();
 }

@@ -13,12 +13,12 @@ public class ExceptionHandler {
     protected static final int SCRIPT_NOT_FOUND = 120001;
 
     protected boolean isHiveNodeException(IOException e) {
-        return e instanceof HiveHttpException;
+        return e instanceof RPCException;
     }
 
     protected HiveException toHiveException(IOException e) {
         if (isHiveNodeException(e)) {
-            HiveHttpException ex = (HiveHttpException)e;
+            RPCException ex = (RPCException)e;
             if (ex.getCode() == UNCAUGHT_EXCEPTION)
                 return new UncaughtException(ex.getMessage());
             else if (ex.getCode() == UNAUTHORIZED)

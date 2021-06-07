@@ -46,7 +46,7 @@ class NormalRequestInterceptor implements Interceptor {
 
         try {
             ErrorResponseBody error = new Gson().fromJson(body.string(), ErrorResponseBody.class);
-            throw new HiveHttpException(code, error.getError().getCode(), error.getError().getMessage());
+            throw new RPCException(code, error.getError().getCode(), error.getError().getMessage());
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }

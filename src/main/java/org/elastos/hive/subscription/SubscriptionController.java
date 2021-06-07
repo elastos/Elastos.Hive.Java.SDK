@@ -14,30 +14,39 @@ public class SubscriptionController extends ExceptionHandler {
 		this.subscriptionAPI = connection.createService(SubscriptionAPI.class);
 	}
 
-	public List<PricingPlan> getPricingPlanList() throws HiveException {
+	public List<PricingPlan> getVaultPricingPlanList() throws HiveException {
 		try {
 			return subscriptionAPI.getPricePlans("vault", "").execute().body().getPricingPlans();
+		} catch (RPCException e) {
+			throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
-	public PricingPlan getPricingPlan(String planName) throws HiveException {
+	public PricingPlan getVaultPricingPlan(String planName) throws HiveException {
 		try {
 			List<PricingPlan> plans = subscriptionAPI.getPricePlans("vault", planName).execute()
 					.body().getPricingPlans();
 			return plans.isEmpty() ? null : plans.get(0);
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PricingPlanNotFoundException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
 	public VaultInfo getVaultInfo() throws HiveException {
         try {
-       	return subscriptionAPI.getVaultInfo().execute().body();
-		 } catch (IOException e) {
-			 throw super.toHiveException(e);
-		 }
+        	return subscriptionAPI.getVaultInfo().execute().body();
+		} catch (RPCException e) {
+			throw new UnknownException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
 	public VaultInfo subscribeToVault(String credential) throws HiveException {
@@ -46,110 +55,138 @@ public class SubscriptionController extends ExceptionHandler {
 
 		try {
 			return subscriptionAPI.subscribeToVault(credential).execute().body();
-		} catch (HiveHttpException e) {
+		} catch (RPCException e) {
 			switch (e.getCode()) {
-			case HiveHttpException.HttpCodeUnauthorized:
+			case RPCException.UNAUTHORIZED:
 				throw new UnauthorizedException();
 
 			case 200:
 				throw new VaultAlreadyExistException();
 
 			default:
-				throw new HiveException("Unknown exception: " + e.getCode() + "," + e.getInternalCode() + "," + e.getMessage());
+				throw new UnknownException(e);
 			}
 		} catch (IOException e) {
-			throw new HiveException(e.getMessage());
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
 	public void unsubscribeVault() throws HiveException {
-         try {
-        	 subscriptionAPI.unsubscribeVault().execute();
-		 } catch (HiveHttpException e) {
-			 if (e.getCode() == 401)
-				 throw new UnauthorizedException();
-			 else
-				 throw new HiveException("Unknown exception: " + e.getCode() + "," + e.getInternalCode() + "," + e.getMessage());
-		 } catch (IOException e) {
-			 throw new HiveException(e.getMessage());
-		 }
-	}
-
-	public void activateVault() throws HiveException {
-         try {
-        	 subscriptionAPI.activateVault().execute();
-		 } catch (IOException e) {
-			 throw super.toHiveException(e);
-		 }
-	}
-
-	public void deactivateVault() throws HiveException {
-        try {
-        	subscriptionAPI.deactivateVault().execute();
-		 } catch (IOException e) {
-			throw super.toHiveException(e);
-		 }
-	}
-
-	public List<PricingPlan> getBackupPlanList() throws HiveException {
 		try {
-			return subscriptionAPI.getPricePlans("backup", "").execute().body().getBackupPlans();
+			subscriptionAPI.unsubscribeVault().execute();
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
-	public PricingPlan getBackupPlan(String planName) throws HiveException {
+	public void activateVault() throws HiveException {
+		try {
+			subscriptionAPI.activateVault().execute();
+		} catch (RPCException e) {
+			throw new UnknownException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e.getMessage());
+		}
+	}
+
+	public void deactivateVault() throws HiveException {
+		try {
+        	subscriptionAPI.deactivateVault().execute();
+		} catch (RPCException e) {
+			throw new UnknownException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e.getMessage());
+		}
+	}
+
+	public List<PricingPlan> getBackupPricingPlanList() throws HiveException {
+		try {
+			return subscriptionAPI.getPricePlans("backup", "").execute().body().getBackupPlans();
+		} catch (RPCException e) {
+			throw new UnknownException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e.getMessage());
+		}
+	}
+
+	public PricingPlan getBackupPricingPlan(String planName) throws HiveException {
 		try {
 			List<PricingPlan> plans = subscriptionAPI.getPricePlans("backup", planName).execute()
 					.body().getBackupPlans();
 			return plans.isEmpty() ? null : plans.get(0);
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PricingPlanNotFoundException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
 	public BackupInfo getBackupInfo() throws HiveException {
         try {
-       	 return subscriptionAPI.getBackupInfo().execute().body();
-		 } catch (Exception e) {
-			 // TODO:
-			 e.printStackTrace();
-			 throw new HiveException(e.getMessage());
-		 }
+       	 	return subscriptionAPI.getBackupInfo().execute().body();
+		} catch (RPCException e) {
+			throw new UnknownException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
 	public BackupInfo subscribeToBackup(String reserved) throws HiveException {
 		try {
         	return subscriptionAPI.subscribeToBackup(reserved).execute().body();
-		 } catch (Exception e) {
-			 // TODO:
-			 e.printStackTrace();
-			 throw new HiveException(e.getMessage());
-		 }
+		} catch (RPCException e) {
+			switch (e.getCode()) {
+			case RPCException.UNAUTHORIZED:
+				throw new UnauthorizedException();
+
+			case 200:
+				throw new VaultAlreadyExistException();
+
+			default:
+				throw new UnknownException(e);
+			}
+		} catch (IOException e) {
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
 	public void unsubscribeBackup() throws HiveException {
         try {
-       	 subscriptionAPI.unsubscribeVault().execute();
-		 } catch (IOException e) {
-			 throw super.toHiveException(e);
-		 }
+			subscriptionAPI.unsubscribeBackup().execute();
+		} catch (RPCException e) {
+			throw new UnknownException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
 	public void activateBackup() throws HiveException {
-        try {
-       	 subscriptionAPI.activateBackup().execute();
-		 } catch (IOException e) {
-			 throw super.toHiveException(e);
-		 }
+		try {
+			// TODO: Not implemented.
+			subscriptionAPI.activateBackup().execute();
+		} catch (RPCException e) {
+			throw new UnknownException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e.getMessage());
+		}
 	}
 
 	public void deactivateBackup() throws HiveException {
-       try {
-       	subscriptionAPI.deactivateBackup().execute();
-		 } catch (IOException e) {
-			throw super.toHiveException(e);
-		 }
+		try {
+			// TODO: Not implemented.
+			subscriptionAPI.deactivateBackup().execute();
+		} catch (RPCException e) {
+			throw new UnknownException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e.getMessage());
+		}
 	}
 }
