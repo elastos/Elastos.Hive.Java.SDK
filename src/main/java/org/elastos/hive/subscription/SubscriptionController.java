@@ -2,12 +2,11 @@ package org.elastos.hive.subscription;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.*;
-import org.elastos.hive.subscription.payment.PricingPlan;
 
 import java.io.IOException;
 import java.util.List;
 
-public class SubscriptionController extends ExceptionHandler {
+public class SubscriptionController {
 	private SubscriptionAPI subscriptionAPI;
 
 	public SubscriptionController(ConnectionManager connection) {
