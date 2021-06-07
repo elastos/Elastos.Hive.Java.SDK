@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.backup.ServiceBuilder;
-import org.elastos.hive.exception.UnsupportedMethodException;
+import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.service.PromotionService;
 
 public class Backup extends ServiceEndpoint {
@@ -82,7 +82,7 @@ public class Backup extends ServiceEndpoint {
 		return this.promotionService;
 	}
 
-	public CompletableFuture<PropertySet> getPropertySet() {
-		throw new UnsupportedMethodException();
+	public CompletableFuture<PropertySet> getInfo() {
+		throw new NotImplementedException();
 	}
 }

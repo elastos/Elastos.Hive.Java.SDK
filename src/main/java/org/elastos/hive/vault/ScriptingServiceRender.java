@@ -3,7 +3,7 @@ package org.elastos.hive.vault;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.InvalidParameterV1Exception;
-import org.elastos.hive.exception.UnsupportedMethodException;
+import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.vault.scripting.Condition;
 import org.elastos.hive.vault.scripting.Executable;
 import org.elastos.hive.service.ScriptingService;
@@ -89,6 +89,6 @@ public class ScriptingServiceRender implements ScriptingService, ExceptionConver
 
 	@Override
 	public CompletableFuture<Void> unregisterScript(String name) {
-		throw new UnsupportedMethodException();
+		throw new NotImplementedException();
 	}
 }
