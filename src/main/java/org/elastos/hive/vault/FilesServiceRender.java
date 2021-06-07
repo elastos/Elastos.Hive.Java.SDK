@@ -27,7 +27,7 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() ->  {
 			try {
 				return controller.getUploadStream(path);
-			} catch (HiveException e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -38,7 +38,7 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() ->  {
 			try {
 				return controller.getUploadWriter(path);
-			} catch (HiveException e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -49,7 +49,7 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.listChildren(path);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -60,17 +60,7 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.getProperty(path);
-			} catch (Exception e) {
-				throw new CompletionException(e);
-			}
-		});
-	}
-
-	private <T> CompletableFuture<T> download(String path, Class<T> resultType) {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return controller.download(path, resultType);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -78,12 +68,24 @@ class FilesServiceRender implements FilesService {
 
 	@Override
 	public CompletableFuture<InputStream> getDownloadStream(String path) {
-		return this.download(path, InputStream.class);
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return controller.download(path, InputStream.class);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
 	@Override
 	public CompletableFuture<Reader> getDownloadReader(String path) {
-		return this.download(path, Reader.class);
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return controller.download(path, Reader.class);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
 	@Override
@@ -104,7 +106,7 @@ class FilesServiceRender implements FilesService {
 			try {
 				controller.moveFile(source, target);
 				return true;
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -116,7 +118,7 @@ class FilesServiceRender implements FilesService {
 			try {
 				controller.copyFile(source, target);
 				return true;
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -127,7 +129,7 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.getHash(path);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
