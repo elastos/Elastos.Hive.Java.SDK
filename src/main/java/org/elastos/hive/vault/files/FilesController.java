@@ -31,9 +31,11 @@ public class FilesController {
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
 			return new UploadOutputStream(urlConnection, urlConnection.getOutputStream());
 		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+			int httpCode = e.getCode();
+
+			if (httpCode == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (e.getCode() == RPCException.NOT_FOUND)
+			else if (httpCode == RPCException.NOT_FOUND)
 				throw new PathNotExistException(e.getMessage());
 			else
 				throw new UnknownServerException(e);
@@ -47,9 +49,11 @@ public class FilesController {
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
 			return new UploadOutputStreamWriter(urlConnection, urlConnection.getOutputStream());
 		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+			int httpCode = e.getCode();
+
+			if (httpCode == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (e.getCode() == RPCException.NOT_FOUND)
+			else if (httpCode == RPCException.NOT_FOUND)
 				throw new PathNotExistException(e.getMessage());
 			else
 				throw new UnknownServerException(e);
@@ -77,9 +81,11 @@ public class FilesController {
 		try {
 			return filesAPI.listChildren(path).execute().body().getValue();
 		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+			int httpCode = e.getCode();
+
+			if (httpCode == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (e.getCode() == RPCException.NOT_FOUND)
+			else if (httpCode == RPCException.NOT_FOUND)
 				throw new PathNotExistException(e.getMessage());
 			else
 				throw new UnknownServerException(e);

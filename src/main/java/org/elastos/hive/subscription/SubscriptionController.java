@@ -1,7 +1,14 @@
 package org.elastos.hive.subscription;
 
 import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.exception.*;
+import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.NetworkException;
+import org.elastos.hive.exception.NotImplementedException;
+import org.elastos.hive.exception.PricingPlanNotFoundException;
+import org.elastos.hive.exception.RPCException;
+import org.elastos.hive.exception.UnauthorizedException;
+import org.elastos.hive.exception.UnknownServerException;
+import org.elastos.hive.exception.VaultAlreadyExistsException;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,7 +22,7 @@ public class SubscriptionController {
 
 	public List<PricingPlan> getVaultPricingPlanList() throws HiveException {
 		try {
-			return subscriptionAPI.getPricePlans("vault", "").execute().body().getPricingPlans();
+			return subscriptionAPI.getPricePlans("vault", "").execute().body().getPricingPlanCollection();
 		} catch (RPCException e) {
 			throw new UnknownServerException(e);
 		} catch (IOException e) {
@@ -26,7 +33,7 @@ public class SubscriptionController {
 	public PricingPlan getVaultPricingPlan(String planName) throws HiveException {
 		try {
 			List<PricingPlan> plans = subscriptionAPI.getPricePlans("vault", planName).execute()
-					.body().getPricingPlans();
+					.body().getPricingPlanCollection();
 			return plans.isEmpty() ? null : plans.get(0);
 		} catch (RPCException e) {
 			if (e.getCode() == RPCException.NOT_FOUND)
@@ -168,24 +175,10 @@ public class SubscriptionController {
 	}
 
 	public void activateBackup() throws HiveException {
-		try {
-			// TODO: Not implemented.
-			subscriptionAPI.activateBackup().execute();
-		} catch (RPCException e) {
-			throw new UnknownServerException(e);
-		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
-		}
+		throw new NotImplementedException();
 	}
 
 	public void deactivateBackup() throws HiveException {
-		try {
-			// TODO: Not implemented.
-			subscriptionAPI.deactivateBackup().execute();
-		} catch (RPCException e) {
-			throw new UnknownServerException(e);
-		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
-		}
+		throw new NotImplementedException();
 	}
 }

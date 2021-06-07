@@ -20,10 +20,7 @@ class PromotionServiceRender implements PromotionService {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.promote();
-			} catch (HiveException e) {
-				e.printStackTrace();
-				throw new CompletionException(e);
-			} catch (RuntimeException e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});

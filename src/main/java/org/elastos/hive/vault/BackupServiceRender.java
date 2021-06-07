@@ -4,6 +4,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.vault.backup.BackupController;
 import org.elastos.hive.vault.backup.credential.CredentialCode;
 import org.elastos.hive.service.BackupContext;
@@ -22,7 +24,9 @@ class BackupServiceRender implements BackupService {
     @Override
     public CompletableFuture<Void> setupContext(BackupContext backupContext) {
 		this.credentialCode = new CredentialCode(serviceEndpoint, backupContext);
-        return null;
+		return CompletableFuture.runAsync(() -> {
+			return;
+		});
     }
 
     @Override
@@ -30,7 +34,7 @@ class BackupServiceRender implements BackupService {
         return CompletableFuture.runAsync(() -> {
             try {
                 controller.startBackup(credentialCode.getToken());
-            } catch (Exception e) {
+            } catch (HiveException | RuntimeException e) {
                 throw new CompletionException(e);
             }
         });
@@ -38,7 +42,9 @@ class BackupServiceRender implements BackupService {
 
     @Override
     public CompletableFuture<Void> stopBackup() {
-        throw new UnsupportedOperationException();
+    	return CompletableFuture.runAsync(() -> {
+    		throw new NotImplementedException();
+    	});
     }
 
     @Override
@@ -46,7 +52,7 @@ class BackupServiceRender implements BackupService {
         return CompletableFuture.runAsync(() -> {
             try {
                 controller.restoreFrom(credentialCode.getToken());
-            } catch (Exception e) {
+            } catch (HiveException | RuntimeException e) {
                 throw new CompletionException(e);
             }
         });
@@ -54,7 +60,9 @@ class BackupServiceRender implements BackupService {
 
     @Override
     public CompletableFuture<Void> stopRestore() {
-        throw new UnsupportedOperationException();
+    	return CompletableFuture.runAsync(() -> {
+    		throw new NotImplementedException();
+    	});
     }
 
     @Override
@@ -62,7 +70,7 @@ class BackupServiceRender implements BackupService {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return controller.checkResult();
-            } catch (Exception e) {
+            } catch (HiveException | RuntimeException e) {
                 throw new CompletionException(e);
             }
         });

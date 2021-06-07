@@ -4,9 +4,10 @@ import retrofit2.Call;
 import retrofit2.http.*;
 
 interface SubscriptionAPI {
-	@GET("/api/v2/subscription/vault")
-	Call<VaultInfo> getVaultInfo();
+	@GET("/api/v2/subscription/pricing_plan")
+	Call<PricingPlanCollection> getPricePlans(@Query("subscription") String subscription, @Query("name") String name);
 
+	// for subscription to vault service.
 	@PUT("/api/v2/subscription/vault")
 	Call<VaultInfo> subscribeToVault(@Query("credential") String credential);
 
@@ -19,12 +20,10 @@ interface SubscriptionAPI {
 	@DELETE("/api/v2/subscription/vault")
 	Call<Void> unsubscribeVault();
 
-	@GET("/api/v2/subscription/pricing_plan")
-	Call<PricingPlansResponse> getPricePlans(@Query("subscription") String subscription, @Query("name") String name);
+	@GET("/api/v2/subscription/vault")
+	Call<VaultInfo> getVaultInfo();
 
-	@GET("/api/v2/subscription/backup")
-	Call<BackupInfo> getBackupInfo();
-
+	// for subscription to backup service.
 	@PUT("/api/v2/subscription/backup")
 	Call<BackupInfo> subscribeToBackup(@Query("credential") String credential);
 
@@ -36,4 +35,7 @@ interface SubscriptionAPI {
 
 	@DELETE("/api/v2/subscription/backup")
 	Call<Void> unsubscribeBackup();
+
+	@GET("/api/v2/subscription/backup")
+	Call<BackupInfo> getBackupInfo();
 }

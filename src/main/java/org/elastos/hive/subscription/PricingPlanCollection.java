@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-class PricingPlansResponse {
+class PricingPlanCollection {
     @SerializedName("backupPlans")
     private List<PricingPlan> backupPlans;
 
@@ -18,7 +18,7 @@ class PricingPlansResponse {
         return backupPlans;
     }
 
-    public List<PricingPlan> getPricingPlans() {
+    public List<PricingPlan> getPricingPlanCollection() {
         return pricingPlans;
     }
 
