@@ -17,7 +17,7 @@ public class SubscriptionController {
 		try {
 			return subscriptionAPI.getPricePlans("vault", "").execute().body().getPricingPlans();
 		} catch (RPCException e) {
-			throw new UnknownException(e);
+			throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -32,7 +32,7 @@ public class SubscriptionController {
 			if (e.getCode() == RPCException.NOT_FOUND)
 				throw new PricingPlanNotFoundException(e.getMessage());
 			else
-				throw new UnknownException(e);
+				throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -42,7 +42,7 @@ public class SubscriptionController {
         try {
         	return subscriptionAPI.getVaultInfo().execute().body();
 		} catch (RPCException e) {
-			throw new UnknownException(e);
+			throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -63,7 +63,7 @@ public class SubscriptionController {
 				throw new VaultAlreadyExistException();
 
 			default:
-				throw new UnknownException(e);
+				throw new UnknownServerException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
@@ -77,7 +77,7 @@ public class SubscriptionController {
 			if (e.getCode() == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
 			else
-				throw new UnknownException(e);
+				throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -87,7 +87,7 @@ public class SubscriptionController {
 		try {
 			subscriptionAPI.activateVault().execute();
 		} catch (RPCException e) {
-			throw new UnknownException(e);
+			throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -97,7 +97,7 @@ public class SubscriptionController {
 		try {
         	subscriptionAPI.deactivateVault().execute();
 		} catch (RPCException e) {
-			throw new UnknownException(e);
+			throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -107,7 +107,7 @@ public class SubscriptionController {
 		try {
 			return subscriptionAPI.getPricePlans("backup", "").execute().body().getBackupPlans();
 		} catch (RPCException e) {
-			throw new UnknownException(e);
+			throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -122,7 +122,7 @@ public class SubscriptionController {
 			if (e.getCode() == RPCException.NOT_FOUND)
 				throw new PricingPlanNotFoundException(e.getMessage());
 			else
-				throw new UnknownException(e);
+				throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -132,7 +132,7 @@ public class SubscriptionController {
         try {
        	 	return subscriptionAPI.getBackupInfo().execute().body();
 		} catch (RPCException e) {
-			throw new UnknownException(e);
+			throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -150,7 +150,7 @@ public class SubscriptionController {
 				throw new VaultAlreadyExistException();
 
 			default:
-				throw new UnknownException(e);
+				throw new UnknownServerException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
@@ -161,7 +161,7 @@ public class SubscriptionController {
         try {
 			subscriptionAPI.unsubscribeBackup().execute();
 		} catch (RPCException e) {
-			throw new UnknownException(e);
+			throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -172,7 +172,7 @@ public class SubscriptionController {
 			// TODO: Not implemented.
 			subscriptionAPI.activateBackup().execute();
 		} catch (RPCException e) {
-			throw new UnknownException(e);
+			throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -183,7 +183,7 @@ public class SubscriptionController {
 			// TODO: Not implemented.
 			subscriptionAPI.deactivateBackup().execute();
 		} catch (RPCException e) {
-			throw new UnknownException(e);
+			throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}

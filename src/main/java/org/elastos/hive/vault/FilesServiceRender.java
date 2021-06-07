@@ -1,9 +1,7 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.exception.FileDoesNotExistsException;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.files.FileInfo;
 import org.elastos.hive.vault.files.FilesController;
@@ -17,7 +15,7 @@ import java.io.Writer;
 import java.io.InputStream;
 import java.io.Reader;
 
-class FilesServiceRender implements FilesService, ExceptionConvertor {
+class FilesServiceRender implements FilesService {
 	private FilesController controller;
 
 	public FilesServiceRender(ServiceEndpoint serviceEndpoint) {
@@ -52,7 +50,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 			try {
 				return controller.listChildren(path);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -63,7 +61,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 			try {
 				return controller.getProperty(path);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -73,7 +71,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 			try {
 				return controller.download(path, resultType);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -95,7 +93,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 				controller.delete(path);
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -107,7 +105,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 				controller.moveFile(source, target);
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -119,7 +117,7 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 				controller.copyFile(source, target);
 				return true;
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -130,18 +128,8 @@ class FilesServiceRender implements FilesService, ExceptionConvertor {
 			try {
 				return controller.getHash(path);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
-	}
-
-	@Override
-	public Exception toHiveException(Exception e) {
-		if (e instanceof HttpFailedException) {
-			HttpFailedException ex = (HttpFailedException) e;
-			if (ex.getCode() == 404)
-				return new FileDoesNotExistsException();
-		}
-		return ExceptionConvertor.super.toHiveException(e);
 	}
 }
