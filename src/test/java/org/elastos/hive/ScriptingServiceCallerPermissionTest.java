@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.connection.KeyValueDict;
-import org.elastos.hive.vault.database.InsertDocumentsOptions;
+import org.elastos.hive.vault.database.InsertOptions;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.ScriptingService;
@@ -74,7 +74,7 @@ class ScriptingServiceCallerPermissionTest {
             docNode.put("collection", COLLECTION_GROUP_MESSAGE);
             docNode.put("did", callDid);
             databaseService.insertOne(COLLECTION_GROUP, docNode,
-                    new InsertDocumentsOptions().setBypassDocumentValidation(false)).get();
+                    new InsertOptions().setBypassDocumentValidation(false)).get();
         });
     }
 

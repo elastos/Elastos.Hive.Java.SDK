@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class InsertDocumentsResponse {
+public class InsertResult {
     private Boolean acknowledged;
     @SerializedName("inserted_ids")
     private List<String> insertedIds;

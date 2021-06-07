@@ -2,7 +2,7 @@ package org.elastos.hive.vault.database;
 
 import com.google.gson.annotations.SerializedName;
 
-class CreateCollectionResponse {
+class CreateCollectionResult {
     @SerializedName("name")
     private String name;
 

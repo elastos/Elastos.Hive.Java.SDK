@@ -5,7 +5,7 @@ import org.elastos.hive.connection.KeyValueDict;
 
 import java.util.List;
 
-public class QueryDocumentsOptions {
+public class QueryOptions {
     private int skip;
     private int limit;
     private KeyValueDict projection;

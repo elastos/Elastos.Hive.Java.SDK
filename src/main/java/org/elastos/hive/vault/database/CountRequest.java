@@ -2,11 +2,11 @@ package org.elastos.hive.vault.database;
 
 import org.elastos.hive.connection.KeyValueDict;
 
-class CountDocumentRequest {
+class CountRequest {
     private final KeyValueDict filter;
-    private final CountDocumentOptions options;
+    private final CountOptions options;
 
-    public CountDocumentRequest(KeyValueDict filter, CountDocumentOptions options) {
+    public CountRequest(KeyValueDict filter, CountOptions options) {
         this.filter = filter;
         this.options = options;
     }
