@@ -1,4 +1,4 @@
-package org.elastos.hive.subscription.payment;
+package org.elastos.hive.subscription;
 
 public class PricingPlan {
 	private float amount;

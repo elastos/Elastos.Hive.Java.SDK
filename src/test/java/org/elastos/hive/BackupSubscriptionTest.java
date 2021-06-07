@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.subscription.payment.PricingPlan;
+import org.elastos.hive.subscription.PricingPlan;
 import org.junit.jupiter.api.*;
 
 import java.util.List;

@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import org.elastos.hive.subscription.PricingPlan;
+
 public class Order {
 	@SerializedName("order_id")
 	private String orderId;

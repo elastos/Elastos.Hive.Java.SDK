@@ -2,6 +2,7 @@ package org.elastos.hive.subscription.payment;
 
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.connection.HiveResponseBody;
+import org.elastos.hive.subscription.PricingPlan;
 
 import java.util.List;
 
