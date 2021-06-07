@@ -11,9 +11,9 @@ import org.elastos.did.backend.ResolverCache;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.did.exception.MalformedDIDException;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.ProviderNotFoundException;
 import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.BadContextProviderException;
+import org.elastos.hive.exception.DIDNotPublishedException;
 import org.elastos.hive.exception.IllegalDidFormatException;
 import org.elastos.hive.exception.DIDResolverNotSetupException;
 import org.elastos.hive.exception.DIDResolverSetupException;
@@ -104,7 +104,7 @@ public class AppContext {
 
 				doc = did.resolve();
 				if (doc == null)
-					throw new ProviderNotFoundException(
+					throw new DIDNotPublishedException(
 							String.format("The DID %s has not published onto sideChain", targetDid));
 
 				services = doc.selectServices((String) null, "HiveVault");

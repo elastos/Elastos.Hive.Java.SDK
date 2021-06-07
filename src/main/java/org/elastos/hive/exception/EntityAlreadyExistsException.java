@@ -1,6 +1,6 @@
 package org.elastos.hive.exception;
 
-public class EntityAlreadyExistsException extends HiveException {
+class EntityAlreadyExistsException extends RuntimeException {
     private static final long serialVersionUID = -586039279266427101L;
 
     public EntityAlreadyExistsException() {

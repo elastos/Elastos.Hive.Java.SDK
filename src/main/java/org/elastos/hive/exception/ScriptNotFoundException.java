@@ -1,6 +1,6 @@
 package org.elastos.hive.exception;
 
-public class ScriptNotFoundException extends HiveException {
+public class ScriptNotFoundException extends EntityNotFoundException {
     private static final long serialVersionUID = -586039279266427101L;
 
     public ScriptNotFoundException() {

@@ -1,6 +1,6 @@
 package org.elastos.hive.exception;
 
-public class EntityNotFoundException extends RuntimeException {
+class EntityNotFoundException extends RuntimeException {
 	private static final long serialVersionUID = -7579248662682963982L;
 
 	public EntityNotFoundException() {
