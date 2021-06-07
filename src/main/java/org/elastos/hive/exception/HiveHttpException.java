@@ -8,6 +8,9 @@ import java.io.IOException;
 public class HiveHttpException extends IOException {
     private static final long serialVersionUID = 1L;
 
+    public static final int HttpCodeBadRequest = 400;
+    public static final int HttpCodeUnauthorized = 401;
+
     private final int code;
     private final int internalCode;
 
