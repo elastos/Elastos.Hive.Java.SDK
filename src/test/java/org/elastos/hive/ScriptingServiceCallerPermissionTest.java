@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.connection.KeyValueDict;
-import org.elastos.hive.vault.database.DeleteOptions;
-import org.elastos.hive.vault.database.InsertOneOptions;
+import org.elastos.hive.vault.database.InsertDocumentsOptions;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.ScriptingService;
@@ -61,8 +60,8 @@ class ScriptingServiceCallerPermissionTest {
 
     private void init_for_caller() {
         Assertions.assertDoesNotThrow(()->{
-            databaseService.createCollection(COLLECTION_GROUP, null).get();
-            databaseService.createCollection(COLLECTION_GROUP_MESSAGE, null).get();
+            databaseService.createCollection(COLLECTION_GROUP).get();
+            databaseService.createCollection(COLLECTION_GROUP_MESSAGE).get();
         });
     }
 
@@ -75,7 +74,7 @@ class ScriptingServiceCallerPermissionTest {
             docNode.put("collection", COLLECTION_GROUP_MESSAGE);
             docNode.put("did", callDid);
             databaseService.insertOne(COLLECTION_GROUP, docNode,
-                    new InsertOneOptions(false)).get();
+                    new InsertDocumentsOptions().setBypassDocumentValidation(false)).get();
         });
     }
 
@@ -116,7 +115,7 @@ class ScriptingServiceCallerPermissionTest {
             ObjectNode filter = JsonNodeFactory.instance.objectNode();
             filter.put("collection", COLLECTION_GROUP_MESSAGE);
             filter.put("did", callDid);
-            databaseService.deleteOne(COLLECTION_GROUP, filter, new DeleteOptions());
+            databaseService.deleteOne(COLLECTION_GROUP, filter);
         });
     }
 

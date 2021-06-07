@@ -1,41 +1,38 @@
 package org.elastos.hive.vault.database;
 
-import org.elastos.hive.connection.HiveResponseBody;
+import org.elastos.hive.connection.KeyValueDict;
 import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.POST;
+import retrofit2.http.*;
 
 interface DatabaseAPI {
-	@POST("/api/v1/db/create_collection")
-	Call<HiveResponseBody> createCollection(@Body CreateCollectionRequestBody body);
+	@PUT("/api/v2/vault/db/collections/{collectionName}")
+	Call<CreateCollectionResponse> createCollection(@Path("collectionName") String collectionName);
 
-	@POST("/api/v1/db/delete_collection")
-	Call<HiveResponseBody> deleteCollection(@Body DeleteCollectionRequestBody body);
+	@DELETE("/api/v2/vault/db/{collectionName}")
+	Call<Void> deleteCollection(@Path("collectionName") String collectionName);
 
-	@POST("/api/v1/db/insert_one")
-	Call<InsertDocResponseBody> insertOne(@Body InsertDocRequestBody body);
+	@POST("/api/v2/vault/db/collection/{collection_name}")
+	Call<InsertDocumentsResponse> insertDocuments(@Path("collectionName") String collectionName,
+							                      @Body InsertDocumentsRequest body);
 
-	@POST("/api/v1/db/insert_many")
-	Call<InsertDocsResponseBody> insertMany(@Body InsertDocsRequestBody body);
+	@PATCH("/api/v2/vault/db/collection/{collection_name}")
+	Call<UpdateDocumentsResponse> updateDocuments(@Path("collectionName") String collectionName,
+							                      @Body UpdateDocumentsRequest body);
 
-	@POST("/api/v1/db/update_one")
-	Call<UpdateDocResponseBody> updateOne(@Body UpdateDocRequestBody body);
+	@DELETE("/api/v2/vault/db/collection/{collection_name}")
+	Call<Void> deleteDocuments(@Path("collectionName") String collectionName,
+							   @Body DeleteDocumentsRequest body);
 
-	@POST("/api/v1/db/update_many")
-	Call<UpdateDocResponseBody> updateMany(@Body UpdateDocRequestBody body);
+	@GET("/api/v2/vault/db/collection/{collection_name}?op=count")
+	Call<CountDocumentResponse> countDocuments(@Path("collectionName") String collectionName,
+							                   @Body CountDocumentRequest body);
 
-	@POST("/api/v1/db/delete_one")
-	Call<DeleteDocResponseBody> deleteOne(@Body DeleteDocRequestBody body);
+	@GET("/api/v2/vault/db/{collection_name}")
+	Call<FindDocumentsResponse> findDocuments(@Path("collectionName") String collectionName,
+											  @Query("filter") KeyValueDict filter,
+											  @Query("skip") Long skip,
+											  @Query("limit") Long limit);
 
-	@POST("/api/v1/db/delete_many")
-	Call<DeleteDocResponseBody> deleteMany(@Body DeleteDocRequestBody body);
-
-	@POST("/api/v1/db/count_documents")
-	Call<CountDocResponseBody> countDocs(@Body CountDocRequestBody body);
-
-	@POST("/api/v1/db/find_one")
-	Call<FindDocResponseBody> findOne(@Body FindDocRequestBody body);
-
-	@POST("/api/v1/db/find_many")
-	Call<FindDocsResponseBody> findMany(@Body FindDocsRequestBody body);
+	@POST("/api/v2/vault/db/query")
+	Call<FindDocumentsResponse> queryDocuments(@Body QueryDocumentsRequest body);
 }

@@ -335,7 +335,7 @@ class ScriptingServiceTest {
 	 */
 	private static void create_test_database() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(
-				databaseService.createCollection(COLLECTION_NAME, null).get()));
+				databaseService.createCollection(COLLECTION_NAME).get()));
 	}
 
 	/**

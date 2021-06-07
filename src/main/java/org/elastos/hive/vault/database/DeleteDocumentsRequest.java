@@ -2,11 +2,10 @@ package org.elastos.hive.vault.database;
 
 import org.elastos.hive.connection.KeyValueDict;
 
-class DeleteDocRequestBody extends CreateCollectionRequestBody {
+class DeleteDocumentsRequest {
     private KeyValueDict filter;
 
-    public DeleteDocRequestBody(String name, KeyValueDict filter) {
-        super(name);
+    public DeleteDocumentsRequest(KeyValueDict filter) {
         this.filter = filter;
     }
 }

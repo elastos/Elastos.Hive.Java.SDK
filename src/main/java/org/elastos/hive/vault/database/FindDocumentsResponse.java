@@ -2,11 +2,10 @@ package org.elastos.hive.vault.database;
 
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.connection.KeyValueDict;
-import org.elastos.hive.connection.HiveResponseBody;
 
 import java.util.List;
 
-class FindDocsResponseBody extends HiveResponseBody {
+class FindDocumentsResponse {
     @SerializedName("items")
     private List<KeyValueDict> items;
 
