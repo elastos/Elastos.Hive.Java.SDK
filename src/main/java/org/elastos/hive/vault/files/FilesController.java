@@ -10,10 +10,14 @@ import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.connection.UploadOutputStream;
 import org.elastos.hive.connection.UploadOutputStreamWriter;
-import org.elastos.hive.exception.ExceptionHandler;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.NetworkException;
+import org.elastos.hive.exception.PathNotExistException;
+import org.elastos.hive.exception.RPCException;
+import org.elastos.hive.exception.UnauthorizedException;
+import org.elastos.hive.exception.UnknownException;
 
-public class FilesController extends ExceptionHandler {
+public class FilesController {
 	private ConnectionManager connection;
 	private FilesAPI filesAPI;
 
@@ -26,8 +30,15 @@ public class FilesController extends ExceptionHandler {
 		try {
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
 			return new UploadOutputStream(urlConnection, urlConnection.getOutputStream());
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PathNotExistException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw new HiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
@@ -35,64 +46,120 @@ public class FilesController extends ExceptionHandler {
 		try {
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
 			return new UploadOutputStreamWriter(urlConnection, urlConnection.getOutputStream());
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PathNotExistException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw new HiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
 	public <T> T download(String path, Class<T> resultType) throws HiveException {
 		try {
 			return HiveResponseBody.getResponseStream(filesAPI.download(path).execute(), resultType);
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PathNotExistException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
 	public List<FileInfo> listChildren(String path) throws HiveException {
 		try {
 			return filesAPI.listChildren(path).execute().body().getValue();
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PathNotExistException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
 	public void copyFile(String srcPath, String destPath) throws HiveException {
 		try {
 			filesAPI.copy(srcPath, destPath).execute();
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PathNotExistException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
 	public void moveFile(String srcPath, String destPath) throws HiveException {
 		try {
 			filesAPI.move(srcPath, destPath).execute();
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PathNotExistException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
 	public void delete(String path) throws HiveException {
 		try {
 			filesAPI.delete(path).execute();
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PathNotExistException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
 	public FileInfo getProperty(String path) throws HiveException {
 		try {
 			return filesAPI.getMetadata(path).execute().body();
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PathNotExistException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 
 	public String getHash(String path) throws HiveException {
 		try {
 			return filesAPI.getHash(path).execute().body().getHash();
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PathNotExistException(e.getMessage());
+			else
+				throw new UnknownException(e);
 		} catch (IOException e) {
-			throw super.toHiveException(e);
+			throw new NetworkException(e.getMessage());
 		}
 	}
 }
