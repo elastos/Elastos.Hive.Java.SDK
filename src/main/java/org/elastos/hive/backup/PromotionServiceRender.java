@@ -7,9 +7,8 @@ import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.backup.promotion.PromotionController;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.PromotionService;
-import org.elastos.hive.vault.ExceptionConvertor;
 
-class PromotionServiceRender implements PromotionService, ExceptionConvertor {
+class PromotionServiceRender implements PromotionService {
 	private PromotionController controller;
 
 	PromotionServiceRender(ServiceEndpoint serviceEndpoint) {

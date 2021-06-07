@@ -12,7 +12,7 @@ import org.elastos.hive.vault.scripting.ScriptingController;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class ScriptingServiceRender implements ScriptingService, ExceptionConvertor {
+public class ScriptingServiceRender implements ScriptingService {
 	private ScriptingController controller;
 
 	public ScriptingServiceRender(ServiceEndpoint serviceEndpoint) {
@@ -33,7 +33,7 @@ public class ScriptingServiceRender implements ScriptingService, ExceptionConver
 			try {
 				controller.registerScript(name, condition, executable, allowAnonymousUser, allowAnonymousApp);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -44,7 +44,7 @@ public class ScriptingServiceRender implements ScriptingService, ExceptionConver
 			try {
 				return controller.callScript(name, params, targetDid, targetAppDid, resultType);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -54,7 +54,7 @@ public class ScriptingServiceRender implements ScriptingService, ExceptionConver
 			try {
 				return controller.callScriptUrl(name, params, targetDid, targetAppDid, resultType);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -68,7 +68,7 @@ public class ScriptingServiceRender implements ScriptingService, ExceptionConver
 
 				return controller.uploadFile(transactionId, resultType);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}
@@ -82,7 +82,7 @@ public class ScriptingServiceRender implements ScriptingService, ExceptionConver
 
 				return controller.downloadFile(transactionId, resultType);
 			} catch (Exception e) {
-				throw new CompletionException(toHiveException(e));
+				throw new CompletionException(e);
 			}
 		});
 	}

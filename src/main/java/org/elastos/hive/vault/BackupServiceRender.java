@@ -9,7 +9,7 @@ import org.elastos.hive.vault.backup.credential.CredentialCode;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;
 
-class BackupServiceRender implements BackupService, ExceptionConvertor {
+class BackupServiceRender implements BackupService {
     private ServiceEndpoint serviceEndpoint;
     private BackupController controller;
     private CredentialCode credentialCode;
@@ -31,7 +31,7 @@ class BackupServiceRender implements BackupService, ExceptionConvertor {
             try {
                 controller.startBackup(credentialCode.getToken());
             } catch (Exception e) {
-                throw new CompletionException(toHiveException(e));
+                throw new CompletionException(e);
             }
         });
     }
@@ -47,7 +47,7 @@ class BackupServiceRender implements BackupService, ExceptionConvertor {
             try {
                 controller.restoreFrom(credentialCode.getToken());
             } catch (Exception e) {
-                throw new CompletionException(toHiveException(e));
+                throw new CompletionException(e);
             }
         });
     }
@@ -63,7 +63,7 @@ class BackupServiceRender implements BackupService, ExceptionConvertor {
             try {
                 return controller.checkResult();
             } catch (Exception e) {
-                throw new CompletionException(toHiveException(e));
+                throw new CompletionException(e);
             }
         });
     }

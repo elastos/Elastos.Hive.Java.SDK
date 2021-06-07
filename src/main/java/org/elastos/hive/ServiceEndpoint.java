@@ -7,9 +7,8 @@ import org.elastos.hive.about.AboutController;
 import org.elastos.hive.about.NodeVersion;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.vault.ExceptionConvertor;
 
-public class ServiceEndpoint implements ExceptionConvertor {
+public class ServiceEndpoint {
 	private AppContext context;
 	private String providerAddress;
 	private ConnectionManager connectionManager;

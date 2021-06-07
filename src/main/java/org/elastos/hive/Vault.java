@@ -3,7 +3,6 @@ package org.elastos.hive;
 import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.service.*;
 import org.elastos.hive.subscription.VaultInfo;
-import org.elastos.hive.vault.ExceptionConvertor;
 import org.elastos.hive.vault.ServiceBuilder;
 
 import java.util.concurrent.CompletableFuture;
@@ -11,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
  */
-public class Vault extends ServiceEndpoint implements ExceptionConvertor {
+public class Vault extends ServiceEndpoint {
 	private FilesService 	filesService;
 	private DatabaseService databaseService;
 	private ScriptingService scriptingService;
