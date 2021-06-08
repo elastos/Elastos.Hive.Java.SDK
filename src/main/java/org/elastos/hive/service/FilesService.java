@@ -46,7 +46,7 @@ public interface FilesService {
 	 * @return the new CompletionStage, the result is true if the file or folder
 	 *         successfully deleted; false otherwise
 	 */
-	CompletableFuture<Boolean> delete(String path);
+	CompletableFuture<Void> delete(String path);
 
 	/**
 	 * Moves (or renames) a file or folder.
@@ -58,7 +58,7 @@ public interface FilesService {
 	 *  	   been moved to target path in success. Otherwise, it will return
 	 *  	   result with false.
 	 */
-	CompletableFuture<Boolean> move(String source, String target);
+	CompletableFuture<Void> move(String source, String target);
 
 	/**
 	 * Copies a file or a folder (recursively).
@@ -68,7 +68,7 @@ public interface FilesService {
 	 * @return the new CompletionStage, the result is true if the file or folder
 	 *         successfully copied; false otherwise
 	 */
-	CompletableFuture<Boolean> copy(String source, String target);
+	CompletableFuture<Void> copy(String source, String target);
 
 	/**
 	 * Returns the SHA256 hash of the given file.

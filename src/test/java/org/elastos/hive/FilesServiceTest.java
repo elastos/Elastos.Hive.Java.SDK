@@ -120,24 +120,24 @@ class FilesServiceTest {
 	}
 
 	@Test @Order(7) void testMove() {
-		Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(
+		Assertions.assertDoesNotThrow(() ->
 				filesService.delete(remoteBackupTxtFilePath)
 						.thenCompose(result -> filesService.move(remoteTxtFilePath, remoteBackupTxtFilePath))
-						.get()));
+						.get());
 		verifyRemoteFileExists(remoteBackupTxtFilePath);
 	}
 
 	@Test @Order(8) void testCopy() {
-		Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(
-				filesService.copy(remoteBackupTxtFilePath, remoteTxtFilePath).get()));
+		Assertions.assertDoesNotThrow(() ->
+				filesService.copy(remoteBackupTxtFilePath, remoteTxtFilePath).get());
 		verifyRemoteFileExists(remoteTxtFilePath);
 	}
 
 	@Test @Order(9) void testDeleteFile() {
-		Assertions.assertDoesNotThrow(() -> Assertions.assertTrue(
+		Assertions.assertDoesNotThrow(() ->
 				filesService.delete(remoteTxtFilePath)
 						.thenCompose(result -> filesService.delete(remoteBackupTxtFilePath))
-						.get()));
+						.get());
 	}
 
 	@Disabled
