@@ -56,23 +56,19 @@ class DatabaseServiceTest {
 
 	@Test @Order(4) void testFindOne() {
 		Assertions.assertDoesNotThrow(()->{
-			// TODO: fix params handling on node.
-//			ObjectNode query = JsonNodeFactory.instance.objectNode();
-//			query.put("author", "john doe1");
-//			Assertions.assertNotNull(databaseService.findOne(COLLECTION_NAME, query,
-//					new FindOptions().setSkip(0L).setLimit(0L)).get());
-			Assertions.assertNotNull(databaseService.findOne(COLLECTION_NAME, null, null).get());
+			ObjectNode query = JsonNodeFactory.instance.objectNode();
+			query.put("author", "john doe1");
+			Assertions.assertNotNull(databaseService.findOne(COLLECTION_NAME, query,
+					new FindOptions().setSkip(0).setLimit(0)).get());
 		});
 	}
 
 	@Test @Order(5) void testFindMany() {
 		Assertions.assertDoesNotThrow(()->{
-			// TODO: fix params handling on node.
-//			ObjectNode query = JsonNodeFactory.instance.objectNode();
-//			query.put("author", "john doe1");
-//			List<JsonNode> docs = databaseService.findMany(COLLECTION_NAME, query,
-//					new FindOptions().setSkip(0L).setLimit(0L)).get();
-			Assertions.assertNotNull(databaseService.findMany(COLLECTION_NAME, null, null).get());
+			ObjectNode query = JsonNodeFactory.instance.objectNode();
+			query.put("author", "john doe1");
+			List<JsonNode> docs = databaseService.findMany(COLLECTION_NAME, query,
+					new FindOptions().setSkip(0).setLimit(0)).get();
 		});
 	}
 
@@ -85,13 +81,12 @@ class DatabaseServiceTest {
 	}
 
 	@Test @Order(7) void testCountDoc() {
-		// TODO: change the http method to post on node.
-//		Assertions.assertDoesNotThrow(()->{
-//			ObjectNode filter = JsonNodeFactory.instance.objectNode();
-//			filter.put("author", "john doe1");
-//			Assertions.assertNotNull(databaseService.countDocuments(COLLECTION_NAME, filter,
-//					new CountOptions().setLimit(1L).setSkip(0L).setMaxTimeMS(1000000000L)).get());
-//		});
+		Assertions.assertDoesNotThrow(()->{
+			ObjectNode filter = JsonNodeFactory.instance.objectNode();
+			filter.put("author", "john doe1");
+			Assertions.assertNotNull(databaseService.countDocuments(COLLECTION_NAME, filter,
+					new CountOptions().setLimit(1L).setSkip(0L).setMaxTimeMS(1000000000L)).get());
+		});
 	}
 
 	@Test @Order(8) void testUpdateOne() {
