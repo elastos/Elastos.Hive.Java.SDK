@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class BackupSubscription extends ServiceEndpoint
-	implements SubscriptionService<Backup.PropertySet>, PaymentService {
+	implements SubscriptionService<BackupInfo>, PaymentService {
 
 	private SubscriptionController subscriptionController;
 	private PaymentController paymentController;
@@ -50,19 +50,16 @@ public class BackupSubscription extends ServiceEndpoint
 		});
 	}
 
-	public CompletableFuture<Backup.PropertySet> subscribe() {
+	public CompletableFuture<BackupInfo> subscribe() {
 		return this.subscribe(null);
 	}
 
 	@Override
-	public CompletableFuture<Backup.PropertySet> subscribe(String reserved) {
+	public CompletableFuture<BackupInfo> subscribe(String reserved) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				subscriptionController.subscribeToBackup(null);
-				return getPropertySet();
-			} catch (HiveException e) {
-				throw new CompletionException(e);
-			} catch (RuntimeException e) {
+				return subscriptionController.subscribeToBackup(null);
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -70,29 +67,24 @@ public class BackupSubscription extends ServiceEndpoint
 
 	@Override
 	public CompletableFuture<Void> unsubscribe() {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public CompletableFuture<Backup.PropertySet> checkSubscription() {
-		return CompletableFuture.supplyAsync(()-> {
+		return CompletableFuture.runAsync(()-> {
 			try {
-				return getPropertySet();
-			} catch (Exception e) {
+				subscriptionController.unsubscribeBackup();
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
 	}
 
-	private Backup.PropertySet getPropertySet() throws HiveException {
-		BackupInfo body = subscriptionController.getBackupInfo();
-		// TODO: serviceDid
-		return new Backup.PropertySet()
-				.setPricingPlan(body.getPricingUsing())
-				.setCreated(body.getStartTime())
-				.setUpdated(body.getModifyTime())
-				.setQuota(body.getMaxStorage())
-				.setUsedSpace(body.getFileUseStorage() + body.getDbUseStorage());
+	@Override
+	public CompletableFuture<BackupInfo> checkSubscription() {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				return subscriptionController.getBackupInfo();
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
 	@Override
@@ -100,9 +92,7 @@ public class BackupSubscription extends ServiceEndpoint
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return paymentController.getOrderInfo(paymentController.createOrder(null, planName));
-			} catch (HiveException e) {
-				throw new CompletionException(e);
-			} catch (RuntimeException e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -113,9 +103,7 @@ public class BackupSubscription extends ServiceEndpoint
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return paymentController.getOrderInfo(orderId);
-			} catch (HiveException e) {
-				throw new CompletionException(e);
-			} catch (RuntimeException e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -127,9 +115,7 @@ public class BackupSubscription extends ServiceEndpoint
 			try {
 				paymentController.payOrder(orderId, Collections.singletonList(transactionId));
 				return null;
-			} catch (HiveException e) {
-				throw new CompletionException(e);
-			} catch (RuntimeException e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
