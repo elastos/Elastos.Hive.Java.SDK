@@ -2,7 +2,7 @@ package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
 
-class RegisterScriptResponse {
+class RegScriptResult {
     @SerializedName("acknowledged")
     private Boolean acknowledged;
     @SerializedName("matched_count")
