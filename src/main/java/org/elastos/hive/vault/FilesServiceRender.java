@@ -89,11 +89,10 @@ class FilesServiceRender implements FilesService {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> delete(String path) {
-		return CompletableFuture.supplyAsync(() -> {
+	public CompletableFuture<Void> delete(String path) {
+		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.delete(path);
-				return true;
 			} catch (Exception e) {
 				throw new CompletionException(e);
 			}
@@ -101,11 +100,10 @@ class FilesServiceRender implements FilesService {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> move(String source, String target) {
-		return CompletableFuture.supplyAsync(() -> {
+	public CompletableFuture<Void> move(String source, String target) {
+		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.moveFile(source, target);
-				return true;
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -113,11 +111,10 @@ class FilesServiceRender implements FilesService {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> copy(String source, String target) {
-		return CompletableFuture.supplyAsync(() -> {
+	public CompletableFuture<Void> copy(String source, String target) {
+		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.copyFile(source, target);
-				return true;
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
