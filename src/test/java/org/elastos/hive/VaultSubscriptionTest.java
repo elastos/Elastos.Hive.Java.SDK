@@ -42,6 +42,7 @@ class VaultSubscriptionTest {
 		Assertions.assertDoesNotThrow(()->subscription.subscribe().get());
 	}
 
+	@Disabled
 	@Test @Order(4) void testCheckSubscription() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(subscription.checkSubscription().get()));
 	}
