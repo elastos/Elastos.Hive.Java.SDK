@@ -70,7 +70,7 @@ class FilesServiceRender implements FilesService {
 	public CompletableFuture<InputStream> getDownloadStream(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return controller.download(path, InputStream.class);
+				return controller.getDownloadStream(path);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -81,7 +81,7 @@ class FilesServiceRender implements FilesService {
 	public CompletableFuture<Reader> getDownloadReader(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return controller.download(path, Reader.class);
+				return controller.getDownloadReader(path);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
