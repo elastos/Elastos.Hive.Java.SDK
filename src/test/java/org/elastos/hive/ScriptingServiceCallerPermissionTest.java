@@ -120,7 +120,6 @@ class ScriptingServiceCallerPermissionTest {
     }
 
     private void run_script_without_group_permission() {
-        //TODO:
         Assertions.assertDoesNotThrow(()->{
             JsonNode result = scriptRunner.callScript(SCRIPT_NAME,
                     HiveResponseBody.map2JsonNode(
