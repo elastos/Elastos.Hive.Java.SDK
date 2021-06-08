@@ -25,7 +25,7 @@ public class ScriptingController {
 							boolean allowAnonymousUser,
 							boolean allowAnonymousApp) throws HiveException {
 		try {
-			scriptingAPI.registerScript(name, new RegisterScriptRequest()
+			scriptingAPI.registerScript(name, new RegScriptParams()
 							.setExecutable(executable)
 							.setAllowAnonymousUser(allowAnonymousUser)
 							.setAllowAnonymousApp(allowAnonymousApp)
@@ -45,7 +45,7 @@ public class ScriptingController {
 							Class<T> resultType) throws HiveException {
 		try {
 			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
-					scriptingAPI.runScript(name, new CallScriptRequest()
+					scriptingAPI.runScript(name, new runScriptParams()
 							.setContext(new ScriptContext()
 							.setTargetDid(targetDid)
 							.setTargetAppDid(targetAppDid))

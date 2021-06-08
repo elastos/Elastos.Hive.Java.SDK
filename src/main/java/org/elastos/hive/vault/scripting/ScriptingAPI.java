@@ -8,12 +8,12 @@ interface ScriptingAPI {
 	String API_SCRIPT_UPLOAD = "/api/v2/vault/scripting/stream";
 
 	@PUT("/api/v2/vault/scripting/{scriptName}")
-	Call<RegisterScriptResponse> registerScript(@Path("scriptName") String scriptName,
-												@Body RegisterScriptRequest body);
+	Call<RegScriptResult> registerScript(@Path("scriptName") String name,
+										@Body RegScriptParams body);
 
 	@PATCH("/api/v2/vault/scripting/{scriptName}")
 	Call<ResponseBody> runScript(@Path("scriptName") String scriptName,
-						         @Body CallScriptRequest body);
+						         @Body runScriptParams body);
 
 	@GET("/api/v2/vault/scripting/{scriptName}/{targetDid}@{targetAppDid}/{params}")
 	Call<ResponseBody> runScriptUrl(@Path("scriptName") String scriptName,
