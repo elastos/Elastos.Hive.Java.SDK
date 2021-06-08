@@ -23,8 +23,7 @@ class DatabaseServiceTest {
 
 	@Test @Order(1) void testCreateCollection() {
 		Assertions.assertDoesNotThrow(()->{
-			Boolean isSuccess = databaseService.createCollection(COLLECTION_NAME).get();
-			Assertions.assertTrue(isSuccess);
+			databaseService.createCollection(COLLECTION_NAME).get();
 		});
 	}
 
@@ -134,7 +133,7 @@ class DatabaseServiceTest {
 	}
 
 	@Test @Order(12) void testDeleteCollection() {
-		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(
-				databaseService.deleteCollection(COLLECTION_NAME).get()));
+		Assertions.assertDoesNotThrow(()->
+				databaseService.deleteCollection(COLLECTION_NAME).get());
 	}
 }

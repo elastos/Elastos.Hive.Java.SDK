@@ -18,11 +18,10 @@ class DatabaseServiceRender implements DatabaseService {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> createCollection(String name) {
-		return CompletableFuture.supplyAsync(() -> {
+	public CompletableFuture<Void> createCollection(String name) {
+		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.createCollection(name);
-				return true;
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -30,11 +29,10 @@ class DatabaseServiceRender implements DatabaseService {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> deleteCollection(String name) {
-		return CompletableFuture.supplyAsync(() -> {
+	public CompletableFuture<Void> deleteCollection(String name) {
+		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.deleteCollection(name);
-				return true;
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
