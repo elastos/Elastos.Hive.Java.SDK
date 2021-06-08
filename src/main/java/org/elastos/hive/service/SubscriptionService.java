@@ -55,25 +55,6 @@ public interface SubscriptionService<T> {
 	 */
 	CompletableFuture<Void> unsubscribe();
 
-	/**
-	 * Let user to activate the vault to start the service for data storage.
-	 * Currently this method only would be reserved for future usage.
-	 *
-	 * @return
-	 * 		None would be returned on success, otherwise, the specific exception
-	 *      would be returned.
-	 */
-	CompletableFuture<Void> activate();
-
-	/**
-	 * Deactivate the vault to stop the service for data storage.
-	 * Currently this method only would be reserved for future usage.
-	 *
-	 * @return
-	 * 		None would be returned on success, otherwise, the specific exception
-	 *      would be returned.
-	 */
-	CompletableFuture<Void> deactivate();
 
 	/**
 	 * Let the user to get the basic information of the subscription.

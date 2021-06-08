@@ -1,7 +1,5 @@
 package org.elastos.hive.exception;
 
-import io.jsonwebtoken.io.IOException;
-
 public class UnauthorizedException extends SecurityException {
     private static final long serialVersionUID = -586039279266427101L;
 
@@ -9,7 +7,7 @@ public class UnauthorizedException extends SecurityException {
         super();
     }
 
-    public UnauthorizedException(IOException e) {
+    public UnauthorizedException(RPCException e) {
         super(e.getMessage());
     }
 

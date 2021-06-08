@@ -22,24 +22,37 @@ public class SubscriptionController {
 
 	public List<PricingPlan> getVaultPricingPlanList() throws HiveException {
 		try {
-			return subscriptionAPI.getPricePlans("vault", "").execute().body().getPricingPlanCollection();
+			return subscriptionAPI.getPricePlans("vault", "")
+								.execute()
+								.body()
+								.getPricingPlanCollection();
 		} catch (RPCException e) {
-			throw new UnknownServerException(e);
+			switch (e.getCode()) {
+			case RPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
+			default:
+				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
 	public PricingPlan getVaultPricingPlan(String planName) throws HiveException {
 		try {
-			List<PricingPlan> plans = subscriptionAPI.getPricePlans("vault", planName).execute()
-					.body().getPricingPlanCollection();
-			return plans.isEmpty() ? null : plans.get(0);
+			return subscriptionAPI.getPricePlans("vault", planName)
+								.execute()
+								.body()
+								.getPricingPlanCollection().get(0);
 		} catch (RPCException e) {
-			if (e.getCode() == RPCException.NOT_FOUND)
-				throw new PricingPlanNotFoundException(e.getMessage());
-			else
+			switch (e.getCode()) {
+			case RPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
+			case RPCException.NOT_FOUND:
+				throw new PricingPlanNotFoundException(e);
+			default:
 				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -49,7 +62,13 @@ public class SubscriptionController {
         try {
         	return subscriptionAPI.getVaultInfo().execute().body();
 		} catch (RPCException e) {
-			throw new UnknownServerException(e);
+			switch (e.getCode()) {
+			case RPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
+			// TODO:
+			default:
+				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
 		}
@@ -64,16 +83,14 @@ public class SubscriptionController {
 		} catch (RPCException e) {
 			switch (e.getCode()) {
 			case RPCException.UNAUTHORIZED:
-				throw new UnauthorizedException();
-
+				throw new UnauthorizedException(e);
 			case 200:
 				throw new VaultAlreadyExistsException();
-
 			default:
 				throw new UnknownServerException(e);
 			}
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -81,42 +98,32 @@ public class SubscriptionController {
 		try {
 			subscriptionAPI.unsubscribeVault().execute();
 		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+			switch(e.getCode()) {
+			case RPCException.UNAUTHORIZED:
 				throw new UnauthorizedException();
-			else
+			default:
 				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
-		}
-	}
-
-	public void activateVault() throws HiveException {
-		try {
-			subscriptionAPI.activateVault().execute();
-		} catch (RPCException e) {
-			throw new UnknownServerException(e);
-		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
-		}
-	}
-
-	public void deactivateVault() throws HiveException {
-		try {
-        	subscriptionAPI.deactivateVault().execute();
-		} catch (RPCException e) {
-			throw new UnknownServerException(e);
-		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
 	public List<PricingPlan> getBackupPricingPlanList() throws HiveException {
 		try {
-			return subscriptionAPI.getPricePlans("backup", "").execute().body().getBackupPlans();
+			return subscriptionAPI.getPricePlans("backup", "")
+								.execute()
+								.body()
+								.getBackupPlans();
 		} catch (RPCException e) {
-			throw new UnknownServerException(e);
+			switch (e.getCode()) {
+			case RPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
+			default:
+				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -126,12 +133,16 @@ public class SubscriptionController {
 					.body().getBackupPlans();
 			return plans.isEmpty() ? null : plans.get(0);
 		} catch (RPCException e) {
-			if (e.getCode() == RPCException.NOT_FOUND)
-				throw new PricingPlanNotFoundException(e.getMessage());
-			else
+			switch (e.getCode()) {
+			case RPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
+			case RPCException.NOT_FOUND:
+				throw new PricingPlanNotFoundException(e);
+			default:
 				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -139,9 +150,15 @@ public class SubscriptionController {
         try {
        	 	return subscriptionAPI.getBackupInfo().execute().body();
 		} catch (RPCException e) {
-			throw new UnknownServerException(e);
+			switch (e.getCode()) {
+			case RPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
+			// TODO:
+			default:
+				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -151,16 +168,14 @@ public class SubscriptionController {
 		} catch (RPCException e) {
 			switch (e.getCode()) {
 			case RPCException.UNAUTHORIZED:
-				throw new UnauthorizedException();
-
+				throw new UnauthorizedException(e);
 			case 200:
 				throw new VaultAlreadyExistsException();
-
 			default:
 				throw new UnknownServerException(e);
 			}
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -168,17 +183,14 @@ public class SubscriptionController {
         try {
 			subscriptionAPI.unsubscribeBackup().execute();
 		} catch (RPCException e) {
-			throw new UnknownServerException(e);
+			switch(e.getCode()) {
+			case RPCException.UNAUTHORIZED:
+				throw new UnauthorizedException();
+			default:
+				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
-	}
-
-	public void activateBackup() throws HiveException {
-		throw new NotImplementedException();
-	}
-
-	public void deactivateBackup() throws HiveException {
-		throw new NotImplementedException();
 	}
 }

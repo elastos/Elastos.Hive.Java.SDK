@@ -41,15 +41,6 @@ class BackupSubscriptionTest {
 	}
 
 	@Disabled
-	@Test @Order(4) void testActivate() {
-		Assertions.assertDoesNotThrow(()->subscription.activate().get());
-	}
-
-	@Disabled
-	@Test @Order(5) void testDeactivate() {
-	}
-
-	@Disabled
 	@Test @Order(6) void testUnsubscribe() {
 		Assertions.assertDoesNotThrow(()->subscription.unsubscribe().get());
 	}

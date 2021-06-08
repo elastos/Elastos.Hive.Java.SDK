@@ -74,16 +74,6 @@ public class BackupSubscription extends ServiceEndpoint
 	}
 
 	@Override
-	public CompletableFuture<Void> activate() {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public CompletableFuture<Void> deactivate() {
-		throw new NotImplementedException();
-	}
-
-	@Override
 	public CompletableFuture<Backup.PropertySet> checkSubscription() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {

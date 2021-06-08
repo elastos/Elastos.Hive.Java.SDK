@@ -149,10 +149,10 @@ class FilesServiceTest {
 
 	@Disabled
 	@Test void testVaultLockException() {
-		Assertions.assertDoesNotThrow(() -> subscription.deactivate().get());
+		// Assertions.assertDoesNotThrow(() -> subscription.deactivate().get());
 		VaultLockedException e = Assertions.assertThrows(VaultLockedException.class, this::uploadTextReally);
 		Assertions.assertNotNull(e);
-		Assertions.assertDoesNotThrow(() -> subscription.activate().get());
+		// Assertions.assertDoesNotThrow(() -> subscription.activate().get());
 	}
 
 	private static void verifyRemoteFileExists(String path) {
