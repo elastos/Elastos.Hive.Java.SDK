@@ -93,7 +93,7 @@ class FilesServiceRender implements FilesService {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.delete(path);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});

@@ -9,6 +9,8 @@ import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
+import org.elastos.hive.exception.NodeRPCException;
+import org.elastos.hive.exception.UnknownServerException;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -26,18 +28,22 @@ public class DatabaseController {
 	public void createCollection(String collectionName) throws HiveException {
 		try {
 			databaseAPI.createCollection(collectionName).execute();
-		} catch (IOException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
-			throw new NetworkException(e.getMessage());
+			throw new UnknownServerException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e);
 		}
 	}
 
 	public void deleteCollection(String collectionName) throws HiveException {
 		try {
 			databaseAPI.deleteCollection(collectionName).execute();
-		} catch (IOException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
-			throw new NetworkException(e.getMessage());
+			throw new UnknownServerException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e);
 		}
 	}
 
@@ -73,9 +79,11 @@ public class DatabaseController {
 					.setDocuments(jsonNodeList2KeyValueDicList(docs))
 					.setOptions(options)
 			).execute().body();
-		} catch (IOException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
-			throw new NetworkException(e.getMessage());
+			throw new UnknownServerException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e);
 		}
 	}
 
@@ -88,18 +96,22 @@ public class DatabaseController {
 					.setUpdate(jsonNode2KeyValueDic(update))
 					.setOptions(options)
 			).execute().body();
-		} catch (IOException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
-			throw new NetworkException(e.getMessage());
+			throw new UnknownServerException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e);
 		}
 	}
 
 	public void deleteMany(String collectionName, JsonNode filter) throws HiveException {
 		try {
 			databaseAPI.delete(collectionName, new DeleteRequest(jsonNode2KeyValueDic(filter))).execute();
-		} catch (IOException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
-			throw new NetworkException(e.getMessage());
+			throw new UnknownServerException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e);
 		}
 	}
 
@@ -107,9 +119,11 @@ public class DatabaseController {
 		try {
 			return databaseAPI.count(collectionName, new CountRequest(jsonNode2KeyValueDic(filter), options))
 					.execute().body().getCount();
-		} catch (IOException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
-			throw new NetworkException(e.getMessage());
+			throw new UnknownServerException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e);
 		}
 	}
 
@@ -120,9 +134,11 @@ public class DatabaseController {
 			return HiveResponseBody.KeyValueDictList2JsonNodeList(
 					databaseAPI.find(collectionName, jsonNode2Str(filter), skip, limit)
 							.execute().body().getItems());
-		} catch (IOException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
-			throw new NetworkException(e.getMessage());
+			throw new UnknownServerException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e);
 		}
 	}
 
@@ -134,9 +150,11 @@ public class DatabaseController {
 							.setFilter(jsonNode2KeyValueDic(filter))
 							.setOptions(options)
 					).execute().body().getItems());
-		} catch (IOException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
-			throw new NetworkException(e.getMessage());
+			throw new UnknownServerException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e);
 		}
 	}
 }

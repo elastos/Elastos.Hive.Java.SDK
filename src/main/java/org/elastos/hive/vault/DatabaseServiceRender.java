@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.Vault;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.vault.database.*;
+import org.elastos.hive.exception.HiveException;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -22,7 +23,7 @@ class DatabaseServiceRender implements DatabaseService {
 			try {
 				controller.createCollection(name);
 				return true;
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -34,7 +35,7 @@ class DatabaseServiceRender implements DatabaseService {
 			try {
 				controller.deleteCollection(name);
 				return true;
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -45,7 +46,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.insertOne(collection, doc, options);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -56,7 +57,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.insertMany(collection, docs, options);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -67,7 +68,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.countDocuments(collection, query, options);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -83,7 +84,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.find(collection, query, options);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -94,7 +95,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.query(collection, query, options);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -110,7 +111,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return controller.updateMany(collection, filter, update, options);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -126,7 +127,7 @@ class DatabaseServiceRender implements DatabaseService {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.deleteMany(collection, filter);
-			} catch (Exception e) {
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
