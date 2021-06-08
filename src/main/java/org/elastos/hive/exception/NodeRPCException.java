@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * Main error response exception for internal usage.
  */
-public class RPCException extends IOException {
+public class NodeRPCException extends IOException {
     private static final long serialVersionUID = 1L;
 
     public static final int BAD_REQUEST     = 400;
@@ -15,7 +15,7 @@ public class RPCException extends IOException {
     private final int code;
     private final int internalCode;
 
-    public RPCException(int code, int internalCode, String message) {
+    public NodeRPCException(int code, int internalCode, String message) {
         super(message);
         this.code = code;
         this.internalCode = internalCode;

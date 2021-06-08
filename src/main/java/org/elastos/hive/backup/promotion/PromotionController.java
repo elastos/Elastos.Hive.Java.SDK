@@ -6,7 +6,7 @@ import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.EmptyRequestBody;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.RPCException;
+import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.exception.UnknownServerException;
 
 public class PromotionController {
@@ -19,7 +19,7 @@ public class PromotionController {
 	public void promote() throws HiveException {
 		try {
 			api.activeToVault(new EmptyRequestBody()).execute().body();
-		} catch (RPCException e) {
+		} catch (NodeRPCException e) {
 			throw new UnknownServerException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
