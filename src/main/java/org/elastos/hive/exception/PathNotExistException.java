@@ -11,7 +11,7 @@ public class PathNotExistException extends EntityNotFoundException {
         super(message);
     }
 
-    public PathNotExistException(RPCException e) {
+    public PathNotExistException(NodeRPCException e) {
         super(e.getMessage());
     }
 }

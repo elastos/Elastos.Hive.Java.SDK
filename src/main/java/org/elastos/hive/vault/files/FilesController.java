@@ -15,7 +15,7 @@ import org.elastos.hive.connection.UploadOutputStreamWriter;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.PathNotExistException;
-import org.elastos.hive.exception.RPCException;
+import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.exception.UnauthorizedException;
 import org.elastos.hive.exception.UnknownServerException;
 
@@ -32,12 +32,12 @@ public class FilesController {
 		try {
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
 			return new UploadOutputStream(urlConnection, urlConnection.getOutputStream());
-		} catch (RPCException e) {
+		} catch (NodeRPCException e) {
 			int httpCode = e.getCode();
 
-			if (httpCode == RPCException.UNAUTHORIZED)
+			if (httpCode == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException(e);
-			else if (httpCode == RPCException.NOT_FOUND)
+			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
@@ -50,12 +50,12 @@ public class FilesController {
 		try {
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
 			return new UploadOutputStreamWriter(urlConnection, urlConnection.getOutputStream());
-		} catch (RPCException e) {
+		} catch (NodeRPCException e) {
 			int httpCode = e.getCode();
 
-			if (httpCode == RPCException.UNAUTHORIZED)
+			if (httpCode == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException(e);
-			else if (httpCode == RPCException.NOT_FOUND)
+			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
@@ -67,10 +67,10 @@ public class FilesController {
 	public InputStream getDownloadStream(String path) throws HiveException {
 		try {
 			return HiveResponseBody.getResponseStream(filesAPI.download(path).execute(), InputStream.class);
-		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+		} catch (NodeRPCException e) {
+			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (e.getCode() == RPCException.NOT_FOUND)
+			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
@@ -82,10 +82,10 @@ public class FilesController {
 	public Reader getDownloadReader(String path) throws HiveException {
 		try {
 			return HiveResponseBody.getResponseStream(filesAPI.download(path).execute(), Reader.class);
-		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+		} catch (NodeRPCException e) {
+			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (e.getCode() == RPCException.NOT_FOUND)
+			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
@@ -97,12 +97,12 @@ public class FilesController {
 	public List<FileInfo> listChildren(String path) throws HiveException {
 		try {
 			return filesAPI.listChildren(path).execute().body().getValue();
-		} catch (RPCException e) {
+		} catch (NodeRPCException e) {
 			int httpCode = e.getCode();
 
-			if (httpCode == RPCException.UNAUTHORIZED)
+			if (httpCode == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (httpCode == RPCException.NOT_FOUND)
+			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
@@ -114,10 +114,10 @@ public class FilesController {
 	public void copyFile(String srcPath, String destPath) throws HiveException {
 		try {
 			filesAPI.copy(srcPath, destPath).execute();
-		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+		} catch (NodeRPCException e) {
+			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (e.getCode() == RPCException.NOT_FOUND)
+			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
@@ -129,10 +129,10 @@ public class FilesController {
 	public void moveFile(String srcPath, String destPath) throws HiveException {
 		try {
 			filesAPI.move(srcPath, destPath).execute();
-		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+		} catch (NodeRPCException e) {
+			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (e.getCode() == RPCException.NOT_FOUND)
+			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
@@ -144,10 +144,10 @@ public class FilesController {
 	public void delete(String path) throws HiveException {
 		try {
 			filesAPI.delete(path).execute();
-		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+		} catch (NodeRPCException e) {
+			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (e.getCode() == RPCException.NOT_FOUND)
+			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
@@ -159,10 +159,10 @@ public class FilesController {
 	public FileInfo getProperty(String path) throws HiveException {
 		try {
 			return filesAPI.getMetadata(path).execute().body();
-		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+		} catch (NodeRPCException e) {
+			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (e.getCode() == RPCException.NOT_FOUND)
+			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
@@ -174,10 +174,10 @@ public class FilesController {
 	public String getHash(String path) throws HiveException {
 		try {
 			return filesAPI.getHash(path).execute().body().getHash();
-		} catch (RPCException e) {
-			if (e.getCode() == RPCException.UNAUTHORIZED)
+		} catch (NodeRPCException e) {
+			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
-			else if (e.getCode() == RPCException.NOT_FOUND)
+			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);

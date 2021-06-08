@@ -7,7 +7,7 @@ public class UnauthorizedException extends SecurityException {
         super();
     }
 
-    public UnauthorizedException(RPCException e) {
+    public UnauthorizedException(NodeRPCException e) {
         super(e.getMessage());
     }
 

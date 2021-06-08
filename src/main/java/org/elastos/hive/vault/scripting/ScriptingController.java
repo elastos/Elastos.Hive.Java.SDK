@@ -5,7 +5,7 @@ import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.RPCException;
+import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.exception.UnknownServerException;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class ScriptingController {
 							.setAllowAnonymousApp(allowAnonymousApp)
 							.setCondition(condition))
 							.execute().body();
-		} catch (RPCException e) {
+		} catch (NodeRPCException e) {
 			e.printStackTrace();
 			// TODO:
 		} catch (IOException e) {
@@ -51,7 +51,7 @@ public class ScriptingController {
 							.setTargetAppDid(targetAppDid))
 							.setParams(HiveResponseBody.jsonNode2Map(params)))
 							.execute(), false), resultType);
-		} catch (RPCException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
 			throw new UnknownServerException(e);
 		} catch (IOException e) {
@@ -69,7 +69,7 @@ public class ScriptingController {
 			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
 					scriptingAPI.runScriptUrl(name, targetDid, targetAppDid, params)
 							.execute(), false), resultType);
-		} catch (RPCException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
 			throw new UnknownServerException(e);
 		} catch (IOException e) {
@@ -84,7 +84,7 @@ public class ScriptingController {
 			return HiveResponseBody.getRequestStream(
 					connectionManager.openConnection(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId),
 					resultType);
-		} catch (RPCException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
 			throw new UnknownServerException(e);
 		} catch (IOException e) {
@@ -97,7 +97,7 @@ public class ScriptingController {
 	public <T> T downloadFile(String transactionId, Class<T> resultType) throws HiveException {
 		try {
 			return HiveResponseBody.getResponseStream(scriptingAPI.downloadFile(transactionId).execute(), resultType);
-		} catch (RPCException e) {
+		} catch (NodeRPCException e) {
 			// TODO:
 			throw new UnknownServerException(e);
 		} catch (IOException e) {
