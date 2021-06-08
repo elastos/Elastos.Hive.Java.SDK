@@ -10,4 +10,8 @@ public class PricingPlanNotFoundException extends EntityNotFoundException {
     public PricingPlanNotFoundException(String message) {
         super(message);
     }
+
+    public PricingPlanNotFoundException(RPCException e) {
+        super(e.getMessage());
+    }
 }

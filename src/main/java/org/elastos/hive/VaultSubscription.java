@@ -78,28 +78,6 @@ public class VaultSubscription extends ServiceEndpoint
 	}
 
 	@Override
-	public CompletableFuture<Void> activate() {
-		return CompletableFuture.runAsync(()-> {
-			try {
-				subscriptionController.activateVault();
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
-	}
-
-	@Override
-	public CompletableFuture<Void> deactivate() {
-		return CompletableFuture.runAsync(()-> {
-			try {
-				subscriptionController.deactivateVault();
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
-	}
-
-	@Override
 	public CompletableFuture<VaultInfo> checkSubscription() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
