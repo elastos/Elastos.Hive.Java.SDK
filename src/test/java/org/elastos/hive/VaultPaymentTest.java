@@ -24,7 +24,7 @@ class VaultPaymentTest {
         });
     }
 
-    @Test
+    @Test @Disabled
     @org.junit.jupiter.api.Order(3)
     void testOrderProcess() {
         Assertions.assertDoesNotThrow(()->{
