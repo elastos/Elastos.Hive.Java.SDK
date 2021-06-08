@@ -1,5 +1,6 @@
 package org.elastos.hive.vault.database;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +11,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,6 +47,16 @@ public class DatabaseController {
 
 	public static List<KeyValueDict> jsonNodeList2KeyValueDicList(List<JsonNode> docs) {
 		return docs.stream().map(DatabaseController::jsonNode2KeyValueDic).collect(Collectors.toList());
+	}
+
+	public static String jsonNode2Str(JsonNode node) {
+		if (node == null)
+			return "";
+		try {
+			return new ObjectMapper().writeValueAsString(node);
+		} catch (JsonProcessingException e) {
+			throw new InvalidParameterException("Invalid parameter of json node.");
+		}
 	}
 
 	public InsertResult insertOne(String collectionName,
@@ -103,10 +115,11 @@ public class DatabaseController {
 
 	public List<JsonNode> find(String collectionName, JsonNode filter, FindOptions options) throws HiveException {
 		try {
+			String skip = options != null ? options.getSkipStr() : "";
+			String limit = options != null ? options.getLimitStr() : "";
 			return HiveResponseBody.KeyValueDictList2JsonNodeList(
-					databaseAPI.find(collectionName,
-							jsonNode2KeyValueDic(filter), options.getSkip(), options.getLimit())
-					.execute().body().getItems());
+					databaseAPI.find(collectionName, jsonNode2Str(filter), skip, limit)
+							.execute().body().getItems());
 		} catch (IOException e) {
 			// TODO:
 			throw new NetworkException(e.getMessage());
