@@ -10,6 +10,7 @@ import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.NodeRPCException;
+import org.elastos.hive.exception.UnauthorizedException;
 import org.elastos.hive.exception.UnknownServerException;
 
 import java.io.IOException;
@@ -27,10 +28,21 @@ public class DatabaseController {
 
 	public void createCollection(String collectionName) throws HiveException {
 		try {
-			databaseAPI.createCollection(collectionName).execute();
+			CreateCollectionResult result;
+
+			result = databaseAPI.createCollection(collectionName).execute().body();
+			if (!collectionName.equals(result.getName()))
+				throw new UnknownServerException("Different collection created, impossible");
+
 		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+			case NodeRPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
 			// TODO:
-			throw new UnknownServerException(e);
+			// case1: collection already exist.
+			default:
+				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -40,8 +52,12 @@ public class DatabaseController {
 		try {
 			databaseAPI.deleteCollection(collectionName).execute();
 		} catch (NodeRPCException e) {
-			// TODO:
-			throw new UnknownServerException(e);
+			switch (e.getCode()) {
+			case NodeRPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
+			default:
+				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}

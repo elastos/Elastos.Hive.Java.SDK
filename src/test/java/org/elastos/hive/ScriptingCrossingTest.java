@@ -74,7 +74,7 @@ class ScriptingCrossingTest {
             docNode.put("collection", COLLECTION_GROUP_MESSAGE);
             docNode.put("did", callDid);
             databaseService.insertOne(COLLECTION_GROUP, docNode,
-                    new InsertOptions().setBypassDocumentValidation(false)).get();
+                    new InsertOptions().bypassDocumentValidation(false)).get();
         });
     }
 
