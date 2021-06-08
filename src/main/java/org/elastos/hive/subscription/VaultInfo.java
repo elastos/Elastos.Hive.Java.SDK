@@ -3,22 +3,17 @@ package org.elastos.hive.subscription;
 import com.google.gson.annotations.SerializedName;
 
 public class VaultInfo {
-    @SerializedName("serviceDid")
+    @SerializedName("service_did")
     private String serviceDid;
-
-    @SerializedName("storageQuota")
+    @SerializedName("storage_quota")
     private int storageQuota;
-
-    @SerializedName("storageUsed")
+    @SerializedName("storage_used")
     private int storageUsed;
-
     @SerializedName("created")
     private long created;
-
     @SerializedName("updated")
     private long updated;
-
-    @SerializedName("pricePlan")
+    @SerializedName("price_plan")
     private String pricePlan;
 
     public String getServiceDid() {

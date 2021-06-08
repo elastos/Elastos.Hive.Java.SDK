@@ -1,11 +1,7 @@
 package org.elastos.hive;
 
-import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.service.*;
-import org.elastos.hive.subscription.VaultInfo;
 import org.elastos.hive.vault.ServiceBuilder;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
@@ -45,9 +41,5 @@ public class Vault extends ServiceEndpoint {
 
 	public BackupService getBackupService() {
 		return this.backupService;
-	}
-
-	public CompletableFuture<VaultInfo> getInfo() {
-		throw new NotImplementedException();
 	}
 }

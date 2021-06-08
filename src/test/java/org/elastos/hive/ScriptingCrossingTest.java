@@ -17,7 +17,7 @@ import org.junit.jupiter.api.*;
 
 @Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ScriptingServiceCallerPermissionTest {
+class ScriptingCrossingTest {
 
     private static final String COLLECTION_GROUP = "st_group";
     private static final String COLLECTION_GROUP_MESSAGE = "st_group_message";

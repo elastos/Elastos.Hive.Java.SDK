@@ -3,56 +3,40 @@ package org.elastos.hive.subscription;
 import com.google.gson.annotations.SerializedName;
 
 public class BackupInfo {
-    private String did;
-    @SerializedName("max_storage")
-    private long maxStorage;
-    @SerializedName("file_use_storage")
-    private long fileUseStorage;
-    @SerializedName("db_use_storage")
-    private long dbUseStorage;
-    @SerializedName("modify_time")
-    private long modifyTime;
-    @SerializedName("start_time")
-    private long startTime;
-    @SerializedName("end_time")
-    private long endTime;
-    @SerializedName("pricing_using")
-    private String pricingUsing;
-    private String state;
+    @SerializedName("service_did")
+    private String serviceDid;
+    @SerializedName("storage_quota")
+    private int storageQuota;
+    @SerializedName("storage_used")
+    private int storageUsed;
+    @SerializedName("created")
+    private long created;
+    @SerializedName("updated")
+    private long updated;
+    @SerializedName("price_plan")
+    private String pricePlan;
 
-    public String getDid() {
-        return did;
+    public String getServiceDid() {
+        return serviceDid;
     }
 
-    public long getMaxStorage() {
-        return maxStorage;
+    public int getStorageQuota() {
+        return storageQuota;
     }
 
-    public long getFileUseStorage() {
-        return fileUseStorage;
+    public int getStorageUsed() {
+        return storageUsed;
     }
 
-    public long getDbUseStorage() {
-        return dbUseStorage;
+    public long getCreated() {
+        return created;
     }
 
-    public long getModifyTime() {
-        return modifyTime;
+    public long getUpdated() {
+        return updated;
     }
 
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public long getEndTime() {
-        return endTime;
-    }
-
-    public String getPricingUsing() {
-        return pricingUsing;
-    }
-
-    public String getState() {
-        return state;
+    public String getPricePlan() {
+        return pricePlan;
     }
 }
