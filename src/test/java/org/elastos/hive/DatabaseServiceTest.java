@@ -33,23 +33,28 @@ class DatabaseServiceTest {
 			docNode.put("author", "john doe1");
 			docNode.put("title", "Eve for Dummies1");
 			Assertions.assertNotNull(databaseService.insertOne(COLLECTION_NAME, docNode,
-					new InsertOptions().setBypassDocumentValidation(false)).get());
+					new InsertOptions().bypassDocumentValidation(false)).get());
 		});
 	}
 
 	@Test @Order(3) void testInsertMany() {
 		Assertions.assertDoesNotThrow(()->{
 			List<JsonNode> nodes = new ArrayList<>();
-			ObjectNode docNode1 = JsonNodeFactory.instance.objectNode();
-			docNode1.put("author", "john doe2");
-			docNode1.put("title", "Eve for Dummies2");
-			nodes.add(docNode1);
-			ObjectNode docNode2 = JsonNodeFactory.instance.objectNode();
-			docNode2.put("author", "john doe3");
-			docNode2.put("title", "Eve for Dummies3");
-			nodes.add(docNode2);
+
+			ObjectNode doc = JsonNodeFactory.instance.objectNode();
+			doc.put("author", "john doe2");
+			doc.put("title", "Eve for Dummies2");
+			nodes.add(doc);
+
+			doc.removeAll();
+
+			doc = JsonNodeFactory.instance.objectNode();
+			doc.put("author", "john doe3");
+			doc.put("title", "Eve for Dummies3");
+			nodes.add(doc);
+
 			Assertions.assertNotNull(databaseService.insertMany(COLLECTION_NAME, nodes,
-					new InsertOptions().setBypassDocumentValidation(false).setOrdered(true)).get());
+					new InsertOptions().bypassDocumentValidation(false).ordered(true)).get());
 		});
 	}
 
