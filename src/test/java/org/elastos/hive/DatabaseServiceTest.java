@@ -76,7 +76,15 @@ class DatabaseServiceTest {
 		});
 	}
 
-	@Test @Order(6) void testCountDoc() {
+	@Test @Order(6) void testQuery() {
+		Assertions.assertDoesNotThrow(()->{
+			ObjectNode query = JsonNodeFactory.instance.objectNode();
+			query.put("author", "john doe1");
+			Assertions.assertNotNull(databaseService.query(COLLECTION_NAME, query, null).get());
+		});
+	}
+
+	@Test @Order(7) void testCountDoc() {
 		// TODO: change the http method to post on node.
 //		Assertions.assertDoesNotThrow(()->{
 //			ObjectNode filter = JsonNodeFactory.instance.objectNode();
@@ -86,7 +94,7 @@ class DatabaseServiceTest {
 //		});
 	}
 
-	@Test @Order(7) void testUpdateOne() {
+	@Test @Order(8) void testUpdateOne() {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe1");
@@ -100,7 +108,7 @@ class DatabaseServiceTest {
 		});
 	}
 
-	@Test @Order(8) void testUpdateMany() {
+	@Test @Order(9) void testUpdateMany() {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe1");
@@ -114,7 +122,7 @@ class DatabaseServiceTest {
 		});
 	}
 
-	@Test @Order(9) void testDeleteOne() {
+	@Test @Order(10) void testDeleteOne() {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe2");
@@ -122,7 +130,7 @@ class DatabaseServiceTest {
 		});
 	}
 
-	@Test @Order(10) void testDeleteMany() {
+	@Test @Order(11) void testDeleteMany() {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe2");
@@ -130,7 +138,7 @@ class DatabaseServiceTest {
 		});
 	}
 
-	@Test @Order(11) void testDeleteCollection() {
+	@Test @Order(12) void testDeleteCollection() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(
 				databaseService.deleteCollection(COLLECTION_NAME).get()));
 	}
