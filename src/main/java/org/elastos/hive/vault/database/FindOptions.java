@@ -1,15 +1,15 @@
 package org.elastos.hive.vault.database;
 
 public class FindOptions {
-	private long skip;
-	private long limit;
+	private Integer skip;
+	private Integer limit;
 
-	public FindOptions setSkip(long skip) {
+	public FindOptions setSkip(Integer skip) {
 		this.skip = skip;
 		return this;
 	}
 
-	public FindOptions setLimit(long limit) {
+	public FindOptions setLimit(Integer limit) {
 		this.limit = limit;
 		return this;
 	}
@@ -18,7 +18,15 @@ public class FindOptions {
 		return skip;
 	}
 
+	public String getSkipStr() {
+		return skip != null ? String.valueOf(skip) : "";
+	}
+
 	public long getLimit() {
 		return limit;
+	}
+
+	public String getLimitStr() {
+		return limit != null ? String.valueOf(limit) : "";
 	}
 }

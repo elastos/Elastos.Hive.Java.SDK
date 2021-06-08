@@ -11,27 +11,27 @@ interface DatabaseAPI {
 	@DELETE("/api/v2/vault/db/{collectionName}")
 	Call<Void> deleteCollection(@Path("collectionName") String collectionName);
 
-	@POST("/api/v2/vault/db/collection/{collection_name}")
+	@POST("/api/v2/vault/db/collection/{collectionName}")
 	Call<InsertResult> insert(@Path("collectionName") String collectionName,
 							  @Body InsertRequest body);
 
-	@PATCH("/api/v2/vault/db/collection/{collection_name}")
+	@PATCH("/api/v2/vault/db/collection/{collectionName}")
 	Call<UpdateResult> update(@Path("collectionName") String collectionName,
 							  @Body UpdateRequest body);
 
-	@DELETE("/api/v2/vault/db/collection/{collection_name}")
+	@HTTP(method = "DELETE", path = "/api/v2/vault/db/collection/{collectionName}", hasBody = true)
 	Call<Void> delete(@Path("collectionName") String collectionName,
 					  @Body DeleteRequest body);
 
-	@GET("/api/v2/vault/db/collection/{collection_name}?op=count")
+	@POST("/api/v2/vault/db/collection/{collectionName}?op=count")
 	Call<CountResult> count(@Path("collectionName") String collectionName,
 							@Body CountRequest body);
 
-	@GET("/api/v2/vault/db/{collection_name}")
+	@GET("/api/v2/vault/db/{collectionName}")
 	Call<QueryResult> find(@Path("collectionName") String collectionName,
-						   @Query("filter") KeyValueDict filter,
-						   @Query("skip") Long skip,
-						   @Query("limit") Long limit);
+						   @Query("filter") String filter,
+						   @Query("skip") String skip,
+						   @Query("limit") String limit);
 
 	@POST("/api/v2/vault/db/query")
 	Call<QueryResult> query(@Body QueryRequest body);
