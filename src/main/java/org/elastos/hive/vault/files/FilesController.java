@@ -1,7 +1,9 @@
 package org.elastos.hive.vault.files;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -34,13 +36,13 @@ public class FilesController {
 			int httpCode = e.getCode();
 
 			if (httpCode == RPCException.UNAUTHORIZED)
-				throw new UnauthorizedException();
+				throw new UnauthorizedException(e);
 			else if (httpCode == RPCException.NOT_FOUND)
-				throw new PathNotExistException(e.getMessage());
+				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -52,28 +54,43 @@ public class FilesController {
 			int httpCode = e.getCode();
 
 			if (httpCode == RPCException.UNAUTHORIZED)
-				throw new UnauthorizedException();
+				throw new UnauthorizedException(e);
 			else if (httpCode == RPCException.NOT_FOUND)
-				throw new PathNotExistException(e.getMessage());
+				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
-	public <T> T download(String path, Class<T> resultType) throws HiveException {
+	public InputStream getDownloadStream(String path) throws HiveException {
 		try {
-			return HiveResponseBody.getResponseStream(filesAPI.download(path).execute(), resultType);
+			return HiveResponseBody.getResponseStream(filesAPI.download(path).execute(), InputStream.class);
 		} catch (RPCException e) {
 			if (e.getCode() == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
 			else if (e.getCode() == RPCException.NOT_FOUND)
-				throw new PathNotExistException(e.getMessage());
+				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
+		}
+	}
+
+	public Reader getDownloadReader(String path) throws HiveException {
+		try {
+			return HiveResponseBody.getResponseStream(filesAPI.download(path).execute(), Reader.class);
+		} catch (RPCException e) {
+			if (e.getCode() == RPCException.UNAUTHORIZED)
+				throw new UnauthorizedException();
+			else if (e.getCode() == RPCException.NOT_FOUND)
+				throw new PathNotExistException(e);
+			else
+				throw new UnknownServerException(e);
+		} catch (IOException e) {
+			throw new NetworkException(e);
 		}
 	}
 
@@ -86,11 +103,11 @@ public class FilesController {
 			if (httpCode == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
 			else if (httpCode == RPCException.NOT_FOUND)
-				throw new PathNotExistException(e.getMessage());
+				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -101,11 +118,11 @@ public class FilesController {
 			if (e.getCode() == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
 			else if (e.getCode() == RPCException.NOT_FOUND)
-				throw new PathNotExistException(e.getMessage());
+				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -116,11 +133,11 @@ public class FilesController {
 			if (e.getCode() == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
 			else if (e.getCode() == RPCException.NOT_FOUND)
-				throw new PathNotExistException(e.getMessage());
+				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -131,11 +148,11 @@ public class FilesController {
 			if (e.getCode() == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
 			else if (e.getCode() == RPCException.NOT_FOUND)
-				throw new PathNotExistException(e.getMessage());
+				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -146,11 +163,11 @@ public class FilesController {
 			if (e.getCode() == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
 			else if (e.getCode() == RPCException.NOT_FOUND)
-				throw new PathNotExistException(e.getMessage());
+				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 
@@ -161,11 +178,11 @@ public class FilesController {
 			if (e.getCode() == RPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
 			else if (e.getCode() == RPCException.NOT_FOUND)
-				throw new PathNotExistException(e.getMessage());
+				throw new PathNotExistException(e);
 			else
 				throw new UnknownServerException(e);
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
 	}
 }
