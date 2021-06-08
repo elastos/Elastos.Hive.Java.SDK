@@ -52,7 +52,7 @@ public class VaultSubscription extends ServiceEndpoint
 	}
 
 	public CompletableFuture<VaultInfo> subscribe() {
-		return this.subscribe("");
+		return this.subscribe(null);
 	}
 
 	@Override
