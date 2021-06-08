@@ -334,16 +334,16 @@ class ScriptingServiceTest {
 	 * If exists, also return OK(_status).
 	 */
 	private static void create_test_database() {
-		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(
-				databaseService.createCollection(COLLECTION_NAME).get()));
+		Assertions.assertDoesNotThrow(()->
+				databaseService.createCollection(COLLECTION_NAME).get());
 	}
 
 	/**
 	 * If not exists, also return OK(_status).
 	 */
 	private static void remove_test_database() {
-		Assertions.assertDoesNotThrow(()->Assertions.assertTrue(
-				databaseService.deleteCollection(COLLECTION_NAME).get()));
+		Assertions.assertDoesNotThrow(() ->
+				databaseService.deleteCollection(COLLECTION_NAME).get());
 	}
 
 }

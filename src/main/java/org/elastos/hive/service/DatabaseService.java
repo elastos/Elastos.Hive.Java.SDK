@@ -16,7 +16,7 @@ public interface DatabaseService {
 	 * @param name the collection name
 	 * @return fail(false) or success(true)
 	 */
-	CompletableFuture<Boolean> createCollection(String name);
+	CompletableFuture<Void> createCollection(String name);
 
 
 	/**
@@ -24,7 +24,7 @@ public interface DatabaseService {
 	 * @param name the collection name
 	 * @return fail(false) or success(true)
 	 */
-	CompletableFuture<Boolean> deleteCollection(String name);
+	CompletableFuture<Void> deleteCollection(String name);
 
 
 	/**
