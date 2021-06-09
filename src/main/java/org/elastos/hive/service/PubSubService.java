@@ -1,7 +1,5 @@
 package org.elastos.hive.service;
 
-import org.elastos.hive.vault.pubsub.ChannelMessage;
-
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,5 +24,5 @@ public interface PubSubService {
 
     CompletableFuture<Boolean> push(String channelName, String message);
 
-    CompletableFuture<List<ChannelMessage>> pop(String channelName, String pubDid, String pubAppId, int limit);
+    // CompletableFuture<List<ChannelMessage>> pop(String channelName, String pubDid, String pubAppId, int limit);
 }

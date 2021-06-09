@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.service.*;
 import org.elastos.hive.vault.ServiceBuilder;
 
@@ -10,7 +11,6 @@ public class Vault extends ServiceEndpoint {
 	private FilesService 	filesService;
 	private DatabaseService databaseService;
 	private ScriptingService scriptingService;
-	private PubSubService pubsubService;
 	private BackupService 	backupService;
 
 	public Vault(AppContext context, String providerAddress) {
@@ -18,7 +18,6 @@ public class Vault extends ServiceEndpoint {
 
 		this.filesService 	= new ServiceBuilder(this).createFilesService();
 		this.databaseService = new ServiceBuilder(this).createDatabase();
-		this.pubsubService 	= new ServiceBuilder(this).createPubsubService();
 		this.backupService 	= new ServiceBuilder(this).createBackupService();
 		this.scriptingService = new ServiceBuilder(this).createScriptingService();
 	}
@@ -35,11 +34,11 @@ public class Vault extends ServiceEndpoint {
 		return this.scriptingService;
 	}
 
-	public PubSubService getPubSubService() {
-		return this.pubsubService;
-	}
-
 	public BackupService getBackupService() {
 		return this.backupService;
+	}
+
+	public PubSubService getPubSubService() {
+		throw new NotImplementedException();
 	}
 }
