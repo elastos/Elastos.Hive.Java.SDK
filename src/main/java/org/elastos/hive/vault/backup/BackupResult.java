@@ -1,19 +1,19 @@
 package org.elastos.hive.vault.backup;
 
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.BackupService;
 
 import java.io.IOException;
 
-class BackupStateResponseBody extends HiveResponseBody {
-    @SerializedName("hive_backup_state")
-    private String hiveBackupState;
+class BackupResult {
+    @SerializedName("state")
+    private String state;
+
     @SerializedName("result")
     private String result;
 
     public BackupService.BackupResult getStatusResult() throws IOException {
-        switch (hiveBackupState) {
+        switch (state) {
             case "stop":
                 return BackupService.BackupResult.STATE_STOP;
             case "backup":
