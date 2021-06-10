@@ -39,14 +39,30 @@ public interface FilesService {
 	CompletableFuture<Reader> getDownloadReader(String path);
 
 	/**
-	 * Deletes a file, or a folder. In case the given path is a folder,
-	 * deletion is recursive.
+	 * Returns the list of all files in a given folder.
+	 *
+	 * @param path the path for the remote folder
+	 * @return the new CompletionStage, the result is List if success; null otherwise
+	 */
+	CompletableFuture<List<FileInfo>> list(String path);
+
+	/**
+	 * Information about the target file or folder.
 	 *
 	 * @param path the path for the remote file or folder
-	 * @return the new CompletionStage, the result is true if the file or folder
-	 *         successfully deleted; false otherwise
+	 * @return the new CompletionStage, the result is FileInfo
+	 *         if success; null otherwise
 	 */
-	CompletableFuture<Void> delete(String path);
+	CompletableFuture<FileInfo> stat(String path);
+
+	/**
+	 * Returns the SHA256 hash of the given file.
+	 *
+	 * @param path path for the remote file
+	 * @return the new CompletionStage, the result is the base64 hash string
+	 *         if the hash successfully calculated; null otherwise
+	 */
+	CompletableFuture<String> hash(String path);
 
 	/**
 	 * Moves (or renames) a file or folder.
@@ -71,28 +87,12 @@ public interface FilesService {
 	CompletableFuture<Void> copy(String source, String target);
 
 	/**
-	 * Returns the SHA256 hash of the given file.
-	 *
-	 * @param path path for the remote file
-	 * @return the new CompletionStage, the result is the base64 hash string
-	 *         if the hash successfully calculated; null otherwise
-	 */
-	CompletableFuture<String> hash(String path);
-
-	/**
-	 * Returns the list of all files in a given folder.
-	 *
-	 * @param path the path for the remote folder
-	 * @return the new CompletionStage, the result is List if success; null otherwise
-	 */
-	CompletableFuture<List<FileInfo>> list(String path);
-
-	/**
-	 * Information about the target file or folder.
+	 * Deletes a file, or a folder. In case the given path is a folder,
+	 * deletion is recursive.
 	 *
 	 * @param path the path for the remote file or folder
-	 * @return the new CompletionStage, the result is FileInfo
-	 *         if success; null otherwise
+	 * @return the new CompletionStage, the result is true if the file or folder
+	 *         successfully deleted; false otherwise
 	 */
-	CompletableFuture<FileInfo> stat(String path);
+	CompletableFuture<Void> delete(String path);
 }
