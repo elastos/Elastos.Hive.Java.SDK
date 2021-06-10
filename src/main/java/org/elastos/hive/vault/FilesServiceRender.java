@@ -45,28 +45,6 @@ class FilesServiceRender implements FilesService {
 	}
 
 	@Override
-	public CompletableFuture<List<FileInfo>> list(String path) {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return controller.listChildren(path);
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
-	}
-
-	@Override
-	public CompletableFuture<FileInfo> stat(String path) {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return controller.getProperty(path);
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
-	}
-
-	@Override
 	public CompletableFuture<InputStream> getDownloadStream(String path) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
@@ -89,10 +67,32 @@ class FilesServiceRender implements FilesService {
 	}
 
 	@Override
-	public CompletableFuture<Void> delete(String path) {
-		return CompletableFuture.runAsync(() -> {
+	public CompletableFuture<List<FileInfo>> list(String path) {
+		return CompletableFuture.supplyAsync(() -> {
 			try {
-				controller.delete(path);
+				return controller.listChildren(path);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<FileInfo> stat(String path) {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return controller.getProperty(path);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<String> hash(String path) {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return controller.getHash(path);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -122,10 +122,10 @@ class FilesServiceRender implements FilesService {
 	}
 
 	@Override
-	public CompletableFuture<String> hash(String path) {
-		return CompletableFuture.supplyAsync(() -> {
+	public CompletableFuture<Void> delete(String path) {
+		return CompletableFuture.runAsync(() -> {
 			try {
-				return controller.getHash(path);
+				controller.delete(path);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
