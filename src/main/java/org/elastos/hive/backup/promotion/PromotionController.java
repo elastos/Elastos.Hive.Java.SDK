@@ -1,28 +1,23 @@
 package org.elastos.hive.backup.promotion;
 
-import java.io.IOException;
-
 import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.connection.EmptyRequestBody;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.NodeRPCException;
-import org.elastos.hive.exception.UnknownServerException;
+import org.elastos.hive.exception.NotImplementedException;
 
 public class PromotionController {
-	private PromotionAPI api;
-
-	public PromotionController(ConnectionManager connection) {
-		api = connection.createService(PromotionAPI.class, true);
-	}
+	public PromotionController(ConnectionManager connection) {}
 
 	public void promote() throws HiveException {
+		throw new NotImplementedException();
+
+		/*
 		try {
-			api.activeToVault(new EmptyRequestBody()).execute().body();
+			api.promoteToVault().execute().body();
 		} catch (NodeRPCException e) {
 			throw new UnknownServerException(e);
 		} catch (IOException e) {
-			throw new NetworkException(e.getMessage());
+			throw new NetworkException(e);
 		}
+		*/
 	}
 }

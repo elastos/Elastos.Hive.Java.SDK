@@ -1,6 +1,5 @@
 package org.elastos.hive;
 
-import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.service.*;
 import org.elastos.hive.vault.ServiceBuilder;
 
@@ -36,9 +35,5 @@ public class Vault extends ServiceEndpoint {
 
 	public BackupService getBackupService() {
 		return this.backupService;
-	}
-
-	public PubSubService getPubSubService() {
-		throw new NotImplementedException();
 	}
 }
