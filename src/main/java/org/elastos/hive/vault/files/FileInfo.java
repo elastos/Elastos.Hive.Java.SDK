@@ -36,10 +36,12 @@ public class FileInfo {
 	}
 
 	public Date getCreated() {
+		// TODO: check
 		return new Date(created * 1000);
 	}
 
 	public Date getUpdated() {
+		// TODO: check
 		return new Date(updated * 1000);
 	}
 }

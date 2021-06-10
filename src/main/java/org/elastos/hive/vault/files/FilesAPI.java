@@ -23,7 +23,7 @@ interface FilesAPI {
 	Call<GeneralResult> copy(@Path("path") String src, @Query("dest") String dest);
 
 	@PATCH("/api/v2/vault/files/{path}")
-	Call<GeneralResult> move(@Path("path") String src, @Query("to") String dest);
+	Call<GeneralResult> move(@Path("path") String src, @Query("to") String to);
 
 	@DELETE("/api/v2/vault/files/{path}")
 	Call<Void> delete(@Path("path") String path);
