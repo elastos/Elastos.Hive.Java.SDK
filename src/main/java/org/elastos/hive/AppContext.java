@@ -3,6 +3,7 @@ package org.elastos.hive;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
@@ -15,6 +16,7 @@ import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.BadContextProviderException;
 import org.elastos.hive.exception.DIDNotPublishedException;
 import org.elastos.hive.exception.IllegalDidFormatException;
+import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.DIDResolverNotSetupException;
 import org.elastos.hive.exception.DIDResolverSetupException;
 import org.elastos.hive.exception.DIDResoverAlreadySetupException;
@@ -40,6 +42,19 @@ public class AppContext {
 		this.dataStorage = new FileStorage(provider.getLocalDataDir() + File.separator, userDid);
 	}
 
+	public AppContextProvider getAppContextProvider() {
+		return this.contextProvider;
+	}
+
+	public String getUserDid() {
+		return userDid;
+	}
+
+	// TOOD: make this method implicit.
+	public DataStorage getDataStorage() {
+		return this.dataStorage;
+	}
+
 	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
 		if (cacheDir == null || resolver == null)
 			throw new IllegalArgumentException("Invalid parameters to setup DID resolver");
@@ -54,18 +69,6 @@ public class AppContext {
 		} catch (DIDResolveException e) {
 			throw new DIDResolverSetupException(e.getMessage());
 		}
-	}
-
-	public AppContextProvider getAppContextProvider() {
-		return this.contextProvider;
-	}
-
-	public String getUserDid() {
-		return userDid;
-	}
-
-	public DataStorage getDataStorage() {
-		return this.dataStorage;
 	}
 
 	public static AppContext build(AppContextProvider provider, String userDid) {
@@ -89,10 +92,10 @@ public class AppContext {
 	}
 
 	public static CompletableFuture<String> getProviderAddress(String targetDid, String preferredProviderAddress) {
-		if (targetDid == null)
-			throw new IllegalArgumentException("Missing input parameter for target Did");
-
 		return CompletableFuture.supplyAsync(() -> {
+			if (targetDid == null)
+				throw new IllegalArgumentException("Missing input parameter for target Did");
+
 			// Prioritize the use of external input value for 'preferredProviderAddress';
 			if (preferredProviderAddress != null)
 				return preferredProviderAddress;
@@ -119,11 +122,8 @@ public class AppContext {
 				return services.get(0).getServiceEndpoint();
 			} catch (MalformedDIDException e) {
 				throw new IllegalDidFormatException("Bad target did: " + targetDid);
-
 			} catch (DIDResolveException e) {
-				// throw new CompletionException(new HiveException(e.getLocalizedMessage()));
-				// TODO:
-				return null;
+				throw new CompletionException(new NetworkException("Resolving DID failed: " + e.getMessage()));
 			}
 		});
 	}

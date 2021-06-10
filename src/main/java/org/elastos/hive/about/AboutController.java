@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.NetworkException;
 
 public class AboutController {
 	private AboutAPI aboutAPI;
@@ -16,19 +17,15 @@ public class AboutController {
 		try {
 			return aboutAPI.version().execute().body();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NetworkException(e);
 		}
-		return null;
 	}
 
 	public String getCommitId() throws HiveException {
 		try {
 			return aboutAPI.commitId().execute().body().getCommitId();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NetworkException(e);
 		}
-		return null;
 	}
 }

@@ -28,6 +28,15 @@ public class ServiceEndpoint {
 	}
 
 	/**
+	 * Get the end-point address of this service End-point.
+	 *
+	 * @return provider address
+	 */
+	public String getProviderAddress() {
+		return providerAddress;
+	}
+
+	/**
 	 * Get the user DID string of this serviceEndpoint.
 	 *
 	 * @return user did
@@ -37,33 +46,12 @@ public class ServiceEndpoint {
 	}
 
 	/**
-	 * Get the end-point address of this service End-point.
-	 *
-	 * @return provider address
-	 */
-	public String getProviderAddress() {
-		return providerAddress;
-	}
-
-	public ConnectionManager getConnectionManager() {
-		return connectionManager;
-	}
-
-	public void setAppDid(String appDid) {
-		this.appDid = appDid;
-	}
-
-	/**
 	 * Get the application DID in the current calling context.
 	 *
 	 * @return application did
 	 */
-	protected String getAppDid() {
+	public String getAppDid() {
 		return appDid;
-	}
-
-	public void setAppInstanceDid(String appInstanceDid) {
-		this.appInstanceDid = appInstanceDid;
 	}
 
 	/**
@@ -71,21 +59,8 @@ public class ServiceEndpoint {
 	 *
 	 * @return application instance did
 	 */
-	protected String getAppInstanceDid() {
+	public String getAppInstanceDid() {
 		return appInstanceDid;
-	}
-
-	public void setServiceInstanceDid(String serviceInstanceDid) {
-		this.serviceInstanceDid = serviceInstanceDid;
-	}
-
-	/**
-	 * Get the remote node service instance DID where is serving the storage service.
-	 *
-	 * @return node service instance did
-	 */
-	public String getServiceInstanceDid() {
-		return serviceInstanceDid;
 	}
 
 	/**
@@ -97,16 +72,40 @@ public class ServiceEndpoint {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Get the remote node service instance DID where is serving the storage service.
+	 *
+	 * @return node service instance did
+	 */
+	public String getServiceInstanceDid() {
+		return serviceInstanceDid;
+	}
+
+	// TODO: make it implicit
+	public ConnectionManager getConnectionManager() {
+		return connectionManager;
+	}
+
+	/*
+	public void setAppDid(String appDid) {
+		this.appDid = appDid;
+	}*/
+
+	// TODO: make it implicit
+	public void setAppInstanceDid(String appInstanceDid) {
+		this.appInstanceDid = appInstanceDid;
+	}
+
+	// TODO: make it implicit
+	public void setServiceInstanceDid(String serviceInstanceDid) {
+		this.serviceInstanceDid = serviceInstanceDid;
+	}
+
 	public CompletableFuture<NodeVersion> getNodeVersion() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				AboutController controller = new AboutController(connectionManager);
-				return controller.getNodeVersion();
-			} catch (HiveException e) {
-				e.printStackTrace();
-				throw new CompletionException(e);
-			} catch (RuntimeException e) {
-				e.printStackTrace();
+				return new AboutController(connectionManager).getNodeVersion();
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
@@ -115,13 +114,8 @@ public class ServiceEndpoint {
 	public CompletableFuture<String> getLatestCommitId() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				AboutController controller = new AboutController(connectionManager);
-				return controller.getCommitId();
-			} catch (HiveException e) {
-				e.printStackTrace();
-				throw new CompletionException(e);
-			} catch (RuntimeException e) {
-				e.printStackTrace();
+				return new AboutController(connectionManager).getCommitId();
+			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});

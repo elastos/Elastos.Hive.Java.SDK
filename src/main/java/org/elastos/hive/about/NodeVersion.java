@@ -1,19 +1,26 @@
 package org.elastos.hive.about;
 
-public class NodeVersion {
-	int major;
-    int minor;
-    int patch;
+import com.google.gson.annotations.SerializedName;
 
-    public int getMajor() {
+public class NodeVersion {
+	@SerializedName("major")
+	long major;
+
+	@SerializedName("minor")
+    long minor;
+
+	@SerializedName("patch")
+    long patch;
+
+    public long major() {
         return major;
     }
 
-    public int getMinor() {
+    public long minor() {
     	return minor;
     }
 
-    public int getPatch() {
+    public long patch() {
         return patch;
     }
 
