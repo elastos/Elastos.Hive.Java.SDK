@@ -17,6 +17,9 @@ public class ServiceEndpoint {
 	private String serviceInstanceDid;
 
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
+		if (context == null || providerAddress == null)
+			throw new IllegalArgumentException("Empty context and provider address parameter");
+
 		this.context = context;
 		this.providerAddress = providerAddress;
 		this.connectionManager = new ConnectionManager();
