@@ -2,6 +2,10 @@ package org.elastos.hive.vault.backup;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.NetworkException;
+import org.elastos.hive.exception.NodeRPCException;
+import org.elastos.hive.exception.UnauthorizedException;
+import org.elastos.hive.exception.UnknownServerException;
 import org.elastos.hive.service.BackupService;
 
 import java.io.IOException;
@@ -13,31 +17,54 @@ public class BackupController {
 		backupAPI = connection.createService(BackupAPI.class, true);
 	}
 
-	public void startBackup(String token) throws HiveException {
+	public void startBackup(String credential) throws HiveException {
 		try {
-			backupAPI.saveToNode(new BackupSaveRequestBody(token)).execute().body();
+			backupAPI.saveToNode(new RequestParams(credential)).execute().body();
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+			case NodeRPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
+
+			// TODO: check more exception here.
+			default:
+				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
-			// TODO:
-			e.printStackTrace();
+			throw new NetworkException(e);
 		}
 	}
 
-	public void restoreFrom(String token) throws HiveException {
+	public void restoreFrom(String credential) throws HiveException {
 		try {
-			backupAPI.restoreFromNode(new BackupRestoreRequestBody(token)).execute().body();
+			backupAPI.restoreFromNode(new RequestParams(credential)).execute().body();
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+			case NodeRPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
+
+			// TODO: check more exception here.
+			default:
+				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
-			// TODO:
-			e.printStackTrace();
+			throw new NetworkException(e);
 		}
 	}
 
 	public BackupService.BackupResult checkResult() throws HiveException {
 		try {
 			return backupAPI.getState().execute().body().getStatusResult();
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+			case NodeRPCException.UNAUTHORIZED:
+				throw new UnauthorizedException(e);
+
+			// TODO: check more exception here.
+			default:
+				throw new UnknownServerException(e);
+			}
 		} catch (IOException e) {
-			// TODO:
-			e.printStackTrace();
+			throw new NetworkException(e);
 		}
-		return null;
 	}
 }

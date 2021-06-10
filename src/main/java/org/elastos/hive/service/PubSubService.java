@@ -4,12 +4,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface PubSubService {
-    /**
-     * Publish a new channel for the following subscript and message send/receive.
-     * TODO:
-     * @param channelName channel name
-     * @return successfully
-     */
     CompletableFuture<Boolean> publish(String channelName);
 
     CompletableFuture<Boolean> remove(String channelName);

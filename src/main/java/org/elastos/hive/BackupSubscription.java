@@ -111,14 +111,14 @@ public class BackupSubscription extends ServiceEndpoint
 	}
 
 	@Override
-	public CompletableFuture<Receipt> getReceipt(String receiptId) {
+	public CompletableFuture<List<Order>> getOrderList() {
 		return CompletableFuture.supplyAsync(() -> {
 			throw new NotImplementedException("Payment will be supported later");
 		});
 	}
 
 	@Override
-	public CompletableFuture<List<Order>> getOrderList() {
+	public CompletableFuture<Receipt> getReceipt(String receiptId) {
 		return CompletableFuture.supplyAsync(() -> {
 			throw new NotImplementedException("Payment will be supported later");
 		});

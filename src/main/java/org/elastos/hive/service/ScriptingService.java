@@ -12,7 +12,8 @@ import java.util.concurrent.CompletableFuture;
  * routine defined in the script.
  */
 public interface ScriptingService extends ScriptingInvocationService {
-    /**
+
+	/**
      *
      * Lets the vault owner register a script on his vault for a given application.
      * The script is built on the client-side, then serialized and stored on the
