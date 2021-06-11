@@ -1,15 +1,16 @@
 package org.elastos.hive.storage;
 
-import org.elastos.hive.utils.CryptoUtil;
 import org.elastos.hive.utils.LogUtil;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Store/load access tokens and credentials to local file storage.
@@ -74,14 +75,8 @@ public class FileStorage implements DataStorage {
 		}
 	}
 
-	@NotNull
 	private String getFilePath(String folder, String fileName) {
 		return this.basePath + File.separator + folder + File.separator + fileName;
-	}
-
-	@NotNull
-	private String getFilePath(String fileName) {
-		return this.basePath + File.separator + fileName;
 	}
 
 	@Override
@@ -96,7 +91,7 @@ public class FileStorage implements DataStorage {
 
 	@Override
 	public String loadAccessTokenByAddress(String providerAddress) {
-		return getFileContent(getFilePath(TOKENS, CryptoUtil.getSHA256(providerAddress)));
+		return getFileContent(getFilePath(TOKENS, getSHA256(providerAddress)));
 	}
 
 	@Override
@@ -117,7 +112,7 @@ public class FileStorage implements DataStorage {
 	public void storeAccessTokenByAddress(String providerAddress, String accessToken) {
 		if (providerAddress == null)
 			return;
-		saveFileContent(getFilePath(TOKENS, CryptoUtil.getSHA256(providerAddress)), accessToken);
+		saveFileContent(getFilePath(TOKENS, getSHA256(providerAddress)), accessToken);
 	}
 
 	@Override
@@ -138,6 +133,31 @@ public class FileStorage implements DataStorage {
 	public void clearAccessTokenByAddress(String providerAddress) {
 		if (providerAddress == null)
 			return;
-		removeFile(getFilePath(TOKENS, CryptoUtil.getSHA256(providerAddress)));
+		removeFile(getFilePath(TOKENS, getSHA256(providerAddress)));
 	}
+
+	private String getSHA256(String message) {
+        byte[] bytes;
+
+        try {
+        	MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        	digest.update(message.getBytes("UTF-8"));
+        	bytes = digest.digest();
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        StringBuffer buffer = new StringBuffer();
+        String temp = null;
+
+        for (int i = 0; i < bytes.length; i++) {
+            temp = Integer.toHexString(bytes[i] & 0xFF);
+            if (temp.length() == 1)
+            	buffer.append("0");
+
+            buffer.append(temp);
+        }
+        return buffer.toString();
+    }
 }
