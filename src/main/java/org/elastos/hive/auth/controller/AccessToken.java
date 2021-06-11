@@ -1,8 +1,7 @@
 package org.elastos.hive.auth.controller;
 
 import org.elastos.did.jwt.Claims;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.utils.JwtUtil;
+import org.elastos.did.jwt.JwtParserBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -11,17 +10,14 @@ class AccessToken {
 	private String token;
 
 	boolean checkValid(String appInstanceDid) {
-		Claims claims;
 		try {
-			claims = JwtUtil.getBody(token);
-		} catch (HiveException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Claims claims = new JwtParserBuilder().build().parseClaimsJws(token).getBody();
+			return claims.getExpiration().getTime() > System.currentTimeMillis()
+					&& claims.getAudience().equals(appInstanceDid);
+		} catch (Exception e) {
+			// TOOD: output log;
 			return false;
 		}
-
-		return claims.getExpiration().getTime() > System.currentTimeMillis()
-				&& claims.getAudience().equals(appInstanceDid);
 	}
 
 	String getAccessToken() {

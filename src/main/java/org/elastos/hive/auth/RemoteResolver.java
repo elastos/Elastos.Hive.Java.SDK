@@ -3,11 +3,11 @@ package org.elastos.hive.auth;
 import com.google.common.base.Throwables;
 
 import org.elastos.did.jwt.Claims;
+import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.controller.AuthController;
 import org.elastos.hive.exception.HttpFailedException;
-import org.elastos.hive.utils.JwtUtil;
 import org.elastos.hive.utils.LogUtil;
 
 class RemoteResolver implements CodeResolver {
@@ -25,7 +25,7 @@ class RemoteResolver implements CodeResolver {
 	public String resolve() throws HttpFailedException {
 		try {
 			String challenge = controller.signIn(contextProvider.getAppInstanceDocument());
-			Claims claims = JwtUtil.getBody(challenge);
+			Claims claims = new JwtParserBuilder().build().parseClaimsJws(challenge).getBody();
 	        // Update the service did to service end-point for future usage.
 	        serviceEndpoint.setServiceInstanceDid(claims.getIssuer());
 	        serviceEndpoint.setAppInstanceDid(claims.getSubject());

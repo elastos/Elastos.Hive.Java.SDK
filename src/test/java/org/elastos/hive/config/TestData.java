@@ -4,13 +4,13 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
+import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.*;
 import org.elastos.hive.did.DApp;
 import org.elastos.hive.did.DIDApp;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.BackupService;
 import org.elastos.hive.service.HiveBackupContext;
-import org.elastos.hive.utils.JwtUtil;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
@@ -103,7 +103,7 @@ public class TestData {
 			public CompletableFuture<String> getAuthorization(String jwtToken) {
 				return CompletableFuture.supplyAsync(() -> {
 					try {
-						Claims claims = JwtUtil.getBody(jwtToken);
+						Claims claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
 						if (claims == null)
 							throw new HiveException("Invalid jwt token as authorization.");
 						return appInstanceDid.createToken(appInstanceDid.createPresentation(
@@ -137,7 +137,7 @@ public class TestData {
 			public CompletableFuture<String> getAuthorization(String jwtToken) {
 				return CompletableFuture.supplyAsync(() -> {
 					try {
-						Claims claims = JwtUtil.getBody(jwtToken);
+						Claims claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
 						if (claims == null)
 							throw new HiveException("Invalid jwt token as authorization.");
 						return appInstanceDid.createToken(appInstanceDid.createPresentation(
