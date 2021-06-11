@@ -15,9 +15,9 @@ public class Vault extends ServiceEndpoint {
 	public Vault(AppContext context, String providerAddress) {
 		super(context, providerAddress);
 
-		this.filesService 	= new ServiceBuilder(this).createFilesService();
-		this.databaseService = new ServiceBuilder(this).createDatabase();
-		this.backupService 	= new ServiceBuilder(this).createBackupService();
+		this.filesService     = new ServiceBuilder(this).createFilesService();
+		this.databaseService  = new ServiceBuilder(this).createDatabase();
+		this.backupService    = new ServiceBuilder(this).createBackupService();
 		this.scriptingService = new ServiceBuilder(this).createScriptingService();
 	}
 

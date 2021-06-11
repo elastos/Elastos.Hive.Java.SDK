@@ -1,31 +1,31 @@
 package org.elastos.hive.vault;
 
-import org.elastos.hive.Vault;
+import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.service.BackupService;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.service.ScriptingService;
 
 public class ServiceBuilder {
-	private Vault vault;
+	private ServiceEndpoint serviceEndpoint;
 
-	public ServiceBuilder(Vault vault) {
-		this.vault = vault;
+	public ServiceBuilder(ServiceEndpoint serviceEndpoint) {
+		this.serviceEndpoint = serviceEndpoint;
 	}
 
 	public FilesService createFilesService() {
-		return new FilesServiceRender(vault);
+		return new FilesServiceRender(serviceEndpoint);
 	}
 
 	public DatabaseService createDatabase() {
-		return new DatabaseServiceRender(vault);
+		return new DatabaseServiceRender(serviceEndpoint);
 	}
 
 	public ScriptingService createScriptingService() {
-		return new ScriptingServiceRender(vault);
+		return new ScriptingServiceRender(serviceEndpoint);
 	}
 
 	public BackupService createBackupService() {
-		return new BackupServiceRender(vault);
+		return new BackupServiceRender(serviceEndpoint);
 	}
 }
