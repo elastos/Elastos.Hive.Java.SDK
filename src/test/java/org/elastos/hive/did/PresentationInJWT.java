@@ -28,7 +28,7 @@ import org.elastos.did.VerifiablePresentation;
 import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
-import org.elastos.hive.utils.JwtUtil;
+import org.elastos.did.jwt.JwtParserBuilder;
 
 
 class PresentationInJWT {
@@ -66,7 +66,7 @@ class PresentationInJWT {
 
 	public String getAuthToken(String jwtToken) {
 		try {
-			Claims claims = JwtUtil.getBody(jwtToken);
+			Claims claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
 			String iss = claims.getIssuer();
 			String nonce = (String) claims.get("nonce");
 
