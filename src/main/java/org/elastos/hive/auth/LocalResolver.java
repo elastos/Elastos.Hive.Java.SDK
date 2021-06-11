@@ -6,11 +6,9 @@ import org.elastos.hive.storage.DataStorage;
 
 class LocalResolver implements CodeResolver {
 	private CodeResolver nextResolver;
-	protected DataStorage storage;
 	protected ServiceEndpoint serviceEndpoint;
 
 	public LocalResolver(ServiceEndpoint endpoint, CodeResolver next) {
-		this.storage  = endpoint.getAppContext().getDataStorage();
 		this.serviceEndpoint = endpoint;
 		this.nextResolver = next;
 	}
@@ -31,6 +29,7 @@ class LocalResolver implements CodeResolver {
 	}
 
 	protected String restoreToken() {
+		DataStorage storage = serviceEndpoint.getStorage();
 		String jwtCode = null;
 
 		String serviceDid = serviceEndpoint.getServiceInstanceDid();
@@ -56,6 +55,8 @@ class LocalResolver implements CodeResolver {
 	}
 
 	protected void saveToken(String jwtCode) {
+		DataStorage storage = serviceEndpoint.getStorage();
+
 		if (jwtCode == null)
 			return;
 
@@ -64,6 +65,8 @@ class LocalResolver implements CodeResolver {
 	}
 
 	protected void clearToken() {
+		DataStorage storage = serviceEndpoint.getStorage();
+
 		storage.clearAccessToken(serviceEndpoint.getServiceInstanceDid());
 		storage.clearAccessTokenByAddress(serviceEndpoint.getProviderAddress());
 	}

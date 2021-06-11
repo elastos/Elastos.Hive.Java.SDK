@@ -7,6 +7,7 @@ import org.elastos.hive.about.AboutController;
 import org.elastos.hive.about.NodeVersion;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.storage.DataStorage;
 
 public class ServiceEndpoint {
 	private AppContext context;
@@ -15,6 +16,7 @@ public class ServiceEndpoint {
 	private String appDid;
 	private String appInstanceDid;
 	private String serviceInstanceDid;
+	private DataStorage storage;
 
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
 		if (context == null || providerAddress == null)
@@ -24,6 +26,7 @@ public class ServiceEndpoint {
 		this.providerAddress = providerAddress;
 		this.connectionManager = new ConnectionManager();
 		this.connectionManager.attach(this);
+		this.storage = context.dataStorage();
 	}
 
 	public AppContext getAppContext() {
@@ -102,6 +105,10 @@ public class ServiceEndpoint {
 	// TODO: make it implicit
 	public void setServiceInstanceDid(String serviceInstanceDid) {
 		this.serviceInstanceDid = serviceInstanceDid;
+	}
+
+	public DataStorage getStorage() {
+		return storage;
 	}
 
 	public CompletableFuture<NodeVersion> getNodeVersion() {

@@ -98,6 +98,7 @@ public class FileStorage implements DataStorage {
 	public void storeBackupCredential(String serviceDid, String credential) {
 		if (serviceDid == null)
 			return;
+
 		saveFileContent(getFilePath(CREDENTIAL_BACKUP, getRelativeDidStr(serviceDid)), credential);
 	}
 
@@ -105,6 +106,7 @@ public class FileStorage implements DataStorage {
 	public void storeAccessToken(String serviceDid, String accessToken) {
 		if (serviceDid == null)
 			return;
+
 		saveFileContent(getFilePath(TOKENS, getRelativeDidStr(serviceDid)), accessToken);
 	}
 
@@ -112,6 +114,7 @@ public class FileStorage implements DataStorage {
 	public void storeAccessTokenByAddress(String providerAddress, String accessToken) {
 		if (providerAddress == null)
 			return;
+
 		saveFileContent(getFilePath(TOKENS, getSHA256(providerAddress)), accessToken);
 	}
 
