@@ -30,9 +30,7 @@ import org.elastos.hive.utils.LogUtil;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +41,6 @@ public class ConnectionManager {
 	private String providerAddress;
 	private Interceptor authRequestInterceptor;
 	private PlainRequestInterceptor plainRequestInterceptor;
-	private NormalRequestInterceptor normalRequestInterceptor;
 	private AccessToken accessToken;
 
 	public ConnectionManager() {
@@ -54,7 +51,6 @@ public class ConnectionManager {
 		this.providerAddress = serviceEndpoint.getProviderAddress();
 		this.accessToken = new AccessToken(serviceEndpoint);
 		this.plainRequestInterceptor = new PlainRequestInterceptor(accessToken);
-		this.normalRequestInterceptor = new NormalRequestInterceptor(accessToken);
 	}
 
 	public HttpURLConnection openConnection(String urlPath) throws IOException {
@@ -94,10 +90,6 @@ public class ConnectionManager {
 	public <S> S createService(Class<S> serviceClass, boolean requiredAuthorization) {
 		return createRetrofit(requiredAuthorization ? this.plainRequestInterceptor : this.authRequestInterceptor)
 				.create(serviceClass);
-	}
-
-	public <S> S createService(Class<S> serviceClass) {
-		return createRetrofit(normalRequestInterceptor).create(serviceClass);
 	}
 
 	private Retrofit createRetrofit(Interceptor requestInterceptor) {

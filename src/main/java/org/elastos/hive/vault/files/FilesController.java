@@ -25,7 +25,7 @@ public class FilesController {
 
 	public FilesController(ConnectionManager connection) {
 		this.connection = connection;
-		this.filesAPI = connection.createService(FilesAPI.class);
+		this.filesAPI = connection.createService(FilesAPI.class, true);
 	}
 
 	public OutputStream getUploadStream(String path) throws HiveException {
