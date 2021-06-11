@@ -8,12 +8,10 @@ import org.elastos.hive.storage.DataStorage;
 class LocalResolver implements CodeResolver {
 	private ServiceEndpoint serviceEndpoint;
 	private CodeResolver nextResolver;
-	private DataStorage storage;
 
     public LocalResolver(ServiceEndpoint serviceEndpoint, CodeResolver next) {
     	this.serviceEndpoint = serviceEndpoint;
     	this.nextResolver = next;
-    	this.storage = serviceEndpoint.getAppContext().getDataStorage();
     }
 
     @Override
@@ -33,6 +31,8 @@ class LocalResolver implements CodeResolver {
 	}
 
 	private String restoreToken() {
+		DataStorage storage = serviceEndpoint.getStorage();
+
         if (serviceEndpoint.getServiceInstanceDid() == null)
             return null;
 
@@ -40,11 +40,15 @@ class LocalResolver implements CodeResolver {
     }
 
     private void saveToken(String token) {
+    	DataStorage storage = serviceEndpoint.getStorage();
+
         if (serviceEndpoint.getServiceInstanceDid() != null)
         	storage.storeBackupCredential(serviceEndpoint.getServiceInstanceDid(), token);
     }
 
     private void clearToken() {
+    	DataStorage storage = serviceEndpoint.getStorage();
+
         if (serviceEndpoint.getServiceInstanceDid() != null)
         	storage.clearBackupCredential(serviceEndpoint.getServiceInstanceDid());
     }

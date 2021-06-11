@@ -3,6 +3,8 @@ package org.elastos.hive.auth.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.elastos.did.DIDDocument;
+import org.elastos.did.jwt.Claims;
+import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HiveException;
 
@@ -20,10 +22,11 @@ public class AuthController {
 
 	public String signIn(DIDDocument appInstanceDidDocument) throws HiveException {
 		try {
-			Object document = new ObjectMapper().readValue(appInstanceDidDocument.toString(), HashMap.class);
+			Object document = new ObjectMapper()
+						.readValue(appInstanceDidDocument.toString(), HashMap.class);
 			ChallengeRequest challenge = authAPI.signIn(new SignInRequest(document)).execute().body();
-			if (!challenge.checkValid(appInstanceDid)) {
-				// TODO:
+			if (!checkMatch(challenge.getChallenge(), appInstanceDid)) {
+				// TODO: logger
 				throw new HiveException("Unknown sign-in failure, probably being hacked.");
 			}
 
@@ -38,8 +41,8 @@ public class AuthController {
 	public String auth(String challengeResponse) throws HiveException {
 		try {
 			AccessToken token = authAPI.auth(new ChallengeResponse(challengeResponse)).execute().body();
-			if (!token.checkValid(appInstanceDid)) {
-				// TODO:
+			if (!checkMatch(token.getAccessToken(), appInstanceDid)) {
+				// TODO: logger
 				throw new HiveException("Unknown auth failure, probably being hacked.");
 			}
 
@@ -50,4 +53,20 @@ public class AuthController {
 		}
 		return null;
 	}
+
+	private boolean checkMatch(String jwtCode, String expected) {
+		Claims claims;
+
+		try {
+			claims = new JwtParserBuilder().build().parseClaimsJws(jwtCode).getBody();
+		} catch (Exception e) {
+			// TOOD: console log;
+			return false;
+		}
+
+		return claims.getExpiration().getTime() > System.currentTimeMillis()
+				&& claims.getAudience().equals(expected);
+
+	}
+
 }

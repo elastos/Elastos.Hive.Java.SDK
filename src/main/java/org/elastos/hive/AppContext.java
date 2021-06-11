@@ -50,8 +50,7 @@ public class AppContext {
 		return userDid;
 	}
 
-	// TOOD: make this method implicit.
-	public DataStorage getDataStorage() {
+	DataStorage dataStorage() {
 		return this.dataStorage;
 	}
 
