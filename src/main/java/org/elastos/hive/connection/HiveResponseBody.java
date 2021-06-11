@@ -61,7 +61,7 @@ public class HiveResponseBody {
 
     public static <T extends HiveResponseBody> T validateBody(T body) throws IOException {
         if (body == null)
-            throw new HiveSdkException("Failed to get response body(null)");
+            throw new IOException("Failed to get response body(null)");
 
         if (body.failed())
             throw new HttpFailedException(600, getHttpErrorMessages().get(600));
@@ -76,18 +76,18 @@ public class HiveResponseBody {
     public static String validateBodyStr(Response<ResponseBody> response, boolean failedCheck) {
         ResponseBody body = response.body();
         if (body == null)
-            throw new HiveSdkException("Failed to get body on validateBody");
+            throw new RuntimeException("Failed to get body on validateBody");
 
         try {
             String bodyStr = body.string();
             if (failedCheck) {
                 if (new Gson().fromJson(bodyStr, HiveResponseBody.class).failed()) {
-                    throw new HiveSdkException("Get ERR response status on validateBody");
+                    throw new RuntimeException("Get ERR response status on validateBody");
                 }
             }
             return bodyStr;
         } catch (IOException e) {
-            throw new HiveSdkException(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -106,7 +106,7 @@ public class HiveResponseBody {
                 obj = new ObjectMapper().readValue(json, clz);
             }
         } catch (Exception e) {
-            throw new HiveSdkException("unsupported result type for call script.");
+            throw new RuntimeException("unsupported result type for call script.");
         }
         return (T) obj;
     }
@@ -127,7 +127,7 @@ public class HiveResponseBody {
     public static <T> T getResponseStream(Response<ResponseBody> response, Class<T> resultType) {
         ResponseBody body = response.body();
         if (body == null)
-            throw new HiveSdkException("Failed to get response body");
+            throw new RuntimeException("Failed to get response body");
 
         if (resultType.isAssignableFrom(Reader.class))
             return resultType.cast(new InputStreamReader(body.byteStream()));

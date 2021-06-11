@@ -3,7 +3,8 @@ package org.elastos.hive.vault.scripting;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.exception.HiveSdkException;
+
+import org.elastos.hive.exception.HiveException;
 
 public class Executable extends Condition {
 	public static final String TYPE_FIND = "find";
@@ -32,11 +33,11 @@ public class Executable extends Condition {
 				new ScriptFileUploadBody("$params.path")).setOutput(true);
 	}
 
-	public static JsonNode createFileUploadParams(String groupId, String path) {
+	public static JsonNode createFileUploadParams(String groupId, String path) throws HiveException {
 		try {
 			return new ObjectMapper().readTree(String.format("{\"group_id\":{\"$oid\":\"%s\"},\"path\":\"%s\"}", groupId, path));
 		} catch (Exception e) {
-			throw new HiveSdkException("invalid groupId or path");
+			throw new HiveException("invalid groupId or path");
 		}
 	}
 
@@ -46,7 +47,13 @@ public class Executable extends Condition {
 	}
 
 	public static JsonNode createFileDownloadParams(String groupId, String path) {
-		return createFileUploadParams(groupId, path);
+		try {
+			return createFileUploadParams(groupId, path);
+		} catch (HiveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static Executable createFilePropertiesExecutable(String name) {
@@ -55,7 +62,13 @@ public class Executable extends Condition {
 	}
 
 	public static JsonNode createFilePropertiesParams(String groupId, String path) {
-		return createFileUploadParams(groupId, path);
+		try {
+			return createFileUploadParams(groupId, path);
+		} catch (HiveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static Executable createFileHashExecutable(String name) {
@@ -64,7 +77,13 @@ public class Executable extends Condition {
 	}
 
 	public static JsonNode createFileHashParams(String groupId, String path) {
-		return createFileUploadParams(groupId, path);
+		try {
+			return createFileUploadParams(groupId, path);
+		} catch (HiveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static Executable createInsertExecutable(String colletion, ScriptInsertExecutableBody body) {
