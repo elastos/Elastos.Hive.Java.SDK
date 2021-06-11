@@ -17,7 +17,7 @@ public class ScriptingController {
 
 	public ScriptingController(ConnectionManager connection) {
 		this.connectionManager = connection;
-		this.scriptingAPI = connection.createService(ScriptingAPI.class);
+		this.scriptingAPI = connection.createService(ScriptingAPI.class, true);
 	}
 
 	public void registerScript(String name,

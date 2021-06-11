@@ -17,7 +17,7 @@ public class SubscriptionController {
 	private SubscriptionAPI subscriptionAPI;
 
 	public SubscriptionController(ConnectionManager connection) {
-		this.subscriptionAPI = connection.createService(SubscriptionAPI.class);
+		this.subscriptionAPI = connection.createService(SubscriptionAPI.class, true);
 	}
 
 	public List<PricingPlan> getVaultPricingPlanList() throws HiveException {
