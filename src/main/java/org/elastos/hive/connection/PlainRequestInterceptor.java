@@ -18,24 +18,21 @@ class PlainRequestInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Request request = chain.request();
-        request = request.newBuilder()
+    	Request request = chain.request()
+    				.newBuilder()
         			.addHeader("Authorization", accessToken.getCanonicalizedAccessToken())
                     .build();
-        return handleResponse(chain.proceed(request));
-    }
 
-    private Response handleResponse(Response response) throws NodeRPCException {
-        if (!response.isSuccessful())
-            handleResponseErrorCode(response);
+        Response response = chain.proceed(request);
+        if (!response.isSuccessful()) {
+        	int httpCode = response.code();
+        	if (httpCode == 401)
+        		accessToken.invalidateToken();
+
+        	// TODO:
+        	throw new NodeRPCException(httpCode, -1, response.message());
+        }
+
         return response;
-    }
-
-    private void handleResponseErrorCode(Response response) throws NodeRPCException {
-    	if (response.code() == 401)
-        	accessToken.invalidateToken();
-
-    	// TODO: need to change to error format.
-        throw new NodeRPCException(response.code(), -1, response.message());
     }
 }

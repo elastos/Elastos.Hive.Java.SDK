@@ -11,17 +11,12 @@ class AuthRequestInterceptor implements Interceptor {
 
 	@Override
 	public Response intercept(Chain chain) throws IOException {
-        return handleResponse(chain.proceed(chain.request()));
-    }
+		Response response = chain.proceed(chain.request());
+		if (!response.isSuccessful()) {
+			// TOOD:
+			throw new NodeRPCException(response.code(), -1, response.message());
+		}
 
-    private Response handleResponse(Response response) throws NodeRPCException {
-        if (!response.isSuccessful())
-            handleResponseErrorCode(response);
-        return response;
-    }
-
-    private void handleResponseErrorCode(Response response) throws NodeRPCException {
-    	// TODO: need to change to error format.
-        throw new NodeRPCException(response.code(), -1, response.message());
-    }
+		return response;
+	}
 }
