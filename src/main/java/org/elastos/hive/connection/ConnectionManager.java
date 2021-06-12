@@ -39,18 +39,14 @@ public class ConnectionManager {
 	private static final int DEFAULT_TIMEOUT = 30;
 
 	private String providerAddress;
-	private Interceptor authRequestInterceptor;
-	private PlainRequestInterceptor plainRequestInterceptor;
 	private AccessToken accessToken;
 
 	public ConnectionManager() {
-		this.authRequestInterceptor  = new AuthRequestInterceptor();
 	}
 
 	public void attach(ServiceEndpoint serviceEndpoint) {
 		this.providerAddress = serviceEndpoint.getProviderAddress();
 		this.accessToken = new AccessToken(serviceEndpoint);
-		this.plainRequestInterceptor = new PlainRequestInterceptor(accessToken);
 	}
 
 	public HttpURLConnection openConnection(String urlPath) throws IOException {
@@ -80,16 +76,12 @@ public class ConnectionManager {
 		return urlConnection;
 	}
 
-	/**
-	 * Create network API service by service class.
-	 * @param serviceClass the class of the service.
-	 * @param requiredAuthorization	need authorization when requests.
-	 * @param <S> the class of the service.
-	 * @return the service instance.
-	 */
 	public <S> S createService(Class<S> serviceClass, boolean requiredAuthorization) {
-		return createRetrofit(requiredAuthorization ? this.plainRequestInterceptor : this.authRequestInterceptor)
-				.create(serviceClass);
+		Interceptor requestInterceptor = requiredAuthorization ?
+					new PlainRequestInterceptor(this.accessToken) :
+						new AuthRequestInterceptor();
+
+		return createRetrofit(requestInterceptor).create(serviceClass);
 	}
 
 	private Retrofit createRetrofit(Interceptor requestInterceptor) {
@@ -105,8 +97,6 @@ public class ConnectionManager {
 
 		return new Retrofit.Builder()
 				.baseUrl(providerAddress)
-				// TODO: remove class StringConverterFactory and this line after v2 completes.
-				.addConverterFactory(StringConverterFactory.create())
 				.addConverterFactory(GsonConverterFactory.create())
 				.client(builder.build())
 				.build();
