@@ -2,7 +2,6 @@ package org.elastos.hive;
 
 import com.google.common.base.Throwables;
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.exception.VaultLockedException;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.files.FileInfo;
 import org.junit.jupiter.api.*;
@@ -32,7 +31,6 @@ class FilesServiceTest {
 	private final String remoteNotExistsFilePath;
 	private final String remoteBackupTxtFilePath;
 
-	private static VaultSubscription subscription;
 	private static FilesService filesService;
 
 	public FilesServiceTest() {
@@ -50,7 +48,7 @@ class FilesServiceTest {
 	@BeforeAll public static void setUp() {
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
-			subscription = new VaultSubscription(testData.getAppContext(),
+			new VaultSubscription(testData.getAppContext(),
 					testData.getProviderAddress());
 			filesService = testData.newVault().getFilesService();
 		});
@@ -142,7 +140,7 @@ class FilesServiceTest {
 
 	@Disabled
 	@Test void testRemoteFileNotExistsException() {
-		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+		Assertions.assertThrows(ExecutionException.class,
 				() -> filesService.hash(remoteNotExistsFilePath).get());
 		//Assertions.assertEquals(e.getCause().getClass(), FileDoesNotExistsException.class);
 	}
@@ -150,8 +148,8 @@ class FilesServiceTest {
 	@Disabled
 	@Test void testVaultLockException() {
 		// Assertions.assertDoesNotThrow(() -> subscription.deactivate().get());
-		VaultLockedException e = Assertions.assertThrows(VaultLockedException.class, this::uploadTextReally);
-		Assertions.assertNotNull(e);
+		// VaultLockedException e = Assertions.assertThrows(VaultLockedException.class, this::uploadTextReally);
+		// Assertions.assertNotNull(e);
 		// Assertions.assertDoesNotThrow(() -> subscription.activate().get());
 	}
 
