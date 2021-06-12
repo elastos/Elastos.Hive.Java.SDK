@@ -1,12 +1,16 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.Map;
+
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.vault.database.InsertOptions;
-import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.ScriptingService;
 import org.elastos.hive.vault.scripting.Condition;
@@ -101,7 +105,7 @@ class ScriptingCrossingTest {
     private void run_script_with_group_permission() {
         Assertions.assertDoesNotThrow(()->{
             JsonNode result = scriptRunner.callScript(SCRIPT_NAME,
-                    HiveResponseBody.map2JsonNode(
+                    map2JsonNode(
                             new KeyValueDict().putKv("author", "John").putKv("content", "message")),
                     ownerDid, appDid, JsonNode.class).get();
             Assertions.assertNotNull(result);
@@ -122,7 +126,7 @@ class ScriptingCrossingTest {
     private void run_script_without_group_permission() {
         Assertions.assertDoesNotThrow(()->{
             JsonNode result = scriptRunner.callScript(SCRIPT_NAME,
-                    HiveResponseBody.map2JsonNode(
+                    map2JsonNode(
                             new KeyValueDict().putKv("author", "John").putKv("content", "message")),
                     ownerDid, appDid, JsonNode.class).get();
             Assertions.assertNotNull(result);
@@ -134,6 +138,10 @@ class ScriptingCrossingTest {
     private void uninit_for_caller() {
         databaseService.deleteCollection(COLLECTION_GROUP_MESSAGE);
         databaseService.deleteCollection(COLLECTION_GROUP);
+    }
+
+    private JsonNode map2JsonNode(Map<String, Object> map) {
+        return new ObjectMapper().convertValue(map, JsonNode.class);
     }
 
 }
