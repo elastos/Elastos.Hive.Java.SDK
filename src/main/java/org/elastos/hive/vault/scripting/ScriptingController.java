@@ -10,10 +10,10 @@ import retrofit2.Response;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.HiveResponseBody;
+import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.NodeRPCException;
-import org.elastos.hive.exception.UnknownServerException;
+import org.elastos.hive.exception.ServerUnkownException;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -82,7 +82,7 @@ public class ScriptingController {
 
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new UnknownServerException(e);
+			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
@@ -117,7 +117,7 @@ public class ScriptingController {
 	        return resultType.cast(obj);
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new UnknownServerException(e);
+			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
@@ -132,7 +132,7 @@ public class ScriptingController {
 					resultType);
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new UnknownServerException(e);
+			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
@@ -145,7 +145,7 @@ public class ScriptingController {
 			return HiveResponseBody.getResponseStream(scriptingAPI.downloadFile(transactionId).execute(), resultType);
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new UnknownServerException(e);
+			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();

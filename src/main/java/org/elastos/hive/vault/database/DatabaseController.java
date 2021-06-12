@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.connection.KeyValueDict;
+import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.exception.UnauthorizedException;
-import org.elastos.hive.exception.UnknownServerException;
+import org.elastos.hive.exception.ServerUnkownException;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -32,7 +32,7 @@ public class DatabaseController {
 
 			result = databaseAPI.createCollection(collectionName).execute().body();
 			if (!collectionName.equals(result.getName()))
-				throw new UnknownServerException("Different collection created, impossible");
+				throw new ServerUnkownException("Different collection created, impossible");
 
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
@@ -41,7 +41,7 @@ public class DatabaseController {
 			// TODO:
 			// case1: collection already exist.
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -56,7 +56,7 @@ public class DatabaseController {
 			case NodeRPCException.UNAUTHORIZED:
 				throw new UnauthorizedException(e);
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -97,7 +97,7 @@ public class DatabaseController {
 			).execute().body();
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new UnknownServerException(e);
+			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -114,7 +114,7 @@ public class DatabaseController {
 			).execute().body();
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new UnknownServerException(e);
+			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -125,7 +125,7 @@ public class DatabaseController {
 			databaseAPI.delete(collectionName, new DeleteRequest(jsonNode2KeyValueDic(filter))).execute();
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new UnknownServerException(e);
+			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -137,7 +137,7 @@ public class DatabaseController {
 					.execute().body().getCount();
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new UnknownServerException(e);
+			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -152,7 +152,7 @@ public class DatabaseController {
 							.execute().body().getItems());
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new UnknownServerException(e);
+			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -168,7 +168,7 @@ public class DatabaseController {
 					).execute().body().getItems());
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new UnknownServerException(e);
+			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}

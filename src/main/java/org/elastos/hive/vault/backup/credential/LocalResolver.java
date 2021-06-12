@@ -2,7 +2,7 @@ package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.CodeResolver;
-import org.elastos.hive.exception.NodeRPCException;
+import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.storage.DataStorage;
 
 class LocalResolver implements CodeResolver {

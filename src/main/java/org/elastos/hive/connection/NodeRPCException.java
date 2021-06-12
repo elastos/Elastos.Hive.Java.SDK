@@ -1,4 +1,4 @@
-package org.elastos.hive.exception;
+package org.elastos.hive.connection;
 
 import java.io.IOException;
 

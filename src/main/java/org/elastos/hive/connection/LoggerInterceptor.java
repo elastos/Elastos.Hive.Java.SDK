@@ -69,7 +69,6 @@ class LoggerInterceptor implements Interceptor {
 
             if (charset != null)
                 bodyInString = buffer.readString(charset);
-
         }
 
         if (bodyInString != null && !bodyInString.equals(""))

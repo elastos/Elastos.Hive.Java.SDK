@@ -1,13 +1,13 @@
 package org.elastos.hive.subscription;
 
 import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.exception.PricingPlanNotFoundException;
-import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.exception.UnauthorizedException;
-import org.elastos.hive.exception.UnknownServerException;
+import org.elastos.hive.exception.ServerUnkownException;
 import org.elastos.hive.exception.VaultAlreadyExistsException;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class SubscriptionController {
 			case NodeRPCException.UNAUTHORIZED:
 				throw new UnauthorizedException(e);
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -51,7 +51,7 @@ public class SubscriptionController {
 			case NodeRPCException.NOT_FOUND:
 				throw new PricingPlanNotFoundException(e);
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
@@ -67,7 +67,7 @@ public class SubscriptionController {
 				throw new UnauthorizedException(e);
 			// TODO:
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
@@ -87,7 +87,7 @@ public class SubscriptionController {
 			case 200:
 				throw new VaultAlreadyExistsException();
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -102,7 +102,7 @@ public class SubscriptionController {
 			case NodeRPCException.UNAUTHORIZED:
 				throw new UnauthorizedException();
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -120,7 +120,7 @@ public class SubscriptionController {
 			case NodeRPCException.UNAUTHORIZED:
 				throw new UnauthorizedException(e);
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -139,7 +139,7 @@ public class SubscriptionController {
 			case NodeRPCException.NOT_FOUND:
 				throw new PricingPlanNotFoundException(e);
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -155,7 +155,7 @@ public class SubscriptionController {
 				throw new UnauthorizedException(e);
 			// TODO:
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -172,7 +172,7 @@ public class SubscriptionController {
 			case 200:
 				throw new VaultAlreadyExistsException();
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -187,7 +187,7 @@ public class SubscriptionController {
 			case NodeRPCException.UNAUTHORIZED:
 				throw new UnauthorizedException();
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
