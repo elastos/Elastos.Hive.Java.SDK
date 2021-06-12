@@ -1,11 +1,11 @@
 package org.elastos.hive.vault.backup;
 
 import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.exception.UnauthorizedException;
-import org.elastos.hive.exception.UnknownServerException;
+import org.elastos.hive.exception.ServerUnkownException;
 import org.elastos.hive.service.BackupService;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class BackupController {
 
 			// TODO: check more exception here.
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -44,7 +44,7 @@ public class BackupController {
 
 			// TODO: check more exception here.
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -61,7 +61,7 @@ public class BackupController {
 
 			// TODO: check more exception here.
 			default:
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);

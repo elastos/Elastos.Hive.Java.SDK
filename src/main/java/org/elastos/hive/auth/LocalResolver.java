@@ -1,7 +1,7 @@
 package org.elastos.hive.auth;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.exception.NodeRPCException;
+import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.storage.DataStorage;
 
 class LocalResolver implements CodeResolver {

@@ -3,7 +3,6 @@ package org.elastos.hive.connection;
 import java.io.IOException;
 
 import org.elastos.hive.auth.AccessToken;
-import org.elastos.hive.exception.NodeRPCException;
 
 import okhttp3.Request;
 import okhttp3.Response;

@@ -10,14 +10,14 @@ import java.util.List;
 
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.HiveResponseBody;
+import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.UploadOutputStream;
 import org.elastos.hive.connection.UploadOutputStreamWriter;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.PathNotExistException;
-import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.exception.UnauthorizedException;
-import org.elastos.hive.exception.UnknownServerException;
+import org.elastos.hive.exception.ServerUnkownException;
 
 public class FilesController {
 	private ConnectionManager connection;
@@ -40,7 +40,7 @@ public class FilesController {
 			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -58,7 +58,7 @@ public class FilesController {
 			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -73,7 +73,7 @@ public class FilesController {
 			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -88,7 +88,7 @@ public class FilesController {
 			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -105,7 +105,7 @@ public class FilesController {
 			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -120,7 +120,7 @@ public class FilesController {
 			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -135,7 +135,7 @@ public class FilesController {
 			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -150,7 +150,7 @@ public class FilesController {
 			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -165,7 +165,7 @@ public class FilesController {
 			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -180,7 +180,7 @@ public class FilesController {
 			else if (e.getCode() == NodeRPCException.NOT_FOUND)
 				throw new PathNotExistException(e);
 			else
-				throw new UnknownServerException(e);
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
