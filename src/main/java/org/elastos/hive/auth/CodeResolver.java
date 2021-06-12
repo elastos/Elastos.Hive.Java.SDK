@@ -1,8 +1,8 @@
 package org.elastos.hive.auth;
 
-import org.elastos.hive.exception.HttpFailedException;
+import org.elastos.hive.exception.NodeRPCException;
 
 public interface CodeResolver {
-	String resolve() throws HttpFailedException;
+	String resolve() throws NodeRPCException;
 	void invalidate();
 }

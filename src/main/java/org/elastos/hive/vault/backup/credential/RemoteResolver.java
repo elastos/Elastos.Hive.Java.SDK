@@ -2,7 +2,7 @@ package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.CodeResolver;
-import org.elastos.hive.exception.HttpFailedException;
+import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.service.BackupContext;
 
 class RemoteResolver implements CodeResolver {
@@ -19,11 +19,11 @@ class RemoteResolver implements CodeResolver {
     }
 
     @Override
-    public String resolve() throws HttpFailedException {
+    public String resolve() throws NodeRPCException {
        /* try {
             return credential(authenticationService.signIn4ServiceDid());
         } catch (Exception e) {
-            throw new HttpFailedException(401, "Failed to authentication backup credential.");
+            throw new NodeRPCException(401, -1, "Failed to authentication backup credential.");
         }*/
     	return null;
     }
