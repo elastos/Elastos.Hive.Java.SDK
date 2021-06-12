@@ -2,6 +2,7 @@ package org.elastos.hive.vault.files;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
@@ -9,7 +10,6 @@ import java.net.HttpURLConnection;
 import java.util.List;
 
 import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.UploadOutputStream;
 import org.elastos.hive.connection.UploadOutputStreamWriter;
@@ -17,6 +17,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.PathNotExistException;
 import org.elastos.hive.exception.UnauthorizedException;
+
 import org.elastos.hive.exception.ServerUnkownException;
 
 public class FilesController {
@@ -66,7 +67,8 @@ public class FilesController {
 
 	public InputStream getDownloadStream(String path) throws HiveException {
 		try {
-			return HiveResponseBody.getResponseStream(filesAPI.download(path).execute(), InputStream.class);
+
+			return filesAPI.download(path).execute().body().byteStream();
 		} catch (NodeRPCException e) {
 			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();
@@ -81,7 +83,7 @@ public class FilesController {
 
 	public Reader getDownloadReader(String path) throws HiveException {
 		try {
-			return HiveResponseBody.getResponseStream(filesAPI.download(path).execute(), Reader.class);
+			return new InputStreamReader(filesAPI.download(path).execute().body().byteStream());
 		} catch (NodeRPCException e) {
 			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
 				throw new UnauthorizedException();

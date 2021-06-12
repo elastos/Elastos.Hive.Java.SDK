@@ -53,15 +53,11 @@ public class ConnectionManager {
 	}
 
 	public HttpURLConnection openConnection(String urlPath) throws IOException {
-		return openConnection(urlPath, "PUT");
-	}
-
-	private HttpURLConnection openConnection(String urlPath, String method) throws IOException {
 		String url = providerAddress + urlPath;
-		LogUtil.d("open connection with URL: " + url + ", and method: " + method);
+		LogUtil.d("open connection with URL: " + url + ", and method: PUT");
 
 		HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
-		urlConnection.setRequestMethod(method);
+		urlConnection.setRequestMethod("PUT");
 		urlConnection.setRequestProperty("User-Agent",
 				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
 		urlConnection.setConnectTimeout(5000);
@@ -70,6 +66,7 @@ public class ConnectionManager {
 		urlConnection.setDoOutput(true);
 		urlConnection.setDoInput(true);
 		urlConnection.setUseCaches(false);
+
 		urlConnection.setRequestProperty("Transfer-Encoding", "chunked");
 		urlConnection.setRequestProperty("Connection", "Keep-Alive");
 		urlConnection.setRequestProperty("Authorization", accessToken.getCanonicalizedAccessToken());
