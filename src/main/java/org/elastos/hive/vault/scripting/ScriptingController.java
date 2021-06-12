@@ -11,13 +11,21 @@ import retrofit2.Response;
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.connection.NodeRPCException;
+import org.elastos.hive.connection.UploadOutputStream;
+import org.elastos.hive.connection.UploadOutputStreamWriter;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.ServerUnkownException;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 
 public class ScriptingController {
@@ -125,9 +133,35 @@ public class ScriptingController {
 		}
 	}
 
+	 private <T> T getRequestStream(HttpURLConnection connection, Class<T> resultType) throws IOException {
+        OutputStream outputStream = connection.getOutputStream();
+        if (resultType.isAssignableFrom(OutputStream.class)) {
+            UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
+            return resultType.cast(uploader);
+        } else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
+            OutputStreamWriter writer = new UploadOutputStreamWriter(connection, outputStream);
+            return resultType.cast(writer);
+        } else {
+        	return null;
+        }
+    }
+
+	private <T> T getResponseStream(Response<ResponseBody> response, Class<T> resultType) {
+        ResponseBody body = response.body();
+        if (body == null)
+            throw new RuntimeException("Failed to get response body");
+
+        if (resultType.isAssignableFrom(Reader.class))
+            return resultType.cast(new InputStreamReader(body.byteStream()));
+        else if (resultType.isAssignableFrom(InputStream.class))
+            return resultType.cast(body.byteStream());
+        else
+            throw new IllegalArgumentException("Not supported result type");
+    }
+
 	public <T> T uploadFile(String transactionId, Class<T> resultType) throws HiveException {
 		try {
-			return HiveResponseBody.getRequestStream(
+			return getRequestStream(
 					connectionManager.openConnection(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId),
 					resultType);
 		} catch (NodeRPCException e) {
@@ -142,7 +176,7 @@ public class ScriptingController {
 
 	public <T> T downloadFile(String transactionId, Class<T> resultType) throws HiveException {
 		try {
-			return HiveResponseBody.getResponseStream(scriptingAPI.downloadFile(transactionId).execute(), resultType);
+			return getResponseStream(scriptingAPI.downloadFile(transactionId).execute(), resultType);
 		} catch (NodeRPCException e) {
 			// TODO:
 			throw new ServerUnkownException(e);

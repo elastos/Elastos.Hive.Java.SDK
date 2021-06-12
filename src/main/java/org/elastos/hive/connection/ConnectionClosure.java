@@ -9,10 +9,8 @@ import java.net.HttpURLConnection;
 class ConnectionClosure {
 	void confirmClosed(HttpURLConnection urlConnection) {
 		try {
-			if (urlConnection.getResponseCode() != 200) {
-				//TODO: output log
+			if (urlConnection.getResponseCode() != 200)
 				return;
-			}
 
 			Reader aReader = new InputStreamReader(urlConnection.getInputStream());
 			BufferedReader bufReader = new BufferedReader(aReader);
@@ -24,11 +22,7 @@ class ConnectionClosure {
 				if (line.length() > 0)
 					result.append(line);
 			}
-
-			// TODO: output log
-
 		} catch (IOException e) {
-			// TODO: output log
 			e.printStackTrace();
 		}
 	}

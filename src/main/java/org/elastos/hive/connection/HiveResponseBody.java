@@ -41,32 +41,6 @@ public class HiveResponseBody {
         return !SUCCESS.equals(this.status);
     }
 
-    public static <T> T getRequestStream(HttpURLConnection connection, Class<T> resultType) throws IOException {
-        OutputStream outputStream = connection.getOutputStream();
-        if (resultType.isAssignableFrom(OutputStream.class)) {
-            UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
-            return resultType.cast(uploader);
-        } else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
-            OutputStreamWriter writer = new UploadOutputStreamWriter(connection, outputStream);
-            return resultType.cast(writer);
-        } else {
-            throw new InvalidPropertiesFormatException("Not supported result type: " + resultType.getName());
-        }
-    }
-
-    public static <T> T getResponseStream(Response<ResponseBody> response, Class<T> resultType) {
-        ResponseBody body = response.body();
-        if (body == null)
-            throw new RuntimeException("Failed to get response body");
-
-        if (resultType.isAssignableFrom(Reader.class))
-            return resultType.cast(new InputStreamReader(body.byteStream()));
-        else if (resultType.isAssignableFrom(InputStream.class))
-            return resultType.cast(body.byteStream());
-        else
-            throw new IllegalArgumentException("Not supported result type");
-    }
-
     public static KeyValueDict jsonNode2KeyValueDic(JsonNode node) {
         return new ObjectMapper().convertValue(node, new TypeReference<KeyValueDict>() {});
     }
