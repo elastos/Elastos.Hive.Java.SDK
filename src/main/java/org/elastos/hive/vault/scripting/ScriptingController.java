@@ -1,6 +1,13 @@
 package org.elastos.hive.vault.scripting;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
+import okhttp3.ResponseBody;
+import retrofit2.Response;
+
 import org.elastos.hive.connection.ConnectionManager;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.exception.HiveException;
@@ -9,6 +16,9 @@ import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.exception.UnknownServerException;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Map;
 
 public class ScriptingController {
 	private ConnectionManager connectionManager;
@@ -44,13 +54,32 @@ public class ScriptingController {
 							String targetAppDid,
 							Class<T> resultType) throws HiveException {
 		try {
-			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
-					scriptingAPI.runScript(name, new runScriptParams()
+			Map<String, Object> map = new ObjectMapper().convertValue(params, new TypeReference<Map<String, Object>>() {});
+			String json = scriptingAPI.runScript(name, new runScriptParams()
 							.setContext(new ScriptContext()
 							.setTargetDid(targetDid)
 							.setTargetAppDid(targetAppDid))
-							.setParams(HiveResponseBody.jsonNode2Map(params)))
-							.execute(), false), resultType);
+							.setParams(map))
+							.execute().body().string();
+
+			Object obj = null;
+	        try {
+	            if(resultType.isAssignableFrom(String.class)) {
+	                obj = json;
+	            } else if(resultType.isAssignableFrom(byte[].class)) {
+	                obj = json.getBytes();
+	            } else if(resultType.isAssignableFrom(JsonNode.class)) {
+	                obj = new ObjectMapper().readTree(json);
+	            } else if(resultType.isAssignableFrom(Reader.class)) {
+	                obj = new StringReader(json);
+	            } else {
+	                obj = new ObjectMapper().readValue(json, resultType);
+	            }
+	        } catch (Exception e) {
+	            throw new RuntimeException("unsupported result type for call script.");
+	        }
+	        return resultType.cast(obj);
+
 		} catch (NodeRPCException e) {
 			// TODO:
 			throw new UnknownServerException(e);
@@ -66,9 +95,26 @@ public class ScriptingController {
 							   String targetAppDid,
 							   Class<T> resultType) throws HiveException {
 		try {
-			return HiveResponseBody.getValue(HiveResponseBody.validateBodyStr(
-					scriptingAPI.runScriptUrl(name, targetDid, targetAppDid, params)
-							.execute(), false), resultType);
+			String json =  scriptingAPI.runScriptUrl(name, targetDid, targetAppDid, params)
+							.execute().body().string();
+
+			Object obj = null;
+	        try {
+	            if(resultType.isAssignableFrom(String.class)) {
+	                obj = json;
+	            } else if(resultType.isAssignableFrom(byte[].class)) {
+	                obj = json.getBytes();
+	            } else if(resultType.isAssignableFrom(JsonNode.class)) {
+	                obj = new ObjectMapper().readTree(json);
+	            } else if(resultType.isAssignableFrom(Reader.class)) {
+	                obj = new StringReader(json);
+	            } else {
+	                obj = new ObjectMapper().readValue(json, resultType);
+	            }
+	        } catch (Exception e) {
+	            throw new RuntimeException("unsupported result type for call script.");
+	        }
+	        return resultType.cast(obj);
 		} catch (NodeRPCException e) {
 			// TODO:
 			throw new UnknownServerException(e);

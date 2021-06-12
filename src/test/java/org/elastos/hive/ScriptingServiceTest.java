@@ -1,12 +1,11 @@
 package org.elastos.hive;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.connection.KeyValueDict;
-import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.service.ScriptingService;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.*;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Map;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ScriptingServiceTest {
@@ -87,7 +87,7 @@ class ScriptingServiceTest {
 	private void callScriptInsert(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
 			JsonNode result = scriptRunner.callScript(scriptName,
-					HiveResponseBody.map2JsonNode(
+					map2JsonNode(
 							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
 					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
@@ -165,7 +165,7 @@ class ScriptingServiceTest {
 	private void callScriptUpdate(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
 			JsonNode result = scriptRunner.callScript(scriptName,
-					HiveResponseBody.map2JsonNode(
+					map2JsonNode(
 							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
 					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
@@ -193,7 +193,8 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			JsonNode result = scriptRunner.callScript(
 					scriptName,
-					HiveResponseBody.map2JsonNode(new KeyValueDict().putKv("author", "John")),
+
+					map2JsonNode(new KeyValueDict().putKv("author", "John")),
 					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
@@ -346,4 +347,7 @@ class ScriptingServiceTest {
 				databaseService.deleteCollection(COLLECTION_NAME).get());
 	}
 
+	private JsonNode map2JsonNode(Map<String, Object> map) {
+        return new ObjectMapper().convertValue(map, JsonNode.class);
+    }
 }
