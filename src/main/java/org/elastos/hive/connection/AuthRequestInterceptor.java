@@ -1,8 +1,6 @@
 package org.elastos.hive.connection;
 
 import java.io.IOException;
-
-import org.elastos.hive.exception.HttpFailedException;
 import org.elastos.hive.exception.NodeRPCException;
 
 import okhttp3.Response;

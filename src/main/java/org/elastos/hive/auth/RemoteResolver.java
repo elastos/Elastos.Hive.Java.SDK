@@ -7,7 +7,7 @@ import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.controller.AuthController;
-import org.elastos.hive.exception.HttpFailedException;
+import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.utils.LogUtil;
 
 class RemoteResolver implements CodeResolver {
@@ -22,7 +22,7 @@ class RemoteResolver implements CodeResolver {
 	}
 
 	@Override
-	public String resolve() throws HttpFailedException {
+	public String resolve() throws NodeRPCException {
 		try {
 			String challenge = controller.signIn(contextProvider.getAppInstanceDocument());
 			Claims claims = new JwtParserBuilder().build().parseClaimsJws(challenge).getBody();
@@ -36,7 +36,7 @@ class RemoteResolver implements CodeResolver {
 			// TODO:
 			e.printStackTrace();
 			LogUtil.d(Throwables.getStackTraceAsString(e));
-			throw new HttpFailedException(401, "Failed to get token by auth requests.");
+			throw new NodeRPCException(401,-1, "Failed to get token by auth requests.");
 		}
 	}
 

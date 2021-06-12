@@ -2,7 +2,7 @@ package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.CodeResolver;
-import org.elastos.hive.exception.HttpFailedException;
+import org.elastos.hive.exception.NodeRPCException;
 import org.elastos.hive.storage.DataStorage;
 
 class LocalResolver implements CodeResolver {
@@ -15,7 +15,7 @@ class LocalResolver implements CodeResolver {
     }
 
     @Override
-	public String resolve() throws HttpFailedException {
+	public String resolve() throws NodeRPCException {
 		String token = restoreToken();
 		if (token == null) {
 			token = nextResolver.resolve();
