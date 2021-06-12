@@ -13,9 +13,11 @@ public class ServiceEndpoint {
 	private AppContext context;
 	private String providerAddress;
 	private ConnectionManager connectionManager;
+
 	private String appDid;
 	private String appInstanceDid;
 	private String serviceInstanceDid;
+
 	private DataStorage storage;
 
 	protected ServiceEndpoint(AppContext context, String providerAddress) {

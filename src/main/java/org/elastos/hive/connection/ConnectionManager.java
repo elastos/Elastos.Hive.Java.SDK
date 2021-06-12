@@ -24,6 +24,9 @@ package org.elastos.hive.connection;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.AccessToken;
 import org.elastos.hive.utils.LogUtil;
@@ -100,5 +103,44 @@ public class ConnectionManager {
 				.addConverterFactory(GsonConverterFactory.create())
 				.client(builder.build())
 				.build();
+	}
+
+	private static class AuthRequestInterceptor implements Interceptor {
+		@Override
+		public Response intercept(Chain chain) throws IOException {
+			Response response = chain.proceed(chain.request());
+			if (!response.isSuccessful()) {
+				// TOOD:
+				throw new NodeRPCException(response.code(), -1, response.message());
+			}
+			return response;
+		}
+	}
+
+	private static class PlainRequestInterceptor implements Interceptor {
+		private AccessToken accessToken;
+
+		PlainRequestInterceptor(AccessToken accessToken) {
+			this.accessToken = accessToken;
+		}
+
+		@Override
+		public Response intercept(Chain chain) throws IOException {
+			Request request = chain.request()
+						.newBuilder()
+						.addHeader("Authorization", this.accessToken.getCanonicalizedAccessToken())
+						.build();
+
+			Response response = chain.proceed(request);
+			if (!response.isSuccessful()) {
+				int httpCode = response.code();
+				if (httpCode == 401)
+					accessToken.invalidateToken();
+
+				// TODO:
+				throw new NodeRPCException(httpCode, -1, response.message());
+			}
+			return response;
+		}
 	}
 }
