@@ -9,7 +9,7 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.util.List;
 
-import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.UploadOutputStream;
 import org.elastos.hive.connection.UploadOutputStreamWriter;
@@ -21,10 +21,10 @@ import org.elastos.hive.exception.UnauthorizedException;
 import org.elastos.hive.exception.ServerUnkownException;
 
 public class FilesController {
-	private ConnectionManager connection;
+	private NodeRPCConnection connection;
 	private FilesAPI filesAPI;
 
-	public FilesController(ConnectionManager connection) {
+	public FilesController(NodeRPCConnection connection) {
 		this.connection = connection;
 		this.filesAPI = connection.createService(FilesAPI.class, true);
 	}

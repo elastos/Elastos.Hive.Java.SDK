@@ -3,6 +3,8 @@ package org.elastos.hive;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.subscription.VaultInfo;
+import org.elastos.hive.subscription.PricingPlan;
+import org.elastos.hive.subscription.SubscriptionController;
 import org.elastos.hive.subscription.payment.Order;
 import org.elastos.hive.subscription.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
@@ -12,9 +14,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-import org.elastos.hive.subscription.PricingPlan;
-import org.elastos.hive.subscription.SubscriptionController;
-
 public class VaultSubscription extends ServiceEndpoint
 	implements SubscriptionService<VaultInfo>, PaymentService {
 
@@ -22,7 +21,7 @@ public class VaultSubscription extends ServiceEndpoint
 
 	public VaultSubscription(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
-		subscriptionController = new SubscriptionController(this.getConnectionManager());
+		subscriptionController = new SubscriptionController(this);
 	}
 
 	@Override

@@ -5,20 +5,22 @@ import java.util.concurrent.CompletionException;
 
 import org.elastos.hive.about.AboutController;
 import org.elastos.hive.about.NodeVersion;
-import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.auth.AccessToken;
+import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.storage.DataStorage;
 
-public class ServiceEndpoint {
+public class ServiceEndpoint extends NodeRPCConnection {
 	private AppContext context;
 	private String providerAddress;
-	private ConnectionManager connectionManager;
 
 	private String appDid;
 	private String appInstanceDid;
 	private String serviceInstanceDid;
 
 	private DataStorage storage;
+	private AccessToken accessToken;
 
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
 		if (context == null || providerAddress == null)
@@ -26,9 +28,8 @@ public class ServiceEndpoint {
 
 		this.context = context;
 		this.providerAddress = providerAddress;
-		this.connectionManager = new ConnectionManager();
-		this.connectionManager.attach(this);
 		this.storage = context.dataStorage();
+		this.accessToken = new AccessToken(this);
 	}
 
 	public AppContext getAppContext() {
@@ -40,6 +41,7 @@ public class ServiceEndpoint {
 	 *
 	 * @return provider address
 	 */
+	@Override
 	public String getProviderAddress() {
 		return providerAddress;
 	}
@@ -77,7 +79,7 @@ public class ServiceEndpoint {
 	 * @return node service did
 	 */
 	public String getServiceDid() {
-		throw new UnsupportedOperationException();
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -88,16 +90,6 @@ public class ServiceEndpoint {
 	public String getServiceInstanceDid() {
 		return serviceInstanceDid;
 	}
-
-	// TODO: make it implicit
-	public ConnectionManager getConnectionManager() {
-		return connectionManager;
-	}
-
-	/*
-	public void setAppDid(String appDid) {
-		this.appDid = appDid;
-	}*/
 
 	// TODO: make it implicit
 	public void setAppInstanceDid(String appInstanceDid) {
@@ -113,10 +105,15 @@ public class ServiceEndpoint {
 		return storage;
 	}
 
+	@Override
+	protected AccessToken getAccessToken() {
+		return accessToken;
+	}
+
 	public CompletableFuture<NodeVersion> getNodeVersion() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return new AboutController(connectionManager).getNodeVersion();
+				return new AboutController(this).getNodeVersion();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -126,7 +123,7 @@ public class ServiceEndpoint {
 	public CompletableFuture<String> getLatestCommitId() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return new AboutController(connectionManager).getCommitId();
+				return new AboutController(this).getCommitId();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}

@@ -19,7 +19,7 @@ public class AuthController {
 	private String expectationAudience;
 
 	public AuthController(ServiceEndpoint endpoint, DIDDocument appInstanceDidDoc ) {
-		this.authAPI = endpoint.getConnectionManager().createService(AuthAPI.class, false);
+		this.authAPI = endpoint.createService(AuthAPI.class, false);
 		this.expectationAudience = appInstanceDidDoc.getSubject().toString();
 	}
 

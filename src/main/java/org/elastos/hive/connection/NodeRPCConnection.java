@@ -27,7 +27,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.AccessToken;
 import org.elastos.hive.utils.LogUtil;
 import retrofit2.Retrofit;
@@ -38,22 +37,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-public class ConnectionManager {
+public abstract class NodeRPCConnection {
 	private static final int DEFAULT_TIMEOUT = 30;
 
-	private String providerAddress;
-	private AccessToken accessToken;
-
-	public ConnectionManager() {
-	}
-
-	public void attach(ServiceEndpoint serviceEndpoint) {
-		this.providerAddress = serviceEndpoint.getProviderAddress();
-		this.accessToken = new AccessToken(serviceEndpoint);
-	}
+	protected abstract String getProviderAddress();
+	protected abstract AccessToken getAccessToken();
 
 	public HttpURLConnection openConnection(String urlPath) throws IOException {
-		String url = providerAddress + urlPath;
+		String url = getProviderAddress() + urlPath;
 		LogUtil.d("open connection with URL: " + url + ", and method: PUT");
 
 		HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
@@ -69,7 +60,7 @@ public class ConnectionManager {
 
 		urlConnection.setRequestProperty("Transfer-Encoding", "chunked");
 		urlConnection.setRequestProperty("Connection", "Keep-Alive");
-		urlConnection.setRequestProperty("Authorization", accessToken.getCanonicalizedAccessToken());
+		urlConnection.setRequestProperty("Authorization", getAccessToken().getCanonicalizedAccessToken());
 
 		urlConnection.setChunkedStreamingMode(0);
 
@@ -78,7 +69,7 @@ public class ConnectionManager {
 
 	public <S> S createService(Class<S> serviceClass, boolean requiredAuthorization) {
 		Interceptor requestInterceptor = requiredAuthorization ?
-					new PlainRequestInterceptor(this.accessToken) :
+					new PlainRequestInterceptor(getAccessToken()) :
 						new AuthRequestInterceptor();
 
 		return createRetrofit(requestInterceptor).create(serviceClass);
@@ -96,7 +87,7 @@ public class ConnectionManager {
 		builder.interceptors().add(new LoggerInterceptor());
 
 		return new Retrofit.Builder()
-				.baseUrl(providerAddress)
+				.baseUrl(getProviderAddress())
 				.addConverterFactory(GsonConverterFactory.create())
 				.client(builder.build())
 				.build();

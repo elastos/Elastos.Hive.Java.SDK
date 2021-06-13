@@ -1,6 +1,6 @@
 package org.elastos.hive.subscription.payment;
 
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
@@ -13,8 +13,8 @@ import java.util.List;
 public class PaymentController {
 	private PaymentAPI paymentAPI;
 
-	public PaymentController(ServiceEndpoint serviceEndpoint) {
-		paymentAPI = serviceEndpoint.getConnectionManager().createService(PaymentAPI.class, true);
+	public PaymentController(NodeRPCConnection connection) {
+		paymentAPI = connection.createService(PaymentAPI.class, true);
 	}
 
 	public Order createOrder(String subscription, String pricingPlan) throws HiveException {

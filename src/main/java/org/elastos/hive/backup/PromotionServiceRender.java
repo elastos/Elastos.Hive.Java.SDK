@@ -12,7 +12,7 @@ class PromotionServiceRender implements PromotionService {
 	private PromotionController controller;
 
 	PromotionServiceRender(ServiceEndpoint serviceEndpoint) {
-		controller = new PromotionController(serviceEndpoint.getConnectionManager());
+		controller = new PromotionController(serviceEndpoint);
 	}
 
 	@Override

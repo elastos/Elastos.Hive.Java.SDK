@@ -16,7 +16,7 @@ public class ScriptingServiceRender implements ScriptingService {
 	private ScriptingController controller;
 
 	public ScriptingServiceRender(ServiceEndpoint serviceEndpoint) {
-		this.controller = new ScriptingController(serviceEndpoint.getConnectionManager());
+		this.controller = new ScriptingController(serviceEndpoint);
 	}
 
 	@Override

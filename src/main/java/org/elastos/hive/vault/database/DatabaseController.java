@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.connection.KeyValueDict;
+import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 public class DatabaseController {
 	private DatabaseAPI databaseAPI;
 
-	public DatabaseController(ServiceEndpoint serviceEndpoint) {
-		databaseAPI = serviceEndpoint.getConnectionManager().createService(DatabaseAPI.class, true);
+	public DatabaseController(NodeRPCConnection connection) {
+		databaseAPI = connection.createService(DatabaseAPI.class, true);
 	}
 
 	public void createCollection(String collectionName) throws HiveException {
