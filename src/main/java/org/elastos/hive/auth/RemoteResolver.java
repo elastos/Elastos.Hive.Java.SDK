@@ -1,22 +1,15 @@
 package org.elastos.hive.auth;
 
-import com.google.common.base.Throwables;
-
-import org.elastos.did.jwt.Claims;
-import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.controller.AuthController;
 import org.elastos.hive.connection.NodeRPCException;
-import org.elastos.hive.utils.LogUtil;
 
 class RemoteResolver implements CodeResolver {
-	private ServiceEndpoint serviceEndpoint;
 	private AppContextProvider contextProvider;
 	private AuthController controller;
 
 	public RemoteResolver(ServiceEndpoint serviceEndpoint) {
-		this.serviceEndpoint = serviceEndpoint;
 		this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
 		this.controller = new AuthController(serviceEndpoint, contextProvider.getAppInstanceDocument());
 	}
@@ -25,17 +18,12 @@ class RemoteResolver implements CodeResolver {
 	public String resolve() throws NodeRPCException {
 		try {
 			String challenge = controller.signIn(contextProvider.getAppInstanceDocument());
-			Claims claims = new JwtParserBuilder().build().parseClaimsJws(challenge).getBody();
-	        // Update the service did to service end-point for future usage.
-	        serviceEndpoint.setServiceInstanceDid(claims.getIssuer());
-	        serviceEndpoint.setAppInstanceDid(claims.getSubject());
 
 	        String challengeResponse = contextProvider.getAuthorization(challenge).get();
 	        return controller.auth(challengeResponse);
 		} catch (Exception e) {
-			// TODO:
+			// TODO: log here.
 			e.printStackTrace();
-			LogUtil.d(Throwables.getStackTraceAsString(e));
 			throw new NodeRPCException(401,-1, "Failed to get token by auth requests.");
 		}
 	}

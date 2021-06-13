@@ -9,11 +9,13 @@ public class AccessToken implements CodeResolver {
 	private CodeResolver nextResolver;
 	private DataStorage storage;
 	private ServiceEndpoint endpoint;
+	private UpdateHandler handler;
 
-	public AccessToken(ServiceEndpoint endpoint, DataStorage storage) {
+	public AccessToken(ServiceEndpoint endpoint, DataStorage storage, UpdateHandler handler) {
 		nextResolver = new RemoteResolver(endpoint);
 		this.storage = storage;
 		this.endpoint = endpoint;
+		this.handler = handler;
 	}
 
 	public String getCanonicalizedAccessToken() {
@@ -36,6 +38,7 @@ public class AccessToken implements CodeResolver {
 		jwtCode = restoreToken();
 		if (jwtCode == null) {
 			jwtCode = nextResolver.resolve();
+			handler.update(jwtCode);
 			saveToken(jwtCode);
 		}
 		return jwtCode;

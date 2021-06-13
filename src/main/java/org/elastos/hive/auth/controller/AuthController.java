@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
-import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
@@ -18,8 +18,8 @@ public class AuthController {
 	private AuthAPI authAPI;
 	private String expectationAudience;
 
-	public AuthController(ServiceEndpoint endpoint, DIDDocument appInstanceDidDoc ) {
-		this.authAPI = endpoint.createService(AuthAPI.class, false);
+	public AuthController(NodeRPCConnection connection, DIDDocument appInstanceDidDoc ) {
+		this.authAPI = connection.createService(AuthAPI.class, false);
 		this.expectationAudience = appInstanceDidDoc.getSubject().toString();
 	}
 
