@@ -2,14 +2,14 @@ package org.elastos.hive.about;
 
 import java.io.IOException;
 
-import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
 
 public class AboutController {
 	private AboutAPI aboutAPI;
 
-	public AboutController(ConnectionManager connection) {
+	public AboutController(NodeRPCConnection connection) {
 		aboutAPI = connection.createService(AboutAPI.class, false);
 	}
 

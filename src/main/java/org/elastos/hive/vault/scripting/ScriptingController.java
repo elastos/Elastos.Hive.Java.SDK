@@ -3,13 +3,11 @@ package org.elastos.hive.vault.scripting;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 
-import org.elastos.hive.connection.ConnectionManager;
-import org.elastos.hive.connection.HiveResponseBody;
+import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.UploadOutputStream;
 import org.elastos.hive.connection.UploadOutputStreamWriter;
@@ -25,15 +23,14 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
-import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 
 public class ScriptingController {
-	private ConnectionManager connectionManager;
+	private NodeRPCConnection connectionManager;
 	private ScriptingAPI scriptingAPI;
 
 
-	public ScriptingController(ConnectionManager connection) {
+	public ScriptingController(NodeRPCConnection connection) {
 		this.connectionManager = connection;
 		this.scriptingAPI = connection.createService(ScriptingAPI.class, true);
 	}

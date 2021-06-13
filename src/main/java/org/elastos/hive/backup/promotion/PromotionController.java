@@ -1,11 +1,11 @@
 package org.elastos.hive.backup.promotion;
 
-import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
 
 public class PromotionController {
-	public PromotionController(ConnectionManager connection) {}
+	public PromotionController(NodeRPCConnection connection) {}
 
 	public void promote() throws HiveException {
 		throw new NotImplementedException();

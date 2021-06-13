@@ -1,6 +1,6 @@
 package org.elastos.hive.subscription;
 
-import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
@@ -16,7 +16,7 @@ import java.util.List;
 public class SubscriptionController {
 	private SubscriptionAPI subscriptionAPI;
 
-	public SubscriptionController(ConnectionManager connection) {
+	public SubscriptionController(NodeRPCConnection connection) {
 		this.subscriptionAPI = connection.createService(SubscriptionAPI.class, true);
 	}
 

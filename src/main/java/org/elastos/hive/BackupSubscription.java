@@ -4,11 +4,12 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.subscription.BackupInfo;
 import org.elastos.hive.subscription.PricingPlan;
+import org.elastos.hive.subscription.SubscriptionController;
 import org.elastos.hive.subscription.payment.Order;
 import org.elastos.hive.subscription.payment.Receipt;
+
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
-import org.elastos.hive.subscription.SubscriptionController;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -21,7 +22,7 @@ public class BackupSubscription extends ServiceEndpoint
 
 	public BackupSubscription(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
-		subscriptionController = new SubscriptionController(this.getConnectionManager());
+		subscriptionController = new SubscriptionController(this);
 	}
 
 	@Override

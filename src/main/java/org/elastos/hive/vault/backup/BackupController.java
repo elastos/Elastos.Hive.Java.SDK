@@ -1,6 +1,6 @@
 package org.elastos.hive.vault.backup;
 
-import org.elastos.hive.connection.ConnectionManager;
+import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
@@ -13,7 +13,7 @@ import java.io.IOException;
 public class BackupController {
 	private BackupAPI backupAPI;
 
-	public BackupController(ConnectionManager connection) {
+	public BackupController(NodeRPCConnection connection) {
 		backupAPI = connection.createService(BackupAPI.class, true);
 	}
 

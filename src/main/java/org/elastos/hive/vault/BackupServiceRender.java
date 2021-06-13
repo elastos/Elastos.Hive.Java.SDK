@@ -18,7 +18,7 @@ class BackupServiceRender implements BackupService {
 
     public BackupServiceRender(ServiceEndpoint serviceEndpoint) {
     	this.serviceEndpoint = serviceEndpoint;
-    	this.controller = new BackupController(serviceEndpoint.getConnectionManager());
+    	this.controller = new BackupController(serviceEndpoint);
     }
 
     @Override

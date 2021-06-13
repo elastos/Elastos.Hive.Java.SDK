@@ -19,7 +19,7 @@ class FilesServiceRender implements FilesService {
 	private FilesController controller;
 
 	public FilesServiceRender(ServiceEndpoint serviceEndpoint) {
-		this.controller = new FilesController(serviceEndpoint.getConnectionManager());
+		this.controller = new FilesController(serviceEndpoint);
 	}
 
 	@Override
