@@ -3,9 +3,12 @@ package org.elastos.hive;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+import org.elastos.did.jwt.Claims;
+import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.about.AboutController;
 import org.elastos.hive.about.NodeVersion;
 import org.elastos.hive.auth.AccessToken;
+import org.elastos.hive.auth.UpdateHandler;
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
@@ -29,7 +32,29 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		this.context = context;
 		this.providerAddress = providerAddress;
 		this.storage = context.dataStorage();
-		this.accessToken = new AccessToken(this, this.storage);
+		this.accessToken = new AccessToken(this, this.storage, new UpdateHandler() {
+			private ServiceEndpoint endpoint;
+
+			@Override
+			public void update(String value) {
+				Claims claims;
+				try {
+					claims = new JwtParserBuilder().build().parseClaimsJws(value).getBody();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return;
+				}
+
+				endpoint.setAppInstanceDid(claims.getIssuer());
+				endpoint.setServiceInstanceDid(claims.getSubject());
+			}
+
+			UpdateHandler setTarget(ServiceEndpoint endpoint) {
+				this.endpoint = endpoint;
+				return this;
+			}
+		}.setTarget(this));
 	}
 
 	public AppContext getAppContext() {
@@ -91,13 +116,11 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		return serviceInstanceDid;
 	}
 
-	// TODO: make it implicit
-	public void setAppInstanceDid(String appInstanceDid) {
+	private void setAppInstanceDid(String appInstanceDid) {
 		this.appInstanceDid = appInstanceDid;
 	}
 
-	// TODO: make it implicit
-	public void setServiceInstanceDid(String serviceInstanceDid) {
+	private void setServiceInstanceDid(String serviceInstanceDid) {
 		this.serviceInstanceDid = serviceInstanceDid;
 	}
 
