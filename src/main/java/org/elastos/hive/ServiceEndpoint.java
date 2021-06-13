@@ -29,7 +29,7 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		this.context = context;
 		this.providerAddress = providerAddress;
 		this.storage = context.dataStorage();
-		this.accessToken = new AccessToken(this);
+		this.accessToken = new AccessToken(this, this.storage);
 	}
 
 	public AppContext getAppContext() {
