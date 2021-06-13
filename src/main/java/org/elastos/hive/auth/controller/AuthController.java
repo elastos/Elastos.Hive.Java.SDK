@@ -6,67 +6,82 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.exception.NetworkException;
+import org.elastos.hive.exception.ServerUnkownException;
 
 import java.io.IOException;
 import java.util.HashMap;
 
 public class AuthController {
 	private AuthAPI authAPI;
-	private String appInstanceDid;
+	private String expectationAudience;
 
-	public AuthController(ServiceEndpoint serviceEndpoint, DIDDocument appInstanceDidDocument ) {
-		this.authAPI = serviceEndpoint.getConnectionManager().createService(AuthAPI.class, false);
-		this.appInstanceDid = appInstanceDidDocument.getSubject().toString();
+	public AuthController(ServiceEndpoint endpoint, DIDDocument appInstanceDidDoc ) {
+		this.authAPI = endpoint.getConnectionManager().createService(AuthAPI.class, false);
+		this.expectationAudience = appInstanceDidDoc.getSubject().toString();
 	}
 
-	public String signIn(DIDDocument appInstanceDidDocument) throws HiveException {
+	public String signIn(DIDDocument appInstanceDidDoc) throws HiveException {
 		try {
 			Object document = new ObjectMapper()
-						.readValue(appInstanceDidDocument.toString(), HashMap.class);
-			ChallengeRequest challenge = authAPI.signIn(new SignInRequest(document)).execute().body();
-			if (!checkMatch(challenge.getChallenge(), appInstanceDid)) {
-				// TODO: logger
-				throw new HiveException("Unknown sign-in failure, probably being hacked.");
-			}
+							.readValue(appInstanceDidDoc.toString(), HashMap.class);
 
+			ChallengeRequest challenge;
+			challenge = authAPI.signIn(new SignInRequest(document))
+							.execute()
+							.body();
+
+			if (!checkValid(challenge.getChallenge(), expectationAudience)) {
+				// TODO: log here.
+				throw new ServerUnkownException("Invalid challenge code, possibly being hacked.");
+			}
 			return challenge.getChallenge();
+
+		} catch (NodeRPCException e) {
+			// TODO: Handle http error code here;
+			throw new ServerUnkownException();
+
 		} catch (IOException e) {
-			// TODO:
-			e.printStackTrace();
+			throw new NetworkException(e);
 		}
-		return null;
 	}
 
 	public String auth(String challengeResponse) throws HiveException {
 		try {
-			AccessToken token = authAPI.auth(new ChallengeResponse(challengeResponse)).execute().body();
-			if (!checkMatch(token.getAccessToken(), appInstanceDid)) {
-				// TODO: logger
-				throw new HiveException("Unknown auth failure, probably being hacked.");
-			}
+			AccessToken token = authAPI.auth(new ChallengeResponse(challengeResponse))
+							.execute()
+							.body();
 
+			if (!checkValid(token.getAccessToken(), expectationAudience)) {
+				// TODO: log here.
+				throw new ServerUnkownException("Invalid challenge code, possibly being hacked.");
+			}
 			return token.getAccessToken();
+
+		} catch (NodeRPCException e) {
+			// TODO: Handle http error code here;
+			throw new ServerUnkownException();
+
 		} catch (IOException e) {
-			// TODO:
-			e.printStackTrace();
+			throw new NetworkException(e);
 		}
-		return null;
 	}
 
-	private boolean checkMatch(String jwtCode, String expected) {
-		Claims claims;
-
+	private boolean checkValid(String jwtCode, String expectationDid) {
 		try {
-			claims = new JwtParserBuilder().build().parseClaimsJws(jwtCode).getBody();
+			Claims claims = new JwtParserBuilder()
+							.build()
+							.parseClaimsJws(jwtCode)
+							.getBody();
+
+			return claims.getExpiration().getTime() > System.currentTimeMillis() &&
+					claims.getAudience().equals(expectationDid);
+
 		} catch (Exception e) {
-			// TOOD: console log;
+			// TOOD: log here.
 			return false;
 		}
-
-		return claims.getExpiration().getTime() > System.currentTimeMillis()
-				&& claims.getAudience().equals(expected);
-
 	}
-
 }
