@@ -123,7 +123,7 @@ public abstract class NodeRPCConnection {
 			if (!response.isSuccessful()) {
 				int httpCode = response.code();
 				if (httpCode == 401)
-					accessToken.invalidateToken();
+					accessToken.invalidate();
 
 				// TODO:
 				throw new NodeRPCException(httpCode, -1, response.message());
