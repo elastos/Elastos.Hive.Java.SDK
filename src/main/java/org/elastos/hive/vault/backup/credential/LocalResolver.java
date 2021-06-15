@@ -1,24 +1,24 @@
 package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.auth.CodeResolver;
+import org.elastos.hive.auth.CodeFetcher;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.storage.DataStorage;
 
-class LocalResolver implements CodeResolver {
+class LocalResolver implements CodeFetcher {
 	private ServiceEndpoint serviceEndpoint;
-	private CodeResolver nextResolver;
+	private CodeFetcher nextResolver;
 
-    public LocalResolver(ServiceEndpoint serviceEndpoint, CodeResolver next) {
+    public LocalResolver(ServiceEndpoint serviceEndpoint, CodeFetcher next) {
     	this.serviceEndpoint = serviceEndpoint;
     	this.nextResolver = next;
     }
 
     @Override
-	public String resolve() throws NodeRPCException {
+	public String fetch() throws NodeRPCException {
 		String token = restoreToken();
 		if (token == null) {
-			token = nextResolver.resolve();
+			token = nextResolver.fetch();
 			saveToken(token);
 		}
 

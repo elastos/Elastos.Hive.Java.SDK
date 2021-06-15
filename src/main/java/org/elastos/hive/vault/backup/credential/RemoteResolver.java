@@ -1,11 +1,11 @@
 package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.auth.CodeResolver;
+import org.elastos.hive.auth.CodeFetcher;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.service.BackupContext;
 
-class RemoteResolver implements CodeResolver {
+class RemoteResolver implements CodeFetcher {
     private BackupContext backupContext;
     private String targetDid;
     private String targetHost;
@@ -19,7 +19,7 @@ class RemoteResolver implements CodeResolver {
     }
 
     @Override
-    public String resolve() throws NodeRPCException {
+    public String fetch() throws NodeRPCException {
        /* try {
             return credential(authenticationService.signIn4ServiceDid());
         } catch (Exception e) {
