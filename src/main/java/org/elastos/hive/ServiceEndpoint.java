@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -8,7 +9,7 @@ import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.about.AboutController;
 import org.elastos.hive.about.NodeVersion;
 import org.elastos.hive.auth.AccessToken;
-import org.elastos.hive.auth.UpdateHandler;
+import org.elastos.hive.auth.UpdationHandler;
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
@@ -32,26 +33,27 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		this.context = context;
 		this.providerAddress = providerAddress;
 		this.storage = context.dataStorage();
-		this.accessToken = new AccessToken(this, this.storage, new UpdateHandler() {
-			private ServiceEndpoint endpoint;
+		this.accessToken = new AccessToken(this, this.storage, new UpdationHandler() {
+			private WeakReference<ServiceEndpoint> weakref;
 
 			@Override
-			public void update(String value) {
-				Claims claims;
+			public void flush(String value) {
 				try {
+					ServiceEndpoint endpoint = weakref.get();
+					Claims claims;
+
 					claims = new JwtParserBuilder().build().parseClaimsJws(value).getBody();
+					endpoint.setAppInstanceDid(claims.getIssuer());
+					endpoint.setServiceInstanceDid(claims.getSubject());
+
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					return;
 				}
-
-				endpoint.setAppInstanceDid(claims.getIssuer());
-				endpoint.setServiceInstanceDid(claims.getSubject());
 			}
 
-			UpdateHandler setTarget(ServiceEndpoint endpoint) {
-				this.endpoint = endpoint;
+			UpdationHandler setTarget(ServiceEndpoint endpoint) {
+				this.weakref = new WeakReference<>(endpoint);
 				return this;
 			}
 		}.setTarget(this));
