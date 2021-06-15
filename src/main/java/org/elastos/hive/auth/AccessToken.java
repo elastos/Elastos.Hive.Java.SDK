@@ -9,9 +9,9 @@ public class AccessToken implements CodeResolver {
 	private CodeResolver nextResolver;
 	private DataStorage storage;
 	private ServiceEndpoint endpoint;
-	private UpdateHandler handler;
+	private UpdationHandler handler;
 
-	public AccessToken(ServiceEndpoint endpoint, DataStorage storage, UpdateHandler handler) {
+	public AccessToken(ServiceEndpoint endpoint, DataStorage storage, UpdationHandler handler) {
 		nextResolver = new RemoteResolver(endpoint);
 		this.storage = storage;
 		this.endpoint = endpoint;
@@ -38,7 +38,7 @@ public class AccessToken implements CodeResolver {
 		jwtCode = restoreToken();
 		if (jwtCode == null) {
 			jwtCode = nextResolver.resolve();
-			handler.update(jwtCode);
+			handler.flush(jwtCode);
 			saveToken(jwtCode);
 		}
 		return jwtCode;
