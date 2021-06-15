@@ -1,5 +1,6 @@
 package org.elastos.hive.auth;
 
-public interface UpdationHandler {
+public interface BridgeHandler {
 	void flush(String value);
+	Object target();
 }
