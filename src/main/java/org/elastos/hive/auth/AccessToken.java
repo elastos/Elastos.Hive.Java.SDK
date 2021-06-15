@@ -4,15 +4,15 @@ import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.storage.DataStorage;
 
-public class AccessToken implements CodeResolver {
+public class AccessToken implements CodeFetcher {
 	private String jwtCode;
-	private CodeResolver nextResolver;
+	private CodeFetcher remoteFetcher;
 	private DataStorage storage;
 	private ServiceEndpoint endpoint;
 	private UpdationHandler handler;
 
 	public AccessToken(ServiceEndpoint endpoint, DataStorage storage, UpdationHandler handler) {
-		nextResolver = new RemoteResolver(endpoint);
+		remoteFetcher = new RemoteFetcher(endpoint);
 		this.storage = storage;
 		this.endpoint = endpoint;
 		this.handler = handler;
@@ -20,7 +20,7 @@ public class AccessToken implements CodeResolver {
 
 	public String getCanonicalizedAccessToken() {
 		try {
-			jwtCode = resolve();
+			jwtCode = fetch();
 		} catch (Exception e) {
 			// TODO:
 			return null;
@@ -34,10 +34,10 @@ public class AccessToken implements CodeResolver {
 	}
 
 	@Override
-	public String resolve() throws NodeRPCException {
+	public String fetch() throws NodeRPCException {
 		jwtCode = restoreToken();
 		if (jwtCode == null) {
-			jwtCode = nextResolver.resolve();
+			jwtCode = remoteFetcher.fetch();
 			handler.flush(jwtCode);
 			saveToken(jwtCode);
 		}

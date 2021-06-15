@@ -5,17 +5,17 @@ import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.auth.controller.AuthController;
 import org.elastos.hive.connection.NodeRPCException;
 
-class RemoteResolver implements CodeResolver {
+class RemoteFetcher implements CodeFetcher {
 	private AppContextProvider contextProvider;
 	private AuthController controller;
 
-	public RemoteResolver(ServiceEndpoint serviceEndpoint) {
+	public RemoteFetcher(ServiceEndpoint serviceEndpoint) {
 		this.contextProvider = serviceEndpoint.getAppContext().getAppContextProvider();
 		this.controller = new AuthController(serviceEndpoint, contextProvider.getAppInstanceDocument());
 	}
 
 	@Override
-	public String resolve() throws NodeRPCException {
+	public String fetch() throws NodeRPCException {
 		try {
 			String challenge = controller.signIn(contextProvider.getAppInstanceDocument());
 
