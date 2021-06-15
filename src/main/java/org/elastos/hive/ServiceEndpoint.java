@@ -9,7 +9,7 @@ import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.about.AboutController;
 import org.elastos.hive.about.NodeVersion;
 import org.elastos.hive.auth.AccessToken;
-import org.elastos.hive.auth.UpdationHandler;
+import org.elastos.hive.auth.BridgeHandler;
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
@@ -23,7 +23,6 @@ public class ServiceEndpoint extends NodeRPCConnection {
 	private String appInstanceDid;
 	private String serviceInstanceDid;
 
-	private DataStorage storage;
 	private AccessToken accessToken;
 
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
@@ -32,8 +31,7 @@ public class ServiceEndpoint extends NodeRPCConnection {
 
 		this.context = context;
 		this.providerAddress = providerAddress;
-		this.storage = context.dataStorage();
-		this.accessToken = new AccessToken(this, this.storage, new UpdationHandler() {
+		this.accessToken = new AccessToken(this, context.dataStorage(), new BridgeHandler() {
 			private WeakReference<ServiceEndpoint> weakref;
 
 			@Override
@@ -43,8 +41,8 @@ public class ServiceEndpoint extends NodeRPCConnection {
 					Claims claims;
 
 					claims = new JwtParserBuilder().build().parseClaimsJws(value).getBody();
-					endpoint.setAppInstanceDid(claims.getIssuer());
-					endpoint.setServiceInstanceDid(claims.getSubject());
+					endpoint.appInstanceDid(claims.getIssuer());
+					endpoint.serviceInstanceDid(claims.getSubject());
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -52,10 +50,16 @@ public class ServiceEndpoint extends NodeRPCConnection {
 				}
 			}
 
-			UpdationHandler setTarget(ServiceEndpoint endpoint) {
+			BridgeHandler setTarget(ServiceEndpoint endpoint) {
 				this.weakref = new WeakReference<>(endpoint);
 				return this;
 			}
+
+			@Override
+			public Object target() {
+				return weakref.get();
+			}
+
 		}.setTarget(this));
 	}
 
@@ -118,16 +122,16 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		return serviceInstanceDid;
 	}
 
-	private void setAppInstanceDid(String appInstanceDid) {
+	private void appInstanceDid(String appInstanceDid) {
 		this.appInstanceDid = appInstanceDid;
 	}
 
-	private void setServiceInstanceDid(String serviceInstanceDid) {
+	private void serviceInstanceDid(String serviceInstanceDid) {
 		this.serviceInstanceDid = serviceInstanceDid;
 	}
 
 	public DataStorage getStorage() {
-		return storage;
+		return context.dataStorage();
 	}
 
 	@Override
