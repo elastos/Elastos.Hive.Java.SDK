@@ -8,7 +8,7 @@ import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.exception.PricingPlanNotFoundException;
 import org.elastos.hive.exception.UnauthorizedException;
 import org.elastos.hive.exception.ServerUnkownException;
-import org.elastos.hive.exception.VaultAlreadyExistsException;
+import org.elastos.hive.exception.AlreadyExistsException;
 
 import java.io.IOException;
 import java.util.List;
@@ -85,7 +85,7 @@ public class SubscriptionController {
 			case NodeRPCException.UNAUTHORIZED:
 				throw new UnauthorizedException(e);
 			case 200:
-				throw new VaultAlreadyExistsException();
+				throw new AlreadyExistsException("Vault already is being subscripted");
 			default:
 				throw new ServerUnkownException(e);
 			}
@@ -170,7 +170,7 @@ public class SubscriptionController {
 			case NodeRPCException.UNAUTHORIZED:
 				throw new UnauthorizedException(e);
 			case 200:
-				throw new VaultAlreadyExistsException();
+				throw new AlreadyExistsException("Backup already being subscripted");
 			default:
 				throw new ServerUnkownException(e);
 			}
