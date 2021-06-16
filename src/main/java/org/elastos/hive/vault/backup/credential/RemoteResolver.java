@@ -1,8 +1,8 @@
 package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.auth.CodeFetcher;
 import org.elastos.hive.connection.NodeRPCException;
+import org.elastos.hive.connection.auth.CodeFetcher;
 import org.elastos.hive.service.BackupContext;
 
 class RemoteResolver implements CodeFetcher {

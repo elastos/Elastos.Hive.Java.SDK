@@ -1,12 +1,12 @@
-package org.elastos.hive.auth.controller;
+package org.elastos.hive.connection.auth;
 
 import com.google.gson.annotations.SerializedName;
 
-class AccessToken {
+class AccessCode {
 	@SerializedName("token")
 	private String token;
 
-	String getAccessToken() {
+	String getToken() {
 		return token;
 	}
 }

@@ -1,8 +1,8 @@
-package org.elastos.hive.auth;
+package org.elastos.hive.connection.auth;
 
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.NodeRPCException;
-import org.elastos.hive.storage.DataStorage;
+import org.elastos.hive.DataStorage;
 
 public class AccessToken implements CodeFetcher {
 	private String jwtCode;

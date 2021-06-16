@@ -1,8 +1,7 @@
-package org.elastos.hive.auth;
+package org.elastos.hive.connection.auth;
 
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.auth.controller.AuthController;
 import org.elastos.hive.connection.NodeRPCException;
 
 class RemoteFetcher implements CodeFetcher {
