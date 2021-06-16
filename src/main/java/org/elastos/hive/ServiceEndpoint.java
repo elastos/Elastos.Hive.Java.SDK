@@ -50,7 +50,7 @@ public class ServiceEndpoint extends NodeRPCConnection {
 					Claims claims;
 
 					claims = new JwtParserBuilder().build().parseClaimsJws(value).getBody();
-					endpoint.flushDids(claims.getIssuer(), claims.getSubject());
+					endpoint.flushDids(claims.getAudience(), claims.getIssuer());
 
 				} catch (Exception e) {
 					e.printStackTrace();
