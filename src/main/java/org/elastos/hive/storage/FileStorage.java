@@ -1,49 +1,81 @@
 package org.elastos.hive.storage;
 
-import org.elastos.hive.utils.LogUtil;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-/**
- * Store/load access tokens and credentials to local file storage.
- */
 public class FileStorage implements DataStorage {
-	private static final String CREDENTIAL_BACKUP = "credential-backup";
+	private static final String BACKUP = "credential-backup";
 	private static final String TOKENS = "tokens";
 
 	private String basePath;
 
 	public FileStorage(String rootPath, String userDid) {
-		this.basePath = rootPath + File.separator + getRelativeDidStr(userDid);
-		File root = new File(this.basePath);
-		if (!root.exists() && !root.mkdirs()) {
-			LogUtil.e("Failed to create root folder " + this.basePath);
-		}
+		String path = rootPath;
+		if (!path.endsWith(File.separator))
+			path += File.separator;
+
+		path += compatDid(userDid);
+		this.basePath = path;
+
+		File file = new File(path);
+		if (!file.exists())
+			file.mkdirs();
 	}
 
-	private boolean createParentDir(String filePath) {
-		File parent = Paths.get(filePath).getParent().toFile();
-		if (!parent.exists() && !parent.mkdirs()) {
-			LogUtil.e("Failed to create parent for file " + filePath);
-			return false;
-		}
-		return true;
+	@Override
+	public String loadBackupCredential(String serviceDid) {
+		return readContent(makeFullPath(BACKUP, compatDid(serviceDid)));
 	}
 
-	private String getRelativeDidStr(String did) {
-		String[] parts = did.split(":");
-		return parts.length >= 3 ? parts[2] : did;
+	@Override
+	public String loadAccessToken(String serviceDid) {
+		return readContent(makeFullPath(TOKENS, compatDid(serviceDid)));
 	}
 
-	private String getFileContent(String path) {
+	@Override
+	public String loadAccessTokenByAddress(String providerAddress) {
+		return readContent(makeFullPath(TOKENS, sha256(providerAddress)));
+	}
+
+	@Override
+	public void storeBackupCredential(String serviceDid, String credential) {
+		writeContent(makeFullPath(BACKUP, compatDid(serviceDid)), credential);
+	}
+
+	@Override
+	public void storeAccessToken(String serviceDid, String accessToken) {
+		writeContent(makeFullPath(TOKENS, compatDid(serviceDid)), accessToken);
+	}
+
+	@Override
+	public void storeAccessTokenByAddress(String providerAddress, String accessToken) {
+		writeContent(makeFullPath(TOKENS, sha256(providerAddress)), accessToken);
+	}
+
+	@Override
+	public void clearBackupCredential(String serviceDid) {
+		deleteContent(makeFullPath(BACKUP, compatDid(serviceDid)));
+	}
+
+	@Override
+	public void clearAccessToken(String serviceDid) {
+		deleteContent(makeFullPath(TOKENS, compatDid(serviceDid)));
+	}
+
+	@Override
+	public void clearAccessTokenByAddress(String providerAddress) {
+		deleteContent(makeFullPath(TOKENS, sha256(providerAddress)));
+	}
+
+	private String readContent(String path) {
+		if (path == null)
+			return null;
+
 		Path p = Paths.get(path);
 		if (!Files.exists(p))
 			return null;
@@ -51,102 +83,61 @@ public class FileStorage implements DataStorage {
 		try {
 			return new String(Files.readAllBytes(p));
 		} catch (IOException e) {
-			LogUtil.e("Failed to get content from file " + path);
+			e.printStackTrace();
 			return null;
 		}
 	}
 
-	private void saveFileContent(String path, String content) {
-		if (!createParentDir(path))
+	private void writeContent(String path, String content) {
+		if (path == null)
+			return;
+
+		File parent = Paths.get(path).getParent().toFile();
+		if (!parent.exists())
+			parent.mkdirs();
+
+		if (!parent.exists())
 			return;
 
 		try {
 			Files.write(Paths.get(path), content.getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
-			LogUtil.e("Failed to save content to file " + path);
+			e.printStackTrace();
 		}
 	}
 
-	private void removeFile(String path) {
+	private void deleteContent(String path) {
+		if (path == null)
+			return;
+
 		try {
 			Files.deleteIfExists(Paths.get(path));
 		} catch (IOException e) {
-			LogUtil.e("Failed to remove file " + path);
+			e.printStackTrace();
 		}
 	}
 
-	private String getFilePath(String folder, String fileName) {
-		return this.basePath + File.separator + folder + File.separator + fileName;
+	private String makeFullPath(String segPath, String fileName) {
+		return this.basePath
+					+ File.separator
+					+ segPath
+					+ File.separator
+					+ fileName;
 	}
 
-	@Override
-	public String loadBackupCredential(String serviceDid) {
-		return getFileContent(getFilePath(CREDENTIAL_BACKUP, getRelativeDidStr(serviceDid)));
+	private String compatDid(String did) {
+		String[] parts = did.split(":");
+		return parts.length >= 3 ? parts[2] : did;
 	}
 
-	@Override
-	public String loadAccessToken(String serviceDid) {
-		return getFileContent(getFilePath(TOKENS, getRelativeDidStr(serviceDid)));
-	}
-
-	@Override
-	public String loadAccessTokenByAddress(String providerAddress) {
-		return getFileContent(getFilePath(TOKENS, getSHA256(providerAddress)));
-	}
-
-	@Override
-	public void storeBackupCredential(String serviceDid, String credential) {
-		if (serviceDid == null)
-			return;
-
-		saveFileContent(getFilePath(CREDENTIAL_BACKUP, getRelativeDidStr(serviceDid)), credential);
-	}
-
-	@Override
-	public void storeAccessToken(String serviceDid, String accessToken) {
-		if (serviceDid == null)
-			return;
-
-		saveFileContent(getFilePath(TOKENS, getRelativeDidStr(serviceDid)), accessToken);
-	}
-
-	@Override
-	public void storeAccessTokenByAddress(String providerAddress, String accessToken) {
-		if (providerAddress == null)
-			return;
-
-		saveFileContent(getFilePath(TOKENS, getSHA256(providerAddress)), accessToken);
-	}
-
-	@Override
-	public void clearBackupCredential(String serviceDid) {
-		if (serviceDid == null)
-			return;
-		removeFile(getFilePath(CREDENTIAL_BACKUP, getRelativeDidStr(serviceDid)));
-	}
-
-	@Override
-	public void clearAccessToken(String serviceDid) {
-		if (serviceDid == null)
-			return;
-		removeFile(getFilePath(TOKENS, getRelativeDidStr(serviceDid)));
-	}
-
-	@Override
-	public void clearAccessTokenByAddress(String providerAddress) {
-		if (providerAddress == null)
-			return;
-		removeFile(getFilePath(TOKENS, getSHA256(providerAddress)));
-	}
-
-	private String getSHA256(String message) {
+	private String sha256(String message) {
         byte[] bytes;
 
         try {
         	MessageDigest digest = MessageDigest.getInstance("SHA-256");
         	digest.update(message.getBytes("UTF-8"));
         	bytes = digest.digest();
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
