@@ -2,7 +2,7 @@ package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.did.VerifiableCredential;
 import org.elastos.hive.ServiceEndpoint;
-import org.elastos.hive.auth.CodeFetcher;
+import org.elastos.hive.connection.auth.CodeFetcher;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.utils.LogUtil;
 

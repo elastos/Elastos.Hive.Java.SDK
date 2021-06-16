@@ -1,4 +1,4 @@
-package org.elastos.hive.storage;
+package org.elastos.hive;
 
 public interface DataStorage {
 	String loadBackupCredential(String serviceDid);

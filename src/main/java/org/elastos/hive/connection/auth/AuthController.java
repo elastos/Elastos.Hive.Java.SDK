@@ -1,4 +1,4 @@
-package org.elastos.hive.auth.controller;
+package org.elastos.hive.connection.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -50,15 +50,15 @@ public class AuthController {
 
 	public String auth(String challengeResponse) throws HiveException {
 		try {
-			AccessToken token = authAPI.auth(new ChallengeResponse(challengeResponse))
+			AccessCode token = authAPI.auth(new ChallengeResponse(challengeResponse))
 							.execute()
 							.body();
 
-			if (!checkValid(token.getAccessToken(), expectationAudience)) {
+			if (!checkValid(token.getToken(), expectationAudience)) {
 				// TODO: log here.
 				throw new ServerUnkownException("Invalid challenge code, possibly being hacked.");
 			}
-			return token.getAccessToken();
+			return token.getToken();
 
 		} catch (NodeRPCException e) {
 			// TODO: Handle http error code here;

@@ -1,4 +1,4 @@
-package org.elastos.hive.storage;
+package org.elastos.hive;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 
-public class FileStorage implements DataStorage {
+class FileStorage implements DataStorage {
 	private static final String BACKUP = "credential-backup";
 	private static final String TOKENS = "tokens";
 

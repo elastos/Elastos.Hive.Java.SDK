@@ -27,7 +27,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import org.elastos.hive.auth.AccessToken;
+import org.elastos.hive.connection.auth.AccessToken;
 import org.elastos.hive.utils.LogUtil;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

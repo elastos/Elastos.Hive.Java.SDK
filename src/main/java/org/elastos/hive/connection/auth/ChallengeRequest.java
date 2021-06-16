@@ -1,4 +1,4 @@
-package org.elastos.hive.auth.controller;
+package org.elastos.hive.connection.auth;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,4 +1,4 @@
-package org.elastos.hive.auth;
+package org.elastos.hive.connection.auth;
 
 import org.elastos.hive.connection.NodeRPCException;
 

@@ -9,13 +9,11 @@ import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.about.AboutController;
 import org.elastos.hive.about.NodeVersion;
-import org.elastos.hive.auth.AccessToken;
-import org.elastos.hive.auth.BridgeHandler;
 import org.elastos.hive.connection.NodeRPCConnection;
+import org.elastos.hive.connection.auth.AccessToken;
+import org.elastos.hive.connection.auth.BridgeHandler;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
-import org.elastos.hive.storage.DataStorage;
-import org.elastos.hive.storage.FileStorage;
 
 public class ServiceEndpoint extends NodeRPCConnection {
 	private AppContext context;

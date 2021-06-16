@@ -1,4 +1,4 @@
-package org.elastos.hive.auth;
+package org.elastos.hive.connection.auth;
 
 public interface BridgeHandler {
 	void flush(String value);
