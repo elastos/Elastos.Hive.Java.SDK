@@ -8,17 +8,18 @@ import org.elastos.hive.vault.ServiceBuilder;
  */
 public class Vault extends ServiceEndpoint {
 	private FilesService 	filesService;
-	private DatabaseService databaseService;
-	private ScriptingService scriptingService;
+	private DatabaseService database;
+	private ScriptingService scripting;
 	private BackupService 	backupService;
 
 	public Vault(AppContext context, String providerAddress) {
 		super(context, providerAddress);
 
-		this.filesService     = new ServiceBuilder(this).createFilesService();
-		this.databaseService  = new ServiceBuilder(this).createDatabase();
-		this.backupService    = new ServiceBuilder(this).createBackupService();
-		this.scriptingService = new ServiceBuilder(this).createScriptingService();
+		ServiceBuilder builder = new ServiceBuilder(this);
+		this.filesService	= builder.createFilesService();
+		this.database		= builder.createDatabase();
+		this.scripting	 	= builder.createScriptingService();
+		this.backupService  = builder.createBackupService();
 	}
 
 	public FilesService getFilesService() {
@@ -26,11 +27,11 @@ public class Vault extends ServiceEndpoint {
 	}
 
 	public DatabaseService getDatabaseService() {
-		return this.databaseService;
+		return this.database;
 	}
 
 	public ScriptingService getScriptingService() {
-		return this.scriptingService;
+		return this.scripting;
 	}
 
 	public BackupService getBackupService() {
