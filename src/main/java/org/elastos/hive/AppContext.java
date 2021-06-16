@@ -106,7 +106,7 @@ public class AppContext {
 							String.format("No 'HiveVault' services declared on DID document %s", targetDid));
 
 				/*
-				 * TODO: should we throw special exception when it has more than one end-point
+				 * Should we throw special exception when it has more than one end-point
 				 * of service "HiveVault";
 				 */
 				return services.get(0).getServiceEndpoint();

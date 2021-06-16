@@ -1,4 +1,4 @@
-package org.elastos.hive.about;
+package org.elastos.hive.endpoint;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

@@ -1,4 +1,4 @@
-package org.elastos.hive.about;
+package org.elastos.hive.endpoint;
 
 import com.google.gson.annotations.SerializedName;
 
