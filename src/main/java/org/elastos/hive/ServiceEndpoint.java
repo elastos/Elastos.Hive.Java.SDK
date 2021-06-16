@@ -7,11 +7,11 @@ import java.util.concurrent.CompletionException;
 
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
-import org.elastos.hive.about.AboutController;
-import org.elastos.hive.about.NodeVersion;
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.auth.AccessToken;
 import org.elastos.hive.connection.auth.BridgeHandler;
+import org.elastos.hive.endpoint.AboutController;
+import org.elastos.hive.endpoint.NodeVersion;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
 
