@@ -59,8 +59,8 @@ public class SubscriptionController {
 	}
 
 	public VaultInfo getVaultInfo() throws HiveException {
-        try {
-        	return subscriptionAPI.getVaultInfo().execute().body();
+		try {
+			return subscriptionAPI.getVaultInfo().execute().body();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 			case NodeRPCException.UNAUTHORIZED:
@@ -147,8 +147,8 @@ public class SubscriptionController {
 	}
 
 	public BackupInfo getBackupInfo() throws HiveException {
-        try {
-       	 	return subscriptionAPI.getBackupInfo().execute().body();
+		try {
+	   	 	return subscriptionAPI.getBackupInfo().execute().body();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 			case NodeRPCException.UNAUTHORIZED:
@@ -164,7 +164,7 @@ public class SubscriptionController {
 
 	public BackupInfo subscribeToBackup(String reserved) throws HiveException {
 		try {
-        	return subscriptionAPI.subscribeToBackup(reserved).execute().body();
+			return subscriptionAPI.subscribeToBackup(reserved).execute().body();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 			case NodeRPCException.UNAUTHORIZED:
@@ -180,7 +180,7 @@ public class SubscriptionController {
 	}
 
 	public void unsubscribeBackup() throws HiveException {
-        try {
+		try {
 			subscriptionAPI.unsubscribeBackup().execute();
 		} catch (NodeRPCException e) {
 			switch(e.getCode()) {

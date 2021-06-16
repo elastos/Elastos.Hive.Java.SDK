@@ -19,13 +19,13 @@ public interface AppContextProvider {
 	 * instance did document as the running context.
 	 * @return The application instance did document.
 	 */
-    DIDDocument getAppInstanceDocument();
+	DIDDocument getAppInstanceDocument();
 
-    /**
-     * The method for upper Application to implement to acquire the authorization
-     * code from user's approval.
-     * @param authenticationChallengeJWtCode  The input challenge code from back-end node service.
-     * @return The credential issued by user.
-     */
-    CompletableFuture<String> getAuthorization(String authenticationChallengeJWtCode);
+	/**
+	 * The method for upper Application to implement to acquire the authorization
+	 * code from user's approval.
+	 * @param authenticationChallengeJWtCode  The input challenge code from back-end node service.
+	 * @return The credential issued by user.
+	 */
+	CompletableFuture<String> getAuthorization(String authenticationChallengeJWtCode);
 }

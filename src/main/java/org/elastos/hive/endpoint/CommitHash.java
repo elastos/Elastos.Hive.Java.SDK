@@ -4,9 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 class CommitHash {
 	@SerializedName("commit_hash")
-    private String commitId;
+	private String commitId;
 
-    public String getCommitId() {
-        return this.commitId;
-    }
+	public String getCommitId() {
+		return this.commitId;
+	}
 }

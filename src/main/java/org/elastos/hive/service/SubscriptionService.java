@@ -38,10 +38,10 @@ public interface SubscriptionService<T> {
 	 * no new service would be subscribed or created.
 	 *
 	 * @param credential The credential used to subscribe to a vault or backup service,
-	 *        currently this parameter would be reserved for future usage.
+	 *		currently this parameter would be reserved for future usage.
 	 * @return
 	 * 		The basic information of the newly created or existing vault on success,
-	 *      otherwise, the specific exception would returned in the wrapper.
+	 *	  otherwise, the specific exception would returned in the wrapper.
 	 *
 	 */
 	CompletableFuture<T> subscribe(String credential);
@@ -51,7 +51,7 @@ public interface SubscriptionService<T> {
 	 *
 	 * @return
 	 * 		None would be returned on success, otherwise, the specific exception
-	 *      would be returned.
+	 *	  would be returned.
 	 */
 	CompletableFuture<Void> unsubscribe();
 
@@ -61,7 +61,7 @@ public interface SubscriptionService<T> {
 	 *
 	 * @return
 	 * 		The basic information of the newly created or existing vault on success,
-	 *      otherwise, the specific exception would returned in the wrapper.
+	 *	  otherwise, the specific exception would returned in the wrapper.
 	 */
 	CompletableFuture<T> checkSubscription();
 }

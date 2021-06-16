@@ -10,33 +10,33 @@ import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class VaultPaymentTest {
-    private static SubscriptionService<VaultInfo> subscriptionService;
-    private static PaymentService paymentService;
+	private static SubscriptionService<VaultInfo> subscriptionService;
+	private static PaymentService paymentService;
 
-    @BeforeAll public static void setUp() {
-        Assertions.assertDoesNotThrow(()->{
-            TestData testData = TestData.getInstance();
-            VaultSubscription vs = new VaultSubscription(
-                    testData.getAppContext(),
-                    testData.getProviderAddress());
-            subscriptionService = vs;
-            paymentService = vs;
-        });
-    }
+	@BeforeAll public static void setUp() {
+		Assertions.assertDoesNotThrow(()->{
+			TestData testData = TestData.getInstance();
+			VaultSubscription vs = new VaultSubscription(
+					testData.getAppContext(),
+					testData.getProviderAddress());
+			subscriptionService = vs;
+			paymentService = vs;
+		});
+	}
 
-    @Test @Disabled
-    @org.junit.jupiter.api.Order(3)
-    void testOrderProcess() {
-        Assertions.assertDoesNotThrow(()->{
-            Order order = paymentService.placeOrder(VaultSubscriptionTest.PRICING_PLAN_NAME).get();
-            Assertions.assertNotNull(order);
-            order = paymentService.getOrder(order.getOrderId()).get();
-            Assertions.assertNotNull(order);
-            Receipt receipt = paymentService.payOrder(order.getOrderId(), null).get();
-            Assertions.assertNotNull(receipt);
-        });
-    }
+	@Test @Disabled
+	@org.junit.jupiter.api.Order(3)
+	void testOrderProcess() {
+		Assertions.assertDoesNotThrow(()->{
+			Order order = paymentService.placeOrder(VaultSubscriptionTest.PRICING_PLAN_NAME).get();
+			Assertions.assertNotNull(order);
+			order = paymentService.getOrder(order.getOrderId()).get();
+			Assertions.assertNotNull(order);
+			Receipt receipt = paymentService.payOrder(order.getOrderId(), null).get();
+			Assertions.assertNotNull(receipt);
+		});
+	}
 
-    @Test @org.junit.jupiter.api.Order(4) void testGetReceipt() {
-    }
+	@Test @org.junit.jupiter.api.Order(4) void testGetReceipt() {
+	}
 }

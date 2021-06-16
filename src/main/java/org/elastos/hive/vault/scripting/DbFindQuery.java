@@ -45,12 +45,12 @@ public class DbFindQuery extends ExecutableV2 {
 		}
 	}
 
-    public DbFindQuery(String name, String collection, JsonNode filter) {
-    	super(TYPE, name);
-        query = new Query(collection, filter);
-    }
+	public DbFindQuery(String name, String collection, JsonNode filter) {
+		super(TYPE, name);
+		query = new Query(collection, filter);
+	}
 
-    public DbFindQuery(String name, String collection, JsonNode filter, JsonNode options) {
+	public DbFindQuery(String name, String collection, JsonNode filter, JsonNode options) {
 		super(TYPE, name);
 		query = new Query(collection, filter, options);
 	}

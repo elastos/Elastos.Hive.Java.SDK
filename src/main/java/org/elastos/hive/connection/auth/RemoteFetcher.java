@@ -18,8 +18,8 @@ class RemoteFetcher implements CodeFetcher {
 		try {
 			String challenge = controller.signIn(contextProvider.getAppInstanceDocument());
 
-	        String challengeResponse = contextProvider.getAuthorization(challenge).get();
-	        return controller.auth(challengeResponse);
+			String challengeResponse = contextProvider.getAuthorization(challenge).get();
+			return controller.auth(challengeResponse);
 		} catch (Exception e) {
 			// TODO: log here.
 			e.printStackTrace();

@@ -34,10 +34,10 @@ public class DbQueryHasResults extends ConditionV2 {
 		}
 	}
 
-    public DbQueryHasResults(String name, String collection, JsonNode filter) {
-    	super(TYPE, name);
-        query = new Query(collection, filter);
-    }
+	public DbQueryHasResults(String name, String collection, JsonNode filter) {
+		super(TYPE, name);
+		query = new Query(collection, filter);
+	}
 
 	@Override
 	public Query getBody() {

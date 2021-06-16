@@ -32,10 +32,10 @@ public class DbInsertQuery extends ExecutableV2 {
 		}
 	}
 
-    public DbInsertQuery(String name, String collection, JsonNode doc) {
-    	super(TYPE, name);
-        query = new Query(collection, doc);
-    }
+	public DbInsertQuery(String name, String collection, JsonNode doc) {
+		super(TYPE, name);
+		query = new Query(collection, doc);
+	}
 
 	@Override
 	public Query getBody() {

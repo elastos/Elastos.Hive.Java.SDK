@@ -55,7 +55,7 @@ public class AccessToken implements CodeFetcher {
 		String address;
 
 		serviceDid = endpoint.getServiceInstanceDid();
-		address    = endpoint.getProviderAddress();
+		address	= endpoint.getProviderAddress();
 
 		if (serviceDid != null)
 			jwtCode = storage.loadAccessToken(serviceDid);

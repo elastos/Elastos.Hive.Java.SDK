@@ -6,14 +6,14 @@ public class PathNotExistException extends NotFoundException {
 	private static final long serialVersionUID = 5181597396226755904L;
 
 	public PathNotExistException() {
-        super();
-    }
+		super();
+	}
 
-    public PathNotExistException(String message) {
-        super(message);
-    }
+	public PathNotExistException(String message) {
+		super(message);
+	}
 
-    public PathNotExistException(NodeRPCException e) {
-        super(e.getMessage());
-    }
+	public PathNotExistException(NodeRPCException e) {
+		super(e.getMessage());
+	}
 }

@@ -5,16 +5,16 @@ import java.util.List;
 
 public class InsertResult {
 	@SerializedName("acknowledged")
-    private Boolean acknowledged;
+	private Boolean acknowledged;
 
-    @SerializedName("inserted_ids")
-    private List<String> insertedIds;
+	@SerializedName("inserted_ids")
+	private List<String> insertedIds;
 
-    public Boolean getAcknowledged() {
-        return acknowledged;
-    }
+	public Boolean getAcknowledged() {
+		return acknowledged;
+	}
 
-    public List<String> getInsertedIds() {
-        return insertedIds;
-    }
+	public List<String> getInsertedIds() {
+		return insertedIds;
+	}
 }

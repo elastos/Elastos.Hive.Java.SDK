@@ -22,7 +22,7 @@ public interface FilesService {
 	 *
 	 * @param path the path for the remote file
 	 * @return the new CompletionStage, the result is the Writer or OutputStream interface for
-	 *              upload the file content if success; null otherwise
+	 *			  upload the file content if success; null otherwise
 	 */
 	CompletableFuture<OutputStream> getUploadStream(String path);
 	CompletableFuture<Writer> getUploadWriter(String path);
@@ -33,7 +33,7 @@ public interface FilesService {
 	 *
 	 * @param path the path for the remote file
 	 * @return the new CompletionStage, the result is the Reader or InputStream interface for
-	 *      read the file content if success; null otherwise
+	 *	  read the file content if success; null otherwise
 	 */
 	CompletableFuture<InputStream> getDownloadStream(String path);
 	CompletableFuture<Reader> getDownloadReader(String path);
@@ -51,7 +51,7 @@ public interface FilesService {
 	 *
 	 * @param path the path for the remote file or folder
 	 * @return the new CompletionStage, the result is FileInfo
-	 *         if success; null otherwise
+	 *		 if success; null otherwise
 	 */
 	CompletableFuture<FileInfo> stat(String path);
 
@@ -60,7 +60,7 @@ public interface FilesService {
 	 *
 	 * @param path path for the remote file
 	 * @return the new CompletionStage, the result is the base64 hash string
-	 *         if the hash successfully calculated; null otherwise
+	 *		 if the hash successfully calculated; null otherwise
 	 */
 	CompletableFuture<String> hash(String path);
 
@@ -82,7 +82,7 @@ public interface FilesService {
 	 * @param source the path for the remote source file or folder
 	 * @param target the path for the remote destination file or folder
 	 * @return the new CompletionStage, the result is true if the file or folder
-	 *         successfully copied; false otherwise
+	 *		 successfully copied; false otherwise
 	 */
 	CompletableFuture<Void> copy(String source, String target);
 
@@ -92,7 +92,7 @@ public interface FilesService {
 	 *
 	 * @param path the path for the remote file or folder
 	 * @return the new CompletionStage, the result is true if the file or folder
-	 *         successfully deleted; false otherwise
+	 *		 successfully deleted; false otherwise
 	 */
 	CompletableFuture<Void> delete(String path);
 }

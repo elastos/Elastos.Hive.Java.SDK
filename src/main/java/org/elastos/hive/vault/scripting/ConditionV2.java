@@ -36,7 +36,7 @@ public abstract class ConditionV2 {
 	public String serialize() throws HiveException {
 		ObjectMapper mapper = new ObjectMapper();
 
-        try {
+		try {
 			return mapper.writer().writeValueAsString(this);
 		} catch (JsonProcessingException e) {
 			throw new HiveException(e);

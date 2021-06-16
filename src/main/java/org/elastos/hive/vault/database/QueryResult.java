@@ -6,10 +6,10 @@ import org.elastos.hive.connection.KeyValueDict;
 import java.util.List;
 
 class QueryResult {
-    @SerializedName("items")
-    private List<KeyValueDict> items;
+	@SerializedName("items")
+	private List<KeyValueDict> items;
 
-    public List<KeyValueDict> getItems() {
-        return this.items;
-    }
+	public List<KeyValueDict> getItems() {
+		return this.items;
+	}
 }

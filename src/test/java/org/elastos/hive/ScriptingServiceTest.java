@@ -348,6 +348,6 @@ class ScriptingServiceTest {
 	}
 
 	private JsonNode map2JsonNode(Map<String, Object> map) {
-        return new ObjectMapper().convertValue(map, JsonNode.class);
-    }
+		return new ObjectMapper().convertValue(map, JsonNode.class);
+	}
 }

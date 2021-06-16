@@ -27,10 +27,10 @@ public interface ScriptingInvocationService {
 
 	/**
 	 * Invoke the execution of the script to upload a file in the streaming mode.
-     * The upload works a bit differently from other executable queries because there
-     * are two steps to this executable. First, register a script on the vault,
-     * then you call this API actually to upload the file
-     *
+	 * The upload works a bit differently from other executable queries because there
+	 * are two steps to this executable. First, register a script on the vault,
+	 * then you call this API actually to upload the file
+	 *
 	 * @param transactionId 	The streaming identifier to the upload process
 	 * @param resultType 		Reader or InputStream class
 	 * @param <T> 				Reader or InputStream class
@@ -40,11 +40,11 @@ public interface ScriptingInvocationService {
 
 	/**
 	 * Invoke the execution of the script to download a file in the streaming mode.
-     * The upload works a bit differently from other executable queries because there
-     * are two steps to this executable. First, register a script on the vault,
-     * then you call this API actually to download the file
-     *
-     * @param transactionId 	The streaming identifier to the upload process
+	 * The upload works a bit differently from other executable queries because there
+	 * are two steps to this executable. First, register a script on the vault,
+	 * then you call this API actually to download the file
+	 *
+	 * @param transactionId 	The streaming identifier to the upload process
 	 * @param resultType 		Reader or InputStream class
 	 * @param <T> 				Reader or InputStream class
 	 * @return 					Reader or InputStream class

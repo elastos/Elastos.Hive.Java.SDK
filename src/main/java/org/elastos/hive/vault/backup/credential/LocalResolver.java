@@ -9,12 +9,12 @@ class LocalResolver implements CodeFetcher {
 	private ServiceEndpoint serviceEndpoint;
 	private CodeFetcher nextResolver;
 
-    public LocalResolver(ServiceEndpoint serviceEndpoint, CodeFetcher next) {
-    	this.serviceEndpoint = serviceEndpoint;
-    	this.nextResolver = next;
-    }
+	public LocalResolver(ServiceEndpoint serviceEndpoint, CodeFetcher next) {
+		this.serviceEndpoint = serviceEndpoint;
+		this.nextResolver = next;
+	}
 
-    @Override
+	@Override
 	public String fetch() throws NodeRPCException {
 		String token = restoreToken();
 		if (token == null) {
@@ -33,23 +33,23 @@ class LocalResolver implements CodeFetcher {
 	private String restoreToken() {
 		DataStorage storage = serviceEndpoint.getStorage();
 
-        if (serviceEndpoint.getServiceInstanceDid() == null)
-            return null;
+		if (serviceEndpoint.getServiceInstanceDid() == null)
+			return null;
 
-        return storage.loadBackupCredential(serviceEndpoint.getServiceInstanceDid());
-    }
+		return storage.loadBackupCredential(serviceEndpoint.getServiceInstanceDid());
+	}
 
-    private void saveToken(String token) {
-    	DataStorage storage = serviceEndpoint.getStorage();
+	private void saveToken(String token) {
+		DataStorage storage = serviceEndpoint.getStorage();
 
-        if (serviceEndpoint.getServiceInstanceDid() != null)
-        	storage.storeBackupCredential(serviceEndpoint.getServiceInstanceDid(), token);
-    }
+		if (serviceEndpoint.getServiceInstanceDid() != null)
+			storage.storeBackupCredential(serviceEndpoint.getServiceInstanceDid(), token);
+	}
 
-    private void clearToken() {
-    	DataStorage storage = serviceEndpoint.getStorage();
+	private void clearToken() {
+		DataStorage storage = serviceEndpoint.getStorage();
 
-        if (serviceEndpoint.getServiceInstanceDid() != null)
-        	storage.clearBackupCredential(serviceEndpoint.getServiceInstanceDid());
-    }
+		if (serviceEndpoint.getServiceInstanceDid() != null)
+			storage.clearBackupCredential(serviceEndpoint.getServiceInstanceDid());
+	}
 }

@@ -32,10 +32,10 @@ public class DbDeleteQuery extends ExecutableV2 {
 		}
 	}
 
-    public DbDeleteQuery(String name, String collection, JsonNode filter) {
-    	super(TYPE, name);
-        query = new Query(collection, filter);
-    }
+	public DbDeleteQuery(String name, String collection, JsonNode filter) {
+		super(TYPE, name);
+		query = new Query(collection, filter);
+	}
 
 	@Override
 	public Query getBody() {

@@ -13,9 +13,9 @@ public class CredentialCode {
 
 	public CredentialCode(ServiceEndpoint endpoint, BackupContext context) {
 		CodeFetcher remoteResolver = new RemoteResolver(
-        		endpoint,context,
-        		context.getParameter("targetServiceDid"),
-        		context.getParameter("targetAddress"));
+				endpoint,context,
+				context.getParameter("targetServiceDid"),
+				context.getParameter("targetAddress"));
 		resolver = new LocalResolver(endpoint, remoteResolver);
 	}
 
