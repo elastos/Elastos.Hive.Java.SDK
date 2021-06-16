@@ -31,9 +31,9 @@ public interface DatabaseService {
 	 * Insert a new document in a given collection
 	 * @param collection the collection name
 	 * @param doc The document to insert. Must be a mutable mapping type. If
-	 *            the document does not have an _id field one will be added automatically
+	 *			the document does not have an _id field one will be added automatically
 	 * @param options bypass_document_validation: (optional) If True, allows
-	 *                the write to opt-out of document level validation. Default is False.
+	 *				the write to opt-out of document level validation. Default is False.
 	 * @return Results returned by {@link InsertResult} wrapper
 	 */
 	CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options);
@@ -43,11 +43,11 @@ public interface DatabaseService {
 	 * Insert many new documents in a given collection
 	 * @param collection the collection name
 	 * @param docs The document to insert. Must be a mutable mapping type. If the
-	 *             document does not have an _id field one will be added automatically.
+	 *			 document does not have an _id field one will be added automatically.
 	 * @param options ordered (optional): If True (the default) documents will be inserted on the server serially,
-	 *                in the order provided. If an error occurs all remaining inserts are aborted. If False, documents
-	 *                will be inserted on the server in arbitrary order, possibly in parallel, and all document inserts will be attempted.
-	 *                bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
+	 *				in the order provided. If an error occurs all remaining inserts are aborted. If False, documents
+	 *				will be inserted on the server in arbitrary order, possibly in parallel, and all document inserts will be attempted.
+	 *				bypass_document_validation: (optional) If True, allows the write to opt-out of document level validation. Default is False.
 	 * @return Results returned by {@link InsertResult} wrapper
 	 */
 	CompletableFuture<InsertResult> insertMany(String collection, List<JsonNode> docs, InsertOptions options);
@@ -58,9 +58,9 @@ public interface DatabaseService {
 	 * @param collection the collection name
 	 * @param query The document of filter
 	 * @param options
-	 *              skip (int): The number of matching documents to skip before returning results.
-	 *              limit (int): The maximum number of documents to count. Must be a positive integer. If not provided, no limit is imposed.
-	 *              maxTimeMS (int): The maximum amount of time to allow this operation to run, in milliseconds.
+	 *			  skip (int): The number of matching documents to skip before returning results.
+	 *			  limit (int): The maximum number of documents to count. Must be a positive integer. If not provided, no limit is imposed.
+	 *			  maxTimeMS (int): The maximum amount of time to allow this operation to run, in milliseconds.
 	 * @return count size
 	 */
 	CompletableFuture<Long> countDocuments(String collection, JsonNode query, CountOptions options);

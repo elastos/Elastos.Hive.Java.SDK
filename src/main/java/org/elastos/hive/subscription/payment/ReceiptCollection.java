@@ -5,10 +5,10 @@ import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
 class ReceiptCollection {
-    @SerializedName("value")
-    private List<Receipt> receipts;
+	@SerializedName("value")
+	private List<Receipt> receipts;
 
-    public List<Receipt> receiptList() {
-        return receipts;
-    }
+	public List<Receipt> receiptList() {
+		return receipts;
+	}
 }

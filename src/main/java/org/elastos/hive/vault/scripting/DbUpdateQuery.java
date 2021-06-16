@@ -39,10 +39,10 @@ public class DbUpdateQuery extends ExecutableV2 {
 		}
 	}
 
-    public DbUpdateQuery(String name, String collection, JsonNode filter, JsonNode update) {
-    	super(TYPE, name);
-        query = new Query(collection, filter, update);
-    }
+	public DbUpdateQuery(String name, String collection, JsonNode filter, JsonNode update) {
+		super(TYPE, name);
+		query = new Query(collection, filter, update);
+	}
 
 	@Override
 	public Query getBody() {

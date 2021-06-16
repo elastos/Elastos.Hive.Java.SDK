@@ -131,27 +131,27 @@ class FileStorage implements DataStorage {
 	}
 
 	private String sha256(String message) {
-        byte[] bytes;
+		byte[] bytes;
 
-        try {
-        	MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        	digest.update(message.getBytes("UTF-8"));
-        	bytes = digest.digest();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			digest.update(message.getBytes("UTF-8"));
+			bytes = digest.digest();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 
-        StringBuffer buffer = new StringBuffer();
-        String temp = null;
+		StringBuffer buffer = new StringBuffer();
+		String temp = null;
 
-        for (int i = 0; i < bytes.length; i++) {
-            temp = Integer.toHexString(bytes[i] & 0xFF);
-            if (temp.length() == 1)
-            	buffer.append("0");
+		for (int i = 0; i < bytes.length; i++) {
+			temp = Integer.toHexString(bytes[i] & 0xFF);
+			if (temp.length() == 1)
+				buffer.append("0");
 
-            buffer.append(temp);
-        }
-        return buffer.toString();
-    }
+			buffer.append(temp);
+		}
+		return buffer.toString();
+	}
 }

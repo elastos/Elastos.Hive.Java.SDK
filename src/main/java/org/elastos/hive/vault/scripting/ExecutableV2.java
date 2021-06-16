@@ -47,9 +47,9 @@ public abstract class ExecutableV2 {
 	public abstract Object getBody();
 
 	public String serialize() throws HiveException {
-        ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper mapper = new ObjectMapper();
 
-        try {
+		try {
 			return mapper.writer().writeValueAsString(this);
 		} catch (JsonProcessingException e) {
 			throw new HiveException(e);

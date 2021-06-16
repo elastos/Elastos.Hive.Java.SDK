@@ -38,80 +38,80 @@ import okio.Buffer;
 import okio.BufferedSource;
 
 class LoggerInterceptor implements Interceptor {
-    private static final int MAX_BODY_LEN = 500;
+	private static final int MAX_BODY_LEN = 500;
 
-    @Override
-    public Response intercept(Chain chain) throws IOException {
-        return dumpResponse(chain.proceed(dumpRequest(chain.request())));
-    }
+	@Override
+	public Response intercept(Chain chain) throws IOException {
+		return dumpResponse(chain.proceed(dumpRequest(chain.request())));
+	}
 
-    private Request dumpRequest(Request request) throws IOException {
-        RequestBody body = request.body();
-        String bodyInString = null;
+	private Request dumpRequest(Request request) throws IOException {
+		RequestBody body = request.body();
+		String bodyInString = null;
 
-        LogUtil.d("request -> [" + request.method() + "] " + request.url().toString());
-        LogUtil.d("request headers->" + request.headers().toString());
+		LogUtil.d("request -> [" + request.method() + "] " + request.url().toString());
+		LogUtil.d("request headers->" + request.headers().toString());
 
-        if (body != null) {
-            Buffer buffer = new Buffer();
-            body.writeTo(buffer);
+		if (body != null) {
+			Buffer buffer = new Buffer();
+			body.writeTo(buffer);
 
-            Charset charset = Charset.defaultCharset();
-            MediaType type  = body.contentType();
+			Charset charset = Charset.defaultCharset();
+			MediaType type  = body.contentType();
 
-            if (type != null) {
-                try {
-                    charset = type.charset(charset);
-                } catch (UnsupportedCharsetException e) {
-                    e.printStackTrace();
-                }
-            }
+			if (type != null) {
+				try {
+					charset = type.charset(charset);
+				} catch (UnsupportedCharsetException e) {
+					e.printStackTrace();
+				}
+			}
 
-            if (charset != null)
-                bodyInString = buffer.readString(charset);
-        }
+			if (charset != null)
+				bodyInString = buffer.readString(charset);
+		}
 
-        if (bodyInString != null && !bodyInString.equals(""))
-            LogUtil.d("request body->" + getOutputBodyContent(bodyInString));
+		if (bodyInString != null && !bodyInString.equals(""))
+			LogUtil.d("request body->" + getOutputBodyContent(bodyInString));
 
-        return request;
-    }
+		return request;
+	}
 
-    private Response dumpResponse(Response response) throws IOException {
-        ResponseBody body = response.body();
-        String bodyInString = null;
+	private Response dumpResponse(Response response) throws IOException {
+		ResponseBody body = response.body();
+		String bodyInString = null;
 
-        LogUtil.d("response headers ->" + response.headers().toString());
+		LogUtil.d("response headers ->" + response.headers().toString());
 
-        if (body != null) {
-            BufferedSource source = body.source();
-            source.request(Long.MAX_VALUE); // Buffer the entire body.
-            Buffer buffer = source.buffer();
+		if (body != null) {
+			BufferedSource source = body.source();
+			source.request(Long.MAX_VALUE); // Buffer the entire body.
+			Buffer buffer = source.buffer();
 
-            Charset charset = Charset.defaultCharset();
-            MediaType type = body.contentType();
+			Charset charset = Charset.defaultCharset();
+			MediaType type = body.contentType();
 
-            if (type != null) {
-                try {
-                    charset = type.charset(charset);
-                } catch (UnsupportedCharsetException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (charset != null)
-                bodyInString = buffer.clone().readString(charset);
+			if (type != null) {
+				try {
+					charset = type.charset(charset);
+				} catch (UnsupportedCharsetException e) {
+					e.printStackTrace();
+				}
+			}
+			if (charset != null)
+				bodyInString = buffer.clone().readString(charset);
 
-        }
+		}
 
-        LogUtil.d("response Code ->" + response.code());
+		LogUtil.d("response Code ->" + response.code());
 
-        if (bodyInString != null && !bodyInString.equals(""))
-            LogUtil.d("response body ->" + getOutputBodyContent(bodyInString));
+		if (bodyInString != null && !bodyInString.equals(""))
+			LogUtil.d("response body ->" + getOutputBodyContent(bodyInString));
 
-        return response;
-    }
+		return response;
+	}
 
-    private String getOutputBodyContent(String body) {
-        return body.length() > MAX_BODY_LEN ? body.substring(0, MAX_BODY_LEN) : body;
-    }
+	private String getOutputBodyContent(String body) {
+		return body.length() > MAX_BODY_LEN ? body.substring(0, MAX_BODY_LEN) : body;
+	}
 }

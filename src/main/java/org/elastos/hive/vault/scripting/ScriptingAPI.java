@@ -13,7 +13,7 @@ interface ScriptingAPI {
 
 	@PATCH("/api/v2/vault/scripting/{scriptName}")
 	Call<ResponseBody> runScript(@Path("scriptName") String scriptName,
-						         @Body runScriptParams body);
+								 @Body runScriptParams body);
 
 	@GET("/api/v2/vault/scripting/{scriptName}/{targetDid}@{targetAppDid}/{params}")
 	Call<ResponseBody> runScriptUrl(@Path("scriptName") String scriptName,

@@ -5,24 +5,24 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 class PricingPlanCollection {
-    @SerializedName("backupPlans")
-    private List<PricingPlan> backupPlans;
+	@SerializedName("backupPlans")
+	private List<PricingPlan> backupPlans;
 
-    @SerializedName("pricingPlans")
-    private List<PricingPlan> pricingPlans;
+	@SerializedName("pricingPlans")
+	private List<PricingPlan> pricingPlans;
 
-    @SerializedName("version")
-    String version;
+	@SerializedName("version")
+	String version;
 
-    public List<PricingPlan> getBackupPlans() {
-        return backupPlans;
-    }
+	public List<PricingPlan> getBackupPlans() {
+		return backupPlans;
+	}
 
-    public List<PricingPlan> getPricingPlanCollection() {
-        return pricingPlans;
-    }
+	public List<PricingPlan> getPricingPlanCollection() {
+		return pricingPlans;
+	}
 
-    public String getVersion() {
-        return version;
-    }
+	public String getVersion() {
+		return version;
+	}
 }
