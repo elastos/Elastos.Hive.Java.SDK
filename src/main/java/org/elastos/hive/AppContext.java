@@ -1,6 +1,5 @@
 package org.elastos.hive;
 
-import java.io.File;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -20,8 +19,6 @@ import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.DIDResolverNotSetupException;
 import org.elastos.hive.exception.DIDResolverSetupException;
 import org.elastos.hive.exception.DIDResoverAlreadySetupException;
-import org.elastos.hive.storage.DataStorage;
-import org.elastos.hive.storage.FileStorage;
 
 /**
  * The application context would contain the resources list below:
@@ -34,12 +31,10 @@ public class AppContext {
 
 	private AppContextProvider contextProvider;
 	private String userDid;
-	private DataStorage dataStorage;
 
 	private AppContext(AppContextProvider provider, String userDid) {
 		this.userDid = userDid;
 		this.contextProvider = provider;
-		this.dataStorage = new FileStorage(provider.getLocalDataDir() + File.separator, userDid);
 	}
 
 	public AppContextProvider getAppContextProvider() {
@@ -48,10 +43,6 @@ public class AppContext {
 
 	public String getUserDid() {
 		return userDid;
-	}
-
-	DataStorage dataStorage() {
-		return this.dataStorage;
 	}
 
 	public static void setupResolver(String resolver, String cacheDir) throws HiveException {

@@ -1,5 +1,6 @@
 package org.elastos.hive;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -14,6 +15,7 @@ import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.storage.DataStorage;
+import org.elastos.hive.storage.FileStorage;
 
 public class ServiceEndpoint extends NodeRPCConnection {
 	private AppContext context;
@@ -24,6 +26,7 @@ public class ServiceEndpoint extends NodeRPCConnection {
 	private String serviceInstanceDid;
 
 	private AccessToken accessToken;
+	private DataStorage dataStorage;
 
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
 		if (context == null || providerAddress == null)
@@ -31,7 +34,13 @@ public class ServiceEndpoint extends NodeRPCConnection {
 
 		this.context = context;
 		this.providerAddress = providerAddress;
-		this.accessToken = new AccessToken(this, context.dataStorage(), new BridgeHandler() {
+
+		String dataDir = context.getAppContextProvider().getLocalDataDir();
+		if (!dataDir.endsWith(File.separator))
+			dataDir += File.separator;
+
+		this.dataStorage = new FileStorage(dataDir, context.getUserDid());
+		this.accessToken = new AccessToken(this, dataStorage, new BridgeHandler() {
 			private WeakReference<ServiceEndpoint> weakref;
 
 			@Override
@@ -41,8 +50,7 @@ public class ServiceEndpoint extends NodeRPCConnection {
 					Claims claims;
 
 					claims = new JwtParserBuilder().build().parseClaimsJws(value).getBody();
-					endpoint.appInstanceDid(claims.getIssuer());
-					endpoint.serviceInstanceDid(claims.getSubject());
+					endpoint.flushDids(claims.getIssuer(), claims.getSubject());
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -122,16 +130,13 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		return serviceInstanceDid;
 	}
 
-	private void appInstanceDid(String appInstanceDid) {
-		this.appInstanceDid = appInstanceDid;
-	}
-
-	private void serviceInstanceDid(String serviceInstanceDid) {
+	private void flushDids(String appInstanceDId, String serviceInstanceDid) {
+		this.appInstanceDid = appInstanceDId;
 		this.serviceInstanceDid = serviceInstanceDid;
 	}
 
 	public DataStorage getStorage() {
-		return context.dataStorage();
+		return dataStorage;
 	}
 
 	@Override
