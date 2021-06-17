@@ -85,13 +85,9 @@ class ScriptingCrossingTest {
 					.putKv("did", "$caller_did");
 			scriptingService.registerScript(SCRIPT_NAME,
 					new QueryHasResultCondition("verify_user_permission", COLLECTION_GROUP, filter),
-					Executable.createInsertExecutable(SCRIPT_NAME,
-							new ScriptInsertExecutableBody(COLLECTION_GROUP_MESSAGE, new KeyValueDict()
-									.putKv("author", "$params.author")
-									.putKv("content", "$params.content"),
-									new KeyValueDict().putKv("bypass_document_validation",false)
-											.putKv("ordered",true)
-							)),
+					new InsertExecutable(SCRIPT_NAME, COLLECTION_GROUP_MESSAGE,
+							new KeyValueDict().putKv("author", "$params.author").putKv("content", "$params.content"),
+							new KeyValueDict().putKv("bypass_document_validation",false).putKv("ordered",true)),
 					false, false).get();
 		});
 	}

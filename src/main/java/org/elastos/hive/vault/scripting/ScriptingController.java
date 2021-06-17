@@ -60,7 +60,7 @@ public class ScriptingController {
 							Class<T> resultType) throws HiveException {
 		try {
 			Map<String, Object> map = new ObjectMapper().convertValue(params, new TypeReference<Map<String, Object>>() {});
-			String json = scriptingAPI.runScript(name, new runScriptParams()
+			String json = scriptingAPI.runScript(name, new RunScriptParams()
 							.setContext(new ScriptContext()
 							.setTargetDid(targetDid)
 							.setTargetAppDid(targetAppDid))
