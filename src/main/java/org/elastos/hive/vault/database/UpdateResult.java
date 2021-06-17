@@ -5,9 +5,9 @@ import com.google.gson.annotations.SerializedName;
 public class UpdateResult {
 	private Boolean acknowledged;
 	@SerializedName("matched_count")
-	private int matchedCount;
+	private Integer matchedCount;
 	@SerializedName("modified_count")
-	private int modifiedCount;
+	private Integer modifiedCount;
 	@SerializedName("upserted_id")
 	private String upsertedId;
 
@@ -15,11 +15,11 @@ public class UpdateResult {
 		return acknowledged;
 	}
 
-	public int getMatchedCount() {
+	public Integer getMatchedCount() {
 		return matchedCount;
 	}
 
-	public int getModifiedCount() {
+	public Integer getModifiedCount() {
 		return modifiedCount;
 	}
 

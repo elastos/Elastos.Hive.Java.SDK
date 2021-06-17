@@ -84,6 +84,15 @@ class DatabaseServiceTest {
 		});
 	}
 
+	@Test @Order(6) void testQueryWithOptions() {
+		Assertions.assertDoesNotThrow(()->{
+			ObjectNode query = JsonNodeFactory.instance.objectNode();
+			query.put("author", "john doe1");
+			QueryOptions options = new QueryOptions().setSort(new SortItem("_id", SortItem.Order.ASCENDING));
+			Assertions.assertNotNull(databaseService.query(COLLECTION_NAME, query, options).get());
+		});
+	}
+
 	@Test @Order(7) void testCountDoc() {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
