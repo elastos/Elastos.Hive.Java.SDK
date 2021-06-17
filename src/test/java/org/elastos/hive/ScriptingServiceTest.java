@@ -67,6 +67,7 @@ class ScriptingServiceTest {
 	}
 
 	@Test @Order(1) void testInsert() {
+		remove_test_database();
 		create_test_database();
 		registerScriptInsert(INSERT_NAME);
 		callScriptInsert(INSERT_NAME);
@@ -332,8 +333,11 @@ class ScriptingServiceTest {
 	 * If not exists, also return OK(_status).
 	 */
 	private static void remove_test_database() {
-		Assertions.assertDoesNotThrow(() ->
-				databaseService.deleteCollection(COLLECTION_NAME).get());
+		try {
+			databaseService.deleteCollection(COLLECTION_NAME).get();
+		} catch (Exception e) {
+			// pass
+		}
 	}
 
 	private JsonNode map2JsonNode(Map<String, Object> map) {
