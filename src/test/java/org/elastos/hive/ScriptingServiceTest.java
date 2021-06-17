@@ -1,6 +1,5 @@
 package org.elastos.hive;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
@@ -62,14 +61,13 @@ class ScriptingServiceTest {
 			ownerDid = testData.getOwnerDid();
 			appDid = testData.getAppId();
 		});
-		create_test_database();
 	}
 
 	@AfterAll public static void tearDown() {
-		remove_test_database();
 	}
 
 	@Test @Order(1) void testInsert() {
+		create_test_database();
 		registerScriptInsert(INSERT_NAME);
 		callScriptInsert(INSERT_NAME);
 	}
@@ -206,7 +204,7 @@ class ScriptingServiceTest {
 	private String callScriptFileUpload(String scriptName, String fileName) {
 		try {
 			JsonNode result = scriptRunner.callScript(scriptName,
-					Executable.createFileUploadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
+					Executable.createRunFileParams(fileName),
 					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
@@ -249,7 +247,7 @@ class ScriptingServiceTest {
 	private String callScriptFileDownload(String scriptName, String fileName) {
 		try {
 			JsonNode result = scriptRunner.callScript(scriptName,
-					Executable.createFileDownloadParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
+					Executable.createRunFileParams(fileName),
 					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
@@ -285,7 +283,7 @@ class ScriptingServiceTest {
 	private void callScriptFileProperties(String scriptName, String fileName) {
 		Assertions.assertDoesNotThrow(()->{
 			JsonNode result = scriptRunner.callScript(scriptName,
-					Executable.createFilePropertiesParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
+					Executable.createRunFileParams(fileName),
 					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
@@ -297,6 +295,7 @@ class ScriptingServiceTest {
 	@Test @Order(9) void testFileHash() {
 		registerScriptFileHash(FILE_HASH_NAME);
 		callScriptFileHash(FILE_HASH_NAME, fileName);
+		remove_test_database();
 	}
 
 	private void registerScriptFileHash(String scriptName) {
@@ -309,7 +308,7 @@ class ScriptingServiceTest {
 	private void callScriptFileHash(String scriptName, String fileName) {
 		Assertions.assertDoesNotThrow(()->{
 			JsonNode result = scriptRunner.callScript(scriptName,
-					Executable.createFileHashParams("5f8d9dfe2f4c8b7a6f8ec0f1", fileName),
+					Executable.createRunFileParams(fileName),
 					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
@@ -322,8 +321,11 @@ class ScriptingServiceTest {
 	 * If exists, also return OK(_status).
 	 */
 	private static void create_test_database() {
-		Assertions.assertDoesNotThrow(()->
-				databaseService.createCollection(COLLECTION_NAME).get());
+		try {
+			databaseService.createCollection(COLLECTION_NAME).get();
+		} catch (Exception e) {
+			// pass
+		}
 	}
 
 	/**

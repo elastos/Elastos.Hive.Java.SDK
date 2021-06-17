@@ -61,7 +61,7 @@ public class ScriptingController {
 		try {
 			Map<String, Object> map = new ObjectMapper().convertValue(params, new TypeReference<Map<String, Object>>() {});
 			String json = scriptingAPI.runScript(name, new RunScriptParams()
-							.setContext(new ScriptContext()
+							.setContext(new Context()
 							.setTargetDid(targetDid)
 							.setTargetAppDid(targetAppDid))
 							.setParams(map))
