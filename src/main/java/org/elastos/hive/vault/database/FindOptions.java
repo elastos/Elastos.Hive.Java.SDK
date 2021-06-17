@@ -14,7 +14,7 @@ public class FindOptions {
 		return this;
 	}
 
-	public long getSkip() {
+	public Integer getSkip() {
 		return skip;
 	}
 
@@ -22,7 +22,7 @@ public class FindOptions {
 		return skip != null ? String.valueOf(skip) : "";
 	}
 
-	public long getLimit() {
+	public Integer getLimit() {
 		return limit;
 	}
 

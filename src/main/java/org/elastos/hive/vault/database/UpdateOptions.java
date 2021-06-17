@@ -4,16 +4,16 @@ import com.google.gson.annotations.SerializedName;
 
 public class UpdateOptions {
 	@SerializedName("upsert")
-	private boolean upsert;
+	private Boolean upsert;
 	@SerializedName("bypass_document_validation")
-	private boolean bypassDocumentValidation;
+	private Boolean bypassDocumentValidation;
 
-	public UpdateOptions setUpsert(boolean upsert) {
+	public UpdateOptions setUpsert(Boolean upsert) {
 		this.upsert = upsert;
 		return this;
 	}
 
-	public UpdateOptions setBypassDocumentValidation(boolean bypassDocumentValidation) {
+	public UpdateOptions setBypassDocumentValidation(Boolean bypassDocumentValidation) {
 		this.bypassDocumentValidation = bypassDocumentValidation;
 		return this;
 	}

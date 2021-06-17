@@ -3,52 +3,66 @@ package org.elastos.hive.vault.database;
 import com.google.gson.annotations.SerializedName;
 import org.elastos.hive.connection.KeyValueDict;
 
+import java.util.Collections;
 import java.util.List;
 
 public class QueryOptions {
-	private int skip;
-	private int limit;
+	private Integer skip;
+	private Integer limit;
 	private KeyValueDict projection;
 	// ex: [('_id', -1)]
-	private List<List<Object>> sort;
+	private List<SortItem> sort;
 	@SerializedName("allow_partial_results")
-	private boolean allowPartialResults;
+	private Boolean allowPartialResults;
 	@SerializedName("return_key")
-	private boolean returnKey;
+	private Boolean returnKey;
 	@SerializedName("show_record_id")
-	private boolean showRecordId;
+	private Boolean showRecordId;
 	@SerializedName("batch_size")
-	private int batchSize;
+	private Integer batchSize;
 
-	public void setSkip(int skip) {
+	public QueryOptions setSkip(Integer skip) {
 		this.skip = skip;
+		return this;
 	}
 
-	public void setLimit(int limit) {
+	public QueryOptions setLimit(Integer limit) {
 		this.limit = limit;
+		return this;
 	}
 
-	public void setProjection(KeyValueDict projection) {
+	public QueryOptions setProjection(KeyValueDict projection) {
 		this.projection = projection;
+		return this;
 	}
 
-	public void setSort(List<List<Object>> sort) {
+	public QueryOptions setSort(List<SortItem> sort) {
 		this.sort = sort;
+		return this;
 	}
 
-	public void setAllowPartialResults(boolean allowPartialResults) {
+	public QueryOptions setSort(SortItem sort) {
+		this.sort = Collections.singletonList(sort);
+		return this;
+	}
+
+	public QueryOptions setAllowPartialResults(Boolean allowPartialResults) {
 		this.allowPartialResults = allowPartialResults;
+		return this;
 	}
 
-	public void setReturnKey(boolean returnKey) {
+	public QueryOptions setReturnKey(Boolean returnKey) {
 		this.returnKey = returnKey;
+		return this;
 	}
 
-	public void setShowRecordId(boolean showRecordId) {
+	public QueryOptions setShowRecordId(Boolean showRecordId) {
 		this.showRecordId = showRecordId;
+		return this;
 	}
 
-	public void setBatchSize(int batchSize) {
+	public QueryOptions setBatchSize(Integer batchSize) {
 		this.batchSize = batchSize;
+		return this;
 	}
 }
