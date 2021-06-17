@@ -75,13 +75,11 @@ class ScriptingServiceTest {
 	}
 
 	private void registerScriptInsert(String scriptName) {
-		Assertions.assertDoesNotThrow(()->scriptingService.registerScript(scriptName,
-				Executable.createInsertExecutable(scriptName,
-						new ScriptInsertExecutableBody(COLLECTION_NAME, new KeyValueDict()
-								.putKv("author", "$params.author")
-								.putKv("content", "$params.content"),
-								new KeyValueDict().putKv("bypass_document_validation",false).putKv("ordered",true)
-						)), false, false).get());
+		Assertions.assertDoesNotThrow(() -> scriptingService.registerScript(scriptName,
+				new InsertExecutable(scriptName, COLLECTION_NAME,
+						new KeyValueDict().putKv("author", "$params.author").putKv("content", "$params.content"),
+						new KeyValueDict().putKv("bypass_document_validation", false).putKv("ordered", true)),
+				false, false).get());
 	}
 
 	private void callScriptInsert(String scriptName) {
@@ -104,8 +102,7 @@ class ScriptingServiceTest {
 	private void registerScriptFindWithoutCondition(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
 			scriptingService.registerScript(scriptName,
-					new Executable(scriptName, Executable.TYPE_FIND,
-							new ScriptFindBody(COLLECTION_NAME, new KeyValueDict().putKv("author","John"))).setOutput(true),
+					new FindExecutable(scriptName, COLLECTION_NAME, new KeyValueDict().putKv("author","John")).setOutput(true),
 					false, false).get();
 		});
 	}
@@ -125,10 +122,7 @@ class ScriptingServiceTest {
 			KeyValueDict filter = new KeyValueDict().putKv("author","John");
 			scriptingService.registerScript(scriptName,
 					new QueryHasResultCondition("verify_user_permission",COLLECTION_NAME, filter),
-					new Executable(
-							scriptName,
-							Executable.TYPE_FIND,
-							new ScriptFindBody(COLLECTION_NAME, filter)).setOutput(true),
+					new FindExecutable(scriptName, COLLECTION_NAME, filter).setOutput(true),
 					false, false).get();
 		});
 	}
@@ -146,17 +140,14 @@ class ScriptingServiceTest {
 	}
 
 	private void registerScriptUpdate(String scriptName) {
-		Assertions.assertDoesNotThrow(()->
+		Assertions.assertDoesNotThrow(() ->
 				scriptingService.registerScript(scriptName,
-						Executable.createUpdateExecutable(scriptName,
-								new ScriptUpdateExecutableBody().setCollection(COLLECTION_NAME)
-										.setFilter(new KeyValueDict().putKv("author", "$params.author"))
-										.setUpdate(new KeyValueDict().putKv("$set", new KeyValueDict()
-												.putKv("author", "$params.author").putKv("content", "$params.content")))
-										.setOptions(new KeyValueDict()
-												.putKv("bypass_document_validation",false)
-												.putKv("upsert",true))
-						), false, false).get());
+						new UpdateExecutable(scriptName, COLLECTION_NAME,
+								new KeyValueDict().putKv("author", "$params.author"),
+								new KeyValueDict().putKv("$set", new KeyValueDict().putKv("author", "$params.author")
+										.putKv("content", "$params.content")),
+								new KeyValueDict().putKv("bypass_document_validation", false).putKv("upsert", true)),
+						false, false).get());
 	}
 
 	private void callScriptUpdate(String scriptName) {
@@ -177,12 +168,11 @@ class ScriptingServiceTest {
 	}
 
 	private void registerScriptDelete(String scriptName) {
-		Assertions.assertDoesNotThrow(()->{
+		Assertions.assertDoesNotThrow(() -> {
 			scriptingService.registerScript(scriptName,
-					Executable.createDeleteExecutable(scriptName,
-							new ScriptDeleteExecutableBody().setCollection(COLLECTION_NAME)
-									.setFilter(new KeyValueDict().putKv("author", "$params.author"))
-					), false, false).get();
+					new DeleteExecutable(scriptName, COLLECTION_NAME,
+							new KeyValueDict().putKv("author", "$params.author")),
+					false, false).get();
 		});
 	}
 
@@ -207,10 +197,10 @@ class ScriptingServiceTest {
 	}
 
 	private void registerScriptFileUpload(String scriptName) {
-		Assertions.assertDoesNotThrow(()->
+		Assertions.assertDoesNotThrow(() ->
 				scriptingService.registerScript(scriptName,
-					Executable.createFileUploadExecutable(scriptName).setOutput(true),
-					false, false).get());
+						new FileUploadExecutable(scriptName).setOutput(true),
+						false, false).get());
 	}
 
 	private String callScriptFileUpload(String scriptName, String fileName) {
@@ -250,10 +240,10 @@ class ScriptingServiceTest {
 	}
 
 	private void registerScriptFileDownload(String scriptName) {
-		Assertions.assertDoesNotThrow(()->
+		Assertions.assertDoesNotThrow(() ->
 				scriptingService.registerScript(scriptName,
-					Executable.createFileDownloadExecutable(scriptName).setOutput(true),
-					false, false).get());
+						new FileDownloadExecutable(scriptName).setOutput(true),
+						false, false).get());
 	}
 
 	private String callScriptFileDownload(String scriptName, String fileName) {
@@ -286,10 +276,10 @@ class ScriptingServiceTest {
 	}
 
 	private void registerScriptFileProperties(String scriptName) {
-		Assertions.assertDoesNotThrow(()->
+		Assertions.assertDoesNotThrow(() ->
 				scriptingService.registerScript(scriptName,
-				Executable.createFilePropertiesExecutable(scriptName),
-				false, false).get());
+						new FilePropertiesExecutable(scriptName).setOutput(true),
+						false, false).get());
 	}
 
 	private void callScriptFileProperties(String scriptName, String fileName) {
@@ -312,7 +302,7 @@ class ScriptingServiceTest {
 	private void registerScriptFileHash(String scriptName) {
 		Assertions.assertDoesNotThrow(()->
 				scriptingService.registerScript(scriptName,
-				Executable.createFileHashExecutable(scriptName),
+						new FileHashExecutable(scriptName).setOutput(true),
 				false, false).get());
 	}
 

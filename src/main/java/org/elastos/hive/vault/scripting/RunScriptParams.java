@@ -2,18 +2,18 @@ package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
 
-class runScriptParams {
+class RunScriptParams {
 	@SerializedName("context")
 	private ScriptContext context;
 	@SerializedName("params")
 	private Object params;
 
-	public runScriptParams setContext(ScriptContext context) {
+	public RunScriptParams setContext(ScriptContext context) {
 		this.context = context;
 		return this;
 	}
 
-	public runScriptParams setParams(Object params) {
+	public RunScriptParams setParams(Object params) {
 		this.params = params;
 		return this;
 	}
