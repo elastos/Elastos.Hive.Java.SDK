@@ -12,6 +12,8 @@ import java.util.concurrent.CompletableFuture;
  * routine defined in the script.
  */
 public interface ScriptingService extends ScriptingInvocationService {
+	CompletableFuture<Void> registerScript(String name, Executable executable);
+	CompletableFuture<Void> registerScript(String name, Condition condition, Executable executable);
 
 	/**
 	 *

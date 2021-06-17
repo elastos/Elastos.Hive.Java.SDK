@@ -20,20 +20,39 @@ public class ScriptingServiceRender implements ScriptingService {
 	}
 
 	@Override
-	public CompletableFuture<Void> registerScript(String name, Executable executable,
-												boolean allowAnonymousUser,
-												boolean allowAnonymousApp) {
+	public CompletableFuture<Void> registerScript(String name, Executable executable) {
+		return registerScript(name, null, executable, false, false);
+	}
+
+	@Override
+	public CompletableFuture<Void> registerScript(String name, Condition condition,
+											Executable executable) {
+		return registerScript(name, condition, executable, false, false);
+	}
+
+	@Override
+	public CompletableFuture<Void> registerScript(String name,
+											Executable executable,
+											boolean allowAnonymousUser,
+											boolean allowAnonymousApp) {
 		return registerScript(name, null, executable, allowAnonymousUser, allowAnonymousApp);
 	}
 
 	@Override
 	public CompletableFuture<Void> registerScript(String name,
-												  Condition condition, Executable executable,
-												  boolean allowAnonymousUser,
-												  boolean allowAnonymousApp) {
+											Condition condition,
+											Executable executable,
+											boolean allowAnonymousUser,
+											boolean allowAnonymousApp) {
 		return CompletableFuture.runAsync(()-> {
+			if (name == null)
+				throw new IllegalArgumentException("Empty script name");
+			if (executable == null)
+				throw new IllegalArgumentException("Empty executable script");
+
 			try {
-				controller.registerScript(name, condition, executable, allowAnonymousUser, allowAnonymousApp);
+				controller.registerScript(name, condition, executable,
+											allowAnonymousUser,	allowAnonymousApp);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -42,15 +61,17 @@ public class ScriptingServiceRender implements ScriptingService {
 
 	@Override
 	public CompletableFuture<Void> unregisterScript(String name) {
-		// TODO:
-		throw new NotImplementedException();
+		return CompletableFuture.runAsync(()-> {
+			throw new NotImplementedException("API unregisterScript will be supported later");
+		});
 	}
 
 	@Override
-	public <T> CompletableFuture<T> callScript(String name, JsonNode params,
-												String targetDid,
-												String targetAppDid,
-												Class<T> resultType) {
+	public <T> CompletableFuture<T> callScript(String name,
+											JsonNode params,
+											String targetDid,
+											String targetAppDid,
+											Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return controller.callScript(name, params, targetDid, targetAppDid, resultType);
@@ -60,7 +81,11 @@ public class ScriptingServiceRender implements ScriptingService {
 		});
 	}
 
-	public <T> CompletableFuture<T> callScriptUrl(String name, String params, String targetDid, String targetAppDid, Class<T> resultType) {
+	public <T> CompletableFuture<T> callScriptUrl(String name,
+											String params,
+											String targetDid,
+											String targetAppDid,
+											Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return controller.callScriptUrl(name, params, targetDid, targetAppDid, resultType);
@@ -75,7 +100,10 @@ public class ScriptingServiceRender implements ScriptingService {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				if (transactionId == null)
-					throw new IllegalArgumentException("Invalid parameter transactionId.");
+					throw new IllegalArgumentException("Empty parameter transactionId.");
+
+				if (resultType == null)
+					throw new IllegalArgumentException("Unkown result type");
 
 				return controller.uploadFile(transactionId, resultType);
 			} catch (HiveException | RuntimeException e) {
@@ -89,7 +117,10 @@ public class ScriptingServiceRender implements ScriptingService {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				if (transactionId == null)
-					throw new IllegalArgumentException("Invalid parameter transactionId.");
+					throw new IllegalArgumentException("Empty parameter transactionId.");
+
+				if (resultType == null)
+					throw new IllegalArgumentException("Unkown result type");
 
 				return controller.downloadFile(transactionId, resultType);
 			} catch (HiveException | RuntimeException e) {
