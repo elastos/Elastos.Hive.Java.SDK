@@ -2,8 +2,8 @@ package org.elastos.hive.vault.database;
 
 import java.util.ArrayList;
 
-public class SortItem extends ArrayList<Object> {
-    public enum Order {
+abstract class SortItem extends ArrayList<Object> {
+    protected enum Order {
         ASCENDING(1), DESCENDING(-1);
 
         private Integer value;
@@ -17,7 +17,7 @@ public class SortItem extends ArrayList<Object> {
         }
     }
 
-    public SortItem(String key, Order order) {
+    protected SortItem(String key, Order order) {
         super.add(key);
         super.add(order.getValue());
     }

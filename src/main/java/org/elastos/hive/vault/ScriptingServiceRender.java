@@ -28,9 +28,9 @@ public class ScriptingServiceRender implements ScriptingService {
 
 	@Override
 	public CompletableFuture<Void> registerScript(String name,
-												Condition condition, Executable executable,
-												boolean allowAnonymousUser,
-												boolean allowAnonymousApp) {
+												  Condition condition, Executable executable,
+												  boolean allowAnonymousUser,
+												  boolean allowAnonymousApp) {
 		return CompletableFuture.runAsync(()-> {
 			try {
 				controller.registerScript(name, condition, executable, allowAnonymousUser, allowAnonymousApp);
