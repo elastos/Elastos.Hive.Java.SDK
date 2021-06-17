@@ -2,11 +2,7 @@ package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Condition {
-	public static final String TYPE_AND = "and";
-	public static final String TYPE_OR = "or";
-	public static final String TYPE_QUERY_HAS_RESULTS = "queryHasResults";
-
+public abstract class Condition {
 	@SerializedName("name")
 	private String name;
 	@SerializedName("type")
@@ -14,9 +10,17 @@ public class Condition {
 	@SerializedName("body")
 	private Object body;
 
-	public Condition(String name, String type, Object body) {
+	protected Condition(String name, String type, Object body) {
 		this.name = name;
 		this.type = type;
 		this.body = body;
+	}
+
+	protected void setBody(Object value) {
+		body = value;
+	}
+
+	protected Object getBody() {
+		return body;
 	}
 }

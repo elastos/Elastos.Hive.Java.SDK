@@ -13,10 +13,7 @@ import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.vault.database.InsertOptions;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.ScriptingService;
-import org.elastos.hive.vault.scripting.Condition;
-import org.elastos.hive.vault.scripting.Executable;
-import org.elastos.hive.vault.scripting.ScriptFindBody;
-import org.elastos.hive.vault.scripting.ScriptInsertExecutableBody;
+import org.elastos.hive.vault.scripting.*;
 import org.junit.jupiter.api.*;
 
 @Disabled
@@ -87,10 +84,7 @@ class ScriptingCrossingTest {
 			KeyValueDict filter = new KeyValueDict().putKv("collection", COLLECTION_GROUP_MESSAGE)
 					.putKv("did", "$caller_did");
 			scriptingService.registerScript(SCRIPT_NAME,
-					new Condition(
-							"verify_user_permission",
-							"queryHasResults",
-							new ScriptFindBody(COLLECTION_GROUP, filter)),
+					new QueryHasResultCondition("verify_user_permission", COLLECTION_GROUP, filter),
 					Executable.createInsertExecutable(SCRIPT_NAME,
 							new ScriptInsertExecutableBody(COLLECTION_GROUP_MESSAGE, new KeyValueDict()
 									.putKv("author", "$params.author")

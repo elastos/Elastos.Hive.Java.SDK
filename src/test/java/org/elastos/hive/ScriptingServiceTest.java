@@ -124,10 +124,7 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			KeyValueDict filter = new KeyValueDict().putKv("author","John");
 			scriptingService.registerScript(scriptName,
-					new Condition(
-							"verify_user_permission",
-							"queryHasResults",
-							new ScriptFindBody(COLLECTION_NAME, filter)),
+					new QueryHasResultCondition("verify_user_permission",COLLECTION_NAME, filter),
 					new Executable(
 							scriptName,
 							Executable.TYPE_FIND,
