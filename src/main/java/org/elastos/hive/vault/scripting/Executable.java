@@ -1,21 +1,11 @@
 package org.elastos.hive.vault.scripting;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.annotations.SerializedName;
 
-import org.elastos.hive.exception.HiveException;
-
 public abstract class Executable extends Condition {
-//	public static final String TYPE_FIND = "find";
-//	private static final String TYPE_INSERT = "insert";
-//	private static final String TYPE_UPDATE = "update";
-//	private static final String TYPE_DELETE = "delete";
-//	private static final String TYPE_FILE_UPLOAD = "fileUpload";
-//	private static final String TYPE_FILE_DOWNLOAD = "fileDownload";
-//	private static final String TYPE_FILE_PROPERTIES = "fileProperties";
-//	private static final String TYPE_FILE_HASH = "fileHash";
-
 	protected enum Type {
 		AGGREGATED("aggregated"), // TODO:
 		FIND("find"),
@@ -67,61 +57,9 @@ public abstract class Executable extends Condition {
 		}
 	}
 
-//	public static Executable createFileUploadExecutable(String name) {
-//		return new Executable(name, Executable.TYPE_FILE_UPLOAD,
-//				new ScriptFileUploadBody("$params.path")).setOutput(true);
-//	}
-
-	public static JsonNode createFileUploadParams(String groupId, String path) throws HiveException {
-		try {
-			return new ObjectMapper().readTree(String.format("{\"group_id\":{\"$oid\":\"%s\"},\"path\":\"%s\"}", groupId, path));
-		} catch (Exception e) {
-			throw new HiveException("invalid groupId or path");
-		}
-	}
-
-//	public static Executable createFileDownloadExecutable(String name) {
-//		return new Executable(name, Executable.TYPE_FILE_DOWNLOAD,
-//				new ScriptFileUploadBody("$params.path")).setOutput(true);
-//	}
-
-	public static JsonNode createFileDownloadParams(String groupId, String path) {
-		try {
-			return createFileUploadParams(groupId, path);
-		} catch (HiveException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-//	public static Executable createFilePropertiesExecutable(String name) {
-//		return new Executable(name, Executable.TYPE_FILE_PROPERTIES,
-//				new ScriptFileUploadBody("$params.path")).setOutput(true);
-//	}
-
-	public static JsonNode createFilePropertiesParams(String groupId, String path) {
-		try {
-			return createFileUploadParams(groupId, path);
-		} catch (HiveException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-//	public static Executable createFileHashExecutable(String name) {
-//		return new Executable(name, Executable.TYPE_FILE_HASH,
-//				new ScriptFileUploadBody("$params.path")).setOutput(true);
-//	}
-
-	public static JsonNode createFileHashParams(String groupId, String path) {
-		try {
-			return createFileUploadParams(groupId, path);
-		} catch (HiveException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	public static JsonNode createRunFileParams(String path) {
+		ObjectNode node = JsonNodeFactory.instance.objectNode();
+		node.put("path", path);
+		return node;
 	}
 }
