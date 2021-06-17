@@ -12,9 +12,10 @@ import org.elastos.did.exception.DIDResolveException;
 import org.elastos.did.exception.MalformedDIDException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.elastos.hive.exception.BadContextProviderException;
 import org.elastos.hive.exception.DIDNotPublishedException;
-import org.elastos.hive.exception.IllegalDidFormatException;
 import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.DIDResolverNotSetupException;
 import org.elastos.hive.exception.DIDResolverSetupException;
@@ -27,6 +28,7 @@ import org.elastos.hive.exception.DIDResoverAlreadySetupException;
  *
  */
 public class AppContext {
+	private static final Logger log = LoggerFactory.getLogger(AppContext.class);
 	private static boolean resolverHasSetup = false;
 
 	private AppContextProvider contextProvider;
@@ -110,9 +112,13 @@ public class AppContext {
 				 * of service "HiveVault";
 				 */
 				return services.get(0).getServiceEndpoint();
+
 			} catch (MalformedDIDException e) {
-				throw new IllegalDidFormatException("Bad target did: " + targetDid);
+				log.error("Malformed target did {} with error: {}", targetDid, e.getMessage());
+				throw new IllegalArgumentException("Malformed did string: " + targetDid);
+
 			} catch (DIDResolveException e) {
+				log.error("Resolving the target DID {} failed: {}", targetDid, e.getMessage());
 				throw new CompletionException(new NetworkException("Resolving DID failed: " + e.getMessage()));
 			}
 		});
