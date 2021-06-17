@@ -1,12 +1,15 @@
 package org.elastos.hive.vault.backup.credential;
 
 import org.elastos.did.VerifiableCredential;
+import org.elastos.hive.Backup;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.auth.CodeFetcher;
 import org.elastos.hive.service.BackupContext;
-import org.elastos.hive.utils.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CredentialCode {
+	private static final Logger log = LoggerFactory.getLogger(Backup.class);
 	public static final String TOKEN_TYPE = "backup";
 	private String jwtCode;
 	private CodeFetcher resolver;
@@ -37,7 +40,7 @@ public class CredentialCode {
 		try {
 			return VerifiableCredential.fromJson(jwtCode).isExpired();
 		} catch (Exception e) {
-			LogUtil.e("Failed to check backup credential with message:" + e.getMessage());
+			log.error("Failed to check backup credential with message: {}", e.getMessage());
 			return true;
 		}
 	}

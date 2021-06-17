@@ -27,8 +27,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import org.elastos.hive.AppContext;
 import org.elastos.hive.connection.auth.AccessToken;
-import org.elastos.hive.utils.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -38,6 +41,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 public abstract class NodeRPCConnection {
+	private static final Logger log = LoggerFactory.getLogger(AppContext.class);
 	private static final int DEFAULT_TIMEOUT = 30;
 
 	protected abstract String getProviderAddress();
@@ -45,7 +49,7 @@ public abstract class NodeRPCConnection {
 
 	public HttpURLConnection openConnection(String urlPath) throws IOException {
 		String url = getProviderAddress() + urlPath;
-		LogUtil.d("open connection with URL: " + url + ", and method: PUT");
+		log.debug("open connection with URL: {} and method: PUT", url);
 
 		HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
 		urlConnection.setRequestMethod("PUT");

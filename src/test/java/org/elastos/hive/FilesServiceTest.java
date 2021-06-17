@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FilesServiceTest {
 	private static final String FILE_NAME_TXT = "test.txt";
@@ -46,6 +51,13 @@ class FilesServiceTest {
 	}
 
 	@BeforeAll public static void setUp() {
+
+		Level level = Level.valueOf("WARN");
+
+		// We use logback as the logging backend
+	    Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+	    root.setLevel(level);
+
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
 			new VaultSubscription(testData.getAppContext(),

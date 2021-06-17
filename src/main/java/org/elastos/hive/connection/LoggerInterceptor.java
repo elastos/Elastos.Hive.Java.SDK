@@ -22,8 +22,6 @@
 
 package org.elastos.hive.connection;
 
-import org.elastos.hive.utils.LogUtil;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
@@ -37,7 +35,12 @@ import okhttp3.ResponseBody;
 import okio.Buffer;
 import okio.BufferedSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 class LoggerInterceptor implements Interceptor {
+	private static final Logger log = LoggerFactory.getLogger(NodeRPCConnection.class);
 	private static final int MAX_BODY_LEN = 500;
 
 	@Override
@@ -49,8 +52,8 @@ class LoggerInterceptor implements Interceptor {
 		RequestBody body = request.body();
 		String bodyInString = null;
 
-		LogUtil.d("request -> [" + request.method() + "] " + request.url().toString());
-		LogUtil.d("request headers->" + request.headers().toString());
+		log.debug("Request -> [{}] {}", request.method(), request.url().toString());
+		//log.debug("Request Header: {}", request.headers().toString());
 
 		if (body != null) {
 			Buffer buffer = new Buffer();
@@ -72,7 +75,9 @@ class LoggerInterceptor implements Interceptor {
 		}
 
 		if (bodyInString != null && !bodyInString.equals(""))
-			LogUtil.d("request body->" + getOutputBodyContent(bodyInString));
+			log.debug("Request Body: {}", getOutputBodyContent(bodyInString));
+		else
+			log.debug("Request Body: N/A");
 
 		return request;
 	}
@@ -81,7 +86,7 @@ class LoggerInterceptor implements Interceptor {
 		ResponseBody body = response.body();
 		String bodyInString = null;
 
-		LogUtil.d("response headers ->" + response.headers().toString());
+		//log.debug("Response Header: {}", response.headers().toString());
 
 		if (body != null) {
 			BufferedSource source = body.source();
@@ -103,10 +108,12 @@ class LoggerInterceptor implements Interceptor {
 
 		}
 
-		LogUtil.d("response Code ->" + response.code());
+		log.info("Response Code: {}", response.code());
 
 		if (bodyInString != null && !bodyInString.equals(""))
-			LogUtil.d("response body ->" + getOutputBodyContent(bodyInString));
+			log.debug("Response Body: {}", getOutputBodyContent(bodyInString));
+		else
+			log.debug("Response Body: N/A");
 
 		return response;
 	}
