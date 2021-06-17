@@ -88,7 +88,7 @@ class DatabaseServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode query = JsonNodeFactory.instance.objectNode();
 			query.put("author", "john doe1");
-			QueryOptions options = new QueryOptions().setSort(new SortItem("_id", SortItem.Order.ASCENDING));
+			QueryOptions options = new QueryOptions().setSort(new AscSortItem("_id"));
 			Assertions.assertNotNull(databaseService.query(COLLECTION_NAME, query, options).get());
 		});
 	}
