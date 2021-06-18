@@ -162,7 +162,7 @@ class ScriptingServiceTest {
 	}
 
 	@Test @Order(5) void testDelete() {
-		registerScriptDelete(DELETE_NAME);
+		//registerScriptDelete(DELETE_NAME);
 		//callScriptDelete(DELETE_NAME);
 	}
 
