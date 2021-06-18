@@ -25,6 +25,21 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 											Class<T> resultType) {
 
 		return CompletableFuture.supplyAsync(()-> {
+			if (name == null)
+				throw new IllegalArgumentException("Missing script name.");
+
+			//if (params == null)
+			//	throw new IllegalArgumentException("Missing parameters to run the script");
+
+			if (targetDid == null)
+				throw new IllegalArgumentException("Missing target user DID");
+
+			if (targetAppDid == null)
+				throw new IllegalArgumentException("Missing target application DID");
+
+			if (resultType == null)
+				throw new IllegalArgumentException("Missing result type");
+
 			try {
 				return controller.callScript(name, params, targetDid, targetAppDid, resultType);
 			} catch (HiveException | RuntimeException e) {
@@ -53,6 +68,21 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 											Class<T> resultType) {
 
 		return CompletableFuture.supplyAsync(()-> {
+			if (name == null)
+				throw new IllegalArgumentException("Missing script name.");
+
+			if (params == null)
+				throw new IllegalArgumentException("Missing parameters to run the script");
+
+			if (targetDid == null)
+				throw new IllegalArgumentException("Missing target user DID");
+
+			if (targetAppDid == null)
+				throw new IllegalArgumentException("Missing target application DID");
+
+			if (resultType == null)
+				throw new IllegalArgumentException("Missing result type");
+
 			try {
 				return controller.callScriptUrl(name, params, targetDid, targetAppDid, resultType);
 			} catch (HiveException | RuntimeException e) {
@@ -66,10 +96,10 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				if (transactionId == null)
-					throw new IllegalArgumentException("Empty parameter transactionId.");
+					throw new IllegalArgumentException("Missing transactionId.");
 
 				if (resultType == null)
-					throw new IllegalArgumentException("Unkown result type");
+					throw new IllegalArgumentException("Missing result type");
 
 				return controller.downloadFile(transactionId, resultType);
 			} catch (HiveException | RuntimeException e) {
@@ -83,10 +113,10 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				if (transactionId == null)
-					throw new IllegalArgumentException("Empty parameter transactionId.");
+					throw new IllegalArgumentException("Missing transactionId.");
 
 				if (resultType == null)
-					throw new IllegalArgumentException("Unkown result type");
+					throw new IllegalArgumentException("Missing result type");
 
 				return controller.uploadFile(transactionId, resultType);
 			} catch (HiveException | RuntimeException e) {
