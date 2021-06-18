@@ -1,5 +1,7 @@
 package org.elastos.hive.exception;
 
+import org.elastos.hive.connection.NodeRPCException;
+
 public class ScriptNotFoundException extends NotFoundException {
 	private static final long serialVersionUID = -586039279266427101L;
 
@@ -17,5 +19,9 @@ public class ScriptNotFoundException extends NotFoundException {
 
 	public ScriptNotFoundException(Throwable cause) {
 		super(cause);
+	}
+
+	public ScriptNotFoundException(NodeRPCException e) {
+		super(e.getMessage());
 	}
 }

@@ -11,9 +11,13 @@ import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.UploadOutputStream;
 import org.elastos.hive.connection.UploadOutputStreamWriter;
+
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
+import org.elastos.hive.exception.NotFoundException;
+import org.elastos.hive.exception.ScriptNotFoundException;
 import org.elastos.hive.exception.ServerUnkownException;
+import org.elastos.hive.exception.UnauthorizedException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,21 +26,22 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.util.Map;
 
 public class ScriptingController {
-	private NodeRPCConnection connectionManager;
+	private WeakReference<NodeRPCConnection> connection;
 	private ScriptingAPI scriptingAPI;
 
-
 	public ScriptingController(NodeRPCConnection connection) {
-		this.connectionManager = connection;
+		this.connection = new WeakReference<>(connection);
 		this.scriptingAPI = connection.createService(ScriptingAPI.class, true);
 	}
 
 	public void registerScript(String name,
-							Condition condition, Executable executable,
+							Condition condition,
+							Executable executable,
 							boolean allowAnonymousUser,
 							boolean allowAnonymousApp) throws HiveException {
 		try {
@@ -46,9 +51,17 @@ public class ScriptingController {
 							.setAllowAnonymousApp(allowAnonymousApp)
 							.setCondition(condition))
 							.execute().body();
+
 		} catch (NodeRPCException e) {
-			e.printStackTrace();
-			// TODO:
+			int httpCode = e.getCode();
+
+			if (httpCode == NodeRPCException.UNAUTHORIZED)
+				throw new UnauthorizedException(e);
+			else if (httpCode == NodeRPCException.NOT_FOUND)
+				throw new ScriptNotFoundException(e);
+			else
+				throw new ServerUnkownException(e);
+
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -59,7 +72,8 @@ public class ScriptingController {
 							String targetAppDid,
 							Class<T> resultType) throws HiveException {
 		try {
-			Map<String, Object> map = new ObjectMapper().convertValue(params, new TypeReference<Map<String, Object>>() {});
+			Map<String, Object> map = new ObjectMapper()
+							.convertValue(params, new TypeReference<Map<String, Object>>() {});
 			String json = scriptingAPI.runScript(name, new RunScriptParams()
 							.setContext(new Context()
 							.setTargetDid(targetDid)
@@ -81,13 +95,20 @@ public class ScriptingController {
 					obj = new ObjectMapper().readValue(json, resultType);
 				}
 			} catch (Exception e) {
-				throw new RuntimeException("unsupported result type for call script.");
+				throw new IllegalArgumentException("Unsupported result Type class.");
 			}
+
 			return resultType.cast(obj);
 
 		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnkownException(e);
+			int httpCode = e.getCode();
+
+			if (httpCode == NodeRPCException.UNAUTHORIZED)
+				throw new UnauthorizedException(e);
+			else if (httpCode == NodeRPCException.NOT_FOUND)
+				throw new ScriptNotFoundException(e);
+			else
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
@@ -101,7 +122,7 @@ public class ScriptingController {
 							   Class<T> resultType) throws HiveException {
 		try {
 			String json =  scriptingAPI.runScriptUrl(name, targetDid, targetAppDid, params)
-							.execute().body().string();
+								.execute().body().string();
 
 			Object obj = null;
 			try {
@@ -121,8 +142,14 @@ public class ScriptingController {
 			}
 			return resultType.cast(obj);
 		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnkownException(e);
+			int httpCode = e.getCode();
+
+			if (httpCode == NodeRPCException.UNAUTHORIZED)
+				throw new UnauthorizedException(e);
+			else if (httpCode == NodeRPCException.NOT_FOUND)
+				throw new ScriptNotFoundException(e);
+			else
+				throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
@@ -130,7 +157,47 @@ public class ScriptingController {
 		}
 	}
 
-	 private <T> T getRequestStream(HttpURLConnection connection, Class<T> resultType) throws IOException {
+	public <T> T uploadFile(String transactionId, Class<T> resultType) throws HiveException {
+		try {
+			HttpURLConnection conn = connection.get().openConnection(
+										ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId);
+			return getRequestStream(conn, resultType);
+
+		} catch (NodeRPCException e) {
+			int httpCode = e.getCode();
+
+			if (httpCode == NodeRPCException.UNAUTHORIZED)
+				throw new UnauthorizedException(e);
+			else if (httpCode == NodeRPCException.NOT_FOUND)
+				throw new NotFoundException(e);
+			else
+				throw new ServerUnkownException(e);
+		} catch (IOException e) {
+			// TODO
+			throw new NetworkException(e);
+		}
+	}
+
+	public <T> T downloadFile(String transactionId, Class<T> resultType) throws HiveException {
+		try {
+			return getResponseStream(scriptingAPI.downloadFile(transactionId).execute(), resultType);
+		} catch (NodeRPCException e) {
+			int httpCode = e.getCode();
+
+			if (httpCode == NodeRPCException.UNAUTHORIZED)
+				throw new UnauthorizedException(e);
+			else if (httpCode == NodeRPCException.NOT_FOUND)
+				throw new NotFoundException(e);
+			else
+				throw new ServerUnkownException(e);
+		} catch (IOException e) {
+			// TODO
+			e.printStackTrace();
+			throw new NetworkException(e);
+		}
+	}
+
+	private <T> T getRequestStream(HttpURLConnection connection, Class<T> resultType) throws IOException {
 		OutputStream outputStream = connection.getOutputStream();
 		if (resultType.isAssignableFrom(OutputStream.class)) {
 			UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
@@ -143,6 +210,7 @@ public class ScriptingController {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	private <T> T getResponseStream(Response<ResponseBody> response, Class<T> resultType) {
 		ResponseBody body = response.body();
 		if (body == null)
@@ -153,34 +221,6 @@ public class ScriptingController {
 		else if (resultType.isAssignableFrom(InputStream.class))
 			return resultType.cast(body.byteStream());
 		else
-			throw new IllegalArgumentException("Not supported result type");
-	}
-
-	public <T> T uploadFile(String transactionId, Class<T> resultType) throws HiveException {
-		try {
-			return getRequestStream(
-					connectionManager.openConnection(ScriptingAPI.API_SCRIPT_UPLOAD + "/" + transactionId),
-					resultType);
-		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnkownException(e);
-		} catch (IOException e) {
-			// TODO
-			e.printStackTrace();
-			throw new NetworkException(e);
-		}
-	}
-
-	public <T> T downloadFile(String transactionId, Class<T> resultType) throws HiveException {
-		try {
-			return getResponseStream(scriptingAPI.downloadFile(transactionId).execute(), resultType);
-		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnkownException(e);
-		} catch (IOException e) {
-			// TODO
-			e.printStackTrace();
-			throw new NetworkException(e);
-		}
+			return null;
 	}
 }
