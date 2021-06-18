@@ -12,7 +12,7 @@ import org.elastos.hive.vault.scripting.ScriptingController;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public class ScriptingServiceRender implements ScriptingService {
+class ScriptingServiceRender implements ScriptingService {
 	private ScriptingController controller;
 
 	public ScriptingServiceRender(ServiceEndpoint serviceEndpoint) {
