@@ -12,7 +12,7 @@ import org.elastos.hive.exception.HiveException;
  *	 How much disk storage filled there;
  *	 etc.
  */
-public class Provider extends ServiceEndpoint {
+class Provider extends ServiceEndpoint {
 	public Provider(AppContext context) throws HiveException {
 		this(context, null);
 	}
