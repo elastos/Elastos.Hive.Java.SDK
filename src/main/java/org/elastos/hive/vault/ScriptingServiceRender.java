@@ -46,9 +46,10 @@ class ScriptingServiceRender implements ScriptingService {
 											boolean allowAnonymousApp) {
 		return CompletableFuture.runAsync(()-> {
 			if (name == null)
-				throw new IllegalArgumentException("Empty script name");
+				throw new IllegalArgumentException("Missing script name.");
+
 			if (executable == null)
-				throw new IllegalArgumentException("Empty executable script");
+				throw new IllegalArgumentException("Missing executable script");
 
 			try {
 				controller.registerScript(name, condition, executable,
@@ -62,6 +63,9 @@ class ScriptingServiceRender implements ScriptingService {
 	@Override
 	public CompletableFuture<Void> unregisterScript(String name) {
 		return CompletableFuture.runAsync(()-> {
+			if (name == null)
+				throw new IllegalArgumentException("Missing script name.");
+
 			throw new NotImplementedException("API unregisterScript will be supported later");
 		});
 	}
@@ -73,6 +77,21 @@ class ScriptingServiceRender implements ScriptingService {
 											String targetAppDid,
 											Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
+			if (name == null)
+				throw new IllegalArgumentException("Missing script name.");
+
+			if (params == null)
+				throw new IllegalArgumentException("Missing parameters to run the script");
+
+			if (targetDid == null)
+				throw new IllegalArgumentException("Missing target user DID");
+
+			if (targetAppDid == null)
+				throw new IllegalArgumentException("Missing target application DID");
+
+			if (resultType == null)
+				throw new IllegalArgumentException("Missing result type");
+
 			try {
 				return controller.callScript(name, params, targetDid, targetAppDid, resultType);
 			} catch (HiveException | RuntimeException e) {
@@ -88,6 +107,21 @@ class ScriptingServiceRender implements ScriptingService {
 											Class<T> resultType) {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
+				if (name == null)
+					throw new IllegalArgumentException("Missing script name.");
+
+				if (params == null)
+					throw new IllegalArgumentException("Missing parameters to run the script");
+
+				if (targetDid == null)
+					throw new IllegalArgumentException("Missing target user DID");
+
+				if (targetAppDid == null)
+					throw new IllegalArgumentException("Missing target application DID");
+
+				if (resultType == null)
+					throw new IllegalArgumentException("Missing result type");
+
 				return controller.callScriptUrl(name, params, targetDid, targetAppDid, resultType);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
@@ -100,10 +134,10 @@ class ScriptingServiceRender implements ScriptingService {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				if (transactionId == null)
-					throw new IllegalArgumentException("Empty parameter transactionId.");
+					throw new IllegalArgumentException("Missing transactionId.");
 
 				if (resultType == null)
-					throw new IllegalArgumentException("Unkown result type");
+					throw new IllegalArgumentException("Missing result type");
 
 				return controller.uploadFile(transactionId, resultType);
 			} catch (HiveException | RuntimeException e) {
@@ -117,10 +151,10 @@ class ScriptingServiceRender implements ScriptingService {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				if (transactionId == null)
-					throw new IllegalArgumentException("Empty parameter transactionId.");
+					throw new IllegalArgumentException("Missing transactionId.");
 
 				if (resultType == null)
-					throw new IllegalArgumentException("Unkown result type");
+					throw new IllegalArgumentException("Missing result type");
 
 				return controller.downloadFile(transactionId, resultType);
 			} catch (HiveException | RuntimeException e) {
