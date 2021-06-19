@@ -1,10 +1,15 @@
 package org.elastos.hive;
 
 import com.google.common.base.Throwables;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.files.FileInfo;
 import org.junit.jupiter.api.*;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,11 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FilesServiceTest {
@@ -53,9 +53,7 @@ class FilesServiceTest {
 	@BeforeAll public static void setUp() {
 
 		Level level = Level.valueOf("WARN");
-
-		// We use logback as the logging backend
-	    Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+		Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 	    root.setLevel(level);
 
 		Assertions.assertDoesNotThrow(()->{

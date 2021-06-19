@@ -37,7 +37,6 @@ public class TestData {
 	}
 
 	private TestData() throws HiveException, DIDException {
-		Logger.hive();
 		init();
 	}
 
