@@ -10,6 +10,8 @@ import org.elastos.hive.service.FilesService;
 import org.elastos.hive.service.ScriptingService;
 import org.elastos.hive.vault.scripting.*;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileReader;
 import java.io.Reader;
@@ -18,6 +20,7 @@ import java.util.Map;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ScriptingServiceTest {
+	private static final Logger log = LoggerFactory.getLogger(ScriptingServiceTest.class);
 	private static final String FIND_NAME = "get_group_messages";
 	private static final String FIND_NO_CONDITION_NAME = "script_no_condition";
 	private static final String INSERT_NAME = "database_insert";
@@ -318,6 +321,11 @@ class ScriptingServiceTest {
 		});
 	}
 
+	@Test @Order(10) void testUnregister() {
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(FILE_HASH_NAME).get(); });
+		remove_test_database();
+	}
+
 	/**
 	 * If exists, also return OK(_status).
 	 */
@@ -325,7 +333,7 @@ class ScriptingServiceTest {
 		try {
 			databaseService.createCollection(COLLECTION_NAME).get();
 		} catch (Exception e) {
-			// pass
+			log.error("Failed to create collection: {}", e.getMessage());
 		}
 	}
 
@@ -336,7 +344,7 @@ class ScriptingServiceTest {
 		try {
 			databaseService.deleteCollection(COLLECTION_NAME).get();
 		} catch (Exception e) {
-			// pass
+			log.error("Failed to remove collection: {}", e.getMessage());
 		}
 	}
 

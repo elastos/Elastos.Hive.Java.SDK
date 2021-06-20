@@ -5,7 +5,7 @@ import org.elastos.hive.connection.KeyValueDict;
 
 public class DeleteExecutable extends Executable {
     public DeleteExecutable(String name, String collectionName, KeyValueDict filter) {
-        super(name, Type.UPDATE, null);
+        super(name, Type.DELETE, null);
         super.setBody(new Body(collectionName, filter));
     }
 
