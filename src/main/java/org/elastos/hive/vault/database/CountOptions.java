@@ -1,8 +1,15 @@
 package org.elastos.hive.vault.database;
 
+import com.google.gson.annotations.SerializedName;
+
 public class CountOptions {
+	@SerializedName("skip")
 	private Long skip;
+
+	@SerializedName("limit")
 	private Long limit;
+
+	@SerializedName("maxTimeMS")
 	private Long maxTimeMS;
 
 	public CountOptions setSkip(Long skip) {

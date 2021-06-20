@@ -22,12 +22,15 @@
 
 package org.elastos.hive.connection;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.*;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import org.elastos.hive.AppContext;
 import org.elastos.hive.connection.auth.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +44,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 public abstract class NodeRPCConnection {
-	private static final Logger log = LoggerFactory.getLogger(AppContext.class);
+	private static final Logger log = LoggerFactory.getLogger(NodeRPCConnection.class);
 	private static final int DEFAULT_TIMEOUT = 30;
 
 	protected abstract String getProviderAddress();
@@ -92,9 +95,31 @@ public abstract class NodeRPCConnection {
 
 		return new Retrofit.Builder()
 				.baseUrl(getProviderAddress())
-				.addConverterFactory(GsonConverterFactory.create())
+				.addConverterFactory(getGsonConverterFactory())
 				.client(builder.build())
 				.build();
+	}
+
+	private GsonConverterFactory getGsonConverterFactory() {
+		GsonBuilder builder = new GsonBuilder();
+		// Hook for convert JsonNode object.
+		builder.registerTypeAdapter(JsonNode.class, (JsonSerializer<JsonNode>) (src, typeOfSrc, context) -> {
+			if (src == null)
+				return new JsonPrimitive("");
+			return new JsonParser().parse(src.toString()).getAsJsonObject();
+		});
+		builder.registerTypeAdapter(JsonNode.class, (JsonDeserializer<JsonNode>) (src, typeOfSrc, context) -> {
+			if (src == null)
+				return null;
+			String json = new Gson().toJson(src);
+			try {
+				return new ObjectMapper().readTree(json);
+			} catch (IOException e) {
+				log.error("Failed to deserialize to JsonNode.");
+				return null;
+			}
+		});
+		return GsonConverterFactory.create(builder.create());
 	}
 
 	private static class AuthRequestInterceptor implements Interceptor {
