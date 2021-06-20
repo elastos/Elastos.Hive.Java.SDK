@@ -1,15 +1,10 @@
 package org.elastos.hive;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.Map;
-
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.vault.database.InsertOptions;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.ScriptingService;
@@ -81,22 +76,28 @@ class ScriptingCrossingTest {
 
 	private void register_script_for_caller() {
 		Assertions.assertDoesNotThrow(()->{
-			KeyValueDict filter = new KeyValueDict().putKv("collection", COLLECTION_GROUP_MESSAGE)
-					.putKv("did", "$caller_did");
+			ObjectNode filter = JsonNodeFactory.instance.objectNode();
+			filter.put("collection", COLLECTION_GROUP_MESSAGE);
+			filter.put("did", "$caller_did");
+			ObjectNode doc = JsonNodeFactory.instance.objectNode();
+			doc.put("author", "$params.author");
+			doc.put("content", "$params.content");
+			ObjectNode options = JsonNodeFactory.instance.objectNode();
+			options.put("bypass_document_validation",false);
+			options.put("ordered",true);
 			scriptingService.registerScript(SCRIPT_NAME,
 					new QueryHasResultCondition("verify_user_permission", COLLECTION_GROUP, filter),
-					new InsertExecutable(SCRIPT_NAME, COLLECTION_GROUP_MESSAGE,
-							new KeyValueDict().putKv("author", "$params.author").putKv("content", "$params.content"),
-							new KeyValueDict().putKv("bypass_document_validation",false).putKv("ordered",true)),
+					new InsertExecutable(SCRIPT_NAME, COLLECTION_GROUP_MESSAGE, doc, options),
 					false, false).get();
 		});
 	}
 
 	private void run_script_with_group_permission() {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptRunner.callScript(SCRIPT_NAME,
-					map2JsonNode(
-							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
+			ObjectNode params = JsonNodeFactory.instance.objectNode();
+			params.put("author", "John");
+			params.put("content", "message");
+			JsonNode result = scriptRunner.callScript(SCRIPT_NAME, params,
 					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(SCRIPT_NAME));
@@ -115,9 +116,10 @@ class ScriptingCrossingTest {
 
 	private void run_script_without_group_permission() {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptRunner.callScript(SCRIPT_NAME,
-					map2JsonNode(
-							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
+			ObjectNode params = JsonNodeFactory.instance.objectNode();
+			params.put("author", "John");
+			params.put("content", "message");
+			JsonNode result = scriptRunner.callScript(SCRIPT_NAME, params,
 					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(SCRIPT_NAME));
@@ -129,9 +131,4 @@ class ScriptingCrossingTest {
 		databaseService.deleteCollection(COLLECTION_GROUP_MESSAGE);
 		databaseService.deleteCollection(COLLECTION_GROUP);
 	}
-
-	private JsonNode map2JsonNode(Map<String, Object> map) {
-		return new ObjectMapper().convertValue(map, JsonNode.class);
-	}
-
 }

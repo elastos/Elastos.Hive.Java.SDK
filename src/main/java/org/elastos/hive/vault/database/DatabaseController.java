@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.*;
@@ -57,14 +56,6 @@ public class DatabaseController {
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
-	}
-
-	public static KeyValueDict jsonNode2KeyValueDic(JsonNode node) {
-		return new ObjectMapper().convertValue(node, new TypeReference<KeyValueDict>() {});
-	}
-
-	public static List<KeyValueDict> jsonNodeList2KeyValueDicList(List<JsonNode> docs) {
-		return docs.stream().map(DatabaseController::jsonNode2KeyValueDic).collect(Collectors.toList());
 	}
 
 	public static String jsonNode2Str(JsonNode node) {

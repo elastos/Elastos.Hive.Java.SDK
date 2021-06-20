@@ -1,6 +1,6 @@
 package org.elastos.hive.vault.scripting;
 
-import org.elastos.hive.connection.KeyValueDict;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Vault script condition to check if a database query returns results or not.
@@ -10,12 +10,12 @@ import org.elastos.hive.connection.KeyValueDict;
 public class QueryHasResultCondition extends Condition {
     private static final String TYPE = "queryHasResults";
 
-    public QueryHasResultCondition(String name, String collectionName, KeyValueDict filter, Options options) {
+    public QueryHasResultCondition(String name, String collectionName, JsonNode filter, Options options) {
         super(name, TYPE, null);
         super.setBody(new Body(collectionName, filter, options));
     }
 
-    public QueryHasResultCondition(String name, String collectionName, KeyValueDict filter) {
+    public QueryHasResultCondition(String name, String collectionName, JsonNode filter) {
         this(name, collectionName, filter, null);
     }
 
@@ -33,10 +33,10 @@ public class QueryHasResultCondition extends Condition {
 
     private class Body {
         private String collection;
-        private KeyValueDict filter;
+        private JsonNode filter;
         private Options options;
 
-        public Body(String collectionName, KeyValueDict filter, Options options) {
+        public Body(String collectionName, JsonNode filter, Options options) {
             this.collection = collectionName;
             this.filter = filter;
             this.options = options;

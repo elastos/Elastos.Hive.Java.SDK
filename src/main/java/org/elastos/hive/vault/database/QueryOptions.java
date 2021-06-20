@@ -1,7 +1,7 @@
 package org.elastos.hive.vault.database;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.connection.KeyValueDict;
 
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 public class QueryOptions {
 	private Integer skip;
 	private Integer limit;
-	private KeyValueDict projection;
+	private JsonNode projection;
 	// ex: [('_id', -1)]
 	private List<SortItem> sort;
 	@SerializedName("allow_partial_results")
@@ -31,7 +31,7 @@ public class QueryOptions {
 		return this;
 	}
 
-	public QueryOptions setProjection(KeyValueDict projection) {
+	public QueryOptions setProjection(JsonNode projection) {
 		this.projection = projection;
 		return this;
 	}
