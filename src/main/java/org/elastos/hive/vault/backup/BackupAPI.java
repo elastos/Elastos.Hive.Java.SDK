@@ -6,15 +6,12 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 interface BackupAPI {
-	@GET("/api/v1/backup/state")
+	@GET("/api/v2/vault/content")
 	Call<BackupResult> getState();
 
-	@POST("/api/v1/backup/save_to_node")
+	@POST("/api/v2/vault/content?to=hive_node")
 	Call<Void> saveToNode(@Body RequestParams params);
 
-	@POST("/api/v1/backup/restore_from_node")
+	@POST("/api/v2/vault/content?from=hive_node")
 	Call<Void> restoreFromNode(@Body RequestParams params);
-
-	@POST("/api/v1/backup/activate_to_vault")
-	Call<Void> activeToVault();
 }

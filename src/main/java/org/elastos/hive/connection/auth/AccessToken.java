@@ -28,6 +28,9 @@ public class AccessToken implements CodeFetcher {
 
 	@Override
 	public String fetch() throws NodeRPCException {
+		if (jwtCode != null)
+			return jwtCode;
+
 		jwtCode = restoreToken();
 		if (jwtCode == null) {
 			jwtCode = remoteFetcher.fetch();
@@ -36,6 +39,8 @@ public class AccessToken implements CodeFetcher {
 				bridge.flush(jwtCode);
 				saveToken(jwtCode);
 			}
+		} else {
+			bridge.flush(jwtCode);
 		}
 		return jwtCode;
 	}

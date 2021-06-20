@@ -1,47 +1,54 @@
 package org.elastos.hive.vault.backup.credential;
 
-import org.elastos.did.VerifiableCredential;
-import org.elastos.hive.Backup;
+import org.elastos.hive.DataStorage;
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.auth.CodeFetcher;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.BackupContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CredentialCode {
-	private static final Logger log = LoggerFactory.getLogger(Backup.class);
-	public static final String TOKEN_TYPE = "backup";
+	private static final Logger log = LoggerFactory.getLogger(CredentialCode.class);
+	private String targetServiceDid;
 	private String jwtCode;
-	private CodeFetcher resolver;
+	private CodeFetcher remoteResolver;
+	private DataStorage storage;
 
 	public CredentialCode(ServiceEndpoint endpoint, BackupContext context) {
+		targetServiceDid = context.getParameter("targetServiceDid");
 		CodeFetcher remoteResolver = new RemoteResolver(
-				endpoint,context,
-				context.getParameter("targetServiceDid"),
+				endpoint, context, targetServiceDid,
 				context.getParameter("targetAddress"));
-		resolver = new LocalResolver(endpoint, remoteResolver);
+		this.remoteResolver = new LocalResolver(endpoint, remoteResolver);
+		storage = endpoint.getStorage();
 	}
 
-	public String getToken() {
+	public String getToken() throws HiveException {
 		if (jwtCode != null)
 			return jwtCode;
 
-		try {
-			jwtCode = resolver.fetch();
-		} catch (Exception e) {
-			// TODO:
-			e.printStackTrace();
-		}
+		jwtCode = restoreToken();
+		if (jwtCode == null) {
+			try {
+				jwtCode = remoteResolver.fetch();
+			} catch (NodeRPCException e) {
+				throw new HiveException(e.getMessage());
+			}
 
+			if (jwtCode != null) {
+				saveToken(jwtCode);
+			}
+		}
 		return jwtCode;
 	}
 
-	public boolean isExpired() {
-		try {
-			return VerifiableCredential.fromJson(jwtCode).isExpired();
-		} catch (Exception e) {
-			log.error("Failed to check backup credential with message: {}", e.getMessage());
-			return true;
-		}
+	private String restoreToken() {
+		return storage.loadBackupCredential(targetServiceDid);
+	}
+
+	private void saveToken(String jwtCode) {
+		storage.storeBackupCredential(targetServiceDid, jwtCode);
 	}
 }
