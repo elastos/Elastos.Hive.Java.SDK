@@ -22,7 +22,6 @@
 
 package org.elastos.hive.connection;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
@@ -111,7 +110,13 @@ public abstract class NodeRPCConnection {
 		builder.registerTypeAdapter(JsonNode.class, (JsonDeserializer<JsonNode>) (src, typeOfSrc, context) -> {
 			if (src == null)
 				return null;
-			return new ObjectMapper().convertValue(src, JsonNode.class);
+			String json = new Gson().toJson(src);
+			try {
+				return new ObjectMapper().readTree(json);
+			} catch (IOException e) {
+				log.error("Failed to deserialize to JsonNode.");
+				return null;
+			}
 		});
 		return GsonConverterFactory.create(builder.create());
 	}
