@@ -8,6 +8,7 @@ import java.util.concurrent.CompletionException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.connection.NodeRPCConnection;
+import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.auth.AccessToken;
 import org.elastos.hive.connection.auth.BridgeHandler;
 import org.elastos.hive.endpoint.AboutController;
@@ -135,6 +136,10 @@ public class ServiceEndpoint extends NodeRPCConnection {
 
 	public DataStorage getStorage() {
 		return dataStorage;
+	}
+
+	public void refreshAccessToken() throws NodeRPCException {
+		accessToken.fetch();
 	}
 
 	@Override

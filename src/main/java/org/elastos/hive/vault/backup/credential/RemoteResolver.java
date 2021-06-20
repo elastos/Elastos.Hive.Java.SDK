@@ -5,14 +5,17 @@ import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.auth.CodeFetcher;
 import org.elastos.hive.service.BackupContext;
 
+import java.util.concurrent.ExecutionException;
+
 class RemoteResolver implements CodeFetcher {
+	private ServiceEndpoint serviceEndpoint;
 	private BackupContext backupContext;
 	private String targetDid;
 	private String targetHost;
-	//private AuthenticationServiceRender authenticationService;
 
 	public RemoteResolver(ServiceEndpoint serviceEndpoint, BackupContext backupContext,
 						  String targetServiceDid, String targetAddress) {
+		this.serviceEndpoint = serviceEndpoint;
 		this.backupContext = backupContext;
 		this.targetDid = targetServiceDid;
 		this.targetHost = targetAddress;
@@ -20,20 +23,16 @@ class RemoteResolver implements CodeFetcher {
 
 	@Override
 	public String fetch() throws NodeRPCException {
-	   /* try {
-			return credential(authenticationService.signIn4ServiceDid());
-		} catch (Exception e) {
-			throw new NodeRPCException(401, -1, "Failed to authentication backup credential.");
-		}*/
-		return null;
+		if (serviceEndpoint.getServiceInstanceDid() == null) {
+			serviceEndpoint.refreshAccessToken();
+		}
+		try {
+			return backupContext.getAuthorization(serviceEndpoint.getServiceInstanceDid(), targetDid, targetHost).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new NodeRPCException(NodeRPCException.UNAUTHORIZED, -1,
+					"Failed to create backup credential." + e.getCause().getMessage());
+		}
 	}
-
-	/*
-	private AuthToken credential(String sourceDid) throws ExecutionException, InterruptedException {
-		return new AuthTokenToBackup(backupContext
-				.getAuthorization(sourceDid, this.targetDid, this.targetHost).get(),
-				0);
-	}*/
 
 	@Override
 	public void invalidate() {}
