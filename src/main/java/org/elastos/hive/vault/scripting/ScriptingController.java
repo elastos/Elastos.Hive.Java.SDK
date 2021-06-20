@@ -223,4 +223,17 @@ public class ScriptingController {
 		else
 			return null;
 	}
+
+	public void unregisterScript(String name) throws HiveException {
+		try {
+			scriptingAPI.unregisterScript(name).execute();
+		} catch (NodeRPCException e) {
+			// TODO:
+			throw new ServerUnkownException(e);
+		} catch (IOException e) {
+			// TODO
+			e.printStackTrace();
+			throw new NetworkException(e);
+		}
+	}
 }

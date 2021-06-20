@@ -129,9 +129,8 @@ public class SubscriptionController {
 
 	public PricingPlan getBackupPricingPlan(String planName) throws HiveException {
 		try {
-			List<PricingPlan> plans = subscriptionAPI.getPricePlans("backup", planName).execute()
-					.body().getBackupPlans();
-			return plans.isEmpty() ? null : plans.get(0);
+			return subscriptionAPI.getPricePlans("backup", planName).execute()
+					.body().getBackupPlans().get(0);
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 			case NodeRPCException.UNAUTHORIZED:

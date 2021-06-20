@@ -63,10 +63,11 @@ class ScriptingServiceRender implements ScriptingService {
 	@Override
 	public CompletableFuture<Void> unregisterScript(String name) {
 		return CompletableFuture.runAsync(()-> {
-			if (name == null)
-				throw new IllegalArgumentException("Missing script name.");
-
-			throw new NotImplementedException("API unregisterScript will be supported later");
+			try {
+				controller.unregisterScript(name);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
 		});
 	}
 
