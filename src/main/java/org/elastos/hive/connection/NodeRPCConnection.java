@@ -111,13 +111,7 @@ public abstract class NodeRPCConnection {
 		builder.registerTypeAdapter(JsonNode.class, (JsonDeserializer<JsonNode>) (src, typeOfSrc, context) -> {
 			if (src == null)
 				return null;
-			String json = new Gson().toJson(src);
-			try {
-				return new ObjectMapper().readTree(json);
-			} catch (IOException e) {
-				log.error("Failed to deserialize to JsonNode.");
-				return null;
-			}
+			return new ObjectMapper().convertValue(src, JsonNode.class);
 		});
 		return GsonConverterFactory.create(builder.create());
 	}

@@ -1,10 +1,10 @@
 package org.elastos.hive;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Throwables;
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.service.ScriptingService;
@@ -77,18 +77,25 @@ class ScriptingServiceTest {
 	}
 
 	private void registerScriptInsert(String scriptName) {
-		Assertions.assertDoesNotThrow(() -> scriptingService.registerScript(scriptName,
-				new InsertExecutable(scriptName, COLLECTION_NAME,
-						new KeyValueDict().putKv("author", "$params.author").putKv("content", "$params.content"),
-						new KeyValueDict().putKv("bypass_document_validation", false).putKv("ordered", true)),
-				false, false).get());
+		Assertions.assertDoesNotThrow(() -> {
+			ObjectNode doc = JsonNodeFactory.instance.objectNode();
+			doc.put("author", "$params.author");
+			doc.put("content", "$params.content");
+			ObjectNode options = JsonNodeFactory.instance.objectNode();
+			options.put("bypass_document_validation", false);
+			options.put("ordered", true);
+			scriptingService.registerScript(scriptName,
+					new InsertExecutable(scriptName, COLLECTION_NAME, doc, options),
+					false, false).get();
+		});
 	}
 
 	private void callScriptInsert(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptRunner.callScript(scriptName,
-					map2JsonNode(
-							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
+			ObjectNode params = JsonNodeFactory.instance.objectNode();
+			params.put("author","John");
+			params.put("content", "message");
+			JsonNode result = scriptRunner.callScript(scriptName, params,
 					ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
@@ -103,8 +110,10 @@ class ScriptingServiceTest {
 
 	private void registerScriptFindWithoutCondition(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
+			ObjectNode filter = JsonNodeFactory.instance.objectNode();
+			filter.put("author","John");
 			scriptingService.registerScript(scriptName,
-					new FindExecutable(scriptName, COLLECTION_NAME, new KeyValueDict().putKv("author","John")).setOutput(true),
+					new FindExecutable(scriptName, COLLECTION_NAME, filter).setOutput(true),
 					false, false).get();
 		});
 	}
@@ -121,7 +130,8 @@ class ScriptingServiceTest {
 
 	private void registerScriptFind(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
-			KeyValueDict filter = new KeyValueDict().putKv("author","John");
+			ObjectNode filter = JsonNodeFactory.instance.objectNode();
+			filter.put("author","John");
 			scriptingService.registerScript(scriptName,
 					new QueryHasResultCondition("verify_user_permission",COLLECTION_NAME, filter),
 					new FindExecutable(scriptName, COLLECTION_NAME, filter).setOutput(true),
@@ -142,22 +152,29 @@ class ScriptingServiceTest {
 	}
 
 	private void registerScriptUpdate(String scriptName) {
-		Assertions.assertDoesNotThrow(() ->
-				scriptingService.registerScript(scriptName,
-						new UpdateExecutable(scriptName, COLLECTION_NAME,
-								new KeyValueDict().putKv("author", "$params.author"),
-								new KeyValueDict().putKv("$set", new KeyValueDict().putKv("author", "$params.author")
-										.putKv("content", "$params.content")),
-								new KeyValueDict().putKv("bypass_document_validation", false).putKv("upsert", true)),
-						false, false).get());
+		Assertions.assertDoesNotThrow(() -> {
+			ObjectNode filter = JsonNodeFactory.instance.objectNode();
+			filter.put("author", "$params.author");
+			ObjectNode set = JsonNodeFactory.instance.objectNode();
+			set.put("author", "$params.author");
+			set.put("content", "$params.content");
+			ObjectNode update = JsonNodeFactory.instance.objectNode();
+			update.put("$set", set);
+			ObjectNode options = JsonNodeFactory.instance.objectNode();
+			options.put("bypass_document_validation", false);
+			options.put("upsert", true);
+			scriptingService.registerScript(scriptName,
+					new UpdateExecutable(scriptName, COLLECTION_NAME, filter, update, options),
+					false, false).get();
+		});
 	}
 
 	private void callScriptUpdate(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptRunner.callScript(scriptName,
-					map2JsonNode(
-							new KeyValueDict().putKv("author", "John").putKv("content", "message")),
-					ownerDid, appDid, JsonNode.class).get();
+			ObjectNode params = JsonNodeFactory.instance.objectNode();
+			params.put("author", "John");
+			params.put("content", "message");
+			JsonNode result = scriptRunner.callScript(scriptName, params, ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("upserted_id"));
@@ -171,20 +188,19 @@ class ScriptingServiceTest {
 
 	private void registerScriptDelete(String scriptName) {
 		Assertions.assertDoesNotThrow(() -> {
+			ObjectNode filter = JsonNodeFactory.instance.objectNode();
+			filter.put("author", "$params.author");
 			scriptingService.registerScript(scriptName,
-					new DeleteExecutable(scriptName, COLLECTION_NAME,
-							new KeyValueDict().putKv("author", "$params.author")),
+					new DeleteExecutable(scriptName, COLLECTION_NAME, filter),
 					false, false).get();
 		});
 	}
 
 	private void callScriptDelete(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptRunner.callScript(
-					scriptName,
-
-					map2JsonNode(new KeyValueDict().putKv("author", "John")),
-					ownerDid, appDid, JsonNode.class).get();
+			ObjectNode params = JsonNodeFactory.instance.objectNode();
+			params.put("author", "John");
+			JsonNode result = scriptRunner.callScript(scriptName, params, ownerDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("deleted_count"));
@@ -299,7 +315,6 @@ class ScriptingServiceTest {
 	@Test @Order(9) void testFileHash() {
 		registerScriptFileHash(FILE_HASH_NAME);
 		callScriptFileHash(FILE_HASH_NAME, fileName);
-		remove_test_database();
 	}
 
 	private void registerScriptFileHash(String scriptName) {
@@ -346,9 +361,5 @@ class ScriptingServiceTest {
 		} catch (Exception e) {
 			log.error("Failed to remove collection: {}", e.getMessage());
 		}
-	}
-
-	private JsonNode map2JsonNode(Map<String, Object> map) {
-		return new ObjectMapper().convertValue(map, JsonNode.class);
 	}
 }
