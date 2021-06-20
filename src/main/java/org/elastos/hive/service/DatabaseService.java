@@ -73,7 +73,7 @@ public interface DatabaseService {
 	 * @param options optional,refer to {@link FindOptions}
 	 * @return a JSON object document result
 	 */
-	CompletableFuture<List<JsonNode>> findOne(String collection, JsonNode query, FindOptions options);
+	CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options);
 
 	/**
 	 * Find many documents

@@ -4,14 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.elastos.hive.connection.HiveResponseBody;
 import org.elastos.hive.connection.KeyValueDict;
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.UnauthorizedException;
-import org.elastos.hive.exception.ServerUnkownException;
+import org.elastos.hive.exception.*;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -32,7 +28,7 @@ public class DatabaseController {
 
 			result = databaseAPI.createCollection(collectionName).execute().body();
 			if (!collectionName.equals(result.getName()))
-				throw new ServerUnkownException("Different collection created, impossible");
+				throw new ServerUnkownException("Different collection created, impossible to happen");
 
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
@@ -82,36 +78,34 @@ public class DatabaseController {
 	}
 
 	public InsertResult insertOne(String collectionName,
-								  JsonNode doc,
+								  JsonNode document,
 								  InsertOptions options) throws HiveException {
-		return insertMany(collectionName, Collections.singletonList(doc), options);
+		return insertMany(collectionName, Collections.singletonList(document), options);
 	}
 
 	public InsertResult insertMany(String collectionName,
-								   List<JsonNode> docs,
+								   List<JsonNode> documents,
 								   InsertOptions options) throws HiveException {
 		try {
-			return databaseAPI.insert(collectionName, new InsertRequest()
-					.setDocuments(jsonNodeList2KeyValueDicList(docs))
-					.setOptions(options)
-			).execute().body();
+			return databaseAPI.insert(collectionName, new InsertParams(documents, options)).execute().body();
 		} catch (NodeRPCException e) {
 			// TODO:
 			throw new ServerUnkownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
+	}
+
+	public UpdateResult updateOne(String collectionName, JsonNode filter,
+								  JsonNode update, UpdateOptions options) throws HiveException {
+		throw new NotImplementedException();
 	}
 
 	public UpdateResult updateMany(String collectionName, JsonNode filter,
 								   JsonNode update,
 								   UpdateOptions options) throws HiveException {
 		try {
-			return databaseAPI.update(collectionName, new UpdateRequest()
-					.setFilter(jsonNode2KeyValueDic(filter))
-					.setUpdate(jsonNode2KeyValueDic(update))
-					.setOptions(options)
-			).execute().body();
+			return databaseAPI.update(collectionName, new UpdateParams(filter, update, options)).execute().body();
 		} catch (NodeRPCException e) {
 			// TODO:
 			throw new ServerUnkownException(e);
@@ -120,9 +114,15 @@ public class DatabaseController {
 		}
 	}
 
-	public void deleteMany(String collectionName, JsonNode filter) throws HiveException {
+	public int deleteOne(String collection, JsonNode filter, DeleteOptions options) throws HiveException {
+		throw new NotImplementedException();
+	}
+
+	public int deleteMany(String collectionName, JsonNode filter, DeleteOptions options) throws HiveException {
 		try {
-			databaseAPI.delete(collectionName, new DeleteRequest(jsonNode2KeyValueDic(filter))).execute();
+			// TODO:
+			databaseAPI.delete(collectionName, new DeleteParams(filter, options)).execute().body();
+			return 0;
 		} catch (NodeRPCException e) {
 			// TODO:
 			throw new ServerUnkownException(e);
@@ -131,9 +131,9 @@ public class DatabaseController {
 		}
 	}
 
-	public Long countDocuments(String collectionName, JsonNode filter, CountOptions options) throws HiveException {
+	public long countDocuments(String collectionName, JsonNode filter, CountOptions options) throws HiveException {
 		try {
-			return databaseAPI.count(collectionName, new CountRequest(jsonNode2KeyValueDic(filter), options))
+			return databaseAPI.count(collectionName, new CountParams(filter, options))
 					.execute().body().getCount();
 		} catch (NodeRPCException e) {
 			// TODO:
@@ -143,13 +143,17 @@ public class DatabaseController {
 		}
 	}
 
+	public JsonNode findOne(String collectionName, JsonNode filter, FindOptions options) throws HiveException {
+		List<JsonNode> docs = find(collectionName, filter, options);
+		return docs != null && !docs.isEmpty() ? docs.get(0) : null;
+	}
+
 	public List<JsonNode> find(String collectionName, JsonNode filter, FindOptions options) throws HiveException {
 		try {
 			String skip = options != null ? options.getSkipStr() : "";
 			String limit = options != null ? options.getLimitStr() : "";
-			return HiveResponseBody.KeyValueDictList2JsonNodeList(
-					databaseAPI.find(collectionName, jsonNode2Str(filter), skip, limit)
-							.execute().body().getItems());
+			return databaseAPI.find(collectionName, jsonNode2Str(filter), skip, limit)
+						.execute().body().documents();
 		} catch (NodeRPCException e) {
 			// TODO:
 			throw new ServerUnkownException(e);
@@ -160,12 +164,7 @@ public class DatabaseController {
 
 	public List<JsonNode> query(String collectionName, JsonNode filter, QueryOptions options) throws HiveException {
 		try {
-			return HiveResponseBody.KeyValueDictList2JsonNodeList(
-					databaseAPI.query(new QueryRequest()
-							.setCollectionName(collectionName)
-							.setFilter(jsonNode2KeyValueDic(filter))
-							.setOptions(options)
-					).execute().body().getItems());
+			return databaseAPI.query(new QueryParams(collectionName, filter, options)).execute().body().documents();
 		} catch (NodeRPCException e) {
 			// TODO:
 			throw new ServerUnkownException(e);

@@ -74,9 +74,18 @@ class DatabaseServiceRender implements DatabaseService {
 	}
 
 	@Override
-	public CompletableFuture<List<JsonNode>> findOne(String collection, JsonNode query, FindOptions options) {
-		return findMany(collection, query, options);
+	public CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options) {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return controller.findOne(collection, query, options);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
+
+
+
 
 	@Override
 	public CompletableFuture<List<JsonNode>> findMany(String collection, JsonNode query, FindOptions options) {
@@ -102,7 +111,13 @@ class DatabaseServiceRender implements DatabaseService {
 
 	@Override
 	public CompletableFuture<UpdateResult> updateOne(String collection, JsonNode filter, JsonNode update, UpdateOptions options) {
-		return updateMany(collection, filter, update, options);
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return controller.updateOne(collection, filter, update, options);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
 	@Override
@@ -118,14 +133,20 @@ class DatabaseServiceRender implements DatabaseService {
 
 	@Override
 	public CompletableFuture<Void> deleteOne(String collection, JsonNode filter) {
-		return deleteMany(collection, filter);
+		return CompletableFuture.runAsync(() -> {
+			try {
+				controller.deleteOne(collection, filter, null);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 
 	@Override
 	public CompletableFuture<Void> deleteMany(String collection, JsonNode filter) {
 		return CompletableFuture.runAsync(() -> {
 			try {
-				controller.deleteMany(collection, filter);
+				controller.deleteMany(collection, filter, null);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
