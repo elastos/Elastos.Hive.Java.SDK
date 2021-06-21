@@ -153,10 +153,27 @@ public abstract class NodeRPCConnection {
 				if (httpCode == 401)
 					accessToken.invalidate();
 
-				// TODO:
-				throw new NodeRPCException(httpCode, -1, response.message());
+				if (response.body() == null)
+					throw new NodeRPCException(httpCode, -1, "Empty body.");
+
+				JsonNode error = getResponseErrorNode(response.body().string());
+				if (error == null)
+					throw new NodeRPCException(httpCode, -1, response.body().string());
+				else
+					throw new NodeRPCException(httpCode,
+							error.has("internal_code") ? error.get("internal_code").asInt() : -1,
+							error.get("message").asText());
 			}
 			return response;
+		}
+
+		private JsonNode getResponseErrorNode(String body) {
+			try {
+				return new ObjectMapper().readTree(body).get("error");
+			} catch (JsonParseException | IOException e) {
+				log.error("No Json response body returned: " + body);
+				return null;
+			}
 		}
 	}
 }

@@ -2,19 +2,13 @@ package org.elastos.hive.subscription;
 
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.NotImplementedException;
-import org.elastos.hive.exception.PricingPlanNotFoundException;
-import org.elastos.hive.exception.UnauthorizedException;
-import org.elastos.hive.exception.ServerUnkownException;
-import org.elastos.hive.exception.AlreadyExistsException;
+import org.elastos.hive.exception.*;
 
 import java.io.IOException;
 import java.util.List;
 
 public class SubscriptionController {
-	private SubscriptionAPI subscriptionAPI;
+	private final SubscriptionAPI subscriptionAPI;
 
 	public SubscriptionController(NodeRPCConnection connection) {
 		this.subscriptionAPI = connection.createService(SubscriptionAPI.class, true);
@@ -23,15 +17,17 @@ public class SubscriptionController {
 	public List<PricingPlan> getVaultPricingPlanList() throws HiveException {
 		try {
 			return subscriptionAPI.getPricePlans("vault", "")
-								.execute()
-								.body()
-								.getPricingPlanCollection();
+					.execute()
+					.body()
+					.getPricingPlanCollection();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException(e);
-			default:
-				throw new ServerUnkownException(e);
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.NOT_FOUND:
+					throw new PricingPlanNotFoundException(e);
+				default:
+					throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -65,7 +61,8 @@ public class SubscriptionController {
 			switch (e.getCode()) {
 			case NodeRPCException.UNAUTHORIZED:
 				throw new UnauthorizedException(e);
-			// TODO:
+			case NodeRPCException.NOT_FOUND:
+				throw new VaultNotFoundException(e);
 			default:
 				throw new ServerUnkownException(e);
 			}
@@ -82,12 +79,12 @@ public class SubscriptionController {
 			return subscriptionAPI.subscribeToVault(credential).execute().body();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException(e);
-			case 200:
-				throw new AlreadyExistsException("Vault already is being subscripted");
-			default:
-				throw new ServerUnkownException(e);
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.ALREADY_EXISTS:
+					throw new AlreadyExistsException(e);
+				default:
+					throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -98,11 +95,11 @@ public class SubscriptionController {
 		try {
 			subscriptionAPI.unsubscribeVault().execute();
 		} catch (NodeRPCException e) {
-			switch(e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException();
-			default:
-				throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException();
+				default:
+					throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -112,15 +109,17 @@ public class SubscriptionController {
 	public List<PricingPlan> getBackupPricingPlanList() throws HiveException {
 		try {
 			return subscriptionAPI.getPricePlans("backup", "")
-								.execute()
-								.body()
-								.getBackupPlans();
+					.execute()
+					.body()
+					.getBackupPlans();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException(e);
-			default:
-				throw new ServerUnkownException(e);
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.NOT_FOUND:
+					throw new PricingPlanNotFoundException(e);
+				default:
+					throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -133,12 +132,12 @@ public class SubscriptionController {
 					.body().getBackupPlans().get(0);
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException(e);
-			case NodeRPCException.NOT_FOUND:
-				throw new PricingPlanNotFoundException(e);
-			default:
-				throw new ServerUnkownException(e);
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.NOT_FOUND:
+					throw new PricingPlanNotFoundException(e);
+				default:
+					throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -152,7 +151,8 @@ public class SubscriptionController {
 			switch (e.getCode()) {
 			case NodeRPCException.UNAUTHORIZED:
 				throw new UnauthorizedException(e);
-			// TODO:
+			case NodeRPCException.NOT_FOUND:
+				throw new BackupNotFoundException(e);
 			default:
 				throw new ServerUnkownException(e);
 			}
@@ -166,12 +166,12 @@ public class SubscriptionController {
 			return subscriptionAPI.subscribeToBackup(reserved).execute().body();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException(e);
-			case 200:
-				throw new AlreadyExistsException("Backup already being subscripted");
-			default:
-				throw new ServerUnkownException(e);
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.ALREADY_EXISTS:
+					throw new AlreadyExistsException(e);
+				default:
+					throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -182,11 +182,11 @@ public class SubscriptionController {
 		try {
 			subscriptionAPI.unsubscribeBackup().execute();
 		} catch (NodeRPCException e) {
-			switch(e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException();
-			default:
-				throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException();
+				default:
+					throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
