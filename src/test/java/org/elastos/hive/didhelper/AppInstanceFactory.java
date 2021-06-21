@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class AppInstanceFactory {
-	private static final String didCachePath = "didCache";
 	private Vault vault;
 	private Client client;
 	private static boolean resolverDidSetup = false;
@@ -49,7 +48,7 @@ public class AppInstanceFactory {
 		try {
 			PresentationInJWT presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
 			if (!resolverDidSetup) {
-				Client.setupResolver(userFactoryOpt.resolveUrl, this.didCachePath);
+				Client.setupResolver(userFactoryOpt.resolveUrl);
 				resolverDidSetup = true;
 			}
 
@@ -162,7 +161,7 @@ public class AppInstanceFactory {
 		try {
 			Config config = ConfigHelper.getConfigInfo("Production.conf");
 			if (!resolverDidSetup) {
-				Client.setupResolver(config.getResolverUrl(), didCachePath);
+				Client.setupResolver(config.getResolverUrl());
 				resolverDidSetup = true;
 			}
 			return VaultAuthHelper.createInstance(config.getUserMn(),
