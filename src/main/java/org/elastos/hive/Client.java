@@ -24,7 +24,7 @@ package org.elastos.hive;
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
-import org.elastos.did.backend.ResolverCache;
+import org.elastos.did.DefaultDIDAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.HiveException;
@@ -67,7 +67,7 @@ public class Client {
 	 * @throws HiveException
 	 */
 	public static void setupResolver() throws HiveException {
-		setupResolver(null, null);
+		setupResolver(null);
 	}
 
 	/**
@@ -78,23 +78,16 @@ public class Client {
 	 * Context.getFilesDir() + "/.cache.did.elastos"
 	 *
 	 * @param resolver the DIDResolver object
-	 * @param cacheDir the cache path name
 	 */
-	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
-		if (cacheDir == null || resolver == null)
+	public static void setupResolver(String resolver) throws HiveException {
+		if (resolver == null)
 			throw new IllegalArgumentException();
 		if (resolverDidSetup)
 			throw new HiveException("Resolver already setup before");
 
-		try {
-			DIDBackend.initialize(resolver, cacheDir);
-			ResolverCache.reset();
-			resolverDidSetup = true;
-		} catch (DIDResolveException e) {
-			throw new HiveException(e.getLocalizedMessage());
-		}
+		DIDBackend.initialize(new DefaultDIDAdapter(resolver));
+		resolverDidSetup = true;
 	}
-
 
 	public static Client createInstance(ApplicationContext context) throws HiveException {
 		if (context == null)

@@ -2,7 +2,6 @@ package org.elastos.hive.didhelper;
 
 import org.elastos.did.VerifiableCredential;
 import org.elastos.did.VerifiablePresentation;
-import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Header;
 
@@ -16,8 +15,8 @@ class DApp extends Entity {
 
 	public String appId = "appId";
 
-	public DApp(String name, String mnemonic, DummyAdapter adapter, String phrasepass, String storepass) throws DIDException {
-		super(name, mnemonic, adapter, phrasepass, storepass);
+	public DApp(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
+		super(name, mnemonic, phrasepass, storepass);
 	}
 
 	public VerifiablePresentation createPresentation(VerifiableCredential vc, String realm, String nonce) throws DIDException {
