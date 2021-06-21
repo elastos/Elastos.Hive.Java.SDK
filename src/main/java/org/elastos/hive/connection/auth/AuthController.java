@@ -7,14 +7,16 @@ import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.ServerUnkownException;
+import org.elastos.hive.exception.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 
 public class AuthController {
+	private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 	private AuthAPI authAPI;
 	private String expectationAudience;
 
@@ -34,15 +36,17 @@ public class AuthController {
 							.body();
 
 			if (!checkValid(challenge.getChallenge(), expectationAudience)) {
-				// TODO: log here.
+				log.error("Failed to check the valid of challenge code when sign in.");
 				throw new ServerUnkownException("Invalid challenge code, possibly being hacked.");
 			}
 			return challenge.getChallenge();
-
 		} catch (NodeRPCException e) {
-			// TODO: Handle http error code here;
-			throw new ServerUnkownException();
-
+			switch (e.getCode()) {
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				default:
+					throw new ServerUnkownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -55,15 +59,18 @@ public class AuthController {
 							.body();
 
 			if (!checkValid(token.getToken(), expectationAudience)) {
-				// TODO: log here.
+				log.error("Failed to check the valid of access token when auth.");
 				throw new ServerUnkownException("Invalid challenge code, possibly being hacked.");
 			}
 			return token.getToken();
 
 		} catch (NodeRPCException e) {
-			// TODO: Handle http error code here;
-			throw new ServerUnkownException();
-
+			switch (e.getCode()) {
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				default:
+					throw new ServerUnkownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -72,15 +79,12 @@ public class AuthController {
 	private boolean checkValid(String jwtCode, String expectationDid) {
 		try {
 			Claims claims = new JwtParserBuilder()
-							.build()
-							.parseClaimsJws(jwtCode)
-							.getBody();
-
+					.build()
+					.parseClaimsJws(jwtCode)
+					.getBody();
 			return claims.getExpiration().getTime() > System.currentTimeMillis() &&
 					claims.getAudience().equals(expectationDid);
-
 		} catch (Exception e) {
-			// TOOD: log here.
 			return false;
 		}
 	}

@@ -1,5 +1,7 @@
 package org.elastos.hive.exception;
 
+import org.elastos.hive.connection.NodeRPCException;
+
 public class AlreadyExistsException extends RuntimeException {
 	private static final long serialVersionUID = -586039279266427101L;
 
@@ -17,5 +19,9 @@ public class AlreadyExistsException extends RuntimeException {
 
 	public AlreadyExistsException(Throwable cause) {
 		super(cause);
+	}
+
+	public AlreadyExistsException(NodeRPCException e) {
+		super(e.getMessage());
 	}
 }

@@ -8,9 +8,10 @@ import java.io.IOException;
 public class NodeRPCException extends IOException {
 	private static final long serialVersionUID = 1L;
 
-	public static final int BAD_REQUEST	 = 400;
+	public static final int BAD_REQUEST	    = 400;
 	public static final int UNAUTHORIZED	= 401;
-	public static final int NOT_FOUND	   = 404;
+	public static final int NOT_FOUND	    = 404;
+	public static final int ALREADY_EXISTS  = 455;
 
 	private final int code;
 	private final int internalCode;
