@@ -1,9 +1,6 @@
 package org.elastos.hive.vault.database;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.*;
@@ -12,7 +9,6 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DatabaseController {
 	private DatabaseAPI databaseAPI;
@@ -31,12 +27,14 @@ public class DatabaseController {
 
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException(e);
-			// TODO:
-			// case1: collection already exist.
-			default:
-				throw new ServerUnkownException(e);
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.ALREADY_EXISTS:
+					throw new AlreadyExistsException(e);
+				default:
+					throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -48,23 +46,15 @@ public class DatabaseController {
 			databaseAPI.deleteCollection(collectionName).execute();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
-			case NodeRPCException.UNAUTHORIZED:
-				throw new UnauthorizedException(e);
-			default:
-				throw new ServerUnkownException(e);
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				default:
+					throw new ServerUnkownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
-		}
-	}
-
-	public static String jsonNode2Str(JsonNode node) {
-		if (node == null)
-			return "";
-		try {
-			return new ObjectMapper().writeValueAsString(node);
-		} catch (JsonProcessingException e) {
-			throw new InvalidParameterException("Invalid parameter of json node.");
 		}
 	}
 
@@ -80,8 +70,18 @@ public class DatabaseController {
 		try {
 			return databaseAPI.insert(collectionName, new InsertParams(documents, options)).execute().body();
 		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e.getMessage());
+				default:
+					throw new ServerUnkownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -92,14 +92,25 @@ public class DatabaseController {
 		throw new NotImplementedException();
 	}
 
-	public UpdateResult updateMany(String collectionName, JsonNode filter,
+	public UpdateResult updateMany(String collectionName,
+								   JsonNode filter,
 								   JsonNode update,
 								   UpdateOptions options) throws HiveException {
 		try {
 			return databaseAPI.update(collectionName, new UpdateParams(filter, update, options)).execute().body();
 		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e.getMessage());
+				default:
+					throw new ServerUnkownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -111,12 +122,22 @@ public class DatabaseController {
 
 	public int deleteMany(String collectionName, JsonNode filter, DeleteOptions options) throws HiveException {
 		try {
-			// TODO:
+			// TODO: refine delete API to return something first.
 			databaseAPI.delete(collectionName, new DeleteParams(filter, options)).execute().body();
 			return 0;
 		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e.getMessage());
+				default:
+					throw new ServerUnkownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -124,11 +145,20 @@ public class DatabaseController {
 
 	public long countDocuments(String collectionName, JsonNode filter, CountOptions options) throws HiveException {
 		try {
-			return databaseAPI.count(collectionName, new CountParams(filter, options))
-					.execute().body().getCount();
+			return databaseAPI.count(collectionName, new CountParams(filter, options)).execute().body().getCount();
 		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e.getMessage());
+				default:
+					throw new ServerUnkownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -141,13 +171,23 @@ public class DatabaseController {
 
 	public List<JsonNode> find(String collectionName, JsonNode filter, FindOptions options) throws HiveException {
 		try {
+			String filterStr = filter == null ? "" : filter.toString();
 			String skip = options != null ? options.getSkipStr() : "";
 			String limit = options != null ? options.getLimitStr() : "";
-			return databaseAPI.find(collectionName, jsonNode2Str(filter), skip, limit)
-						.execute().body().documents();
+			return databaseAPI.find(collectionName, filterStr, skip, limit).execute().body().documents();
 		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e.getMessage());
+				default:
+					throw new ServerUnkownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -157,8 +197,18 @@ public class DatabaseController {
 		try {
 			return databaseAPI.query(new QueryParams(collectionName, filter, options)).execute().body().documents();
 		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e.getMessage());
+				default:
+					throw new ServerUnkownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
