@@ -1,5 +1,10 @@
 package org.elastos.hive;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.concurrent.CompletableFuture;
+
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.elastos.hive.scripting.AggregatedExecutable;
 import org.elastos.hive.scripting.Executable;
@@ -7,12 +12,7 @@ import org.elastos.hive.scripting.HashExecutable;
 import org.elastos.hive.scripting.PropertiesExecutable;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
-import org.junit.Test;
-
-import java.util.concurrent.CompletableFuture;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.Test;
 
 @Ignore
 public class HiveURLTest {

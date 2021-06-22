@@ -1,20 +1,20 @@
 package org.elastos.hive;
 
-import org.elastos.hive.didhelper.AppInstanceFactory;
-import org.elastos.hive.payment.Order;
-import org.elastos.hive.payment.PricingPlan;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.elastos.hive.payment.Order;
+import org.elastos.hive.payment.PricingPlan;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.jupiter.api.Test;
+import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PaymentTest {

@@ -36,7 +36,7 @@ class Entity {
 		if (store.containsRootIdentity(id))
 			return; // Already exists
 
-		this.identity = RootIdentity.create(mnemonic, phrasepass, store, storepass);
+		identity = RootIdentity.create(mnemonic, phrasepass, store, storepass);
 	}
 
 	protected void initDid() throws DIDException {
@@ -51,7 +51,7 @@ class Entity {
 			}
 		}*/
 
-		DIDDocument doc = this.identity.newDid(storepass);
+		DIDDocument doc = identity.newDid(storepass);
 		doc.getMetadata().setAlias("me");
 		this.did = doc.getSubject();
 		System.out.format("[%s] My new DID created: %s%n", name, did);

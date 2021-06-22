@@ -1,13 +1,13 @@
 package org.elastos.hive;
 
-import org.elastos.hive.didhelper.AppInstanceFactory;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.junit.BeforeClass;
+import org.junit.jupiter.api.Test;
 
 public class VersionTest {
 
