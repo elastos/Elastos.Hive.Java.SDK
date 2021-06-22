@@ -1,18 +1,18 @@
 package org.elastos.hive;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.elastos.hive.scripting.DbFindQuery;
 import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.utils.JsonUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class ScriptingOtherTest {
 

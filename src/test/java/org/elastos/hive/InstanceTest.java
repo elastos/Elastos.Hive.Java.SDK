@@ -1,10 +1,10 @@
 package org.elastos.hive;
 
-import org.elastos.hive.didhelper.AppInstanceFactory;
-import org.junit.Test;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+
+import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.junit.jupiter.api.Test;
 
 public class InstanceTest {
 
