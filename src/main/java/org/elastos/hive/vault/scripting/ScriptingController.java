@@ -5,19 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import okhttp3.ResponseBody;
+import org.elastos.hive.exception.*;
 import retrofit2.Response;
 
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.UploadOutputStream;
 import org.elastos.hive.connection.UploadOutputStreamWriter;
-
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.NotFoundException;
-import org.elastos.hive.exception.ScriptNotFoundException;
-import org.elastos.hive.exception.ServerUnknownException;
-import org.elastos.hive.exception.UnauthorizedException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +22,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
+import java.security.InvalidParameterException;
 import java.util.Map;
 
 public class ScriptingController {
@@ -53,15 +48,16 @@ public class ScriptingController {
 							.execute().body();
 
 		} catch (NodeRPCException e) {
-			int httpCode = e.getCode();
-
-			if (httpCode == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException(e);
-			else if (httpCode == NodeRPCException.NOT_FOUND)
-				throw new ScriptNotFoundException(e);
-			else
-				throw new ServerUnknownException(e);
-
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -101,17 +97,19 @@ public class ScriptingController {
 			return resultType.cast(obj);
 
 		} catch (NodeRPCException e) {
-			int httpCode = e.getCode();
-
-			if (httpCode == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException(e);
-			else if (httpCode == NodeRPCException.NOT_FOUND)
-				throw new ScriptNotFoundException(e);
-			else
-				throw new ServerUnknownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
-			// TODO
-			e.printStackTrace();
 			throw new NetworkException(e);
 		}
 	}
@@ -142,17 +140,19 @@ public class ScriptingController {
 			}
 			return resultType.cast(obj);
 		} catch (NodeRPCException e) {
-			int httpCode = e.getCode();
-
-			if (httpCode == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException(e);
-			else if (httpCode == NodeRPCException.NOT_FOUND)
-				throw new ScriptNotFoundException(e);
-			else
-				throw new ServerUnknownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
-			// TODO
-			e.printStackTrace();
 			throw new NetworkException(e);
 		}
 	}
@@ -164,16 +164,9 @@ public class ScriptingController {
 			return getRequestStream(conn, resultType);
 
 		} catch (NodeRPCException e) {
-			int httpCode = e.getCode();
-
-			if (httpCode == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException(e);
-			else if (httpCode == NodeRPCException.NOT_FOUND)
-				throw new NotFoundException(e);
-			else
-				throw new ServerUnknownException(e);
+			// INFO: The error code and message can be found on stream closing.
+			throw new ServerUnknownException(e);
 		} catch (IOException e) {
-			// TODO
 			throw new NetworkException(e);
 		}
 	}
@@ -182,17 +175,19 @@ public class ScriptingController {
 		try {
 			return getResponseStream(scriptingAPI.downloadFile(transactionId).execute(), resultType);
 		} catch (NodeRPCException e) {
-			int httpCode = e.getCode();
-
-			if (httpCode == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException(e);
-			else if (httpCode == NodeRPCException.NOT_FOUND)
-				throw new NotFoundException(e);
-			else
-				throw new ServerUnknownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
-			// TODO
-			e.printStackTrace();
 			throw new NetworkException(e);
 		}
 	}
@@ -228,11 +223,19 @@ public class ScriptingController {
 		try {
 			scriptingAPI.unregisterScript(name).execute();
 		} catch (NodeRPCException e) {
-			// TODO:
-			throw new ServerUnknownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
-			// TODO
-			e.printStackTrace();
 			throw new NetworkException(e);
 		}
 	}
