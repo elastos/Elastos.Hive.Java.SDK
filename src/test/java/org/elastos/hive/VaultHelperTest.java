@@ -1,16 +1,16 @@
 package org.elastos.hive;
 
-import org.elastos.hive.didhelper.AppInstanceFactory;
-import org.elastos.hive.didhelper.VaultAuthHelper;
-import org.elastos.did.exception.DIDException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.elastos.did.exception.DIDException;
+import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.elastos.hive.didhelper.VaultAuthHelper;
+import org.junit.BeforeClass;
+import org.junit.jupiter.api.Test;
 
 public class VaultHelperTest {
 

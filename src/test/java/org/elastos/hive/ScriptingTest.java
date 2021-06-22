@@ -1,8 +1,12 @@
 package org.elastos.hive;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.concurrent.CompletableFuture;
 
 import org.elastos.hive.database.Date;
 import org.elastos.hive.database.MaxKey;
@@ -29,16 +33,13 @@ import org.elastos.hive.utils.JsonUtil;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.concurrent.CompletableFuture;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ScriptingTest {
