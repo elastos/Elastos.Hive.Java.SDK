@@ -37,7 +37,7 @@ public class AuthController {
 
 			if (!checkValid(challenge.getChallenge(), expectationAudience)) {
 				log.error("Failed to check the valid of challenge code when sign in.");
-				throw new ServerUnkownException("Invalid challenge code, possibly being hacked.");
+				throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
 			}
 			return challenge.getChallenge();
 		} catch (NodeRPCException e) {
@@ -45,7 +45,7 @@ public class AuthController {
 				case NodeRPCException.BAD_REQUEST:
 					throw new InvalidParameterException(e.getMessage());
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -60,7 +60,7 @@ public class AuthController {
 
 			if (!checkValid(token.getToken(), expectationAudience)) {
 				log.error("Failed to check the valid of access token when auth.");
-				throw new ServerUnkownException("Invalid challenge code, possibly being hacked.");
+				throw new ServerUnknownException("Invalid challenge code, possibly being hacked.");
 			}
 			return token.getToken();
 
@@ -69,7 +69,7 @@ public class AuthController {
 				case NodeRPCException.BAD_REQUEST:
 					throw new InvalidParameterException(e.getMessage());
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);

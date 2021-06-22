@@ -23,7 +23,7 @@ public class DatabaseController {
 
 			result = databaseAPI.createCollection(collectionName).execute().body();
 			if (!collectionName.equals(result.getName()))
-				throw new ServerUnkownException("Different collection created, impossible to happen");
+				throw new ServerUnknownException("Different collection created, impossible to happen");
 
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
@@ -34,7 +34,7 @@ public class DatabaseController {
 				case NodeRPCException.ALREADY_EXISTS:
 					throw new AlreadyExistsException(e);
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -51,7 +51,7 @@ public class DatabaseController {
 				case NodeRPCException.FORBIDDEN:
 					throw new VaultForbiddenException(e);
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -80,7 +80,7 @@ public class DatabaseController {
 				case NodeRPCException.NOT_FOUND:
 					throw new NotFoundException(e.getMessage());
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -109,7 +109,7 @@ public class DatabaseController {
 				case NodeRPCException.NOT_FOUND:
 					throw new NotFoundException(e.getMessage());
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -136,7 +136,7 @@ public class DatabaseController {
 				case NodeRPCException.NOT_FOUND:
 					throw new NotFoundException(e.getMessage());
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -157,7 +157,7 @@ public class DatabaseController {
 				case NodeRPCException.NOT_FOUND:
 					throw new NotFoundException(e.getMessage());
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -186,7 +186,7 @@ public class DatabaseController {
 				case NodeRPCException.NOT_FOUND:
 					throw new NotFoundException(e.getMessage());
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -207,7 +207,7 @@ public class DatabaseController {
 				case NodeRPCException.NOT_FOUND:
 					throw new NotFoundException(e.getMessage());
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);

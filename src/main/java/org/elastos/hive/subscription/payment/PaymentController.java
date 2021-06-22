@@ -5,7 +5,7 @@ import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.NotImplementedException;
-import org.elastos.hive.exception.ServerUnkownException;
+import org.elastos.hive.exception.ServerUnknownException;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +21,7 @@ public class PaymentController {
 		try {
 			return paymentAPI.createOrder(new CreateOrderParams()).execute().body();
 		} catch (NodeRPCException e) {
-			throw new ServerUnkownException(e);
+			throw new ServerUnknownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -31,7 +31,7 @@ public class PaymentController {
 		try {
 			 return paymentAPI.payOrder(new PayOrderParams()).execute().body();
 		} catch (NodeRPCException e) {
-				throw new ServerUnkownException(e);
+				throw new ServerUnknownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}

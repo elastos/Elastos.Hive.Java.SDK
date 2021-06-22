@@ -16,7 +16,7 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.NotFoundException;
 import org.elastos.hive.exception.ScriptNotFoundException;
-import org.elastos.hive.exception.ServerUnkownException;
+import org.elastos.hive.exception.ServerUnknownException;
 import org.elastos.hive.exception.UnauthorizedException;
 
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class ScriptingController {
 			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new ScriptNotFoundException(e);
 			else
-				throw new ServerUnkownException(e);
+				throw new ServerUnknownException(e);
 
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -108,7 +108,7 @@ public class ScriptingController {
 			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new ScriptNotFoundException(e);
 			else
-				throw new ServerUnkownException(e);
+				throw new ServerUnknownException(e);
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
@@ -149,7 +149,7 @@ public class ScriptingController {
 			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new ScriptNotFoundException(e);
 			else
-				throw new ServerUnkownException(e);
+				throw new ServerUnknownException(e);
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
@@ -171,7 +171,7 @@ public class ScriptingController {
 			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new NotFoundException(e);
 			else
-				throw new ServerUnkownException(e);
+				throw new ServerUnknownException(e);
 		} catch (IOException e) {
 			// TODO
 			throw new NetworkException(e);
@@ -189,7 +189,7 @@ public class ScriptingController {
 			else if (httpCode == NodeRPCException.NOT_FOUND)
 				throw new NotFoundException(e);
 			else
-				throw new ServerUnkownException(e);
+				throw new ServerUnknownException(e);
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
@@ -229,7 +229,7 @@ public class ScriptingController {
 			scriptingAPI.unregisterScript(name).execute();
 		} catch (NodeRPCException e) {
 			// TODO:
-			throw new ServerUnkownException(e);
+			throw new ServerUnknownException(e);
 		} catch (IOException e) {
 			// TODO
 			e.printStackTrace();
