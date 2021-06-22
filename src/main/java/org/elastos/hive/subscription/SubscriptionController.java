@@ -27,7 +27,7 @@ public class SubscriptionController {
 				case NodeRPCException.NOT_FOUND:
 					throw new PricingPlanNotFoundException(e);
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -47,7 +47,7 @@ public class SubscriptionController {
 			case NodeRPCException.NOT_FOUND:
 				throw new PricingPlanNotFoundException(e);
 			default:
-				throw new ServerUnkownException(e);
+				throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
@@ -64,7 +64,7 @@ public class SubscriptionController {
 			case NodeRPCException.NOT_FOUND:
 				throw new VaultNotFoundException(e);
 			default:
-				throw new ServerUnkownException(e);
+				throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e.getMessage());
@@ -84,7 +84,7 @@ public class SubscriptionController {
 				case NodeRPCException.ALREADY_EXISTS:
 					throw new AlreadyExistsException(e);
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -99,7 +99,7 @@ public class SubscriptionController {
 				case NodeRPCException.UNAUTHORIZED:
 					throw new UnauthorizedException();
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -119,7 +119,7 @@ public class SubscriptionController {
 				case NodeRPCException.NOT_FOUND:
 					throw new PricingPlanNotFoundException(e);
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -137,7 +137,7 @@ public class SubscriptionController {
 				case NodeRPCException.NOT_FOUND:
 					throw new PricingPlanNotFoundException(e);
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -154,7 +154,7 @@ public class SubscriptionController {
 			case NodeRPCException.NOT_FOUND:
 				throw new BackupNotFoundException(e);
 			default:
-				throw new ServerUnkownException(e);
+				throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -171,7 +171,7 @@ public class SubscriptionController {
 				case NodeRPCException.ALREADY_EXISTS:
 					throw new AlreadyExistsException(e);
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -186,7 +186,7 @@ public class SubscriptionController {
 				case NodeRPCException.UNAUTHORIZED:
 					throw new UnauthorizedException();
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);

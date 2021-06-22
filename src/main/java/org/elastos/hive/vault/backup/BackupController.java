@@ -32,7 +32,7 @@ public class BackupController {
 				case NodeRPCException.INSUFFICIENT_STORAGE:
 					throw new InsufficientStorageException(e);
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -56,7 +56,7 @@ public class BackupController {
 				case NodeRPCException.INSUFFICIENT_STORAGE:
 					throw new InsufficientStorageException(e);
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
@@ -75,7 +75,7 @@ public class BackupController {
 				case NodeRPCException.NOT_FOUND:
 					throw new NotFoundException(e);
 				default:
-					throw new ServerUnkownException(e);
+					throw new ServerUnknownException(e);
 			}
 		} catch (IOException e) {
 			throw new NetworkException(e);

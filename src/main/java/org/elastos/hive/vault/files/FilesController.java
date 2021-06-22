@@ -1,24 +1,15 @@
 package org.elastos.hive.vault.files;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.UploadOutputStream;
 import org.elastos.hive.connection.UploadOutputStreamWriter;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.PathNotExistException;
-import org.elastos.hive.exception.UnauthorizedException;
-
-import org.elastos.hive.exception.ServerUnkownException;
+import org.elastos.hive.exception.*;
 
 public class FilesController {
 	private NodeRPCConnection connection;
@@ -34,14 +25,8 @@ public class FilesController {
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
 			return new UploadOutputStream(urlConnection, urlConnection.getOutputStream());
 		} catch (NodeRPCException e) {
-			int httpCode = e.getCode();
-
-			if (httpCode == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException(e);
-			else if (httpCode == NodeRPCException.NOT_FOUND)
-				throw new PathNotExistException(e);
-			else
-				throw new ServerUnkownException(e);
+			// INFO: The error code and message can be found on stream closing.
+			throw new ServerUnknownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -52,14 +37,8 @@ public class FilesController {
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
 			return new UploadOutputStreamWriter(urlConnection, urlConnection.getOutputStream());
 		} catch (NodeRPCException e) {
-			int httpCode = e.getCode();
-
-			if (httpCode == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException(e);
-			else if (httpCode == NodeRPCException.NOT_FOUND)
-				throw new PathNotExistException(e);
-			else
-				throw new ServerUnkownException(e);
+			// INFO: The error code and message can be found on stream closing.
+			throw new ServerUnknownException(e);
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -67,15 +46,20 @@ public class FilesController {
 
 	public InputStream getDownloadStream(String path) throws HiveException {
 		try {
-
 			return filesAPI.download(path).execute().body().byteStream();
 		} catch (NodeRPCException e) {
-			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException();
-			else if (e.getCode() == NodeRPCException.NOT_FOUND)
-				throw new PathNotExistException(e);
-			else
-				throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -85,12 +69,18 @@ public class FilesController {
 		try {
 			return new InputStreamReader(filesAPI.download(path).execute().body().byteStream());
 		} catch (NodeRPCException e) {
-			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException();
-			else if (e.getCode() == NodeRPCException.NOT_FOUND)
-				throw new PathNotExistException(e);
-			else
-				throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -100,14 +90,18 @@ public class FilesController {
 		try {
 			return filesAPI.listChildren(path).execute().body().getValue();
 		} catch (NodeRPCException e) {
-			int httpCode = e.getCode();
-
-			if (httpCode == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException();
-			else if (httpCode == NodeRPCException.NOT_FOUND)
-				throw new PathNotExistException(e);
-			else
-				throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -117,12 +111,18 @@ public class FilesController {
 		try {
 			return filesAPI.getMetadata(path).execute().body();
 		} catch (NodeRPCException e) {
-			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException();
-			else if (e.getCode() == NodeRPCException.NOT_FOUND)
-				throw new PathNotExistException(e);
-			else
-				throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -132,12 +132,18 @@ public class FilesController {
 		try {
 			return filesAPI.getHash(path).execute().body().getHash();
 		} catch (NodeRPCException e) {
-			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException();
-			else if (e.getCode() == NodeRPCException.NOT_FOUND)
-				throw new PathNotExistException(e);
-			else
-				throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -147,12 +153,18 @@ public class FilesController {
 		try {
 			filesAPI.copy(srcPath, destPath).execute();
 		} catch (NodeRPCException e) {
-			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException();
-			else if (e.getCode() == NodeRPCException.NOT_FOUND)
-				throw new PathNotExistException(e);
-			else
-				throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -162,12 +174,18 @@ public class FilesController {
 		try {
 			filesAPI.move(srcPath, destPath).execute();
 		} catch (NodeRPCException e) {
-			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException();
-			else if (e.getCode() == NodeRPCException.NOT_FOUND)
-				throw new PathNotExistException(e);
-			else
-				throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
@@ -177,12 +195,16 @@ public class FilesController {
 		try {
 			filesAPI.delete(path).execute();
 		} catch (NodeRPCException e) {
-			if (e.getCode() == NodeRPCException.UNAUTHORIZED)
-				throw new UnauthorizedException();
-			else if (e.getCode() == NodeRPCException.NOT_FOUND)
-				throw new PathNotExistException(e);
-			else
-				throw new ServerUnkownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
