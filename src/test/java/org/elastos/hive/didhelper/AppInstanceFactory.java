@@ -46,11 +46,12 @@ public class AppInstanceFactory {
 
 	private void setUp(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
 		try {
-			PresentationInJWT presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
 			if (!resolverDidSetup) {
 				Client.setupResolver(userFactoryOpt.resolveUrl);
 				resolverDidSetup = true;
 			}
+
+			PresentationInJWT presentationInJWT = new PresentationInJWT().init(userDidOpt, appInstanceDidOpt);
 
 			client = Client.createInstance(new ApplicationContext() {
 				@Override
