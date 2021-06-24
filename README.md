@@ -20,10 +20,10 @@ Preparing with the developer tool **git**, and then run the following commands t
 ```shell
 $ git clone https://github.com/elastos/Elastos.NET.Hive.Java.SDK
 $ cd Elastos.NET.Hive.Java.SDK
-$ open -a Elipse .
+$ open -a Eclipse .
 ```
 
-Then open the **Eclipse** the build the project and run the test cases.  You also can run the instruction commands in the next each sections.
+Then open the **Eclipse** to build the project and run the test cases.  As an alternative to Eclipse, you can also use the following commands.
 
 With the simple command below, build the whole project and run the test cases:
 
@@ -54,11 +54,11 @@ $ ls -a doc
 allclasses-frame.html	deprecated-list.html index.html overview-summary.html	script.js
 ```
 
-Then open **index.html** with the browser, you can see the whole APIs document there.
+Then open **index.html** with the browser; you can see the whole APIs document there.
 
 ## How To Use SDK
 
-Here are exmaples to integrate this SDK into the projects with **Gradle** or **Maven** build system.
+Here are examples to integrate this SDK into the projects with **Gradle** or **Maven** build system.
 
 #### 1. Gradle
 
@@ -81,10 +81,10 @@ Add the following snippet of dependency declaration in their **pom** scripts:
 </dependency>
 ```
 
-Here also is a brief guilde document about [How-to use the APIs](./HOW_TO_USE_APIS.md) , please read it carefully and feedback as issues.
+Here also is a brief guide document about [How-to use the APIs](./HOW_TO_USE_APIS.md). Please read it carefully and feedback as issues.
 
 ## Thanks
-Sincerely thanks to all teams and projects that we relies on directly or indirectly.
+Sincerely thanks to all teams and projects that we rely on directly or indirectly.
 
 ## Contributing
 We welcome contributions to the Elastos Hive Java Project.
