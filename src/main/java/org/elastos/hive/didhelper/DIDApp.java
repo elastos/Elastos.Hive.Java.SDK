@@ -34,10 +34,6 @@ class DIDApp  extends Entity {
 		String vcStr = vc.toString();
 		System.out.println(vcStr);
 
-		if(!vc.isValid()) {
-			throw new IllegalStateException("Verifiable Credential is invalid");
-		}
-
 		return vc;
 	}
 }

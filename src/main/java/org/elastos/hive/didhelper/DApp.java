@@ -33,10 +33,6 @@ class DApp extends Entity {
 		String vpStr = vp.toString();
 		System.out.println(vpStr);
 
-		if(!vp.isValid()) {
-			throw new IllegalStateException("Verifiable Presentation is invalid");
-		}
-
 		return vp;
 	}
 
