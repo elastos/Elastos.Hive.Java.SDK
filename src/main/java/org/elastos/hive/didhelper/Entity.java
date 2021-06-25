@@ -1,5 +1,6 @@
 package org.elastos.hive.didhelper;
 
+import java.io.Console;
 import java.io.File;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDStore;
 import org.elastos.did.RootIdentity;
 import org.elastos.did.exception.DIDException;
+import org.elastos.did.exception.DIDStoreException;
 
 class Entity {
 	private String phrasepass;
@@ -37,24 +39,18 @@ class Entity {
 			identity = store.loadRootIdentity(id);// Already exists
 		else
 			identity = RootIdentity.create(mnemonic, phrasepass, store, storepass);
+
+		identity.synchronize(0);
 	}
 
 	protected void initDid() throws DIDException {
 		List<DID> dids = store.listDids();
 		if (dids.size() > 0) {
-			for (DID did : dids) {
-				if (did.getMetadata().getAlias().equals("me")) {
-					System.out.format("[%s] My DID: %s%n", name, did);
-					if (store.containsPrivateKeys(did)) {
-						this.did = did;
-						return;
-					}
-				}
-			}
+			this.did = dids.get(0);
+			return;
 		}
 
 		DIDDocument doc = identity.newDid(storepass);
-		doc.getMetadata().setAlias("me");
 		this.did = doc.getSubject();
 		System.out.format("[%s] My new DID created: %s%n", name, did);
 	}
