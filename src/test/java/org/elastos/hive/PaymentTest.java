@@ -11,8 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runners.MethodSorters;
 
@@ -138,8 +138,8 @@ public class PaymentTest {
 		}
 	}
 
-	@BeforeClass
-	public static void setUp() {
+	@BeforeEach
+	public void setUp() {
 		Vault vault = AppInstanceFactory.configSelector().getVault();
 		paymentApi = vault.getPayment();
 	}
