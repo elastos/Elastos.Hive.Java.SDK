@@ -1,50 +1,27 @@
 package org.elastos.hive;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.elastos.hive.database.*;
+import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.elastos.hive.scripting.*;
+import org.elastos.hive.utils.JsonUtil;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
-import org.elastos.hive.database.Date;
-import org.elastos.hive.database.MaxKey;
-import org.elastos.hive.database.MinKey;
-import org.elastos.hive.database.ObjectId;
-import org.elastos.hive.database.RegularExpression;
-import org.elastos.hive.database.Timestamp;
-import org.elastos.hive.didhelper.AppInstanceFactory;
-import org.elastos.hive.scripting.AggregatedExecutable;
-import org.elastos.hive.scripting.AndCondition;
-import org.elastos.hive.scripting.Condition;
-import org.elastos.hive.scripting.DbFindQuery;
-import org.elastos.hive.scripting.DbInsertQuery;
-import org.elastos.hive.scripting.DownloadExecutable;
-import org.elastos.hive.scripting.Executable;
-import org.elastos.hive.scripting.HashExecutable;
-import org.elastos.hive.scripting.OrCondition;
-import org.elastos.hive.scripting.PropertiesExecutable;
-import org.elastos.hive.scripting.QueryHasResultsCondition;
-import org.elastos.hive.scripting.RawCondition;
-import org.elastos.hive.scripting.RawExecutable;
-import org.elastos.hive.scripting.UploadExecutable;
-import org.elastos.hive.utils.JsonUtil;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.jupiter.api.Test;
-import org.junit.runners.MethodSorters;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ScriptingTest {
 
-	@Test
+	@Test @Order(1)
 	public void test01_condition() throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		String json = "{\"name\":\"mkyong\", \"age\":37, \"c\":[\"adc\",\"zfy\",\"aaa\"], \"d\": {\"foo\": 1, \"bar\": 2}}";
@@ -71,7 +48,7 @@ public class ScriptingTest {
 
 	}
 
-	@Test
+	@Test @Order(2)
 	public void test02_executable() throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		String json = "{\"name\":\"mkyong\", \"age\":37, \"c\":[\"adc\",\"zfy\",\"aaa\"], \"d\": {\"foo\": 1, \"bar\": 2}}";
@@ -90,7 +67,7 @@ public class ScriptingTest {
 		ae2.append(exec1).append(exec2).append(ae).append(exec3);
 	}
 
-	@Test
+	@Test @Order(3)
 	public void test03_registerScript() {
 
 		CompletableFuture<Boolean> noConditionFuture;
@@ -124,7 +101,7 @@ public class ScriptingTest {
 
 	}
 
-	@Test
+	@Test @Order(4)
 	public void test04_callScript() {
 		CompletableFuture<Boolean> stringFuture = scripting.callScript(noConditionName, null, null, String.class)
 				.handle((success, ex) -> (ex == null));
@@ -150,7 +127,7 @@ public class ScriptingTest {
 		}
 	}
 
-	@Test
+	@Test @Order(5)
 	public void test5_setUploadFile() {
 		Executable executable = new UploadExecutable("upload_file", "$params.path", true);
 		CompletableFuture<Boolean> future = scripting.registerScript("upload_file", executable, false, false)
@@ -166,7 +143,7 @@ public class ScriptingTest {
 						fail();
 					}
 
-					return scripting.callScript(scriptName, params, null, JsonNode.class)
+					return scripting.callScript(scriptName, params, "appId", JsonNode.class)
 							.thenComposeAsync(jsonNode -> {
 								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
 								return scripting.uploadFile(transactionId, Writer.class);
@@ -194,7 +171,7 @@ public class ScriptingTest {
 	}
 
 
-	@Test
+	@Test @Order(6)
 	public void test6_setDownloadFile() {
 		Executable executable = new DownloadExecutable("download_file", "$params.path", true);
 		CompletableFuture<Boolean> downloadFuture = scripting.registerScript("download_file", executable, false, false)
@@ -203,7 +180,7 @@ public class ScriptingTest {
 					String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
 					JsonNode params = JsonUtil.deserialize(path);
 
-					return scripting.callScript(scriptName, params, null, JsonNode.class)
+					return scripting.callScript(scriptName, params, "appId", JsonNode.class)
 							.handle((jsonNode, ex) -> {
 								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
 								scripting.downloadFile(transactionId, Reader.class)
@@ -227,7 +204,7 @@ public class ScriptingTest {
 		}
 	}
 
-	@Test
+	@Test @Order(7)
 	public void test7_setGetFileInfo() {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
@@ -242,7 +219,7 @@ public class ScriptingTest {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					return scripting.callScript("get_file_info", params, null, String.class);
+					return scripting.callScript("get_file_info", params, "appId", String.class);
 				}).handle((success, ex) -> (ex == null));
 
 		try {
@@ -255,8 +232,8 @@ public class ScriptingTest {
 		}
 	}
 
-	@Test
-	@Ignore
+	@Test @Order(8)
+	@Disabled
 	public void test8_callScriptUrl() {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
@@ -277,8 +254,8 @@ public class ScriptingTest {
 		}
 	}
 
-	@BeforeClass
-	public static void setUp() {
+	@BeforeEach
+	public void setUp() {
 		Vault vault = AppInstanceFactory.configSelector().getVault();
 		scripting = vault.getScripting();
 	}

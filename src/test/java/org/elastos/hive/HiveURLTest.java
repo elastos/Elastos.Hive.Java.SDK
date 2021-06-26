@@ -10,11 +10,11 @@ import org.elastos.hive.scripting.AggregatedExecutable;
 import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.scripting.HashExecutable;
 import org.elastos.hive.scripting.PropertiesExecutable;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Ignore
+@Disabled
 public class HiveURLTest {
 
 	private final String scriptUrl = "hive://did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n@appId/get_file_info?params={\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
@@ -59,8 +59,8 @@ public class HiveURLTest {
 	private static Client client;
 	private static Scripting scriptingApi;
 
-	@BeforeClass
-	public static void setUp() {
+	@BeforeEach
+	public void setUp() {
 		client = AppInstanceFactory.configSelector().getClient();
 		scriptingApi = AppInstanceFactory.configSelector().getVault().getScripting();
 	}
