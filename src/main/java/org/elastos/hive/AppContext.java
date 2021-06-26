@@ -7,7 +7,7 @@ import java.util.concurrent.CompletionException;
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
-import org.elastos.did.backend.ResolverCache;
+import org.elastos.did.DefaultDIDAdapter;
 import org.elastos.did.exception.DIDResolveException;
 import org.elastos.did.exception.MalformedDIDException;
 import org.elastos.hive.exception.HiveException;
@@ -54,13 +54,8 @@ public class AppContext {
 		if (resolverHasSetup)
 			throw new DIDResoverAlreadySetupException();
 
-		try {
-			DIDBackend.initialize(resolver, cacheDir);
-			ResolverCache.reset();
-			resolverHasSetup = true;
-		} catch (DIDResolveException e) {
-			throw new DIDResolverSetupException(e.getMessage());
-		}
+		DIDBackend.initialize(new DefaultDIDAdapter(resolver));
+		resolverHasSetup = true;
 	}
 
 	public static AppContext build(AppContextProvider provider, String userDid) {

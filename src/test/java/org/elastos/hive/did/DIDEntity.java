@@ -3,7 +3,7 @@ package org.elastos.hive.did;
 import org.elastos.did.DID;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDStore;
-import org.elastos.did.adapter.DummyAdapter;
+import org.elastos.did.RootIdentity;
 import org.elastos.did.exception.DIDException;
 
 import java.io.File;
@@ -12,18 +12,16 @@ import java.util.List;
 class DIDEntity {
 	private String phrasepass;
 	protected String storepass;
+	private RootIdentity identity;
 
 	private String name;
 	private DIDStore store;
 	private DID did;
 
-	private static DummyAdapter adapter;
-
-	protected DIDEntity(String name, String mnemonic, DummyAdapter adapter, String phrasepass, String storepass) throws DIDException {
+	protected DIDEntity(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
 		this.phrasepass = phrasepass;
 		this.storepass = storepass;
 		this.name = name;
-		this.adapter = adapter;
 
 		initPrivateIdentity(mnemonic);
 		initDid();
@@ -32,27 +30,25 @@ class DIDEntity {
 	protected void initPrivateIdentity(String mnemonic) throws DIDException {
 		final String storePath = System.getProperty("user.dir") + File.separator + "data/didCache" + File.separator + name;
 
-		store = DIDStore.open("filesystem", storePath, adapter);
+		store = DIDStore.open(storePath);
 
-		if (store.containsPrivateIdentity())
+		String id = RootIdentity.getId(mnemonic, phrasepass);
+		if (store.containsRootIdentity(id))
 			return; // Already exists
 
-		store.initPrivateIdentity(null, mnemonic, phrasepass, storepass);
+		this.identity = RootIdentity.create(mnemonic, phrasepass, store, storepass);
+
+		identity.synchronize(0);
 	}
 
 	protected void initDid() throws DIDException {
-		List<DID> dids = store.listDids(DIDStore.DID_HAS_PRIVATEKEY);
+		List<DID> dids = store.listDids();
 		if (dids.size() > 0) {
-			for (DID did : dids) {
-				if (did.getMetadata().getAlias().equals("me")) {
-					System.out.format("[%s] My DID: %s%n", name, did);
-					this.did = did;
-					return;
-				}
-			}
+			this.did = dids.get(0);
+			return;
 		}
 
-		DIDDocument doc = store.newDid("me", storepass);
+		DIDDocument doc = identity.newDid(storepass);
 		this.did = doc.getSubject();
 		System.out.format("[%s] My new DID created: %s%n", name, did);
 	}
