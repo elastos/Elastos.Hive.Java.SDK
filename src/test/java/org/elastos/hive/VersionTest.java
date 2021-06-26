@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.concurrent.ExecutionException;
 
 import org.elastos.hive.didhelper.AppInstanceFactory;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class VersionTest {
@@ -36,8 +36,8 @@ public class VersionTest {
 	}
 
 	private static Vault vault;
-	@BeforeClass
-	public static void setUp() {
+	@BeforeEach
+	public void setUp() {
 		vault = AppInstanceFactory.configSelector().getVault();
 	}
 }

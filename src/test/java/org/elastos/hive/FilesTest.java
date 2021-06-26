@@ -1,26 +1,18 @@
 package org.elastos.hive;
 
+import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.junit.jupiter.api.*;
+
+import java.io.*;
+import java.util.concurrent.CompletableFuture;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.concurrent.CompletableFuture;
-
-import org.elastos.hive.didhelper.AppInstanceFactory;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.jupiter.api.Test;
-import org.junit.runners.MethodSorters;
-
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FilesTest {
 
-	@Test
+	@Test @Order(1)
 	public void test01_uploadText() {
 		FileReader fileReader = null;
 		Writer writer = null;
@@ -49,7 +41,7 @@ public class FilesTest {
 	}
 
 
-	@Test
+	@Test @Order(2)
 	public void test02_uploadBin() {
 		try {
 			OutputStream outputStream = filesApi.upload(remoteImgPath, OutputStream.class).get();
@@ -63,7 +55,7 @@ public class FilesTest {
 		}
 	}
 
-	@Test
+	@Test @Order(3)
 	public void test03_downloadText() {
 		try {
 			Reader reader = filesApi.download(remoteTextPath, Reader.class).get();
@@ -74,7 +66,7 @@ public class FilesTest {
 		}
 	}
 
-	@Test
+	@Test @Order(4)
 	public void test04_downloadBin() {
 		try {
 			InputStream inputStream = filesApi.download(remoteImgPath, InputStream.class).get();
@@ -85,7 +77,7 @@ public class FilesTest {
 		}
 	}
 
-	@Test
+	@Test @Order(5)
 	public void test05_list() {
 		CompletableFuture<Boolean> future = filesApi.list(remoteRootPath)
 				.handle((result, ex) -> {
@@ -104,7 +96,7 @@ public class FilesTest {
 		}
 	}
 
-	@Test
+	@Test @Order(6)
 	public void test06_hash() {
 		CompletableFuture<Boolean> future = filesApi.hash(remoteTextPath)
 				.handle((result, ex) -> {
@@ -121,7 +113,7 @@ public class FilesTest {
 		}
 	}
 
-	@Test
+	@Test @Order(7)
 	public void test07_move() {
 		CompletableFuture<Boolean> future = filesApi.delete(remoteTextBackupPath)
 				.thenCompose(result -> filesApi.move(remoteTextPath, remoteTextBackupPath))
@@ -139,7 +131,7 @@ public class FilesTest {
 		}
 	}
 
-	@Test
+	@Test @Order(8)
 	public void test08_copy() {
 		CompletableFuture<Boolean> future = filesApi.copy(remoteTextBackupPath, remoteTextPath)
 				.handle((result, ex) -> {
@@ -157,7 +149,7 @@ public class FilesTest {
 	}
 
 
-	@Test
+	@Test @Order(9)
 	public void test09_deleteFile() {
 		CompletableFuture<Boolean> future = filesApi.delete(remoteTextPath)
 				.thenCompose(result -> filesApi.delete(remoteTextBackupPath))
@@ -175,9 +167,8 @@ public class FilesTest {
 		}
 	}
 
-
-	@BeforeClass
-	public static void setUp() {
+	@BeforeEach
+	public void setUp() {
 		Vault vault = AppInstanceFactory.configSelector().getVault();
 		filesApi = vault.getFiles();
 	}
