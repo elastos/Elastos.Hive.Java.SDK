@@ -1,7 +1,6 @@
 package org.elastos.hive.config;
 
 import org.elastos.did.DIDDocument;
-import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
@@ -58,24 +57,20 @@ public class TestData {
 		ClientConfig clientConfig = ClientConfig.deserialize(Utils.getConfigure(fileName));
 		AppContext.setupResolver(clientConfig.resolverUrl(), "data/didCache");
 
-		DummyAdapter adapter = new DummyAdapter();
 		ApplicationConfig applicationConfig = clientConfig.applicationConfig();
 		appInstanceDid = new DApp(applicationConfig.name(),
 				applicationConfig.mnemonic(),
-				adapter,
 				applicationConfig.passPhrase(),
 				applicationConfig.storepass());
 
 		UserConfig userConfig = clientConfig.userConfig();
 		userDid = new DIDApp(userConfig.name(),
 				userConfig.mnemonic(),
-				adapter,
 				userConfig.passPhrase(),
 				userConfig.storepass());
 		UserConfig userConfigCaller = clientConfig.crossConfig().userConfig();
 		userDidCaller = new DIDApp(userConfigCaller.name(),
 				userConfigCaller.mnemonic(),
-				adapter,
 				userConfigCaller.passPhrase(),
 				userConfigCaller.storepass());
 

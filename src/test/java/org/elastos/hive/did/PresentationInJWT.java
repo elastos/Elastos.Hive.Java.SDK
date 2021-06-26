@@ -25,7 +25,6 @@ package org.elastos.hive.did;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.VerifiableCredential;
 import org.elastos.did.VerifiablePresentation;
-import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
@@ -37,20 +36,12 @@ class PresentationInJWT {
 	private DIDDocument doc = null;
 	private BackupOptions backupOptions;
 
-	private static DummyAdapter adapter;
-
-	private void initDIDBackend() {
-		adapter = new DummyAdapter();
-	}
-
 	public PresentationInJWT init(AppOptions userDidOpt, AppOptions appInstanceDidOpt, BackupOptions backupOptions) {
 		try {
 			this.backupOptions = backupOptions;
 
-			initDIDBackend();
-
-			userDidApp = new DIDApp(userDidOpt.name, userDidOpt.mnemonic, adapter, userDidOpt.phrasepass, userDidOpt.storepass);
-			appInstanceDidApp = new DApp(appInstanceDidOpt.name, appInstanceDidOpt.mnemonic, adapter, appInstanceDidOpt.phrasepass, appInstanceDidOpt.storepass);
+			userDidApp = new DIDApp(userDidOpt.name, userDidOpt.mnemonic, userDidOpt.phrasepass, userDidOpt.storepass);
+			appInstanceDidApp = new DApp(appInstanceDidOpt.name, appInstanceDidOpt.mnemonic, appInstanceDidOpt.phrasepass, appInstanceDidOpt.storepass);
 
 			doc = appInstanceDidApp.getDocument();
 		} catch (Exception e) {

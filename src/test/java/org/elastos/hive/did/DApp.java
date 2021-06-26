@@ -2,7 +2,6 @@ package org.elastos.hive.did;
 
 import org.elastos.did.VerifiableCredential;
 import org.elastos.did.VerifiablePresentation;
-import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Header;
 
@@ -15,8 +14,8 @@ public class DApp extends DIDEntity {
 
 	public String appId = "appId";
 
-	public DApp(String name, String mnemonic, DummyAdapter adapter, String phrasepass, String storepass) throws DIDException {
-		super(name, mnemonic, adapter, phrasepass, storepass);
+	public DApp(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
+		super(name, mnemonic, phrasepass, storepass);
 	}
 
 	public VerifiablePresentation createPresentation(VerifiableCredential vc, String realm, String nonce) throws DIDException {
@@ -32,10 +31,6 @@ public class DApp extends DIDEntity {
 		System.out.println("VerifiablePresentation:");
 		String vpStr = vp.toString();
 		System.out.println(vpStr);
-
-		if(!vp.isValid()) {
-			throw new IllegalStateException("Verifiable Presentation is invalid");
-		}
 
 		return vp;
 	}

@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 
 class LoggerInterceptor implements Interceptor {
-	private static final Logger log = LoggerFactory.getLogger(NodeRPCConnection.class);
+	private static final Logger log = LoggerFactory.getLogger(LoggerInterceptor.class);
 	private static final int MAX_BODY_LEN = 500;
 
 	@Override

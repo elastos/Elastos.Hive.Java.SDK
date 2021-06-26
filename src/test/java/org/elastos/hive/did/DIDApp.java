@@ -1,9 +1,7 @@
 package org.elastos.hive.did;
 
-import org.elastos.did.DID;
 import org.elastos.did.Issuer;
 import org.elastos.did.VerifiableCredential;
-import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 
 import java.util.Calendar;
@@ -13,19 +11,19 @@ import java.util.Map;
 public class DIDApp  extends DIDEntity {
 	private Issuer issuer;
 
-	public DIDApp(String name, String mnemonic, DummyAdapter adapter,  String phrasepass, String storepass) throws DIDException {
-		super(name, mnemonic, adapter, phrasepass, storepass);
+	public DIDApp(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
+		super(name, mnemonic, phrasepass, storepass);
 		issuer = new Issuer(getDocument());
 	}
 
 	public VerifiableCredential issueDiplomaFor(DApp dapp) throws DIDException {
-		Map<String, String> subject = new HashMap<String, String>();
+		Map<String, Object> subject = new HashMap<>();
 		subject.put("appDid", dapp.appId);
 
 		Calendar exp = Calendar.getInstance();
 		exp.add(Calendar.YEAR, 5);
 
-		Issuer.CredentialBuilder cb = issuer.issueFor(dapp.getDid());
+		VerifiableCredential.Builder cb = issuer.issueFor(dapp.getDid());
 		VerifiableCredential vc = cb.id("didapp")
 				.type("AppIdCredential")
 				.properties(subject)
@@ -36,15 +34,11 @@ public class DIDApp  extends DIDEntity {
 		String vcStr = vc.toString();
 		System.out.println(vcStr);
 
-		if(!vc.isValid()) {
-			throw new IllegalStateException("Verifiable Credential is invalid");
-		}
-
 		return vc;
 	}
 
 	public VerifiableCredential issueBackupDiplomaFor(String sourceDID, String targetHost, String targetDID) throws DIDException {
-		Map<String, String> subject = new HashMap<String, String>();
+		Map<String, Object> subject = new HashMap<>();
 		subject.put("sourceDID", sourceDID);
 		subject.put("targetHost", targetHost);
 		subject.put("targetDID", targetDID);
@@ -52,7 +46,7 @@ public class DIDApp  extends DIDEntity {
 		Calendar exp = Calendar.getInstance();
 		exp.add(Calendar.YEAR, 5);
 
-		Issuer.CredentialBuilder cb = issuer.issueFor(new DID(sourceDID));
+		VerifiableCredential.Builder cb = issuer.issueFor(sourceDID);
 		VerifiableCredential vc = cb.id("backupId")
 				.type("BackupCredential")
 				.properties(subject)
@@ -62,10 +56,6 @@ public class DIDApp  extends DIDEntity {
 		System.out.println("BackupCredential:");
 		String vcStr = vc.toString();
 		System.out.println(vcStr);
-
-		if(!vc.isValid()) {
-			throw new IllegalStateException("Verifiable Credential is invalid");
-		}
 
 		return vc;
 	}
