@@ -1,27 +1,27 @@
 package org.elastos.hive;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.elastos.hive.payment.Order;
+import org.elastos.hive.payment.PricingPlan;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.elastos.hive.didhelper.AppInstanceFactory;
-import org.elastos.hive.payment.Order;
-import org.elastos.hive.payment.PricingPlan;
-import org.junit.FixMethodOrder;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.runners.MethodSorters;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PaymentTest {
 
 	private static Payment paymentApi;
 
-	@Test
+	@Test @org.junit.jupiter.api.Order(1)
 	public void test01_getPricingPlanByPlanName() {
 		CompletableFuture<Boolean> future = paymentApi.getPaymentInfo()
 				.thenApplyAsync(pricingInfo -> {
@@ -72,7 +72,7 @@ public class PaymentTest {
 		}
 	}
 
-	@Test
+	@Test @org.junit.jupiter.api.Order(2)
 	public void test02_payOrder() {
 		CompletableFuture<Boolean> future = paymentApi.getAllOrders()
 				.thenApplyAsync(orders -> {
@@ -108,7 +108,7 @@ public class PaymentTest {
 		}
 	}
 
-	@Test
+	@Test @org.junit.jupiter.api.Order(3)
 	public void test03_getUsingPricePlan() {
 		CompletableFuture<Boolean> future = paymentApi.getUsingPricePlan()
 				.handleAsync((usingPlan, throwable) -> (throwable == null));
@@ -123,7 +123,7 @@ public class PaymentTest {
 		}
 	}
 
-	@Test
+	@Test @org.junit.jupiter.api.Order(4)
 	public void test04_getPaymentVersion() {
 		CompletableFuture<Boolean> future = paymentApi.getPaymentVersion()
 				.handleAsync((version, throwable) -> (throwable == null));

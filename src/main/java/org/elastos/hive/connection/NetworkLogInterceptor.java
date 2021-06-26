@@ -44,7 +44,7 @@ public class NetworkLogInterceptor implements Interceptor {
 
         Request request = chain.request();
 
-        LogUtil.d("request url->" + request.url().toString());
+        LogUtil.d("request url->" + request.url().toString() + ", method->" + request.method());
         LogUtil.d("request headers->" + request.headers().toString());
 
         RequestBody requestBody = request.body();

@@ -9,7 +9,7 @@ import java.util.concurrent.CompletionException;
 import org.elastos.did.exception.DIDException;
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.elastos.hive.didhelper.VaultAuthHelper;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class VaultHelperTest {
@@ -41,8 +41,8 @@ public class VaultHelperTest {
 		}
 	}
 
-	@BeforeClass
-	public static void setUp() {
+	@BeforeEach
+	public void setUp() {
 		try {
 			Client client = AppInstanceFactory.getClientWithAuth();
 			String ownerDid = "did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL";

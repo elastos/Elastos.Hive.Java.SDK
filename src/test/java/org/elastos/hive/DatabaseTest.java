@@ -1,10 +1,18 @@
 package org.elastos.hive;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.elastos.hive.database.*;
+import org.elastos.hive.database.Collation.Alternate;
+import org.elastos.hive.database.Collation.CaseFirst;
+import org.elastos.hive.database.Collation.MaxVariable;
+import org.elastos.hive.database.Collation.Strength;
+import org.elastos.hive.didhelper.AppInstanceFactory;
+import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,48 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.elastos.hive.database.Collation;
-import org.elastos.hive.database.Collation.Alternate;
-import org.elastos.hive.database.Collation.CaseFirst;
-import org.elastos.hive.database.Collation.MaxVariable;
-import org.elastos.hive.database.Collation.Strength;
-import org.elastos.hive.database.CountOptions;
-import org.elastos.hive.database.CreateCollectionOptions;
-import org.elastos.hive.database.Date;
-import org.elastos.hive.database.DeleteOptions;
-import org.elastos.hive.database.DeleteResult;
-import org.elastos.hive.database.FindOptions;
-import org.elastos.hive.database.Index;
-import org.elastos.hive.database.InsertManyResult;
-import org.elastos.hive.database.InsertOneResult;
-import org.elastos.hive.database.InsertOptions;
-import org.elastos.hive.database.MaxKey;
-import org.elastos.hive.database.MinKey;
-import org.elastos.hive.database.ObjectId;
-import org.elastos.hive.database.ReadConcern;
-import org.elastos.hive.database.ReadPreference;
-import org.elastos.hive.database.RegularExpression;
-import org.elastos.hive.database.Timestamp;
-import org.elastos.hive.database.UpdateOptions;
-import org.elastos.hive.database.UpdateResult;
-import org.elastos.hive.database.WriteConcern;
-import org.elastos.hive.didhelper.AppInstanceFactory;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.jupiter.api.Test;
-import org.junit.runners.MethodSorters;
+import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DatabaseTest {
 
-	@Test
+	@Test @Order(1)
 	public void test01_DbOptions() throws Exception {
 		Collation collation = new Collation();
 		collation.locale("en_us")
@@ -166,7 +138,7 @@ public class DatabaseTest {
 		assertEquals(json, json2);
 	}
 
-	@Test
+	@Test @Order(2)
 	public void test02_DbResults() throws Exception {
 		String json = "{\"deleted_count\":1000}";
 		DeleteResult ds = DeleteResult.deserialize(json);
@@ -229,7 +201,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(3)
 	public void test03_DbDataTypes() throws Exception {
 		Map<String, Object> values = new HashMap<String, Object>();
 
@@ -253,7 +225,7 @@ public class DatabaseTest {
 
 	private static final String collectionName = "works";
 
-	@Test
+	@Test @Order(4)
 	public void test04_createCollection() {
 		CompletableFuture<Boolean> future = database.createCollection(collectionName, null)
 				.handle((success, ex) -> (ex == null));
@@ -267,7 +239,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(5)
 	public void test05_insertOne() {
 		ObjectNode docNode = JsonNodeFactory.instance.objectNode();
 		docNode.put("author", "john doe1");
@@ -289,7 +261,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(6)
 	public void test06_insertMany() {
 		List<JsonNode> nodes = new ArrayList<JsonNode>();
 		ObjectNode docNode1 = JsonNodeFactory.instance.objectNode();
@@ -316,7 +288,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(7)
 	public void test07_findOne() {
 		ObjectNode query = JsonNodeFactory.instance.objectNode();
 		query.put("author", "john doe1");
@@ -340,7 +312,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(8)
 	public void test08_findMany() {
 		ObjectNode query = JsonNodeFactory.instance.objectNode();
 		query.put("author", "john doe1");
@@ -364,7 +336,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(9)
 	public void test09_countDoc() {
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe1");
@@ -384,7 +356,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(10)
 	public void test10_updateOne() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe1");
@@ -413,7 +385,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(11)
 	public void test11_updateMany() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe1");
@@ -442,7 +414,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(12)
 	public void test12_deleteOne() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe2");
@@ -461,7 +433,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(13)
 	public void test13_deleteMany() {
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("author", "john doe2");
@@ -480,7 +452,7 @@ public class DatabaseTest {
 		}
 	}
 
-	@Test
+	@Test @Order(14)
 	public void test14_deleteCollection() {
 		CompletableFuture<Boolean> future = database.deleteCollection(collectionName)
 				.handle((success, ex) -> (ex == null));
@@ -508,8 +480,8 @@ public class DatabaseTest {
 		return null;
 	}
 
-	@BeforeClass
-	public static void setUp() {
+	@BeforeEach
+	public void setUp() {
 		Vault vault = AppInstanceFactory.configSelector().getVault();
 		database = vault.getDatabase();
 	}
