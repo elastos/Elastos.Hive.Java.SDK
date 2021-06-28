@@ -46,7 +46,7 @@ public class VaultHelperTest {
 		try {
 			Client client = AppInstanceFactory.getClientWithAuth();
 			String ownerDid = "did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL";
-			String providerAddress = "https://hive1.trinity-tech.io";
+			String providerAddress = "https://hive-testnet3.trinity-tech.io";
 			client.createVault(ownerDid, providerAddress)
 					.whenComplete((vault, throwable) -> {
 						if (throwable == null) {
