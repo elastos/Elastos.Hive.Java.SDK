@@ -184,7 +184,10 @@ public class Client {
 				DID did = new DID(ownerDid);
 				DIDDocument doc;
 
-				doc = did.resolve();
+				/* TODO: Disable local cache for getting service end point timely.
+				 * 	     Good solution will be chosen for this.
+				 */
+				doc = did.resolve(true);
 				if (doc == null)
 					throw new ProviderNotFoundException(
 							String.format("The DID document %s has not published", ownerDid));
