@@ -10,13 +10,14 @@ import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.elastos.hive.scripting.DbFindQuery;
 import org.elastos.hive.scripting.Executable;
 import org.elastos.hive.utils.JsonUtil;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ScriptingOtherTest {
 
-	@Test
+	@Test @Disabled
 	public void test00_callOtherScript() {
 		String scriptName = "get_groups";
 		CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() ->
