@@ -10,11 +10,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class DApp extends DIDEntity {
+public class AppDID extends DIDEntity {
 
 	public String appId = "appId";
 
-	public DApp(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
+	public AppDID(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
 		super(name, mnemonic, phrasepass, storepass);
 	}
 

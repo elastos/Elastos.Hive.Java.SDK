@@ -5,8 +5,8 @@ import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.*;
-import org.elastos.hive.did.DApp;
-import org.elastos.hive.did.DIDApp;
+import org.elastos.hive.did.AppDID;
+import org.elastos.hive.did.UserDID;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.BackupService;
 import org.elastos.hive.service.HiveBackupContext;
@@ -19,12 +19,12 @@ import java.util.concurrent.CompletionException;
  * This is used for representing 3rd-party application.
  */
 public class TestData {
+	private static final String RESOLVE_CACHE = "data/didCache";
 	private static TestData instance = null;
 
-	private DIDApp userDid;
-	private DIDApp userDidCaller;
-	private String callerDid;
-	private DApp appInstanceDid;
+	private UserDID userDid;
+	private UserDID callerDid;
+	private AppDID appInstanceDid;
 	private NodeConfig nodeConfig;
 	private AppContext context;
 	private AppContext contextCaller;
@@ -55,21 +55,21 @@ public class TestData {
 		}
 
 		ClientConfig clientConfig = ClientConfig.deserialize(Utils.getConfigure(fileName));
-		AppContext.setupResolver(clientConfig.resolverUrl(), "data/didCache");
+		AppContext.setupResolver(clientConfig.resolverUrl(), RESOLVE_CACHE);
 
 		ApplicationConfig applicationConfig = clientConfig.applicationConfig();
-		appInstanceDid = new DApp(applicationConfig.name(),
+		appInstanceDid = new AppDID(applicationConfig.name(),
 				applicationConfig.mnemonic(),
 				applicationConfig.passPhrase(),
 				applicationConfig.storepass());
 
 		UserConfig userConfig = clientConfig.userConfig();
-		userDid = new DIDApp(userConfig.name(),
+		userDid = new UserDID(userConfig.name(),
 				userConfig.mnemonic(),
 				userConfig.passPhrase(),
 				userConfig.storepass());
 		UserConfig userConfigCaller = clientConfig.crossConfig().userConfig();
-		userDidCaller = new DIDApp(userConfigCaller.name(),
+		callerDid = new UserDID(userConfigCaller.name(),
 				userConfigCaller.mnemonic(),
 				userConfigCaller.passPhrase(),
 				userConfigCaller.storepass());
@@ -135,7 +135,7 @@ public class TestData {
 						if (claims == null)
 							throw new HiveException("Invalid jwt token as authorization.");
 						return appInstanceDid.createToken(appInstanceDid.createPresentation(
-								userDidCaller.issueDiplomaFor(appInstanceDid),
+								callerDid.issueDiplomaFor(appInstanceDid),
 								claims.getIssuer(),
 								(String) claims.get("nonce")), claims.getIssuer());
 					} catch (Exception e) {
@@ -143,8 +143,7 @@ public class TestData {
 					}
 				});
 			}
-		}, userConfigCaller.did());
-		callerDid = userConfigCaller.did();
+		}, callerDid.getDidStr());
 	}
 
 	public AppContext getAppContext() {
@@ -212,7 +211,7 @@ public class TestData {
 	}
 
 	public String getCallerDid() {
-		return this.callerDid;
+		return this.callerDid.getDidStr();
 	}
 
 	private enum EnvironmentType {

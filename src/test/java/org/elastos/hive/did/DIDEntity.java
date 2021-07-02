@@ -10,18 +10,18 @@ import java.io.File;
 import java.util.List;
 
 class DIDEntity {
-	private String phrasepass;
-	protected String storepass;
-	private RootIdentity identity;
+	private final String name;
+	private final String phrasepass;
+	protected final String storepass;
 
-	private String name;
+	private RootIdentity identity;
 	private DIDStore store;
 	private DID did;
 
 	protected DIDEntity(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
+		this.name = name;
 		this.phrasepass = phrasepass;
 		this.storepass = storepass;
-		this.name = name;
 
 		initPrivateIdentity(mnemonic);
 		initDid();
@@ -71,5 +71,9 @@ class DIDEntity {
 
 	protected String getStorePassword() {
 		return storepass;
+	}
+
+	public String getDidStr() {
+		return this.did.toString();
 	}
 }

@@ -8,15 +8,15 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DIDApp  extends DIDEntity {
+public class UserDID extends DIDEntity {
 	private Issuer issuer;
 
-	public DIDApp(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
+	public UserDID(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
 		super(name, mnemonic, phrasepass, storepass);
 		issuer = new Issuer(getDocument());
 	}
 
-	public VerifiableCredential issueDiplomaFor(DApp dapp) throws DIDException {
+	public VerifiableCredential issueDiplomaFor(AppDID dapp) throws DIDException {
 		Map<String, Object> subject = new HashMap<>();
 		subject.put("appDid", dapp.appId);
 
