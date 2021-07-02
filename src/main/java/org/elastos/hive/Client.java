@@ -26,13 +26,12 @@ import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DefaultDIDAdapter;
 import org.elastos.did.exception.DIDException;
-import org.elastos.did.exception.DIDResolveException;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.ProviderNotSetException;
 import org.elastos.hive.exception.VaultAlreadyExistException;
 
-import java.net.URI;
 import java.nio.file.ProviderNotFoundException;
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -40,7 +39,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
 public class Client {
-
+	private static final String HIVE_URL_PREFIX = "hive://";
 	private static boolean resolverDidSetup;
 
 	private AuthenticationAdapter authenticationAdapter;
@@ -263,16 +262,25 @@ public class Client {
 		 *	hive://target_did@target_app_did/script_name?params={key=value}
 		 */
 		public HiveURLInfoImpl(String scriptUrl) {
-			try {
-				String url = scriptUrl.split("params=")[0];
-				params = scriptUrl.split("params=")[1];
-				URI uri = new URI(url);
-				targetDid = uri.getRawUserInfo();
-				appDid = uri.getHost();
-				scriptName = uri.getRawPath().replace("/", "");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			if (scriptUrl == null || !scriptUrl.startsWith(HIVE_URL_PREFIX))
+				throw new InvalidParameterException("Invalid hive script url: no hive prefix.");
+
+			String[] parts = scriptUrl.substring(HIVE_URL_PREFIX.length()).split("/");
+			if (parts.length != 2)
+				throw new InvalidParameterException("Invalid hive script url: must contain one slash.");
+
+			String[] dids = parts[0].split("@");
+			if (dids.length != 2)
+				throw new InvalidParameterException("Invalid hive script url: must contain two dids.");
+
+			String[] values = parts[1].split("\\?params=");
+			if (values.length != 2)
+				throw new InvalidParameterException("Invalid hive script url: must contain script name and params.");
+
+			targetDid = dids[0];
+			appDid = dids[1];
+			scriptName = values[0];
+			params = values[1];
 		}
 
 		@Override
