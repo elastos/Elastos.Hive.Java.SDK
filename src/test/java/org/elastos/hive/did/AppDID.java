@@ -12,10 +12,14 @@ import java.util.List;
 
 public class AppDID extends DIDEntity {
 
-	public String appId = "appId";
+	private String appId = "appId";
 
 	public AppDID(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
 		super(name, mnemonic, phrasepass, storepass);
+	}
+
+	public String getAppDid() {
+		return appId;
 	}
 
 	public VerifiablePresentation createPresentation(VerifiableCredential vc, String realm, String nonce) throws DIDException {
