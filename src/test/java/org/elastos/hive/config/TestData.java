@@ -27,7 +27,7 @@ public class TestData {
 	private AppDID appInstanceDid;
 	private NodeConfig nodeConfig;
 	private AppContext context;
-	private AppContext contextCaller;
+	private AppContext callerContext;
 
 	public static TestData getInstance() throws HiveException, DIDException {
 		if (instance == null)
@@ -80,7 +80,7 @@ public class TestData {
 		context = AppContext.build(new AppContextProvider() {
 			@Override
 			public String getLocalDataDir() {
-				return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
+				return getLocalStorePath();
 			}
 
 			@Override
@@ -102,19 +102,18 @@ public class TestData {
 							throw new HiveException("Invalid jwt token as authorization.");
 						return appInstanceDid.createToken(appInstanceDid.createPresentation(
 								userDid.issueDiplomaFor(appInstanceDid),
-								claims.getIssuer(),
-								(String) claims.get("nonce")), claims.getIssuer());
+								claims.getIssuer(), (String) claims.get("nonce")), claims.getIssuer());
 					} catch (Exception e) {
 						throw new CompletionException(new HiveException(e.getMessage()));
 					}
 				});
 			}
-		}, nodeConfig.ownerDid());
+		}, userDid.toString());
 
-		contextCaller = AppContext.build(new AppContextProvider() {
+		callerContext = AppContext.build(new AppContextProvider() {
 			@Override
 			public String getLocalDataDir() {
-				return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
+				return getLocalStorePath();
 			}
 
 			@Override
@@ -143,15 +142,15 @@ public class TestData {
 					}
 				});
 			}
-		}, callerDid.getDidStr());
+		}, callerDid.toString());
+	}
+
+	private String getLocalStorePath() {
+		return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
 	}
 
 	public AppContext getAppContext() {
 		return this.context;
-	}
-
-	public String getOwnerDid() {
-		return nodeConfig.ownerDid();
 	}
 
 	public String getProviderAddress() {
@@ -159,15 +158,15 @@ public class TestData {
 	}
 
 	public Vault newVault() {
-		return new Vault(context, nodeConfig.provider());
+		return new Vault(context, getProviderAddress());
 	}
 
 	public ScriptRunner newScriptRunner() {
-		return new ScriptRunner(context, nodeConfig.provider());
+		return new ScriptRunner(context, getProviderAddress());
 	}
 
 	public ScriptRunner newCallerScriptRunner() {
-		return new ScriptRunner(contextCaller, nodeConfig.provider());
+		return new ScriptRunner(callerContext, getProviderAddress());
 	}
 
 	public Backup newBackup() {
@@ -206,12 +205,16 @@ public class TestData {
 		return bs;
 	}
 
-	public String getAppId() {
-		return appInstanceDid.appId;
+	public String getAppDid() {
+		return appInstanceDid.getAppDid();
+	}
+
+	public String getUserDid() {
+		return userDid.toString();
 	}
 
 	public String getCallerDid() {
-		return this.callerDid.getDidStr();
+		return this.callerDid.toString();
 	}
 
 	private enum EnvironmentType {

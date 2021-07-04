@@ -73,7 +73,8 @@ class DIDEntity {
 		return storepass;
 	}
 
-	public String getDidStr() {
+	@Override
+	public String toString() {
 		return this.did.toString();
 	}
 }

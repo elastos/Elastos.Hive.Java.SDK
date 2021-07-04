@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Map;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ScriptingServiceTest {
@@ -33,7 +32,7 @@ class ScriptingServiceTest {
 
 	private static final String COLLECTION_NAME = "script_database";
 
-	private static String ownerDid;
+	private static String targetDid;
 	private static String appDid;
 
 	private static FilesService filesService;
@@ -61,8 +60,8 @@ class ScriptingServiceTest {
 			scriptRunner = testData.newScriptRunner();
 			filesService = testData.newVault().getFilesService();
 			databaseService = testData.newVault().getDatabaseService();
-			ownerDid = testData.getOwnerDid();
-			appDid = testData.getAppId();
+			targetDid = testData.getUserDid();
+			appDid = testData.getAppDid();
 		});
 	}
 
@@ -96,7 +95,7 @@ class ScriptingServiceTest {
 			params.put("author","John");
 			params.put("content", "message");
 			JsonNode result = scriptRunner.callScript(scriptName, params,
-					ownerDid, appDid, JsonNode.class).get();
+					targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("inserted_id"));
@@ -120,7 +119,7 @@ class ScriptingServiceTest {
 
 	private void callScriptFindWithoutCondition(String scriptName) {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-				scriptRunner.callScriptUrl(scriptName, "{}", ownerDid, appDid, String.class).get()));
+				scriptRunner.callScriptUrl(scriptName, "{}", targetDid, appDid, String.class).get()));
 	}
 
 	@Test @Order(3) void testFind() {
@@ -142,7 +141,7 @@ class ScriptingServiceTest {
 	private void callScriptFind(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
 			Assertions.assertNotNull(
-				scriptRunner.callScript(scriptName, null, ownerDid, appDid, String.class).get());
+				scriptRunner.callScript(scriptName, null, targetDid, appDid, String.class).get());
 		});
 	}
 
@@ -174,7 +173,7 @@ class ScriptingServiceTest {
 			ObjectNode params = JsonNodeFactory.instance.objectNode();
 			params.put("author", "John");
 			params.put("content", "message");
-			JsonNode result = scriptRunner.callScript(scriptName, params, ownerDid, appDid, JsonNode.class).get();
+			JsonNode result = scriptRunner.callScript(scriptName, params, targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("upserted_id"));
@@ -200,7 +199,7 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode params = JsonNodeFactory.instance.objectNode();
 			params.put("author", "John");
-			JsonNode result = scriptRunner.callScript(scriptName, params, ownerDid, appDid, JsonNode.class).get();
+			JsonNode result = scriptRunner.callScript(scriptName, params, targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("deleted_count"));
@@ -225,7 +224,7 @@ class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptRunner.callScript(scriptName,
 					Executable.createRunFileParams(fileName),
-					ownerDid, appDid, JsonNode.class).get();
+					targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
@@ -268,7 +267,7 @@ class ScriptingServiceTest {
 		try {
 			JsonNode result = scriptRunner.callScript(scriptName,
 					Executable.createRunFileParams(fileName),
-					ownerDid, appDid, JsonNode.class).get();
+					targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
@@ -304,7 +303,7 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			JsonNode result = scriptRunner.callScript(scriptName,
 					Executable.createRunFileParams(fileName),
-					ownerDid, appDid, JsonNode.class).get();
+					targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("size"));
@@ -328,7 +327,7 @@ class ScriptingServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			JsonNode result = scriptRunner.callScript(scriptName,
 					Executable.createRunFileParams(fileName),
-					ownerDid, appDid, JsonNode.class).get();
+					targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("SHA256"));

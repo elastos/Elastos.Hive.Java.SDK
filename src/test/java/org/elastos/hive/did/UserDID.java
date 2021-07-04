@@ -16,14 +16,14 @@ public class UserDID extends DIDEntity {
 		issuer = new Issuer(getDocument());
 	}
 
-	public VerifiableCredential issueDiplomaFor(AppDID dapp) throws DIDException {
+	public VerifiableCredential issueDiplomaFor(AppDID appInstanceDid) throws DIDException {
 		Map<String, Object> subject = new HashMap<>();
-		subject.put("appDid", dapp.appId);
+		subject.put("appDid", appInstanceDid.getAppDid());
 
 		Calendar exp = Calendar.getInstance();
 		exp.add(Calendar.YEAR, 5);
 
-		VerifiableCredential.Builder cb = issuer.issueFor(dapp.getDid());
+		VerifiableCredential.Builder cb = issuer.issueFor(appInstanceDid.getDid());
 		VerifiableCredential vc = cb.id("didapp")
 				.type("AppIdCredential")
 				.properties(subject)

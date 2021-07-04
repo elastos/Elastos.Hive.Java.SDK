@@ -23,7 +23,7 @@ class ScriptingCrossingTest {
 	private static ScriptRunner scriptRunner;
 	private static DatabaseService databaseService;
 
-	private static String ownerDid;
+	private static String targetDid;
 	private static String callDid;
 	private static String appDid;
 
@@ -34,8 +34,8 @@ class ScriptingCrossingTest {
 			scriptingService = testData.newVault().getScriptingService();
 			scriptRunner = testData.newCallerScriptRunner();
 			databaseService = testData.newVault().getDatabaseService();
-			ownerDid = testData.getOwnerDid();
-			appDid = testData.getAppId();
+			targetDid = testData.getUserDid();
+			appDid = testData.getAppDid();
 			callDid = testData.getCallerDid();
 		});
 	}
@@ -97,8 +97,7 @@ class ScriptingCrossingTest {
 			ObjectNode params = JsonNodeFactory.instance.objectNode();
 			params.put("author", "John");
 			params.put("content", "message");
-			JsonNode result = scriptRunner.callScript(SCRIPT_NAME, params,
-					ownerDid, appDid, JsonNode.class).get();
+			JsonNode result = scriptRunner.callScript(SCRIPT_NAME, params, targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(SCRIPT_NAME));
 			Assertions.assertTrue(result.get(SCRIPT_NAME).has("inserted_id"));
@@ -119,8 +118,7 @@ class ScriptingCrossingTest {
 			ObjectNode params = JsonNodeFactory.instance.objectNode();
 			params.put("author", "John");
 			params.put("content", "message");
-			JsonNode result = scriptRunner.callScript(SCRIPT_NAME, params,
-					ownerDid, appDid, JsonNode.class).get();
+			JsonNode result = scriptRunner.callScript(SCRIPT_NAME, params, targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(SCRIPT_NAME));
 			Assertions.assertTrue(result.get(SCRIPT_NAME).has("inserted_id"));
