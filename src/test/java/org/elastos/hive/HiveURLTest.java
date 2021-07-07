@@ -1,27 +1,34 @@
 package org.elastos.hive;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
+import java.io.Reader;
 import java.util.concurrent.CompletableFuture;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.didhelper.AppInstanceFactory;
-import org.elastos.hive.scripting.AggregatedExecutable;
-import org.elastos.hive.scripting.Executable;
-import org.elastos.hive.scripting.HashExecutable;
-import org.elastos.hive.scripting.PropertiesExecutable;
+import org.elastos.hive.scripting.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * TODO: to test this, please update this line in class Client:
+ * 		return getVaultProvider(targetDid, null)
+ * 	to:
+ * 		return getVaultProvider(targetDid, "https://hive-testnet1.trinity-tech.io")
+ */
 @Disabled
 public class HiveURLTest {
 
-	private final String scriptUrl = "hive://did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n@appId/get_file_info?params={\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
+	private static final String SCRIPT_URL = "hive://did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n@appId/get_file_info?" +
+			"params={\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"" + ScriptingTest.REMOTE_UPLOAD_FILE + "\"}";
+	private static final String SCRIPT_URL_DOWNLOAD = "hive://did:elastos:icXtpDnZRSDrjmD5NQt6TYSphFRqoo2q6n@appId/download_file?" +
+			"params={\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"" + ScriptingTest.REMOTE_UPLOAD_FILE + "\"}";
 
-	@Test
+	@Test @Disabled
 	public void testGetHiveURL() {
-		CompletableFuture<Boolean> future = client.parseHiveURL(scriptUrl)
+		CompletableFuture<Boolean> future = client.parseHiveURL(SCRIPT_URL)
 				.handleAsync((hiveURLInfo, throwable) -> (null != hiveURLInfo && throwable == null));
 
 		try {
@@ -35,34 +42,44 @@ public class HiveURLTest {
 
 	@Test
 	public void testCallScriptUrl() {
+		String scriptName = "get_file_info";
+		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path", true);
+		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path", true);
+		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash",
+				new Executable[]{hashExecutable, propertiesExecutable});
+		ScriptingTest.registerScript(scripting, scriptName, executable);
 
-		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
-		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
-		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
-		CompletableFuture<Boolean> fileInfoFuture = scriptingApi.registerScript("get_file_info", executable, false, false)
-				.thenComposeAsync(aBoolean -> client.callScriptUrl(scriptUrl, String.class))
-				.handle((success, ex) -> {
-					if(ex != null) ex.printStackTrace();
-					return (ex == null);
-				});
+		assertDoesNotThrow(() -> client.callScriptUrl(SCRIPT_URL, JsonNode.class)
+				.whenComplete((jsonNode, throwable) -> {
+			assertNull(throwable);
+			assertTrue(jsonNode.has("file_hash"));
+			assertTrue(jsonNode.has("file_properties"));
+		}).get());
+	}
 
-		try {
-			assertTrue(fileInfoFuture.get());
-			assertTrue(fileInfoFuture.isCompletedExceptionally() == false);
-			assertTrue(fileInfoFuture.isDone());
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
-		}
+	@Test
+	public void testCallScriptUrl4Download() {
+		String scriptName = "download_file";
+		ScriptingTest.registerScript(scripting, scriptName,
+				new DownloadExecutable("download_file", "$params.path", true));
+
+		JsonNode jsonNode = assertDoesNotThrow(() -> client.downloadFileByScriptUrl(SCRIPT_URL_DOWNLOAD, JsonNode.class).get());
+		String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
+
+		assertDoesNotThrow(() -> scripting.downloadFile(transactionId, Reader.class)
+				.whenComplete((reader, throwable) -> {
+			assertNull(throwable);
+			Utils.cacheTextFile(reader, ScriptingTest.getLocalScriptCacheDir(), "test.txt");
+		}).get());
 	}
 
 	private static Client client;
-	private static Scripting scriptingApi;
+	private static Scripting scripting;
 
 	@BeforeEach
 	public void setUp() {
 		client = AppInstanceFactory.configSelector().getClient();
-		scriptingApi = AppInstanceFactory.configSelector().getVault().getScripting();
+		scripting = AppInstanceFactory.configSelector().getVault().getScripting();
 	}
 
 }
