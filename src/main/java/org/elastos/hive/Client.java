@@ -266,14 +266,14 @@ public class Client {
 				throw new InvalidParameterException("Invalid hive script url: no hive prefix.");
 
 			String[] parts = scriptUrl.substring(HIVE_URL_PREFIX.length()).split("/");
-			if (parts.length != 2)
-				throw new InvalidParameterException("Invalid hive script url: must contain one slash.");
+			if (parts.length < 2)
+				throw new InvalidParameterException("Invalid hive script url: must contain at least one slash.");
 
 			String[] dids = parts[0].split("@");
 			if (dids.length != 2)
 				throw new InvalidParameterException("Invalid hive script url: must contain two dids.");
 
-			String[] values = parts[1].split("\\?params=");
+			String[] values = scriptUrl.substring(HIVE_URL_PREFIX.length() + parts[0].length() + 1).split("\\?params=");
 			if (values.length != 2)
 				throw new InvalidParameterException("Invalid hive script url: must contain script name and params.");
 

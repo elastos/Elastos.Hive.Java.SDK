@@ -161,9 +161,13 @@ public class ScriptingTest {
 		}).get());
 	}
 
-	private void registerScript(String name, Executable executable) {
-		assertDoesNotThrow(() -> assertTrue(scripting.registerScript(
+	public static void registerScript(Scripting s, String name, Executable executable) {
+		assertDoesNotThrow(() -> assertTrue(s.registerScript(
 				name, executable, false, false).get()));
+	}
+
+	private void registerScript(String name, Executable executable) {
+		registerScript(scripting, name, executable);
 	}
 
 	private <T> T callScript(String name, JsonNode params, Class<T> resultType) {
@@ -233,11 +237,18 @@ public class ScriptingTest {
 	private String withConditionName = "get_group_messages";
 
 	private static Scripting scripting;
-	private static final String REMOTE_UPLOAD_FILE = "hello/test.txt";
+	public static final String REMOTE_UPLOAD_FILE = "hello/test.txt";
+
+	private static String getResourcesDir() {
+		return System.getProperty("user.dir") + "/src/test/resources/";
+	}
+
+	public static String getLocalScriptCacheDir() {
+		return getResourcesDir() + "cache/script/";
+	}
 
 	public ScriptingTest() {
-		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
-		textLocalPath = localRootPath + "test.txt";
-		testLocalCacheRootPath = localRootPath + "cache/script/";
+		textLocalPath = getResourcesDir() + "test.txt";
+		testLocalCacheRootPath = getLocalScriptCacheDir();
 	}
 }
