@@ -9,13 +9,11 @@ import org.elastos.hive.scripting.*;
 import org.elastos.hive.utils.JsonUtil;
 import org.junit.jupiter.api.*;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -128,84 +126,52 @@ public class ScriptingTest {
 	}
 
 	@Test @Order(5)
-	public void test5_setUploadFile() {
-		Executable executable = new UploadExecutable("upload_file", "$params.path", true);
-		CompletableFuture<Boolean> future = scripting.registerScript("upload_file", executable, false, false)
-				.thenComposeAsync(aBoolean -> {
+	public void test05_setUploadFile() {
+		String scriptName = "upload_file";
+		registerScript(scriptName, new UploadExecutable("upload_file", "$params.path", true));
 
-					String scriptName = "upload_file";
-					String metadata = "{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"test.txt\"}";
-					JsonNode params = null;
-					try {
-						ObjectMapper objectMapper = new ObjectMapper();
-						params = objectMapper.readTree(metadata);
-					} catch (Exception e) {
-						fail();
-					}
+		JsonNode params = JsonUtil.deserialize(
+				"{\"group_id\":{\"$oid\":\"5f8d9dfe2f4c8b7a6f8ec0f1\"},\"path\":\"" + REMOTE_UPLOAD_FILE + "\"}");
+		JsonNode jsonNode = callScript(scriptName, params, JsonNode.class);
+		String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
 
-					return scripting.callScript(scriptName, params, "appId", JsonNode.class)
-							.thenComposeAsync(jsonNode -> {
-								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
-								return scripting.uploadFile(transactionId, Writer.class);
-							}).handle((writer, ex) -> {
-								if(null != writer) {
-									Utils.fileWrite(textLocalPath, writer);
-									try {
-										writer.close();
-									} catch (IOException e) {
-										e.printStackTrace();
-									}
-								}
-								return ex == null;
-							});
-				});
-
-		try {
-			assertTrue(future.get());
-			assertTrue(future.isCompletedExceptionally() == false);
-			assertTrue(future.isDone());
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
-		}
+		assertDoesNotThrow(() -> scripting.uploadFile(transactionId, Writer.class)
+				.whenComplete((writer, throwable) -> {
+			assertNull(throwable);
+			Utils.fileWrite(textLocalPath, writer);
+			assertDoesNotThrow(writer::close);
+		}).get());
 	}
 
 
 	@Test @Order(6)
-	public void test6_setDownloadFile() {
-		Executable executable = new DownloadExecutable("download_file", "$params.path", true);
-		CompletableFuture<Boolean> downloadFuture = scripting.registerScript("download_file", executable, false, false)
-				.thenComposeAsync(aBoolean -> {
-					String scriptName = "download_file";
-					String path = "{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"test.txt\"}";
-					JsonNode params = JsonUtil.deserialize(path);
+	public void test06_setDownloadFile() {
+		String scriptName = "download_file";
+		registerScript(scriptName, new DownloadExecutable("download_file", "$params.path", true));
 
-					return scripting.callScript(scriptName, params, "appId", JsonNode.class)
-							.handle((jsonNode, ex) -> {
-								String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
-								scripting.downloadFile(transactionId, Reader.class)
-										.handle((reader, throwable) -> {
-											if (throwable == null) {
-												Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
-											}
-											return throwable == null;
-										});
-								return true;
-							});
-				});
+		JsonNode params = JsonUtil.deserialize(
+				"{\"group_id\":{\"$oid\":\"5f497bb83bd36ab235d82e6a\"},\"path\":\"" + REMOTE_UPLOAD_FILE + "\"}");
+		JsonNode jsonNode = callScript(scriptName, params, JsonNode.class);
+		String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
 
-		try {
-			assertTrue(downloadFuture.get());
-			assertTrue(downloadFuture.isCompletedExceptionally() == false);
-			assertTrue(downloadFuture.isDone());
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
-		}
+		assertDoesNotThrow(() -> scripting.downloadFile(transactionId, Reader.class)
+				.whenComplete((reader, throwable) -> {
+			assertNull(throwable);
+			Utils.cacheTextFile(reader, testLocalCacheRootPath, "test.txt");
+		}).get());
+	}
+
+	private void registerScript(String name, Executable executable) {
+		assertDoesNotThrow(() -> assertTrue(scripting.registerScript(
+				name, executable, false, false).get()));
+	}
+
+	private <T> T callScript(String name, JsonNode params, Class<T> resultType) {
+		return assertDoesNotThrow(() -> scripting.callScript(name, params, "appId", resultType).get());
 	}
 
 	@Test @Order(7)
-	public void test7_setGetFileInfo() {
+	public void test07_setGetFileInfo() {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
 		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
@@ -234,7 +200,7 @@ public class ScriptingTest {
 
 	@Test @Order(8)
 	@Disabled
-	public void test8_callScriptUrl() {
+	public void test08_callScriptUrl() {
 		HashExecutable hashExecutable = new HashExecutable("file_hash", "$params.path");
 		PropertiesExecutable propertiesExecutable = new PropertiesExecutable("file_properties", "$params.path");
 		AggregatedExecutable executable = new AggregatedExecutable("file_properties_and_hash", new Executable[]{hashExecutable, propertiesExecutable});
@@ -267,6 +233,7 @@ public class ScriptingTest {
 	private String withConditionName = "get_group_messages";
 
 	private static Scripting scripting;
+	private static final String REMOTE_UPLOAD_FILE = "hello/test.txt";
 
 	public ScriptingTest() {
 		String localRootPath = System.getProperty("user.dir") + "/src/test/resources/";
