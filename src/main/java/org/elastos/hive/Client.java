@@ -21,6 +21,7 @@
  */
 package org.elastos.hive;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.did.DID;
 import org.elastos.did.DIDBackend;
 import org.elastos.did.DIDDocument;
@@ -223,7 +224,7 @@ public class Client {
 	 * starting and a file reader is returned.
 	 */
 	public <T> CompletableFuture<T> downloadFileByScriptUrl(String scriptUrl, Class<T> resultType) {
-		return parseHiveURL(scriptUrl).thenComposeAsync(hiveURLInfo -> hiveURLInfo.callScript(resultType));
+		return parseHiveURL(scriptUrl).thenComposeAsync(hiveURLInfo -> hiveURLInfo.downloadFile(resultType));
 	}
 
 	/**
@@ -287,6 +288,49 @@ public class Client {
 		public <T> CompletableFuture<T> callScript(Class<T> resultType) {
 			return getVault().thenComposeAsync((Function<Vault, CompletionStage<T>>) vault -> vault.getScripting()
 					.callScriptUrl(scriptName, params, appDid, resultType));
+		}
+
+		@Override
+		public <T> CompletableFuture<T> downloadFile(Class<T> resultType) {
+			return getVault().thenCompose((Function<Vault, CompletionStage<T>>) vault ->
+				vault.getScripting().callScriptUrl(scriptName, params, appDid, JsonNode.class)
+					.thenCompose(jsonNode ->
+							vault.getScripting().downloadFile(getTransactionIdByJsonNode(jsonNode), resultType))
+			);
+		}
+
+		private String getTransactionIdByJsonNode(JsonNode jsonNode) {
+			JsonNode node = searchForEntity(jsonNode, "transaction_id");
+			if (node == null)
+				throw new CompletionException(new InvalidParameterException("Can not get transaction id by running script."));
+			return node.asText();
+		}
+
+		private JsonNode searchForEntity(JsonNode node, String entityName) {
+			// A naive depth-first search implementation using recursion. Useful
+			// **only** for small object graphs. This will be inefficient
+			// (stack overflow) for finding deeply-nested needles or needles
+			// toward the end of a forest with deeply-nested branches.
+			if (node == null) {
+				return null;
+			}
+			if (node.has(entityName)) {
+				return node.get(entityName);
+			}
+			if (!node.isContainerNode()) {
+				return null;
+			}
+			for (JsonNode child : node) {
+				if (child.isContainerNode()) {
+					JsonNode childResult = searchForEntity(child, entityName);
+					// The mission node is virtual node.
+					if (childResult != null && !childResult.isMissingNode()) {
+						return childResult;
+					}
+				}
+			}
+			// not found fall through
+			return null;
 		}
 
 		@Override
