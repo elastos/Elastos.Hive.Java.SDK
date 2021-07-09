@@ -63,10 +63,7 @@ public class HiveURLTest {
 		ScriptingTest.registerScript(scripting, scriptName,
 				new DownloadExecutable("download_file", "$params.path", true));
 
-		JsonNode jsonNode = assertDoesNotThrow(() -> client.downloadFileByScriptUrl(SCRIPT_URL_DOWNLOAD, JsonNode.class).get());
-		String transactionId = jsonNode.get(scriptName).get("transaction_id").textValue();
-
-		assertDoesNotThrow(() -> scripting.downloadFile(transactionId, Reader.class)
+		assertDoesNotThrow(() -> client.downloadFileByScriptUrl(SCRIPT_URL_DOWNLOAD, Reader.class)
 				.whenComplete((reader, throwable) -> {
 			assertNull(throwable);
 			Utils.cacheTextFile(reader, ScriptingTest.getLocalScriptCacheDir(), "test.txt");
