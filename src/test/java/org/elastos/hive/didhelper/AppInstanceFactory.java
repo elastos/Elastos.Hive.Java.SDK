@@ -12,8 +12,9 @@ public class AppInstanceFactory {
 	private Vault vault;
 	private Client client;
 	private static boolean resolverDidSetup = false;
+	private Options options;
 
-	static class Options {
+	public static class Options {
 		private String storePath;
 		private String ownerDid;
 		private String resolveUrl;
@@ -28,9 +29,17 @@ public class AppInstanceFactory {
 			return this;
 		}
 
+		public String getStorePath() {
+			return storePath;
+		}
+
 		public Options ownerDid(String ownerDid) {
 			this.ownerDid = ownerDid;
 			return this;
+		}
+
+		public String getOwnerDid() {
+			return ownerDid;
 		}
 
 		public Options resolveUrl(String resolveUrl) {
@@ -38,9 +47,17 @@ public class AppInstanceFactory {
 			return this;
 		}
 
+		public String getResolveUrl() {
+			return resolveUrl;
+		}
+
 		public Options provider(String provider) {
 			this.provider = provider;
 			return this;
+		}
+
+		public String getProvider() {
+			return provider;
 		}
 	}
 
@@ -86,7 +103,12 @@ public class AppInstanceFactory {
 	}
 
 	private AppInstanceFactory(PresentationInJWT.Options userDidOpt, PresentationInJWT.Options appInstanceDidOpt, Options userFactoryOpt) {
+		options = userFactoryOpt;
 		setUp(userDidOpt, appInstanceDidOpt, userFactoryOpt);
+	}
+
+	public Options getOptions() {
+		return options;
 	}
 
 	private static AppInstanceFactory initOptions(Config config) {

@@ -45,15 +45,16 @@ public class VaultHelperTest {
 	public void setUp() {
 		try {
 			Client client = AppInstanceFactory.getClientWithAuth();
-			String ownerDid = "did:elastos:iqcpzTBTbi27exRoP27uXMLNM1r3w3UwaL";
-			String providerAddress = "https://hive-testnet3.trinity-tech.io";
-			client.createVault(ownerDid, providerAddress)
+			// Use AppInstanceFactory to get configuration items.
+			AppInstanceFactory.Options options = AppInstanceFactory.configSelector().getOptions();
+			client.createVault(options.getOwnerDid(), options.getProvider())
 					.whenComplete((vault, throwable) -> {
 						if (throwable == null) {
 							database = vault.getDatabase();
 						} else {
 							try {
-								database = client.getVault(ownerDid, providerAddress).join().getDatabase();
+								database = client.getVault(options.getOwnerDid(), options.getProvider()).join()
+										.getDatabase();
 							} catch (Exception e) {
 								throw new CompletionException(e);
 							}
