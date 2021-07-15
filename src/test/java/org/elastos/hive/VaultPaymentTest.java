@@ -24,7 +24,7 @@ class VaultPaymentTest {
 		});
 	}
 
-	@Test @org.junit.jupiter.api.Order(1) @Disabled
+	@Test @org.junit.jupiter.api.Order(1)
 	void testGetVersion() {
 		Assertions.assertDoesNotThrow(()->{
 			String version = paymentService.getVersion().get();
@@ -32,7 +32,8 @@ class VaultPaymentTest {
 		});
 	}
 
-	@Test @org.junit.jupiter.api.Order(2) @Disabled
+	@Disabled
+	@Test @org.junit.jupiter.api.Order(2)
 	void testPlaceOrder() {
 		Assertions.assertDoesNotThrow(()->{
 			Order order = paymentService.placeOrder(PRICING_PLAN_NAME).get();
@@ -41,7 +42,8 @@ class VaultPaymentTest {
 		});
 	}
 
-	@Test @org.junit.jupiter.api.Order(3) @Disabled
+	@Disabled
+	@Test @org.junit.jupiter.api.Order(3)
 	void testPayOrder() {
 		Assertions.assertDoesNotThrow(()->{
 			Receipt receipt = paymentService.payOrder(ORDER_ID, TRANS_ID).get();
@@ -51,7 +53,8 @@ class VaultPaymentTest {
 		});
 	}
 
-	@Test @org.junit.jupiter.api.Order(4) @Disabled
+	@Disabled
+	@Test @org.junit.jupiter.api.Order(4)
 	void testGetOrder() {
 		Assertions.assertDoesNotThrow(()->{
 			Order order = paymentService.getOrder(ORDER_ID).get();
@@ -60,7 +63,8 @@ class VaultPaymentTest {
 		});
 	}
 
-	@Test @org.junit.jupiter.api.Order(5) @Disabled
+	@Disabled
+	@Test @org.junit.jupiter.api.Order(5)
 	void testGetOrders() {
 		Assertions.assertDoesNotThrow(()->{
 			List<Order> orders = paymentService.getOrderList().get();
@@ -69,7 +73,8 @@ class VaultPaymentTest {
 		});
 	}
 
-	@Test @org.junit.jupiter.api.Order(6) @Disabled
+	@Disabled
+	@Test @org.junit.jupiter.api.Order(6)
 	void testGetReceipt() {
 		Assertions.assertDoesNotThrow(()->{
 			Receipt receipt = paymentService.getReceipt(ORDER_ID).get();
@@ -79,7 +84,8 @@ class VaultPaymentTest {
 		});
 	}
 
-	@Test @org.junit.jupiter.api.Order(3) @Disabled
+	@Disabled
+	@Test @org.junit.jupiter.api.Order(3)
 	void testMakeOrderProcess() {
 		Assertions.assertDoesNotThrow(()->{
 			Order order = paymentService.placeOrder(PRICING_PLAN_NAME).get();
