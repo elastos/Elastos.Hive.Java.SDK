@@ -1,24 +1,22 @@
 package org.elastos.hive.subscription.payment;
 
 import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.PUT;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 
 interface PaymentAPI {
 	@PUT("/api/v2/payment/order")
-	Call<Order> createOrder(@Body CreateOrderParams params);
+	Call<Order> placeOrder(@Body CreateOrderParams params);
 
 	@POST("/api/v2/payment/order/{order_id}")
-	Call<Receipt> payOrder(@Body PayOrderParams params);
+	Call<Receipt> payOrder(@Path("order_id") String orderId,
+						   @Body PayOrderParams params);
 
 	@GET("/api/v2/payment/order")
-	Call<OrderCollection> getOrders(@Query("subscription") String subscription);
+	Call<OrderCollection> getOrders(@Query("subscription") String subscription,
+									@Query("order_id") String orderId);
 
 	@GET("/api/v2/payment/receipt")
-	Call<ReceiptCollection> getReceipts(@Query("subscription") String subscription);
+	Call<Receipt> getReceipt(@Query("order_id") String orderId);
 
 	@GET("/api/v2/payment/version")
 	Call<String> getVersion();

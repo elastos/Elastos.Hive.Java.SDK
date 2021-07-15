@@ -9,53 +9,70 @@ import org.elastos.hive.subscription.PricingPlan;
 public class Order {
 	@SerializedName("order_id")
 	private String orderId;
-	private String did;
-	@SerializedName("app_id")
-	private String appId;
-	@SerializedName("pricing_info")
-	private PricingPlan pricingInfo;
-	@SerializedName("pay_txids")
-	private List<String> payTxids;
-	private String state;
-	private String type;
-	@SerializedName("creat_time")
-	private double createTime;
-	@SerializedName("finish_time")
-	private double finishTime;
+	private String subscription;
+	@SerializedName("pricing_name")
+	private String pricingName;
+	@SerializedName("ela_amount")
+	private Float elaAmount;
+	@SerializedName("ela_address")
+	private String elaAddress;
+	private String proof;
+	@SerializedName("create_time")
+	private Integer createTime;
 
 	public String getOrderId() {
 		return orderId;
 	}
 
-	public String getDid() {
-		return did;
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
 	}
 
-	public String getAppId() {
-		return appId;
+	public String getSubscription() {
+		return subscription;
 	}
 
-	public PricingPlan getPricingInfo() {
-		return pricingInfo;
+	public void setSubscription(String subscription) {
+		this.subscription = subscription;
 	}
 
-	public List<String> getPayTxids() {
-		return payTxids;
+	public String getPricingName() {
+		return pricingName;
 	}
 
-	public String getState() {
-		return state;
+	public void setPricingName(String pricingName) {
+		this.pricingName = pricingName;
 	}
 
-	public String getType() {
-		return type;
+	public Float getElaAmount() {
+		return elaAmount;
 	}
 
-	public double getCreateTime() {
+	public void setElaAmount(Float elaAmount) {
+		this.elaAmount = elaAmount;
+	}
+
+	public String getElaAddress() {
+		return elaAddress;
+	}
+
+	public void setElaAddress(String elaAddress) {
+		this.elaAddress = elaAddress;
+	}
+
+	public String getProof() {
+		return proof;
+	}
+
+	public void setProof(String proof) {
+		this.proof = proof;
+	}
+
+	public Integer getCreateTime() {
 		return createTime;
 	}
 
-	public double getFinishTime() {
-		return finishTime;
+	public void setCreateTime(Integer createTime) {
+		this.createTime = createTime;
 	}
 }
