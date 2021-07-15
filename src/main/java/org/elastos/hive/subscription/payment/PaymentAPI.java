@@ -19,5 +19,5 @@ interface PaymentAPI {
 	Call<Receipt> getReceipt(@Query("order_id") String orderId);
 
 	@GET("/api/v2/payment/version")
-	Call<String> getVersion();
+	Call<VersionResult> getVersion();
 }

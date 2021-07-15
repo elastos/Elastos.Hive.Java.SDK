@@ -58,7 +58,7 @@ public class PaymentController {
 	}
 
 	public Order getOrder(String orderId) throws HiveException {
-		List<Order> orders = getOrdersInternal(null, orderId);
+		List<Order> orders = getOrdersInternal("vault", orderId);
 		return orders.get(0);
 	}
 
@@ -110,7 +110,7 @@ public class PaymentController {
 
 	public String getVersion() throws HiveException {
 		try {
-			return paymentAPI.getVersion().execute().body();
+			return paymentAPI.getVersion().execute().body().getVersion();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:

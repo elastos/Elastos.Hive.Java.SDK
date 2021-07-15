@@ -12,6 +12,7 @@ class BackupServiceTest {
 		Assertions.assertDoesNotThrow(()->backupService = TestData.getInstance().getBackupService());
 	}
 
+	@Disabled
 	@Test @Order(1) void testStartBackup() {
 		Assertions.assertDoesNotThrow(()->backupService.startBackup().get());
 	}
@@ -20,6 +21,7 @@ class BackupServiceTest {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(backupService.checkResult().get()));
 	}
 
+	@Disabled
 	@Test @Order(3) void testStopBackup() {
 		//TODO:
 	}
