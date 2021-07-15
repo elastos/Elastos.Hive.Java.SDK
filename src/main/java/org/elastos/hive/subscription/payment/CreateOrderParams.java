@@ -6,14 +6,11 @@ class CreateOrderParams {
 	@SerializedName("subscription")
 	private String subscription;
 
-	@SerializedName("pricing_plan")
-	private String pricingPlan;
+	@SerializedName("pricing_name")
+	private String pricingName;
 
-	public CreateOrderParams() {
-	}
-
-	public CreateOrderParams(String subscription, String pricingPlan) {
+	public CreateOrderParams(String subscription, String pricingName) {
 		this.subscription = subscription;
-		this.pricingPlan = pricingPlan;
+		this.pricingName = pricingName;
 	}
 }

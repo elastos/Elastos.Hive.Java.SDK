@@ -2,12 +2,10 @@ package org.elastos.hive.subscription.payment;
 
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NetworkException;
-import org.elastos.hive.exception.NotImplementedException;
-import org.elastos.hive.exception.ServerUnknownException;
+import org.elastos.hive.exception.*;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.List;
 
 public class PaymentController {
@@ -17,39 +15,113 @@ public class PaymentController {
 		paymentAPI = connection.createService(PaymentAPI.class, true);
 	}
 
-	public Order createOrder(String subscription, String pricingPlan) throws HiveException {
+	public Order placeOrder(String subscription, String pricingName) throws HiveException {
 		try {
-			return paymentAPI.createOrder(new CreateOrderParams()).execute().body();
+			return paymentAPI.placeOrder(new CreateOrderParams(subscription, pricingName)).execute().body();
 		} catch (NodeRPCException e) {
-			throw new ServerUnknownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
 	}
 
-	public Receipt payOrder(String orderId, String transIds) throws HiveException {
+	public Receipt payOrder(String orderId, String transactionId) throws HiveException {
 		try {
-			 return paymentAPI.payOrder(new PayOrderParams()).execute().body();
+			return paymentAPI.payOrder(orderId, new PayOrderParams(transactionId)).execute().body();
 		} catch (NodeRPCException e) {
-				throw new ServerUnknownException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
 	}
 
-	public Order getOrderInfo(String orderId) throws HiveException {
-		throw new NotImplementedException();
+	public Order getOrder(String orderId) throws HiveException {
+		List<Order> orders = getOrdersInternal(null, orderId);
+		return orders.get(0);
 	}
 
 	public List<Order> getOrders(String subscription) throws HiveException {
-		throw new NotImplementedException();
+		return getOrdersInternal(subscription, null);
 	}
 
-	public List<Receipt> getReceipts(String subscription) throws HiveException {
-		throw new NotImplementedException();
+	private List<Order> getOrdersInternal(String subscription, String orderId) throws HiveException {
+		try {
+			return paymentAPI.getOrders(subscription, orderId).execute().body().getOrders();
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
+		} catch (IOException e) {
+			throw new NetworkException(e);
+		}
+	}
+
+	public Receipt getReceipt(String orderId) throws HiveException {
+		try {
+			return paymentAPI.getReceipt(orderId).execute().body();
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
+		} catch (IOException e) {
+			throw new NetworkException(e);
+		}
 	}
 
 	public String getVersion() throws HiveException {
-		throw new NotImplementedException();
+		try {
+			return paymentAPI.getVersion().execute().body();
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
+		} catch (IOException e) {
+			throw new NetworkException(e);
+		}
 	}
 }
