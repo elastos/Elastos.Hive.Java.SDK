@@ -6,6 +6,7 @@ import org.elastos.hive.subscription.VaultInfo;
 import org.elastos.hive.subscription.PricingPlan;
 import org.elastos.hive.subscription.SubscriptionController;
 import org.elastos.hive.subscription.payment.Order;
+import org.elastos.hive.subscription.payment.PaymentController;
 import org.elastos.hive.subscription.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
 import org.elastos.hive.service.SubscriptionService;
@@ -18,10 +19,12 @@ public class VaultSubscription extends ServiceEndpoint
 	implements SubscriptionService<VaultInfo>, PaymentService {
 
 	private SubscriptionController subscriptionController;
+	private PaymentController paymentController;
 
 	public VaultSubscription(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
 		subscriptionController = new SubscriptionController(this);
+		paymentController = new PaymentController(this);
 	}
 
 	@Override
@@ -92,42 +95,66 @@ public class VaultSubscription extends ServiceEndpoint
 	@Override
 	public CompletableFuture<Order> placeOrder(String planName) {
 		return CompletableFuture.supplyAsync(() -> {
-			throw new NotImplementedException("Payment will be supported later");
+			try {
+				return paymentController.placeOrder("vault", planName);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
 		});
 	}
 
 	@Override
 	public CompletableFuture<Order> getOrder(String orderId) {
 		return CompletableFuture.supplyAsync(() -> {
-			throw new NotImplementedException("Payment will be supported later");
+			try {
+				return paymentController.getOrder(orderId);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
 		});
 	}
 
 	@Override
 	public CompletableFuture<Receipt> payOrder(String orderId, String transactionId) {
-		return CompletableFuture.supplyAsync(()-> {
-			throw new NotImplementedException("Payment will be supported later");
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return paymentController.payOrder(orderId, transactionId);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
 		});
 	}
 
 	@Override
 	public CompletableFuture<List<Order>> getOrderList() {
 		return CompletableFuture.supplyAsync(() -> {
-			throw new NotImplementedException("Payment will be supported later");
+			try {
+				return paymentController.getOrders("vault");
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
 		});
 	}
 
 	@Override
-	public CompletableFuture<Receipt> getReceipt(String receiptId) {
+	public CompletableFuture<Receipt> getReceipt(String orderId) {
 		return CompletableFuture.supplyAsync(() -> {
-			throw new NotImplementedException("Payment will be supported later");
+			try {
+				return paymentController.getReceipt(orderId);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
 		});
 	}
 
 	@Override
-	public CompletableFuture<List<Receipt>> getReceiptList() {
+	public CompletableFuture<String> getVersion() {
 		return CompletableFuture.supplyAsync(() -> {
-			throw new NotImplementedException("Payment will be supported later");
+			try {
+				return paymentController.getVersion();
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
 		});
 	}
 }

@@ -56,21 +56,20 @@ public interface PaymentService {
 	CompletableFuture<Receipt> payOrder(String orderId, String transactionId);
 
 	/**
-	 * Obtain the receipt detail according to the receipt id.
+	 * Obtain the receipt detail according to the order id.
 	 *
-	 * @param receiptId receipt id.
+	 * @param orderId order id.
 	 * @return
 	 * 		return the receipt detail in case there is a receipt existing,
 	 * 		otherwise, return the specific exception.
 	 */
-	CompletableFuture<Receipt> getReceipt(String receiptId);
+	CompletableFuture<Receipt> getReceipt(String orderId);
 
 	/**
-	 * Obtain all the list of receipt detail.
+	 * Obtain the version of the payment module.
 	 *
 	 * @return
-	 *		return the list of receipt detail on success, otherwise, return the
-	 *		specific exception.
+	 *		return the version, otherwise, return the specific exception.
 	 */
-	CompletableFuture<List<Receipt>> getReceiptList();
+	CompletableFuture<String> getVersion();
 }
