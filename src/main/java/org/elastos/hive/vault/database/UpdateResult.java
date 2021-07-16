@@ -11,6 +11,22 @@ public class UpdateResult {
 	@SerializedName("upserted_id")
 	private String upsertedId;
 
+	public void setAcknowledged(Boolean acknowledged) {
+		this.acknowledged = acknowledged;
+	}
+
+	public void setMatchedCount(Integer matchedCount) {
+		this.matchedCount = matchedCount;
+	}
+
+	public void setModifiedCount(Integer modifiedCount) {
+		this.modifiedCount = modifiedCount;
+	}
+
+	public void setUpsertedId(String upsertedId) {
+		this.upsertedId = upsertedId;
+	}
+
 	public Boolean getAcknowledged() {
 		return acknowledged;
 	}

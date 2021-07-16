@@ -23,6 +23,26 @@ public class FileInfo {
 	@SerializedName("updated")
 	private long updated;
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setFile(boolean file) {
+		isFile = file;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
+	}
+
+	public void setCreated(long created) {
+		this.created = created;
+	}
+
+	public void setUpdated(long updated) {
+		this.updated = updated;
+	}
+
 	public String getName() {
 		return name;
 	}

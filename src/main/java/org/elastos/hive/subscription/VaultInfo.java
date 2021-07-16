@@ -16,6 +16,30 @@ public class VaultInfo {
 	@SerializedName("price_plan")
 	private String pricePlan;
 
+	public void setServiceDid(String serviceDid) {
+		this.serviceDid = serviceDid;
+	}
+
+	public void setStorageQuota(int storageQuota) {
+		this.storageQuota = storageQuota;
+	}
+
+	public void setStorageUsed(int storageUsed) {
+		this.storageUsed = storageUsed;
+	}
+
+	public void setCreated(long created) {
+		this.created = created;
+	}
+
+	public void setUpdated(long updated) {
+		this.updated = updated;
+	}
+
+	public void setPricePlan(String pricePlan) {
+		this.pricePlan = pricePlan;
+	}
+
 	public String getServiceDid() {
 		return serviceDid;
 	}

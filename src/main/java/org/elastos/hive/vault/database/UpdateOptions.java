@@ -17,4 +17,12 @@ public class UpdateOptions {
 		this.bypassDocumentValidation = bypassDocumentValidation;
 		return this;
 	}
+
+	public Boolean getUpsert() {
+		return upsert;
+	}
+
+	public Boolean getBypassDocumentValidation() {
+		return bypassDocumentValidation;
+	}
 }
