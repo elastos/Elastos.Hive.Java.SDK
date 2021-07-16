@@ -65,4 +65,36 @@ public class QueryOptions {
 		this.batchSize = batchSize;
 		return this;
 	}
+
+	public Integer getSkip() {
+		return skip;
+	}
+
+	public Integer getLimit() {
+		return limit;
+	}
+
+	public JsonNode getProjection() {
+		return projection;
+	}
+
+	public List<SortItem> getSort() {
+		return sort;
+	}
+
+	public Boolean getAllowPartialResults() {
+		return allowPartialResults;
+	}
+
+	public Boolean getReturnKey() {
+		return returnKey;
+	}
+
+	public Boolean getShowRecordId() {
+		return showRecordId;
+	}
+
+	public Integer getBatchSize() {
+		return batchSize;
+	}
 }

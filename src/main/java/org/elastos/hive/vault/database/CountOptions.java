@@ -26,4 +26,16 @@ public class CountOptions {
 		this.maxTimeMS = maxTimeMS;
 		return this;
 	}
+
+	public Long getSkip() {
+		return skip;
+	}
+
+	public Long getLimit() {
+		return limit;
+	}
+
+	public Long getMaxTimeMS() {
+		return maxTimeMS;
+	}
 }
