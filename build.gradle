@@ -19,13 +19,14 @@ buildscript {
     }
 }
 
-version = 'alpha-v2.1.1'
+// Change this before generating jars.
+version = 'v2.3.0'
+
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
 
     //implementation 'org.jetbrains:annotations:17.0.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
@@ -58,25 +59,24 @@ dependencies {
 jar {
     manifest {
         attributes('Implementation-Title': project.name,
-                'Implementation-Version': project.version)
+                   'Implementation-Version': project.version)
     }
 }
 
-//task createjavadoc(type: Javadoc) {
-//    options{
-//        encoding "UTF-8"
-//        charSet 'UTF-8'
-//        links "http://docs.oracle.com/javase/8/docs/api"
-//    }
-//    include(
-//
-//    )
-//    source = sourceSets.main.java.srcDirs
-//    destinationDir = file("doc/")
-//    failOnError false
-//}
-//
-//javadoc.dependsOn(build)
+// Generate java API docs
+task createjavadoc(type: Javadoc) {
+    source = sourceSets.main.java.srcDirs
+    destinationDir = file("build/docs/javadoc")
+    classpath = sourceSets.main.runtimeClasspath
+    failOnError false
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        links "http://docs.oracle.com/javase/8/docs/api"
+    }
+}
+
+javadoc.dependsOn(build)
 
 test {
     useJUnitPlatform()
@@ -87,9 +87,22 @@ test {
     }
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
+// Generate java source .jar file
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+// Generate java API docs .jar file
+task javadocJar(type: Jar, dependsOn: createjavadoc) {
+    classifier = 'javadoc'
+    from createjavadoc.destinationDir
+}
+
+// Generate java source and API docs .jar file
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }
 
 publish {
