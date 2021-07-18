@@ -10,7 +10,6 @@ import org.elastos.hive.subscription.payment.Receipt;
  * The payment service provides users with the way to purchase a paid vault or
  * backup service, such as to subscribe to a new vault or backup with paid
  * pricing plan or extend the purchased subscription service.
- *
  */
 public interface PaymentService {
 	/**

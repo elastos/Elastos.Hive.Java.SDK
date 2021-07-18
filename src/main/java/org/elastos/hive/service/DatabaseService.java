@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
+ * Mongo database service.
+ *
  * TODO: refine APIs like *One, *Many, find*.
  */
 public interface DatabaseService {
