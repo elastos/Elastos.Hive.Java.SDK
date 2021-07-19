@@ -24,9 +24,9 @@ public class AuthController {
 	private String expectationAudience;
 
 	/**
-	 * Create the auth controller with the node rpc connection and application instance did document.
+	 * Create the auth controller with the node RPC connection and application instance did document.
 	 *
-	 * @param connection The node rpc connection
+	 * @param connection The node RPC connection
 	 * @param appInstanceDidDoc The application instance did document.
 	 */
 	public AuthController(NodeRPCConnection connection, DIDDocument appInstanceDidDoc ) {
