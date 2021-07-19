@@ -4,10 +4,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
+/**
+ * The UploadOutputStream is for uploading file by the Http connection.
+ */
 public class UploadOutputStream extends OutputStream {
 	private HttpURLConnection connection;
 	private OutputStream outputStream;
 
+	/**
+	 * Create the upload output stream by connection and relating output stream.
+	 *
+	 * @param connection Http Connection.
+	 * @param output The output stream for uploading file.
+	 */
 	public UploadOutputStream(HttpURLConnection connection, OutputStream output) {
 		this.connection = connection;
 		this.outputStream = output;
