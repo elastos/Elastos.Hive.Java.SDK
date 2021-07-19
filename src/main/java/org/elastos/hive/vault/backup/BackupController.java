@@ -8,13 +8,27 @@ import org.elastos.hive.service.BackupService;
 import java.io.IOException;
 import java.security.InvalidParameterException;
 
+/**
+ * The backup controller is the wrapper class to access the backup module of the hive node.
+ */
 public class BackupController {
 	private BackupAPI backupAPI;
 
+	/**
+	 * Create with the RPC connection.
+	 *
+	 * @param connection The RPC connection.
+	 */
 	public BackupController(NodeRPCConnection connection) {
 		backupAPI = connection.createService(BackupAPI.class, true);
 	}
 
+	/**
+	 * Start the backup process which backups the data of the vault to other place.
+	 *
+	 * @param credential The credential for the hive node to access the backup service.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public void startBackup(String credential) throws HiveException {
 		try {
 			backupAPI.saveToNode(new RequestParams(credential)).execute().body();
@@ -39,6 +53,12 @@ public class BackupController {
 		}
 	}
 
+	/**
+	 * Restore the data of the vault from other place.
+	 *
+	 * @param credential The credential for the hive node to access the backup service.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public void restoreFrom(String credential) throws HiveException {
 		try {
 			backupAPI.restoreFromNode(new RequestParams(credential)).execute().body();
@@ -63,6 +83,12 @@ public class BackupController {
 		}
 	}
 
+	/**
+	 * Check the result of the backup process.
+	 *
+	 * @return The result of the backup process.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public BackupService.BackupResult checkResult() throws HiveException {
 		try {
 			return backupAPI.getState().execute().body().getStatusResult();

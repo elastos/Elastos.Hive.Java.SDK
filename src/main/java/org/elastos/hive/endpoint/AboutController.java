@@ -13,7 +13,7 @@ public class AboutController {
 	private AboutAPI aboutAPI;
 
 	/**
-	 * Create the about controller by rpc connection.
+	 * Create the about controller by the RPC connection.
 	 *
 	 * @param connection The connection instance.
 	 */
