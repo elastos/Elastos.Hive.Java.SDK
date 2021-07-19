@@ -5,6 +5,7 @@ import org.elastos.hive.ServiceEndpoint;
 
 /**
  * The bridge handler is for the {@link AccessToken#AccessToken(ServiceEndpoint, DataStorage, BridgeHandler)} ()}
+ * to notify the caller some information.
  */
 public interface BridgeHandler {
 	/**
