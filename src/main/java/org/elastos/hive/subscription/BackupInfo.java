@@ -2,6 +2,9 @@ package org.elastos.hive.subscription;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * This contains the details of the backup service.
+ */
 public class BackupInfo {
 	@SerializedName("service_did")
 	private String serviceDid;

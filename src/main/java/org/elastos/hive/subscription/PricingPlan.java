@@ -1,5 +1,8 @@
 package org.elastos.hive.subscription;
 
+/**
+ * The pricing plan is for upgrading the service of the vault or the backup.
+ */
 public class PricingPlan {
 	private float amount;
 	private String currency;

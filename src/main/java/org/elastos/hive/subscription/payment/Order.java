@@ -2,10 +2,9 @@ package org.elastos.hive.subscription.payment;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
-import org.elastos.hive.subscription.PricingPlan;
-
+/**
+ * The order is used for payment module and represents and order to upgrade the service of the vault or the backup.
+ */
 public class Order {
 	@SerializedName("order_id")
 	private String orderId;

@@ -2,6 +2,9 @@ package org.elastos.hive.subscription.payment;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The receipt contains the details of the paid information.
+ */
 public class Receipt {
 	@SerializedName("receipt_id")
 	private String receiptId;
