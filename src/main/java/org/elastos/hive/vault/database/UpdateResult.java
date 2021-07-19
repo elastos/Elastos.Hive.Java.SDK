@@ -1,7 +1,11 @@
 package org.elastos.hive.vault.database;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The request result for {@link DatabaseController#updateOne(String, JsonNode, JsonNode, UpdateOptions)}
+ */
 public class UpdateResult {
 	private Boolean acknowledged;
 	@SerializedName("matched_count")

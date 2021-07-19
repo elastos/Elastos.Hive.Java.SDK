@@ -1,7 +1,11 @@
 package org.elastos.hive.vault.database;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The request parameter for {@link DatabaseController#insertOne(String, JsonNode, InsertOptions)}
+ */
 public class InsertOptions {
 	@SerializedName("bypass_document_validation")
 	Boolean bypassDocumentValidation;
