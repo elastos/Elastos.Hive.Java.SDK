@@ -7,6 +7,9 @@ import org.elastos.hive.exception.*;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * The subscription controller is for subscribing the vault or the backup.
+ */
 public class SubscriptionController {
 	private final SubscriptionAPI subscriptionAPI;
 
@@ -14,6 +17,12 @@ public class SubscriptionController {
 		this.subscriptionAPI = connection.createService(SubscriptionAPI.class, true);
 	}
 
+	/**
+	 * Get the pricing plan list of the vault which can be used for upgrading the vault.
+	 *
+	 * @return The price plan list.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public List<PricingPlan> getVaultPricingPlanList() throws HiveException {
 		try {
 			return subscriptionAPI.getPricePlans("vault", "")
@@ -34,6 +43,13 @@ public class SubscriptionController {
 		}
 	}
 
+	/**
+	 * Get the pricing plan for the vault by name.
+	 *
+	 * @param planName The name of the pricing plan.
+	 * @return The pricing plan
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public PricingPlan getVaultPricingPlan(String planName) throws HiveException {
 		try {
 			return subscriptionAPI.getPricePlans("vault", planName)
@@ -54,6 +70,12 @@ public class SubscriptionController {
 		}
 	}
 
+	/**
+	 * Get the details of the vault.
+	 *
+	 * @return The details of the vault.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public VaultInfo getVaultInfo() throws HiveException {
 		try {
 			return subscriptionAPI.getVaultInfo().execute().body();
@@ -71,10 +93,15 @@ public class SubscriptionController {
 		}
 	}
 
+	/**
+	 * Subscribe the vault with the free pricing plan.
+	 * TODO: remove the parameter "credential"
+	 *
+	 * @param credential To be removed later.
+	 * @return The details of the new created vault.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public VaultInfo subscribeToVault(String credential) throws HiveException {
-		if (credential != null)
-			throw new NotImplementedException();
-
 		try {
 			return subscriptionAPI.subscribeToVault(credential).execute().body();
 		} catch (NodeRPCException e) {
@@ -91,6 +118,11 @@ public class SubscriptionController {
 		}
 	}
 
+	/**
+	 * Unsubscribe the vault.
+	 *
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public void unsubscribeVault() throws HiveException {
 		try {
 			subscriptionAPI.unsubscribeVault().execute();
@@ -106,6 +138,12 @@ public class SubscriptionController {
 		}
 	}
 
+	/**
+	 * Get the pricing plan list of the backup service which can be used for upgrading the service.
+	 *
+	 * @return The price plan list.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public List<PricingPlan> getBackupPricingPlanList() throws HiveException {
 		try {
 			return subscriptionAPI.getPricePlans("backup", "")
@@ -126,6 +164,13 @@ public class SubscriptionController {
 		}
 	}
 
+	/**
+	 * Get the pricing plan for the backup by name.
+	 *
+	 * @param planName The name of the pricing plan.
+	 * @return The pricing plan
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public PricingPlan getBackupPricingPlan(String planName) throws HiveException {
 		try {
 			return subscriptionAPI.getPricePlans("backup", planName).execute()
@@ -144,6 +189,12 @@ public class SubscriptionController {
 		}
 	}
 
+	/**
+	 * Get the details of the backup service.
+	 *
+	 * @return The details of the backup service.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public BackupInfo getBackupInfo() throws HiveException {
 		try {
 	   	 	return subscriptionAPI.getBackupInfo().execute().body();
@@ -161,6 +212,14 @@ public class SubscriptionController {
 		}
 	}
 
+	/**
+	 * Subscribe the backup service with the free pricing plan.
+	 * TODO: remove the parameter "reserved"
+	 *
+	 * @param reserved To be removed later.
+	 * @return The details of the new created backup service.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public BackupInfo subscribeToBackup(String reserved) throws HiveException {
 		try {
 			return subscriptionAPI.subscribeToBackup(reserved).execute().body();
@@ -178,6 +237,11 @@ public class SubscriptionController {
 		}
 	}
 
+	/**
+	 * Unsubscribe the backup service.
+	 *
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public void unsubscribeBackup() throws HiveException {
 		try {
 			subscriptionAPI.unsubscribeBackup().execute();
