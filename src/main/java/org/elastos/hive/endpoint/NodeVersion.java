@@ -2,6 +2,9 @@ package org.elastos.hive.endpoint;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The version of the hive node is returned by {@link AboutController#getNodeVersion()}
+ */
 public class NodeVersion {
 	@SerializedName("major")
 	long major;
