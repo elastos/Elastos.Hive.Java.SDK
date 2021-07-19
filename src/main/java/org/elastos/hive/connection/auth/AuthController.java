@@ -15,16 +15,32 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.HashMap;
 
+/**
+ * The authorization controller is the wrapper class for accessing hive node auth module.
+ */
 public class AuthController {
 	private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 	private AuthAPI authAPI;
 	private String expectationAudience;
 
+	/**
+	 * Create the auth controller with the node rpc connection and application instance did document.
+	 *
+	 * @param connection The node rpc connection
+	 * @param appInstanceDidDoc The application instance did document.
+	 */
 	public AuthController(NodeRPCConnection connection, DIDDocument appInstanceDidDoc ) {
 		this.authAPI = connection.createService(AuthAPI.class, false);
 		this.expectationAudience = appInstanceDidDoc.getSubject().toString();
 	}
 
+	/**
+	 * Sign in to hive node
+	 *
+	 * @param appInstanceDidDoc The application
+	 * @return The challenge.
+	 * @throws HiveException The exception shows the error result of the request.
+	 */
 	public String signIn(DIDDocument appInstanceDidDoc) throws HiveException {
 		try {
 			Object document = new ObjectMapper()
@@ -52,6 +68,13 @@ public class AuthController {
 		}
 	}
 
+	/**
+	 * The auth operation is for getting the access token for node APIs.
+	 *
+	 * @param challengeResponse The challenge returned by sign in.
+	 * @return The access token.
+	 * @throws HiveException The exception shows the error result of the request.
+	 */
 	public String auth(String challengeResponse) throws HiveException {
 		try {
 			AccessCode token = authAPI.auth(new ChallengeResponse(challengeResponse))

@@ -4,18 +4,34 @@ import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.DataStorage;
 
+/**
+ * The access token is made by hive node and represents the user DID and the application DID.
+ * Some of the node APIs requires access token when handling request.
+ */
 public class AccessToken implements CodeFetcher {
 	private String jwtCode;
 	private CodeFetcher remoteFetcher;
 	private DataStorage storage;
 	private BridgeHandler bridge;
 
+	/**
+	 * Create the access token by service end point, data storage, and bridge handler.
+	 *
+	 * @param endpoint The service end point.
+	 * @param storage The data storage which is used to save the access token.
+	 * @param bridge The bridge handle is used for caller to do sth when getting the access token.
+	 */
 	public AccessToken(ServiceEndpoint endpoint, DataStorage storage, BridgeHandler bridge) {
 		remoteFetcher = new RemoteFetcher(endpoint);
 		this.storage = storage;
 		this.bridge = bridge;
 	}
 
+	/**
+	 * Get the access token without exception.
+	 *
+	 * @return null if not exists.
+	 */
 	public String getCanonicalizedAccessToken() {
 		try {
 			jwtCode = fetch();

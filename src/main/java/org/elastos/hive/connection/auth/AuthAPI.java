@@ -4,7 +4,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
-public interface AuthAPI {
+interface AuthAPI {
 	@POST("/api/v2/did/signin")
 	Call<ChallengeRequest> signIn(@Body SignInRequest request);
 

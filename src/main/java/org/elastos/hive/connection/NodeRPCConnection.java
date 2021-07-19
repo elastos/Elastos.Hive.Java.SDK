@@ -42,6 +42,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Network connection for accessing hive node with restful APIs.
+ */
 public abstract class NodeRPCConnection {
 	private static final Logger log = LoggerFactory.getLogger(NodeRPCConnection.class);
 	private static final int DEFAULT_TIMEOUT = 30;
@@ -49,6 +52,13 @@ public abstract class NodeRPCConnection {
 	protected abstract String getProviderAddress();
 	protected abstract AccessToken getAccessToken();
 
+	/**
+	 * Open a HTTP connection to communicate with hive node.
+	 *
+	 * @param urlPath Relative URL path of the node API.
+	 * @return The connection.
+	 * @throws IOException exception such as timeout, network error, etc.
+	 */
 	public HttpURLConnection openConnection(String urlPath) throws IOException {
 		String url = getProviderAddress() + urlPath;
 		log.debug("open connection with URL: {} and method: PUT", url);
@@ -73,6 +83,15 @@ public abstract class NodeRPCConnection {
 		return urlConnection;
 	}
 
+	/**
+	 * Create a retrofit API service which can map Java call to Http request.
+	 *
+	 * @param serviceClass The service class is the base class for the service.
+	 * @param requiredAuthorization If this service need authorization.
+	 *                              Normally if true, the service need token when send request.
+	 * @param <S> The service class.
+	 * @return The service instance based on the service class.
+	 */
 	public <S> S createService(Class<S> serviceClass, boolean requiredAuthorization) {
 		Interceptor requestInterceptor = requiredAuthorization ?
 					new PlainRequestInterceptor(getAccessToken()) :

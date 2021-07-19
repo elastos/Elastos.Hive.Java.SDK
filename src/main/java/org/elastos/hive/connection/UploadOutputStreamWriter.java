@@ -5,6 +5,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 
+/**
+ * The UploadOutputStreamWriter is for uploading file by connection.
+ */
 public class UploadOutputStreamWriter extends OutputStreamWriter {
 	private final HttpURLConnection connection;
 
