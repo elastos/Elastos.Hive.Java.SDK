@@ -3,6 +3,9 @@ package org.elastos.hive.vault.database;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Index presents the condition of the query operation.
+ */
 public class Index {
 	private String key;
 	private Order order;

@@ -1,5 +1,10 @@
 package org.elastos.hive.vault.database;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+/**
+ * The request parameter for {@link DatabaseController#find(String, JsonNode, FindOptions)}
+ */
 public class FindOptions {
 	private Integer skip;
 	private Integer limit;

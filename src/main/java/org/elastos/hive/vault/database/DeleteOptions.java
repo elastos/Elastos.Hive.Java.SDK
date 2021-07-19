@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The request parameter for {@link DatabaseController#deleteOne(String, JsonNode, DeleteOptions)}
+ */
 public class DeleteOptions {
 	@SerializedName("collation")
 	private Collation collation;

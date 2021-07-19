@@ -1,7 +1,11 @@
 package org.elastos.hive.vault.database;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The request parameter for {@link DatabaseController#updateOne(String, JsonNode, JsonNode, UpdateOptions)}
+ */
 public class UpdateOptions {
 	@SerializedName("upsert")
 	private Boolean upsert;

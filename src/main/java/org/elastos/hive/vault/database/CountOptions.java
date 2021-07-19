@@ -1,7 +1,11 @@
 package org.elastos.hive.vault.database;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The request parameter for {@link DatabaseController#countDocuments(String, JsonNode, CountOptions)}
+ */
 public class CountOptions {
 	@SerializedName("skip")
 	private Long skip;

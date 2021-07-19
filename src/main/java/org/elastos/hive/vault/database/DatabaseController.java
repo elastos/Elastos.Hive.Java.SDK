@@ -10,13 +10,27 @@ import java.security.InvalidParameterException;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * The wrapper class is to access the database module of the hive node.
+ */
 public class DatabaseController {
 	private DatabaseAPI databaseAPI;
 
+	/**
+	 * Create by the RPC connection.
+	 *
+	 * @param connection The RPC connection.
+	 */
 	public DatabaseController(NodeRPCConnection connection) {
 		databaseAPI = connection.createService(DatabaseAPI.class, true);
 	}
 
+	/**
+	 * Create the collection.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public void createCollection(String collectionName) throws HiveException {
 		try {
 			CreateCollectionResult result;
@@ -41,6 +55,12 @@ public class DatabaseController {
 		}
 	}
 
+	/**
+	 * Delete the collection by name.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public void deleteCollection(String collectionName) throws HiveException {
 		try {
 			databaseAPI.deleteCollection(collectionName).execute();
@@ -58,12 +78,30 @@ public class DatabaseController {
 		}
 	}
 
+	/**
+	 * Insert one document.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @param document The document.
+	 * @param options Insert options.
+	 * @return The details of the insert operation.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public InsertResult insertOne(String collectionName,
 								  JsonNode document,
 								  InsertOptions options) throws HiveException {
 		return insertMany(collectionName, Collections.singletonList(document), options);
 	}
 
+	/**
+	 * Insert many documents.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @param documents The document.
+	 * @param options Insert options.
+	 * @return The details of the insert operation.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public InsertResult insertMany(String collectionName,
 								   List<JsonNode> documents,
 								   InsertOptions options) throws HiveException {
@@ -87,11 +125,31 @@ public class DatabaseController {
 		}
 	}
 
+	/**
+	 * Update the first matched document by the filter.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @param filter The filter to filter the matched document.
+	 * @param update The update data.
+	 * @param options The update options.
+	 * @return The details of the update operation.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public UpdateResult updateOne(String collectionName, JsonNode filter,
 								  JsonNode update, UpdateOptions options) throws HiveException {
 		throw new NotImplementedException();
 	}
 
+	/**
+	 * Update all matched documents by the filter.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @param filter The filter to filter the matched document.
+	 * @param update The update data.
+	 * @param options The update options.
+	 * @return The details of the update operation.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public UpdateResult updateMany(String collectionName,
 								   JsonNode filter,
 								   JsonNode update,
@@ -116,10 +174,28 @@ public class DatabaseController {
 		}
 	}
 
-	public int deleteOne(String collection, JsonNode filter, DeleteOptions options) throws HiveException {
+	/**
+	 * Delete the first matched document by the filter.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @param filter The filter to filter the matched document.
+	 * @param options The delete options.
+	 * @return The details of the delete operation.
+	 * @throws HiveException The error comes from the hive node.
+	 */
+	public int deleteOne(String collectionName, JsonNode filter, DeleteOptions options) throws HiveException {
 		throw new NotImplementedException();
 	}
 
+	/**
+	 * Delete all matched document by the filter.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @param filter The filter to filter the matched documents.
+	 * @param options The delete options.
+	 * @return The details of the delete operation.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public int deleteMany(String collectionName, JsonNode filter, DeleteOptions options) throws HiveException {
 		try {
 			// TODO: refine delete API to return something first.
@@ -143,6 +219,15 @@ public class DatabaseController {
 		}
 	}
 
+	/**
+	 * Count the documents by filter.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @param filter The filter to match the documents.
+	 * @param options Count options.
+	 * @return The number of the matched documents.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public long countDocuments(String collectionName, JsonNode filter, CountOptions options) throws HiveException {
 		try {
 			return databaseAPI.count(collectionName, new CountParams(filter, options)).execute().body().getCount();
@@ -164,11 +249,29 @@ public class DatabaseController {
 		}
 	}
 
+	/**
+	 * Find the first matched document by filter.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @param filter The filter to match the document.
+	 * @param options The find options.
+	 * @return The first matched document for the find operation.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public JsonNode findOne(String collectionName, JsonNode filter, FindOptions options) throws HiveException {
 		List<JsonNode> docs = find(collectionName, filter, options);
 		return docs != null && !docs.isEmpty() ? docs.get(0) : null;
 	}
 
+	/**
+	 * Find all matched document by filter.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @param filter The filter to match the documents.
+	 * @param options The find options.
+	 * @return All matched documents for the find operation.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public List<JsonNode> find(String collectionName, JsonNode filter, FindOptions options) throws HiveException {
 		try {
 			String filterStr = filter == null ? "" : filter.toString();
@@ -193,6 +296,15 @@ public class DatabaseController {
 		}
 	}
 
+	/**
+	 * Query the documents by filter and options.
+	 *
+	 * @param collectionName The name of the collection.
+	 * @param filter The filter to match the documents.
+	 * @param options The query options.
+	 * @return All matched documents for the query operation.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public List<JsonNode> query(String collectionName, JsonNode filter, QueryOptions options) throws HiveException {
 		try {
 			return databaseAPI.query(new QueryParams(collectionName, filter, options)).execute().body().documents();

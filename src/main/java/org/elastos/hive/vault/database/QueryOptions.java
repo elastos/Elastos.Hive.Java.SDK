@@ -6,6 +6,9 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * The request parameter for {@link DatabaseController#query(String, JsonNode, QueryOptions)}
+ */
 public class QueryOptions {
 	private Integer skip;
 	private Integer limit;
