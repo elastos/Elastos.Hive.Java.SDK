@@ -11,15 +11,30 @@ import org.elastos.hive.connection.UploadOutputStream;
 import org.elastos.hive.connection.UploadOutputStreamWriter;
 import org.elastos.hive.exception.*;
 
+/**
+ * The wrapper class is to access the files module of the hive node.
+ */
 public class FilesController {
 	private NodeRPCConnection connection;
 	private FilesAPI filesAPI;
 
+	/**
+	 * Create by the RPC connection.
+	 *
+	 * @param connection The RPC connection.
+	 */
 	public FilesController(NodeRPCConnection connection) {
 		this.connection = connection;
 		this.filesAPI = connection.createService(FilesAPI.class, true);
 	}
 
+	/**
+	 * Get the upload stream for uploading the content of the file.
+	 *
+	 * @param path The uploading file path.
+	 * @return The output stream.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public OutputStream getUploadStream(String path) throws HiveException {
 		try {
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
@@ -32,6 +47,13 @@ public class FilesController {
 		}
 	}
 
+	/**
+	 * Get the upload writer for uploading the content of the file.
+	 *
+	 * @param path The uploading file path.
+	 * @return The writer.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public Writer getUploadWriter(String path) throws HiveException {
 		try {
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
@@ -44,6 +66,13 @@ public class FilesController {
 		}
 	}
 
+	/**
+	 * Get the input stream for downloading the content of the file.
+	 *
+	 * @param path The download file path.
+	 * @return The input stream.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public InputStream getDownloadStream(String path) throws HiveException {
 		try {
 			return filesAPI.download(path).execute().body().byteStream();
@@ -65,6 +94,13 @@ public class FilesController {
 		}
 	}
 
+	/**
+	 * Get the download reader for downloading the content of the file.
+	 *
+	 * @param path The download file path.
+	 * @return The reader.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public Reader getDownloadReader(String path) throws HiveException {
 		try {
 			return new InputStreamReader(filesAPI.download(path).execute().body().byteStream());
@@ -86,6 +122,13 @@ public class FilesController {
 		}
 	}
 
+	/**
+	 * List the files on the remote folder.
+	 *
+	 * @param path The path of the folder.
+	 * @return The info. of the file list.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public List<FileInfo> listChildren(String path) throws HiveException {
 		try {
 			return filesAPI.listChildren(path).execute().body().getValue();
@@ -107,6 +150,13 @@ public class FilesController {
 		}
 	}
 
+	/**
+	 * Get the details of the remote file.
+	 *
+	 * @param path The path of the remote file.
+	 * @return The details of the remote file.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public FileInfo getProperty(String path) throws HiveException {
 		try {
 			return filesAPI.getMetadata(path).execute().body();
@@ -128,6 +178,13 @@ public class FilesController {
 		}
 	}
 
+	/**
+	 * Get the hash code of the remote file content.
+	 *
+	 * @param path The path of the remote file.
+	 * @return The hash code.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public String getHash(String path) throws HiveException {
 		try {
 			return filesAPI.getHash(path).execute().body().getHash();
@@ -149,6 +206,13 @@ public class FilesController {
 		}
 	}
 
+	/**
+	 * Copy file from srcPath to destPath.
+	 *
+	 * @param srcPath The source path.
+	 * @param destPath The destination path.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public void copyFile(String srcPath, String destPath) throws HiveException {
 		try {
 			filesAPI.copy(srcPath, destPath).execute();
@@ -170,6 +234,13 @@ public class FilesController {
 		}
 	}
 
+	/**
+	 * Move file from srcPath to destPath.
+	 *
+	 * @param srcPath The source path.
+	 * @param destPath The destination path.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public void moveFile(String srcPath, String destPath) throws HiveException {
 		try {
 			filesAPI.move(srcPath, destPath).execute();
@@ -191,6 +262,12 @@ public class FilesController {
 		}
 	}
 
+	/**
+	 * Delete the remote file.
+	 *
+	 * @param path The path of the file.
+	 * @throws HiveException The error comes from the hive node.
+	 */
 	public void delete(String path) throws HiveException {
 		try {
 			filesAPI.delete(path).execute();
