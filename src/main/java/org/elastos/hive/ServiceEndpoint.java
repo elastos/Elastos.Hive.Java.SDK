@@ -16,6 +16,12 @@ import org.elastos.hive.endpoint.NodeVersion;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
 
+/**
+ * The service end-point represents the service provides some API functions. It supports:
+ * 	- Access token management.
+ * 	- Local cache for the access token.
+ * 	- The service DID of the hive node.
+ */
 public class ServiceEndpoint extends NodeRPCConnection {
 	private AppContext context;
 	private String providerAddress;
@@ -27,6 +33,12 @@ public class ServiceEndpoint extends NodeRPCConnection {
 	private AccessToken accessToken;
 	private DataStorage dataStorage;
 
+	/**
+	 * Create by the application context, and the address of the provider.
+	 *
+	 * @param context The application context.
+	 * @param providerAddress The address of the provider.
+	 */
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
 		if (context == null || providerAddress == null)
 			throw new IllegalArgumentException("Empty context or provider address parameter");
@@ -70,6 +82,11 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		}.setTarget(this));
 	}
 
+	/**
+	 * Get the application context.
+	 *
+	 * @return The application context.
+	 */
 	public AppContext getAppContext() {
 		return context;
 	}
@@ -134,10 +151,18 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		this.serviceInstanceDid = serviceInstanceDid;
 	}
 
+	/**
+	 * Get the instance of the data storage.
+	 *
+	 * @return The instance of the data storage.
+	 */
 	public DataStorage getStorage() {
 		return dataStorage;
 	}
 
+	/**
+	 * Refresh the access token. This will do remote refresh if not exist.
+	 */
 	public void refreshAccessToken() throws NodeRPCException {
 		accessToken.fetch();
 	}
@@ -147,6 +172,11 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		return accessToken;
 	}
 
+	/**
+	 * Get the version of the hive node.
+	 *
+	 * @return The version of the hive node.
+	 */
 	public CompletableFuture<NodeVersion> getNodeVersion() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
@@ -157,6 +187,11 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		});
 	}
 
+	/**
+	 * Get the last commit ID of the hive node.
+	 *
+	 * @return The last commit ID.
+	 */
 	public CompletableFuture<String> getLatestCommitId() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {

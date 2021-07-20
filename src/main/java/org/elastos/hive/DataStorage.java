@@ -1,5 +1,8 @@
 package org.elastos.hive;
 
+/**
+ * The data storage for the access token, the backup credential, etc. which comes from the hive node.
+ */
 public interface DataStorage {
 	String loadBackupCredential(String serviceDid);
 	String loadAccessToken(String serviceDid);

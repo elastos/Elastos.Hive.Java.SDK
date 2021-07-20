@@ -9,6 +9,9 @@ import org.elastos.hive.vault.scripting.ScriptingController;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+/**
+ * The script runner is used on the script calling side.
+ */
 public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocationService {
 	private ScriptingController controller;
 
