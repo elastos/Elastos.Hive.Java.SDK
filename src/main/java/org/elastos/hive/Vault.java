@@ -5,6 +5,7 @@ import org.elastos.hive.vault.ServiceBuilder;
 
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
+ * The services belongs to the vault will be got by this class.
  */
 public class Vault extends ServiceEndpoint {
 	private FilesService 	filesService;
@@ -22,18 +23,38 @@ public class Vault extends ServiceEndpoint {
 		this.backupService  = builder.createBackupService();
 	}
 
+	/**
+	 * Get the files service of the vault.
+	 *
+	 * @return The instance of the files service.
+	 */
 	public FilesService getFilesService() {
 		return this.filesService;
 	}
 
+	/**
+	 * Get the database service of the vault.
+	 *
+	 * @return The instance of the database service.
+	 */
 	public DatabaseService getDatabaseService() {
 		return this.database;
 	}
 
+	/**
+	 * Get the scripting service of the vault.
+	 *
+	 * @return The instance of the scripting service.
+	 */
 	public ScriptingService getScriptingService() {
 		return this.scripting;
 	}
 
+	/**
+	 * Get the backup service of the vault.
+	 *
+	 * @return The instance of the backup service.
+	 */
 	public BackupService getBackupService() {
 		return this.backupService;
 	}

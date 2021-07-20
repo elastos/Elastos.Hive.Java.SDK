@@ -15,12 +15,23 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+/**
+ * The vault subscription is used for the vault management.
+ * Subscribe the vault is the first step to use the service in the vault.
+ */
 public class VaultSubscription extends ServiceEndpoint
 	implements SubscriptionService<VaultInfo>, PaymentService {
 
 	private SubscriptionController subscriptionController;
 	private PaymentController paymentController;
 
+	/**
+	 * Create by the application context, and the address of the provider.
+	 *
+	 * @param context The application context.
+	 * @param providerAddress The address of the provider.
+	 * @throws HiveException See {@link HiveException}
+	 */
 	public VaultSubscription(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
 		subscriptionController = new SubscriptionController(this);

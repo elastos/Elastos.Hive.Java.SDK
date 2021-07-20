@@ -16,12 +16,23 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
+/**
+ * The backup subscription is for subscribe or unsubscribe the backup service.
+ * With the backup service, the vault data can be backup for security purpose.
+ */
 public class BackupSubscription extends ServiceEndpoint
 				implements SubscriptionService<BackupInfo>, PaymentService {
 
 	private SubscriptionController subscriptionController;
 	private PaymentController paymentController;
 
+	/**
+	 * Create by the application context and the address of the provider which can save the vault data.
+	 *
+	 * @param context The application context.
+	 * @param providerAddress The address of the provider.
+	 * @throws HiveException See {@link HiveException}
+	 */
 	public BackupSubscription(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
 		subscriptionController = new SubscriptionController(this);

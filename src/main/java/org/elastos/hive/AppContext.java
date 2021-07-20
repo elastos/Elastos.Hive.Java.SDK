@@ -24,8 +24,7 @@ import org.elastos.hive.exception.DIDResoverAlreadySetupException;
 /**
  * The application context would contain the resources list below:
  *  - the reference of application context provider;
- *  -
- *
+ *  - the user did which uses this application.
  */
 public class AppContext {
 	private static final Logger log = LoggerFactory.getLogger(AppContext.class);
@@ -39,14 +38,31 @@ public class AppContext {
 		this.contextProvider = provider;
 	}
 
+	/**
+	 * Get the provider of the application context.
+	 *
+	 * @return The provider of the application context.
+	 */
 	public AppContextProvider getAppContextProvider() {
 		return this.contextProvider;
 	}
 
+	/**
+	 * Get the user DID.
+	 *
+	 * @return The user DID.
+	 */
 	public String getUserDid() {
 		return userDid;
 	}
 
+	/**
+	 * Setup the resolver for the DID verification.
+	 *
+	 * @param resolver The URL of the resolver.
+	 * @param cacheDir The local directory for DID cache.
+	 * @throws HiveException See {@link HiveException}
+	 */
 	public static void setupResolver(String resolver, String cacheDir) throws HiveException {
 		if (cacheDir == null || resolver == null)
 			throw new IllegalArgumentException("Invalid parameters to setup DID resolver");
@@ -58,6 +74,13 @@ public class AppContext {
 		resolverHasSetup = true;
 	}
 
+	/**
+	 * Create the application context.
+	 *
+	 * @param provider The provider of the application context.
+	 * @param userDid The user DID.
+	 * @return The application context.
+	 */
 	public static AppContext build(AppContextProvider provider, String userDid) {
 		if (provider == null)
 			throw new IllegalArgumentException("Missing AppContext provider");
@@ -74,10 +97,25 @@ public class AppContext {
 		return new AppContext(provider, userDid);
 	}
 
+	/**
+	 * Get the URL address of the provider by the user DID.
+	 * The will access the property of the user DID.
+	 *
+	 * @param targetDid The user DID.
+	 * @return The URL address of the provider
+	 */
 	public static CompletableFuture<String> getProviderAddress(String targetDid) {
 		return getProviderAddress(targetDid, null);
 	}
 
+	/**
+	 * Get the URL address of the provider by the user DID.
+	 * The will access the property of the user DID.
+	 *
+	 * @param targetDid The user DID.
+	 * @param preferredProviderAddress The preferred URL address of the provider.
+	 * @return The URL address of the provider
+	 */
 	public static CompletableFuture<String> getProviderAddress(String targetDid, String preferredProviderAddress) {
 		return CompletableFuture.supplyAsync(() -> {
 			if (targetDid == null)

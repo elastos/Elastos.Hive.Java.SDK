@@ -8,6 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 
+/**
+ * Storage with file system.
+ */
 class FileStorage implements DataStorage {
 	private static final String BACKUP = "credential-backup";
 	private static final String TOKENS = "tokens";
