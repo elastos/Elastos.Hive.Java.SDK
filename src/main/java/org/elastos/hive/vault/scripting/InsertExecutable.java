@@ -3,6 +3,9 @@ package org.elastos.hive.vault.scripting;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The executable to wrapper the "insert" operation to the mongo database of the hive node.
+ */
 public class InsertExecutable extends Executable {
     public InsertExecutable(String name, String collectionName, JsonNode document, JsonNode options) {
         super(name, Type.INSERT, null);

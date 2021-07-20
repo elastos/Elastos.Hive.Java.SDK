@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Represents the executable of the script.
+ */
 public abstract class Executable extends Condition {
 	protected enum Type {
 		AGGREGATED("aggregated"), // TODO:

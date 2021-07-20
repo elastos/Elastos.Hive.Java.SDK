@@ -2,6 +2,10 @@ package org.elastos.hive.vault.scripting;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The condition is used for registering the script.
+ * If the condition matches, the script will be executed normally.
+ */
 public abstract class Condition {
 	@SerializedName("name")
 	private String name;
