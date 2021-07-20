@@ -3,6 +3,9 @@ package org.elastos.hive.vault.scripting;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Convenient class to delete the documents from the collection.
+ */
 public class DeleteExecutable extends Executable {
     public DeleteExecutable(String name, String collectionName, JsonNode filter) {
         super(name, Type.DELETE, null);

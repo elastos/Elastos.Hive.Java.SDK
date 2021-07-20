@@ -3,6 +3,9 @@ package org.elastos.hive.vault.scripting;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * The executable to update the documents of the mongo database.
+ */
 public class UpdateExecutable extends Executable {
     public UpdateExecutable(String name, String collectionName,
                             JsonNode filter, JsonNode update, JsonNode options) {
