@@ -10,6 +10,8 @@ import org.elastos.hive.did.UserDID;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.BackupService;
 import org.elastos.hive.service.HiveBackupContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
@@ -19,6 +21,7 @@ import java.util.concurrent.CompletionException;
  * This is used for representing 3rd-party application.
  */
 public class TestData {
+	private static final Logger log = LoggerFactory.getLogger(TestData.class);
 	private static final String RESOLVE_CACHE = "data/didCache";
 	private static TestData instance = null;
 
@@ -40,21 +43,7 @@ public class TestData {
 	}
 
 	public void init() throws HiveException, DIDException {
-		//TODO set environment config
-		String fileName = null;
-		switch (EnvironmentType.DEVELOPING) {
-			case DEVELOPING:
-				fileName = "Developing.conf";
-				break;
-			case PRODUCTION:
-				fileName = "Production.conf";
-				break;
-			case LOCAL:
-				fileName = "Local.conf";
-				break;
-		}
-
-		ClientConfig clientConfig = ClientConfig.deserialize(Utils.getConfigure(fileName));
+		ClientConfig clientConfig = getClientConfig();
 		AppContext.setupResolver(clientConfig.resolverUrl(), RESOLVE_CACHE);
 
 		ApplicationConfig applicationConfig = clientConfig.applicationConfig();
@@ -145,6 +134,24 @@ public class TestData {
 		}, callerDid.toString());
 	}
 
+	/**
+	 * If run test cases for production environment, please try this:
+	 * 	- HIVE_ENV=production ./gradlew build
+	 *
+	 * @return Client configuration.
+	 */
+	private ClientConfig getClientConfig() {
+		String fileName, hiveEnv = System.getenv("HIVE_ENV");
+		if ("production".equals(hiveEnv))
+			fileName = "Production.conf";
+		else if ("local".equals(hiveEnv))
+			fileName = "Local.conf";
+		else
+			fileName = "Developing.conf";
+		log.info(">>>>>> Current config file: " + fileName + " <<<<<<");
+		return ClientConfig.deserialize(Utils.getConfigure(fileName));
+	}
+
 	private String getLocalStorePath() {
 		return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
 	}
@@ -215,11 +222,5 @@ public class TestData {
 
 	public String getCallerDid() {
 		return this.callerDid.toString();
-	}
-
-	private enum EnvironmentType {
-		DEVELOPING,
-		PRODUCTION,
-		LOCAL
 	}
 }
