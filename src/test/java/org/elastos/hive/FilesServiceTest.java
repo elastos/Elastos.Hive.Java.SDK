@@ -2,14 +2,10 @@ package org.elastos.hive;
 
 import com.google.common.base.Throwables;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.files.FileInfo;
 import org.junit.jupiter.api.*;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -51,11 +47,6 @@ class FilesServiceTest {
 	}
 
 	@BeforeAll public static void setUp() {
-
-		Level level = Level.valueOf("WARN");
-		Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-	    root.setLevel(level);
-
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
 			new VaultSubscription(testData.getAppContext(),
