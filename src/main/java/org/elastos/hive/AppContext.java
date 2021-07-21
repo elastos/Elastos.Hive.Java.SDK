@@ -25,6 +25,8 @@ import org.elastos.hive.exception.DIDResoverAlreadySetupException;
  * The application context would contain the resources list below:
  *  - the reference of application context provider;
  *  - the user did which uses this application.
+ *
+ * Normally, there are only one application context for one application.
  */
 public class AppContext {
 	private static final Logger log = LoggerFactory.getLogger(AppContext.class);
@@ -98,11 +100,11 @@ public class AppContext {
 	}
 
 	/**
-	 * Get the URL address of the provider by the user DID.
-	 * The will access the property of the user DID.
+	 * Get the URL address of the provider throw the document of the user DID.
+	 * The will access the property of the document of the user DID.
 	 *
 	 * @param targetDid The user DID.
-	 * @return The URL address of the provider
+	 * @return The URL address of the provider.
 	 */
 	public static CompletableFuture<String> getProviderAddress(String targetDid) {
 		return getProviderAddress(targetDid, null);
