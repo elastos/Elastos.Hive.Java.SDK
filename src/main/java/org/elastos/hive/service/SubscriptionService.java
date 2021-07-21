@@ -44,7 +44,7 @@ public interface SubscriptionService<T> {
 	 *	  otherwise, the specific exception would returned in the wrapper.
 	 *
 	 */
-	CompletableFuture<T> subscribe(String credential);
+	CompletableFuture<T> subscribe();
 
 	/**
 	 * Let user to unsubscribe to an existing but useless vault or backup service.

@@ -9,7 +9,7 @@ interface SubscriptionAPI {
 
 	// for subscription to vault service.
 	@PUT("/api/v2/subscription/vault")
-	Call<VaultInfo> subscribeToVault(@Query("credential") String credential);
+	Call<VaultInfo> subscribeToVault();
 
 	@POST("/api/v2/subscription/vault?op=activation")
 	Call<Void> activateVault();
