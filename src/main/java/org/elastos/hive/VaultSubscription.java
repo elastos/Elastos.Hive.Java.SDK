@@ -63,18 +63,11 @@ public class VaultSubscription extends ServiceEndpoint
 		});
 	}
 
-	public CompletableFuture<VaultInfo> subscribe() {
-		return this.subscribe(null);
-	}
-
 	@Override
-	public CompletableFuture<VaultInfo> subscribe(String credential) {
+	public CompletableFuture<VaultInfo> subscribe() {
 		return CompletableFuture.supplyAsync(()-> {
-			if (credential != null)
-				throw new NotImplementedException("Paid pricing plan will be supported later");
-
 			try {
-				return subscriptionController.subscribeToVault(credential);
+				return subscriptionController.subscribeToVault();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}

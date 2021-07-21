@@ -97,13 +97,12 @@ public class SubscriptionController {
 	 * Subscribe the vault with the free pricing plan.
 	 * TODO: remove the parameter "credential"
 	 *
-	 * @param credential To be removed later.
 	 * @return The details of the new created vault.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public VaultInfo subscribeToVault(String credential) throws HiveException {
+	public VaultInfo subscribeToVault() throws HiveException {
 		try {
-			return subscriptionAPI.subscribeToVault(credential).execute().body();
+			return subscriptionAPI.subscribeToVault().execute().body();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:

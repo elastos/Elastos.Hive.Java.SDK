@@ -64,16 +64,9 @@ public class BackupSubscription extends ServiceEndpoint
 		});
 	}
 
-	public CompletableFuture<BackupInfo> subscribe() {
-		return this.subscribe(null);
-	}
-
 	@Override
-	public CompletableFuture<BackupInfo> subscribe(String credential) {
+	public CompletableFuture<BackupInfo> subscribe() {
 		return CompletableFuture.supplyAsync(()-> {
-			if (credential != null)
-				throw new NotImplementedException("Paid pricing plan will be supported later");
-
 			try {
 				return subscriptionController.subscribeToBackup(null);
 			} catch (HiveException | RuntimeException e) {
