@@ -1,8 +1,7 @@
 package org.elastos.hive;
 
-import com.google.common.base.Throwables;
-
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.exception.NotFoundException;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.files.FileInfo;
 import org.junit.jupiter.api.*;
@@ -30,6 +29,7 @@ class FilesServiceTest {
 	private final String remoteTxtFilePath;
 	private final String remoteImgFilePath;
 	private final String remoteNotExistsFilePath;
+	private final String remoteNotExistsDirPath;
 	private final String remoteBackupTxtFilePath;
 
 	private static FilesService filesService;
@@ -43,6 +43,7 @@ class FilesServiceTest {
 		remoteTxtFilePath = remoteRootDir + "/" + FILE_NAME_TXT;
 		remoteImgFilePath = remoteRootDir + "/" + FILE_NAME_IMG;
 		remoteNotExistsFilePath = remoteRootDir + "/" + FILE_NAME_NOT_EXISTS;
+		remoteNotExistsDirPath = remoteNotExistsFilePath;
 		remoteBackupTxtFilePath = remoteRootDir + "/" + FILE_NAME_TXT + "2";
 	}
 
@@ -72,34 +73,46 @@ class FilesServiceTest {
 	}
 
 	@Test @Order(2) void testUploadBin() {
+		Assertions.assertDoesNotThrow(this::uploadBinReally);
+		verifyRemoteFileExists(remoteImgFilePath);
+	}
+
+	private void uploadBinReally() throws ExecutionException, InterruptedException, IOException {
 		try (OutputStream out = filesService.getUploadStream(remoteImgFilePath).get()) {
 			Assertions.assertNotNull(out);
 			out.write(Utils.readImage(localImgFilePath));
 			out.flush();
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
-		verifyRemoteFileExists(remoteImgFilePath);
 	}
 
 	@Test @Order(3) void testDownloadText() {
+		Assertions.assertDoesNotThrow(this::downloadTextReally);
+	}
+
+	private void downloadTextReally() throws ExecutionException, InterruptedException, IOException {
 		try (Reader reader = filesService.getDownloadReader(remoteTxtFilePath).get()) {
 			Assertions.assertNotNull(reader);
 			Utils.cacheTextFile(reader, localCacheRootDir, FILE_NAME_TXT);
 			Assertions.assertTrue(isFileContentEqual(localTxtFilePath, localCacheRootDir + FILE_NAME_TXT));
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
 	@Test @Order(4) void testDownloadBin() {
+		Assertions.assertDoesNotThrow(this::downloadBinReally);
+	}
+
+	private void downloadBinReally() throws ExecutionException, InterruptedException, IOException {
 		try (InputStream in = filesService.getDownloadStream(remoteImgFilePath).get()) {
 			Assertions.assertNotNull(in);
 			Utils.cacheBinFile(in, localCacheRootDir, FILE_NAME_IMG);
 			Assertions.assertTrue(isFileContentEqual(localImgFilePath, localCacheRootDir + FILE_NAME_IMG));
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
+	}
+
+	@Test @Order(4) void testDownloadBin4NotFoundException() {
+		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+				() -> filesService.getDownloadStream(remoteNotExistsFilePath).get());
+		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
 	}
 
 	@Test @Order(5) void testList() {
@@ -113,9 +126,21 @@ class FilesServiceTest {
 		});
 	}
 
+	@Test @Order(5) void testList4NotFoundException() {
+		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+				() -> filesService.list(remoteNotExistsDirPath).get());
+		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
+	}
+
 	@Test @Order(6) void testHash() {
 		Assertions.assertDoesNotThrow(() -> Assertions.assertNotNull(
 				filesService.hash(remoteTxtFilePath).get()));
+	}
+
+	@Test @Order(6) void testHash4NotFoundException() {
+		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+				() -> filesService.hash(remoteNotExistsFilePath).get());
+		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
 	}
 
 	@Test @Order(7) void testMove() {
@@ -126,10 +151,22 @@ class FilesServiceTest {
 		verifyRemoteFileExists(remoteBackupTxtFilePath);
 	}
 
+	@Test @Order(7) void testMove4NotFoundException() {
+		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+				() -> filesService.move(remoteNotExistsFilePath, remoteNotExistsFilePath + "_bak").get());
+		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
+	}
+
 	@Test @Order(8) void testCopy() {
 		Assertions.assertDoesNotThrow(() ->
 				filesService.copy(remoteBackupTxtFilePath, remoteTxtFilePath).get());
 		verifyRemoteFileExists(remoteTxtFilePath);
+	}
+
+	@Test @Order(8) void testCopy4NotFoundException() {
+		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
+				() -> filesService.copy(remoteNotExistsFilePath, remoteNotExistsFilePath + "_bak").get());
+		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
 	}
 
 	@Test @Order(9) void testDeleteFile() {
@@ -137,21 +174,6 @@ class FilesServiceTest {
 				filesService.delete(remoteTxtFilePath)
 						.thenCompose(result -> filesService.delete(remoteBackupTxtFilePath))
 						.get());
-	}
-
-	@Disabled
-	@Test void testRemoteFileNotExistsException() {
-		Assertions.assertThrows(ExecutionException.class,
-				() -> filesService.hash(remoteNotExistsFilePath).get());
-		//Assertions.assertEquals(e.getCause().getClass(), FileDoesNotExistsException.class);
-	}
-
-	@Disabled
-	@Test void testVaultLockException() {
-		// Assertions.assertDoesNotThrow(() -> subscription.deactivate().get());
-		// VaultLockedException e = Assertions.assertThrows(VaultLockedException.class, this::uploadTextReally);
-		// Assertions.assertNotNull(e);
-		// Assertions.assertDoesNotThrow(() -> subscription.activate().get());
 	}
 
 	private static void verifyRemoteFileExists(String path) {
