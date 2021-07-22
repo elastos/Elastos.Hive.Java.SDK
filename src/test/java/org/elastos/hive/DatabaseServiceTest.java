@@ -192,8 +192,9 @@ class DatabaseServiceTest {
 		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
 	}
 
-//	@Disabled
+	@Disabled
 	@Test @Order(8) void testUpdateOne() {
+		// TODO: updateOne need be implemented.
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe1");
@@ -207,7 +208,9 @@ class DatabaseServiceTest {
 		});
 	}
 
+	@Disabled
 	@Test @Order(8) void testUpdateOne4NotFoundException() {
+		// TODO: updateOne need be implemented.
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe1");
 		ObjectNode doc = JsonNodeFactory.instance.objectNode();
@@ -216,7 +219,7 @@ class DatabaseServiceTest {
 		ObjectNode update = JsonNodeFactory.instance.objectNode();
 		update.put("$set", doc);
 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
-				() -> databaseService.updateOne(COLLECTION_NAME, filter, update,
+				() -> databaseService.updateOne(COLLECTION_NAME_NOT_EXIST, filter, update,
 						new UpdateOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
 		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
 	}
@@ -244,13 +247,14 @@ class DatabaseServiceTest {
 		ObjectNode update = JsonNodeFactory.instance.objectNode();
 		update.put("$set", doc);
 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
-				() -> databaseService.updateMany(COLLECTION_NAME, filter, update,
+				() -> databaseService.updateMany(COLLECTION_NAME_NOT_EXIST, filter, update,
 						new UpdateOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
 		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
 	}
 
 	@Disabled
 	@Test @Order(10) void testDeleteOne() {
+		// TODO: deleteOne need be implemented.
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
 			filter.put("author", "john doe2");
@@ -258,11 +262,13 @@ class DatabaseServiceTest {
 		});
 	}
 
+	@Disabled
 	@Test @Order(10) void testDeleteOne4NotFoundException() {
+		// TODO: deleteOne need be implemented.
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe2");
 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
-				() -> databaseService.deleteOne(COLLECTION_NAME, filter).get());
+				() -> databaseService.deleteOne(COLLECTION_NAME_NOT_EXIST, filter).get());
 		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
 	}
 
@@ -278,7 +284,7 @@ class DatabaseServiceTest {
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe2");
 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
-				() -> databaseService.deleteMany(COLLECTION_NAME, filter).get());
+				() -> databaseService.deleteMany(COLLECTION_NAME_NOT_EXIST, filter).get());
 		Assertions.assertEquals(e.getCause().getClass(), NotFoundException.class);
 	}
 
