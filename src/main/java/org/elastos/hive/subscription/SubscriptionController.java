@@ -213,15 +213,13 @@ public class SubscriptionController {
 
 	/**
 	 * Subscribe the backup service with the free pricing plan.
-	 * TODO: remove the parameter "reserved"
 	 *
-	 * @param reserved To be removed later.
 	 * @return The details of the new created backup service.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public BackupInfo subscribeToBackup(String reserved) throws HiveException {
+	public BackupInfo subscribeToBackup() throws HiveException {
 		try {
-			return subscriptionAPI.subscribeToBackup(reserved).execute().body();
+			return subscriptionAPI.subscribeToBackup().execute().body();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:

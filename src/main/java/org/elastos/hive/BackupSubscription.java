@@ -68,7 +68,7 @@ public class BackupSubscription extends ServiceEndpoint
 	public CompletableFuture<BackupInfo> subscribe() {
 		return CompletableFuture.supplyAsync(()-> {
 			try {
-				return subscriptionController.subscribeToBackup(null);
+				return subscriptionController.subscribeToBackup();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}

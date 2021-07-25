@@ -25,7 +25,7 @@ interface SubscriptionAPI {
 
 	// for subscription to backup service.
 	@PUT("/api/v2/subscription/backup")
-	Call<BackupInfo> subscribeToBackup(@Query("credential") String credential);
+	Call<BackupInfo> subscribeToBackup();
 
 	@POST("/api/v2/subscription/backup?op=activation")
 	Call<Void> activateBackup();
