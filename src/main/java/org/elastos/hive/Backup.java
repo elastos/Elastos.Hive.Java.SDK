@@ -6,25 +6,31 @@ import org.elastos.hive.service.PromotionService;
 /**
  * This represents the service end-point of the backup hive node.
  *
- * Currently, the backup hive node only supports store the backup data of the vault service,
+ * <p>Currently, the backup hive node only supports store the backup data of the vault service,
  * 	and promote the backup node to the vault node. The old vault will be disabled
- * 	after this promotion.
+ * 	after this promotion.</p>
  *
- * Before using promotion service, the subscription for the backup service is required on backup hive node.
+ * <p>Before using promotion service, the subscription for the backup service is required on backup hive node.</p>
  *
- * 		BackupSubscription subscription = new BackupSubscription(appContext, providerAddress);
- * 		subscription.subscribe().get();
+ * <pre>
+ *      BackupSubscription subscription = new BackupSubscription(appContext, providerAddress);
+ *      subscription.subscribe().get();
+ * </pre>
  *
- * And then, execute the backup operation on the vault hive node.
+ * <p>And then, execute the backup operation on the vault hive node.</p>
  *
- *		Vault vault = new Vault(appContext, providerAddress);
- *		BackupService backupService = vault.getBackupService());
- *		backupService.startBackup().get();
+ * <pre>
+ *      Vault vault = new Vault(appContext, providerAddress);
+ *      BackupService backupService = vault.getBackupService());
+ *      backupService.startBackup().get();
+ * </pre>
  *
- * The third step is executing the promotion operation.
+ * <p>The third step is executing the promotion operation.</p>
  *
- *  	PromotionService promotionService = new Backup(appContext, providerAddress);
- *  	promotionService.promote().get();
+ * <pre>
+ *      PromotionService promotionService = new Backup(appContext, providerAddress);
+ *      promotionService.promote().get();
+ * </pre>
  */
 public class Backup extends ServiceEndpoint {
 	private PromotionService promotionService;

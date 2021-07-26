@@ -19,13 +19,15 @@ import org.elastos.hive.exception.NotImplementedException;
 /**
  * The service end-point represents the service provides some API functions. It supports:
  *
- * 	- Access token management.
- * 	- Local cache for the access token.
- * 	- The service DID of the hive node.
- * 	- The provider address.
+ * <ul>
+ * <li>Access token management.</li>
+ * <li>Local cache for the access token.</li>
+ * <li>The service DID of the hive node.</li>
+ * <li>The provider address.</li>
+ * </ul>
  *
- * The service end-point is just like the map of the hive node. The application can communicate
- * 		with the hive node APIs by its sub-class.
+ * <p>The service end-point is just like the map of the hive node. The application can communicate
+ * 		with the hive node APIs by its sub-class.</p>
  */
 public class ServiceEndpoint extends NodeRPCConnection {
 	private AppContext context;

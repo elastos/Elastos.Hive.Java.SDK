@@ -12,16 +12,20 @@ import java.util.concurrent.CompletionException;
 /**
  * The script runner is used on the script calling side.
  *
- * To call the script, the script owner need register the script first.
+ * <p>To call the script, the script owner need register the script first.</p>
  *
+ * <pre>
  * 		Vault vault = new Vault(appContext, providerAddress);
  * 		ScriptingService scriptingService = vault.getScriptingService();
  * 		scriptingService.registerScript(...);
+ * </pre>
  *
- * Then the script caller can use this class to execute the script.
+ * <p>Then the script caller can use this class to execute the script.</p>
  *
+ * <pre>
  * 		ScriptRunner scriptRunner = new ScriptRunner(callerAppContext, providerAddress);
  * 		scriptRunner.callScript(...).get();
+ * </pre>
  */
 public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocationService {
 	private ScriptingController controller;

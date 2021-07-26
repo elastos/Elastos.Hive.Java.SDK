@@ -4,9 +4,12 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Backup service is for doing backup vault data from vault node server to backup server.
- * Backup server maybe another node server or third-party centered server like Google Driver.
- * As a restrict, only one vault can be used for one DID.
- * User also need just one backup copy for vault data.
+ *
+ * <p>Backup server maybe another node server or third-party centered server like Google Driver.</p>
+ *
+ * <p>As a restrict, only one vault can be used for one DID.</p>
+ *
+ * <p>User also need just one backup copy for vault data.</p>
  */
 public interface BackupService {
 	enum BackupResult {
@@ -26,8 +29,9 @@ public interface BackupService {
 	/**
 	 * Backup process in node side is a continues process. Vault node server backup whole vault data to
 	 * backup server and keep syncing with it. This is for user personal data security.
-	 * This function is for starting a background scheduler to update data to backup server. It's an
-	 * async process.
+	 *
+	 * <p>This function is for starting a background scheduler to update data to backup server. It's an
+	 * async process.</p>
 	 *
 	 * @return Void
 	 */

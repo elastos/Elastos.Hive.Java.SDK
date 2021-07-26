@@ -6,7 +6,8 @@ import org.elastos.hive.DataStorage;
 
 /**
  * The access token is made by hive node and represents the user DID and the application DID.
- * Some of the node APIs requires access token when handling request.
+ *
+ * <p>Some of the node APIs requires access token when handling request.</p>
  */
 public class AccessToken implements CodeFetcher {
 	private String jwtCode;

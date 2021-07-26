@@ -12,7 +12,8 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Vault provides a storage for files saving.
- * Files can be uploading, downloading and getting the status and information.
+ *
+ * <p>Files can be uploading, downloading and getting the status and information.</p>
  */
 public interface FilesService {
 	/**

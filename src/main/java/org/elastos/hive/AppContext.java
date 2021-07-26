@@ -23,10 +23,12 @@ import org.elastos.hive.exception.DIDResoverAlreadySetupException;
 /**
  * The application context would contain the resources list below:
  *
- *  - the reference of application context provider;
- *  - the user did which uses this application.
+ * <ul>
+ * <li>The reference of application context provider;</li>
+ * <li>The user did which uses this application.</li>
+ * </ul>
  *
- * Normally, there are only one application context for one application.
+ * <p>Normally, there are only one application context for one application.</p>
  */
 public class AppContext {
 	private static final Logger log = LoggerFactory.getLogger(AppContext.class);

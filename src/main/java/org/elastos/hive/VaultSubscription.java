@@ -17,7 +17,8 @@ import java.util.concurrent.CompletionException;
 
 /**
  * The vault subscription is used for the vault management.
- * Subscribe the vault is the first step to use the service in the vault.
+ *
+ * <p>Subscribe the vault is the first step to use the service in the vault.</p>
  */
 public class VaultSubscription extends ServiceEndpoint
 	implements SubscriptionService<VaultInfo>, PaymentService {
