@@ -10,11 +10,12 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Mongo database service.
  *
- * TODO: refine APIs like *One, *Many, find*.
+ * <p>TODO: refine APIs like *One, *Many, find*.</p>
  */
 public interface DatabaseService {
 	/**
 	 * Lets the vault owner create a collection on database.
+	 *
 	 * @param name the collection name
 	 * @return fail(false) or success(true)
 	 */
@@ -23,6 +24,7 @@ public interface DatabaseService {
 
 	/**
 	 * Lets the vault owner delete a collection on database according to collection name.
+	 *
 	 * @param name the collection name
 	 * @return fail(false) or success(true)
 	 */
@@ -30,7 +32,8 @@ public interface DatabaseService {
 
 
 	/**
-	 * Insert a new document in a given collection
+	 * Insert a new document in a given collection.
+	 *
 	 * @param collection the collection name
 	 * @param doc The document to insert. Must be a mutable mapping type. If
 	 *			the document does not have an _id field one will be added automatically
@@ -42,7 +45,8 @@ public interface DatabaseService {
 
 
 	/**
-	 * Insert many new documents in a given collection
+	 * Insert many new documents in a given collection.
+	 *
 	 * @param collection the collection name
 	 * @param docs The document to insert. Must be a mutable mapping type. If the
 	 *			 document does not have an _id field one will be added automatically.
@@ -56,7 +60,8 @@ public interface DatabaseService {
 
 
 	/**
-	 * Count documents
+	 * Count documents.
+	 *
 	 * @param collection the collection name
 	 * @param query The document of filter
 	 * @param options
@@ -69,7 +74,8 @@ public interface DatabaseService {
 
 
 	/**
-	 * Find a specific document
+	 * Find a specific document.
+	 *
 	 * @param collection the collection name
 	 * @param query optional, a JSON object specifying elements which must be present for a document to be included in the result set
 	 * @param options optional,refer to {@link FindOptions}
@@ -78,7 +84,8 @@ public interface DatabaseService {
 	CompletableFuture<JsonNode> findOne(String collection, JsonNode query, FindOptions options);
 
 	/**
-	 * Find many documents
+	 * Find many documents.
+	 *
 	 * @param collection the collection name
 	 * @param query optional, a JSON object specifying elements which must be present for a document to be included in the result set
 	 * @param options optional,refer to {@link FindOptions}
@@ -88,6 +95,7 @@ public interface DatabaseService {
 
 	/**
 	 * Find many documents by many options.
+	 *
 	 * @param collection the collection name
 	 * @param query optional, a JSON object specifying elements which must be present for a document to be included in the result set
 	 * @param options optional,refer to {@link QueryOptions}
@@ -96,7 +104,8 @@ public interface DatabaseService {
 	CompletableFuture<List<JsonNode>> query(String collection, JsonNode query, QueryOptions options);
 
 	/**
-	 * Update an existing document in a given collection
+	 * Update an existing document in a given collection.
+	 *
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to update.
 	 * @param update The modifications to apply.
@@ -107,7 +116,8 @@ public interface DatabaseService {
 
 
 	/**
-	 * Update many existing documents in a given collection
+	 * Update many existing documents in a given collection.
+	 *
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to update.
 	 * @param update The modifications to apply.
@@ -118,7 +128,8 @@ public interface DatabaseService {
 
 
 	/**
-	 * Delete an existing document in a given collection
+	 * Delete an existing document in a given collection.
+	 *
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to delete.
 	 * @return Delete result
@@ -127,7 +138,8 @@ public interface DatabaseService {
 
 
 	/**
-	 * Delete many existing documents in a given collection
+	 * Delete many existing documents in a given collection.
+	 *
 	 * @param collection the collection name
 	 * @param filter A query that matches the document to delete.
 	 * @return Delete result

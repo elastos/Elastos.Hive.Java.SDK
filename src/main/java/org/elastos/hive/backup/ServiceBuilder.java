@@ -5,7 +5,8 @@ import org.elastos.hive.service.PromotionService;
 
 /**
  * The service builder for the services of the backup hive node.
- * TODO: to be implemented.
+ *
+ * <p>TODO: to be implemented.</p>
  */
 public class ServiceBuilder {
 	private ServiceEndpoint backup;

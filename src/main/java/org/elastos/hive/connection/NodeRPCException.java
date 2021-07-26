@@ -4,7 +4,8 @@ import java.io.IOException;
 
 /**
  * Main error response exception for internal usage.
- * The APIs of SDK need translate this to the specific exception.
+ *
+ * <p>The APIs of SDK need translate this to the specific exception.</p>
  */
 public class NodeRPCException extends IOException {
 	private static final long serialVersionUID = 1L;

@@ -18,7 +18,8 @@ import java.util.concurrent.CompletionException;
 
 /**
  * The backup subscription is for subscribe or unsubscribe the backup service.
- * With the backup service, the vault data can be backup for security purpose.
+ *
+ * <p>With the backup service, the vault data can be backup for security purpose.</p>
  */
 public class BackupSubscription extends ServiceEndpoint
 				implements SubscriptionService<BackupInfo>, PaymentService {
