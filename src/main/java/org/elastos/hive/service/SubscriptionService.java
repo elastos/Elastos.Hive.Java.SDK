@@ -37,8 +37,6 @@ public interface SubscriptionService<T> {
 	 * with free pricing plan. When there is already a corresponding service existed,
 	 * no new service would be subscribed or created.
 	 *
-	 * @param credential The credential used to subscribe to a vault or backup service,
-	 *		currently this parameter would be reserved for future usage.
 	 * @return
 	 * 		The basic information of the newly created or existing vault on success,
 	 *	  otherwise, the specific exception would returned in the wrapper.

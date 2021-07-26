@@ -44,6 +44,19 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Network connection for accessing hive node with restful APIs.
+ *
+ * The access token management is required for the sub-class implicitly.
+ *
+ * For file uploading, direct connection need be created for uploading stream.
+ *
+ * 		HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
+ * 		OutputStream outputStream = new UploadOutputStream(urlConnection, urlConnection.getOutputStream());
+ *
+ * For other APIs, please directly create the relating service.
+ *
+ * 		FilesAPI filesAPI = connection.createService(FilesAPI.class, true);
+ * 		String hashCode = filesAPI.getHash(path).execute().body().getHash();
+ *
  */
 public abstract class NodeRPCConnection {
 	private static final Logger log = LoggerFactory.getLogger(NodeRPCConnection.class);
