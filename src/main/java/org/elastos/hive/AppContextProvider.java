@@ -4,7 +4,7 @@ import java.util.concurrent.CompletableFuture;
 import org.elastos.did.DIDDocument;
 
 /**
- * The application context provider.
+ * The provider of the application context provides some information for communicate with the hive node.
  */
 public interface AppContextProvider {
 	/**

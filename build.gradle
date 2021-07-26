@@ -99,10 +99,9 @@ task javadocJar(type: Jar, dependsOn: createjavadoc) {
     from createjavadoc.destinationDir
 }
 
-// Generate java source and API docs .jar file
-artifacts {
-    archives sourcesJar
-    archives javadocJar
+task jars {
+    dependsOn sourcesJar
+    dependsOn javadocJar
 }
 
 publish {

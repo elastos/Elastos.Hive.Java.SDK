@@ -5,7 +5,16 @@ import org.elastos.hive.vault.ServiceBuilder;
 
 /**
  * This class explicitly represents the vault service subscribed by "userDid".
- * The services belongs to the vault will be got by this class.
+ *
+ * To use the vault, subscription is required.
+ *
+ * 		VaultSubscription subscription = new VaultSubscription(appContext, providerAddress);
+ * 		subscription.subscribe().get();
+ *
+ * Then the services belongs to the vault will be got by this class.
+ *
+ * 		Vault vault = new Vault(appContext, providerAddress);
+ * 		FilesService filesService = vault.getFilesService();
  */
 public class Vault extends ServiceEndpoint {
 	private FilesService 	filesService;

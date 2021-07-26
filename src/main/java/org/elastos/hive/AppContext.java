@@ -18,11 +18,11 @@ import org.elastos.hive.exception.BadContextProviderException;
 import org.elastos.hive.exception.DIDNotPublishedException;
 import org.elastos.hive.exception.NetworkException;
 import org.elastos.hive.exception.DIDResolverNotSetupException;
-import org.elastos.hive.exception.DIDResolverSetupException;
 import org.elastos.hive.exception.DIDResoverAlreadySetupException;
 
 /**
  * The application context would contain the resources list below:
+ *
  *  - the reference of application context provider;
  *  - the user did which uses this application.
  *
