@@ -3,56 +3,53 @@ package org.elastos.hive.demo.sdk.did;
 import org.elastos.did.DID;
 import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDStore;
-import org.elastos.did.adapter.DummyAdapter;
+import org.elastos.did.RootIdentity;
 import org.elastos.did.exception.DIDException;
+import org.elastos.hive.demo.sdk.Utils;
 
+import java.io.File;
 import java.util.List;
 
 class DIDEntity {
-	private String phrasepass;
-	protected String storepass;
+	private final String name;
+	private final String phrasepass;
+	protected final String storepass;
 
-	private String name;
+	private RootIdentity identity;
 	private DIDStore store;
 	private DID did;
-	private String storeRootDir;
 
-	private static DummyAdapter adapter;
-
-	protected DIDEntity(String name, String mnemonic, DummyAdapter adapter, String phrasepass, String storepass, String storeRootDir) throws DIDException {
+	protected DIDEntity(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
+		this.name = name;
 		this.phrasepass = phrasepass;
 		this.storepass = storepass;
-		this.name = name;
-		this.adapter = adapter;
-		this.storeRootDir = storeRootDir;
 
 		initPrivateIdentity(mnemonic);
 		initDid();
 	}
 
 	protected void initPrivateIdentity(String mnemonic) throws DIDException {
-		String storeDir = this.storeRootDir + "/" + this.name;
-		store = DIDStore.open("filesystem", storeDir, adapter);
+		final String storePath = Utils.getLocalRootDir() + File.separator + "data/didCache" + File.separator + name;
 
-		if (store.containsPrivateIdentity())
+		store = DIDStore.open(storePath);
+
+		String id = RootIdentity.getId(mnemonic, phrasepass);
+		if (store.containsRootIdentity(id))
 			return; // Already exists
 
-		store.initPrivateIdentity(null, mnemonic, phrasepass, storepass);
+		this.identity = RootIdentity.create(mnemonic, phrasepass, store, storepass);
+
+		identity.synchronize(0);
 	}
 
 	protected void initDid() throws DIDException {
-		List<DID> dids = store.listDids(DIDStore.DID_HAS_PRIVATEKEY);
+		List<DID> dids = store.listDids();
 		if (dids.size() > 0) {
-			for (DID did : dids) {
-				if (did.getMetadata().getAlias().equals("me")) {
-					System.out.format("[%s] My DID: %s%n", name, did);
-					this.did = did;
-					return;
-				}
-			}
+			this.did = dids.get(0);
+			return;
 		}
 
-		DIDDocument doc = store.newDid("me", storepass);
+		DIDDocument doc = identity.newDid(storepass);
 		this.did = doc.getSubject();
 		System.out.format("[%s] My new DID created: %s%n", name, did);
 	}
@@ -75,5 +72,10 @@ class DIDEntity {
 
 	protected String getStorePassword() {
 		return storepass;
+	}
+
+	@Override
+	public String toString() {
+		return this.did.toString();
 	}
 }

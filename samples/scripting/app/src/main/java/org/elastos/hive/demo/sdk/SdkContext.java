@@ -1,15 +1,11 @@
 package org.elastos.hive.demo.sdk;
 
 import android.content.res.AssetManager;
-import android.os.Build;
-import android.os.Environment;
-
-import androidx.annotation.RequiresApi;
 
 import org.elastos.did.DIDDocument;
-import org.elastos.did.adapter.DummyAdapter;
 import org.elastos.did.exception.DIDException;
 import org.elastos.did.jwt.Claims;
+import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.AppContext;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.Backup;
@@ -19,12 +15,11 @@ import org.elastos.hive.demo.sdk.config.ApplicationConfig;
 import org.elastos.hive.demo.sdk.config.ClientConfig;
 import org.elastos.hive.demo.sdk.config.NodeConfig;
 import org.elastos.hive.demo.sdk.config.UserConfig;
-import org.elastos.hive.demo.sdk.did.DApp;
-import org.elastos.hive.demo.sdk.did.DIDApp;
+import org.elastos.hive.demo.sdk.did.AppDID;
+import org.elastos.hive.demo.sdk.did.UserDID;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.BackupService;
 import org.elastos.hive.service.HiveBackupContext;
-import org.elastos.hive.utils.JwtUtil;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -32,10 +27,9 @@ import java.util.concurrent.CompletionException;
 public class SdkContext {
     private static SdkContext instance = null;
 
-    private DIDApp userDid;
-    private DIDApp userDidCaller;
-    private String callerDid;
-    private DApp appInstanceDid;
+    private UserDID userDid;
+    private UserDID callerDid;
+    private AppDID appInstanceDid;
     private NodeConfig nodeConfig;
     private AppContext context;
     private AppContext contextCaller;
@@ -54,18 +48,12 @@ public class SdkContext {
         init();
     }
 
-    private String getLocalRootDir() {
-        String rootDir = Environment.getDataDirectory().getAbsolutePath() + "/data/org.elastos.hive.demo";
-        System.setProperty("user.dir", rootDir);
-        return rootDir;
-    }
-
     private String getLocalDidCacheDir(String envName) {
-        return getLocalRootDir() + "/hive/" + envName + "/didCache";
+        return Utils.getLocalRootDir() + "/hive/" + envName + "/didCache";
     }
 
     private String getLocalDidStoreRootDir(String envName) {
-        return getLocalRootDir() + "/hive/" + envName + "/store";
+        return Utils.getLocalRootDir() + "/hive/" + envName + "/store";
     }
 
     public void init() throws HiveException, DIDException {
@@ -88,29 +76,22 @@ public class SdkContext {
 
         AppContext.setupResolver(clientConfig.resolverUrl(), getLocalDidCacheDir(nodeConfig.storePath()));
 
-        DummyAdapter adapter = new DummyAdapter();
         ApplicationConfig applicationConfig = clientConfig.applicationConfig();
-        appInstanceDid = new DApp(applicationConfig.name(),
+        appInstanceDid = new AppDID(applicationConfig.name(),
                 applicationConfig.mnemonic(),
-                adapter,
                 applicationConfig.passPhrase(),
-                applicationConfig.storepass(),
-                getLocalDidStoreRootDir(nodeConfig.storePath()));
+                applicationConfig.storepass());
 
         UserConfig userConfig = clientConfig.userConfig();
-        userDid = new DIDApp(userConfig.name(),
+        userDid = new UserDID(userConfig.name(),
                 userConfig.mnemonic(),
-                adapter,
                 userConfig.passPhrase(),
-                userConfig.storepass(),
-                getLocalDidStoreRootDir(nodeConfig.storePath()));
+                userConfig.storepass());
         UserConfig userConfigCaller = clientConfig.crossConfig().userConfig();
-        userDidCaller = new DIDApp(userConfigCaller.name(),
+        callerDid = new UserDID(userConfigCaller.name(),
                 userConfigCaller.mnemonic(),
-                adapter,
                 userConfigCaller.passPhrase(),
-                userConfigCaller.storepass(),
-                getLocalDidStoreRootDir(nodeConfig.storePath()));
+                userConfigCaller.storepass());
 
         //初始化Application Context
         context = AppContext.build(new AppContextProvider() {
@@ -129,24 +110,22 @@ public class SdkContext {
                 return null;
             }
 
-            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public CompletableFuture<String> getAuthorization(String jwtToken) {
                 return CompletableFuture.supplyAsync(() -> {
                     try {
-                        Claims claims = JwtUtil.getBody(jwtToken);
+                        Claims claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
                         if (claims == null)
                             throw new HiveException("Invalid jwt token as authorization.");
                         return appInstanceDid.createToken(appInstanceDid.createPresentation(
                                 userDid.issueDiplomaFor(appInstanceDid),
-                                claims.getIssuer(),
-                                (String) claims.get("nonce")), claims.getIssuer());
+                                claims.getIssuer(), (String) claims.get("nonce")), claims.getIssuer());
                     } catch (Exception e) {
                         throw new CompletionException(new HiveException(e.getMessage()));
                     }
                 });
             }
-        }, nodeConfig.ownerDid());
+        }, userDid.toString());
 
         contextCaller = AppContext.build(new AppContextProvider() {
             @Override
@@ -168,11 +147,11 @@ public class SdkContext {
             public CompletableFuture<String> getAuthorization(String jwtToken) {
                 return CompletableFuture.supplyAsync(() -> {
                     try {
-                        Claims claims = JwtUtil.getBody(jwtToken);
+                        Claims claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
                         if (claims == null)
                             throw new HiveException("Invalid jwt token as authorization.");
                         return appInstanceDid.createToken(appInstanceDid.createPresentation(
-                                userDidCaller.issueDiplomaFor(appInstanceDid),
+                                callerDid.issueDiplomaFor(appInstanceDid),
                                 claims.getIssuer(),
                                 (String) claims.get("nonce")), claims.getIssuer());
                     } catch (Exception e) {
@@ -180,16 +159,11 @@ public class SdkContext {
                     }
                 });
             }
-        }, userConfigCaller.did());
-        callerDid = userConfigCaller.did();
+        }, callerDid.toString());
     }
 
     public AppContext getAppContext() {
         return this.context;
-    }
-
-    public String getOwnerDid() {
-        return nodeConfig.ownerDid();
     }
 
     public String getProviderAddress() {
@@ -244,12 +218,16 @@ public class SdkContext {
         return bs;
     }
 
-    public String getAppId() {
-        return appInstanceDid.appId;
+    public String getAppDid() {
+        return appInstanceDid.getAppDid();
+    }
+
+    public String getUserDid() {
+        return userDid.toString();
     }
 
     public String getCallerDid() {
-        return this.callerDid;
+        return this.callerDid.toString();
     }
 
     private enum EnvironmentType {

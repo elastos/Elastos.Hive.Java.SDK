@@ -3,8 +3,6 @@ package org.elastos.hive.demo.sdk.config;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserConfig extends Config {
-	@JsonProperty("did")
-	private String did;
 	@JsonProperty("name")
 	private String name;
 	@JsonProperty("mnemonic")
@@ -13,10 +11,6 @@ public class UserConfig extends Config {
 	private String passPhrase;
 	@JsonProperty("storepass")
 	private String storepass;
-
-	public String did() {
-		return this.did;
-	}
 
 	public String name() {
 		return this.name;
