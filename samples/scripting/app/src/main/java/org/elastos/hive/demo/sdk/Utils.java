@@ -1,6 +1,7 @@
 package org.elastos.hive.demo.sdk;
 
 import android.content.res.AssetManager;
+import android.os.Environment;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +12,17 @@ import java.util.Properties;
 
 public class Utils {
 	public static AssetManager assetManager = null;
+
+	/**
+	 * Base folder to save the application data.
+	 *
+	 * <p>Here is "/data/data/org.elastos.hive.demo"</p>
+	 *
+	 * @return local data dir
+	 */
+	public static String getLocalRootDir() {
+		return Environment.getDataDirectory().getAbsolutePath() + "/data/org.elastos.hive.demo";
+	}
 
 	public static boolean deleteFile(String path) {
 		File file = new File(path);
