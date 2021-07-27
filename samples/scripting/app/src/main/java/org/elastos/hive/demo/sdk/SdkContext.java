@@ -87,7 +87,9 @@ public class SdkContext {
                 userConfig.mnemonic(),
                 userConfig.passPhrase(),
                 userConfig.storepass());
-        UserConfig userConfigCaller = clientConfig.crossConfig().userConfig();
+//        UserConfig userConfigCaller = clientConfig.crossConfig().userConfig();
+        // TODO: caller should be other guy.
+        UserConfig userConfigCaller = clientConfig.userConfig();
         callerDid = new UserDID(userConfigCaller.name(),
                 userConfigCaller.mnemonic(),
                 userConfigCaller.passPhrase(),

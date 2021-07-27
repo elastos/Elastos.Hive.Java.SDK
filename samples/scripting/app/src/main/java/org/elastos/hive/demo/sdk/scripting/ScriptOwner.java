@@ -20,35 +20,38 @@ public class ScriptOwner {
     private ScriptingService scriptingService;
     private DatabaseService databaseService;
 
-    private String ownerDid;
     private String callDid;
-    private String appDid;
 
     public ScriptOwner(SdkContext sdkContext) {
         this.sdkContext = sdkContext;
         scriptingService = this.sdkContext.newVault().getScriptingService();
         databaseService = this.sdkContext.newVault().getDatabaseService();
-        ownerDid = this.sdkContext.getUserDid();
         callDid = this.sdkContext.getCallerDid();
-        appDid = this.sdkContext.getAppDid();
     }
 
-    public CompletableFuture<Boolean> setScript() {
-        // Create COLLECTION_GROUP to record the permission of the user DID.
-        CompletableFuture<Void> createGroup = databaseService.createCollection(ScriptConst.COLLECTION_GROUP);
-        // Create COLLECTION_GROUP_MESSAGE to keep the messages of the application.
-        CompletableFuture<Void> createMessage = databaseService.createCollection(ScriptConst.COLLECTION_GROUP_MESSAGE);
+    private CompletableFuture<Void> cleanTwoCollections() {
+        return databaseService.deleteCollection(ScriptConst.COLLECTION_GROUP)
+                .thenCompose(s -> databaseService.deleteCollection(ScriptConst.COLLECTION_GROUP_MESSAGE));
+    }
 
+    private CompletableFuture<Void> createTwoCollections() {
+        return databaseService.createCollection(ScriptConst.COLLECTION_GROUP)
+                .thenCompose(s->databaseService.createCollection(ScriptConst.COLLECTION_GROUP_MESSAGE));
+    }
+
+    private CompletableFuture<InsertResult> addPermission2Caller() {
         // The document to save the permission of the user DID.
         ObjectNode conditionDoc = JsonNodeFactory.instance.objectNode();
         conditionDoc.put("collection", ScriptConst.COLLECTION_GROUP_MESSAGE);
         conditionDoc.put("did", callDid);
         // Insert persmission to COLLECTION_GROUP
-        CompletableFuture<InsertResult> addPermission = databaseService.insertOne(
+        return databaseService.insertOne(
                 ScriptConst.COLLECTION_GROUP,
                 conditionDoc,
                 new InsertOptions().bypassDocumentValidation(false));
+    }
 
+    private CompletableFuture<Void> doSetScript() {
         // The condition to restrict the user DID.
         ObjectNode filter = JsonNodeFactory.instance.objectNode();
         filter.put("collection",ScriptConst.COLLECTION_GROUP_MESSAGE);
@@ -61,15 +64,16 @@ public class ScriptOwner {
         options.put("bypass_document_validation", false);
         options.put("ordered", true);
         // register the script for caller to insert message to COLLECTION_GROUP_MESSAGE
-        CompletableFuture<Void> setScript = scriptingService.registerScript(ScriptConst.SCRIPT_NAME,
-                new QueryHasResultCondition("verify_user_permission",ScriptConst.COLLECTION_GROUP, filter),
+        return scriptingService.registerScript(ScriptConst.SCRIPT_NAME,
+                new QueryHasResultCondition("verify_user_permission", ScriptConst.COLLECTION_GROUP, filter),
                 new InsertExecutable(ScriptConst.SCRIPT_NAME, ScriptConst.COLLECTION_GROUP_MESSAGE, msgDoc, options),
                 false, false);
-        return createGroup.thenCombineAsync(createMessage, (r1, r2)-> true)
-                .thenCombineAsync(addPermission, (r1, r2)->{
-                    if (r2.getInsertedIds() == null || r2.getInsertedIds().isEmpty())
-                        throw new CompletionException(new Exception("Failed to add permission."));
-                    return true;
-                }).thenCombineAsync(setScript, (r1, r2)-> true);
+    }
+
+    public CompletableFuture<Void> setScript() {
+        return cleanTwoCollections()
+                .thenCompose(s->createTwoCollections())
+                .thenCompose(s->addPermission2Caller())
+                .thenCompose(s->doSetScript());
     }
 }
