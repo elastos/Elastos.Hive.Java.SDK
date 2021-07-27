@@ -12,12 +12,12 @@ import java.util.concurrent.CompletableFuture;
 public class ScriptCaller {
     private ScriptRunner scriptRunner;
 
-    private String ownerDid;
+    private String userDid;
     private String appDid;
 
     public ScriptCaller(SdkContext sdkContext) {
         scriptRunner = sdkContext.newCallerScriptRunner();
-        ownerDid = sdkContext.getUserDid();
+        userDid = sdkContext.getUserDid();
         appDid = sdkContext.getAppDid();
     }
 
@@ -26,6 +26,6 @@ public class ScriptCaller {
         params.put("author", "John");
         params.put("content", "message");
         return scriptRunner.callScript(ScriptConst.SCRIPT_NAME,
-                params, ownerDid, appDid, JsonNode.class);
+                params, userDid, appDid, JsonNode.class);
     }
 }

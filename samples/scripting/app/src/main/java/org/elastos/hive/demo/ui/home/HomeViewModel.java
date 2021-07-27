@@ -31,7 +31,7 @@ public class HomeViewModel extends ViewModel {
 
     public void setScript() {
         this.mainActivity.loading(true);
-        this.scriptOwner.setScript().handleAsync(
+        this.scriptOwner.setScript().whenCompleteAsync(
                 (result, e)-> {
                     String msg = e == null ? "Success" : "Failed: " + e.getMessage();
                     mainActivity.runOnUiThread(() -> {
@@ -39,7 +39,6 @@ public class HomeViewModel extends ViewModel {
                         mText.setValue(msg);
                         mainActivity.loading(false);
                     });
-                    return true;
                 });
     }
 }
