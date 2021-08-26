@@ -9,9 +9,9 @@ public class VaultInfo {
 	@SerializedName("service_did")
 	private String serviceDid;
 	@SerializedName("storage_quota")
-	private float storageQuota;
+	private long storageQuota;
 	@SerializedName("storage_used")
-	private float storageUsed;
+	private long storageUsed;
 	@SerializedName("created")
 	private long created;
 	@SerializedName("updated")
@@ -47,11 +47,11 @@ public class VaultInfo {
 		return serviceDid;
 	}
 
-	public float getStorageQuota() {
+	public long getStorageQuota() {
 		return storageQuota;
 	}
 
-	public float getStorageUsed() {
+	public long getStorageUsed() {
 		return storageUsed;
 	}
 
