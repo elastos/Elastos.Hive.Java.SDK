@@ -137,7 +137,7 @@ public class DatabaseController {
 	 */
 	public UpdateResult updateOne(String collectionName, JsonNode filter,
 								  JsonNode update, UpdateOptions options) throws HiveException {
-		throw new NotImplementedException();
+		return updateInternal(collectionName, false, filter, update, options);
 	}
 
 	/**
@@ -154,8 +154,18 @@ public class DatabaseController {
 								   JsonNode filter,
 								   JsonNode update,
 								   UpdateOptions options) throws HiveException {
+		return updateInternal(collectionName, true, filter, update, options);
+	}
+
+	private UpdateResult updateInternal(String collectionName,
+										boolean updateOne,
+										JsonNode filter,
+										JsonNode update,
+										UpdateOptions options) throws HiveException {
 		try {
-			return databaseAPI.update(collectionName, new UpdateParams(filter, update, options)).execute().body();
+			return databaseAPI.update(collectionName,
+					updateOne ? "true" : "false",
+					new UpdateParams(filter, update, options)).execute().body();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:
@@ -184,7 +194,7 @@ public class DatabaseController {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	public int deleteOne(String collectionName, JsonNode filter, DeleteOptions options) throws HiveException {
-		throw new NotImplementedException();
+		return deleteInternal(collectionName, false, filter, options);
 	}
 
 	/**
@@ -197,9 +207,16 @@ public class DatabaseController {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	public int deleteMany(String collectionName, JsonNode filter, DeleteOptions options) throws HiveException {
+		return deleteInternal(collectionName, true, filter, options);
+	}
+
+	private int deleteInternal(String collectionName, boolean deleteOne, JsonNode filter, DeleteOptions options)
+			throws HiveException {
 		try {
 			// TODO: refine delete API to return something first.
-			databaseAPI.delete(collectionName, new DeleteParams(filter, options)).execute().body();
+			databaseAPI.delete(collectionName,
+					deleteOne ? "true" : "false",
+					new DeleteParams(filter, options)).execute().body();
 			return 0;
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {

@@ -12,25 +12,27 @@ interface DatabaseAPI {
 
 	@POST("/api/v2/vault/db/collection/{collection}")
 	Call<InsertResult> insert(@Path("collection") String collection,
-				@Body InsertParams params);
+							  @Body InsertParams params);
 
-	@PATCH("/api/v2/vault/db/collection/{collection}")
+	@PATCH("/api/v2/vault/db/collection/{collection}?updateone={updateone}")
 	Call<UpdateResult> update(@Path("collection") String collection,
-				@Body UpdateParams params);
+							  @Path("updateone") String updateOne,
+							  @Body UpdateParams params);
 
-	@HTTP(method = "DELETE", path = "/api/v2/vault/db/collection/{collection}", hasBody = true)
+	@HTTP(method = "DELETE", path = "/api/v2/vault/db/collection/{collection}?deleteone={deleteone}", hasBody = true)
 	Call<DeleteResult> delete(@Path("collection") String collection,
-				@Body DeleteParams params);
+							  @Path("deleteone") String deleteOne,
+							  @Body DeleteParams params);
 
 	@POST("/api/v2/vault/db/collection/{collection}?op=count")
 	Call<CountResult> count(@Path("collection") String collection,
-				@Body CountParams params);
+							@Body CountParams params);
 
 	@GET("/api/v2/vault/db/{collection}")
 	Call<FindResult> find(@Path("collection") String collection,
-				@Query("filter") String filter,
-				@Query("skip") String skip,
-				@Query("limit") String limit);
+						  @Query("filter") String filter,
+						  @Query("skip") String skip,
+						  @Query("limit") String limit);
 
 	@POST("/api/v2/vault/db/query")
 	Call<QueryResult> query(@Body QueryParams params);
