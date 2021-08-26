@@ -14,14 +14,14 @@ interface DatabaseAPI {
 	Call<InsertResult> insert(@Path("collection") String collection,
 							  @Body InsertParams params);
 
-	@PATCH("/api/v2/vault/db/collection/{collection}?updateone={updateone}")
+	@PATCH("/api/v2/vault/db/collection/{collection}")
 	Call<UpdateResult> update(@Path("collection") String collection,
-							  @Path("updateone") String updateOne,
+							  @Query("updateone") String updateOne,
 							  @Body UpdateParams params);
 
-	@HTTP(method = "DELETE", path = "/api/v2/vault/db/collection/{collection}?deleteone={deleteone}", hasBody = true)
+	@HTTP(method = "DELETE", path = "/api/v2/vault/db/collection/{collection}", hasBody = true)
 	Call<DeleteResult> delete(@Path("collection") String collection,
-							  @Path("deleteone") String deleteOne,
+							  @Query("deleteone") String deleteOne,
 							  @Body DeleteParams params);
 
 	@POST("/api/v2/vault/db/collection/{collection}?op=count")
