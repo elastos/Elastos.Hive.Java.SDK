@@ -17,6 +17,7 @@ class BackupServiceTest {
 		Assertions.assertDoesNotThrow(()->backupService.startBackup().get());
 	}
 
+	@Disabled
 	@Test @Order(2) void testCheckResult() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(backupService.checkResult().get()));
 	}
