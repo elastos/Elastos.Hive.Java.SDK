@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.exception.NotFoundException;
 import org.elastos.hive.vault.database.InsertOptions;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.ScriptingService;
@@ -19,6 +20,7 @@ class ScriptingCrossingTest {
 	private static final String COLLECTION_GROUP_MESSAGE = "st_group_message";
 	private static final String SCRIPT_NAME = "get_group_message";
 
+	private static VaultSubscription subscription;
 	private static ScriptingService scriptingService;
 	private static ScriptRunner scriptRunner;
 	private static DatabaseService databaseService;
@@ -29,6 +31,7 @@ class ScriptingCrossingTest {
 
 	@BeforeAll
 	public static void setUp() {
+		trySubscribeVault();
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
 			scriptingService = testData.newVault().getScriptingService();
@@ -38,6 +41,18 @@ class ScriptingCrossingTest {
 			appDid = testData.getAppDid();
 			callDid = testData.getCallerDid();
 		});
+	}
+
+	private static void trySubscribeVault() {
+		Assertions.assertDoesNotThrow(()->{
+			TestData testData = TestData.getInstance();
+			subscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
+		});
+		try {
+			subscription.subscribe();
+		} catch (NotFoundException e) {
+			// do nothing.
+		}
 	}
 
 	/**

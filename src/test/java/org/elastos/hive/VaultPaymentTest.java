@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.exception.NotFoundException;
 import org.elastos.hive.subscription.payment.Order;
 import org.elastos.hive.subscription.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
@@ -15,13 +16,27 @@ class VaultPaymentTest {
 	private static final String TRANS_ID = "280a24034bfb241c31b5a73c792c9d05df2b1f79bb98733c5358aeb909c27010";
 	private static final String PRICING_PLAN_NAME = "Rookie";
 
+	private static VaultSubscription subscription;
 	private static PaymentService paymentService;
 
 	@BeforeAll public static void setUp() {
+		trySubscribeVault();
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
 			paymentService = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
 		});
+	}
+
+	private static void trySubscribeVault() {
+		Assertions.assertDoesNotThrow(()->{
+			TestData testData = TestData.getInstance();
+			subscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
+		});
+		try {
+			subscription.subscribe();
+		} catch (NotFoundException e) {
+			// do nothing.
+		}
 	}
 
 	@Test @org.junit.jupiter.api.Order(1)
