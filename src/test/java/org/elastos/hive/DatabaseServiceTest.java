@@ -21,11 +21,26 @@ class DatabaseServiceTest {
 	private static final String COLLECTION_NAME = "works";
 	private static final String COLLECTION_NAME_NOT_EXIST = "works_not_exists";
 
+	private static VaultSubscription subscription;
 	private static DatabaseService databaseService;
 
 	@BeforeAll public static void setUp() {
-		Assertions.assertDoesNotThrow(()->databaseService = TestData.getInstance()
-				.newVault().getDatabaseService());
+		trySubscribeVault();
+		Assertions.assertDoesNotThrow(()->{
+			databaseService = TestData.getInstance().newVault().getDatabaseService();
+		});
+	}
+
+	private static void trySubscribeVault() {
+		Assertions.assertDoesNotThrow(()->{
+			TestData testData = TestData.getInstance();
+			subscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
+		});
+		try {
+			subscription.subscribe();
+		} catch (NotFoundException e) {
+			// do nothing.
+		}
 	}
 
 	private void deleteCollectionAnyway() {

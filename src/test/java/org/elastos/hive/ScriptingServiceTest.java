@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Throwables;
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.exception.NotFoundException;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.service.ScriptingService;
@@ -35,6 +36,7 @@ class ScriptingServiceTest {
 	private static String targetDid;
 	private static String appDid;
 
+	private static VaultSubscription subscription;
 	private static FilesService filesService;
 	private static DatabaseService databaseService;
 	private static ScriptingService scriptingService;
@@ -54,6 +56,7 @@ class ScriptingServiceTest {
 	}
 
 	@BeforeAll public static void setUp() {
+		trySubscribeVault();
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
 			scriptingService = testData.newVault().getScriptingService();
@@ -63,6 +66,18 @@ class ScriptingServiceTest {
 			targetDid = testData.getUserDid();
 			appDid = testData.getAppDid();
 		});
+	}
+
+	private static void trySubscribeVault() {
+		Assertions.assertDoesNotThrow(()->{
+			TestData testData = TestData.getInstance();
+			subscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
+		});
+		try {
+			subscription.subscribe();
+		} catch (NotFoundException e) {
+			// do nothing.
+		}
 	}
 
 	@AfterAll public static void tearDown() {

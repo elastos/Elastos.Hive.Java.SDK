@@ -1,15 +1,31 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.exception.NotFoundException;
 import org.elastos.hive.service.BackupService;
 import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BackupServiceTest {
+
+	private static VaultSubscription subscription;
 	private static BackupService backupService;
 
 	@BeforeAll public static void setUp() {
+		trySubscribeVault();
 		Assertions.assertDoesNotThrow(()->backupService = TestData.getInstance().getBackupService());
+	}
+
+	private static void trySubscribeVault() {
+		Assertions.assertDoesNotThrow(()->{
+			TestData testData = TestData.getInstance();
+			subscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
+		});
+		try {
+			subscription.subscribe();
+		} catch (NotFoundException e) {
+			// do nothing.
+		}
 	}
 
 	@Disabled
