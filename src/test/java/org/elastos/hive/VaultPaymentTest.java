@@ -21,22 +21,14 @@ class VaultPaymentTest {
 
 	@BeforeAll public static void setUp() {
 		trySubscribeVault();
-		Assertions.assertDoesNotThrow(()->{
-			TestData testData = TestData.getInstance();
-			paymentService = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
-		});
+		Assertions.assertDoesNotThrow(()->paymentService = TestData.getInstance().newVaultSubscription());
 	}
 
 	private static void trySubscribeVault() {
-		Assertions.assertDoesNotThrow(()->{
-			TestData testData = TestData.getInstance();
-			subscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
-		});
+		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
 		try {
 			subscription.subscribe();
-		} catch (NotFoundException e) {
-			// do nothing.
-		}
+		} catch (NotFoundException e) {}
 	}
 
 	@Test @org.junit.jupiter.api.Order(1)

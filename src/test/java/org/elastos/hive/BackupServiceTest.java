@@ -10,22 +10,26 @@ class BackupServiceTest {
 
 	private static VaultSubscription subscription;
 	private static BackupService backupService;
+	private static BackupSubscription backupSubscription;
 
 	@BeforeAll public static void setUp() {
 		trySubscribeVault();
 		Assertions.assertDoesNotThrow(()->backupService = TestData.getInstance().getBackupService());
+		trySubscribeBackup();
 	}
 
 	private static void trySubscribeVault() {
-		Assertions.assertDoesNotThrow(()->{
-			TestData testData = TestData.getInstance();
-			subscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
-		});
+		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
 		try {
 			subscription.subscribe();
-		} catch (NotFoundException e) {
-			// do nothing.
-		}
+		} catch (NotFoundException e) {}
+	}
+
+	private static void trySubscribeBackup() {
+		Assertions.assertDoesNotThrow(()->backupSubscription = TestData.getInstance().newBackupSubscription());
+		try {
+			backupSubscription.subscribe();
+		} catch (NotFoundException e) {}
 	}
 
 	@Disabled
@@ -33,7 +37,6 @@ class BackupServiceTest {
 		Assertions.assertDoesNotThrow(()->backupService.startBackup().get());
 	}
 
-	@Disabled
 	@Test @Order(2) void testCheckResult() {
 		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(backupService.checkResult().get()));
 	}

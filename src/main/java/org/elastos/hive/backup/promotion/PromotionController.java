@@ -1,23 +1,37 @@
 package org.elastos.hive.backup.promotion;
 
 import org.elastos.hive.connection.NodeRPCConnection;
-import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NotImplementedException;
+import org.elastos.hive.connection.NodeRPCException;
+import org.elastos.hive.exception.*;
+
+import java.io.IOException;
+import java.security.InvalidParameterException;
 
 public class PromotionController {
-	public PromotionController(NodeRPCConnection connection) {}
+	private PromotionAPI promotionAPI;
+
+	public PromotionController(NodeRPCConnection connection) {
+		this.promotionAPI = connection.createService(PromotionAPI.class, true);
+	}
 
 	public void promote() throws HiveException {
-		throw new NotImplementedException();
-
-		/*
 		try {
-			api.promoteToVault().execute().body();
+			promotionAPI.promoteToVault().execute();
 		} catch (NodeRPCException e) {
-			throw new UnknownServerException(e);
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.ALREADY_EXISTS:
+					throw new VaultAlreadyExistsException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.INSUFFICIENT_STORAGE:
+					throw new InsufficientStorageException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}
-		*/
 	}
 }

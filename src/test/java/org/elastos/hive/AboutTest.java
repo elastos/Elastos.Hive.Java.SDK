@@ -9,12 +9,7 @@ class AboutTest {
 	private static VaultSubscription subscription;
 
 	@BeforeAll public static void setup() {
-		Assertions.assertDoesNotThrow(()->{
-			TestData testData = TestData.getInstance();
-			subscription = new VaultSubscription(
-					testData.getAppContext(),
-					testData.getProviderAddress());
-		});
+		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
 	}
 
 	@Test @Order(1) void testGetVersion() {

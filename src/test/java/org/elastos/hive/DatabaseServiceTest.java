@@ -26,21 +26,14 @@ class DatabaseServiceTest {
 
 	@BeforeAll public static void setUp() {
 		trySubscribeVault();
-		Assertions.assertDoesNotThrow(()->{
-			databaseService = TestData.getInstance().newVault().getDatabaseService();
-		});
+		Assertions.assertDoesNotThrow(()->databaseService = TestData.getInstance().newVault().getDatabaseService());
 	}
 
 	private static void trySubscribeVault() {
-		Assertions.assertDoesNotThrow(()->{
-			TestData testData = TestData.getInstance();
-			subscription = new VaultSubscription(testData.getAppContext(), testData.getProviderAddress());
-		});
+		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
 		try {
 			subscription.subscribe();
-		} catch (NotFoundException e) {
-			// do nothing.
-		}
+		} catch (NotFoundException e) {}
 	}
 
 	private void deleteCollectionAnyway() {

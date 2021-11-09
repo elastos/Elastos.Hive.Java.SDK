@@ -11,12 +11,7 @@ class BackupSubscriptionTest {
 	private static BackupSubscription subscription;
 
 	@BeforeAll public static void setup() {
-		Assertions.assertDoesNotThrow(()->{
-			TestData testData = TestData.getInstance();
-			subscription = new BackupSubscription(
-					testData.getAppContext(),
-					testData.getProviderAddress());
-		} );
+		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newBackupSubscription());
 	}
 
 	@Test @Order(1) void testGetPricingPlanList() {
