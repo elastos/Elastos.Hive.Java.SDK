@@ -18,10 +18,10 @@ public class FileInfo {
 	private int size;
 
 	@SerializedName("created")
-	private long created;
+	private double created;
 
 	@SerializedName("updated")
-	private long updated;
+	private double updated;
 
 	public void setName(String name) {
 		this.name = name;
@@ -57,11 +57,11 @@ public class FileInfo {
 
 	public Date getCreated() {
 		// TODO: check
-		return new Date(created * 1000);
+		return new Date((long)created * 1000);
 	}
 
 	public Date getUpdated() {
 		// TODO: check
-		return new Date(updated * 1000);
+		return new Date((long)updated * 1000);
 	}
 }

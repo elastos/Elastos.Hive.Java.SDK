@@ -121,8 +121,8 @@ class FilesServiceTest {
 			Assertions.assertNotNull(files);
 			Assertions.assertTrue(files.size() >= 2);
 			List<String> names = files.stream().map(FileInfo::getName).collect(Collectors.toList());
-			Assertions.assertTrue(names.contains(FILE_NAME_TXT));
-			Assertions.assertTrue(names.contains(FILE_NAME_IMG));
+			Assertions.assertTrue(names.contains(remoteTxtFilePath));
+			Assertions.assertTrue(names.contains(remoteImgFilePath));
 		});
 	}
 
