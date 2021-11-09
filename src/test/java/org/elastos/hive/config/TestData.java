@@ -160,29 +160,41 @@ public class TestData {
 		return this.context;
 	}
 
-	public String getProviderAddress() {
+	public String getVaultProviderAddress() {
 		return nodeConfig.provider();
 	}
 
+	public String getBackupProviderAddress() {
+		return nodeConfig.targetHost();
+	}
+
+	public VaultSubscription newVaultSubscription() throws HiveException {
+		return new VaultSubscription(context, getVaultProviderAddress());
+	}
+
 	public Vault newVault() {
-		return new Vault(context, getProviderAddress());
+		return new Vault(context, getVaultProviderAddress());
 	}
 
 	public ScriptRunner newScriptRunner() {
-		return new ScriptRunner(context, getProviderAddress());
+		return new ScriptRunner(context, getVaultProviderAddress());
 	}
 
 	public ScriptRunner newCallerScriptRunner() {
-		return new ScriptRunner(callerContext, getProviderAddress());
+		return new ScriptRunner(callerContext, getVaultProviderAddress());
+	}
+
+	public BackupSubscription newBackupSubscription() throws HiveException {
+		return new BackupSubscription(context, getBackupProviderAddress());
 	}
 
 	public Backup newBackup() {
-		return new Backup(context, nodeConfig.targetHost());
+		return new Backup(context, getBackupProviderAddress());
 	}
 
 	public BackupService getBackupService() {
-		BackupService bs = this.newVault().getBackupService();
-		bs.setupContext(new HiveBackupContext() {
+		BackupService backupService = this.newVault().getBackupService();
+		backupService.setupContext(new HiveBackupContext() {
 			@Override
 			public String getType() {
 				return null;
@@ -209,7 +221,7 @@ public class TestData {
 				});
 			}
 		});
-		return bs;
+		return backupService;
 	}
 
 	public String getAppDid() {

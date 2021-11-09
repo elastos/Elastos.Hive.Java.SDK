@@ -32,6 +32,7 @@ class FilesServiceTest {
 	private final String remoteNotExistsDirPath;
 	private final String remoteBackupTxtFilePath;
 
+	private static VaultSubscription subscription;
 	private static FilesService filesService;
 
 	public FilesServiceTest() {
@@ -48,12 +49,15 @@ class FilesServiceTest {
 	}
 
 	@BeforeAll public static void setUp() {
-		Assertions.assertDoesNotThrow(()->{
-			TestData testData = TestData.getInstance();
-			new VaultSubscription(testData.getAppContext(),
-					testData.getProviderAddress());
-			filesService = testData.newVault().getFilesService();
-		});
+		trySubscribeVault();
+		Assertions.assertDoesNotThrow(()->filesService = TestData.getInstance().newVault().getFilesService());
+	}
+
+	private static void trySubscribeVault() {
+		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
+		try {
+			subscription.subscribe();
+		} catch (NotFoundException e) {}
 	}
 
 	@Test @Order(1) void testUploadText() {
