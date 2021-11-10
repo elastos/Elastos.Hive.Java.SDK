@@ -194,10 +194,14 @@ public abstract class NodeRPCConnection {
 				JsonNode error = getResponseErrorNode(response.body().string());
 				if (error == null)
 					throw new NodeRPCException(httpCode, -1, response.body().string());
-				else
+				else {
+					if (httpCode == NodeRPCException.UNAUTHORIZED) {
+						this.accessToken.invalidate();
+					}
 					throw new NodeRPCException(httpCode,
 							error.has("internal_code") ? error.get("internal_code").asInt() : -1,
 							error.get("message").asText());
+				}
 			}
 			return response;
 		}

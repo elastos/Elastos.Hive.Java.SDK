@@ -62,7 +62,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.30'
 
     implementation 'org.elastos.did:didsdk:2.0.6-pre'
-    implementation 'org.elastos:hive:v2.3.0'
+    implementation 'org.elastos:hive:v2.4.1'
 
 //    // Use JUnit test framework
 //    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
