@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-public class Config {
+public class BaseConfig {
 	protected static ObjectMapper getObjectMapper() {
 		ObjectMapper mapper = new ObjectMapper();
 
@@ -25,11 +25,9 @@ public class Config {
 		return getObjectMapper().writeValueAsString(this);
 	}
 
-	protected static <T extends Config> T deserialize(String content, Class<T> clazz) {
-		ObjectMapper mapper = getObjectMapper();
-
+	protected static <T extends BaseConfig> T deserialize(String content, Class<T> clazz) {
 		try {
-			return mapper.readValue(content, clazz);
+			return getObjectMapper().readValue(content, clazz);
 		} catch (IOException e) {
 			throw new IllegalArgumentException(e);
 		}

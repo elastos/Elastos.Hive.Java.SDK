@@ -2,7 +2,7 @@ package org.elastos.hive.demo.sdk.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class UserConfig extends Config {
+public class UserConfig extends BaseConfig {
 	@JsonProperty("name")
 	private String name;
 	@JsonProperty("mnemonic")

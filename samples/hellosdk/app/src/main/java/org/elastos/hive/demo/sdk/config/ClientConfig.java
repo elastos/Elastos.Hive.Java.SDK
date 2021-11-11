@@ -2,7 +2,10 @@ package org.elastos.hive.demo.sdk.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ClientConfig extends Config {
+/**
+ * Main class for configure file.
+ */
+public class ClientConfig extends BaseConfig {
 	@JsonProperty("resolverUrl")
 	private String resolverUrl;
 	@JsonProperty("application")

@@ -2,7 +2,7 @@ package org.elastos.hive.demo.sdk.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class NodeConfig extends Config {
+public class NodeConfig extends BaseConfig {
 	@JsonProperty("provider")
 	private String provider;
 	// the service instance did of backup node.

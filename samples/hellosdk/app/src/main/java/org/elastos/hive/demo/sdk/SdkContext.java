@@ -1,6 +1,7 @@
 package org.elastos.hive.demo.sdk;
 
-import android.content.res.AssetManager;
+import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 import org.elastos.did.DIDDocument;
 import org.elastos.did.exception.DIDException;
@@ -11,6 +12,7 @@ import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.Backup;
 import org.elastos.hive.ScriptRunner;
 import org.elastos.hive.Vault;
+import org.elastos.hive.demo.MainActivity;
 import org.elastos.hive.demo.sdk.config.ApplicationConfig;
 import org.elastos.hive.demo.sdk.config.ClientConfig;
 import org.elastos.hive.demo.sdk.config.NodeConfig;
@@ -27,24 +29,28 @@ import java.util.concurrent.CompletionException;
 public class SdkContext {
     private static SdkContext instance = null;
 
-    private UserDID userDid;
-    private UserDID callerDid;
-    private AppDID appInstanceDid;
+    private static final String SETTING_KEY_MNEMONIC = "mnemonic";
+    private static final String SETTING_KEY_PASS_PHRASE = "passPhrase";
+
+    private MainActivity mainActivity;
+
     private NodeConfig nodeConfig;
+    private AppDID appInstanceDid;
+    private UserDID userDid;
     private AppContext context;
+    private UserDID callerDid;
     private AppContext contextCaller;
 
-    private AssetManager assetManager;
 
-    public static SdkContext getInstance(AssetManager assetManager) throws HiveException, DIDException {
+    public static SdkContext getInstance(MainActivity mainActivity) throws HiveException, DIDException {
         if (instance == null)
-            instance = new SdkContext(assetManager);
+            instance = new SdkContext(mainActivity);
         return instance;
     }
 
-    private SdkContext(AssetManager assetManager) throws HiveException, DIDException {
-        this.assetManager = assetManager;
-        Utils.assetManager = assetManager;
+    private SdkContext(MainActivity mainActivity) throws HiveException, DIDException {
+        this.mainActivity = mainActivity;
+        Utils.assetManager = mainActivity.getAssets();
         init();
     }
 
@@ -57,21 +63,7 @@ public class SdkContext {
     }
 
     public void init() throws HiveException, DIDException {
-        //TODO set environment config
-        String fileName = null;
-        switch (EnvironmentType.DEVELOPING) {
-            case DEVELOPING:
-                fileName = "Developing.conf";
-                break;
-            case PRODUCTION:
-                fileName = "Production.conf";
-                break;
-            case LOCAL:
-                fileName = "Local.conf";
-                break;
-        }
-
-        ClientConfig clientConfig = ClientConfig.deserialize(Utils.getConfigure(fileName));
+        ClientConfig clientConfig = getClientConfig();
         nodeConfig = clientConfig.nodeConfig();
 
         AppContext.setupResolver(clientConfig.resolverUrl(), getLocalDidCacheDir(nodeConfig.storePath()));
@@ -82,18 +74,17 @@ public class SdkContext {
                 applicationConfig.passPhrase(),
                 applicationConfig.storepass());
 
+        this.initByUserDid(clientConfig);
+        this.initByCallerDid(clientConfig);
+    }
+
+    public void initByUserDid(ClientConfig clientConfig) throws DIDException {
         UserConfig userConfig = clientConfig.userConfig();
         userDid = new UserDID(userConfig.name(),
-                userConfig.mnemonic(),
-                userConfig.passPhrase(),
+                getMnemonicStr(userConfig),
+                getPassPhraseStr(userConfig),
                 userConfig.storepass());
-        UserConfig callerConfig = clientConfig.crossConfig().userConfig();
-        callerDid = new UserDID(callerConfig.name(),
-                callerConfig.mnemonic(),
-                callerConfig.passPhrase(),
-                callerConfig.storepass());
 
-        //初始化Application Context
         context = AppContext.build(new AppContextProvider() {
             @Override
             public String getLocalDataDir() {
@@ -126,6 +117,15 @@ public class SdkContext {
                 });
             }
         }, userDid.toString());
+    }
+
+    private void initByCallerDid(ClientConfig clientConfig) throws DIDException {
+        UserConfig callerConfig = clientConfig.crossConfig().userConfig();
+        callerDid = new UserDID(callerConfig.name(),
+                callerConfig.mnemonic(),
+                callerConfig.passPhrase(),
+                callerConfig.storepass());
+
 
         contextCaller = AppContext.build(new AppContextProvider() {
             @Override
@@ -160,6 +160,45 @@ public class SdkContext {
                 });
             }
         }, callerDid.toString());
+    }
+
+    private SharedPreferences getSettings() {
+        return this.mainActivity.getApplicationContext().getSharedPreferences("hive_sdk", 0);
+    }
+
+    private String getMnemonicStr(UserConfig userConfig) {
+        String m = getSettings().getString(SETTING_KEY_MNEMONIC, null);
+        return !TextUtils.isEmpty(m) ? m : userConfig.mnemonic();
+    }
+
+    private String getPassPhraseStr(UserConfig userConfig) {
+        String p = getSettings().getString(SETTING_KEY_PASS_PHRASE, null);
+        return !TextUtils.isEmpty(p) ? p : userConfig.passPhrase();
+    }
+
+    private void saveStringSetting(String key, String value) {
+        SharedPreferences settings = getSettings();
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(key, value);
+        editor.apply();
+    }
+
+    private ClientConfig getClientConfig() {
+        //TODO set environment config
+        String fileName = null;
+        switch (EnvironmentType.DEVELOPING) {
+            case DEVELOPING:
+                fileName = "Developing.conf";
+                break;
+            case PRODUCTION:
+                fileName = "Production.conf";
+                break;
+            case LOCAL:
+                fileName = "Local.conf";
+                break;
+        }
+
+        return ClientConfig.deserialize(Utils.getConfigure(fileName));
     }
 
     public AppContext getAppContext() {
@@ -228,6 +267,12 @@ public class SdkContext {
 
     public String getCallerDid() {
         return this.callerDid.toString();
+    }
+
+    public void updateUserDid(String mnemonic, String passPhrase) throws DIDException {
+        this.saveStringSetting(SETTING_KEY_MNEMONIC, mnemonic);
+        this.saveStringSetting(SETTING_KEY_PASS_PHRASE, passPhrase);
+        this.initByUserDid(getClientConfig());
     }
 
     private enum EnvironmentType {
