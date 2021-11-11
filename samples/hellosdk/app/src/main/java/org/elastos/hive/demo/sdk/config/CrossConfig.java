@@ -2,7 +2,7 @@ package org.elastos.hive.demo.sdk.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class CrossConfig extends Config {
+public class CrossConfig extends BaseConfig {
 	@JsonProperty("application")
 	private ApplicationConfig applicationConfig;
 	@JsonProperty("user")

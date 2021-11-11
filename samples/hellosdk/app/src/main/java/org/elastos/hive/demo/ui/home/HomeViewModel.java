@@ -29,16 +29,27 @@ public class HomeViewModel extends ViewModel {
         this.scriptOwner = new ScriptOwner(mainActivity.getSdkContext());
     }
 
-    public void setScript() {
-        this.mainActivity.loading(true);
-        this.scriptOwner.setScript().whenCompleteAsync(
-                (result, e)-> {
-                    String msg = e == null ? "Success" : "Failed: " + e.getMessage();
-                    mainActivity.runOnUiThread(() -> {
-                        // 更新UI的操作
-                        mText.setValue(msg);
-                        mainActivity.loading(false);
-                    });
-                });
+    public void uploadFile() {
+        // TODO:
+        mainActivity.showToastMessage("updateFile");
     }
+
+    public void setScript() {
+        this.showLoading();
+        this.scriptOwner.setScript().whenCompleteAsync((result, e)-> hideLoadingWithMessage(e));
+    }
+
+    private void showLoading() {
+        this.mainActivity.loading(true);
+    }
+
+    private void hideLoadingWithMessage(Throwable e) {
+        String msg = e == null ? "Success" : "Failed: " + e.getMessage();
+        mainActivity.runOnUiThread(() -> {
+            // 更新UI的操作
+            mText.setValue(msg);
+            mainActivity.loading(false);
+        });
+    }
+
 }

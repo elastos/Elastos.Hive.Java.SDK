@@ -2,8 +2,12 @@ package org.elastos.hive.demo;
 
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -13,6 +17,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import org.elastos.did.exception.DIDException;
 import org.elastos.did.exception.NetworkException;
 import org.elastos.hive.demo.sdk.SdkContext;
 import org.elastos.hive.exception.HiveException;
@@ -38,15 +43,16 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+
+        showToastMessage("hello world application.");
     }
 
     private void initSdkContext() {
         assetManager = getAssets();
         try {
-            sdkContext = SdkContext.getInstance(assetManager);
+            sdkContext = SdkContext.getInstance(this);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to initSdkContext: " + e.toString());
+            showToastMessage("Failed to initialize hive sdk.");
         }
     }
 
@@ -61,5 +67,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void loading(boolean isVisible) {
         findViewById(R.id.loadingPanel).setVisibility(isVisible ? View.VISIBLE : View.GONE);
+    }
+
+    public void showToastMessage(String msg) {
+        Log.d("Toast: ", msg);
+        runOnUiThread(() -> Toast.makeText(this.getApplicationContext(), msg, Toast.LENGTH_LONG).show());
+    }
+
+    public void updateUserDid(String mnemonic, String passPhrase) {
+        try {
+            getSdkContext().updateUserDid(mnemonic, passPhrase);
+            showToastMessage("Success to update user did.");
+        } catch (DIDException e) {
+            showToastMessage("Failed to update user did.");
+        }
     }
 }

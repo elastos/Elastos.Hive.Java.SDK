@@ -14,7 +14,23 @@
         android:orientation="vertical" >
 
         <Button
-            android:id="@+id/owner_set_bttn"
+            android:id="@+id/owner_set_did"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Update User DID"
+            tools:layout_editor_absoluteX="-8dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <Button
+            android:id="@+id/owner_upload_file"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Upload File"
+            tools:layout_editor_absoluteX="-8dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <Button
+            android:id="@+id/owner_set_script"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:text="Register Script"
