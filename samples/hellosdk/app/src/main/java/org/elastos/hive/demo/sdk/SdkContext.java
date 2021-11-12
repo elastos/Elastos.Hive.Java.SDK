@@ -12,6 +12,7 @@ import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.Backup;
 import org.elastos.hive.ScriptRunner;
 import org.elastos.hive.Vault;
+import org.elastos.hive.VaultSubscription;
 import org.elastos.hive.demo.MainActivity;
 import org.elastos.hive.demo.sdk.config.ApplicationConfig;
 import org.elastos.hive.demo.sdk.config.ClientConfig;
@@ -205,20 +206,24 @@ public class SdkContext {
         return this.context;
     }
 
-    public String getProviderAddress() {
+    public String getVaultProviderAddress() {
         return nodeConfig.provider();
     }
 
+    public VaultSubscription newVaultSubscription() throws HiveException {
+        return new VaultSubscription(context, getVaultProviderAddress());
+    }
+
     public Vault newVault() {
-        return new Vault(context, nodeConfig.provider());
+        return new Vault(context, getVaultProviderAddress());
     }
 
     public ScriptRunner newScriptRunner() {
-        return new ScriptRunner(context, nodeConfig.provider());
+        return new ScriptRunner(context, getVaultProviderAddress());
     }
 
     public ScriptRunner newCallerScriptRunner() {
-        return new ScriptRunner(contextCaller, nodeConfig.provider());
+        return new ScriptRunner(contextCaller, getVaultProviderAddress());
     }
 
     public Backup newBackup() {
