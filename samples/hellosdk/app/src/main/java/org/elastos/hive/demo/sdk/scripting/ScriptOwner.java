@@ -12,7 +12,6 @@ import org.elastos.hive.vault.scripting.InsertExecutable;
 import org.elastos.hive.vault.scripting.QueryHasResultCondition;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 public class ScriptOwner {
     private final SdkContext sdkContext;
@@ -31,12 +30,12 @@ public class ScriptOwner {
 
     private CompletableFuture<Void> cleanTwoCollections() {
         return databaseService.deleteCollection(ScriptConst.COLLECTION_GROUP)
-                .thenCompose(s -> databaseService.deleteCollection(ScriptConst.COLLECTION_GROUP_MESSAGE));
+                .thenCompose(result -> databaseService.deleteCollection(ScriptConst.COLLECTION_GROUP_MESSAGE));
     }
 
     private CompletableFuture<Void> createTwoCollections() {
         return databaseService.createCollection(ScriptConst.COLLECTION_GROUP)
-                .thenCompose(s->databaseService.createCollection(ScriptConst.COLLECTION_GROUP_MESSAGE));
+                .thenCompose(result->databaseService.createCollection(ScriptConst.COLLECTION_GROUP_MESSAGE));
     }
 
     private CompletableFuture<InsertResult> addPermission2Caller() {
@@ -44,7 +43,7 @@ public class ScriptOwner {
         ObjectNode conditionDoc = JsonNodeFactory.instance.objectNode();
         conditionDoc.put("collection", ScriptConst.COLLECTION_GROUP_MESSAGE);
         conditionDoc.put("did", callDid);
-        // Insert persmission to COLLECTION_GROUP
+        // Insert the permission to COLLECTION_GROUP
         return databaseService.insertOne(
                 ScriptConst.COLLECTION_GROUP,
                 conditionDoc,
@@ -72,8 +71,8 @@ public class ScriptOwner {
 
     public CompletableFuture<Void> setScript() {
         return cleanTwoCollections()
-                .thenCompose(s->createTwoCollections())
-                .thenCompose(s->addPermission2Caller())
-                .thenCompose(s->doSetScript());
+                .thenCompose(result->createTwoCollections())
+                .thenCompose(result->addPermission2Caller())
+                .thenCompose(result->doSetScript());
     }
 }
