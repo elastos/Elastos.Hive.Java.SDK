@@ -1,5 +1,6 @@
 package org.elastos.hive.demo.sdk.scripting;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -14,6 +15,7 @@ import org.elastos.hive.vault.scripting.QueryHasResultCondition;
 import java.util.concurrent.CompletableFuture;
 
 public class ScriptOwner {
+
     private final SdkContext sdkContext;
 
     private ScriptingService scriptingService;
@@ -75,4 +77,17 @@ public class ScriptOwner {
                 .thenCompose(result->addPermission2Caller())
                 .thenCompose(result->doSetScript());
     }
+
+    public CompletableFuture<InsertResult> insertDocument() {
+        return cleanTwoCollections()
+                .thenCompose(result->createTwoCollections())
+                .thenCompose(result->{
+                    ObjectNode msg = JsonNodeFactory.instance.objectNode();
+                    msg.put("author", "John");
+                    msg.put("content", "the message from the owner.");
+                    return databaseService.insertOne(ScriptConst.COLLECTION_GROUP_MESSAGE,
+                            msg, new InsertOptions().bypassDocumentValidation(true));
+                });
+    }
+
 }

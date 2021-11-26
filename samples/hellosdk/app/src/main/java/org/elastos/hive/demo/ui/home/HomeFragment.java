@@ -43,6 +43,12 @@ public class HomeFragment extends Fragment {
             homeViewModel.subscribeVault();
         });
 
+        // listen button to insert the document.
+        button= (Button)root.findViewById(R.id.owner_insert_document);
+        button.setOnClickListener(view -> {
+            homeViewModel.insertDocument();
+        });
+
         // listen button to upload file.
         button= (Button)root.findViewById(R.id.owner_upload_file);
         button.setOnClickListener(view -> {

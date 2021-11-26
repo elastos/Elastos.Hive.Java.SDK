@@ -12,6 +12,7 @@ import org.elastos.hive.demo.MainActivity;
 import org.elastos.hive.demo.sdk.SdkContext;
 import org.elastos.hive.demo.sdk.scripting.ScriptOwner;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class HomeViewModel extends ViewModel {
 
     private VaultSubscription vaultSubscription;
     private FilesService filesService;
+    private DatabaseService databaseService;
     private ScriptOwner scriptOwner;
 
     public HomeViewModel() {
@@ -52,7 +54,12 @@ public class HomeViewModel extends ViewModel {
 
     public void subscribeVault() {
         this.showLoading();
-        this.vaultSubscription.subscribe().whenCompleteAsync((result, e)-> hideLoadingWithMessage(e));
+        this.vaultSubscription.subscribe()
+                .thenAcceptAsync(result -> hideLoadingWithMessage(null))
+                .exceptionally(ex -> {
+                    hideLoadingWithMessage(ex);
+                    return null;
+                });
     }
 
     public CompletableFuture<Void> writeFileContent(Writer writer) {
@@ -81,6 +88,16 @@ public class HomeViewModel extends ViewModel {
     public void setScript() {
         this.showLoading();
         this.scriptOwner.setScript()
+                .thenAcceptAsync(result -> hideLoadingWithMessage(null))
+                .exceptionally(ex -> {
+                    hideLoadingWithMessage(ex);
+                    return null;
+                });
+    }
+
+    public void insertDocument() {
+        this.showLoading();
+        this.scriptOwner.insertDocument()
                 .thenAcceptAsync(result -> hideLoadingWithMessage(null))
                 .exceptionally(ex -> {
                     hideLoadingWithMessage(ex);
