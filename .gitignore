@@ -22,7 +22,6 @@ src/test/resources/local/cache/
 intellij/
 .idea/
 *.iml
-gradle.properties
 local.properties
 
 # Output file when rendering ReadMe.md locally.

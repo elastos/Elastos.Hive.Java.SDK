@@ -1,5 +1,6 @@
 package org.elastos.hive.demo.ui.home;
 
+import android.support.v4.os.IResultReceiver;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -70,12 +71,21 @@ public class HomeViewModel extends ViewModel {
         this.showLoading();
         filesService.getUploadWriter(REMOTE_FILE_PATH)
                 .thenCompose(this::writeFileContent)
-                .whenComplete((result, e)-> hideLoadingWithMessage(e));
+                .thenAcceptAsync(result -> hideLoadingWithMessage(null))
+                .exceptionally(ex -> {
+                    hideLoadingWithMessage(ex);
+                    return null;
+                });
     }
 
     public void setScript() {
         this.showLoading();
-        this.scriptOwner.setScript().whenCompleteAsync((result, e)-> hideLoadingWithMessage(e));
+        this.scriptOwner.setScript()
+                .thenAcceptAsync(result -> hideLoadingWithMessage(null))
+                .exceptionally(ex -> {
+                    hideLoadingWithMessage(ex);
+                    return null;
+                });
     }
 
     private void showLoading() {
