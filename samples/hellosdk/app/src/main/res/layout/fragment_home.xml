@@ -30,6 +30,14 @@
             tools:layout_editor_absoluteY="16dp" />
 
         <Button
+            android:id="@+id/owner_insert_document"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Insert Document"
+            tools:layout_editor_absoluteX="-8dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <Button
             android:id="@+id/owner_upload_file"
             android:layout_width="match_parent"
             android:layout_height="50dp"
