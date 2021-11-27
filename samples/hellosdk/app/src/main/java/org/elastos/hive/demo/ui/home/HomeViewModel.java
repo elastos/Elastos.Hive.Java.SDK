@@ -9,9 +9,11 @@ import androidx.lifecycle.ViewModel;
 
 import org.elastos.hive.VaultSubscription;
 import org.elastos.hive.demo.MainActivity;
+import org.elastos.hive.demo.sdk.BackupVault;
 import org.elastos.hive.demo.sdk.SdkContext;
 import org.elastos.hive.demo.sdk.scripting.ScriptOwner;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.service.BackupService;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
 
@@ -30,8 +32,8 @@ public class HomeViewModel extends ViewModel {
 
     private VaultSubscription vaultSubscription;
     private FilesService filesService;
-    private DatabaseService databaseService;
     private ScriptOwner scriptOwner;
+    private BackupVault backupVault;
 
     public HomeViewModel() {
         mText = new MutableLiveData<>();
@@ -49,6 +51,7 @@ public class HomeViewModel extends ViewModel {
             Log.e("HomeViewModel", "Failed to initialize the vault subscription object.");
         }
         this.filesService = mainActivity.getSdkContext().newVault().getFilesService();
+        this.backupVault = new BackupVault(mainActivity.getSdkContext());
         this.scriptOwner = new ScriptOwner(mainActivity.getSdkContext());
     }
 
@@ -118,4 +121,13 @@ public class HomeViewModel extends ViewModel {
         });
     }
 
+    public void startBackup() {
+        this.showLoading();
+        this.backupVault.startBackup()
+                .thenAcceptAsync(result -> hideLoadingWithMessage(null))
+                .exceptionally(ex -> {
+                    hideLoadingWithMessage(ex);
+                    return null;
+                });
+    }
 }
