@@ -53,6 +53,14 @@
             tools:layout_editor_absoluteX="-8dp"
             tools:layout_editor_absoluteY="16dp" />
 
+        <Button
+            android:id="@+id/owner_start_backup"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Start Backup"
+            tools:layout_editor_absoluteX="-8dp"
+            tools:layout_editor_absoluteY="16dp" />
+
         <TextView
             android:id="@+id/text_home"
             android:layout_width="match_parent"

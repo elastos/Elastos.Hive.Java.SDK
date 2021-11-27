@@ -13,9 +13,9 @@ public class BackupInfo {
 	@SerializedName("storage_used")
 	private int storageUsed;
 	@SerializedName("created")
-	private long created;
+	private double created;
 	@SerializedName("updated")
-	private long updated;
+	private double updated;
 	@SerializedName("price_plan")
 	private String pricePlan;
 
@@ -56,11 +56,11 @@ public class BackupInfo {
 	}
 
 	public long getCreated() {
-		return created;
+		return (long)created;
 	}
 
 	public long getUpdated() {
-		return updated;
+		return (long)updated;
 	}
 
 	public String getPricePlan() {

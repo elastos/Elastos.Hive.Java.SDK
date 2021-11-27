@@ -10,6 +10,7 @@ import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.AppContext;
 import org.elastos.hive.AppContextProvider;
 import org.elastos.hive.Backup;
+import org.elastos.hive.BackupSubscription;
 import org.elastos.hive.ScriptRunner;
 import org.elastos.hive.Vault;
 import org.elastos.hive.VaultSubscription;
@@ -210,8 +211,16 @@ public class SdkContext {
         return nodeConfig.provider();
     }
 
+    public String getBackupProviderAddress() {
+        return nodeConfig.targetHost();
+    }
+
     public VaultSubscription newVaultSubscription() throws HiveException {
         return new VaultSubscription(context, getVaultProviderAddress());
+    }
+
+    public BackupSubscription newBackupSubscription() throws HiveException {
+        return new BackupSubscription(context, getBackupProviderAddress());
     }
 
     public Vault newVault() {

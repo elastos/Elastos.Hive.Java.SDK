@@ -62,6 +62,13 @@ public class HomeFragment extends Fragment {
             homeViewModel.setScript();
         });
 
+        // listen button to start backup
+
+        button= (Button)root.findViewById(R.id.owner_start_backup);
+        button.setOnClickListener(view -> {
+            homeViewModel.startBackup();
+        });
+
         return root;
     }
 }

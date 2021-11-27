@@ -63,6 +63,7 @@ dependencies {
 
     implementation 'org.elastos.did:didsdk:2.0.6-pre'
     implementation 'org.elastos:hive:v2.4.1'
+    // implementation files('libs/ElastosHiveSDK-v2.4.1.1.jar')
 
 //    // Use JUnit test framework
 //    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
