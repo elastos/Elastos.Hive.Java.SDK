@@ -6,11 +6,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.NotFoundException;
+import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.database.InsertOptions;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.ScriptingService;
 import org.elastos.hive.vault.scripting.*;
 import org.junit.jupiter.api.*;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 @Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -20,10 +27,15 @@ class ScriptingCrossingTest {
 	private static final String COLLECTION_GROUP_MESSAGE = "st_group_message";
 	private static final String SCRIPT_NAME = "get_group_message";
 
+	private static final String HIVE_URL_SCRIPT_NAME = "downloadFileWithHiveUrl";
+	private static final String HIVE_URL_FILE_NAME = "hiveUrl.txt";
+	private static final String HIVE_URL_FILE_CONTENT = "The file content on hiveUrl.txt";
+
 	private static VaultSubscription subscription;
 	private static ScriptingService scriptingService;
 	private static ScriptRunner scriptRunner;
 	private static DatabaseService databaseService;
+	private static FilesService filesService;
 
 	private static String targetDid;
 	private static String callDid;
@@ -34,9 +46,13 @@ class ScriptingCrossingTest {
 		trySubscribeVault();
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
-			scriptingService = testData.newVault().getScriptingService();
+			Vault vault = testData.newVault();
+
+			scriptingService = vault.getScriptingService();
+			databaseService = vault.getDatabaseService();
+			filesService = vault.getFilesService();
 			scriptRunner = testData.newCallerScriptRunner();
-			databaseService = testData.newVault().getDatabaseService();
+
 			targetDid = testData.getUserDid();
 			appDid = testData.getAppDid();
 			callDid = testData.getCallerDid();
@@ -139,4 +155,57 @@ class ScriptingCrossingTest {
 		databaseService.deleteCollection(COLLECTION_GROUP_MESSAGE);
 		databaseService.deleteCollection(COLLECTION_GROUP);
 	}
+
+	@Test
+	@Order(2) void testDownloadByHiveUrl() {
+		String hiveUrl = String.format("hive://%s@%s/%s?params=%s",
+				targetDid, appDid, HIVE_URL_SCRIPT_NAME, "{\"empty\":0}");
+		Assertions.assertDoesNotThrow(() -> uploadFile().get());
+		Assertions.assertDoesNotThrow(() -> registerScript().get());
+		Assertions.assertDoesNotThrow(() -> scriptRunner.downloadFileByHiveUrl(hiveUrl, Reader.class)
+				.thenAccept(reader -> {
+					Assertions.assertNotNull(reader);
+					Assertions.assertEquals(HIVE_URL_FILE_CONTENT, getFileContentByReader(reader));
+				}).get());
+	}
+
+	private CompletableFuture<Void> writeFileContent2Writer(Writer writer) {
+		return CompletableFuture.runAsync(() -> {
+			try {
+				writer.write(HIVE_URL_FILE_CONTENT);
+			} catch (IOException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	private String getFileContentByReader(Reader reader) {
+		try {
+			StringBuilder stringBuilder = new StringBuilder();
+			char[] buffer = new char[1];
+			while (reader.read(buffer) != -1) {
+				stringBuilder.append(buffer);
+			}
+			return stringBuilder.toString();
+		} catch (IOException e) {
+			throw new CompletionException(e);
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private CompletableFuture<Void> registerScript() {
+		AggregatedExecutable executable = new AggregatedExecutable("downloadGroup");
+		executable.appendExecutable(new FileDownloadExecutable("download", HIVE_URL_FILE_NAME));
+		return scriptingService.registerScript(HIVE_URL_SCRIPT_NAME, executable, true, true);
+	}
+
+	private CompletableFuture<Void> uploadFile() {
+		return filesService.getUploadWriter(HIVE_URL_FILE_NAME).thenCompose(this::writeFileContent2Writer);
+	}
+
 }

@@ -280,6 +280,47 @@ public class ScriptingController {
 			return null;
 	}
 
+	public <T> T downloadFileByHiveUrl(String hiveUrl, Class<T> resultType) throws HiveException {
+		HiveUrlInfo info = new HiveUrlInfo(hiveUrl);
+		JsonNode result = callScriptUrl(info.getScriptName(), info.getParams(),
+					info.getTargetDid(), info.getTargetAppDid(), JsonNode.class);
+		return downloadFile(getTransactionIdByJsonNode(result), resultType);
+	}
+
+	private String getTransactionIdByJsonNode(JsonNode jsonNode) {
+		JsonNode node = searchForEntity(jsonNode, "transaction_id");
+		if (node == null)
+			throw new InvalidParameterException("Can't get transaction id by calling script.");
+		return node.asText();
+	}
+
+	private JsonNode searchForEntity(JsonNode node, String entityName) {
+		// A naive depth-first search implementation using recursion. Useful
+		// **only** for small object graphs. This will be inefficient
+		// (stack overflow) for finding deeply-nested needles or needles
+		// toward the end of a forest with deeply-nested branches.
+		if (node == null) {
+			return null;
+		}
+		if (node.has(entityName)) {
+			return node.get(entityName);
+		}
+		if (!node.isContainerNode()) {
+			return null;
+		}
+		for (JsonNode child : node) {
+			if (child.isContainerNode()) {
+				JsonNode childResult = searchForEntity(child, entityName);
+				// The mission node is virtual node.
+				if (childResult != null && !childResult.isMissingNode()) {
+					return childResult;
+				}
+			}
+		}
+		// not found fall through
+		return null;
+	}
+
 	/**
 	 * Unregister the script.
 	 *

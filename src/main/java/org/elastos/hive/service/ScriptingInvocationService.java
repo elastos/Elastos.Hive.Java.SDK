@@ -50,4 +50,16 @@ public interface ScriptingInvocationService {
 	 * @return 					Reader or InputStream class
 	 */
 	<T> CompletableFuture<T> downloadFile(String transactionId, Class<T> resultType);
+
+	/**
+	 * This is the compatible implementation for downloading file by the hive url
+	 * which comes from v1 version SDK. The hive url definition is as this format:
+	 *
+	 * 	- hive://<targetDid>@<targetAppDid>/<scriptName>?params=<paramJsonStr>
+	 *
+	 * @param hiveUrl 			The hive url.
+	 * @param <T> 				Reader or InputStream class
+	 * @return 					Reader or InputStream instance
+	 */
+	<T> CompletableFuture<T> downloadFileByHiveUrl(String hiveUrl, Class<T> resultType);
 }
