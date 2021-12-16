@@ -58,6 +58,10 @@ public abstract class Executable extends Condition {
 		public FileBody() {
 			this.path = "$params.path";
 		}
+
+		public FileBody(String path) {
+			this.path = path;
+		}
 	}
 
 	public static JsonNode createRunFileParams(String path) {

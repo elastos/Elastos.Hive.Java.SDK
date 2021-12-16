@@ -8,4 +8,9 @@ public class FileDownloadExecutable extends Executable {
         super(name, Type.FILE_DOWNLOAD, null);
         super.setBody(new FileBody());
     }
+
+    public FileDownloadExecutable(String name, String path) {
+        super(name, Type.FILE_DOWNLOAD, null);
+        super.setBody(new FileBody(path));
+    }
 }

@@ -163,4 +163,15 @@ class ScriptingServiceRender implements ScriptingService {
 			}
 		});
 	}
+
+	@Override
+	public <T> CompletableFuture<T> downloadFileByHiveUrl(String hiveUrl, Class<T> resultType) {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return controller.downloadFileByHiveUrl(hiveUrl, resultType);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
 }
