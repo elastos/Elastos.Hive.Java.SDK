@@ -18,6 +18,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 
 @Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -160,23 +161,13 @@ class ScriptingCrossingTest {
 	@Order(2) void testDownloadByHiveUrl() {
 		String hiveUrl = String.format("hive://%s@%s/%s?params=%s",
 				targetDid, appDid, HIVE_URL_SCRIPT_NAME, "{\"empty\":0}");
-		Assertions.assertDoesNotThrow(() -> uploadFile().get());
+		Assertions.assertDoesNotThrow(this::uploadFile);
 		Assertions.assertDoesNotThrow(() -> registerScript().get());
 		Assertions.assertDoesNotThrow(() -> scriptRunner.downloadFileByHiveUrl(hiveUrl, Reader.class)
 				.thenAccept(reader -> {
 					Assertions.assertNotNull(reader);
 					Assertions.assertEquals(HIVE_URL_FILE_CONTENT, getFileContentByReader(reader));
 				}).get());
-	}
-
-	private CompletableFuture<Void> writeFileContent2Writer(Writer writer) {
-		return CompletableFuture.runAsync(() -> {
-			try {
-				writer.write(HIVE_URL_FILE_CONTENT);
-			} catch (IOException e) {
-				throw new CompletionException(e);
-			}
-		});
 	}
 
 	private String getFileContentByReader(Reader reader) {
@@ -204,8 +195,11 @@ class ScriptingCrossingTest {
 		return scriptingService.registerScript(HIVE_URL_SCRIPT_NAME, executable, true, true);
 	}
 
-	private CompletableFuture<Void> uploadFile() {
-		return filesService.getUploadWriter(HIVE_URL_FILE_NAME).thenCompose(this::writeFileContent2Writer);
+	private void uploadFile() throws IOException, ExecutionException, InterruptedException {
+		try (Writer writer = filesService.getUploadWriter(HIVE_URL_FILE_NAME).get()) {
+			Assertions.assertNotNull(writer);
+			writer.write(HIVE_URL_FILE_CONTENT);
+		}
 	}
 
 }
