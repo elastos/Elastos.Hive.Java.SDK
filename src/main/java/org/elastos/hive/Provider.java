@@ -1,6 +1,11 @@
 package org.elastos.hive;
 
+import org.elastos.hive.endpoint.*;
 import org.elastos.hive.exception.HiveException;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * This class is used to fetch some possible information from remote hive node.
@@ -16,6 +21,8 @@ import org.elastos.hive.exception.HiveException;
  * </ul>
  */
 class Provider extends ServiceEndpoint {
+	private ManagementController managementController;
+
 	public Provider(AppContext context) throws HiveException {
 		this(context, null);
 	}
@@ -29,5 +36,86 @@ class Provider extends ServiceEndpoint {
 	 */
 	public Provider(AppContext context, String providerAddress) throws HiveException {
 		super(context, providerAddress);
+		managementController = new ManagementController(this);
+	}
+
+	public CompletableFuture<List<VaultDetail>> getVaults() {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return managementController.getVaults();
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	public CompletableFuture<List<BackupDetail>> getBackups() {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return managementController.getBackups();
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	public CompletableFuture<List<UserDetail>> getUsers() {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return managementController.getUsers();
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	public CompletableFuture<List<PaymentDetail>> getPayments() {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return managementController.getPayments();
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	public CompletableFuture<Void> deleteVaults(List<String> userDids) {
+		return CompletableFuture.runAsync(() -> {
+			try {
+				managementController.deleteVaults(userDids);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	public CompletableFuture<Void> deleteBackups(List<String> userDids) {
+		return CompletableFuture.runAsync(() -> {
+			try {
+				managementController.deleteBackups(userDids);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	public CompletableFuture<List<VaultAppDetail>> getVaultApps() {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return managementController.getVaultApps();
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	public CompletableFuture<Void> deleteVaultApps(List<String> appDids) {
+		return CompletableFuture.runAsync(() -> {
+			try {
+				managementController.deleteVaultApps(appDids);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
 	}
 }
