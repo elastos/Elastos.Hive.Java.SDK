@@ -192,6 +192,10 @@ public class TestData {
 		return new Backup(context, getBackupProviderAddress());
 	}
 
+	public Provider newProvider() {
+		return new Provider(context, getVaultProviderAddress());
+	}
+
 	public BackupService getBackupService() {
 		BackupService backupService = this.newVault().getBackupService();
 		backupService.setupContext(new HiveBackupContext() {

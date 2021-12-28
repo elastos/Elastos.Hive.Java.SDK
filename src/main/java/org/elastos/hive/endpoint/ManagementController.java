@@ -17,7 +17,7 @@ public class ManagementController {
 
     public List<VaultDetail> getVaults() throws HiveException {
         try {
-            return managementAPI.getVaults().execute().body();
+            return managementAPI.getVaults().execute().body().getVaults();
         } catch (NodeRPCException e) {
             switch (e.getCode()) {
                 case NodeRPCException.UNAUTHORIZED:
@@ -26,6 +26,8 @@ public class ManagementController {
 					throw new VaultForbiddenException(e);
                 case NodeRPCException.BAD_REQUEST:
                     throw new InvalidParameterException(e.getMessage());
+                case NodeRPCException.NOT_FOUND:
+                    throw new NotFoundException(e);
                 default:
                     throw new ServerUnknownException(e);
             }
@@ -36,7 +38,7 @@ public class ManagementController {
 
     public List<BackupDetail> getBackups() throws HiveException {
         try {
-            return managementAPI.getBackups().execute().body();
+            return managementAPI.getBackups().execute().body().getBackups();
         } catch (NodeRPCException e) {
             switch (e.getCode()) {
                 case NodeRPCException.UNAUTHORIZED:
@@ -45,6 +47,8 @@ public class ManagementController {
                     throw new VaultForbiddenException(e);
                 case NodeRPCException.BAD_REQUEST:
                     throw new InvalidParameterException(e.getMessage());
+                case NodeRPCException.NOT_FOUND:
+                    throw new NotFoundException(e);
                 default:
                     throw new ServerUnknownException(e);
             }
@@ -55,7 +59,7 @@ public class ManagementController {
 
     public List<UserDetail> getUsers() throws HiveException {
         try {
-            return managementAPI.getUsers().execute().body();
+            return managementAPI.getUsers().execute().body().getUsers();
         } catch (NodeRPCException e) {
             switch (e.getCode()) {
                 case NodeRPCException.UNAUTHORIZED:
@@ -64,6 +68,8 @@ public class ManagementController {
                     throw new VaultForbiddenException(e);
                 case NodeRPCException.BAD_REQUEST:
                     throw new InvalidParameterException(e.getMessage());
+                case NodeRPCException.NOT_FOUND:
+                    throw new NotFoundException(e);
                 default:
                     throw new ServerUnknownException(e);
             }
@@ -74,7 +80,7 @@ public class ManagementController {
 
     public List<PaymentDetail> getPayments() throws HiveException {
         try {
-            return managementAPI.getPayments().execute().body();
+            return managementAPI.getPayments().execute().body().getPayments();
         } catch (NodeRPCException e) {
             switch (e.getCode()) {
                 case NodeRPCException.UNAUTHORIZED:
@@ -83,6 +89,8 @@ public class ManagementController {
                     throw new VaultForbiddenException(e);
                 case NodeRPCException.BAD_REQUEST:
                     throw new InvalidParameterException(e.getMessage());
+                case NodeRPCException.NOT_FOUND:
+                    throw new NotFoundException(e);
                 default:
                     throw new ServerUnknownException(e);
             }
@@ -105,6 +113,8 @@ public class ManagementController {
                     throw new VaultForbiddenException(e);
                 case NodeRPCException.BAD_REQUEST:
                     throw new InvalidParameterException(e.getMessage());
+                case NodeRPCException.NOT_FOUND:
+                    throw new NotFoundException(e);
                 default:
                     throw new ServerUnknownException(e);
             }
@@ -127,6 +137,8 @@ public class ManagementController {
                     throw new VaultForbiddenException(e);
                 case NodeRPCException.BAD_REQUEST:
                     throw new InvalidParameterException(e.getMessage());
+                case NodeRPCException.NOT_FOUND:
+                    throw new NotFoundException(e);
                 default:
                     throw new ServerUnknownException(e);
             }
@@ -137,7 +149,7 @@ public class ManagementController {
 
     public List<VaultAppDetail> getVaultApps() throws HiveException {
         try {
-            return managementAPI.getVaultApps().execute().body();
+            return managementAPI.getVaultApps().execute().body().getApps();
         } catch (NodeRPCException e) {
             switch (e.getCode()) {
                 case NodeRPCException.UNAUTHORIZED:
@@ -146,6 +158,8 @@ public class ManagementController {
                     throw new VaultForbiddenException(e);
                 case NodeRPCException.BAD_REQUEST:
                     throw new InvalidParameterException(e.getMessage());
+                case NodeRPCException.NOT_FOUND:
+                    throw new NotFoundException(e);
                 default:
                     throw new ServerUnknownException(e);
             }
@@ -168,6 +182,8 @@ public class ManagementController {
                     throw new VaultForbiddenException(e);
                 case NodeRPCException.BAD_REQUEST:
                     throw new InvalidParameterException(e.getMessage());
+                case NodeRPCException.NOT_FOUND:
+                    throw new NotFoundException(e);
                 default:
                     throw new ServerUnknownException(e);
             }
