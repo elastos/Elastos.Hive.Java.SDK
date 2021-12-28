@@ -20,10 +20,10 @@ import java.util.concurrent.CompletionException;
  * <li>etc.</li>
  * </ul>
  */
-class Provider extends ServiceEndpoint {
+public class Provider extends ServiceEndpoint {
 	private ManagementController managementController;
 
-	public Provider(AppContext context) throws HiveException {
+	public Provider(AppContext context) {
 		this(context, null);
 	}
 
@@ -32,9 +32,8 @@ class Provider extends ServiceEndpoint {
 	 *
 	 * @param context The application context
 	 * @param providerAddress The provider address
-	 * @throws HiveException See {@link HiveException}
 	 */
-	public Provider(AppContext context, String providerAddress) throws HiveException {
+	public Provider(AppContext context, String providerAddress) {
 		super(context, providerAddress);
 		managementController = new ManagementController(this);
 	}
