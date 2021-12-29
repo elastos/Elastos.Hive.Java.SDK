@@ -59,7 +59,7 @@ public class ProviderTest {
         });
     }
 
-    @Test
+    @Test @Disabled
     @Order(4) void testGetPayments() {
         Assertions.assertDoesNotThrow(()-> {
             List<PaymentDetail> backups = provider.getPayments().handle((res, ex) -> {

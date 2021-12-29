@@ -130,7 +130,6 @@ class FilesServiceTest {
 		});
 	}
 
-	@Disabled
 	@Test @Order(5) void testList4NotFoundException() {
 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
 				() -> filesService.list(remoteNotExistsDirPath).get());
