@@ -18,12 +18,6 @@ interface ManagementAPI {
     @GET("/api/v2/management/node/payments")
     Call<PaymentsInfo> getPayments();
 
-    @HTTP(method = "DELETE", path = "/api/v2/management/node/vaults", hasBody = true)
-    Call<Void> deleteVaults(@Body DeleteVaultsParams body);
-
-    @HTTP(method = "DELETE", path = "/api/v2/management/node/backups", hasBody = true)
-    Call<Void> deleteBackups(@Body DeleteBackupsParams body);
-
     @GET("/api/v2/management/vault/apps")
     Call<VaultAppsInfo> getVaultApps();
 

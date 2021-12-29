@@ -74,25 +74,7 @@ public class ProviderTest {
     }
 
     @Test
-    @Order(5) void testDeleteVaults() {
-        Assertions.assertDoesNotThrow(()->{
-            List<String> userDids = Arrays.asList("did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm5",
-                    "did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm6");
-            provider.deleteVaults(userDids).get();
-        });
-    }
-
-    @Test
-    @Order(6) void testDeleteBackups() {
-        Assertions.assertDoesNotThrow(()->{
-            List<String> userDids = Arrays.asList("did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm5",
-                    "did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm6");
-            provider.deleteBackups(userDids).get();
-        });
-    }
-
-    @Test
-    @Order(7) void testGetVaultApps() {
+    @Order(5) void testGetVaultApps() {
         Assertions.assertDoesNotThrow(()->{
             List<VaultAppDetail> apps = provider.getVaultApps().get();
             Assertions.assertNotNull(apps);
@@ -101,7 +83,7 @@ public class ProviderTest {
     }
 
     @Test
-    @Order(8) void testDeleteVaultApps() {
+    @Order(6) void testDeleteVaultApps() {
         Assertions.assertDoesNotThrow(()->{
             List<String> appDids = Arrays.asList("did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm5",
                     "did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm6");
