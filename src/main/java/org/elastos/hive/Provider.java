@@ -98,38 +98,6 @@ public class Provider extends ServiceEndpoint {
 	}
 
 	/**
-	 * Delete vault services by user DIDs.
-	 * The access user DID MUST be the owner of the hive node.
-	 * @param userDids user DIDs whose vault services will be removed.
-	 * @return void
-	 */
-	public CompletableFuture<Void> deleteVaults(List<String> userDids) {
-		return CompletableFuture.runAsync(() -> {
-			try {
-				managementController.deleteVaults(userDids);
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
-	}
-
-	/**
-	 * Delete backup services by user DIDs.
-	 * The access user DID MUST be the owner of the hive node.
-	 * @param userDids user DIDs whose vault services will be removed.
-	 * @return void
-	 */
-	public CompletableFuture<Void> deleteBackups(List<String> userDids) {
-		return CompletableFuture.runAsync(() -> {
-			try {
-				managementController.deleteBackups(userDids);
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
-	}
-
-	/**
 	 * Get all application information of the vault service.
 	 * The access user DID MUST be the owner of the vault service.
 	 * @return application list.

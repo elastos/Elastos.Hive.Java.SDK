@@ -99,54 +99,6 @@ public class ManagementController {
         }
     }
 
-    public void deleteVaults(List<String> userDids) throws HiveException {
-        try {
-            if (userDids == null) {
-                throw new InvalidParameterException("Invalid parameter userDids");
-            }
-            managementAPI.deleteVaults(new DeleteVaultsParams(userDids)).execute().body();
-        } catch (NodeRPCException e) {
-            switch (e.getCode()) {
-                case NodeRPCException.UNAUTHORIZED:
-                    throw new UnauthorizedException(e);
-                case NodeRPCException.FORBIDDEN:
-                    throw new VaultForbiddenException(e);
-                case NodeRPCException.BAD_REQUEST:
-                    throw new InvalidParameterException(e.getMessage());
-                case NodeRPCException.NOT_FOUND:
-                    throw new NotFoundException(e);
-                default:
-                    throw new ServerUnknownException(e);
-            }
-        } catch (IOException e) {
-            throw new NetworkException(e);
-        }
-    }
-
-    public void deleteBackups(List<String> userDids) throws HiveException {
-        try {
-            if (userDids == null) {
-                throw new InvalidParameterException("Invalid parameter userDids");
-            }
-            managementAPI.deleteBackups(new DeleteBackupsParams(userDids)).execute().body();
-        } catch (NodeRPCException e) {
-            switch (e.getCode()) {
-                case NodeRPCException.UNAUTHORIZED:
-                    throw new UnauthorizedException(e);
-                case NodeRPCException.FORBIDDEN:
-                    throw new VaultForbiddenException(e);
-                case NodeRPCException.BAD_REQUEST:
-                    throw new InvalidParameterException(e.getMessage());
-                case NodeRPCException.NOT_FOUND:
-                    throw new NotFoundException(e);
-                default:
-                    throw new ServerUnknownException(e);
-            }
-        } catch (IOException e) {
-            throw new NetworkException(e);
-        }
-    }
-
     public List<VaultAppDetail> getVaultApps() throws HiveException {
         try {
             return managementAPI.getVaultApps().execute().body().getApps();
