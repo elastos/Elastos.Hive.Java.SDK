@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
+import org.elastos.hive.subscription.AppInfo;
 import org.elastos.hive.subscription.BackupInfo;
 import org.elastos.hive.subscription.PricingPlan;
 import org.elastos.hive.subscription.SubscriptionController;
@@ -96,6 +97,11 @@ public class BackupSubscription extends ServiceEndpoint
 				throw new CompletionException(e);
 			}
 		});
+	}
+
+	@Override
+	public CompletableFuture<List<AppInfo>> getAppStats() {
+		throw new NotImplementedException();
 	}
 
 	@Override

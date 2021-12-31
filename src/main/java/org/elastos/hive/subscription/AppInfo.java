@@ -1,8 +1,8 @@
-package org.elastos.hive.endpoint;
+package org.elastos.hive.subscription;
 
 import com.google.gson.annotations.SerializedName;
 
-public class VaultAppDetail {
+public class AppInfo {
     @SerializedName("user_did")
     private String userDid;
     @SerializedName("app_did")

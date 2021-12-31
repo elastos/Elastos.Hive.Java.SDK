@@ -3,6 +3,7 @@ package org.elastos.hive.service;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.elastos.hive.subscription.AppInfo;
 import org.elastos.hive.subscription.PricingPlan;
 
 /**
@@ -62,4 +63,11 @@ public interface SubscriptionService<T> {
 	 *	  otherwise, the specific exception would returned in the wrapper.
 	 */
 	CompletableFuture<T> checkSubscription();
+
+	/**
+	 * Get all application stats of the vault service
+	 *
+	 * @return The application list.
+	 */
+	CompletableFuture<List<AppInfo>> getAppStats();
 }

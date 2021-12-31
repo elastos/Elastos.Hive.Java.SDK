@@ -1,16 +1,14 @@
-package org.elastos.hive.endpoint;
+package org.elastos.hive.provider;
 
 import com.google.gson.annotations.SerializedName;
 
-public class VaultDetail {
+public class BackupDetail {
     @SerializedName("pricing_using")
     private String pricingName;
     @SerializedName("max_storage")
     private int maxStorage;
-    @SerializedName("file_use_storage")
-    private int fileUseStorage;
-    @SerializedName("db_use_storage")
-    private int databaseUseStorage;
+    @SerializedName("use_storage")
+    private int useStorage;
     @SerializedName("user_did")
     private String userDid;
 
@@ -30,20 +28,12 @@ public class VaultDetail {
         this.maxStorage = maxStorage;
     }
 
-    public int getFileUseStorage() {
-        return fileUseStorage;
+    public int getUseStorage() {
+        return useStorage;
     }
 
-    public void setFileUseStorage(int fileUseStorage) {
-        this.fileUseStorage = fileUseStorage;
-    }
-
-    public int getDatabaseUseStorage() {
-        return databaseUseStorage;
-    }
-
-    public void setDatabaseUseStorage(int databaseUseStorage) {
-        this.databaseUseStorage = databaseUseStorage;
+    public void setUseStorage(int useStorage) {
+        this.useStorage = useStorage;
     }
 
     public String getUserDid() {

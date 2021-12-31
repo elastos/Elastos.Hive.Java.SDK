@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NotImplementedException;
+import org.elastos.hive.subscription.AppInfo;
 import org.elastos.hive.subscription.VaultInfo;
 import org.elastos.hive.subscription.PricingPlan;
 import org.elastos.hive.subscription.SubscriptionController;
@@ -91,6 +91,17 @@ public class VaultSubscription extends ServiceEndpoint
 		return CompletableFuture.supplyAsync(()-> {
 			try {
 				return subscriptionController.getVaultInfo();
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<List<AppInfo>> getAppStats() {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				return subscriptionController.getAppStats();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}

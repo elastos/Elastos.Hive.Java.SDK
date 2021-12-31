@@ -93,6 +93,23 @@ public class SubscriptionController {
 		}
 	}
 
+	public List<AppInfo> getAppStats() throws HiveException {
+		try {
+			return subscriptionAPI.getVaultAppStats().execute().body().getApps();
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.NOT_FOUND:
+					throw new VaultNotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
+		} catch (IOException e) {
+			throw new NetworkException(e.getMessage());
+		}
+	}
+
 	/**
 	 * Subscribe the vault with the free pricing plan.
 	 *

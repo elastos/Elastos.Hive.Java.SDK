@@ -1,10 +1,10 @@
-package org.elastos.hive.endpoint;
+package org.elastos.hive.provider;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-class BackupsInfo {
+class BackupStats {
     @SerializedName("backups")
     private List<BackupDetail> backups;
 

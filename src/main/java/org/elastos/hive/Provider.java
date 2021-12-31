@@ -1,7 +1,10 @@
 package org.elastos.hive;
 
-import org.elastos.hive.endpoint.*;
 import org.elastos.hive.exception.HiveException;
+import org.elastos.hive.provider.BackupDetail;
+import org.elastos.hive.provider.FilledOrderDetail;
+import org.elastos.hive.provider.RunStatsController;
+import org.elastos.hive.provider.VaultDetail;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -20,7 +23,7 @@ import java.util.concurrent.CompletionException;
  * </ul>
  */
 public class Provider extends ServiceEndpoint {
-	private ManagementController managementController;
+	private RunStatsController managementController;
 
 	public Provider(AppContext context) {
 		this(context, null);
@@ -34,11 +37,11 @@ public class Provider extends ServiceEndpoint {
 	 */
 	public Provider(AppContext context, String providerAddress) {
 		super(context, providerAddress);
-		managementController = new ManagementController(this);
+		managementController = new RunStatsController(this);
 	}
 
 	/**
-	 * Get all vault service information of the hive node.
+	 * Get all vault service stats of the hive node.
 	 * The access user DID MUST be the owner of the hive node.
 	 * @return vault service list.
 	 */
@@ -53,7 +56,7 @@ public class Provider extends ServiceEndpoint {
 	}
 
 	/**
-	 * Get all backup service information of the hive node.
+	 * Get all backup service stats of the hive node.
 	 * The access user DID MUST be the owner of the hive node.
 	 * @return backup service list.
 	 */
@@ -68,63 +71,18 @@ public class Provider extends ServiceEndpoint {
 	}
 
 	/**
-	 * Get all users in the hive node.
-	 * The access user DID MUST be the owner of the hive node.
-	 * @return users list.
-	 */
-	public CompletableFuture<List<UserDetail>> getUsers() {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return managementController.getUsers();
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
-	}
-
-	/**
-	 * Get all payments information of the hive node.
+	 * Get all filled order stats of the hive node.
 	 * The access user DID MUST be the owner of the hive node.
 	 * @return payment list.
 	 */
-	public CompletableFuture<List<PaymentDetail>> getPayments() {
+	public CompletableFuture<List<FilledOrderDetail>> getFilledOrders() {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return managementController.getPayments();
+				return managementController.getFilledOrders();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
 	}
 
-	/**
-	 * Get all application information of the vault service.
-	 * The access user DID MUST be the owner of the vault service.
-	 * @return application list.
-	 */
-	public CompletableFuture<List<VaultAppDetail>> getVaultApps() {
-		return CompletableFuture.supplyAsync(() -> {
-			try {
-				return managementController.getVaultApps();
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
-	}
-
-	/**
-	 * Delete applications of the vault service by application DIDs.
-	 * The access user DID MUST be the owner of the vault service.
-	 * @param appDids application DIDs whose data will be removed.
-	 * @return void
-	 */
-	public CompletableFuture<Void> deleteVaultApps(List<String> appDids) {
-		return CompletableFuture.runAsync(() -> {
-			try {
-				managementController.deleteVaultApps(appDids);
-			} catch (HiveException | RuntimeException e) {
-				throw new CompletionException(e);
-			}
-		});
-	}
 }
