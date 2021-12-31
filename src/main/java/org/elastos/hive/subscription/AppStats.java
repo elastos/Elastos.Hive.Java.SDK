@@ -1,14 +1,14 @@
-package org.elastos.hive.endpoint;
+package org.elastos.hive.subscription;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-class VaultAppsInfo {
+class AppStats {
     @SerializedName("apps")
-    private List<VaultAppDetail> apps;
+    private List<AppInfo> apps;
 
-    List<VaultAppDetail> getApps() {
+    List<AppInfo> getApps() {
         return apps;
     }
 }

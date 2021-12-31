@@ -1,8 +1,8 @@
-package org.elastos.hive.endpoint;
+package org.elastos.hive.provider;
 
 import com.google.gson.annotations.SerializedName;
 
-public class PaymentDetail {
+public class FilledOrderDetail {
     @SerializedName("order_id")
     private String orderId;
     @SerializedName("receipt_id")

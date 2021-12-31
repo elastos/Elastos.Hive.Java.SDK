@@ -23,6 +23,9 @@ interface SubscriptionAPI {
 	@GET("/api/v2/subscription/vault")
 	Call<VaultInfo> getVaultInfo();
 
+	@GET("/api/v2/subscription/vault/app_stats")
+	Call<AppStats> getVaultAppStats();
+
 	// for subscription to backup service.
 	@PUT("/api/v2/subscription/backup")
 	Call<BackupInfo> subscribeToBackup();

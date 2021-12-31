@@ -1,14 +1,16 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.endpoint.*;
 import org.elastos.hive.exception.NotFoundException;
+import org.elastos.hive.provider.BackupDetail;
+import org.elastos.hive.provider.FilledOrderDetail;
+import org.elastos.hive.provider.VaultDetail;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+@Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProviderTest {
     private static Provider provider;
@@ -51,43 +53,16 @@ public class ProviderTest {
     }
 
     @Test
-    @Order(3) void testGetUsers() {
-        Assertions.assertDoesNotThrow(()->{
-            List<UserDetail> users = provider.getUsers().get();
-            Assertions.assertNotNull(users);
-            Assertions.assertFalse(users.isEmpty());
-        });
-    }
-
-    @Test @Disabled
-    @Order(4) void testGetPayments() {
+    @Order(3) void testGetFilledOrders() {
         Assertions.assertDoesNotThrow(()-> {
-            List<PaymentDetail> backups = provider.getPayments().handle((res, ex) -> {
+            List<FilledOrderDetail> backups = provider.getFilledOrders().handle((res, ex) -> {
                 if (ex != null) {
                     Assertions.assertEquals(ex.getCause().getClass(), NotFoundException.class);
-                    return new ArrayList<PaymentDetail>();
+                    return new ArrayList<FilledOrderDetail>();
                 }
                 return res;
             }).get();
             Assertions.assertNotNull(backups);
-        });
-    }
-
-    @Test
-    @Order(5) void testGetVaultApps() {
-        Assertions.assertDoesNotThrow(()->{
-            List<VaultAppDetail> apps = provider.getVaultApps().get();
-            Assertions.assertNotNull(apps);
-            Assertions.assertFalse(apps.isEmpty());
-        });
-    }
-
-    @Test
-    @Order(6) void testDeleteVaultApps() {
-        Assertions.assertDoesNotThrow(()->{
-            List<String> appDids = Arrays.asList("did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm5",
-                    "did:elastos:imedtHyjLS155Gedhv7vKP3FTWjpBUAUm6");
-            provider.deleteVaultApps(appDids).get();
         });
     }
 }
