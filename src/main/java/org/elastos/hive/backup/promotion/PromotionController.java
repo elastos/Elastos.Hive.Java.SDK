@@ -23,6 +23,8 @@ public class PromotionController {
 					throw new UnauthorizedException(e);
 				case NodeRPCException.ALREADY_EXISTS:
 					throw new VaultAlreadyExistsException(e);
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
 				case NodeRPCException.BAD_REQUEST:
 					throw new InvalidParameterException(e.getMessage());
 				case NodeRPCException.INSUFFICIENT_STORAGE:

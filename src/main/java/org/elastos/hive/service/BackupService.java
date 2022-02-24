@@ -1,5 +1,7 @@
 package org.elastos.hive.service;
 
+import org.elastos.hive.vault.backup.BackupResult;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -12,12 +14,6 @@ import java.util.concurrent.CompletableFuture;
  * <p>User also need just one backup copy for vault data.</p>
  */
 public interface BackupService {
-	enum BackupResult {
-		STATE_STOP,
-		STATE_BACKUP,
-		STATE_RESTORE,
-	}
-
 	/**
 	 * Set-up a context for get more detailed information for backup server.
 	 *
