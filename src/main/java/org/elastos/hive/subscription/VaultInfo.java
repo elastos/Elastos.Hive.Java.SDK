@@ -17,7 +17,7 @@ public class VaultInfo {
 	@SerializedName("updated")
 	private long updated;
 	@SerializedName("pricing_plan")
-	private String pricePlan;
+	private String pricingPlan;
 
 	public void setServiceDid(String serviceDid) {
 		this.serviceDid = serviceDid;
@@ -39,8 +39,8 @@ public class VaultInfo {
 		this.updated = updated;
 	}
 
-	public void setPricePlan(String pricePlan) {
-		this.pricePlan = pricePlan;
+	public void setPricingPlan(String pricingPlan) {
+		this.pricingPlan = pricingPlan;
 	}
 
 	public String getServiceDid() {
@@ -63,7 +63,7 @@ public class VaultInfo {
 		return updated;
 	}
 
-	public String getPricePlan() {
-		return pricePlan;
+	public String getPricingPlan() {
+		return pricingPlan;
 	}
 }

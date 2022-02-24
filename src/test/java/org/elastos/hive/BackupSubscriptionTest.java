@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.subscription.BackupInfo;
 import org.elastos.hive.subscription.PricingPlan;
 import org.junit.jupiter.api.*;
 
@@ -36,7 +37,20 @@ class BackupSubscriptionTest {
 	}
 
 	@Disabled
-	@Test @Order(6) void testUnsubscribe() {
+	@Test @Order(4) void testCheckSubscription() {
+		Assertions.assertDoesNotThrow(()-> {
+			BackupInfo info = subscription.checkSubscription().get();
+			Assertions.assertNotNull(info);
+			Assertions.assertNotNull(info.getPricingPlan());
+			Assertions.assertNotNull(info.getServiceDid());
+			Assertions.assertTrue(info.getStorageQuota() > 0);
+			Assertions.assertTrue(info.getCreated() > 0);
+			Assertions.assertTrue(info.getUpdated() > 0);
+		});
+	}
+
+	@Disabled
+	@Test @Order(5) void testUnsubscribe() {
 		Assertions.assertDoesNotThrow(()->subscription.unsubscribe().get());
 	}
 }
