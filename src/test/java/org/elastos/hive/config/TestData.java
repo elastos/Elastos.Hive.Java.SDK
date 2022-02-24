@@ -215,10 +215,10 @@ public class TestData {
 			}
 
 			@Override
-			public CompletableFuture<String> getAuthorization(String srcDid, String targetDid, String targetHost) {
+			public CompletableFuture<String> getAuthorization(String serviceDid, String targetDid, String targetHost) {
 				return CompletableFuture.supplyAsync(() -> {
 					try {
-						return userDid.issueBackupDiplomaFor(srcDid, targetHost, targetDid).toString();
+						return userDid.issueBackupDiplomaFor(serviceDid, targetHost, targetDid).toString();
 					} catch (DIDException e) {
 						throw new CompletionException(new HiveException(e.getMessage()));
 					}

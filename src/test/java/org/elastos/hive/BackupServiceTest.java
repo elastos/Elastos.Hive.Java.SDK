@@ -3,6 +3,7 @@ package org.elastos.hive;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.exception.NotFoundException;
 import org.elastos.hive.service.BackupService;
+import org.elastos.hive.vault.backup.BackupResult;
 import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -38,7 +39,12 @@ class BackupServiceTest {
 	}
 
 	@Test @Order(2) void testCheckResult() {
-		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(backupService.checkResult().get()));
+		Assertions.assertDoesNotThrow(()-> {
+			BackupResult result = backupService.checkResult().get();
+			Assertions.assertNotNull(result);
+			Assertions.assertNotNull(result.getState());
+			Assertions.assertNotNull(result.getResult());
+		});
 	}
 
 	@Disabled

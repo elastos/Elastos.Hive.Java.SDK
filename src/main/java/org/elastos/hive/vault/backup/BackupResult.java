@@ -1,27 +1,70 @@
 package org.elastos.hive.vault.backup;
 
 import com.google.gson.annotations.SerializedName;
-import org.elastos.hive.service.BackupService;
 
 import java.io.IOException;
 
-class BackupResult {
+public class BackupResult {
+	enum State {
+		STATE_STOP,
+		STATE_BACKUP,
+		STATE_RESTORE,
+	}
+
+	enum Result {
+		RESULT_SUCCESS,
+		RESULT_FAILED,
+		RESULT_PROCESS,
+	}
+
 	@SerializedName("state")
 	private String state;
 
 	@SerializedName("result")
 	private String result;
 
-	public BackupService.BackupResult getStatusResult() throws IOException {
+	@SerializedName("message")
+	private String message;
+
+	public State getState() throws IOException {
 		switch (state) {
 			case "stop":
-				return BackupService.BackupResult.STATE_STOP;
+				return State.STATE_STOP;
 			case "backup":
-				return BackupService.BackupResult.STATE_BACKUP;
+				return State.STATE_BACKUP;
 			case "restore":
-				return BackupService.BackupResult.STATE_RESTORE;
+				return State.STATE_RESTORE;
 			default:
-				throw new IOException("Unknown state :" + result);
+				throw new IOException("Unknown state :" + state);
 		}
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public Result getResult() throws IOException {
+		switch (result) {
+			case "success":
+				return Result.RESULT_SUCCESS;
+			case "failed":
+				return Result.RESULT_FAILED;
+			case "process":
+				return Result.RESULT_PROCESS;
+			default:
+				throw new IOException("Unknown result :" + result);
+		}
+	}
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }

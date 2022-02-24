@@ -7,6 +7,7 @@ import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.vault.backup.BackupController;
+import org.elastos.hive.vault.backup.BackupResult;
 import org.elastos.hive.vault.backup.credential.CredentialCode;
 import org.elastos.hive.service.BackupContext;
 import org.elastos.hive.service.BackupService;

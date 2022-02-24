@@ -3,7 +3,6 @@ package org.elastos.hive.vault.backup;
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.exception.*;
-import org.elastos.hive.service.BackupService;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -89,9 +88,9 @@ public class BackupController {
 	 * @return The result of the backup process.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public BackupService.BackupResult checkResult() throws HiveException {
+	public BackupResult checkResult() throws HiveException {
 		try {
-			return backupAPI.getState().execute().body().getStatusResult();
+			return backupAPI.getState().execute().body();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:

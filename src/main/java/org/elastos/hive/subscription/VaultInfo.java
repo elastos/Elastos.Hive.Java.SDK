@@ -16,7 +16,7 @@ public class VaultInfo {
 	private long created;
 	@SerializedName("updated")
 	private long updated;
-	@SerializedName("price_plan")
+	@SerializedName("pricing_plan")
 	private String pricePlan;
 
 	public void setServiceDid(String serviceDid) {

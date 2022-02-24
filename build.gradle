@@ -20,7 +20,7 @@ buildscript {
 }
 
 // Change this before generating jars.
-version = 'v2.4.1.1'
+version = 'v2.4.1'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -73,6 +73,7 @@ task createjavadoc(type: Javadoc) {
         encoding "UTF-8"
         charSet 'UTF-8'
         links "http://docs.oracle.com/javase/8/docs/api"
+        locale "en_US"
     }
 }
 
