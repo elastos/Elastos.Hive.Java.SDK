@@ -2,6 +2,7 @@ package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.subscription.PricingPlan;
+import org.elastos.hive.subscription.VaultInfo;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
@@ -38,7 +39,15 @@ class VaultSubscriptionTest {
 	}
 
 	@Test @Order(4) void testCheckSubscription() {
-		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(subscription.checkSubscription().get()));
+		Assertions.assertDoesNotThrow(()-> {
+			VaultInfo info = subscription.checkSubscription().get();
+			Assertions.assertNotNull(info);
+			Assertions.assertNotNull(info.getPricingPlan());
+			Assertions.assertNotNull(info.getServiceDid());
+			Assertions.assertTrue(info.getStorageQuota() > 0);
+			Assertions.assertTrue(info.getCreated() > 0);
+			Assertions.assertTrue(info.getUpdated() > 0);
+		});
 	}
 
 	@Disabled
