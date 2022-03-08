@@ -12,7 +12,7 @@ public class UserDID extends DIDEntity {
 	private Issuer issuer;
 
 	public UserDID(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
-		super(name, mnemonic, phrasepass, storepass);
+		super(name, mnemonic, phrasepass, storepass, true);
 		issuer = new Issuer(getDocument());
 	}
 
