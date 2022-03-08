@@ -5,56 +5,67 @@ import org.elastos.did.DIDDocument;
 import org.elastos.did.DIDStore;
 import org.elastos.did.RootIdentity;
 import org.elastos.did.exception.DIDException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
 
 class DIDEntity {
+	private static final Logger log = LoggerFactory.getLogger(DIDEntity.class);
+
 	private final String name;
 	private final String phrasepass;
 	protected final String storepass;
 
-	private RootIdentity identity;
-	private DIDStore store;
+	private DIDStore didStore;
 	private DID did;
 
-	protected DIDEntity(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
+	protected DIDEntity(String name, String mnemonic, String phrasepass, String storepass,
+						boolean needResolve) throws DIDException {
 		this.name = name;
 		this.phrasepass = phrasepass;
 		this.storepass = storepass;
-
-		initPrivateIdentity(mnemonic);
-		initDid();
+		this.initDid(mnemonic, needResolve);
 	}
 
-	protected void initPrivateIdentity(String mnemonic) throws DIDException {
+	private void initDid(String mnemonic, boolean needResolve) throws DIDException {
 		final String storePath = System.getProperty("user.dir") + File.separator + "data/didCache" + File.separator + name;
-
-		store = DIDStore.open(storePath);
-
-		String id = RootIdentity.getId(mnemonic, phrasepass);
-		if (store.containsRootIdentity(id))
-			return; // Already exists
-
-		this.identity = RootIdentity.create(mnemonic, phrasepass, store, storepass);
-
-		identity.synchronize(0);
+		didStore = DIDStore.open(storePath);
+		RootIdentity rootIdentity = this.getRootIdentity(mnemonic);
+		this.initDidByRootIdentity(rootIdentity, needResolve);
 	}
 
-	protected void initDid() throws DIDException {
-		List<DID> dids = store.listDids();
+	private RootIdentity getRootIdentity(String mnemonic) throws DIDException {
+		String id = RootIdentity.getId(mnemonic, phrasepass);
+		return didStore.containsRootIdentity(id) ? didStore.loadRootIdentity(id)
+				: RootIdentity.create(mnemonic, phrasepass, didStore, storepass);
+	}
+
+	private void initDidByRootIdentity(RootIdentity rootIdentity, boolean needResolve) throws DIDException {
+		List<DID> dids = didStore.listDids();
 		if (dids.size() > 0) {
 			this.did = dids.get(0);
-			return;
+		} else {
+			if (needResolve) {
+				// Sync the all information of the did with index 0.
+				boolean synced = rootIdentity.synchronize(0);
+				log.info("{}: identity synchronized result: {}", this.name, synced);
+				this.did = rootIdentity.getDid(0);
+			} else {
+				// Only create the did on local store.
+				DIDDocument doc = rootIdentity.newDid(storepass);
+				this.did = doc.getSubject();
+				System.out.format("[%s] My new DID created: %s%n", name, did);
+			}
 		}
-
-		DIDDocument doc = identity.newDid(storepass);
-		this.did = doc.getSubject();
-		System.out.format("[%s] My new DID created: %s%n", name, did);
+		if (this.did == null) {
+			throw new DIDException("Can not get the did from the local store.");
+		}
 	}
 
 	protected DIDStore getDIDStore() {
-		return store;
+		return didStore;
 	}
 
 	public DID getDid() {
@@ -62,7 +73,7 @@ class DIDEntity {
 	}
 
 	public DIDDocument getDocument() throws DIDException {
-		return store.loadDid(did);
+		return didStore.loadDid(did);
 	}
 
 	public String getName() {
