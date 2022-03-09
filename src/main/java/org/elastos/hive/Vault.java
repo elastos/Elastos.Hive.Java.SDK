@@ -36,6 +36,10 @@ public class Vault extends ServiceEndpoint {
 		this.backupService  = builder.createBackupService();
 	}
 
+	public Vault(AppContext context) {
+		this(context, null);
+	}
+
 	/**
 	 * Get the files service of the vault.
 	 *

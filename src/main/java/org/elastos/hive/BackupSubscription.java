@@ -41,6 +41,16 @@ public class BackupSubscription extends ServiceEndpoint
 		paymentController = new PaymentController(this);
 	}
 
+	/**
+	 * Create by the application context and the address of the provider which can save the vault data.
+	 *
+	 * @param context The application context.
+	 * @throws HiveException See {@link HiveException}
+	 */
+	public BackupSubscription(AppContext context) throws HiveException {
+		this(context, null);
+	}
+
 	@Override
 	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
 		return CompletableFuture.supplyAsync(()-> {

@@ -40,6 +40,10 @@ public class Backup extends ServiceEndpoint {
 		this.promotionService = new ServiceBuilder(this).createPromotionService();
 	}
 
+	public Backup(AppContext context) {
+		this(context, null);
+	}
+
 	public PromotionService getPromotionService() {
 		return this.promotionService;
 	}
