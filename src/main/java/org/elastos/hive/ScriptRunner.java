@@ -36,6 +36,10 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 		this.controller = new ScriptingController(this);
 	}
 
+	public ScriptRunner(AppContext context) {
+		this(context, null);
+	}
+
 	@Override
 	public <T> CompletableFuture<T> callScript(String name,
 											JsonNode params,

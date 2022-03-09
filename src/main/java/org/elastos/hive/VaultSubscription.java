@@ -39,6 +39,16 @@ public class VaultSubscription extends ServiceEndpoint
 		paymentController = new PaymentController(this);
 	}
 
+	/**
+	 * Create by the application context, and the address of the provider.
+	 *
+	 * @param context The application context.
+	 * @throws HiveException See {@link HiveException}
+	 */
+	public VaultSubscription(AppContext context) throws HiveException {
+		this(context, null);
+	}
+
 	@Override
 	public CompletableFuture<List<PricingPlan>> getPricingPlanList() {
 		return CompletableFuture.supplyAsync(()-> {

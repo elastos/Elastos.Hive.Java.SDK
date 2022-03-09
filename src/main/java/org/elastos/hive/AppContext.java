@@ -61,6 +61,14 @@ public class AppContext {
 	}
 
 	/**
+	 * Get the provider address from user DID document.
+	 * @return
+	 */
+	public CompletableFuture<String> getProviderAddress() {
+		return AppContext.getProviderAddress(this.userDid);
+	}
+
+	/**
 	 * Setup the resolver for the DID verification.
 	 *
 	 * @param resolver The URL of the resolver.

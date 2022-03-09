@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
@@ -47,7 +48,7 @@ public class ServiceEndpoint extends NodeRPCConnection {
 	 * @param providerAddress The address of the provider.
 	 */
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
-		if (context == null || providerAddress == null)
+		if (context == null)
 			throw new IllegalArgumentException("Empty context or provider address parameter");
 
 		this.context = context;
@@ -105,6 +106,13 @@ public class ServiceEndpoint extends NodeRPCConnection {
 	 */
 	@Override
 	public String getProviderAddress() {
+		if (providerAddress == null) {
+			try {
+				providerAddress = context.getProviderAddress().get();
+			} catch (InterruptedException | ExecutionException  e) {
+				throw new RuntimeException("Failed to get the provider address from the user did.");
+			}
+		}
 		return providerAddress;
 	}
 
