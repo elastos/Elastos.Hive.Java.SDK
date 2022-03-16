@@ -62,6 +62,7 @@ class DatabaseServiceTest {
 			ObjectNode docNode = JsonNodeFactory.instance.objectNode();
 			docNode.put("author", "john doe1");
 			docNode.put("title", "Eve for Dummies1");
+			docNode.put("words_count", 10000);
 			Assertions.assertNotNull(databaseService.insertOne(COLLECTION_NAME, docNode,
 					new InsertOptions().bypassDocumentValidation(false)).get());
 		});
@@ -84,6 +85,7 @@ class DatabaseServiceTest {
 			ObjectNode doc = JsonNodeFactory.instance.objectNode();
 			doc.put("author", "john doe2");
 			doc.put("title", "Eve for Dummies2");
+			doc.put("words_count", 1000);
 			nodes.add(doc);
 
 			doc.removeAll();
@@ -91,6 +93,7 @@ class DatabaseServiceTest {
 			doc = JsonNodeFactory.instance.objectNode();
 			doc.put("author", "john doe3");
 			doc.put("title", "Eve for Dummies3");
+			doc.put("words_count", 10000);
 			nodes.add(doc);
 
 			Assertions.assertNotNull(databaseService.insertMany(COLLECTION_NAME, nodes,
@@ -141,8 +144,13 @@ class DatabaseServiceTest {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode query = JsonNodeFactory.instance.objectNode();
 			query.put("author", "john doe1");
+			ObjectNode wordsCount = JsonNodeFactory.instance.objectNode();
+			wordsCount.put("$gt", 5000);
+			wordsCount.put("$lt", 15000);
+			query.put("words_count", wordsCount);
 			List<JsonNode> docs = databaseService.findMany(COLLECTION_NAME, query,
 					new FindOptions().setSkip(0).setLimit(0)).get();
+			Assertions.assertEquals(docs.size(), 1);
 		});
 	}
 

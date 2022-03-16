@@ -11,7 +11,10 @@ public class InsertOptions {
 	Boolean bypassDocumentValidation;
 
 	@SerializedName("ordered")
-	boolean ordered;
+	Boolean ordered;
+
+	@SerializedName("timestamp")
+	Boolean timestamp;
 
 	public InsertOptions() {
 		this(false, false);
@@ -33,6 +36,11 @@ public class InsertOptions {
 
 	public InsertOptions ordered(Boolean value) {
 		ordered = value;
+		return this;
+	}
+
+	public InsertOptions timestamp(Boolean value) {
+		timestamp = value;
 		return this;
 	}
 }

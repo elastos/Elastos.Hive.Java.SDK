@@ -147,6 +147,8 @@ public class SubscriptionController {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:
 					throw new UnauthorizedException();
+				case NodeRPCException.NOT_FOUND:
+					throw new VaultNotFoundException();
 				default:
 					throw new ServerUnknownException(e);
 			}
@@ -264,6 +266,8 @@ public class SubscriptionController {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:
 					throw new UnauthorizedException();
+				case NodeRPCException.NOT_FOUND:
+					throw new BackupNotFoundException();
 				default:
 					throw new ServerUnknownException(e);
 			}
