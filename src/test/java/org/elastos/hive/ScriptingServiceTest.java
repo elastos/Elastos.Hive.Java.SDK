@@ -90,6 +90,7 @@ class ScriptingServiceTest {
 			ObjectNode doc = JsonNodeFactory.instance.objectNode();
 			doc.put("author", "$params.author");
 			doc.put("content", "$params.content");
+			doc.put("words_count", "$params.words_count");
 			ObjectNode options = JsonNodeFactory.instance.objectNode();
 			options.put("bypass_document_validation", false);
 			options.put("ordered", true);
@@ -104,6 +105,7 @@ class ScriptingServiceTest {
 			ObjectNode params = JsonNodeFactory.instance.objectNode();
 			params.put("author","John");
 			params.put("content", "message");
+			params.put("words_count", 10000);
 			JsonNode result = scriptRunner.callScript(scriptName, params,
 					targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
@@ -120,7 +122,11 @@ class ScriptingServiceTest {
 	private void registerScriptFindWithoutCondition(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode filter = JsonNodeFactory.instance.objectNode();
-			filter.put("author","John");
+			filter.put("author","$params.author");
+			ObjectNode wordsCount = JsonNodeFactory.instance.objectNode();
+			wordsCount.put("$gt","$params.start");
+			wordsCount.put("$lt","$params.end");
+			filter.put("words_count",wordsCount);
 			scriptingService.registerScript(scriptName,
 					new FindExecutable(scriptName, COLLECTION_NAME, filter).setOutput(true),
 					false, false).get();
@@ -128,8 +134,18 @@ class ScriptingServiceTest {
 	}
 
 	private void callScriptFindWithoutCondition(String scriptName) {
-		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(
-				scriptRunner.callScriptUrl(scriptName, "{}", targetDid, appDid, String.class).get()));
+		Assertions.assertDoesNotThrow(()->{
+			ObjectNode params = JsonNodeFactory.instance.objectNode();
+			params.put("author","John");
+			params.put("start", 5000);
+			params.put("end", 15000);
+			JsonNode result = scriptRunner.callScript(scriptName, params,
+					targetDid, appDid, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("items"));
+			Assertions.assertTrue(result.get(scriptName).get("items").size() > 0);
+		});
 	}
 
 	@Test @Order(3) void testFind() {

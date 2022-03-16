@@ -279,6 +279,8 @@ public class FilesController {
 					throw new VaultForbiddenException(e);
 				case NodeRPCException.BAD_REQUEST:
 					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
 				default:
 					throw new ServerUnknownException(e);
 			}

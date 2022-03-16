@@ -26,7 +26,7 @@ public class BackupResult {
 	@SerializedName("message")
 	private String message;
 
-	public State getState() throws IOException {
+	public State getState() {
 		switch (state) {
 			case "stop":
 				return State.STATE_STOP;
@@ -35,7 +35,7 @@ public class BackupResult {
 			case "restore":
 				return State.STATE_RESTORE;
 			default:
-				throw new IOException("Unknown state :" + state);
+				throw new RuntimeException("Unknown state :" + state);
 		}
 	}
 
@@ -43,7 +43,7 @@ public class BackupResult {
 		this.state = state;
 	}
 
-	public Result getResult() throws IOException {
+	public Result getResult() {
 		switch (result) {
 			case "success":
 				return Result.RESULT_SUCCESS;
@@ -52,7 +52,7 @@ public class BackupResult {
 			case "process":
 				return Result.RESULT_PROCESS;
 			default:
-				throw new IOException("Unknown result :" + result);
+				throw new RuntimeException("Unknown result :" + result);
 		}
 	}
 

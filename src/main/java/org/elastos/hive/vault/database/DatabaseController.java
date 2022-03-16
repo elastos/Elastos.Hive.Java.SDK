@@ -70,6 +70,8 @@ public class DatabaseController {
 					throw new UnauthorizedException(e);
 				case NodeRPCException.FORBIDDEN:
 					throw new VaultForbiddenException(e);
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
 				default:
 					throw new ServerUnknownException(e);
 			}
