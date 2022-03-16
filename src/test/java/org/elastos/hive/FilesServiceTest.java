@@ -149,10 +149,7 @@ class FilesServiceTest {
 	}
 
 	@Test @Order(7) void testMove() {
-		Assertions.assertDoesNotThrow(() ->
-				filesService.delete(remoteBackupTxtFilePath)
-						.thenCompose(result -> filesService.move(remoteTxtFilePath, remoteBackupTxtFilePath))
-						.get());
+		Assertions.assertDoesNotThrow(() -> filesService.move(remoteTxtFilePath, remoteBackupTxtFilePath).get());
 		verifyRemoteFileExists(remoteBackupTxtFilePath);
 	}
 
