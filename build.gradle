@@ -20,7 +20,7 @@ buildscript {
 }
 
 // Change this before generating jars.
-version = 'v2.4.1'
+version = 'v2.5.1'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8

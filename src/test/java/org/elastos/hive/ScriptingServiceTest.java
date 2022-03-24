@@ -282,11 +282,23 @@ class ScriptingServiceTest {
 		Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
 	}
 
+	@Test @Order(7) void testFileDownloadAnonymous() {
+		FilesServiceTest.removeLocalFile(localDstFilePath);
+		registerScriptFileDownload(DOWNLOAD_FILE_NAME, true);
+		String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
+		downloadFileByTransActionId(transactionId);
+		Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
+	}
+
 	private void registerScriptFileDownload(String scriptName) {
+		registerScriptFileDownload(scriptName, false);
+	}
+
+	private void registerScriptFileDownload(String scriptName, boolean anonymous) {
 		Assertions.assertDoesNotThrow(() ->
 				scriptingService.registerScript(scriptName,
 						new FileDownloadExecutable(scriptName).setOutput(true),
-						false, false).get());
+						anonymous, anonymous).get());
 	}
 
 	private String callScriptFileDownload(String scriptName, String fileName) {
@@ -297,6 +309,9 @@ class ScriptingServiceTest {
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
 			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
+			if (result.get(scriptName).has("anonymous_url")) {
+				log.info("anonymous_url: " + result.get(scriptName).get("anonymous_url").textValue());
+			}
 			return result.get(scriptName).get("transaction_id").textValue();
 		} catch (Exception e) {
 			Assertions.fail(Throwables.getStackTraceAsString(e));
