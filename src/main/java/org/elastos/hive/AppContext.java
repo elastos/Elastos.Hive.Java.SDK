@@ -62,7 +62,7 @@ public class AppContext {
 
 	/**
 	 * Get the provider address from user DID document.
-	 * @return
+	 * @return The provider address.
 	 */
 	public CompletableFuture<String> getProviderAddress() {
 		return AppContext.getProviderAddress(this.userDid);

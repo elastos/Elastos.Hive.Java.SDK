@@ -54,10 +54,11 @@ public interface ScriptingInvocationService {
 	/**
 	 * This is the compatible implementation for downloading file by the hive url
 	 * which comes from v1 version SDK. The hive url definition is as this format:
-	 *
-	 * 	- hive://<targetDid>@<targetAppDid>/<scriptName>?params=<paramJsonStr>
+	 * <br>
+	 * hive://&lt;targetDid&gt;@&lt;targetAppDid&gt;/&lt;scriptName&gt;?params=&lt;paramJsonStr&gt;
 	 *
 	 * @param hiveUrl 			The hive url.
+	 * @param resultType 		Reader or InputStream class
 	 * @param <T> 				Reader or InputStream class
 	 * @return 					Reader or InputStream instance
 	 */
