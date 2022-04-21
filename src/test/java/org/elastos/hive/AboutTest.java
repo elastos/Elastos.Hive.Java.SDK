@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.endpoint.NodeInfo;
 import org.elastos.hive.endpoint.NodeVersion;
 import org.junit.jupiter.api.*;
 
@@ -24,6 +25,21 @@ class AboutTest {
 		Assertions.assertDoesNotThrow(()-> {
 			String commitId = subscription.getLatestCommitId().get();
 			Assertions.assertNotNull(commitId);
+		});
+	}
+
+	@Test @Order(3) void testGetNodeInfo() {
+		Assertions.assertDoesNotThrow(()-> {
+			NodeInfo info = subscription.getNodeInfo().get();
+			Assertions.assertNotNull(info);
+			Assertions.assertNotNull(info.getName());
+			Assertions.assertNotNull(info.getOwnershipPresentation());
+			Assertions.assertNotNull(info.getDescription());
+			Assertions.assertNotNull(info.getEmail());
+			Assertions.assertNotNull(info.getOwnerDid());
+			Assertions.assertNotNull(info.getLastCommitId());
+			Assertions.assertNotNull(info.getVersion());
+			Assertions.assertNotNull(info.getServiceDid());
 		});
 	}
 }
