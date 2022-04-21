@@ -222,6 +222,26 @@ class DatabaseServiceTest {
 		});
 	}
 
+	@Test @Order(8) void testUpdateOneInsertNotExists() {
+		/** The inserted document:
+		 {
+		 "_id": ObjectId("6241471ab042663cc9f179e7"),
+		 "author": "john doe4",
+		 "title": "title": "Eve for Dummies4"
+		 }
+		 */
+		Assertions.assertDoesNotThrow(()-> {
+			ObjectNode filter = JsonNodeFactory.instance.objectNode();
+			filter.put("author", "john doe4");
+			ObjectNode doc = JsonNodeFactory.instance.objectNode();
+			doc.put("title", "Eve for Dummies1_1");
+			ObjectNode update = JsonNodeFactory.instance.objectNode();
+			update.put("$setOnInsert", doc);
+			Assertions.assertNotNull(databaseService.updateOne(COLLECTION_NAME, filter, update,
+					new UpdateOptions().setBypassDocumentValidation(false).setUpsert(true)).get());
+		});
+	}
+
 	@Test @Order(8) void testUpdateOne4NotFoundException() {
 		ObjectNode filter = JsonNodeFactory.instance.objectNode();
 		filter.put("author", "john doe1");
