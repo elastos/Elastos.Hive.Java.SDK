@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.subscription.AppInfo;
 import org.elastos.hive.subscription.PricingPlan;
 import org.elastos.hive.subscription.VaultInfo;
 import org.junit.jupiter.api.*;
@@ -52,7 +53,17 @@ class VaultSubscriptionTest {
 
 	@Disabled
 	@Test @Order(5) void testGetAppStats() {
-		Assertions.assertDoesNotThrow(()->Assertions.assertNotNull(subscription.getAppStats().get()));
+		Assertions.assertDoesNotThrow(()-> {
+			List<AppInfo> infos = subscription.getAppStats().get();
+			Assertions.assertNotNull(infos);
+			Assertions.assertTrue(infos.size() > 0);
+			Assertions.assertNotNull(infos.get(0).getName());
+			Assertions.assertNotNull(infos.get(0).getDeveloperDid());
+			Assertions.assertNotNull(infos.get(0).getIconUrl());
+			Assertions.assertNotNull(infos.get(0).getUserDid());
+			Assertions.assertNotNull(infos.get(0).getAppDid());
+			Assertions.assertTrue(infos.get(0).getUsedStorageSize() >= 0);
+		});
 	}
 
 	@Disabled

@@ -11,6 +11,7 @@ import org.elastos.hive.exception.NetworkException;
  */
 public class AboutController {
 	private AboutAPI aboutAPI;
+	private AboutAPI aboutAPIAuth;
 
 	/**
 	 * Create the about controller by the RPC connection.
@@ -19,6 +20,7 @@ public class AboutController {
 	 */
 	public AboutController(NodeRPCConnection connection) {
 		aboutAPI = connection.createService(AboutAPI.class, false);
+		aboutAPIAuth = connection.createService(AboutAPI.class, true);
 	}
 
 	/**
@@ -44,6 +46,20 @@ public class AboutController {
 	public String getCommitId() throws HiveException {
 		try {
 			return aboutAPI.commitId().execute().body().getCommitId();
+		} catch (IOException e) {
+			throw new NetworkException(e);
+		}
+	}
+
+	/**
+	 * Get the information of the hive node.
+	 *
+	 * @return The information of the hive node.
+	 * @throws HiveException The exception shows the error from the request.
+	 */
+	public NodeInfo getNodeInfo() throws HiveException {
+		try {
+			return aboutAPIAuth.info().execute().body();
 		} catch (IOException e) {
 			throw new NetworkException(e);
 		}

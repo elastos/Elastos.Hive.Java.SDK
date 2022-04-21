@@ -3,16 +3,42 @@ package org.elastos.hive.subscription;
 import com.google.gson.annotations.SerializedName;
 
 public class AppInfo {
+    private String name;
+    @SerializedName("developer_did")
+    private String developerDid;
+    @SerializedName("icon_url")
+    private String iconUrl;
+    // skip redirect_url
     @SerializedName("user_did")
     private String userDid;
     @SerializedName("app_did")
     private String appDid;
-    @SerializedName("database_name")
-    private String databaseName;
-    @SerializedName("file_use_storage")
-    private int fileUseStorage;
-    @SerializedName("db_use_storage")
-    private int databaseUseStorage;
+    @SerializedName("used_storage_size")
+    private int usedStorageSize;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDeveloperDid() {
+        return developerDid;
+    }
+
+    public void setDeveloperDid(String developerDid) {
+        this.developerDid = developerDid;
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
 
     public String getUserDid() {
         return userDid;
@@ -30,27 +56,11 @@ public class AppInfo {
         this.appDid = appDid;
     }
 
-    public String getDatabaseName() {
-        return databaseName;
+    public int getUsedStorageSize() {
+        return usedStorageSize;
     }
 
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    public int getFileUseStorage() {
-        return fileUseStorage;
-    }
-
-    public void setFileUseStorage(int fileUseStorage) {
-        this.fileUseStorage = fileUseStorage;
-    }
-
-    public int getDatabaseUseStorage() {
-        return databaseUseStorage;
-    }
-
-    public void setDatabaseUseStorage(int databaseUseStorage) {
-        this.databaseUseStorage = databaseUseStorage;
+    public void setUsedStorageSize(int usedStorageSize) {
+        this.usedStorageSize = usedStorageSize;
     }
 }

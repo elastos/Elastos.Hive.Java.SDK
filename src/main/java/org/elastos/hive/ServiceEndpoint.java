@@ -13,6 +13,7 @@ import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.connection.auth.AccessToken;
 import org.elastos.hive.connection.auth.BridgeHandler;
 import org.elastos.hive.endpoint.AboutController;
+import org.elastos.hive.endpoint.NodeInfo;
 import org.elastos.hive.endpoint.NodeVersion;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
@@ -213,6 +214,21 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return new AboutController(this).getCommitId();
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	/**
+	 * Get the information of the hive node.
+	 *
+	 * @return The information.
+	 */
+	public CompletableFuture<NodeInfo> getNodeInfo() {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return new AboutController(this).getNodeInfo();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
