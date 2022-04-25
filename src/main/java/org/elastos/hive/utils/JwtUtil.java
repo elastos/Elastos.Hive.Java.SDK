@@ -32,7 +32,7 @@ public class JwtUtil {
 
     public static Claims getBody(String jwt) {
         try {
-            JwtParser jwtParser = new JwtParserBuilder().build();
+            JwtParser jwtParser = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build();
             Jws<Claims> jws = jwtParser.parseClaimsJws(jwt);
             return jws.getBody();
         } catch (ExpiredJwtException e) {

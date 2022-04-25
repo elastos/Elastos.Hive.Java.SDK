@@ -3,10 +3,7 @@ package org.elastos.hive;
 import org.elastos.hive.didhelper.AppInstanceFactory;
 import org.elastos.hive.payment.Order;
 import org.elastos.hive.payment.PricingPlan;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+@Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PaymentTest {
 
