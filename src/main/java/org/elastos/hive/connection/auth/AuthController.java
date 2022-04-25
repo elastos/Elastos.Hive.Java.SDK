@@ -101,7 +101,7 @@ public class AuthController {
 
 	private boolean checkValid(String jwtCode, String expectationDid) {
 		try {
-			Claims claims = new JwtParserBuilder()
+			Claims claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300)
 					.build()
 					.parseClaimsJws(jwtCode)
 					.getBody();
