@@ -270,6 +270,7 @@ class ScriptingServiceTest {
 			while (fileReader.read(buffer) != -1) {
 				writer.write(buffer);
 			}
+			writer.flush();
 		} catch (Exception e) {
 			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
