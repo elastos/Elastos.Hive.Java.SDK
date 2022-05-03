@@ -88,7 +88,7 @@ public class TestData {
 			public CompletableFuture<String> getAuthorization(String jwtToken) {
 				return CompletableFuture.supplyAsync(() -> {
 					try {
-						Claims claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
+						Claims claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(jwtToken).getBody();
 						if (claims == null)
 							throw new HiveException("Invalid jwt token as authorization.");
 						return appInstanceDid.createToken(appInstanceDid.createPresentation(
@@ -121,7 +121,7 @@ public class TestData {
 			public CompletableFuture<String> getAuthorization(String jwtToken) {
 				return CompletableFuture.supplyAsync(() -> {
 					try {
-						Claims claims = new JwtParserBuilder().build().parseClaimsJws(jwtToken).getBody();
+						Claims claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(jwtToken).getBody();
 						if (claims == null)
 							throw new HiveException("Invalid jwt token as authorization.");
 						return appInstanceDid.createToken(appInstanceDid.createPresentation(
