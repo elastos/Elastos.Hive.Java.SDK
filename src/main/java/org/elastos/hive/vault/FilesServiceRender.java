@@ -1,19 +1,18 @@
 package org.elastos.hive.vault;
 
 import org.elastos.hive.ServiceEndpoint;
+import org.elastos.hive.connection.UploadStream;
+import org.elastos.hive.connection.UploadWriter;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.files.FileInfo;
 import org.elastos.hive.vault.files.FilesController;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-
-import java.io.OutputStream;
-import java.io.Writer;
-import java.io.InputStream;
-import java.io.Reader;
 
 class FilesServiceRender implements FilesService {
 	private FilesController controller;
@@ -23,13 +22,25 @@ class FilesServiceRender implements FilesService {
 	}
 
 	@Override
-	public CompletableFuture<OutputStream> getUploadStream(String path) {
+	public CompletableFuture<UploadStream> getUploadStream(String path) {
+		return this.getUploadStream(path, false, null);
+	}
+
+	@Override
+	public CompletableFuture<UploadStream> getUploadStream(String path, String scriptName) {
+		return this.getUploadStream(path, true, scriptName);
+	}
+
+	private CompletableFuture<UploadStream> getUploadStream(String path, boolean is_public, String scriptName) {
 		return CompletableFuture.supplyAsync(() ->  {
 			if (path == null)
 				throw new IllegalArgumentException("Empty path parameter");
 
+			if (is_public && (scriptName == null || scriptName.isEmpty()))
+				throw new IllegalArgumentException("Script name should be provided when public.");
+
 			try {
-				return controller.getUploadStream(path);
+				return controller.getUploadStream(path, is_public, scriptName);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -37,13 +48,25 @@ class FilesServiceRender implements FilesService {
 	}
 
 	@Override
-	public CompletableFuture<Writer> getUploadWriter(String path) {
+	public CompletableFuture<UploadWriter> getUploadWriter(String path) {
+		return this.getUploadWriter(path, false, null);
+	}
+
+	@Override
+	public CompletableFuture<UploadWriter> getUploadWriter(String path, String scriptName) {
+		return this.getUploadWriter(path, true, scriptName);
+	}
+
+	private CompletableFuture<UploadWriter> getUploadWriter(String path, boolean is_public, String scriptName) {
 		return CompletableFuture.supplyAsync(() ->  {
 			if (path == null)
 				throw new IllegalArgumentException("Empty path parameter");
 
+			if (is_public && (scriptName == null || scriptName.isEmpty()))
+				throw new IllegalArgumentException("Script name should be provided when public.");
+
 			try {
-				return controller.getUploadWriter(path);
+				return controller.getUploadWriter(path, is_public, scriptName);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}

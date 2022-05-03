@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ClientConfig extends Config {
 	@JsonProperty("resolverUrl")
 	private String resolverUrl;
+	@JsonProperty("ipfsGateUrl")
+	private String ipfsGateUrl;
 	@JsonProperty("application")
 	private ApplicationConfig applicationConfig;
 	@JsonProperty("user")
@@ -17,6 +19,8 @@ public class ClientConfig extends Config {
 	public String resolverUrl() {
 		return this.resolverUrl;
 	}
+
+	public String getIpfsGateUrl() { return this.ipfsGateUrl; }
 
 	public ApplicationConfig applicationConfig() {
 		return this.applicationConfig;

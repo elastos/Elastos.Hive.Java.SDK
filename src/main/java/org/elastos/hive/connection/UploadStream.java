@@ -7,9 +7,10 @@ import java.net.HttpURLConnection;
 /**
  * The UploadOutputStream is for uploading file by the Http connection.
  */
-public class UploadOutputStream extends OutputStream {
+public class UploadStream extends OutputStream {
 	private HttpURLConnection connection;
 	private OutputStream outputStream;
+	private ConnectionClosure connectionClosure;
 
 	/**
 	 * Create the upload output stream by connection and relating output stream.
@@ -17,9 +18,10 @@ public class UploadOutputStream extends OutputStream {
 	 * @param connection Http Connection.
 	 * @param output The output stream for uploading file.
 	 */
-	public UploadOutputStream(HttpURLConnection connection, OutputStream output) {
+	public UploadStream(HttpURLConnection connection, OutputStream output) {
 		this.connection = connection;
 		this.outputStream = output;
+		this.connectionClosure = new ConnectionClosure(connection, output);
 	}
 
 	@Override
@@ -37,6 +39,10 @@ public class UploadOutputStream extends OutputStream {
 		outputStream.write(bytes, offset, length);
 	}
 
+	public String getCid() {
+		return this.connectionClosure.getCid();
+	}
+
 	@Override
 	public void flush() throws IOException {
 		outputStream.flush();
@@ -52,7 +58,6 @@ public class UploadOutputStream extends OutputStream {
 		//
 		// This close() method on the output stream is the only location where we know
 		// user has finished writing his file.
-		new ConnectionClosure().confirmClosed(connection);
-		outputStream.close();
+		this.connectionClosure.confirmClosed();
 	}
 }

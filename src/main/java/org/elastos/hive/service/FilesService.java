@@ -1,5 +1,7 @@
 package org.elastos.hive.service;
 
+import org.elastos.hive.connection.UploadStream;
+import org.elastos.hive.connection.UploadWriter;
 import org.elastos.hive.vault.files.FileInfo;
 
 import java.io.InputStream;
@@ -22,11 +24,14 @@ public interface FilesService {
 	 * to actually send the data remotely.
 	 *
 	 * @param path the path for the remote file
+	 *        scriptName used to download file anonymously by the scripting service with uploading public file.
 	 * @return the new CompletionStage, the result is the Writer or OutputStream interface for
 	 *			  upload the file content if success; null otherwise
 	 */
-	CompletableFuture<OutputStream> getUploadStream(String path);
-	CompletableFuture<Writer> getUploadWriter(String path);
+	CompletableFuture<UploadStream> getUploadStream(String path);
+	CompletableFuture<UploadStream> getUploadStream(String path, String scriptName);
+	CompletableFuture<UploadWriter> getUploadWriter(String path);
+	CompletableFuture<UploadWriter> getUploadWriter(String path, String scriptName);
 
 	/**
 	 * Initiates a download sequence by returning a Reader or InputStream object that can
