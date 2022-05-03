@@ -69,7 +69,7 @@ public class ServiceEndpoint extends NodeRPCConnection {
 					ServiceEndpoint endpoint = weakref.get();
 					Claims claims;
 
-					claims = new JwtParserBuilder().build().parseClaimsJws(value).getBody();
+					claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(value).getBody();
 					endpoint.flushDids(claims.getAudience(), claims.getIssuer());
 
 				} catch (Exception e) {
