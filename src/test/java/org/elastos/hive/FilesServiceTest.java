@@ -81,45 +81,8 @@ class FilesServiceTest {
 			while (fileReader.read(buffer) != -1) {
 				writer.write(buffer);
 			}
+			writer.flush();
 		}
-	}
-
-	@Test @Order(1) void testUploadPublicText() {
-		Assertions.assertDoesNotThrow(() -> {
-			String fileName = FILE_PUBLIC_NAME_TXT;
-			String scriptName = FILE_PUBLIC_NAME_TXT.split("\\.")[0];
-			String cid = null;
-			// Upload public file.
-			try (UploadWriter writer = filesService.getUploadWriter(fileName, scriptName).get();
-				 FileReader fileReader = new FileReader(localTxtFilePath)) {
-				Assertions.assertNotNull(writer);
-				char[] buffer = new char[1];
-				while (fileReader.read(buffer) != -1) {
-					writer.write(buffer);
-				}
-				writer.flush();
-				cid = writer.getCid();
-			}
-			// Download and verify normally.
-			try (Reader reader = filesService.getDownloadReader(fileName).get()) {
-				Assertions.assertNotNull(reader);
-				Utils.cacheTextFile(reader, localCacheRootDir, FILE_NAME_TXT);
-				Assertions.assertTrue(isFileContentEqual(localTxtFilePath, localCacheRootDir + FILE_NAME_TXT));
-			}
-			// Download by cid.
-			try (Reader reader = new IpfsRunner(TestData.getInstance().getIpfsGatewayUrl()).getFileReader(cid).get()) {
-				Assertions.assertNotNull(reader);
-				Utils.cacheTextFile(reader, localCacheRootDir, FILE_NAME_TXT);
-				Assertions.assertTrue(isFileContentEqual(localTxtFilePath, localCacheRootDir + FILE_NAME_TXT));
-			}
-			// Download by script.
-			ScriptingServiceTest scriptingServiceTest = new ScriptingServiceTest();
-			ScriptingServiceTest.setUp();
-			scriptingServiceTest.downloadPublicTxtFileAndVerify(scriptName, localCacheRootDir, FILE_NAME_TXT, localTxtFilePath);
-			// clean file and script
-			scriptingServiceTest.unregisterScript(scriptName);
-			filesService.delete(fileName).get();
-		});
 	}
 
 	@Test @Order(2) void testUploadBin() {
@@ -133,40 +96,6 @@ class FilesServiceTest {
 			out.write(Utils.readImage(localImgFilePath));
 			out.flush();
 		}
-	}
-
-	@Test @Order(2) void testUploadPublicBin() {
-		Assertions.assertDoesNotThrow(() -> {
-			String fileName = FILE_PUBLIC_NAME_BIN;
-			String scriptName = FILE_PUBLIC_NAME_BIN.split("\\.")[0];
-			String cid = null;
-			// Upload public file.
-			try (UploadStream out = filesService.getUploadStream(fileName, scriptName).get()) {
-				Assertions.assertNotNull(out);
-				out.write(Utils.readImage(localImgFilePath));
-				out.flush();
-				cid = out.getCid();
-			}
-			// Download and verify normally.
-			try (InputStream in = filesService.getDownloadStream(fileName).get()) {
-				Assertions.assertNotNull(in);
-				Utils.cacheBinFile(in, localCacheRootDir, FILE_NAME_IMG);
-				Assertions.assertTrue(isFileContentEqual(localImgFilePath, localCacheRootDir + FILE_NAME_IMG));
-			}
-			// Download by cid.
-			try (InputStream in = new IpfsRunner(TestData.getInstance().getIpfsGatewayUrl()).getFileStream(cid).get()) {
-				Assertions.assertNotNull(in);
-				Utils.cacheBinFile(in, localCacheRootDir, FILE_NAME_IMG);
-				Assertions.assertTrue(isFileContentEqual(localImgFilePath, localCacheRootDir + FILE_NAME_IMG));
-			}
-			// Download by script.
-			ScriptingServiceTest scriptingServiceTest = new ScriptingServiceTest();
-			ScriptingServiceTest.setUp();
-			scriptingServiceTest.downloadPublicBinFileAndVerify(scriptName, localCacheRootDir, FILE_NAME_IMG, localImgFilePath);
-			// clean file and script
-			scriptingServiceTest.unregisterScript(scriptName);
-			filesService.delete(fileName).get();
-		});
 	}
 
 	@Test @Order(3) void testDownloadText() {
@@ -256,6 +185,78 @@ class FilesServiceTest {
 				filesService.delete(remoteTxtFilePath)
 						.thenCompose(result -> filesService.delete(remoteBackupTxtFilePath))
 						.get());
+	}
+
+	@Test @Order(10) void testUploadPublicText() {
+		Assertions.assertDoesNotThrow(() -> {
+			String fileName = FILE_PUBLIC_NAME_TXT;
+			String scriptName = FILE_PUBLIC_NAME_TXT.split("\\.")[0];
+			String cid = null;
+			// Upload public file.
+			try (UploadWriter writer = filesService.getUploadWriter(fileName, scriptName).get();
+				 FileReader fileReader = new FileReader(localTxtFilePath)) {
+				Assertions.assertNotNull(writer);
+				char[] buffer = new char[1];
+				while (fileReader.read(buffer) != -1) {
+					writer.write(buffer);
+				}
+				writer.flush();
+				cid = writer.getCid();
+			}
+			// Download and verify normally.
+			try (Reader reader = filesService.getDownloadReader(fileName).get()) {
+				Assertions.assertNotNull(reader);
+				Utils.cacheTextFile(reader, localCacheRootDir, FILE_NAME_TXT);
+				Assertions.assertTrue(isFileContentEqual(localTxtFilePath, localCacheRootDir + FILE_NAME_TXT));
+			}
+			// Download by cid.
+			try (Reader reader = new IpfsRunner(TestData.getInstance().getIpfsGatewayUrl()).getFileReader(cid).get()) {
+				Assertions.assertNotNull(reader);
+				Utils.cacheTextFile(reader, localCacheRootDir, FILE_NAME_TXT);
+				Assertions.assertTrue(isFileContentEqual(localTxtFilePath, localCacheRootDir + FILE_NAME_TXT));
+			}
+			// Download by script.
+			ScriptingServiceTest scriptingServiceTest = new ScriptingServiceTest();
+			ScriptingServiceTest.setUp();
+			scriptingServiceTest.downloadPublicTxtFileAndVerify(scriptName, localCacheRootDir, FILE_NAME_TXT, localTxtFilePath);
+			// clean file and script
+			scriptingServiceTest.unregisterScript(scriptName);
+			filesService.delete(fileName).get();
+		});
+	}
+
+	@Test @Order(10) void testUploadPublicBin() {
+		Assertions.assertDoesNotThrow(() -> {
+			String fileName = FILE_PUBLIC_NAME_BIN;
+			String scriptName = FILE_PUBLIC_NAME_BIN.split("\\.")[0];
+			String cid = null;
+			// Upload public file.
+			try (UploadStream out = filesService.getUploadStream(fileName, scriptName).get()) {
+				Assertions.assertNotNull(out);
+				out.write(Utils.readImage(localImgFilePath));
+				out.flush();
+				cid = out.getCid();
+			}
+			// Download and verify normally.
+			try (InputStream in = filesService.getDownloadStream(fileName).get()) {
+				Assertions.assertNotNull(in);
+				Utils.cacheBinFile(in, localCacheRootDir, FILE_NAME_IMG);
+				Assertions.assertTrue(isFileContentEqual(localImgFilePath, localCacheRootDir + FILE_NAME_IMG));
+			}
+			// Download by cid.
+			try (InputStream in = new IpfsRunner(TestData.getInstance().getIpfsGatewayUrl()).getFileStream(cid).get()) {
+				Assertions.assertNotNull(in);
+				Utils.cacheBinFile(in, localCacheRootDir, FILE_NAME_IMG);
+				Assertions.assertTrue(isFileContentEqual(localImgFilePath, localCacheRootDir + FILE_NAME_IMG));
+			}
+			// Download by script.
+			ScriptingServiceTest scriptingServiceTest = new ScriptingServiceTest();
+			ScriptingServiceTest.setUp();
+			scriptingServiceTest.downloadPublicBinFileAndVerify(scriptName, localCacheRootDir, FILE_NAME_IMG, localImgFilePath);
+			// clean file and script
+			scriptingServiceTest.unregisterScript(scriptName);
+			filesService.delete(fileName).get();
+		});
 	}
 
 	private static void verifyRemoteFileExists(String path) {
