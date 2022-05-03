@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileReader;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 
@@ -319,6 +320,28 @@ class ScriptingServiceTest {
 		}
 	}
 
+	public void downloadPublicBinFileAndVerify(String scriptName, String cacheRoot, String cacheFileName, String checkFilePath) {
+		String transId = this.callScriptFileDownload(scriptName, null);
+		try (InputStream in = scriptRunner.downloadFile(transId, InputStream.class).get()) {
+			Assertions.assertNotNull(in);
+			Utils.cacheBinFile(in, cacheRoot, cacheFileName);
+			Assertions.assertTrue(FilesServiceTest.isFileContentEqual(checkFilePath, cacheRoot + cacheFileName));
+		} catch (Exception e) {
+			Assertions.fail(Throwables.getStackTraceAsString(e));
+		}
+	}
+
+	public void downloadPublicTxtFileAndVerify(String scriptName, String cacheRoot, String cacheFileName, String checkFilePath) {
+		String transId = this.callScriptFileDownload(scriptName, null);
+		try (Reader reader = scriptRunner.downloadFile(transId, Reader.class).get()) {
+			Assertions.assertNotNull(reader);
+			Utils.cacheTextFile(reader, cacheRoot, cacheFileName);
+			Assertions.assertTrue(FilesServiceTest.isFileContentEqual(checkFilePath, cacheRoot + cacheFileName));
+		} catch (Exception e) {
+			Assertions.fail(Throwables.getStackTraceAsString(e));
+		}
+	}
+
 	private void downloadFileByTransActionId(String transactionId) {
 		try (Reader reader = scriptRunner.downloadFile(transactionId, Reader.class).get()) {
 			Assertions.assertNotNull(reader);
@@ -377,8 +400,12 @@ class ScriptingServiceTest {
 	}
 
 	@Test @Order(10) void testUnregister() {
-		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(FILE_HASH_NAME).get(); });
+		this.unregisterScript(FILE_HASH_NAME);
 		remove_test_database();
+	}
+
+	public void unregisterScript(String scriptName) {
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
 	}
 
 	/**

@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
-import org.elastos.hive.connection.UploadOutputStream;
-import org.elastos.hive.connection.UploadOutputStreamWriter;
+import org.elastos.hive.connection.UploadStream;
+import org.elastos.hive.connection.UploadWriter;
 import org.elastos.hive.exception.*;
 
 /**
@@ -35,10 +35,11 @@ public class FilesController {
 	 * @return The output stream.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public OutputStream getUploadStream(String path) throws HiveException {
+	public UploadStream getUploadStream(String path, boolean is_public, String scriptName) throws HiveException {
 		try {
-			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
-			return new UploadOutputStream(urlConnection, urlConnection.getOutputStream());
+			String params = is_public ? "?public=true&script_name=" + scriptName : "";
+			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path + params);
+			return new UploadStream(urlConnection, urlConnection.getOutputStream());
 		} catch (NodeRPCException e) {
 			// INFO: The error code and message can be found on stream closing.
 			throw new ServerUnknownException(e);
@@ -54,10 +55,11 @@ public class FilesController {
 	 * @return The writer.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public Writer getUploadWriter(String path) throws HiveException {
+	public UploadWriter getUploadWriter(String path, boolean is_public, String scriptName) throws HiveException {
 		try {
-			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path);
-			return new UploadOutputStreamWriter(urlConnection, urlConnection.getOutputStream());
+			String params = is_public ? "?public=true&script_name=" + scriptName : "";
+			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path + params);
+			return new UploadWriter(urlConnection, urlConnection.getOutputStream());
 		} catch (NodeRPCException e) {
 			// INFO: The error code and message can be found on stream closing.
 			throw new ServerUnknownException(e);

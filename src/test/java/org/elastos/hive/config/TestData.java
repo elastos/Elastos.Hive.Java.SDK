@@ -31,6 +31,7 @@ public class TestData {
 	private NodeConfig nodeConfig;
 	private AppContext context;
 	private AppContext callerContext;
+	private String ipfsGatewayUrl;
 
 	public static TestData getInstance() throws HiveException, DIDException {
 		if (instance == null)
@@ -45,6 +46,7 @@ public class TestData {
 	public void init() throws HiveException, DIDException {
 		ClientConfig clientConfig = getClientConfig();
 		AppContext.setupResolver(clientConfig.resolverUrl(), RESOLVE_CACHE);
+		this.ipfsGatewayUrl = clientConfig.getIpfsGateUrl();
 
 		ApplicationConfig applicationConfig = clientConfig.applicationConfig();
 		appInstanceDid = new AppDID(applicationConfig.name(),
@@ -167,6 +169,8 @@ public class TestData {
 	public String getBackupProviderAddress() {
 		return nodeConfig.targetHost();
 	}
+
+	public String getIpfsGatewayUrl() { return this.ipfsGatewayUrl; }
 
 	public VaultSubscription newVaultSubscription() throws HiveException {
 		return new VaultSubscription(context, getVaultProviderAddress());

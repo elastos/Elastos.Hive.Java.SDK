@@ -10,8 +10,8 @@ import retrofit2.Response;
 
 import org.elastos.hive.connection.NodeRPCConnection;
 import org.elastos.hive.connection.NodeRPCException;
-import org.elastos.hive.connection.UploadOutputStream;
-import org.elastos.hive.connection.UploadOutputStreamWriter;
+import org.elastos.hive.connection.UploadStream;
+import org.elastos.hive.connection.UploadWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -256,10 +256,10 @@ public class ScriptingController {
 	private <T> T getRequestStream(HttpURLConnection connection, Class<T> resultType) throws IOException {
 		OutputStream outputStream = connection.getOutputStream();
 		if (resultType.isAssignableFrom(OutputStream.class)) {
-			UploadOutputStream uploader = new UploadOutputStream(connection, outputStream);
+			UploadStream uploader = new UploadStream(connection, outputStream);
 			return resultType.cast(uploader);
 		} else if (resultType.isAssignableFrom(OutputStreamWriter.class)) {
-			OutputStreamWriter writer = new UploadOutputStreamWriter(connection, outputStream);
+			OutputStreamWriter writer = new UploadWriter(connection, outputStream);
 			return resultType.cast(writer);
 		} else {
 			return null;
