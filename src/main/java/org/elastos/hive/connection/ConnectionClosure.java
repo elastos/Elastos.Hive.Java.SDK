@@ -72,7 +72,9 @@ class ConnectionClosure {
 				return;
 
 			JsonNode result = this.getResponseBody();
-			this.cid = result.get("cid").asText();
+			if (result.has("cid"))
+				// INFO: ConnectionClosure is also used for uploading file by script.
+				this.cid = result.get("cid").asText();
 		} catch (IOException e) {
 			log.error("Failed to handle the response of the connection: " + e.getMessage());
 			this.exception = e;
