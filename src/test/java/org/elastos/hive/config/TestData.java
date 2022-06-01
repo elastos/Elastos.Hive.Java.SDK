@@ -22,9 +22,9 @@ import java.util.concurrent.CompletionException;
  */
 public class TestData {
 	private static final Logger log = LoggerFactory.getLogger(TestData.class);
-	private static final String RESOLVE_CACHE = "data/didCache";
 	private static TestData instance = null;
 
+	private String network;
 	private UserDID userDid;
 	private UserDID callerDid;
 	private AppDID appInstanceDid;
@@ -40,100 +40,25 @@ public class TestData {
 	}
 
 	private TestData() throws HiveException, DIDException {
-		init();
-	}
-
-	public void init() throws HiveException, DIDException {
 		ClientConfig clientConfig = getClientConfig();
-		AppContext.setupResolver(clientConfig.resolverUrl(), RESOLVE_CACHE);
+		this.network = clientConfig.resolverUrl();
+		AppContext.setupResolver(clientConfig.resolverUrl(), this.getLocalCachePath(true));
 		this.ipfsGatewayUrl = clientConfig.getIpfsGateUrl();
 
-		ApplicationConfig applicationConfig = clientConfig.applicationConfig();
-		appInstanceDid = new AppDID(applicationConfig.name(),
-				applicationConfig.mnemonic(),
-				applicationConfig.passPhrase(),
-				applicationConfig.storepass());
+		ApplicationConfig appCfg = clientConfig.applicationConfig();
+		appInstanceDid = new AppDID(appCfg.name(), appCfg.mnemonic(), appCfg.passPhrase(), appCfg.storepass(), network);
 
-		UserConfig userConfig = clientConfig.userConfig();
-		userDid = new UserDID(userConfig.name(),
-				userConfig.mnemonic(),
-				userConfig.passPhrase(),
-				userConfig.storepass());
-		UserConfig userConfigCaller = clientConfig.crossConfig().userConfig();
-		callerDid = new UserDID(userConfigCaller.name(),
-				userConfigCaller.mnemonic(),
-				userConfigCaller.passPhrase(),
-				userConfigCaller.storepass());
+		UserConfig usrCfg = clientConfig.userConfig();
+		userDid = new UserDID(usrCfg.name(), usrCfg.mnemonic(), usrCfg.passPhrase(), usrCfg.storepass(), network);
+
+		UserConfig calCfg = clientConfig.crossConfig().userConfig();
+		callerDid = new UserDID(calCfg.name(), calCfg.mnemonic(), calCfg.passPhrase(), calCfg.storepass(), network);
 
 		nodeConfig = clientConfig.nodeConfig();
 
 		//初始化Application Context
-		context = AppContext.build(new AppContextProvider() {
-			@Override
-			public String getLocalDataDir() {
-				return getLocalStorePath();
-			}
-
-			@Override
-			public DIDDocument getAppInstanceDocument() {
-				try {
-					return appInstanceDid.getDocument();
-				} catch (DIDException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-
-			@Override
-			public CompletableFuture<String> getAuthorization(String jwtToken) {
-				return CompletableFuture.supplyAsync(() -> {
-					try {
-						Claims claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(jwtToken).getBody();
-						if (claims == null)
-							throw new HiveException("Invalid jwt token as authorization.");
-						return appInstanceDid.createToken(appInstanceDid.createPresentation(
-								userDid.issueDiplomaFor(appInstanceDid),
-								claims.getIssuer(), (String) claims.get("nonce")), claims.getIssuer());
-					} catch (Exception e) {
-						throw new CompletionException(new HiveException(e.getMessage()));
-					}
-				});
-			}
-		}, userDid.toString());
-
-		callerContext = AppContext.build(new AppContextProvider() {
-			@Override
-			public String getLocalDataDir() {
-				return getLocalStorePath();
-			}
-
-			@Override
-			public DIDDocument getAppInstanceDocument() {
-				try {
-					return appInstanceDid.getDocument();
-				} catch (DIDException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-
-			@Override
-			public CompletableFuture<String> getAuthorization(String jwtToken) {
-				return CompletableFuture.supplyAsync(() -> {
-					try {
-						Claims claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(jwtToken).getBody();
-						if (claims == null)
-							throw new HiveException("Invalid jwt token as authorization.");
-						return appInstanceDid.createToken(appInstanceDid.createPresentation(
-								callerDid.issueDiplomaFor(appInstanceDid),
-								claims.getIssuer(),
-								(String) claims.get("nonce")), claims.getIssuer());
-					} catch (Exception e) {
-						throw new CompletionException(new HiveException(e.getMessage()));
-					}
-				});
-			}
-		}, callerDid.toString());
+		context = this.createAppContext(userDid);
+		callerContext = this.createAppContext(callerDid);
 	}
 
 	/**
@@ -146,16 +71,53 @@ public class TestData {
 		String fileName, hiveEnv = System.getenv("HIVE_ENV");
 		if ("production".equals(hiveEnv))
 			fileName = "Production.conf";
-		else if ("local".equals(hiveEnv))
-			fileName = "Local.conf";
 		else
 			fileName = "Developing.conf";
 		log.info(">>>>>> Current config file: " + fileName + " <<<<<<");
 		return ClientConfig.deserialize(Utils.getConfigure(fileName));
 	}
 
-	private String getLocalStorePath() {
-		return System.getProperty("user.dir") + File.separator + "data/store" + File.separator + nodeConfig.storePath();
+	private String getLocalCachePath(boolean isDidCache) {
+		if (isDidCache) {
+			return "data/" + this.network + "/didCache";
+		}
+		return System.getProperty("user.dir") + File.separator +
+				"data/" + this.network + "/store" + File.separator + nodeConfig.storePath();
+	}
+
+	private AppContext createAppContext(UserDID did) {
+		return AppContext.build(new AppContextProvider() {
+			@Override
+			public String getLocalDataDir() {
+				return getLocalCachePath(false);
+			}
+
+			@Override
+			public DIDDocument getAppInstanceDocument() {
+				try {
+					return appInstanceDid.getDocument();
+				} catch (DIDException e) {
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+			}
+
+			@Override
+			public CompletableFuture<String> getAuthorization(String jwtToken) {
+				return CompletableFuture.supplyAsync(() -> {
+					try {
+						Claims claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(jwtToken).getBody();
+						if (claims == null)
+							throw new HiveException("Invalid jwt token as authorization.");
+						return appInstanceDid.createToken(appInstanceDid.createPresentation(
+								did.issueDiplomaFor(appInstanceDid),
+								claims.getIssuer(), (String) claims.get("nonce")), claims.getIssuer());
+					} catch (Exception e) {
+						throw new CompletionException(new HiveException(e.getMessage()));
+					}
+				});
+			}
+		}, did.toString());
 	}
 
 	public AppContext getAppContext() {

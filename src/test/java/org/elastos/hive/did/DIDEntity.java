@@ -22,15 +22,16 @@ class DIDEntity {
 	private DID did;
 
 	protected DIDEntity(String name, String mnemonic, String phrasepass, String storepass,
-						boolean needResolve) throws DIDException {
+						boolean needResolve, String network) throws DIDException {
 		this.name = name;
 		this.phrasepass = phrasepass;
 		this.storepass = storepass;
-		this.initDid(mnemonic, needResolve);
+		this.initDid(mnemonic, needResolve, network);
 	}
 
-	private void initDid(String mnemonic, boolean needResolve) throws DIDException {
-		final String storePath = System.getProperty("user.dir") + File.separator + "data/didCache" + File.separator + name;
+	private void initDid(String mnemonic, boolean needResolve, String network) throws DIDException {
+		final String storePath = System.getProperty("user.dir") + File.separator +
+				"data/" + network + "/didCache" + File.separator + name;
 		didStore = DIDStore.open(storePath);
 		RootIdentity rootIdentity = this.getRootIdentity(mnemonic);
 		this.initDidByRootIdentity(rootIdentity, needResolve);

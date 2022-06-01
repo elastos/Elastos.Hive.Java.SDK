@@ -14,8 +14,8 @@ public class AppDID extends DIDEntity {
 
 	private String appId = "appId";
 
-	public AppDID(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
-		super(name, mnemonic, phrasepass, storepass, false);
+	public AppDID(String name, String mnemonic, String phrasepass, String storepass, String network) throws DIDException {
+		super(name, mnemonic, phrasepass, storepass, false, network);
 	}
 
 	public String getAppDid() {
