@@ -163,7 +163,7 @@ public class VaultSubscription extends ServiceEndpoint
 	}
 
 	@Override
-	public CompletableFuture<Receipt> getReceipt(String orderId) {
+	public CompletableFuture<Receipt> getReceipt(int orderId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return paymentController.getReceipt(orderId);

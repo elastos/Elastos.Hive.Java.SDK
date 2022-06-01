@@ -138,8 +138,8 @@ public class PaymentController {
 	 * @return The details of the receipt.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public Receipt getReceipt(String orderId) throws HiveException {
-		List<Receipt> receipts = this.getReceiptsInternal(orderId);
+	public Receipt getReceipt(int orderId) throws HiveException {
+		List<Receipt> receipts = this.getReceiptsInternal(Integer.toString(orderId));
 		return receipts.get(0);
 	}
 
