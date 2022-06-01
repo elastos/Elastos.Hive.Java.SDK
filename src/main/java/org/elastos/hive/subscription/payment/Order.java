@@ -6,26 +6,20 @@ import com.google.gson.annotations.SerializedName;
  * The order is used for payment module and represents and order to upgrade the service of the vault or the backup.
  */
 public class Order {
-	@SerializedName("order_id")
-	private String orderId;
 	private String subscription;
-	@SerializedName("pricing_name")
-	private String pricingName;
-	@SerializedName("ela_amount")
-	private Float elaAmount;
-	@SerializedName("ela_address")
-	private String elaAddress;
-	private String proof;
+	@SerializedName("pricing_plan")
+	private String pricingPlan;
+	@SerializedName("paying_did")
+	private String payingDid;
+	@SerializedName("paying_amount")
+	private Float payingAmount;
 	@SerializedName("create_time")
 	private Integer createTime;
-
-	public String getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
+	@SerializedName("expiration_time")
+	private Integer expirationTime;
+	@SerializedName("receiving_address")
+	private String receivingAddress;
+	private String proof;
 
 	public String getSubscription() {
 		return subscription;
@@ -35,36 +29,28 @@ public class Order {
 		this.subscription = subscription;
 	}
 
-	public String getPricingName() {
-		return pricingName;
+	public String getPricingPlan() {
+		return pricingPlan;
 	}
 
-	public void setPricingName(String pricingName) {
-		this.pricingName = pricingName;
+	public void setPricingPlan(String pricingPlan) {
+		this.pricingPlan = pricingPlan;
 	}
 
-	public Float getElaAmount() {
-		return elaAmount;
+	public String getPayingDid() {
+		return payingDid;
 	}
 
-	public void setElaAmount(Float elaAmount) {
-		this.elaAmount = elaAmount;
+	public void setPayingDid(String payingDid) {
+		this.payingDid = payingDid;
 	}
 
-	public String getElaAddress() {
-		return elaAddress;
+	public Float getPayingAmount() {
+		return payingAmount;
 	}
 
-	public void setElaAddress(String elaAddress) {
-		this.elaAddress = elaAddress;
-	}
-
-	public String getProof() {
-		return proof;
-	}
-
-	public void setProof(String proof) {
-		this.proof = proof;
+	public void setPayingAmount(Float payingAmount) {
+		this.payingAmount = payingAmount;
 	}
 
 	public Integer getCreateTime() {
@@ -73,5 +59,29 @@ public class Order {
 
 	public void setCreateTime(Integer createTime) {
 		this.createTime = createTime;
+	}
+
+	public Integer getExpirationTime() {
+		return expirationTime;
+	}
+
+	public void setExpirationTime(Integer expirationTime) {
+		this.expirationTime = expirationTime;
+	}
+
+	public String getReceivingAddress() {
+		return receivingAddress;
+	}
+
+	public void setReceivingAddress(String receivingAddress) {
+		this.receivingAddress = receivingAddress;
+	}
+
+	public String getProof() {
+		return proof;
+	}
+
+	public void setProof(String proof) {
+		this.proof = proof;
 	}
 }

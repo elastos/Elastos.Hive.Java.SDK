@@ -53,7 +53,7 @@ class VaultPaymentTest {
 	@Test @org.junit.jupiter.api.Order(3)
 	void testPayOrder() {
 		Assertions.assertDoesNotThrow(()->{
-			Receipt receipt = paymentService.payOrder(ORDER_ID, TRANS_ID).get();
+			Receipt receipt = paymentService.settleOrder(ORDER_ID, TRANS_ID).get();
 			Assertions.assertNotNull(receipt);
 			Assertions.assertNotNull(receipt.getReceiptId());
 			Assertions.assertNotNull(receipt.getOrderId());
@@ -101,7 +101,7 @@ class VaultPaymentTest {
 			order = paymentService.getOrder(order.getOrderId()).get();
 			Assertions.assertNotNull(order);
 			Assertions.assertNotNull(order.getOrderId());
-			Receipt receipt = paymentService.payOrder(order.getOrderId(), TRANS_ID).get();
+			Receipt receipt = paymentService.settleOrder(order.getOrderId(), TRANS_ID).get();
 			Assertions.assertNotNull(receipt);
 			Assertions.assertNotNull(receipt.getReceiptId());
 			Assertions.assertNotNull(receipt.getOrderId());

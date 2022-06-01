@@ -8,15 +8,14 @@ interface PaymentAPI {
 	Call<Order> placeOrder(@Body CreateOrderParams params);
 
 	@POST("/api/v2/payment/order/{order_id}")
-	Call<Receipt> payOrder(@Path("order_id") String orderId,
-						   @Body PayOrderParams params);
+	Call<Receipt> settleOrder(@Path("order_id") String orderId);
 
 	@GET("/api/v2/payment/order")
 	Call<OrderCollection> getOrders(@Query("subscription") String subscription,
 									@Query("order_id") String orderId);
 
 	@GET("/api/v2/payment/receipt")
-	Call<Receipt> getReceipt(@Query("order_id") String orderId);
+	Call<ReceiptCollection> getReceipts(@Query("order_id") String orderId);
 
 	@GET("/api/v2/payment/version")
 	Call<VersionResult> getVersion();

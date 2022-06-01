@@ -9,16 +9,20 @@ public class Receipt {
 	@SerializedName("receipt_id")
 	private String receiptId;
 	@SerializedName("order_id")
-	private String orderId;
-	@SerializedName("transaction_id")
-	private String transactionId;
-	@SerializedName("pricing_name")
-	private String pricingName;
+	private Integer orderId;
+	@SerializedName("subscription")
+	private String subscription;
+	@SerializedName("pricing_plan")
+	private String pricingPlan;
+	@SerializedName("payment_amount")
+	private Float paymentAmount;
 	@SerializedName("paid_did")
 	private String paidDid;
-	@SerializedName("ela_amount")
-	private Float elaAmount;
-	private String proof;
+	@SerializedName("create_time")
+	private Integer createTime;
+	@SerializedName("receiving_address")
+	private String receivingAddress;
+	private String receiptProof;
 
 	public String getReceiptId() {
 		return receiptId;
@@ -28,28 +32,36 @@ public class Receipt {
 		this.receiptId = receiptId;
 	}
 
-	public String getOrderId() {
+	public Integer getOrderId() {
 		return orderId;
 	}
 
-	public void setOrderId(String orderId) {
+	public void setOrderId(Integer orderId) {
 		this.orderId = orderId;
 	}
 
-	public String getTransactionId() {
-		return transactionId;
+	public String getSubscription() {
+		return subscription;
 	}
 
-	public void setTransactionId(String transactionId) {
-		this.transactionId = transactionId;
+	public void setSubscription(String subscription) {
+		this.subscription = subscription;
 	}
 
-	public String getPricingName() {
-		return pricingName;
+	public String getPricingPlan() {
+		return pricingPlan;
 	}
 
-	public void setPricingName(String pricingName) {
-		this.pricingName = pricingName;
+	public void setPricingPlan(String pricingPlan) {
+		this.pricingPlan = pricingPlan;
+	}
+
+	public Float getPaymentAmount() {
+		return paymentAmount;
+	}
+
+	public void setPaymentAmount(Float paymentAmount) {
+		this.paymentAmount = paymentAmount;
 	}
 
 	public String getPaidDid() {
@@ -60,19 +72,27 @@ public class Receipt {
 		this.paidDid = paidDid;
 	}
 
-	public Float getElaAmount() {
-		return elaAmount;
+	public Integer getCreateTime() {
+		return createTime;
 	}
 
-	public void setElaAmount(Float elaAmount) {
-		this.elaAmount = elaAmount;
+	public void setCreateTime(Integer createTime) {
+		this.createTime = createTime;
 	}
 
-	public String getProof() {
-		return proof;
+	public String getReceivingAddress() {
+		return receivingAddress;
 	}
 
-	public void setProof(String proof) {
-		this.proof = proof;
+	public void setReceivingAddress(String receivingAddress) {
+		this.receivingAddress = receivingAddress;
+	}
+
+	public String getReceiptProof() {
+		return receiptProof;
+	}
+
+	public void setReceiptProof(String receiptProof) {
+		this.receiptProof = receiptProof;
 	}
 }

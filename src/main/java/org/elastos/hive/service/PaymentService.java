@@ -31,7 +31,7 @@ public interface PaymentService {
 	 *		return the order detail in case there is a order with order id existing.
 	 *		otherwise, return the specific exception.
 	 */
-	CompletableFuture<Order> getOrder(String orderId);
+	CompletableFuture<Order> getOrder(int orderId);
 
 
 	/**
@@ -46,13 +46,12 @@ public interface PaymentService {
 	/**
 	 * Pay for the order with a given id.
 	 *
-	 * @param orderId order id
-	 * @param transactionId the transaction id on the block-chain.
+	 * @param orderId order id of the payment contract
 	 * @return
 	 * 		return the receipt detail in case the payment was accepted by hive
 	 * 		node, otherwise return the specific exception.
 	 */
-	CompletableFuture<Receipt> payOrder(String orderId, String transactionId);
+	CompletableFuture<Receipt> settleOrder(int orderId);
 
 	/**
 	 * Obtain the receipt detail according to the order id.
@@ -63,6 +62,15 @@ public interface PaymentService {
 	 * 		otherwise, return the specific exception.
 	 */
 	CompletableFuture<Receipt> getReceipt(String orderId);
+
+	/**
+	 * Obtain the receipt of the vault.
+	 *
+	 * @return
+	 * 		return the receipt detail in case there is a receipt existing,
+	 * 		otherwise, return the specific exception.
+	 */
+	CompletableFuture<List<Receipt>> getReceipts();
 
 	/**
 	 * Obtain the version of the payment module.

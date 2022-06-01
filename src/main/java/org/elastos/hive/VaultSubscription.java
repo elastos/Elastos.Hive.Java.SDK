@@ -130,10 +130,10 @@ public class VaultSubscription extends ServiceEndpoint
 	}
 
 	@Override
-	public CompletableFuture<Order> getOrder(String orderId) {
+	public CompletableFuture<Order> getOrder(int orderId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return paymentController.getOrder(orderId);
+				return paymentController.getVaultOrder(orderId);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -141,10 +141,10 @@ public class VaultSubscription extends ServiceEndpoint
 	}
 
 	@Override
-	public CompletableFuture<Receipt> payOrder(String orderId, String transactionId) {
+	public CompletableFuture<Receipt> settleOrder(int orderId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return paymentController.payOrder(orderId, transactionId);
+				return paymentController.settleOrder(orderId);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
@@ -167,6 +167,17 @@ public class VaultSubscription extends ServiceEndpoint
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return paymentController.getReceipt(orderId);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<List<Receipt>> getReceipts() {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return paymentController.getReceipts();
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
