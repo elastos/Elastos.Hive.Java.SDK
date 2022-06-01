@@ -11,8 +11,8 @@ public class Order {
 	private String pricingPlan;
 	@SerializedName("paying_did")
 	private String payingDid;
-	@SerializedName("paying_amount")
-	private Float payingAmount;
+	@SerializedName("payment_amount")
+	private Float paymentAmount;
 	@SerializedName("create_time")
 	private Integer createTime;
 	@SerializedName("expiration_time")
@@ -45,12 +45,12 @@ public class Order {
 		this.payingDid = payingDid;
 	}
 
-	public Float getPayingAmount() {
-		return payingAmount;
+	public Float getPaymentAmount() {
+		return paymentAmount;
 	}
 
-	public void setPayingAmount(Float payingAmount) {
-		this.payingAmount = payingAmount;
+	public void setPaymentAmount(Float paymentAmount) {
+		this.paymentAmount = paymentAmount;
 	}
 
 	public Integer getCreateTime() {

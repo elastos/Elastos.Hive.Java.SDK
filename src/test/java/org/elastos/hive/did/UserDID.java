@@ -11,8 +11,8 @@ import java.util.Map;
 public class UserDID extends DIDEntity {
 	private Issuer issuer;
 
-	public UserDID(String name, String mnemonic, String phrasepass, String storepass) throws DIDException {
-		super(name, mnemonic, phrasepass, storepass, true);
+	public UserDID(String name, String mnemonic, String phrasepass, String storepass, String network) throws DIDException {
+		super(name, mnemonic, phrasepass, storepass, true, network);
 		issuer = new Issuer(getDocument());
 	}
 
