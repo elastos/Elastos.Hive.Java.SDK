@@ -50,14 +50,13 @@ public class PaymentController {
 	/**
 	 * Pay the order by the order id and the transaction id.
 	 *
-	 * @param orderId The order id.
-	 * @param transactionId The transaction id.
-	 * @return The receipt which is the proof of the payment of the order for the user.
+	 * @param orderId The order id of payment contract
+	 * @return The order which is the proof of the payment of the order for the user.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public Receipt payOrder(String orderId, String transactionId) throws HiveException {
+	public Receipt settleOrder(int orderId) throws HiveException {
 		try {
-			return paymentAPI.payOrder(orderId, new PayOrderParams(transactionId)).execute().body();
+			return paymentAPI.settleOrder(Integer.toString(orderId)).execute().body();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:
@@ -77,14 +76,26 @@ public class PaymentController {
 	}
 
 	/**
-	 * Get the order information by the order id.
+	 * Get the order information of the vault by the order id.
 	 *
-	 * @param orderId The order id.
+	 * @param orderId  of payment contract
 	 * @return The details of the order.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public Order getOrder(String orderId) throws HiveException {
-		List<Order> orders = getOrdersInternal("vault", orderId);
+	public Order getVaultOrder(int orderId) throws HiveException {
+		List<Order> orders = getOrdersInternal("vault", Integer.toString(orderId));
+		return orders.get(0);
+	}
+
+	/**
+	 * Get the order information of the backup by the order id.
+	 *
+	 * @param orderId  of payment contract
+	 * @return The details of the order.
+	 * @throws HiveException The error comes from the hive node.
+	 */
+	public Order getBackupOrder(int orderId) throws HiveException {
+		List<Order> orders = getOrdersInternal("backup", Integer.toString(orderId));
 		return orders.get(0);
 	}
 
@@ -128,8 +139,23 @@ public class PaymentController {
 	 * @throws HiveException The error comes from the hive node.
 	 */
 	public Receipt getReceipt(String orderId) throws HiveException {
+		List<Receipt> receipts = this.getReceiptsInternal(orderId);
+		return receipts.get(0);
+	}
+
+	/**
+	 * Get the receipts belongs to the current user.
+	 *
+	 * @return The details of the receipt.
+	 * @throws HiveException The error comes from the hive node.
+	 */
+	public List<Receipt> getReceipts() throws HiveException {
+		return this.getReceiptsInternal(null);
+	}
+
+	private List<Receipt> getReceiptsInternal(String orderId) throws HiveException {
 		try {
-			return paymentAPI.getReceipt(orderId).execute().body();
+			return paymentAPI.getReceipts(orderId).execute().body().getReceipts();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:
