@@ -61,7 +61,7 @@ public interface PaymentService {
 	 * 		return the receipt detail in case there is a receipt existing,
 	 * 		otherwise, return the specific exception.
 	 */
-	CompletableFuture<Receipt> getReceipt(String orderId);
+	CompletableFuture<Receipt> getReceipt(int orderId);
 
 	/**
 	 * Obtain the receipt of the vault.

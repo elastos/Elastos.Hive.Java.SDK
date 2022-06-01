@@ -1,7 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.exception.NotFoundException;
+import org.elastos.hive.exception.AlreadyExistsException;
 import org.elastos.hive.subscription.payment.Order;
 import org.elastos.hive.subscription.payment.Receipt;
 import org.elastos.hive.service.PaymentService;
@@ -11,24 +11,24 @@ import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class VaultPaymentTest {
-	// INFO: to make test ok, please keep this two value at the same time.
-	private static final String ORDER_ID = "60ee8c056fdd17b16bb5b4c2";
-	private static final String TRANS_ID = "280a24034bfb241c31b5a73c792c9d05df2b1f79bb98733c5358aeb909c27010";
+	// TODO: to do pay, please use contract
 	private static final String PRICING_PLAN_NAME = "Rookie";
 
-	private static VaultSubscription subscription;
+	private static VaultSubscription vaultSubscription;
+	private static BackupSubscription backupSubscription;
 	private static PaymentService paymentService;
 
 	@BeforeAll public static void setUp() {
-		trySubscribeVault();
-		Assertions.assertDoesNotThrow(()->paymentService = TestData.getInstance().newVaultSubscription());
-	}
-
-	private static void trySubscribeVault() {
-		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
+		Assertions.assertDoesNotThrow(()-> vaultSubscription = TestData.getInstance().newVaultSubscription());
 		try {
-			subscription.subscribe();
-		} catch (NotFoundException e) {}
+			vaultSubscription.subscribe();
+		} catch (AlreadyExistsException e) {}
+		Assertions.assertDoesNotThrow(()-> backupSubscription = TestData.getInstance().newBackupSubscription());
+		try {
+			backupSubscription.subscribe();
+		} catch (AlreadyExistsException e) {}
+
+		Assertions.assertDoesNotThrow(()->paymentService = TestData.getInstance().newVaultSubscription());
 	}
 
 	@Test @org.junit.jupiter.api.Order(1)
@@ -41,22 +41,53 @@ class VaultPaymentTest {
 
 	@Disabled
 	@Test @org.junit.jupiter.api.Order(2)
-	void testPlaceOrder() {
+	void testPlaceOrderVault() {
 		Assertions.assertDoesNotThrow(()->{
 			Order order = paymentService.placeOrder(PRICING_PLAN_NAME).get();
 			Assertions.assertNotNull(order);
-			Assertions.assertNotNull(order.getOrderId());
+			Assertions.assertEquals(order.getSubscription(), "vault");
+			Assertions.assertEquals(order.getPricingPlan(), PRICING_PLAN_NAME);
+			Assertions.assertNotNull(order.getPayingDid());
+			Assertions.assertTrue(order.getPayingAmount() > 0);
+			Assertions.assertTrue(order.getCreateTime() > 0);
+			Assertions.assertTrue(order.getExpirationTime() > 0);
+			Assertions.assertNotNull(order.getReceivingAddress());
+			Assertions.assertNotNull(order.getProof());
+		});
+	}
+
+	@Disabled
+	@Test @org.junit.jupiter.api.Order(2)
+	void testPlaceOrderBackup() {
+		Assertions.assertDoesNotThrow(()->{
+			Order order = paymentService.placeOrder(PRICING_PLAN_NAME).get();
+			Assertions.assertNotNull(order);
+			Assertions.assertEquals(order.getSubscription(), "backup");
+			Assertions.assertEquals(order.getPricingPlan(), PRICING_PLAN_NAME);
+			Assertions.assertNotNull(order.getPayingDid());
+			Assertions.assertTrue(order.getPayingAmount() > 0);
+			Assertions.assertTrue(order.getCreateTime() > 0);
+			Assertions.assertTrue(order.getExpirationTime() > 0);
+			Assertions.assertNotNull(order.getReceivingAddress());
+			Assertions.assertNotNull(order.getProof());
 		});
 	}
 
 	@Disabled
 	@Test @org.junit.jupiter.api.Order(3)
-	void testPayOrder() {
+	void testSettleOrder() {
 		Assertions.assertDoesNotThrow(()->{
-			Receipt receipt = paymentService.settleOrder(ORDER_ID, TRANS_ID).get();
+			Receipt receipt = paymentService.settleOrder(3).get();
 			Assertions.assertNotNull(receipt);
 			Assertions.assertNotNull(receipt.getReceiptId());
 			Assertions.assertNotNull(receipt.getOrderId());
+			Assertions.assertEquals(receipt.getSubscription(), "vault");
+			Assertions.assertEquals(receipt.getPricingPlan(), PRICING_PLAN_NAME);
+			Assertions.assertTrue(receipt.getPaymentAmount() > 0);
+			Assertions.assertNotNull(receipt.getPaidDid());
+			Assertions.assertTrue(receipt.getCreateTime() > 0);
+			Assertions.assertNotNull(receipt.getReceivingAddress());
+			Assertions.assertNotNull(receipt.getReceiptProof());
 		});
 	}
 
@@ -64,9 +95,16 @@ class VaultPaymentTest {
 	@Test @org.junit.jupiter.api.Order(4)
 	void testGetOrder() {
 		Assertions.assertDoesNotThrow(()->{
-			Order order = paymentService.getOrder(ORDER_ID).get();
+			Order order = paymentService.getOrder(3).get();
 			Assertions.assertNotNull(order);
-			Assertions.assertNotNull(order.getOrderId());
+			Assertions.assertEquals(order.getSubscription(), "vault");
+			Assertions.assertEquals(order.getPricingPlan(), PRICING_PLAN_NAME);
+			Assertions.assertNotNull(order.getPayingDid());
+			Assertions.assertTrue(order.getPayingAmount() > 0);
+			Assertions.assertTrue(order.getCreateTime() > 0);
+			Assertions.assertTrue(order.getExpirationTime() > 0);
+			Assertions.assertNotNull(order.getReceivingAddress());
+			Assertions.assertNotNull(order.getProof());
 		});
 	}
 
@@ -77,6 +115,15 @@ class VaultPaymentTest {
 			List<Order> orders = paymentService.getOrderList().get();
 			Assertions.assertNotNull(orders);
 			Assertions.assertFalse(orders.isEmpty());
+			Order order = orders.get(0);
+			Assertions.assertEquals(order.getSubscription(), "vault");
+			Assertions.assertEquals(order.getPricingPlan(), PRICING_PLAN_NAME);
+			Assertions.assertNotNull(order.getPayingDid());
+			Assertions.assertTrue(order.getPayingAmount() > 0);
+			Assertions.assertTrue(order.getCreateTime() > 0);
+			Assertions.assertTrue(order.getExpirationTime() > 0);
+			Assertions.assertNotNull(order.getReceivingAddress());
+			Assertions.assertNotNull(order.getProof());
 		});
 	}
 
@@ -84,27 +131,37 @@ class VaultPaymentTest {
 	@Test @org.junit.jupiter.api.Order(6)
 	void testGetReceipt() {
 		Assertions.assertDoesNotThrow(()->{
-			Receipt receipt = paymentService.getReceipt(ORDER_ID).get();
+			Receipt receipt = paymentService.getReceipt(3).get();
 			Assertions.assertNotNull(receipt);
 			Assertions.assertNotNull(receipt.getReceiptId());
 			Assertions.assertNotNull(receipt.getOrderId());
+			Assertions.assertEquals(receipt.getSubscription(), "vault");
+			Assertions.assertEquals(receipt.getPricingPlan(), PRICING_PLAN_NAME);
+			Assertions.assertTrue(receipt.getPaymentAmount() > 0);
+			Assertions.assertNotNull(receipt.getPaidDid());
+			Assertions.assertTrue(receipt.getCreateTime() > 0);
+			Assertions.assertNotNull(receipt.getReceivingAddress());
+			Assertions.assertNotNull(receipt.getReceiptProof());
 		});
 	}
 
 	@Disabled
-	@Test @org.junit.jupiter.api.Order(3)
-	void testMakeOrderProcess() {
+	@Test @org.junit.jupiter.api.Order(7)
+	void testGetReceipts() {
 		Assertions.assertDoesNotThrow(()->{
-			Order order = paymentService.placeOrder(PRICING_PLAN_NAME).get();
-			Assertions.assertNotNull(order);
-			Assertions.assertNotNull(order.getOrderId());
-			order = paymentService.getOrder(order.getOrderId()).get();
-			Assertions.assertNotNull(order);
-			Assertions.assertNotNull(order.getOrderId());
-			Receipt receipt = paymentService.settleOrder(order.getOrderId(), TRANS_ID).get();
-			Assertions.assertNotNull(receipt);
+			List<Receipt> receipts = paymentService.getReceipts().get();
+			Assertions.assertNotNull(receipts);
+			Assertions.assertTrue(receipts.size() > 0);
+			Receipt receipt = receipts.get(0);
 			Assertions.assertNotNull(receipt.getReceiptId());
 			Assertions.assertNotNull(receipt.getOrderId());
+			Assertions.assertEquals(receipt.getSubscription(), "vault");
+			Assertions.assertEquals(receipt.getPricingPlan(), PRICING_PLAN_NAME);
+			Assertions.assertTrue(receipt.getPaymentAmount() > 0);
+			Assertions.assertNotNull(receipt.getPaidDid());
+			Assertions.assertTrue(receipt.getCreateTime() > 0);
+			Assertions.assertNotNull(receipt.getReceivingAddress());
+			Assertions.assertNotNull(receipt.getReceiptProof());
 		});
 	}
 }

@@ -22,6 +22,7 @@ public class Receipt {
 	private Integer createTime;
 	@SerializedName("receiving_address")
 	private String receivingAddress;
+	@SerializedName("receipt_proof")
 	private String receiptProof;
 
 	public String getReceiptId() {
