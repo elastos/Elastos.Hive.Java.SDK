@@ -75,16 +75,35 @@ class VaultPaymentTest {
 
 	@Disabled
 	@Test @org.junit.jupiter.api.Order(3)
-	void testSettleOrder() {
+	void testSettleOrderVault() {
 		Assertions.assertDoesNotThrow(()->{
 			// TODO: to do pay, please use contract
-			// INFO: same for vaultSubscription and backupSubscription
-			Receipt receipt = vaultSubscription.settleOrder(3).get();
+			Receipt receipt = backupSubscription.settleOrder(2).get();
 			Assertions.assertNotNull(receipt);
 			Assertions.assertNotNull(receipt.getReceiptId());
 			Assertions.assertNotNull(receipt.getOrderId());
 			String subscription = receipt.getSubscription();
-			Assertions.assertTrue(subscription.equals("vault") || subscription.equals("backup"));
+			Assertions.assertEquals(subscription, "vault");
+			Assertions.assertEquals(receipt.getPricingPlan(), PRICING_PLAN_NAME);
+			Assertions.assertTrue(receipt.getPaymentAmount() > 0);
+			Assertions.assertNotNull(receipt.getPaidDid());
+			Assertions.assertTrue(receipt.getCreateTime() > 0);
+			Assertions.assertNotNull(receipt.getReceivingAddress());
+			Assertions.assertNotNull(receipt.getReceiptProof());
+		});
+	}
+
+	@Disabled
+	@Test @org.junit.jupiter.api.Order(3)
+	void testSettleOrderBackup() {
+		Assertions.assertDoesNotThrow(()->{
+			// TODO: to do pay, please use contract
+			Receipt receipt = backupSubscription.settleOrder(3).get();
+			Assertions.assertNotNull(receipt);
+			Assertions.assertNotNull(receipt.getReceiptId());
+			Assertions.assertNotNull(receipt.getOrderId());
+			String subscription = receipt.getSubscription();
+			Assertions.assertEquals(subscription, "backup");
 			Assertions.assertEquals(receipt.getPricingPlan(), PRICING_PLAN_NAME);
 			Assertions.assertTrue(receipt.getPaymentAmount() > 0);
 			Assertions.assertNotNull(receipt.getPaidDid());
@@ -98,7 +117,7 @@ class VaultPaymentTest {
 	@Test @org.junit.jupiter.api.Order(4)
 	void testGetOrderVault() {
 		Assertions.assertDoesNotThrow(()->{
-			Order order = vaultSubscription.getOrder(3).get();
+			Order order = vaultSubscription.getOrder(2).get();
 			Assertions.assertNotNull(order);
 			String subscription = order.getSubscription();
 			Assertions.assertEquals(subscription, "vault");
@@ -116,7 +135,7 @@ class VaultPaymentTest {
 	@Test @org.junit.jupiter.api.Order(4)
 	void testGetOrderBackup() {
 		Assertions.assertDoesNotThrow(()->{
-			Order order = vaultSubscription.getOrder(3).get();
+			Order order = backupSubscription.getOrder(3).get();
 			Assertions.assertNotNull(order);
 			String subscription = order.getSubscription();
 			Assertions.assertEquals(subscription, "backup");
@@ -134,7 +153,7 @@ class VaultPaymentTest {
 	@Test @org.junit.jupiter.api.Order(5)
 	void testGetOrders() {
 		Assertions.assertDoesNotThrow(()->{
-			List<Order> orders = backupSubscription.getOrderList().get();
+			List<Order> orders = vaultSubscription.getOrderList().get();
 			Assertions.assertNotNull(orders);
 			Assertions.assertFalse(orders.isEmpty());
 			Order order = orders.get(0);
@@ -154,7 +173,7 @@ class VaultPaymentTest {
 	@Test @org.junit.jupiter.api.Order(6)
 	void testGetReceipt() {
 		Assertions.assertDoesNotThrow(()->{
-			Receipt receipt = vaultSubscription.getReceipt(3).get();
+			Receipt receipt = vaultSubscription.getReceipt(2).get();
 			Assertions.assertNotNull(receipt);
 			Assertions.assertNotNull(receipt.getReceiptId());
 			Assertions.assertNotNull(receipt.getOrderId());
@@ -173,7 +192,7 @@ class VaultPaymentTest {
 	@Test @org.junit.jupiter.api.Order(7)
 	void testGetReceipts() {
 		Assertions.assertDoesNotThrow(()->{
-			List<Receipt> receipts = backupSubscription.getReceipts().get();
+			List<Receipt> receipts = vaultSubscription.getReceipts().get();
 			Assertions.assertNotNull(receipts);
 			Assertions.assertTrue(receipts.size() > 0);
 			Receipt receipt = receipts.get(0);
