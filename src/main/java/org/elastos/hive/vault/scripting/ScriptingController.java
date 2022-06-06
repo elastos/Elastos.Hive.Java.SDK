@@ -37,9 +37,9 @@ public class ScriptingController {
 	 *
 	 * @param connection The RPC connection.
 	 */
-	public ScriptingController(NodeRPCConnection connection) {
+	public ScriptingController(NodeRPCConnection connection, boolean anonymous) {
 		this.connection = new WeakReference<>(connection);
-		this.scriptingAPI = connection.createService(ScriptingAPI.class, true);
+		this.scriptingAPI = connection.createService(ScriptingAPI.class, !anonymous);
 	}
 
 	/**

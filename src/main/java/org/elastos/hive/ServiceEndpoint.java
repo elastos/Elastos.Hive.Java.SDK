@@ -44,51 +44,54 @@ public class ServiceEndpoint extends NodeRPCConnection {
 
 	/**
 	 * Create by the application context, and the address of the provider.
+	 * They are not all null.
 	 *
-	 * @param context The application context.
+	 * @param context The application context. Access token is not required if null.
 	 * @param providerAddress The address of the provider.
 	 */
 	protected ServiceEndpoint(AppContext context, String providerAddress) {
-		if (context == null)
-			throw new IllegalArgumentException("Empty context or provider address parameter");
+		if (context == null && providerAddress == null)
+			throw new IllegalArgumentException("Empty context and provider address parameter");
 
 		this.context = context;
 		this.providerAddress = providerAddress;
 
-		String dataDir = context.getAppContextProvider().getLocalDataDir();
-		if (!dataDir.endsWith(File.separator))
-			dataDir += File.separator;
+		if (context != null) {
+			String dataDir = context.getAppContextProvider().getLocalDataDir();
+			if (!dataDir.endsWith(File.separator))
+				dataDir += File.separator;
 
-		this.dataStorage = new FileStorage(dataDir, context.getUserDid());
-		this.accessToken = new AccessToken(this, dataStorage, new BridgeHandler() {
-			private WeakReference<ServiceEndpoint> weakref;
+			this.dataStorage = new FileStorage(dataDir, context.getUserDid());
+			this.accessToken = new AccessToken(this, dataStorage, new BridgeHandler() {
+				private WeakReference<ServiceEndpoint> weakref;
 
-			@Override
-			public void flush(String value) {
-				try {
-					ServiceEndpoint endpoint = weakref.get();
-					Claims claims;
+				@Override
+				public void flush(String value) {
+					try {
+						ServiceEndpoint endpoint = weakref.get();
+						Claims claims;
 
-					claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(value).getBody();
-					endpoint.flushDids(claims.getAudience(), claims.getIssuer());
+						claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(value).getBody();
+						endpoint.flushDids(claims.getAudience(), claims.getIssuer());
 
-				} catch (Exception e) {
-					e.printStackTrace();
-					return;
+					} catch (Exception e) {
+						e.printStackTrace();
+						return;
+					}
 				}
-			}
 
-			BridgeHandler setTarget(ServiceEndpoint endpoint) {
-				this.weakref = new WeakReference<>(endpoint);
-				return this;
-			}
+				BridgeHandler setTarget(ServiceEndpoint endpoint) {
+					this.weakref = new WeakReference<>(endpoint);
+					return this;
+				}
 
-			@Override
-			public Object target() {
-				return weakref.get();
-			}
+				@Override
+				public Object target() {
+					return weakref.get();
+				}
 
-		}.setTarget(this));
+			}.setTarget(this));
+		}
 	}
 
 	/**
@@ -97,6 +100,9 @@ public class ServiceEndpoint extends NodeRPCConnection {
 	 * @return The application context.
 	 */
 	public AppContext getAppContext() {
+		if (this.context == null)
+			throw new RuntimeException("No application context setup.");
+
 		return context;
 	}
 
@@ -123,6 +129,9 @@ public class ServiceEndpoint extends NodeRPCConnection {
 	 * @return user did
 	 */
 	public String getUserDid() {
+		if (this.context == null)
+			throw new RuntimeException("No application context setup.");
+
 		return context.getUserDid();
 	}
 
@@ -173,6 +182,9 @@ public class ServiceEndpoint extends NodeRPCConnection {
 	 * @return The instance of the data storage.
 	 */
 	public DataStorage getStorage() {
+		if (this.context == null)
+			throw new RuntimeException("No application context setup.");
+
 		return dataStorage;
 	}
 
@@ -182,11 +194,17 @@ public class ServiceEndpoint extends NodeRPCConnection {
 	 * @throws NodeRPCException See {@link org.elastos.hive.connection.NodeRPCException}
 	 */
 	public void refreshAccessToken() throws NodeRPCException {
+		if (this.context == null)
+			throw new RuntimeException("No application context setup.");
+
 		accessToken.fetch();
 	}
 
 	@Override
 	protected AccessToken getAccessToken() {
+		if (this.context == null)
+			throw new RuntimeException("No application context setup.");
+
 		return accessToken;
 	}
 
