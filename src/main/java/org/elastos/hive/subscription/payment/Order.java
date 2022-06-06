@@ -6,6 +6,9 @@ import com.google.gson.annotations.SerializedName;
  * The order is used for payment module and represents and order to upgrade the service of the vault or the backup.
  */
 public class Order {
+	// Only for getOrders()
+	@SerializedName("order_id")
+	private Integer orderId;
 	private String subscription;
 	@SerializedName("pricing_plan")
 	private String pricingPlan;
@@ -20,6 +23,14 @@ public class Order {
 	@SerializedName("receiving_address")
 	private String receivingAddress;
 	private String proof;
+
+	public Integer getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(Integer orderId) {
+		this.orderId = orderId;
+	}
 
 	public String getSubscription() {
 		return subscription;
