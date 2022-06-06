@@ -33,7 +33,7 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 
 	public ScriptRunner(AppContext context, String providerAddress) {
 		super(context, providerAddress);
-		this.controller = new ScriptingController(this);
+		this.controller = new ScriptingController(this, context == null);
 	}
 
 	public ScriptRunner(AppContext context) {
