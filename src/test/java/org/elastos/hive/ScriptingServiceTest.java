@@ -144,6 +144,8 @@ class ScriptingServiceTest {
 					targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
 			Assertions.assertTrue(result.has(scriptName));
+			Assertions.assertTrue(result.get(scriptName).has("total"));
+			Assertions.assertTrue(result.get(scriptName).get("total").asInt() > 0);
 			Assertions.assertTrue(result.get(scriptName).has("items"));
 			Assertions.assertTrue(result.get(scriptName).get("items").size() > 0);
 		});
