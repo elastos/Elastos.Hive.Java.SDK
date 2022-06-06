@@ -32,7 +32,7 @@ public abstract class Executable extends Condition {
 	}
 
 	@SerializedName("output")
-	private Boolean output;
+	private Boolean output = true;
 
 	protected Executable(String name, Type type, Object body) {
 		super(name, type.getValue(), body);
