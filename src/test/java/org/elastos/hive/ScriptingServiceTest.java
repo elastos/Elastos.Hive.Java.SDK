@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Throwables;
+import org.elastos.did.exception.DIDException;
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.exception.AlreadyExistsException;
+import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotFoundException;
 import org.elastos.hive.service.DatabaseService;
 import org.elastos.hive.service.FilesService;
@@ -22,17 +25,17 @@ import java.io.Writer;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ScriptingServiceTest {
 	private static final Logger log = LoggerFactory.getLogger(ScriptingServiceTest.class);
-	private static final String FIND_NAME = "get_group_messages";
-	private static final String FIND_NO_CONDITION_NAME = "script_no_condition";
-	private static final String INSERT_NAME = "database_insert";
-	private static final String UPDATE_NAME = "database_update";
-	private static final String DELETE_NAME = "database_delete";
-	private static final String UPLOAD_FILE_NAME = "upload_file";
-	private static final String DOWNLOAD_FILE_NAME = "download_file";
-	private static final String FILE_PROPERTIES_NAME = "file_properties";
-	private static final String FILE_HASH_NAME = "file_hash";
 
-	private static final String COLLECTION_NAME = "script_database";
+	private static final String FIND_NAME = "script_database_find";
+	private static final String INSERT_NAME = "script_database_insert";
+	private static final String UPDATE_NAME = "script_database_update";
+	private static final String DELETE_NAME = "script_database_delete";
+	private static final String UPLOAD_FILE = "script_upload_file";
+	private static final String DOWNLOAD_FILE = "script_download_file";
+	private static final String FILE_PROPERTIES = "script_file_properties";
+	private static final String FILE_HASH = "script_file_hash";
+
+	private static final String COLLECTION_NAME = "java_script_database";
 
 	private static String targetDid;
 	private static String appDid;
@@ -42,6 +45,7 @@ class ScriptingServiceTest {
 	private static DatabaseService databaseService;
 	private static ScriptingService scriptingService;
 	private static ScriptRunner scriptRunner;
+	private static ScriptRunner anonymousRunner;
 
 	private final String localSrcFilePath;
 	private final String localDstFileRoot;
@@ -56,253 +60,337 @@ class ScriptingServiceTest {
 		localDstFilePath = localDstFileRoot + fileName;
 	}
 
-	@BeforeAll public static void setUp() {
-		trySubscribeVault();
+	@BeforeAll public static void setUp() throws HiveException, DIDException {
+		TestData testData = TestData.getInstance();
 		Assertions.assertDoesNotThrow(()->{
-			TestData testData = TestData.getInstance();
 			scriptingService = testData.newVault().getScriptingService();
 			scriptRunner = testData.newScriptRunner();
+			anonymousRunner = testData.newAnonymousScriptRunner();
 			filesService = testData.newVault().getFilesService();
 			databaseService = testData.newVault().getDatabaseService();
 			targetDid = testData.getUserDid();
 			appDid = testData.getAppDid();
 		});
-	}
 
-	private static void trySubscribeVault() {
-		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
+		// try to subscribe for script owner.
+		Assertions.assertDoesNotThrow(()->subscription = testData.newVaultSubscription());
 		try {
 			subscription.subscribe();
 		} catch (NotFoundException e) {}
+
+		// try to create a new collection.
+		try {
+			databaseService.createCollection(COLLECTION_NAME).get();
+		} catch (Exception e) {
+			if (e.getCause() instanceof AlreadyExistsException)
+				log.info("Already exists, skip");
+			else
+				throw new RuntimeException("Failed to create collection: " + e.getMessage());
+		}
 	}
 
 	@AfterAll public static void tearDown() {
+		try {
+			databaseService.deleteCollection(COLLECTION_NAME).get();
+		} catch (Exception e) {
+			if (e.getCause() instanceof NotFoundException)
+				log.info("Already deleted, skip");
+			else
+				throw new RuntimeException("Failed to delete collection: " + e.getMessage());
+		}
+	}
+
+	private void insertDocument(String scriptName, String executableName, String message, int count) {
+		ObjectNode params = JsonNodeFactory.instance.objectNode();
+		params.put("author","John");
+		params.put("content", message);
+		params.put("words_count", count);
+		Assertions.assertDoesNotThrow(()->{
+			JsonNode result = scriptRunner.callScript(scriptName, params,
+					targetDid, appDid, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(executableName));
+			Assertions.assertTrue(result.get(executableName).has("inserted_id"));
+			Assertions.assertNotNull(result.get(executableName).get("inserted_id").toString());
+		});
 	}
 
 	@Test @Order(1) void testInsert() {
-		remove_test_database();
-		create_test_database();
-		registerScriptInsert(INSERT_NAME);
-		callScriptInsert(INSERT_NAME);
-	}
+		String scriptName = INSERT_NAME;
+		String executableName = "database_insert";
 
-	private void registerScriptInsert(String scriptName) {
-		Assertions.assertDoesNotThrow(() -> {
-			ObjectNode doc = JsonNodeFactory.instance.objectNode();
-			doc.put("author", "$params.author");
-			doc.put("content", "$params.content");
-			doc.put("words_count", "$params.words_count");
-			ObjectNode options = JsonNodeFactory.instance.objectNode();
-			options.put("bypass_document_validation", false);
-			options.put("ordered", true);
-			scriptingService.registerScript(scriptName,
-					new InsertExecutable(scriptName, COLLECTION_NAME, doc, options),
-					false, false).get();
-		});
-	}
+		ObjectNode doc = JsonNodeFactory.instance.objectNode();
+		doc.put("author", "$params.author");
+		doc.put("content", "$params.content");
+		doc.put("words_count", "$params.words_count");
 
-	private void callScriptInsert(String scriptName) {
-		Assertions.assertDoesNotThrow(()->{
-			ObjectNode params = JsonNodeFactory.instance.objectNode();
-			params.put("author","John");
-			params.put("content", "message");
-			params.put("words_count", 10000);
-			JsonNode result = scriptRunner.callScript(scriptName, params,
-					targetDid, appDid, JsonNode.class).get();
-			Assertions.assertNotNull(result);
-			Assertions.assertTrue(result.has(scriptName));
-			Assertions.assertTrue(result.get(scriptName).has("inserted_id"));
-		});
+		ObjectNode options = JsonNodeFactory.instance.objectNode();
+		options.put("bypass_document_validation", false);
+		options.put("ordered", true);
+
+		Assertions.assertDoesNotThrow(() -> scriptingService.registerScript(scriptName,
+				new InsertExecutable(executableName, COLLECTION_NAME, doc, null),
+				false, false).get());
+
+		this.insertDocument(scriptName, executableName, "message1", 10000);
+		this.insertDocument(scriptName, executableName, "message2", 20000);
+		this.insertDocument(scriptName, executableName, "message3", 30000);
+		this.insertDocument(scriptName, executableName, "message4", 40000);
+		this.insertDocument(scriptName, executableName, "message5", 50000);
+		this.insertDocument(scriptName, executableName, "message6", 60000);
+
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
 	}
 
 	@Test @Order(2) void testFindWithoutCondition() {
-		registerScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
-		callScriptFindWithoutCondition(FIND_NO_CONDITION_NAME);
-	}
+		String scriptName = FIND_NAME;
+		String executableName = "database_find";
 
-	private void registerScriptFindWithoutCondition(String scriptName) {
+		ObjectNode filter = JsonNodeFactory.instance.objectNode();
+		filter.put("author","$params.author");
+		ObjectNode wordsCount = JsonNodeFactory.instance.objectNode();
+		wordsCount.put("$gt","$params.start");
+		wordsCount.put("$lt","$params.end");
+		filter.put("words_count", wordsCount);
 		Assertions.assertDoesNotThrow(()->{
-			ObjectNode filter = JsonNodeFactory.instance.objectNode();
-			filter.put("author","$params.author");
-			ObjectNode wordsCount = JsonNodeFactory.instance.objectNode();
-			wordsCount.put("$gt","$params.start");
-			wordsCount.put("$lt","$params.end");
-			filter.put("words_count",wordsCount);
 			scriptingService.registerScript(scriptName,
-					new FindExecutable(scriptName, COLLECTION_NAME, filter).setOutput(true),
+					new FindExecutable(executableName, COLLECTION_NAME, filter),
 					false, false).get();
 		});
+
+		ObjectNode params = JsonNodeFactory.instance.objectNode();
+		params.put("author","John");
+		params.put("start", 5000);
+		params.put("end", 15000);
+		Assertions.assertDoesNotThrow(()->{
+			JsonNode result = scriptRunner.callScript(
+					scriptName, params, targetDid, appDid, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(executableName));
+			Assertions.assertTrue(result.get(executableName).has("total"));
+			Assertions.assertEquals(result.get(executableName).get("total").asInt(), 1);
+			Assertions.assertTrue(result.get(executableName).has("items"));
+			Assertions.assertEquals(result.get(executableName).get("items").size(), 1);
+		});
+
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
 	}
 
-	private void callScriptFindWithoutCondition(String scriptName) {
+	private void testFindInternal(boolean anonymous) {
+		String scriptName = FIND_NAME;
+		String executableName = "database_find";
+		ScriptRunner runner = anonymous ? anonymousRunner : scriptRunner;
+
+		ObjectNode filter = JsonNodeFactory.instance.objectNode();
+		filter.put("author","John");
 		Assertions.assertDoesNotThrow(()->{
-			ObjectNode params = JsonNodeFactory.instance.objectNode();
-			params.put("author","John");
-			params.put("start", 5000);
-			params.put("end", 15000);
-			JsonNode result = scriptRunner.callScript(scriptName, params,
-					targetDid, appDid, JsonNode.class).get();
-			Assertions.assertNotNull(result);
-			Assertions.assertTrue(result.has(scriptName));
-			Assertions.assertTrue(result.get(scriptName).has("total"));
-			Assertions.assertTrue(result.get(scriptName).get("total").asInt() > 0);
-			Assertions.assertTrue(result.get(scriptName).has("items"));
-			Assertions.assertTrue(result.get(scriptName).get("items").size() > 0);
+			scriptingService.registerScript(scriptName,
+					new QueryHasResultCondition("verify_user_permission",COLLECTION_NAME, filter),
+					new FindExecutable(executableName, COLLECTION_NAME, filter),
+					anonymous, anonymous).get();
 		});
+
+		Assertions.assertDoesNotThrow(()->{
+			JsonNode result = runner.callScript(scriptName, null, targetDid, appDid, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(executableName));
+			Assertions.assertTrue(result.get(executableName).has("total"));
+			Assertions.assertTrue(result.get(executableName).get("total").asInt() > 1);
+			Assertions.assertTrue(result.get(executableName).has("items"));
+			Assertions.assertTrue(result.get(executableName).get("items").size() > 1);
+		});
+
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
 	}
 
 	@Test @Order(3) void testFind() {
-		registerScriptFind(FIND_NAME);
-		callScriptFind(FIND_NAME);
+		this.testFindInternal(false);
+		this.testFindInternal(true);
 	}
 
-	private void registerScriptFind(String scriptName) {
+	private void executeUpdate(String scriptName, String executableName, int words_count) {
+		ObjectNode params = JsonNodeFactory.instance.objectNode();
+		params.put("content", "message5");
+		params.put("words_count", words_count);
 		Assertions.assertDoesNotThrow(()->{
-			ObjectNode filter = JsonNodeFactory.instance.objectNode();
-			filter.put("author","John");
-			scriptingService.registerScript(scriptName,
-					new QueryHasResultCondition("verify_user_permission",COLLECTION_NAME, filter),
-					new FindExecutable(scriptName, COLLECTION_NAME, filter).setOutput(true),
-					false, false).get();
-		});
-	}
-
-	private void callScriptFind(String scriptName) {
-		Assertions.assertDoesNotThrow(()->{
-			Assertions.assertNotNull(
-				scriptRunner.callScript(scriptName, null, targetDid, appDid, String.class).get());
+			JsonNode result = scriptRunner.callScript(scriptName, params, targetDid, appDid, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(executableName));
+			Assertions.assertTrue(result.get(executableName).has("upserted_id"));
+			Assertions.assertNotNull(result.get(executableName).get("upserted_id"));
 		});
 	}
 
 	@Test @Order(4) void testUpdate() {
-		registerScriptUpdate(UPDATE_NAME);
-		callScriptUpdate(UPDATE_NAME);
-	}
+		String scriptName = UPDATE_NAME;
+		String executableName = "database_update";
 
-	private void registerScriptUpdate(String scriptName) {
+		ObjectNode filter = JsonNodeFactory.instance.objectNode();
+		filter.put("content", "$params.content");
+		ObjectNode set = JsonNodeFactory.instance.objectNode();
+		set.put("words_count", "$params.words_count");
+		ObjectNode update = JsonNodeFactory.instance.objectNode();
+		update.put("$set", set);
+		ObjectNode options = JsonNodeFactory.instance.objectNode();
+		options.put("bypass_document_validation", false);
+		options.put("upsert", false);
 		Assertions.assertDoesNotThrow(() -> {
-			ObjectNode filter = JsonNodeFactory.instance.objectNode();
-			filter.put("author", "$params.author");
-			ObjectNode set = JsonNodeFactory.instance.objectNode();
-			set.put("author", "$params.author");
-			set.put("content", "$params.content");
-			ObjectNode update = JsonNodeFactory.instance.objectNode();
-			update.put("$set", set);
-			ObjectNode options = JsonNodeFactory.instance.objectNode();
-			options.put("bypass_document_validation", false);
-			options.put("upsert", true);
 			scriptingService.registerScript(scriptName,
-					new UpdateExecutable(scriptName, COLLECTION_NAME, filter, update, options),
+					new UpdateExecutable(executableName, COLLECTION_NAME, filter, update, options),
 					false, false).get();
 		});
-	}
 
-	private void callScriptUpdate(String scriptName) {
-		Assertions.assertDoesNotThrow(()->{
-			ObjectNode params = JsonNodeFactory.instance.objectNode();
-			params.put("author", "John");
-			params.put("content", "message");
-			JsonNode result = scriptRunner.callScript(scriptName, params, targetDid, appDid, JsonNode.class).get();
-			Assertions.assertNotNull(result);
-			Assertions.assertTrue(result.has(scriptName));
-			Assertions.assertTrue(result.get(scriptName).has("upserted_id"));
-		});
+		this.executeUpdate(scriptName, executableName, 60000);
+		this.executeUpdate(scriptName, executableName, 50000);
+
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
 	}
 
 	@Test @Order(5) void testDelete() {
-		registerScriptDelete(DELETE_NAME);
-		callScriptDelete(DELETE_NAME);
-	}
+		String scriptName = DELETE_NAME;
+		String executableName = "database_delete";
 
-	private void registerScriptDelete(String scriptName) {
+		ObjectNode filter = JsonNodeFactory.instance.objectNode();
+		filter.put("author", "$params.author");
+		filter.put("content", "$params.content");
 		Assertions.assertDoesNotThrow(() -> {
-			ObjectNode filter = JsonNodeFactory.instance.objectNode();
-			filter.put("author", "$params.author");
 			scriptingService.registerScript(scriptName,
-					new DeleteExecutable(scriptName, COLLECTION_NAME, filter),
+					new DeleteExecutable(executableName, COLLECTION_NAME, filter),
 					false, false).get();
 		});
-	}
 
-	private void callScriptDelete(String scriptName) {
+		ObjectNode params = JsonNodeFactory.instance.objectNode();
+		params.put("author", "John");
+		params.put("content", "message5");
 		Assertions.assertDoesNotThrow(()->{
-			ObjectNode params = JsonNodeFactory.instance.objectNode();
-			params.put("author", "John");
 			JsonNode result = scriptRunner.callScript(scriptName, params, targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
-			Assertions.assertTrue(result.has(scriptName));
-			Assertions.assertTrue(result.get(scriptName).has("deleted_count"));
+			Assertions.assertTrue(result.has(executableName));
+			Assertions.assertTrue(result.get(executableName).has("deleted_count"));
+			Assertions.assertEquals(result.get(executableName).get("deleted_count").asInt(), 1);
 		});
+
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
 	}
 
 	@Test @Order(6) void testUploadFile() {
-		registerScriptFileUpload(UPLOAD_FILE_NAME);
-		String transactionId = callScriptFileUpload(UPLOAD_FILE_NAME, fileName);
-		uploadFileByTransActionId(transactionId);
-		FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
-	}
+		String scriptName = UPLOAD_FILE;
+		String executableName = "file_upload";
 
-	private void registerScriptFileUpload(String scriptName) {
 		Assertions.assertDoesNotThrow(() ->
 				scriptingService.registerScript(scriptName,
-						new FileUploadExecutable(scriptName).setOutput(true),
+						new FileUploadExecutable(executableName),
 						false, false).get());
-	}
 
-	private String callScriptFileUpload(String scriptName, String fileName) {
-		try {
+		Assertions.assertDoesNotThrow(() -> {
 			JsonNode result = scriptRunner.callScript(scriptName,
 					Executable.createRunFileParams(fileName),
 					targetDid, appDid, JsonNode.class).get();
 			Assertions.assertNotNull(result);
-			Assertions.assertTrue(result.has(scriptName));
-			Assertions.assertTrue(result.get(scriptName).has("transaction_id"));
-			return result.get(scriptName).get("transaction_id").textValue();
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-			return null;
-		}
+			Assertions.assertTrue(result.has(executableName));
+			Assertions.assertTrue(result.get(executableName).has("transaction_id"));
+			Assertions.assertNotNull(result.get(executableName).get("transaction_id"));
+			String transactionId = result.get(executableName).get("transaction_id").textValue();
+
+			// really upload file
+			try (Writer writer = scriptRunner.uploadFile(transactionId, Writer.class).get();
+				 FileReader fileReader = new FileReader(localSrcFilePath)) {
+				Assertions.assertNotNull(writer);
+				char[] buffer = new char[1];
+				while (fileReader.read(buffer) != -1) {
+					writer.write(buffer);
+				}
+				writer.flush();
+			} catch (Exception e) {
+				Assertions.fail(Throwables.getStackTraceAsString(e));
+			}
+		});
+
+		FilesServiceTest.verifyRemoteFileExists(filesService, fileName);
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
 	}
 
-	private void uploadFileByTransActionId(String transactionId) {
-		try (Writer writer = scriptRunner.uploadFile(transactionId, Writer.class).get();
-			 FileReader fileReader = new FileReader(localSrcFilePath)) {
-			Assertions.assertNotNull(writer);
-			char[] buffer = new char[1];
-			while (fileReader.read(buffer) != -1) {
-				writer.write(buffer);
+	private void testDownloadFile(boolean anonymous) {
+		String scriptName = DOWNLOAD_FILE;
+		String executableName = "file_download";
+
+		Assertions.assertDoesNotThrow(() ->
+				scriptingService.registerScript(scriptName,
+						new FileDownloadExecutable(executableName).setOutput(true),
+						anonymous, anonymous).get());
+
+		Assertions.assertDoesNotThrow(() -> {
+			JsonNode result = scriptRunner.callScript(scriptName,
+					Executable.createRunFileParams(fileName),
+					targetDid, appDid, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(executableName));
+			Assertions.assertTrue(result.get(executableName).has("transaction_id"));
+			String transactionId = result.get(executableName).get("transaction_id").textValue();
+
+			// download by transaction id
+			try (Reader reader = scriptRunner.downloadFile(transactionId, Reader.class).get()) {
+				Assertions.assertNotNull(reader);
+				Utils.cacheTextFile(reader, localDstFileRoot, fileName);
+			} catch (Exception e) {
+				Assertions.fail(Throwables.getStackTraceAsString(e));
 			}
-			writer.flush();
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
+
+		});
+
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
+		Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
 	}
 
 	@Test @Order(7) void testFileDownload() {
-		FilesServiceTest.removeLocalFile(localDstFilePath);
-		registerScriptFileDownload(DOWNLOAD_FILE_NAME);
-		String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
-		downloadFileByTransActionId(transactionId);
-		Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
+        FilesServiceTest.removeLocalFile(localDstFilePath);
+
+		testDownloadFile(false);
+		testDownloadFile(true);
 	}
 
-	@Test @Order(7) void testFileDownloadAnonymous() {
-		FilesServiceTest.removeLocalFile(localDstFilePath);
-		registerScriptFileDownload(DOWNLOAD_FILE_NAME, true);
-		String transactionId = callScriptFileDownload(DOWNLOAD_FILE_NAME, fileName);
-		downloadFileByTransActionId(transactionId);
-		Assertions.assertTrue(FilesServiceTest.isFileContentEqual(localSrcFilePath, localDstFilePath));
-	}
+	@Test @Order(8) void testFileProperties() {
+		String scriptName = FILE_PROPERTIES;
+		String executableName = "file_properties";
 
-	private void registerScriptFileDownload(String scriptName) {
-		registerScriptFileDownload(scriptName, false);
-	}
-
-	private void registerScriptFileDownload(String scriptName, boolean anonymous) {
 		Assertions.assertDoesNotThrow(() ->
 				scriptingService.registerScript(scriptName,
-						new FileDownloadExecutable(scriptName).setOutput(true),
-						anonymous, anonymous).get());
+						new FilePropertiesExecutable(executableName).setOutput(true),
+						false, false).get());
+
+		Assertions.assertDoesNotThrow(()->{
+			JsonNode result = scriptRunner.callScript(scriptName,
+					Executable.createRunFileParams(fileName),
+					targetDid, appDid, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(executableName));
+			Assertions.assertTrue(result.get(executableName).has("size"));
+			Assertions.assertTrue(result.get(executableName).get("size").asInt() > 0);
+		});
+
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
+	}
+
+	@Test @Order(9) void testFileHash() {
+		String scriptName = FILE_HASH;
+		String executableName = "file_hash";
+
+		Assertions.assertDoesNotThrow(()->
+				scriptingService.registerScript(scriptName,
+						new FileHashExecutable(executableName).setOutput(true),
+				false, false).get());
+
+		Assertions.assertDoesNotThrow(()->{
+			JsonNode result = scriptRunner.callScript(scriptName,
+					Executable.createRunFileParams(fileName),
+					targetDid, appDid, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(executableName));
+			Assertions.assertTrue(result.get(executableName).has("SHA256"));
+			Assertions.assertNotEquals(result.get(executableName).get("SHA256").asText(""), "");
+		});
+
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
 	}
 
 	private String callScriptFileDownload(String scriptName, String fileName) {
@@ -323,17 +411,9 @@ class ScriptingServiceTest {
 		}
 	}
 
-	public void downloadPublicBinFileAndVerify(String scriptName, String cacheRoot, String cacheFileName, String checkFilePath) {
-		String transId = this.callScriptFileDownload(scriptName, null);
-		try (InputStream in = scriptRunner.downloadFile(transId, InputStream.class).get()) {
-			Assertions.assertNotNull(in);
-			Utils.cacheBinFile(in, cacheRoot, cacheFileName);
-			Assertions.assertTrue(FilesServiceTest.isFileContentEqual(checkFilePath, cacheRoot + cacheFileName));
-		} catch (Exception e) {
-			Assertions.fail(Throwables.getStackTraceAsString(e));
-		}
-	}
-
+	/**
+	 * for files service
+	 */
 	public void downloadPublicTxtFileAndVerify(String scriptName, String cacheRoot, String cacheFileName, String checkFilePath) {
 		String transId = this.callScriptFileDownload(scriptName, null);
 		try (Reader reader = scriptRunner.downloadFile(transId, Reader.class).get()) {
@@ -345,91 +425,24 @@ class ScriptingServiceTest {
 		}
 	}
 
-	private void downloadFileByTransActionId(String transactionId) {
-		try (Reader reader = scriptRunner.downloadFile(transactionId, Reader.class).get()) {
-			Assertions.assertNotNull(reader);
-			Utils.cacheTextFile(reader, localDstFileRoot, fileName);
+	/**
+	 * for files service
+	 */
+	public void downloadPublicBinFileAndVerify(String scriptName, String cacheRoot, String cacheFileName, String checkFilePath) {
+		String transId = this.callScriptFileDownload(scriptName, null);
+		try (InputStream in = scriptRunner.downloadFile(transId, InputStream.class).get()) {
+			Assertions.assertNotNull(in);
+			Utils.cacheBinFile(in, cacheRoot, cacheFileName);
+			Assertions.assertTrue(FilesServiceTest.isFileContentEqual(checkFilePath, cacheRoot + cacheFileName));
 		} catch (Exception e) {
 			Assertions.fail(Throwables.getStackTraceAsString(e));
 		}
 	}
 
-	@Test @Order(8) void testFileProperties() {
-		registerScriptFileProperties(FILE_PROPERTIES_NAME);
-		callScriptFileProperties(FILE_PROPERTIES_NAME, fileName);
-	}
-
-	private void registerScriptFileProperties(String scriptName) {
-		Assertions.assertDoesNotThrow(() ->
-				scriptingService.registerScript(scriptName,
-						new FilePropertiesExecutable(scriptName).setOutput(true),
-						false, false).get());
-	}
-
-	private void callScriptFileProperties(String scriptName, String fileName) {
-		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptRunner.callScript(scriptName,
-					Executable.createRunFileParams(fileName),
-					targetDid, appDid, JsonNode.class).get();
-			Assertions.assertNotNull(result);
-			Assertions.assertTrue(result.has(scriptName));
-			Assertions.assertTrue(result.get(scriptName).has("size"));
-			Assertions.assertTrue(result.get(scriptName).get("size").asInt(0) > 0);
-		});
-	}
-
-	@Test @Order(9) void testFileHash() {
-		registerScriptFileHash(FILE_HASH_NAME);
-		callScriptFileHash(FILE_HASH_NAME, fileName);
-	}
-
-	private void registerScriptFileHash(String scriptName) {
-		Assertions.assertDoesNotThrow(()->
-				scriptingService.registerScript(scriptName,
-						new FileHashExecutable(scriptName).setOutput(true),
-				false, false).get());
-	}
-
-	private void callScriptFileHash(String scriptName, String fileName) {
-		Assertions.assertDoesNotThrow(()->{
-			JsonNode result = scriptRunner.callScript(scriptName,
-					Executable.createRunFileParams(fileName),
-					targetDid, appDid, JsonNode.class).get();
-			Assertions.assertNotNull(result);
-			Assertions.assertTrue(result.has(scriptName));
-			Assertions.assertTrue(result.get(scriptName).has("SHA256"));
-			Assertions.assertNotEquals(result.get(scriptName).get("SHA256").asText(""), "");
-		});
-	}
-
-	@Test @Order(10) void testUnregister() {
-		this.unregisterScript(FILE_HASH_NAME);
-		remove_test_database();
-	}
-
+	/**
+	 * for files service
+	 */
 	public void unregisterScript(String scriptName) {
 		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
-	}
-
-	/**
-	 * If exists, also return OK(_status).
-	 */
-	private static void create_test_database() {
-		try {
-			databaseService.createCollection(COLLECTION_NAME).get();
-		} catch (Exception e) {
-			log.error("Failed to create collection: {}", e.getMessage());
-		}
-	}
-
-	/**
-	 * If not exists, also return OK(_status).
-	 */
-	private static void remove_test_database() {
-		try {
-			databaseService.deleteCollection(COLLECTION_NAME).get();
-		} catch (Exception e) {
-			log.error("Failed to remove collection: {}", e.getMessage());
-		}
 	}
 }
