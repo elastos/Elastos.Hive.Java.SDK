@@ -143,7 +143,11 @@ public class TestData {
 	}
 
 	public ScriptRunner newScriptRunner() {
-		return new ScriptRunner(context, getVaultProviderAddress());
+		return new ScriptRunner(callerContext, getVaultProviderAddress());
+	}
+
+	public ScriptRunner newAnonymousScriptRunner() {
+		return new ScriptRunner(null, getVaultProviderAddress());
 	}
 
 	public ScriptRunner newCallerScriptRunner() {
