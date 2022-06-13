@@ -27,6 +27,7 @@ class ScriptingServiceTest {
 	private static final Logger log = LoggerFactory.getLogger(ScriptingServiceTest.class);
 
 	private static final String FIND_NAME = "script_database_find";
+	private static final String COUNT_NAME = "script_database_count";
 	private static final String INSERT_NAME = "script_database_insert";
 	private static final String UPDATE_NAME = "script_database_update";
 	private static final String DELETE_NAME = "script_database_delete";
@@ -140,6 +141,36 @@ class ScriptingServiceTest {
 		this.insertDocument(scriptName, executableName, "message6", 60000);
 
 		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
+	}
+
+	private void testCountInternal(boolean anonymous) {
+		String scriptName = COUNT_NAME;
+		String executableName = "database_count";
+		ScriptRunner runner = anonymous ? anonymousRunner : scriptRunner;
+
+		ObjectNode filter = JsonNodeFactory.instance.objectNode();
+		filter.put("author","John");
+		Assertions.assertDoesNotThrow(()->{
+			scriptingService.registerScript(scriptName,
+					new QueryHasResultCondition("verify_user_permission",COLLECTION_NAME, filter),
+					new CountExecutable(executableName, COLLECTION_NAME, filter),
+					anonymous, anonymous).get();
+		});
+
+		Assertions.assertDoesNotThrow(()->{
+			JsonNode result = runner.callScript(scriptName, null, targetDid, appDid, JsonNode.class).get();
+			Assertions.assertNotNull(result);
+			Assertions.assertTrue(result.has(executableName));
+			Assertions.assertTrue(result.get(executableName).has("count"));
+			Assertions.assertEquals(result.get(executableName).get("count").asInt(), 6);
+		});
+
+		Assertions.assertDoesNotThrow(()->{ scriptingService.unregisterScript(scriptName).get(); });
+	}
+
+	@Test @Order(2) void testCount() {
+		this.testCountInternal(false);
+		this.testCountInternal(true);
 	}
 
 	@Test @Order(2) void testFindWithoutCondition() {
