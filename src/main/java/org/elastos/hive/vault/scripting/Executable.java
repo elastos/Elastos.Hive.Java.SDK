@@ -12,6 +12,7 @@ public abstract class Executable extends Condition {
 	protected enum Type {
 		AGGREGATED("aggregated"), // TODO:
 		FIND("find"),
+		COUNT("count"),
 		INSERT("insert"),
 		UPDATE("update"),
 		DELETE("delete"),
