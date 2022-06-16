@@ -6,6 +6,13 @@ import com.google.gson.annotations.SerializedName;
  * The order is used for payment module and represents and order to upgrade the service of the vault or the backup.
  */
 public class Order {
+	enum State {
+		NORMAL,
+		EXPIRED,
+		PAID,
+		ARCHIVE,
+	}
+
 	// Only for getOrders()
 	@SerializedName("order_id")
 	private Integer orderId;
@@ -22,6 +29,7 @@ public class Order {
 	private Integer expirationTime;
 	@SerializedName("receiving_address")
 	private String receivingAddress;
+	private String state;
 	private String proof;
 
 	public Integer getOrderId() {
@@ -86,6 +94,25 @@ public class Order {
 
 	public void setReceivingAddress(String receivingAddress) {
 		this.receivingAddress = receivingAddress;
+	}
+
+	public State getState() {
+		switch (state) {
+			case "normal":
+				return State.NORMAL;
+			case "expired":
+				return State.EXPIRED;
+			case "paid":
+				return State.PAID;
+			case "archive":
+				return State.ARCHIVE;
+			default:
+				throw new RuntimeException("Unknown state :" + state);
+		}
+	}
+
+	public void setState(String state) {
+		this.state = state;
 	}
 
 	public String getProof() {
