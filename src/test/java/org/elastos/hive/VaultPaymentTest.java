@@ -51,6 +51,7 @@ class VaultPaymentTest {
 			Assertions.assertTrue(order.getCreateTime() > 0);
 			Assertions.assertTrue(order.getExpirationTime() > 0);
 			Assertions.assertNotNull(order.getReceivingAddress());
+			Assertions.assertNotNull(order.getState());
 			Assertions.assertNotNull(order.getProof());
 		});
 	}
@@ -69,6 +70,7 @@ class VaultPaymentTest {
 			Assertions.assertTrue(order.getCreateTime() > 0);
 			Assertions.assertTrue(order.getExpirationTime() > 0);
 			Assertions.assertNotNull(order.getReceivingAddress());
+			Assertions.assertNotNull(order.getState());
 			Assertions.assertNotNull(order.getProof());
 		});
 	}
@@ -127,6 +129,7 @@ class VaultPaymentTest {
 			Assertions.assertTrue(order.getCreateTime() > 0);
 			Assertions.assertTrue(order.getExpirationTime() > 0);
 			Assertions.assertNotNull(order.getReceivingAddress());
+			Assertions.assertNotNull(order.getState());
 			Assertions.assertNotNull(order.getProof());
 		});
 	}
@@ -145,6 +148,7 @@ class VaultPaymentTest {
 			Assertions.assertTrue(order.getCreateTime() > 0);
 			Assertions.assertTrue(order.getExpirationTime() > 0);
 			Assertions.assertNotNull(order.getReceivingAddress());
+			Assertions.assertNotNull(order.getState());
 			Assertions.assertNotNull(order.getProof());
 		});
 	}
@@ -165,6 +169,7 @@ class VaultPaymentTest {
 			Assertions.assertTrue(order.getCreateTime() > 0);
 			Assertions.assertTrue(order.getExpirationTime() > 0);
 			Assertions.assertNotNull(order.getReceivingAddress());
+			Assertions.assertNotNull(order.getState());
 			Assertions.assertNotNull(order.getProof());
 		});
 	}
