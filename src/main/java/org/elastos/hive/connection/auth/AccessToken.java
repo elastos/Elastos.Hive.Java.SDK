@@ -1,5 +1,6 @@
 package org.elastos.hive.connection.auth;
 
+import org.elastos.did.jwt.*;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.DataStorage;
@@ -35,12 +36,11 @@ public class AccessToken implements CodeFetcher {
 	 */
 	public String getCanonicalizedAccessToken() {
 		try {
-			jwtCode = fetch();
+			String token = fetch();
+			return "token " + token;
 		} catch (Exception e) {
-			// TODO:
-			return null;
+			throw new RuntimeException(e);
 		}
-		return "token " + jwtCode;
 	}
 
 	@Override
@@ -51,7 +51,6 @@ public class AccessToken implements CodeFetcher {
 		jwtCode = restoreToken();
 		if (jwtCode == null) {
 			jwtCode = remoteFetcher.fetch();
-
 			if (jwtCode != null) {
 				bridge.flush(jwtCode);
 				saveToken(jwtCode);
@@ -72,26 +71,15 @@ public class AccessToken implements CodeFetcher {
 		if (endpoint == null)
 			return null;
 
-		String jwtCode = null;
-		String serviceDid;
-		String address;
+		String serviceDid = endpoint.getServiceInstanceDid();
+		String address = endpoint.getProviderAddress();
 
-		serviceDid = endpoint.getServiceInstanceDid();
-		address	= endpoint.getProviderAddress();
-
-		if (serviceDid != null)
+		String jwtCode = storage.loadAccessTokenByAddress(address);
+		if (jwtCode == null && serviceDid != null) {
 			jwtCode = storage.loadAccessToken(serviceDid);
-
-		if (jwtCode != null && isExpired(jwtCode)) {
-			storage.clearAccessTokenByAddress(address);
-			storage.clearAccessToken(serviceDid);
 		}
 
-		if (jwtCode == null)
-			jwtCode = storage.loadAccessTokenByAddress(address);
-
-
-		if (jwtCode != null && isExpired(jwtCode)) {
+		if (jwtCode != null && this.isExpired(jwtCode)) {
 			storage.clearAccessTokenByAddress(address);
 			storage.clearAccessToken(serviceDid);
 		}
@@ -100,8 +88,12 @@ public class AccessToken implements CodeFetcher {
 	}
 
 	private boolean isExpired(String jwtCode) {
-		// return System.currentTimeMillis() >= (getExpiresTime() * 1000);
-		return false;
+		try {
+			Claims claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(jwtCode).getBody();
+			return System.currentTimeMillis() > (claims.getExpiration().getTime());
+		} catch (Exception e) {
+			return true;
+		}
 	}
 
 	private void saveToken(String jwtCode) {
