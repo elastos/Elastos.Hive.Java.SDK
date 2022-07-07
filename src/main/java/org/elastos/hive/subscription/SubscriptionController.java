@@ -136,6 +136,50 @@ public class SubscriptionController {
 	}
 
 	/**
+	 * Activate vault
+	 *
+	 * @throws HiveException The error comes from the hive node.
+	 */
+	public void activateVault() throws HiveException {
+		try {
+			subscriptionAPI.activateVault().execute();
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
+		} catch (IOException e) {
+			throw new NetworkException(e);
+		}
+	}
+
+	/**
+	 * Deactivate vault
+	 *
+	 * @throws HiveException The error comes from the hive node.
+	 */
+	public void deactivateVault() throws HiveException {
+		try {
+			subscriptionAPI.deactivateVault().execute();
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
+		} catch (IOException e) {
+			throw new NetworkException(e);
+		}
+	}
+
+	/**
 	 * Unsubscribe the vault.
 	 *
 	 * @throws HiveException The error comes from the hive node.

@@ -46,6 +46,24 @@ public interface SubscriptionService<T> {
 	CompletableFuture<T> subscribe();
 
 	/**
+	 * Activate the vault service.
+	 *
+	 * @return
+	 * 		None would be returned on success, otherwise, the specific exception
+	 *	  would be returned.
+	 */
+	CompletableFuture<Void> activate();
+
+	/**
+	 * Deactivate the vault service.
+	 *
+	 * @return
+	 * 		None would be returned on success, otherwise, the specific exception
+	 *	  would be returned.
+	 */
+	CompletableFuture<Void> deactivate();
+
+	/**
 	 * Let user to unsubscribe to an existing but useless vault or backup service.
 	 *
 	 * @return
