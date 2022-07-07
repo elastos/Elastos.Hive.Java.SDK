@@ -2,10 +2,13 @@ package org.elastos.hive;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 
+import com.google.gson.Gson;
 import org.elastos.did.jwt.Claims;
 import org.elastos.did.jwt.JwtParserBuilder;
 import org.elastos.hive.connection.NodeRPCConnection;
@@ -69,11 +72,12 @@ public class ServiceEndpoint extends NodeRPCConnection {
 				public void flush(String value) {
 					try {
 						ServiceEndpoint endpoint = weakref.get();
-						Claims claims;
 
-						claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(value).getBody();
-						endpoint.flushDids(claims.getAudience(), claims.getIssuer());
+						Claims claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(value).getBody();
 
+						@SuppressWarnings("unchecked")
+						Map<String, String> props = new Gson().fromJson(claims.getAsJson("props"), HashMap.class);
+						endpoint.flushDids(claims.getAudience(), props.get("appDid"), claims.getIssuer());
 					} catch (Exception e) {
 						e.printStackTrace();
 						return;
@@ -171,8 +175,9 @@ public class ServiceEndpoint extends NodeRPCConnection {
 		return serviceInstanceDid;
 	}
 
-	private void flushDids(String appInstanceDId, String serviceInstanceDid) {
+	private void flushDids(String appInstanceDId, String appDid, String serviceInstanceDid) {
 		this.appInstanceDid = appInstanceDId;
+		this.appDid = appDid;
 		this.serviceInstanceDid = serviceInstanceDid;
 	}
 
