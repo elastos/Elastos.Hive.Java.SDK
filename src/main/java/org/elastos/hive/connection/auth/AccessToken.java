@@ -4,6 +4,7 @@ import org.elastos.did.jwt.*;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.DataStorage;
+import org.elastos.hive.connection.SHA256;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,10 +16,12 @@ import org.slf4j.LoggerFactory;
 public class AccessToken implements CodeFetcher {
 	private static final Logger log = LoggerFactory.getLogger(AccessToken.class);
 
+	private ServiceEndpoint endpoint;
 	private String jwtCode;
 	private CodeFetcher remoteFetcher;
 	private DataStorage storage;
 	private BridgeHandler bridge;
+	private String storageKey;
 
 	/**
 	 * Create the access token by service end point, data storage, and bridge handler.
@@ -28,9 +31,11 @@ public class AccessToken implements CodeFetcher {
 	 * @param bridge The bridge handle is used for caller to do sth when getting the access token.
 	 */
 	public AccessToken(ServiceEndpoint endpoint, DataStorage storage, BridgeHandler bridge) {
-		remoteFetcher = new RemoteFetcher(endpoint);
+		this.endpoint = endpoint;
+		this.remoteFetcher = new RemoteFetcher(endpoint);
 		this.storage = storage;
 		this.bridge = bridge;
+		this.storageKey = null;
 	}
 
 	/**
@@ -47,10 +52,26 @@ public class AccessToken implements CodeFetcher {
 		}
 	}
 
+	private String getStorageKey() {
+		if (this.storageKey == null) {
+			String userDid = this.endpoint.getUserDid();
+			String appDid = this.endpoint.getAppDid();
+			String nodeDid = this.endpoint.getServiceInstanceDid();
+			this.storageKey = SHA256.generate(userDid + ";" + appDid + ";" + nodeDid);
+		}
+		return this.storageKey;
+	}
+
 	@Override
 	public String fetch() throws NodeRPCException {
 		if (jwtCode != null)
 			return jwtCode;
+
+		if (this.endpoint.getAppDid() == null || this.endpoint.getServiceInstanceDid() == null) {
+			jwtCode = this.remoteFetcher.fetch();
+			saveToken(jwtCode);
+			return jwtCode;
+		}
 
 		jwtCode = restoreToken();
 		if (jwtCode == null) {
@@ -72,21 +93,11 @@ public class AccessToken implements CodeFetcher {
 	}
 
 	private String restoreToken() {
-		ServiceEndpoint endpoint = (ServiceEndpoint)bridge.target();
-		if (endpoint == null)
-			return null;
-
-		String serviceDid = endpoint.getServiceInstanceDid();
-		String address = endpoint.getProviderAddress();
-
-		String jwtCode = storage.loadAccessTokenByAddress(address);
-		if (jwtCode == null && serviceDid != null) {
-			jwtCode = storage.loadAccessToken(serviceDid);
-		}
+		String key = this.getStorageKey();
+		jwtCode = storage.loadAccessToken(key);
 
 		if (jwtCode != null && this.isExpired(jwtCode)) {
-			storage.clearAccessTokenByAddress(address);
-			storage.clearAccessToken(serviceDid);
+			storage.clearAccessToken(key);
 		}
 
 		return jwtCode;
@@ -102,20 +113,12 @@ public class AccessToken implements CodeFetcher {
 	}
 
 	private void saveToken(String jwtCode) {
-		ServiceEndpoint endpoint = (ServiceEndpoint)bridge.target();
-		if (endpoint == null)
-			return;
-
-		storage.storeAccessToken(endpoint.getServiceInstanceDid(), jwtCode);
-		storage.storeAccessTokenByAddress(endpoint.getProviderAddress(), jwtCode);
+		String key = this.getStorageKey();
+		storage.storeAccessToken(key, jwtCode);
 	}
 
 	private void clearToken() {
-		ServiceEndpoint endpoint = (ServiceEndpoint)bridge.target();
-		if (endpoint == null)
-			return;
-
-		storage.clearAccessToken(endpoint.getServiceInstanceDid());
-		storage.clearAccessTokenByAddress(endpoint.getProviderAddress());
+		String key = this.getStorageKey();
+		storage.clearAccessToken(key);
 	}
 }
