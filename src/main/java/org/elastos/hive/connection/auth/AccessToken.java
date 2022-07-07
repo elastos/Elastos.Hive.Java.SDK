@@ -4,6 +4,8 @@ import org.elastos.did.jwt.*;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.DataStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The access token is made by hive node and represents the user DID and the application DID.
@@ -11,6 +13,8 @@ import org.elastos.hive.DataStorage;
  * <p>Some of the node APIs requires access token when handling request.</p>
  */
 public class AccessToken implements CodeFetcher {
+	private static final Logger log = LoggerFactory.getLogger(AccessToken.class);
+
 	private String jwtCode;
 	private CodeFetcher remoteFetcher;
 	private DataStorage storage;
@@ -56,6 +60,7 @@ public class AccessToken implements CodeFetcher {
 				saveToken(jwtCode);
 			}
 		} else {
+			log.debug("Got token from local cache: " + jwtCode);
 			bridge.flush(jwtCode);
 		}
 		return jwtCode;
