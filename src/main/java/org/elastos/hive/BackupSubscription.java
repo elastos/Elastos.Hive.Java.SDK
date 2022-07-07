@@ -88,6 +88,16 @@ public class BackupSubscription extends ServiceEndpoint
 	}
 
 	@Override
+	public CompletableFuture<Void> activate() {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public CompletableFuture<Void> deactivate() {
+		throw new NotImplementedException();
+	}
+
+	@Override
 	public CompletableFuture<Void> unsubscribe() {
 		return CompletableFuture.runAsync(()-> {
 			try {

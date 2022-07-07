@@ -52,7 +52,17 @@ class VaultSubscriptionTest {
 	}
 
 	@Disabled
-	@Test @Order(5) void testGetAppStats() {
+	@Test @Order(5) void testActivate() {
+		Assertions.assertDoesNotThrow(()->subscription.activate().get());
+	}
+
+	@Disabled
+	@Test @Order(6) void testDeactivate() {
+		Assertions.assertDoesNotThrow(()->subscription.deactivate().get());
+	}
+
+	@Disabled
+	@Test @Order(7) void testGetAppStats() {
 		Assertions.assertDoesNotThrow(()-> {
 			List<AppInfo> infos = subscription.getAppStats().get();
 			Assertions.assertNotNull(infos);
@@ -67,12 +77,12 @@ class VaultSubscriptionTest {
 	}
 
 	@Disabled
-	@Test @Order(6) void testUnsubscribe() {
+	@Test @Order(8) void testUnsubscribe() {
 		Assertions.assertDoesNotThrow(()->subscription.unsubscribe().get());
 	}
 
 	@Disabled
-	@Test @Order(7) void testGetFileHashProcess() {
+	@Test @Order(9) void testGetFileHashProcess() {
 		//prepare for access vault service
 		Assertions.assertDoesNotThrow(() -> {
 			subscription.subscribe().get();
