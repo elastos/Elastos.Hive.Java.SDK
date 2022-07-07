@@ -36,10 +36,12 @@ public class AppContext {
 
 	private AppContextProvider contextProvider;
 	private String userDid;
+	private boolean forceResolve;
 
 	private AppContext(AppContextProvider provider, String userDid) {
 		this.userDid = userDid;
 		this.contextProvider = provider;
+		this.forceResolve = false;
 	}
 
 	/**
@@ -65,7 +67,7 @@ public class AppContext {
 	 * @return The provider address.
 	 */
 	public CompletableFuture<String> getProviderAddress() {
-		return AppContext.getProviderAddress(this.userDid);
+		return this.getProviderAddress(this.userDid);
 	}
 
 	/**
@@ -110,13 +112,24 @@ public class AppContext {
 	}
 
 	/**
+	 * Set the force resolve flag for app context which will cause always resolve did from chain.
+	 *
+	 * @param force force or not.
+	 * @return app context
+	 */
+	public AppContext setUserDidForceResolveFlag(boolean force) {
+		this.forceResolve = force;
+		return this;
+	}
+
+	/**
 	 * Get the URL address of the provider throw the document of the user DID.
 	 * The will access the property of the document of the user DID.
 	 *
 	 * @param targetDid The user DID.
 	 * @return The URL address of the provider.
 	 */
-	public static CompletableFuture<String> getProviderAddress(String targetDid) {
+	public CompletableFuture<String> getProviderAddress(String targetDid) {
 		return getProviderAddress(targetDid, null);
 	}
 
@@ -128,7 +141,7 @@ public class AppContext {
 	 * @param preferredProviderAddress The preferred URL address of the provider.
 	 * @return The URL address of the provider
 	 */
-	public static CompletableFuture<String> getProviderAddress(String targetDid, String preferredProviderAddress) {
+	private CompletableFuture<String> getProviderAddress(String targetDid, String preferredProviderAddress) {
 		return CompletableFuture.supplyAsync(() -> {
 			if (targetDid == null)
 				throw new IllegalArgumentException("Missing input parameter for target Did");
@@ -142,7 +155,7 @@ public class AppContext {
 				DID did = new DID(targetDid);
 				DIDDocument doc;
 
-				doc = did.resolve();
+				doc = did.resolve(this.forceResolve);
 				if (doc == null)
 					throw new DIDNotPublishedException(
 							String.format("The DID %s has not published onto sideChain", targetDid));
