@@ -6,6 +6,7 @@ import java.util.concurrent.CompletionException;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.exception.NotImplementedException;
+import org.elastos.hive.service.BackupServiceProgress;
 import org.elastos.hive.vault.backup.BackupController;
 import org.elastos.hive.vault.backup.BackupResult;
 import org.elastos.hive.vault.backup.credential.CredentialCode;
@@ -30,14 +31,31 @@ class BackupServiceRender implements BackupService {
 		});
 	}
 
+	private void waitBackupRestoreEnd(BackupServiceProgress callback) {
+		try {
+			BackupResult result = null;
+			do {
+				result = controller.checkResult();
+				if (callback != null) {
+					callback.onProgress(result.getState(), result.getResult(), result.getMessage());
+				}
+				Thread.sleep(1000);
+			} while (result.getResult() == BackupResult.Result.RESULT_PROCESS);
+		} catch (HiveException | RuntimeException | InterruptedException e) {
+			throw new CompletionException(e);
+		}
+	}
+
 	@Override
-	public CompletableFuture<Void> startBackup() {
+	public CompletableFuture<Void> startBackup(BackupServiceProgress callback) {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.startBackup(credentialCode.getToken());
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
+
+			this.waitBackupRestoreEnd(callback);
 		});
 	}
 
@@ -49,13 +67,15 @@ class BackupServiceRender implements BackupService {
 	}
 
 	@Override
-	public CompletableFuture<Void> restoreFrom() {
+	public CompletableFuture<Void> restoreFrom(BackupServiceProgress callback) {
 		return CompletableFuture.runAsync(() -> {
 			try {
 				controller.restoreFrom(credentialCode.getToken());
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
+
+			this.waitBackupRestoreEnd(callback);
 		});
 	}
 

@@ -5,13 +5,13 @@ import com.google.gson.annotations.SerializedName;
 import java.io.IOException;
 
 public class BackupResult {
-	enum State {
+	public enum State {
 		STATE_STOP,
 		STATE_BACKUP,
 		STATE_RESTORE,
 	}
 
-	enum Result {
+	public enum Result {
 		RESULT_SUCCESS,
 		RESULT_FAILED,
 		RESULT_PROCESS,

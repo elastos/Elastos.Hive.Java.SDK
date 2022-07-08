@@ -87,7 +87,7 @@ public class CredentialCode {
 	private String restoreToken() {
 		String key = this.getStorageKey();
 		String cred = storage.loadBackupCredential(key);
-		if (this.isExpired(cred)) {
+		if (cred != null && this.isExpired(cred)) {
 			storage.clearBackupCredential(key);
 		}
 		return cred;

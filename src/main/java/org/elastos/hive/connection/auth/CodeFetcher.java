@@ -9,7 +9,7 @@ public interface CodeFetcher {
 	/**
 	 * Fetch the code.
 	 *
-	 * @return The code.
+	 * @return The code, MUST not be null.
 	 * @throws NodeRPCException The exception shows the error returned by hive node.
 	 */
 	String fetch() throws NodeRPCException;
