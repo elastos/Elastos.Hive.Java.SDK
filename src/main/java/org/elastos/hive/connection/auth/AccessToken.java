@@ -68,23 +68,25 @@ public class AccessToken implements CodeFetcher {
 			return jwtCode;
 
 		if (this.endpoint.getAppDid() == null || this.endpoint.getServiceInstanceDid() == null) {
-			jwtCode = this.remoteFetcher.fetch();
-			saveToken(jwtCode);
+			jwtCode = this.fetchFromRemote();
 			return jwtCode;
 		}
 
 		jwtCode = restoreToken();
-		if (jwtCode == null) {
-			jwtCode = remoteFetcher.fetch();
-			if (jwtCode != null) {
-				bridge.flush(jwtCode);
-				saveToken(jwtCode);
-			}
-		} else {
-			log.debug("Got token from local cache: " + jwtCode);
+		if (jwtCode != null) {
 			bridge.flush(jwtCode);
+			return jwtCode;
 		}
+
+		jwtCode = this.fetchFromRemote();
 		return jwtCode;
+	}
+
+	private String fetchFromRemote() throws NodeRPCException {
+		String token = this.remoteFetcher.fetch();
+		bridge.flush(token);
+		saveToken(token);
+		return token;
 	}
 
 	@Override

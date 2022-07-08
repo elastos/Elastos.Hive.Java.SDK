@@ -75,8 +75,9 @@ public class ServiceEndpoint extends NodeRPCConnection {
 
 						Claims claims = new JwtParserBuilder().setAllowedClockSkewSeconds(300).build().parseClaimsJws(value).getBody();
 
+						String propsStr = claims.get("props").toString();
 						@SuppressWarnings("unchecked")
-						Map<String, String> props = new Gson().fromJson(claims.getAsJson("props"), HashMap.class);
+						Map<String, String> props = new Gson().fromJson(propsStr, HashMap.class);
 						endpoint.flushDids(claims.getAudience(), props.get("appDid"), claims.getIssuer());
 					} catch (Exception e) {
 						e.printStackTrace();

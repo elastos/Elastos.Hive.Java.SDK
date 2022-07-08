@@ -31,7 +31,7 @@ public interface BackupService {
 	 *
 	 * @return Void
 	 */
-	CompletableFuture<Void> startBackup();
+	CompletableFuture<Void> startBackup(BackupServiceProgress callback);
 
 	/**
 	 * As startBackup() shows, this is just for stopping the async process in vault node side.
@@ -46,7 +46,7 @@ public interface BackupService {
 	 *
 	 * @return Void
 	 */
-	CompletableFuture<Void> restoreFrom();
+	CompletableFuture<Void> restoreFrom(BackupServiceProgress callback);
 
 	/**
 	 * Stop the running restore process in background.
