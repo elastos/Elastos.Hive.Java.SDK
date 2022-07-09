@@ -7,6 +7,7 @@ import org.elastos.hive.subscription.payment.Receipt;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class VaultPaymentTest {
@@ -15,15 +16,22 @@ class VaultPaymentTest {
 	private static VaultSubscription vaultSubscription;
 	private static BackupSubscription backupSubscription;
 
-	@BeforeAll public static void setUp() {
-		Assertions.assertDoesNotThrow(()-> vaultSubscription = TestData.getInstance().newVaultSubscription());
+	@BeforeAll public static void setUp() throws InterruptedException, ExecutionException {
+		Assertions.assertDoesNotThrow(()->vaultSubscription = TestData.getInstance().newVaultSubscription());
 		try {
-			vaultSubscription.subscribe();
-		} catch (AlreadyExistsException e) {}
+			vaultSubscription.subscribe().get();
+		} catch (ExecutionException e) {
+			if (e.getCause() instanceof AlreadyExistsException) {}
+			else throw e;
+		}
+
 		Assertions.assertDoesNotThrow(()-> backupSubscription = TestData.getInstance().newBackupSubscription());
 		try {
-			backupSubscription.subscribe();
-		} catch (AlreadyExistsException e) {}
+			backupSubscription.subscribe().get();
+		} catch (ExecutionException e) {
+			if (e.getCause() instanceof AlreadyExistsException) {}
+			else throw e;
+		}
 	}
 
 	@Test @org.junit.jupiter.api.Order(1)

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.elastos.hive.config.TestData;
-import org.elastos.hive.exception.NotFoundException;
+import org.elastos.hive.exception.AlreadyExistsException;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.database.InsertOptions;
 import org.elastos.hive.service.DatabaseService;
@@ -43,7 +43,7 @@ class ScriptingCrossingTest {
 	private static String appDid;
 
 	@BeforeAll
-	public static void setUp() {
+	public static void setUp() throws ExecutionException, InterruptedException {
 		trySubscribeVault();
 		Assertions.assertDoesNotThrow(()->{
 			TestData testData = TestData.getInstance();
@@ -60,11 +60,14 @@ class ScriptingCrossingTest {
 		});
 	}
 
-	private static void trySubscribeVault() {
+	private static void trySubscribeVault() throws InterruptedException, ExecutionException {
 		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
 		try {
-			subscription.subscribe();
-		} catch (NotFoundException e) {}
+			subscription.subscribe().get();
+		} catch (ExecutionException e) {
+			if (e.getCause() instanceof AlreadyExistsException) {}
+			else throw e;
+		}
 	}
 
 	/**

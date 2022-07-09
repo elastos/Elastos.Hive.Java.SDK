@@ -24,16 +24,19 @@ class DatabaseServiceTest {
 	private static VaultSubscription subscription;
 	private static DatabaseService databaseService;
 
-	@BeforeAll public static void setUp() {
+	@BeforeAll public static void setUp() throws ExecutionException, InterruptedException {
 		trySubscribeVault();
 		Assertions.assertDoesNotThrow(()->databaseService = TestData.getInstance().newVault().getDatabaseService());
 	}
 
-	private static void trySubscribeVault() {
+	private static void trySubscribeVault() throws InterruptedException, ExecutionException {
 		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
 		try {
-			subscription.subscribe();
-		} catch (NotFoundException e) {}
+			subscription.subscribe().get();
+		} catch (ExecutionException e) {
+			if (e.getCause() instanceof AlreadyExistsException) {}
+			else throw e;
+		}
 	}
 
 	private void deleteCollectionAnyway() {
