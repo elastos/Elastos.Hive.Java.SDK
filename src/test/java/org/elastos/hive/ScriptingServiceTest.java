@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.concurrent.ExecutionException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ScriptingServiceTest {
@@ -61,7 +62,7 @@ class ScriptingServiceTest {
 		localDstFilePath = localDstFileRoot + fileName;
 	}
 
-	@BeforeAll public static void setUp() throws HiveException, DIDException {
+	@BeforeAll public static void setUp() throws HiveException, DIDException, InterruptedException, ExecutionException {
 		TestData testData = TestData.getInstance();
 		Assertions.assertDoesNotThrow(()->{
 			scriptingService = testData.newVault().getScriptingService();
@@ -74,10 +75,13 @@ class ScriptingServiceTest {
 		});
 
 		// try to subscribe for script owner.
-		Assertions.assertDoesNotThrow(()->subscription = testData.newVaultSubscription());
+		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
 		try {
-			subscription.subscribe();
-		} catch (NotFoundException e) {}
+			subscription.subscribe().get();
+		} catch (ExecutionException e) {
+			if (e.getCause() instanceof AlreadyExistsException) {}
+			else throw e;
+		}
 
 		// try to create a new collection.
 		try {

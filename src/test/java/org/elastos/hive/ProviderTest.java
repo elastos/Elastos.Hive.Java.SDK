@@ -1,6 +1,7 @@
 package org.elastos.hive;
 
 import org.elastos.hive.config.TestData;
+import org.elastos.hive.exception.AlreadyExistsException;
 import org.elastos.hive.exception.NotFoundException;
 import org.elastos.hive.provider.BackupDetail;
 import org.elastos.hive.provider.FilledOrderDetail;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -17,16 +19,19 @@ public class ProviderTest {
     private static VaultSubscription subscription;
 
     @BeforeAll
-    public static void setUp() {
+    public static void setUp() throws ExecutionException, InterruptedException {
         trySubscribeVault();
         Assertions.assertDoesNotThrow(()->provider = TestData.getInstance().newProvider());
     }
 
-    private static void trySubscribeVault() {
+    private static void trySubscribeVault() throws InterruptedException, ExecutionException {
         Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
         try {
-            subscription.subscribe();
-        } catch (NotFoundException e) {}
+            subscription.subscribe().get();
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof AlreadyExistsException) {}
+            else throw e;
+        }
     }
 
     @Test

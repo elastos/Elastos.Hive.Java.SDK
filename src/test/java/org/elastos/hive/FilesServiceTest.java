@@ -3,6 +3,7 @@ package org.elastos.hive;
 import org.elastos.hive.config.TestData;
 import org.elastos.hive.connection.UploadStream;
 import org.elastos.hive.connection.UploadWriter;
+import org.elastos.hive.exception.AlreadyExistsException;
 import org.elastos.hive.exception.NotFoundException;
 import org.elastos.hive.service.FilesService;
 import org.elastos.hive.vault.files.FileInfo;
@@ -56,16 +57,19 @@ class FilesServiceTest {
 		remoteBackupTxtFilePath = remoteRootDir + "/" + FILE_NAME_TXT + "2";
 	}
 
-	@BeforeAll public static void setUp() {
+	@BeforeAll public static void setUp() throws ExecutionException, InterruptedException {
 		trySubscribeVault();
 		Assertions.assertDoesNotThrow(()->filesService = TestData.getInstance().newVault().getFilesService());
 	}
 
-	private static void trySubscribeVault() {
+	private static void trySubscribeVault() throws InterruptedException, ExecutionException {
 		Assertions.assertDoesNotThrow(()->subscription = TestData.getInstance().newVaultSubscription());
 		try {
-			subscription.subscribe();
-		} catch (NotFoundException e) {}
+			subscription.subscribe().get();
+		} catch (ExecutionException e) {
+			if (e.getCause() instanceof AlreadyExistsException) {}
+			else throw e;
+		}
 	}
 
 	@Test @Order(1) void testUploadText() {
@@ -139,7 +143,6 @@ class FilesServiceTest {
 		});
 	}
 
-	@Disabled // TODO:
 	@Test @Order(5) void testList4NotFoundException() {
 		ExecutionException e = Assertions.assertThrows(ExecutionException.class,
 				() -> filesService.list(remoteNotExistsDirPath).get());

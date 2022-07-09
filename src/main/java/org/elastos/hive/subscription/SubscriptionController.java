@@ -25,7 +25,7 @@ public class SubscriptionController {
 	 */
 	public List<PricingPlan> getVaultPricingPlanList() throws HiveException {
 		try {
-			return subscriptionAPI.getPricePlans("vault", "")
+			return subscriptionAPI.getPricePlans("vault", null)
 					.execute()
 					.body()
 					.getPricingPlanCollection();
@@ -209,7 +209,7 @@ public class SubscriptionController {
 	 */
 	public List<PricingPlan> getBackupPricingPlanList() throws HiveException {
 		try {
-			return subscriptionAPI.getPricePlans("backup", "")
+			return subscriptionAPI.getPricePlans("backup", null)
 					.execute()
 					.body()
 					.getBackupPlans();
