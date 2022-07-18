@@ -152,7 +152,7 @@ public class ScriptRunner extends ServiceEndpoint implements ScriptingInvocation
 	public <T> CompletableFuture<T> downloadFileByHiveUrl(String hiveUrl, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return controller.downloadFileByHiveUrl(hiveUrl, resultType);
+				return ScriptingController.downloadFileByHiveUrl(hiveUrl, resultType, this.getAppContext());
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}

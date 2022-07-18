@@ -139,6 +139,7 @@ public class AppContext {
 	 *
 	 * @param targetDid The user DID.
 	 * @param preferredProviderAddress The preferred URL address of the provider.
+	 * @param isForce Whether forcing resolve provider url from chain.
 	 * @return The URL address of the provider
 	 */
 	public static CompletableFuture<String> getProviderAddress(String targetDid, String preferredProviderAddress, boolean isForce) {
