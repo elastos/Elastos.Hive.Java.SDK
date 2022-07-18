@@ -3,7 +3,6 @@ package org.elastos.hive.vault;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.exception.HiveException;
-import org.elastos.hive.exception.NotImplementedException;
 import org.elastos.hive.vault.scripting.Condition;
 import org.elastos.hive.vault.scripting.Executable;
 import org.elastos.hive.service.ScriptingService;
@@ -13,9 +12,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 class ScriptingServiceRender implements ScriptingService {
+	private ServiceEndpoint endpoint;
 	private ScriptingController controller;
 
 	public ScriptingServiceRender(ServiceEndpoint serviceEndpoint) {
+		this.endpoint = serviceEndpoint;
 		this.controller = new ScriptingController(serviceEndpoint, false);
 	}
 
@@ -168,7 +169,7 @@ class ScriptingServiceRender implements ScriptingService {
 	public <T> CompletableFuture<T> downloadFileByHiveUrl(String hiveUrl, Class<T> resultType) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
-				return controller.downloadFileByHiveUrl(hiveUrl, resultType);
+				return ScriptingController.downloadFileByHiveUrl(hiveUrl, resultType, endpoint.getAppContext());
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}

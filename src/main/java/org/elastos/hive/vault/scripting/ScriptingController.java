@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import okhttp3.ResponseBody;
+import org.elastos.hive.AppContext;
+import org.elastos.hive.ScriptRunner;
 import org.elastos.hive.exception.*;
 import retrofit2.Response;
 
@@ -24,6 +26,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.security.InvalidParameterException;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The wrapper class to access the scripting APIs of the hive node.
@@ -280,11 +283,24 @@ public class ScriptingController {
 			return null;
 	}
 
-	public <T> T downloadFileByHiveUrl(String hiveUrl, Class<T> resultType) throws HiveException {
+	public static  <T> T downloadFileByHiveUrl(String hiveUrl, Class<T> resultType, AppContext context) throws HiveException {
 		HiveUrlInfo info = new HiveUrlInfo(hiveUrl);
-		JsonNode result = callScriptUrl(info.getScriptName(), info.getParams(),
+		String targetUrl = null;
+
+		// Get the provider address for targetDid.
+		try {
+			targetUrl = AppContext.getProviderAddress(info.getTargetDid(), null, true).get();
+		} catch (InterruptedException|ExecutionException e) {
+			throw new NetworkException("Failed to resolve targetDid on the hive url.");
+		}
+
+		// Prepare the new scripting service for targetDid with current user's appContext.
+		ScriptRunner runner = new ScriptRunner(context, targetUrl);
+		ScriptingController controller = new ScriptingController(runner, false);
+
+		JsonNode result = controller.callScriptUrl(info.getScriptName(), info.getParams(),
 					info.getTargetDid(), info.getTargetAppDid(), JsonNode.class);
-		return downloadFile(getTransactionIdByJsonNode(result), resultType);
+		return controller.downloadFile(controller.getTransactionIdByJsonNode(result), resultType);
 	}
 
 	private String getTransactionIdByJsonNode(JsonNode jsonNode) {

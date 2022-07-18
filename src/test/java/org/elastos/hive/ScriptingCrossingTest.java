@@ -160,6 +160,7 @@ class ScriptingCrossingTest {
 		databaseService.deleteCollection(COLLECTION_GROUP);
 	}
 
+	@Disabled
 	@Test
 	@Order(2) void testDownloadByHiveUrl() {
 		String hiveUrl = String.format("hive://%s@%s/%s?params=%s",
@@ -171,6 +172,16 @@ class ScriptingCrossingTest {
 					Assertions.assertNotNull(reader);
 					Assertions.assertEquals(HIVE_URL_FILE_CONTENT, getFileContentByReader(reader));
 				}).get());
+	}
+
+	@Disabled
+	@Test
+	@Order(2) void testDownloadByHiveUrlOnMainnet() {
+		// INFO: the hive url of did:elastos:iabbGwqUN18F6YxkndmZCiHpRPFsQF1imT is in hive1, so please test with hive2.
+        String hiveUrl = "hive://did:elastos:iabbGwqUN18F6YxkndmZCiHpRPFsQF1imT@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1627717470347?params={\"empty\": 0}";
+		Assertions.assertDoesNotThrow(() ->
+				scriptRunner.downloadFileByHiveUrl(hiveUrl, Reader.class)
+				.thenAccept(Assertions::assertNotNull).get());
 	}
 
 	private String getFileContentByReader(Reader reader) {

@@ -12,7 +12,7 @@ public class AppContextTest {
     @Order(1) void testGetProviderAddress() {
         Assertions.assertDoesNotThrow(()->{
             DIDBackend.initialize(new DefaultDIDAdapter("https://api.elastos.io/eid"));
-            String providerAddress = TestData.getInstance().getAppContext().getProviderAddress().get();
+            String providerAddress = AppContext.getProviderAddress("did:elastos:ikkFHgoUHrVDTU8HTYDAWH9Z8S377Qvt7n", null, true).get();
             System.out.println("Provider address: " + providerAddress);
             Assertions.assertNotNull(providerAddress);
         });
