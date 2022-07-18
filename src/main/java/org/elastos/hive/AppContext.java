@@ -130,7 +130,7 @@ public class AppContext {
 	 * @return The URL address of the provider.
 	 */
 	public CompletableFuture<String> getProviderAddress(String targetDid) {
-		return getProviderAddress(targetDid, null);
+		return getProviderAddress(targetDid, null, this.forceResolve);
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class AppContext {
 	 * @param preferredProviderAddress The preferred URL address of the provider.
 	 * @return The URL address of the provider
 	 */
-	private CompletableFuture<String> getProviderAddress(String targetDid, String preferredProviderAddress) {
+	public static CompletableFuture<String> getProviderAddress(String targetDid, String preferredProviderAddress, boolean isForce) {
 		return CompletableFuture.supplyAsync(() -> {
 			if (targetDid == null)
 				throw new IllegalArgumentException("Missing input parameter for target Did");
@@ -155,7 +155,7 @@ public class AppContext {
 				DID did = new DID(targetDid);
 				DIDDocument doc;
 
-				doc = did.resolve(this.forceResolve);
+				doc = did.resolve(isForce);
 				if (doc == null)
 					throw new DIDNotPublishedException(
 							String.format("The DID %s has not published onto sideChain", targetDid));
