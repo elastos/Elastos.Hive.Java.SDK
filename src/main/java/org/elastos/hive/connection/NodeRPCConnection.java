@@ -92,7 +92,7 @@ public abstract class NodeRPCConnection {
 
 		urlConnection.setRequestProperty("Transfer-Encoding", "chunked");
 		urlConnection.setRequestProperty("Connection", "Keep-Alive");
-		urlConnection.setRequestProperty("Authorization", getAccessToken().getCanonicalizedAccessToken());
+		urlConnection.setRequestProperty("Authorization", "token " + getAccessToken().fetch());
 
 		urlConnection.setChunkedStreamingMode(0);
 
@@ -179,7 +179,7 @@ public abstract class NodeRPCConnection {
 		public Response intercept(Chain chain) throws IOException {
 			Request request = chain.request()
 						.newBuilder()
-						.addHeader("Authorization", this.accessToken.getCanonicalizedAccessToken())
+						.addHeader("Authorization", "token " + this.accessToken.fetch())
 						.build();
 
 			Response response = chain.proceed(request);

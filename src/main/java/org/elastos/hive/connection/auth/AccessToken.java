@@ -1,6 +1,7 @@
 package org.elastos.hive.connection.auth;
 
 import org.elastos.did.jwt.*;
+import org.elastos.hive.AppContext;
 import org.elastos.hive.ServiceEndpoint;
 import org.elastos.hive.connection.NodeRPCException;
 import org.elastos.hive.DataStorage;
@@ -38,26 +39,12 @@ public class AccessToken implements CodeFetcher {
 		this.storageKey = null;
 	}
 
-	/**
-	 * Get the access token without exception.
-	 *
-	 * @return null if not exists.
-	 */
-	public String getCanonicalizedAccessToken() {
-		try {
-			String token = fetch();
-			return "token " + token;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	private String getStorageKey() {
 		if (this.storageKey == null) {
 			String userDid = this.endpoint.getUserDid();
 			String appDid = this.endpoint.getAppDid();
-			String nodeDid = this.endpoint.getServiceInstanceDid();
-			this.storageKey = SHA256.generate(userDid + ";" + appDid + ";" + nodeDid);
+			String hiveUrl = this.endpoint.getProviderAddress();
+			this.storageKey = SHA256.generate(userDid + ";" + appDid + ";" + hiveUrl);
 		}
 		return this.storageKey;
 	}
@@ -67,19 +54,16 @@ public class AccessToken implements CodeFetcher {
 		if (jwtCode != null)
 			return jwtCode;
 
-		if (this.endpoint.getAppDid() == null || this.endpoint.getServiceInstanceDid() == null) {
+		synchronized (AppContext.class) {
+			jwtCode = restoreToken();
+			if (jwtCode != null) {
+				bridge.flush(jwtCode);
+				return jwtCode;
+			}
+
 			jwtCode = this.fetchFromRemote();
 			return jwtCode;
 		}
-
-		jwtCode = restoreToken();
-		if (jwtCode != null) {
-			bridge.flush(jwtCode);
-			return jwtCode;
-		}
-
-		jwtCode = this.fetchFromRemote();
-		return jwtCode;
 	}
 
 	private String fetchFromRemote() throws NodeRPCException {
