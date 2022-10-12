@@ -108,14 +108,19 @@ public class VaultSubscription extends ServiceEndpoint
 	}
 
 	@Override
-	public CompletableFuture<Void> unsubscribe() {
+	public CompletableFuture<Void> unsubscribe(boolean force) {
 		return CompletableFuture.runAsync(()-> {
 			try {
-				subscriptionController.unsubscribeVault();
+				subscriptionController.unsubscribeVault(force);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}
 		});
+	}
+
+	@Override
+	public CompletableFuture<Void> unsubscribe() {
+		return this.unsubscribe(false);
 	}
 
 	@Override

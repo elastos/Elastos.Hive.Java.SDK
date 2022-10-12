@@ -70,6 +70,7 @@ public interface SubscriptionService<T> {
 	 * 		None would be returned on success, otherwise, the specific exception
 	 *	  would be returned.
 	 */
+	CompletableFuture<Void> unsubscribe(boolean force);
 	CompletableFuture<Void> unsubscribe();
 
 

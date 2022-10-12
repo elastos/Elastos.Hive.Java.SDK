@@ -184,9 +184,9 @@ public class SubscriptionController {
 	 *
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public void unsubscribeVault() throws HiveException {
+	public void unsubscribeVault(boolean force) throws HiveException {
 		try {
-			subscriptionAPI.unsubscribeVault().execute();
+			subscriptionAPI.unsubscribeVault(force).execute();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:
