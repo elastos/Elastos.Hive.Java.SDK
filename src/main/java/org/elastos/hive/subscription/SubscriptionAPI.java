@@ -18,7 +18,7 @@ interface SubscriptionAPI {
 	Call<Void> deactivateVault();
 
 	@DELETE("/api/v2/subscription/vault")
-	Call<Void> unsubscribeVault();
+	Call<Void> unsubscribeVault(@Query("force") boolean force);
 
 	@GET("/api/v2/subscription/vault")
 	Call<VaultInfo> getVaultInfo();
