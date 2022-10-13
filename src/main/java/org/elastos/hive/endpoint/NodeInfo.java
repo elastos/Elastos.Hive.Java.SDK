@@ -26,6 +26,22 @@ public class NodeInfo {
 	private String version;
 	@SerializedName("last_commit_id")
 	private String lastCommitId;
+	@SerializedName("user_count")
+	private int userCount;
+	@SerializedName("vault_count")
+	private int vaultCount;
+	@SerializedName("backup_count")
+	private int backupCount;
+	@SerializedName("latest_access_time")
+	private long latestAccessTime;
+	@SerializedName("memory_used")
+	private long memoryUsed;
+	@SerializedName("memory_total")
+	private long memoryTotal;
+	@SerializedName("storage_used")
+	private long storageUsed;
+	@SerializedName("storage_total")
+	private long storageTotal;
 
 	public String getServiceDid() {
 		return serviceDid;
@@ -94,5 +110,69 @@ public class NodeInfo {
 
 	public void setLastCommitId(String lastCommitId) {
 		this.lastCommitId = lastCommitId;
+	}
+
+	public int getUserCount() {
+		return userCount;
+	}
+
+	public void setUserCount(int userCount) {
+		this.userCount = userCount;
+	}
+
+	public int getVaultCount() {
+		return vaultCount;
+	}
+
+	public void setVaultCount(int vaultCount) {
+		this.vaultCount = vaultCount;
+	}
+
+	public int getBackupCount() {
+		return backupCount;
+	}
+
+	public void setBackupCount(int backupCount) {
+		this.backupCount = backupCount;
+	}
+
+	public long getLatestAccessTime() {
+		return latestAccessTime;
+	}
+
+	public void setLatestAccessTime(long latestAccessTime) {
+		this.latestAccessTime = latestAccessTime;
+	}
+
+	public long getMemoryUsed() {
+		return memoryUsed;
+	}
+
+	public void setMemoryUsed(long memoryUsed) {
+		this.memoryUsed = memoryUsed;
+	}
+
+	public long getMemoryTotal() {
+		return memoryTotal;
+	}
+
+	public void setMemoryTotal(long memoryTotal) {
+		this.memoryTotal = memoryTotal;
+	}
+
+	public long getStorageUsed() {
+		return storageUsed;
+	}
+
+	public void setStorageUsed(long storageUsed) {
+		this.storageUsed = storageUsed;
+	}
+
+	public long getStorageTotal() {
+		return storageTotal;
+	}
+
+	public void setStorageTotal(long storageTotal) {
+		this.storageTotal = storageTotal;
 	}
 }

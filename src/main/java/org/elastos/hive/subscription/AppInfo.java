@@ -15,6 +15,12 @@ public class AppInfo {
     private String appDid;
     @SerializedName("used_storage_size")
     private int usedStorageSize;
+    @SerializedName("access_count")
+    private int accessCount;
+    @SerializedName("access_amount")
+    private long accessAmount;
+    @SerializedName("access_last_time")
+    private long accessLastTime;
 
     public String getName() {
         return name;
@@ -62,5 +68,29 @@ public class AppInfo {
 
     public void setUsedStorageSize(int usedStorageSize) {
         this.usedStorageSize = usedStorageSize;
+    }
+
+    public int getAccessCount() {
+        return accessCount;
+    }
+
+    public void setAccessCount(int accessCount) {
+        this.accessCount = accessCount;
+    }
+
+    public long getAccessAmount() {
+        return accessAmount;
+    }
+
+    public void setAccessAmount(long accessAmount) {
+        this.accessAmount = accessAmount;
+    }
+
+    public long getAccessLastTime() {
+        return accessLastTime;
+    }
+
+    public void setAccessLastTime(long accessLastTime) {
+        this.accessLastTime = accessLastTime;
     }
 }

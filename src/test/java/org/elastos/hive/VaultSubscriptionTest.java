@@ -48,6 +48,10 @@ class VaultSubscriptionTest {
 			Assertions.assertTrue(info.getStorageQuota() > 0);
 			Assertions.assertTrue(info.getCreated() > 0);
 			Assertions.assertTrue(info.getUpdated() > 0);
+			Assertions.assertTrue(info.getAppCount() > 0);
+			Assertions.assertTrue(info.getAccessCount() >= 0);
+			Assertions.assertTrue(info.getAccessAmount() >= 0);
+			Assertions.assertTrue(info.getAccessLastTime() >= -1);
 		});
 	}
 
@@ -73,12 +77,15 @@ class VaultSubscriptionTest {
 			Assertions.assertNotNull(infos.get(0).getUserDid());
 			Assertions.assertNotNull(infos.get(0).getAppDid());
 			Assertions.assertTrue(infos.get(0).getUsedStorageSize() >= 0);
+			Assertions.assertTrue(infos.get(0).getAccessCount() >= 0);
+			Assertions.assertTrue(infos.get(0).getAccessAmount() >= 0);
+			Assertions.assertTrue(infos.get(0).getAccessLastTime() >= -1);
 		});
 	}
 
 	@Disabled
 	@Test @Order(8) void testUnsubscribe() {
-		Assertions.assertDoesNotThrow(()->subscription.unsubscribe().get());
+		Assertions.assertDoesNotThrow(()->subscription.unsubscribe(true).get());
 	}
 
 	@Disabled
@@ -91,7 +98,7 @@ class VaultSubscriptionTest {
 		new FilesServiceTest().testHash();
 		//release for disable vault service accessing
 		Assertions.assertDoesNotThrow(() -> {
-			subscription.unsubscribe().get();
+			subscription.unsubscribe(true).get();
 		});
 	}
 }
