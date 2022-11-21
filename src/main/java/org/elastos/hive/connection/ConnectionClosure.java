@@ -6,10 +6,7 @@ import org.elastos.hive.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.security.InvalidParameterException;
 
@@ -29,7 +26,10 @@ class ConnectionClosure {
 	}
 
 	private JsonNode getResponseBody() throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(this.connection.getInputStream()));
+		InputStream in = this.connection.getErrorStream();
+		if (in == null) return null;
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		StringBuilder result = new StringBuilder();
 		String line = "";
 		while ((line = reader.readLine()) != null) {
@@ -40,12 +40,19 @@ class ConnectionClosure {
 		return new ObjectMapper().readTree(result.toString());
 	}
 
+	/**
+	 * handle error response.
+	 * @return If got an error.
+	 * @throws IOException
+	 */
 	private boolean handleErrorResponse() throws IOException {
 		int errorCode = this.connection.getResponseCode();
-		if (errorCode == 200)
+		if (errorCode >= 200 && errorCode < 300)
 			return false;
 
 		JsonNode result = this.getResponseBody();
+		if (result == null) return true;
+
 		switch (errorCode) {
 			case NodeRPCException.UNAUTHORIZED:
 				this.exception = new UnauthorizedException(result.toString());
@@ -72,7 +79,7 @@ class ConnectionClosure {
 				return;
 
 			JsonNode result = this.getResponseBody();
-			if (result.has("cid"))
+			if (result != null && result.has("cid"))
 				// INFO: ConnectionClosure is also used for uploading file by script.
 				this.cid = result.get("cid").asText();
 		} catch (IOException e) {

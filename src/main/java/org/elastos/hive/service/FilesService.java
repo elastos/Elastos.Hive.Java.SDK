@@ -29,9 +29,9 @@ public interface FilesService {
 	 *			  upload the file content if success; null otherwise
 	 */
 	CompletableFuture<UploadStream> getUploadStream(String path);
-	CompletableFuture<UploadStream> getUploadStream(String path, String scriptName);
+	CompletableFuture<UploadStream> getPublicUploadStream(String path);
 	CompletableFuture<UploadWriter> getUploadWriter(String path);
-	CompletableFuture<UploadWriter> getUploadWriter(String path, String scriptName);
+	CompletableFuture<UploadWriter> getPublicUploadWriter(String path);
 
 	/**
 	 * Initiates a download sequence by returning a Reader or InputStream object that can
