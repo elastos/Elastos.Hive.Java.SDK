@@ -30,6 +30,12 @@ public interface DatabaseService {
 	 */
 	CompletableFuture<Void> deleteCollection(String name);
 
+	/**
+	 * Get all user collections.
+	 *
+	 * @return fail(false) or success(true)
+	 */
+	CompletableFuture<List<Collection>> getCollections();
 
 	/**
 	 * Insert a new document in a given collection.

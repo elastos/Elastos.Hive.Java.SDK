@@ -81,6 +81,31 @@ public class DatabaseController {
 	}
 
 	/**
+	 * Get user's collections.
+	 *
+	 * @return Collection list.
+	 * @throws HiveException The error comes from the hive node.
+	 */
+	public List<Collection> getCollections() throws HiveException {
+		try {
+			return databaseAPI.getCollections().execute().body().getCollections();
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.NOT_FOUND:
+					throw new NotFoundException(e);
+				default:
+					throw new ServerUnknownException(e);
+			}
+		} catch (IOException e) {
+			throw new NetworkException(e);
+		}
+	}
+
+	/**
 	 * Insert one document.
 	 *
 	 * @param collectionName The name of the collection.
@@ -296,7 +321,7 @@ public class DatabaseController {
 			String filterStr = filter == null ? "" : filter.toString();
 			String skip = options != null ? options.getSkipStr() : "";
 			String limit = options != null ? options.getLimitStr() : "";
-			return databaseAPI.find(collectionName, filterStr, skip, limit).execute().body().documents();
+			return databaseAPI.find(collectionName, filterStr, skip, limit).execute().body().getDocuments();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:
@@ -326,7 +351,7 @@ public class DatabaseController {
 	 */
 	public List<JsonNode> query(String collectionName, JsonNode filter, QueryOptions options) throws HiveException {
 		try {
-			return databaseAPI.query(new QueryParams(collectionName, filter, options)).execute().body().documents();
+			return databaseAPI.query(new QueryParams(collectionName, filter, options)).execute().body().getDocuments();
 		} catch (NodeRPCException e) {
 			switch (e.getCode()) {
 				case NodeRPCException.UNAUTHORIZED:

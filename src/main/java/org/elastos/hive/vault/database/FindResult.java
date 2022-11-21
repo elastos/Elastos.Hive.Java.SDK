@@ -10,7 +10,7 @@ class FindResult {
     @SerializedName("items")
     private List<JsonNode> documents;
 
-    public List<JsonNode> documents() {
+    public List<JsonNode> getDocuments() {
     	return documents;
     }
 }

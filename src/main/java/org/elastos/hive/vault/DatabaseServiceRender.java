@@ -41,6 +41,17 @@ class DatabaseServiceRender implements DatabaseService {
 	}
 
 	@Override
+	public CompletableFuture<List<Collection>> getCollections() {
+		return CompletableFuture.supplyAsync(() -> {
+			try {
+				return controller.getCollections();
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	@Override
 	public CompletableFuture<InsertResult> insertOne(String collection, JsonNode doc, InsertOptions options) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
