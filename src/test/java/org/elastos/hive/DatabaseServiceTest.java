@@ -60,6 +60,12 @@ class DatabaseServiceTest {
 		Assertions.assertEquals(e.getCause().getClass(), AlreadyExistsException.class);
 	}
 
+	@Test @Order(2) void testGetCollections() {
+		Assertions.assertDoesNotThrow(()->{
+			databaseService.getCollections().get();
+		});
+	}
+
 	@Test @Order(2) void testInsertOne() {
 		Assertions.assertDoesNotThrow(()->{
 			ObjectNode docNode = JsonNodeFactory.instance.objectNode();

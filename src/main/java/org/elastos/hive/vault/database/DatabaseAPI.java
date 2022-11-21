@@ -10,6 +10,9 @@ interface DatabaseAPI {
 	@DELETE("/api/v2/vault/db/{collection}")
 	Call<Void> deleteCollection(@Path("collection") String collection);
 
+	@GET("/api/v2/vault/db/collections")
+	Call<GetCollectionResult> getCollections();
+
 	@POST("/api/v2/vault/db/collection/{collection}")
 	Call<InsertResult> insert(@Path("collection") String collection,
 							  @Body InsertParams params);
