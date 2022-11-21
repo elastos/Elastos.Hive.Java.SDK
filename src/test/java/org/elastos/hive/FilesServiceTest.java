@@ -29,6 +29,7 @@ class FilesServiceTest {
 
 	private static final String FILE_PUBLIC_NAME_TXT = "ipfs_public_file.txt";
 	private static final String FILE_PUBLIC_NAME_BIN = "ipfs_public_file.png";
+	private static final String PUBLIC_SCRIPT_NAME = "__anonymous_files__";
 
 	private final String localTxtFilePath;
 	private final String localImgFilePath;
@@ -190,13 +191,12 @@ class FilesServiceTest {
 						.get());
 	}
 
-	@Test @Order(10) void testUploadPublicText() {
+	@Test @Order(10) @Disabled void testUploadPublicText() {
 		Assertions.assertDoesNotThrow(() -> {
 			String fileName = FILE_PUBLIC_NAME_TXT;
-			String scriptName = FILE_PUBLIC_NAME_TXT.split("\\.")[0];
 			String cid = null;
 			// Upload public file.
-			try (UploadWriter writer = filesService.getUploadWriter(fileName, scriptName).get();
+			try (UploadWriter writer = filesService.getPublicUploadWriter(fileName).get();
 				 FileReader fileReader = new FileReader(localTxtFilePath)) {
 				Assertions.assertNotNull(writer);
 				char[] buffer = new char[1];
@@ -221,20 +221,18 @@ class FilesServiceTest {
 			// Download by script.
 			ScriptingServiceTest scriptingServiceTest = new ScriptingServiceTest();
 			ScriptingServiceTest.setUp();
-			scriptingServiceTest.downloadPublicTxtFileAndVerify(scriptName, localCacheRootDir, FILE_NAME_TXT, localTxtFilePath);
-			// clean file and script
-			scriptingServiceTest.unregisterScript(scriptName);
+			scriptingServiceTest.downloadPublicTxtFileAndVerify(PUBLIC_SCRIPT_NAME, localCacheRootDir, FILE_NAME_TXT, localTxtFilePath);
+			// clean file
 			filesService.delete(fileName).get();
 		});
 	}
 
-	@Test @Order(10) void testUploadPublicBin() {
+	@Test @Order(10) @Disabled void testUploadPublicBin() {
 		Assertions.assertDoesNotThrow(() -> {
 			String fileName = FILE_PUBLIC_NAME_BIN;
-			String scriptName = FILE_PUBLIC_NAME_BIN.split("\\.")[0];
 			String cid = null;
 			// Upload public file.
-			try (UploadStream out = filesService.getUploadStream(fileName, scriptName).get()) {
+			try (UploadStream out = filesService.getPublicUploadStream(fileName).get()) {
 				Assertions.assertNotNull(out);
 				out.write(Utils.readImage(localImgFilePath));
 				out.flush();
@@ -255,9 +253,10 @@ class FilesServiceTest {
 			// Download by script.
 			ScriptingServiceTest scriptingServiceTest = new ScriptingServiceTest();
 			ScriptingServiceTest.setUp();
-			scriptingServiceTest.downloadPublicBinFileAndVerify(scriptName, localCacheRootDir, FILE_NAME_IMG, localImgFilePath);
-			// clean file and script
-			scriptingServiceTest.unregisterScript(scriptName);
+			scriptingServiceTest.downloadPublicBinFileAndVerify(
+					PUBLIC_SCRIPT_NAME, FILE_PUBLIC_NAME_BIN,
+					localCacheRootDir, FILE_NAME_IMG, localImgFilePath);
+			// clean file
 			filesService.delete(fileName).get();
 		});
 	}

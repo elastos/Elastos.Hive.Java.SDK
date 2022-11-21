@@ -463,8 +463,12 @@ class ScriptingServiceTest {
 	/**
 	 * for files service
 	 */
-	public void downloadPublicBinFileAndVerify(String scriptName, String cacheRoot, String cacheFileName, String checkFilePath) {
-		String transId = this.callScriptFileDownload(scriptName, null);
+	public void downloadPublicBinFileAndVerify(String scriptName,
+											   String remotePath,
+											   String cacheRoot,
+											   String cacheFileName,
+											   String checkFilePath) {
+		String transId = this.callScriptFileDownload(scriptName, remotePath);
 		try (InputStream in = scriptRunner.downloadFile(transId, InputStream.class).get()) {
 			Assertions.assertNotNull(in);
 			Utils.cacheBinFile(in, cacheRoot, cacheFileName);

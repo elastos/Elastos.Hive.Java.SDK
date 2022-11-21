@@ -32,12 +32,13 @@ public class FilesController {
 	 * Get the upload stream for uploading the content of the file.
 	 *
 	 * @param path The uploading file path.
+	 * @param isPublic The uploading file is for public.
 	 * @return The output stream.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public UploadStream getUploadStream(String path, boolean is_public, String scriptName) throws HiveException {
+	public UploadStream getUploadStream(String path, boolean isPublic) throws HiveException {
 		try {
-			String params = is_public ? "?public=true&script_name=" + scriptName : "";
+			String params = isPublic ? "?public=true" : "";
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path + params);
 			return new UploadStream(urlConnection, urlConnection.getOutputStream());
 		} catch (NodeRPCException e) {
@@ -52,12 +53,13 @@ public class FilesController {
 	 * Get the upload writer for uploading the content of the file.
 	 *
 	 * @param path The uploading file path.
+	 * @param isPublic The uploading file is for public.
 	 * @return The writer.
 	 * @throws HiveException The error comes from the hive node.
 	 */
-	public UploadWriter getUploadWriter(String path, boolean is_public, String scriptName) throws HiveException {
+	public UploadWriter getUploadWriter(String path, boolean isPublic) throws HiveException {
 		try {
-			String params = is_public ? "?public=true&script_name=" + scriptName : "";
+			String params = isPublic ? "?public=true" : "";
 			HttpURLConnection urlConnection = connection.openConnection(FilesAPI.API_UPLOAD + path + params);
 			return new UploadWriter(urlConnection, urlConnection.getOutputStream());
 		} catch (NodeRPCException e) {
