@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutionException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class VaultPaymentTest {
-	private static final String PRICING_PLAN_NAME = "Rookie";
+	private static final String PRICING_PLAN_NAME = "Standard";
 
 	private static VaultSubscription vaultSubscription;
 	private static BackupSubscription backupSubscription;

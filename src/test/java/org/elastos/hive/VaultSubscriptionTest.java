@@ -10,7 +10,7 @@ import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class VaultSubscriptionTest {
-	public static final String PRICING_PLAN_NAME = "Rookie";
+	public static final String PRICING_PLAN_NAME = "Standard";
 
 	private static VaultSubscription subscription;
 
