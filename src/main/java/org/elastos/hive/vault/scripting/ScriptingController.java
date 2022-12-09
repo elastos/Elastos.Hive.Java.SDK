@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.security.InvalidParameterException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -76,6 +77,37 @@ public class ScriptingController {
 					throw new VaultForbiddenException(e);
 				case NodeRPCException.BAD_REQUEST:
 					throw new InvalidParameterException(e.getMessage());
+				default:
+					throw new ServerUnknownException(e);
+			}
+		} catch (IOException e) {
+			throw new NetworkException(e);
+		}
+	}
+
+	/**
+	 * Get the registered scripts.
+	 *
+	 * @param name the specific script name
+	 * @param skip skip, default 0
+	 * @param limit limit, default 0
+	 * @return the list of the scripts.
+	 * @throws HiveException The error comes from the hive node.
+	 */
+	public List<ScriptContent> getScripts(String name, int skip, int limit) throws HiveException {
+		try {
+			return scriptingAPI.getScripts(name, skip, limit).execute().body().getScripts();
+
+		} catch (NodeRPCException e) {
+			switch (e.getCode()) {
+				case NodeRPCException.UNAUTHORIZED:
+					throw new UnauthorizedException(e);
+				case NodeRPCException.FORBIDDEN:
+					throw new VaultForbiddenException(e);
+				case NodeRPCException.BAD_REQUEST:
+					throw new InvalidParameterException(e.getMessage());
+				case NodeRPCException.NOT_FOUND:
+					throw new ScriptNotFoundException(e.getMessage());
 				default:
 					throw new ServerUnknownException(e);
 			}

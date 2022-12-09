@@ -2,7 +2,9 @@ package org.elastos.hive.service;
 
 import org.elastos.hive.vault.scripting.Condition;
 import org.elastos.hive.vault.scripting.Executable;
+import org.elastos.hive.vault.scripting.ScriptContent;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -44,6 +46,15 @@ public interface ScriptingService extends ScriptingInvocationService {
 	CompletableFuture<Void> registerScript(String name, Condition condition, Executable executable,
 						boolean allowAnonymousUser, boolean allowAnonymousApp);
 
+	/**
+	 * Get all registered scripts.
+	 *
+	 * @param name the specific script name, default null
+	 * @param skip skip, default 0
+	 * @param limit limit, default 0
+	 * @return the list of scripts
+	 */
+	CompletableFuture<List<ScriptContent>> getScripts(String name, int skip, int limit);
 
 	/**
 	 * Let the vault owner unregister a script when the script become useless to
