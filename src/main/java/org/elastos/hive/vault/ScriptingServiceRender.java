@@ -6,8 +6,10 @@ import org.elastos.hive.exception.HiveException;
 import org.elastos.hive.vault.scripting.Condition;
 import org.elastos.hive.vault.scripting.Executable;
 import org.elastos.hive.service.ScriptingService;
+import org.elastos.hive.vault.scripting.ScriptContent;
 import org.elastos.hive.vault.scripting.ScriptingController;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -55,6 +57,23 @@ class ScriptingServiceRender implements ScriptingService {
 			try {
 				controller.registerScript(name, condition, executable,
 											allowAnonymousUser,	allowAnonymousApp);
+			} catch (HiveException | RuntimeException e) {
+				throw new CompletionException(e);
+			}
+		});
+	}
+
+	@Override
+	public CompletableFuture<List<ScriptContent>> getScripts(String name, int skip, int limit) {
+		return CompletableFuture.supplyAsync(()-> {
+			try {
+				if (skip < 0)
+					throw new IllegalArgumentException("Invalid skip");
+
+				if (limit < 0)
+					throw new IllegalArgumentException("Invalid limit");
+
+				return controller.getScripts(name, skip, limit);
 			} catch (HiveException | RuntimeException e) {
 				throw new CompletionException(e);
 			}

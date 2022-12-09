@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -159,6 +160,11 @@ class ScriptingServiceTest {
 					new QueryHasResultCondition("verify_user_permission",COLLECTION_NAME, filter),
 					new CountExecutable(executableName, COLLECTION_NAME, filter),
 					anonymous, anonymous).get();
+		});
+
+		Assertions.assertDoesNotThrow(()-> {
+			List<ScriptContent> scripts = scriptingService.getScripts(null, 0, 0).get();
+			Assertions.assertFalse(scripts.isEmpty());
 		});
 
 		Assertions.assertDoesNotThrow(()->{

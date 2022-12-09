@@ -11,6 +11,11 @@ interface ScriptingAPI {
 	Call<RegScriptResult> registerScript(@Path("scriptName") String name,
 										 @Body RegScriptParams body);
 
+	@GET("/api/v2/vault/scripting/scripts")
+	Call<GetScriptResult> getScripts(@Query("name") String name,
+									 @Query("skip") Integer skip,
+									 @Query("limit") Integer limit);
+
 	@PATCH("/api/v2/vault/scripting/{scriptName}")
 	Call<ResponseBody> runScript(@Path("scriptName") String scriptName,
 								 @Body RunScriptParams body);
